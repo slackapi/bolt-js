@@ -1,12 +1,28 @@
-const request = require('request')
+const slack = require('slack')
+const conversationStore = require('./lib/conversation_store')
+const Receiver = require('./lib/receiver')
+const Conversation = require('./lib/conversation')
 
-module.exports = function(options) {
-  var opts = options || {};
-  return new SlackApp(opts)
-};
+/**
+ * SlackApp module
+ */
+module.exports = class SlackApp {
 
-class SlackApp {
+  /**
+   * Initialize a SlackApp, accepts an options object
+   *
+   * Options:
+   * - `app_token`   Slack App token
+   * - `app_user_id` Slack App User ID (who installed the app)
+   * - `bot_token`   Slack App Bot token
+   * - `bot_user_id` Slack App Bot ID
+   * - `convo_store` `string` of type of Conversation store (`memory`, etc.) or `object` implementation
+   * - `error`       Error handler function `(error) => {}`
+   * - `client`      `slack` client, defaults to `require('slack')`
+   */
+
   constructor(opts) {
+    opts = opts || {}
     this.middleware = []
     this.matchers = []
     this.registry = {}
@@ -21,22 +37,29 @@ class SlackApp {
     // a converation store
     if (opts.convo_store) {
       if (typeof opts.convo_store === 'string') {
-        this.convoStore = require('./conversation')({ type: opts.convo_store })
+        this.convoStore = conversationStore({ type: opts.convo_store })
       } else {
         this.convoStore = opts.convo_store
       }
     } else {
-      this.convoStore = require('./conversation')()
+      this.convoStore = conversationStore()
     }
 
     this.onError = opts.error || (() => {})
-    this.client = opts.client || require('slack')
+    this.client = opts.client || slack
+    this.receiver = new Receiver(opts)
 
-    this.receiver = require('./receiver')(opts)
+    // call `handle` for each new request
     this.receiver.on('request', this.handle.bind(this))
-
     this.use(this.preprocessConversationMiddleware())
   }
+
+  /**
+   * Middleware that gets an existing conversation from the conversation store
+   * or initialize a new one.
+   *
+   * @api private
+   */
 
   preprocessConversationMiddleware () {
     return (req, next) => {
@@ -55,9 +78,22 @@ class SlackApp {
     }
   }
 
+  /**
+   * Register a new middleware
+   *
+   * Middleware is processed in the order registered.
+   * `fn` : (req, next) => { }
+   */
+
   use(fn) {
     this.middleware.push(fn)
   }
+
+  /**
+   * Handle new events (slack events, commands, actions, webhooks, etc.)
+   *
+   * @api private
+   */
 
   handle(req) {
     var self = this
@@ -102,79 +138,47 @@ class SlackApp {
     next()
   }
 
+  /**
+   * Attach HTTP routes to an Express app
+   *
+   * Routes are:
+   * - POST `/slack-event`
+   * - POST `/slack-command`
+   * - POST `/slack-interactive`
+   */
+
   attachToExpress(app) {
     return this.receiver.attachToExpress(app)
   }
+
+  /**
+   * Register a new function handler, used with Conversations
+   *
+   * Parameters
+   * - `key` string - unique key to refer to function
+   * - `fn`  function - `(req) => {}`
+   */
 
   register(key, fn) {
     this.registry[key] = fn
   }
 
-  // startConvo(req, expSeconds) {
-  //   var convoId = req.convoId
-  //   if (!convoId) throw new Error('Conversation ID is missing, is middleware configured?')
-  //   var convo = new Conversation(this, convoId)
-  //   this.convoStore.set(convoId, '', {}, expSeconds)
-  //   return convo
-  // }
+  /**
+   * Register a new handler function for the criteria
+   */
 
-  hear(criteria, cb) {
+  hear(criteria, fn) {
     if (typeof criteria === 'string') {
       criteria = new RegExp(criteria, 'i')
     }
-    this.matchers.push({ type: 'hear', match: criteria, handler: cb })
+    this.matchers.push({ type: 'hear', match: criteria, handler: fn })
   }
 
-  action(actionName, cb) {
-    this.matchers.push({ type: 'action', name: actionName, handler: cb })
-  }
-}
+  /**
+   * Register a new action handler for an actionName
+   */
 
-class Conversation {
-  constructor(slackapp, convoId, data, nextFn) {
-    this.id = convoId
-    this.slackapp = slackapp
-    // this.expiration = Date.now() + (expSeconds || 60*10) * 1000
-    this.data = data
-    this.nextFn = nextFn
-  }
-
-  next(fnKey, data, exp) {
-    // set what's next for the conversation and set data
-    this.data = data
-    this.slackapp.convoStore.set(this.id, fnKey, data, exp)
-  }
-
-  done() {
-    this.slackapp.convoStore.del(this.id)
-  }
-
-  say(something, cb) {
-    if (!cb) cb = (() => {})
-    if (typeof something === 'string') {
-      something = {
-        text: something
-      }
-    }
-
-    var msg = Object.assign({}, something, {
-      token: this.slackapp.bot_token || this.slackapp.app_token,
-      channel: this.getChannelId(),
-    })
-
-    this.slackapp.client.chat.postMessage(msg, cb.bind(this))
-  }
-
-  updateAction(responseURL, payload, cb) {
-    if (!cb) cb = (() => {})
-    request({
-      uri: responseURL,
-      method: 'POST',
-      json: payload
-    }, cb)
-  }
-
-  getChannelId() {
-    return this.id.split(':')[1]
+  action(actionName, fn) {
+    this.matchers.push({ type: 'action', name: actionName, handler: fn })
   }
 }

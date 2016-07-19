@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "body-parser": "^1.15.2",
-    "request": "^2.73.0"
+    "request": "^2.73.0",
+    "slack": "^7.5.7"
   }
 }
