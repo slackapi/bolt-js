@@ -31,6 +31,7 @@ module.exports = class SlackApp {
     this.app_user_id = opts.app_user_id
     this.bot_token = opts.bot_token
     this.bot_user_id = opts.bot_user_id
+    this.debug = opts.debug
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an impmementation of
@@ -51,6 +52,7 @@ module.exports = class SlackApp {
 
     // call `handle` for each new request
     this.receiver.on('request', this.handle.bind(this))
+    this.use(this.ignoreMeMiddleware())
     this.use(this.preprocessConversationMiddleware())
   }
 
@@ -75,6 +77,23 @@ module.exports = class SlackApp {
         }
         next()
       })
+    }
+  }
+
+  /**
+   * Middleware that ignores messages from the bot user
+   * or initialize a new one.
+   *
+   * @api private
+   */
+
+  ignoreMeMiddleware () {
+    return (req, next) => {
+      var isMessage = req.type === 'event' && req.body.event.type === 'message'
+      if (isMessage && req.meta.user_id === this.bot_user_id) {
+        return
+      }
+      next()
     }
   }
 
@@ -181,4 +200,5 @@ module.exports = class SlackApp {
   action(actionName, fn) {
     this.matchers.push({ type: 'action', name: actionName, handler: fn })
   }
+
 }
