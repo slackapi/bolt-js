@@ -1,0 +1,27 @@
+{
+  "name": "slackapp",
+  "version": "0.0.0",
+  "description": "A module for Slack App integrations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BeepBoopHQ/slackapp-js.git"
+  },
+  "keywords": [
+    "slack",
+    "bot",
+    "beepboop"
+  ],
+  "author": "Mike Brevoort",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BeepBoopHQ/slackapp-js/issues"
+  },
+  "homepage": "https://github.com/BeepBoopHQ/slackapp-js#readme",
+  "engines" : {
+    "node" : ">=6.0.0"
+  }
+}
