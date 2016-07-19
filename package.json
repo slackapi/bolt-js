@@ -1,6 +1,6 @@
 {
   "name": "slackapp",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A module for Slack App integrations",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "url": "https://github.com/BeepBoopHQ/slackapp-js/issues"
   },
   "homepage": "https://github.com/BeepBoopHQ/slackapp-js#readme",
-  "engines" : {
-    "node" : ">=6.0.0"
+  "engines": {
+    "node": ">=6.0.0"
   }
 }
