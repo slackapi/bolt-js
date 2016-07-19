@@ -52,7 +52,7 @@ module.exports = class SlackApp {
 
     // call `handle` for each new request
     this.receiver.on('request', this.handle.bind(this))
-    this.use(this.ignoreMeMiddleware())
+    this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
   }
 
@@ -81,16 +81,14 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Middleware that ignores messages from the bot user
-   * or initialize a new one.
+   * Middleware that ignores messages from any bot user
    *
    * @api private
    */
 
-  ignoreMeMiddleware () {
+  ignoreBotsMiddleware () {
     return (req, next) => {
-      var isMessage = req.type === 'event' && req.body.event.type === 'message'
-      if (isMessage && req.meta.user_id === this.bot_user_id) {
+      if (req.meta.bot_id) {
         return
       }
       next()
@@ -150,6 +148,15 @@ module.exports = class SlackApp {
               }
             }
           }
+
+          if (matcher.type === 'command') {
+            if (req.body.command === matcher.command ) {
+              if (matcher.match.test(req.body.text)) {
+                return matcher.handler (req)
+              }
+            }
+          }
+
         }
       }
     }
@@ -195,10 +202,68 @@ module.exports = class SlackApp {
 
   /**
    * Register a new action handler for an actionName
+   *
+   * Parameters:
+   * - `id` string - the `callback_id` [optional]
+   * - `actionName` string
+   * - `fn` function - `(req) => {}`
    */
 
-  action(actionName, fn) {
+  action(id, actionName, fn) {
+    if (typeof actionName === 'function') {
+      fn = actionName
+      actionName = id
+    }
     this.matchers.push({ type: 'action', name: actionName, handler: fn })
+  }
+
+  /**
+   * Register a new slash command handler
+   *
+   * Parameters:
+   * - `command` string - the slash command (e.g. "/doit")
+   * - `criteria` string or RegExp (e.g "/^create.*$/") [optional]
+   * - `fn` function - `(req) => {}`
+   *
+   * Example `req` object:
+   *
+   *     {
+   *        "type":"command",
+   *        "body":{
+   *           "token":"xxxxxxxxxxxxxxxxxxx",
+   *           "team_id":"TXXXXXXXX",
+   *           "team_domain":"teamxxxxxxx",
+   *           "channel_id":"Dxxxxxxxx",
+   *           "channel_name":"directmessage",
+   *           "user_id":"Uxxxxxxxx",
+   *           "user_name":"xxxx.xxxxxxxx",
+   *           "command":"/doit",
+   *           "text":"whatever was typed after command",
+   *           "response_url":"https://hooks.slack.com/commands/TXXXXXXXX/111111111111111111111111111"
+   *        },
+   *        "resource":{
+   *           "app_token":"xoxp-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX",
+   *           "app_user_id":"UXXXXXXXX",
+   *           "bot_token":"xoxb-XXXXXXXXXX-XXXXXXXXXXXXXXXXXXXX",
+   *           "bot_user_id":"UXXXXXXXX"
+   *        },
+   *        "meta":{
+   *           "user_id":"UXXXXXXXX",
+   *           "channel_id":"DXXXXXXXX",
+   *           "team_id":"TXXXXXXXX"
+   *        },
+   *     }
+   */
+
+  command(command, criteria, fn) {
+    if (typeof criteria === 'function') {
+      fn = criteria
+      criteria = /.*/
+    }
+    if (typeof criteria === 'string') {
+      criteria = new RegExp(criteria, 'i')
+    }
+    this.matchers.push({ type: 'command', command: command, match: criteria, handler: fn })
   }
 
 }
