@@ -1,6 +1,6 @@
 {
   "name": "slackapp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A module for Slack App integrations",
   "main": "index.js",
   "scripts": {
