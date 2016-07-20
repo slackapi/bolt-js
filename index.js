@@ -120,43 +120,41 @@ module.exports = class SlackApp {
       var current = idx++
       if (self.middleware[current]) {
         self.middleware[current](req, next)
-      } else if (req.convo && req.convo.nextFn) {
-        console.log("req.convo.nextFn: ", req.convo.nextFn)
+        return
+      }
+
+      // is there a nextFn registered?
+      if (req.convo && req.convo.nextFn) {
         self.convoStore.del(req.convo.id)
         var fn = self.registry[req.convo.nextFn]
         if (fn) {
           return fn(req)
         }
-      } else {
-        // handle matchers
-        for (var i=0; i < self.matchers.length; i++) {
-          // if match is a regex, text the regex against the text of a message (if it is a message)
-          var matcher = self.matchers[i]
+      }
 
-          if (matcher.type === 'hear' && matcher.match instanceof RegExp) {
-            var text = req.body.event && req.body.event.text
-            if (matcher.match.test(text)) {
-              return matcher.handler (req)
+      // consider the matchers
+      for (var i=0; i < self.matchers.length; i++) {
+        // if match is a regex, text the regex against the text of a message (if it is a message)
+        var matcher = self.matchers[i]
+
+        if (matcher.type === 'hear' && matcher.match instanceof RegExp) {
+          var text = req.body.event && req.body.event.text
+          if (matcher.match.test(text)) {
+            return matcher.handler (req)
+          }
+        }
+
+        if (matcher.type === 'action' && req.body.actions && req.body.callback_id === matcher.callback_id) {
+          for (var i=0; i < req.body.actions.length; i++) {
+            var action = req.body.actions[i]
+            if (action.name === matcher.name) {
+              return matcher.handler (req, action.value)
             }
           }
+        }
 
-          if (matcher.type === 'action' && req.body.actions) {
-            for (var i=0; i < req.body.actions.length; i++) {
-              var action = req.body.actions[i]
-              if (action.name === matcher.name) {
-                return matcher.handler (req, action.value)
-              }
-            }
-          }
-
-          if (matcher.type === 'command') {
-            if (req.body.command === matcher.command ) {
-              if (matcher.match.test(req.body.text)) {
-                return matcher.handler (req)
-              }
-            }
-          }
-
+        if (matcher.type === 'command' && req.body.command === matcher.command && matcher.match.test(req.body.text)) {
+          return matcher.handler (req)
         }
       }
     }
@@ -204,17 +202,18 @@ module.exports = class SlackApp {
    * Register a new action handler for an actionName
    *
    * Parameters:
-   * - `id` string - the `callback_id` [optional]
-   * - `actionName` string
+   * - `id` string - the `callback_id`
+   * - `actionName` string - the name of the action
    * - `fn` function - `(req) => {}`
    */
 
-  action(id, actionName, fn) {
-    if (typeof actionName === 'function') {
-      fn = actionName
-      actionName = id
-    }
-    this.matchers.push({ type: 'action', name: actionName, handler: fn })
+  action(callback_id, actionName, fn) {
+    this.matchers.push({
+      type: 'action',
+      callback_id: callback_id,
+      name: actionName,
+      handler: fn
+    })
   }
 
   /**
