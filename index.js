@@ -78,14 +78,14 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Middleware that ignores messages from any bot user
+   * Middleware that ignores messages from any bot user when we can tell
    *
    * @api private
    */
 
   ignoreBotsMiddleware () {
     return (msg, next) => {
-      if (msg.meta.bot_id) {
+      if (msg.meta.bot_id || msg.meta.user_id === msg.meta.bot_user_id) {
         return
       }
       next()
@@ -192,16 +192,16 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Register a new handler function for the criteria
+   * Register a new message handler function for the criteria
    *
    * Parameters:
-   * - `criteria` string or RegExp - message includes string or match RegExp
+   * - `criteria` string or RegExp - message is string or match RegExp
    * - `fn` function - `(msg) => {}`
    */
 
   hear(criteria, fn) {
     if (typeof criteria === 'string') {
-      criteria = new RegExp(criteria, 'i')
+      criteria = new RegExp('^' + criteria + '\s*$', 'i')
     }
     this._matchers.push({ type: 'hear', match: criteria, handler: fn })
   }
