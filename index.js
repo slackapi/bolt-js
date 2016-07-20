@@ -1,7 +1,6 @@
 const slack = require('slack')
 const conversationStore = require('./lib/conversation_store')
 const Receiver = require('./lib/receiver')
-const Conversation = require('./lib/conversation')
 
 /**
  * SlackApp module
@@ -18,14 +17,13 @@ module.exports = class SlackApp {
    * - `bot_user_id` Slack App Bot ID
    * - `convo_store` `string` of type of Conversation store (`memory`, etc.) or `object` implementation
    * - `error`       Error handler function `(error) => {}`
-   * - `client`      `slack` client, defaults to `require('slack')`
    */
 
   constructor(opts) {
     opts = opts || {}
-    this.middleware = []
-    this.matchers = []
-    this.registry = {}
+    this._middleware = []
+    this._matchers = []
+    this._registry = {}
 
     this.app_token = opts.app_token
     this.app_user_id = opts.app_user_id
@@ -47,11 +45,11 @@ module.exports = class SlackApp {
     }
 
     this.onError = opts.error || (() => {})
-    this.client = opts.client || slack
+    this.client = slack
     this.receiver = new Receiver(opts)
 
     // call `handle` for each new request
-    this.receiver.on('request', this.handle.bind(this))
+    this.receiver.on('message', this._handle.bind(this))
     this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
   }
@@ -64,17 +62,16 @@ module.exports = class SlackApp {
    */
 
   preprocessConversationMiddleware () {
-    return (req, next) => {
-      var convoId = [req.meta.team_id, req.meta.channel_id].join(':')
-      // req.convoId = convoId
-
-      this.convoStore.get(convoId, (err, val) => {
-        if (err) return this.onError(err)
-        if (val) {
-          req.convo = new Conversation(this, convoId, val.data, val.nextFn)
-        } else {
-          req.convo = new Conversation(this, convoId)
+    return (msg, next) => {
+      this.convoStore.get(msg.conversation_id, (err, val) => {
+        if (err) {
+          return this.onError(err)
         }
+
+        if (val) {
+          msg.attachOverrideRoute(val.nextFn, val.data)
+        }
+
         next()
       })
     }
@@ -87,8 +84,8 @@ module.exports = class SlackApp {
    */
 
   ignoreBotsMiddleware () {
-    return (req, next) => {
-      if (req.meta.bot_id) {
+    return (msg, next) => {
+      if (msg.meta.bot_id) {
         return
       }
       next()
@@ -99,11 +96,11 @@ module.exports = class SlackApp {
    * Register a new middleware
    *
    * Middleware is processed in the order registered.
-   * `fn` : (req, next) => { }
+   * `fn` : (msg, next) => { }
    */
 
   use(fn) {
-    this.middleware.push(fn)
+    this._middleware.push(fn)
   }
 
   /**
@@ -112,49 +109,52 @@ module.exports = class SlackApp {
    * @api private
    */
 
-  handle(req) {
+  _handle(msg) {
     var self = this
+    msg.attachSlackApp(self)
     var idx = 0
 
     var next = () => {
       var current = idx++
-      if (self.middleware[current]) {
-        self.middleware[current](req, next)
+      if (self._middleware[current]) {
+        self._middleware[current](msg, next)
         return
       }
 
-      // is there a nextFn registered?
-      if (req.convo && req.convo.nextFn) {
-        self.convoStore.del(req.convo.id)
-        var fn = self.registry[req.convo.nextFn]
-        if (fn) {
-          return fn(req)
-        }
+      // is there a conversation override?
+      if (msg.override) {
+        self.convoStore.del(msg.conversation_id)
+        msg.override(msg)
+        return
       }
 
       // consider the matchers
-      for (var i=0; i < self.matchers.length; i++) {
+      for (var i=0; i < self._matchers.length; i++) {
         // if match is a regex, text the regex against the text of a message (if it is a message)
-        var matcher = self.matchers[i]
+        var matcher = self._matchers[i]
 
-        if (matcher.type === 'hear' && matcher.match instanceof RegExp) {
-          var text = req.body.event && req.body.event.text
+        if (matcher.type === 'hear' && msg.type === 'event' && msg.body.event.type === 'message') {
+          var text = msg.body.event && msg.body.event.text
           if (matcher.match.test(text)) {
-            return matcher.handler (req)
+            return matcher.handler(msg)
           }
         }
 
-        if (matcher.type === 'action' && req.body.actions && req.body.callback_id === matcher.callback_id) {
-          for (var i=0; i < req.body.actions.length; i++) {
-            var action = req.body.actions[i]
-            if (action.name === matcher.name) {
-              return matcher.handler (req, action.value)
+        if (matcher.type === 'event' && msg.type === 'event' && matcher.match.test(msg.body.event.type)) {
+          return matcher.handler(msg)
+        }
+
+        if (matcher.type === 'action' && msg.type === 'action' && msg.body.actions && msg.body.callback_id === matcher.callback_id) {
+          for (var i=0; i < msg.body.actions.length; i++) {
+            var action = msg.body.actions[i]
+            if (matcher.match.test(action.name)) {
+              return matcher.handler(msg, action.value)
             }
           }
         }
 
-        if (matcher.type === 'command' && req.body.command === matcher.command && matcher.match.test(req.body.text)) {
-          return matcher.handler (req)
+        if (matcher.type === 'command' && msg.type === 'command' && msg.body.command === matcher.command && matcher.match.test(msg.body.text)) {
+          return matcher.handler(msg)
         }
       }
     }
@@ -176,42 +176,74 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Register a new function handler, used with Conversations
+   * Register a new function route
    *
    * Parameters
-   * - `key` string - unique key to refer to function
-   * - `fn`  function - `(req) => {}`
+   * - `fnKey` string - unique key to refer to function
+   * - `fn`  function - `(msg) => {}`
    */
 
-  register(key, fn) {
-    this.registry[key] = fn
+  route(fnKey, fn) {
+    this._registry[fnKey] = fn
+  }
+
+  getRoute(fnKey) {
+    return this._registry[fnKey]
   }
 
   /**
    * Register a new handler function for the criteria
+   *
+   * Parameters:
+   * - `criteria` string or RegExp - message includes string or match RegExp
+   * - `fn` function - `(msg) => {}`
    */
 
   hear(criteria, fn) {
     if (typeof criteria === 'string') {
       criteria = new RegExp(criteria, 'i')
     }
-    this.matchers.push({ type: 'hear', match: criteria, handler: fn })
+    this._matchers.push({ type: 'hear', match: criteria, handler: fn })
   }
 
   /**
-   * Register a new action handler for an actionName
+   * Register a new event handler for an actionName
    *
    * Parameters:
-   * - `id` string - the `callback_id`
-   * - `actionName` string - the name of the action
-   * - `fn` function - `(req) => {}`
+   * - `typeCriteria` string or RegExp - the type of event
+   * - `fn` function - `(msg) => {}`
    */
 
-  action(callback_id, actionName, fn) {
-    this.matchers.push({
+  event(typeCriteria, fn) {
+    if (typeof typeCriteria === 'string') {
+      typeCriteria = new RegExp('^' + typeCriteria + '$', 'i')
+    }
+    this._matchers.push({ type: 'event', match: typeCriteria, handler: fn })
+  }
+
+  /**
+   * Register a new action handler for an actionNameCriteria
+   *
+   * Parameters:
+   * - `callback_id` string
+   * - `actionNameCriteria` string or RegExp - the name of the action [optional]
+   * - `fn` function - `(msg) => {}`
+   */
+
+  action(callback_id, actionNameCriteria, fn) {
+    if (typeof actionNameCriteria === 'function') {
+      fn = actionNameCriteria
+      actionNameCriteria = /.*/
+    }
+
+    if (typeof actionNameCriteria === 'string') {
+      actionNameCriteria = new RegExp('^' + actionNameCriteria + '$', 'i')
+    }
+
+    this._matchers.push({
       type: 'action',
       callback_id: callback_id,
-      name: actionName,
+      match: actionNameCriteria,
       handler: fn
     })
   }
@@ -222,9 +254,9 @@ module.exports = class SlackApp {
    * Parameters:
    * - `command` string - the slash command (e.g. "/doit")
    * - `criteria` string or RegExp (e.g "/^create.*$/") [optional]
-   * - `fn` function - `(req) => {}`
+   * - `fn` function - `(msg) => {}`
    *
-   * Example `req` object:
+   * Example `msg` object:
    *
    *     {
    *        "type":"command",
@@ -262,7 +294,7 @@ module.exports = class SlackApp {
     if (typeof criteria === 'string') {
       criteria = new RegExp(criteria, 'i')
     }
-    this.matchers.push({ type: 'command', command: command, match: criteria, handler: fn })
+    this._matchers.push({ type: 'command', command: command, match: criteria, handler: fn })
   }
 
 }
