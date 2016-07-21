@@ -7,15 +7,15 @@ module.exports = class MemoryStore {
     this.store = {}
   }
 
-  set(key, nextFn, data, exp, cb) {
-    cb = cb || (() => {})
+  set(key, nextFn, data, exp, callback) {
+    callback = callback || (() => {})
     if (typeof data === 'function') {
-      cb = data
+      callback = data
       data = {}
       exp = 0
     }
     if (typeof exp === 'function') {
-      cb = exp
+      callback = exp
       exp = 0
     }
 
@@ -27,25 +27,25 @@ module.exports = class MemoryStore {
     }
 
     this.store[key] = envelope
-    cb()
+    callback()
   }
 
-  get(key, cb) {
+  get(key, callback) {
     let val = this.store[key]
     if (!val) {
-      return cb(null, null)
+      return callback(null, null)
     }
     if (val.expire > 0 && val.expire < Date.now()) {
       delete this.store[key]
-      return cb(null, null)
+      return callback(null, null)
     }
-    cb(null, val)
+    callback(null, val)
   }
 
-  del(key, cb) {
-    cb = cb || (() => {})
+  del(key, callback) {
+    callback = callback || (() => {})
     delete this.store[key]
-    cb()
+    callback()
   }
 
 }

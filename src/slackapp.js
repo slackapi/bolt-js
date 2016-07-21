@@ -111,12 +111,12 @@ module.exports = class SlackApp {
    */
 
   _handle(msg) {
-    var self = this
+    let self = this
     msg.attachSlackApp(self)
-    var idx = 0
+    let idx = 0
 
-    var next = () => {
-      var current = idx++
+    let next = () => {
+      let current = idx++
       if (self._middleware[current]) {
         self._middleware[current](msg, next)
         return
@@ -130,32 +130,11 @@ module.exports = class SlackApp {
       }
 
       // consider the matchers
-      for (var i=0; i < self._matchers.length; i++) {
+      for (let i=0; i < self._matchers.length; i++) {
         // if match is a regex, text the regex against the text of a message (if it is a message)
-        var matcher = self._matchers[i]
-
-        if (matcher.type === 'message' && msg.type === 'event' && msg.body.event.type === 'message') {
-          var text = msg.body.event && msg.body.event.text
-          if (matcher.match.test(text)) {
-            return matcher.handler(msg)
-          }
-        }
-
-        if (matcher.type === 'event' && msg.type === 'event' && matcher.match.test(msg.body.event.type)) {
-          return matcher.handler(msg)
-        }
-
-        if (matcher.type === 'action' && msg.type === 'action' && msg.body.actions && msg.body.callback_id === matcher.callback_id) {
-          for (var i=0; i < msg.body.actions.length; i++) {
-            var action = msg.body.actions[i]
-            if (matcher.match.test(action.name)) {
-              return matcher.handler(msg, action.value)
-            }
-          }
-        }
-
-        if (matcher.type === 'command' && msg.type === 'command' && msg.body.command === matcher.command && matcher.match.test(msg.body.text)) {
-          return matcher.handler(msg)
+        let matcher = self._matchers[i]
+        if (matcher(msg)) {
+          return
         }
       }
     }
@@ -193,33 +172,114 @@ module.exports = class SlackApp {
   }
 
   /**
+   * Register a custom Match function (fn)
+
+   * $eturns `true` if there is a match AND you handled the msg.
+   * Return `false` if there is not a match and you pass on the message.
+
+   * All of the higher level matching convenience functions
+   * generate a match function and call match to register it.
+   *
+   * Only one matcher can return true and they are executed in the order they are
+   * defined. Match functions should return as fast as possible because it's important
+   * that they are efficient. However you may do asyncronous tasks within to
+   * your hearts content.
+   *
+   * Parameters
+   * - `fn` function - match function `(msg) => { return bool }`
+   */
+
+   match(fn) {
+     this._matchers.push(fn)
+   }
+
+  /**
    * Register a new message handler function for the criteria
    *
    * Parameters:
    * - `criteria` string or RegExp - message is string or match RegExp
-   * - `fn` function - `(msg) => {}`
+   * - `callback` function - `(msg) => {}`
+   *
+   * Example `msg` object:
+   *
+   *    {
+   *       "token":"dxxxxxxxxxxxxxxxxxxxx",
+   *       "team_id":"TXXXXXXXX",
+   *       "api_app_id":"AXXXXXXXX",
+   *       "event":{
+   *          "type":"message",
+   *          "user":"UXXXXXXXX",
+   *          "text":"hello!",
+   *          "ts":"1469130107.000088",
+   *          "channel":"DXXXXXXXX"
+   *       },
+   *       "event_ts":"1469130107.000088",
+   *       "type":"event_callback",
+   *       "authed_users":[
+   *          "UXXXXXXXX"
+   *       ]
+   *    }
    */
 
-  message(criteria, fn) {
+  message(criteria, callback) {
     if (typeof criteria === 'string') {
       criteria = new RegExp('^' + criteria + '\s*$', 'i')
     }
-    this._matchers.push({ type: 'message', match: criteria, handler: fn })
+    let fn = (msg) => {
+      if (msg.type === 'event' && msg.body.event && msg.body.event.type === 'message') {
+        let text = msg.body.event.text
+        if (criteria.test(text)) {
+          callback(msg)
+          return true
+        }
+      }
+    }
+    this.match(fn)
   }
 
   /**
    * Register a new event handler for an actionName
    *
    * Parameters:
-   * - `typeCriteria` string or RegExp - the type of event
-   * - `fn` function - `(msg) => {}`
+   * - `criteria` string or RegExp - the type of event
+   * - `callback` function - `(msg) => {}`
+   *
+   * Example `msg` object:
+   *
+   *    {
+   *       "token":"dxxxxxxxxxxxxxxxxxxxx",
+   *       "team_id":"TXXXXXXXX",
+   *       "api_app_id":"AXXXXXXXX",
+   *       "event":{
+   *          "type":"reaction_added",
+   *          "user":"UXXXXXXXX",
+   *          "item":{
+   *             "type":"message",
+   *             "channel":"DXXXXXXXX",
+   *             "ts":"1469130181.000096"
+   *          },
+   *          "reaction":"grinning"
+   *       },
+   *       "event_ts":"1469131201.822817",
+   *       "type":"event_callback",
+   *       "authed_users":[
+   *          "UXXXXXXXX"
+   *       ]
+   *    }
    */
 
-  event(typeCriteria, fn) {
-    if (typeof typeCriteria === 'string') {
-      typeCriteria = new RegExp('^' + typeCriteria + '$', 'i')
+  event(criteria, callback) {
+    if (typeof criteria === 'string') {
+      criteria = new RegExp('^' + criteria + '$', 'i')
     }
-    this._matchers.push({ type: 'event', match: typeCriteria, handler: fn })
+    let fn = (msg) => {
+      if (msg.type === 'event' && msg.body.event && criteria.test(msg.body.event.type)) {
+        callback(msg)
+        return true
+      }
+    }
+
+    this.match(fn)
   }
 
   /**
@@ -228,12 +288,79 @@ module.exports = class SlackApp {
    * Parameters:
    * - `callback_id` string
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
-   * - `fn` function - `(msg) => {}`
+   * - `callback` function - `(msg) => {}`
+   *
+   * Example `msg` object:
+   *
+   * {
+   *    "actions":[
+   *       {
+   *          "name":"answer",
+   *          "value":":wine_glass:"
+   *       }
+   *    ],
+   *    "callback_id":"in_or_out_callback",
+   *    "team":{
+   *       "id":"TXXXXXXXX",
+   *       "domain":"companydomain"
+   *    },
+   *    "channel":{
+   *       "id":"DXXXXXXXX",
+   *       "name":"directmessage"
+   *    },
+   *    "user":{
+   *       "id":"UXXXXXXXX",
+   *       "name":"mike.brevoort"
+   *    },
+   *    "action_ts":"1469129995.067370",
+   *    "message_ts":"1469129988.000084",
+   *    "attachment_id":"1",
+   *    "token":"dxxxxxxxxxxxxxxxxxxxx",
+   *    "original_message":{
+   *       "text":"What?",
+   *       "username":"In or Out",
+   *       "bot_id":"BXXXXXXXX",
+   *       "attachments":[
+   *          {
+   *             "callback_id":"in_or_out_callback",
+   *             "fallback":"Pick one",
+   *             "id":1,
+   *             "actions":[
+   *                {
+   *                   "id":"1",
+   *                   "name":"answer",
+   *                   "text":":beer:",
+   *                   "type":"button",
+   *                   "value":":beer:",
+   *                   "style":""
+   *                },
+   *                {
+   *                   "id":"2",
+   *                   "name":"answer",
+   *                   "text":":beers:",
+   *                   "type":"button",
+   *                   "value":":wine:",
+   *                   "style":""
+   *                },
+   *             ]
+   *          },
+   *          {
+   *             "text":":beers: • mike.brevoort",
+   *             "id":2,
+   *             "fallback":"who picked beers"
+   *          }
+   *       ],
+   *       "type":"message",
+   *       "subtype":"bot_message",
+   *       "ts":"1469129988.000084"
+   *    },
+   *    "response_url":"https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx"
+   *
    */
 
-  action(callback_id, actionNameCriteria, fn) {
+  action(callback_id, actionNameCriteria, callback) {
     if (typeof actionNameCriteria === 'function') {
-      fn = actionNameCriteria
+      callback = actionNameCriteria
       actionNameCriteria = /.*/
     }
 
@@ -241,12 +368,19 @@ module.exports = class SlackApp {
       actionNameCriteria = new RegExp('^' + actionNameCriteria + '$', 'i')
     }
 
-    this._matchers.push({
-      type: 'action',
-      callback_id: callback_id,
-      match: actionNameCriteria,
-      handler: fn
-    })
+    let fn = (msg) => {
+      if (msg.type === 'action' && msg.body.actions && msg.body.callback_id === callback_id) {
+        for (let i=0; i < msg.body.actions.length; i++) {
+          let action = msg.body.actions[i]
+          if (actionNameCriteria.test(action.name)) {
+            callback(msg, action.value)
+            return true
+          }
+        }
+      }
+    }
+
+    this.match(fn)
   }
 
   /**
@@ -255,7 +389,7 @@ module.exports = class SlackApp {
    * Parameters:
    * - `command` string - the slash command (e.g. "/doit")
    * - `criteria` string or RegExp (e.g "/^create.*$/") [optional]
-   * - `fn` function - `(msg) => {}`
+   * - `callback` function - `(msg) => {}`
    *
    * Example `msg` object:
    *
@@ -287,15 +421,22 @@ module.exports = class SlackApp {
    *     }
    */
 
-  command(command, criteria, fn) {
+  command(command, criteria, callback) {
     if (typeof criteria === 'function') {
-      fn = criteria
+      callback = criteria
       criteria = /.*/
     }
     if (typeof criteria === 'string') {
       criteria = new RegExp(criteria, 'i')
     }
-    this._matchers.push({ type: 'command', command: command, match: criteria, handler: fn })
-  }
 
+    let fn = (msg) => {
+      if (msg.type === 'command' && msg.body.command === command && criteria.test(msg.body.text)) {
+        callback(msg)
+        return true
+      }
+    }
+
+    this.match(fn)
+  }
 }
