@@ -132,6 +132,71 @@ module.exports = class Message {
     return this
   }
 
+  isMessage() {
+    return this.type === 'event' && this.body.event && this.body.event.type === 'message'
+  }
+
+  isDirectMention() {
+    return this.isMessage() && new RegExp(`^<@${this.meta.bot_user_id}>`, 'i').text(this.body.event.text)
+  }
+
+  isDirectMessage() {
+    return this.isMessage() && this.meta.channel_id[0] === 'D'
+  }
+
+  isMention() {
+    this.isMessage() && new RegExp(`<@${this.meta.bot_user_id}>`, 'i').text(this.body.event.text)
+  }
+
+  isAmbient() {
+    return this.isMessage() && !this.isMention() && !this.isDirectMention()
+  }
+
+  usersMentioned() {
+    let ids = []
+    let re = new RegExp('<@([A-Za-z0-9]+)>', 'g')
+    let matcher
+
+    if (this.isMessage()) {
+      do {
+          matcher = re.exec(this.body.event.text);
+          if (matcher) {
+              ids.push(matcher[1])
+          }
+      } while (matcher)
+    }
+    return ids
+  }
+
+  links() {
+    let links = []
+    let re = new RegExp('<([^@^>]+)>', 'g')
+    let matcher
+
+    if (this.isMessage()) {
+      do {
+          matcher = re.exec(this.body.event.text);
+          if (matcher) {
+            links.push(matcher[1].split('|')[0])
+          }
+      } while (matcher)
+    }
+
+    return links
+  }
+
+  stripDirectMention() {
+    var text = ''
+    if (this.isMessage()) {
+      text = this.body.event.text
+      let match = text.match(new RegExp(`^<@${this.meta.bot_user_id}>:{0,1}(.*)`))
+      if (match) {
+        text = match[1].trim()
+      }
+    }
+    return text
+  }
+
   _processInput(input) {
     // if input is an array, randomly pick one of the values
     if (Array.isArray(input)) {
