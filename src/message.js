@@ -79,7 +79,7 @@ module.exports = class Message {
 
     input = this._processInput(input)
 
-    var payload = Object.assign({}, input, {
+    let payload = Object.assign({}, input, {
       token: this.meta.bot_token || this.meta.app_token,
       channel: this.meta.channel_id
     })
@@ -113,7 +113,7 @@ module.exports = class Message {
       method: 'POST',
       json: input
     }, (err, res, body) => {
-      var rateLimit = 'You are sending too many requests. Please relax.'
+      let rateLimit = 'You are sending too many requests. Please relax.'
       if (err) {
         callback(err)
       } else if (body.error) {

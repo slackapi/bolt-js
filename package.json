@@ -2,7 +2,7 @@
   "name": "slackapp",
   "version": "0.0.4",
   "description": "A module for Slack App integrations",
-  "main": "index.js",
+  "main": "src/slackapp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

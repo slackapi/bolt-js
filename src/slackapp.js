@@ -1,6 +1,6 @@
 const slack = require('slack')
-const conversationStore = require('./lib/conversation_store')
-const Receiver = require('./lib/receiver')
+const conversationStore = require('./conversation_store')
+const Receiver = require('./receiver')
 
 /**
  * SlackApp module
@@ -49,6 +49,7 @@ module.exports = class SlackApp {
     this.receiver = new Receiver(opts)
 
     // call `handle` for each new request
+    // TODO: make overridable for testing
     this.receiver.on('message', this._handle.bind(this))
     this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
@@ -133,7 +134,7 @@ module.exports = class SlackApp {
         // if match is a regex, text the regex against the text of a message (if it is a message)
         var matcher = self._matchers[i]
 
-        if (matcher.type === 'hear' && msg.type === 'event' && msg.body.event.type === 'message') {
+        if (matcher.type === 'message' && msg.type === 'event' && msg.body.event.type === 'message') {
           var text = msg.body.event && msg.body.event.text
           if (matcher.match.test(text)) {
             return matcher.handler(msg)
@@ -199,11 +200,11 @@ module.exports = class SlackApp {
    * - `fn` function - `(msg) => {}`
    */
 
-  hear(criteria, fn) {
+  message(criteria, fn) {
     if (typeof criteria === 'string') {
       criteria = new RegExp('^' + criteria + '\s*$', 'i')
     }
-    this._matchers.push({ type: 'hear', match: criteria, handler: fn })
+    this._matchers.push({ type: 'message', match: criteria, handler: fn })
   }
 
   /**

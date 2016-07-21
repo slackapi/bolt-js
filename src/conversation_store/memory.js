@@ -19,7 +19,7 @@ module.exports = class MemoryStore {
       exp = 0
     }
 
-    var envelope = {
+    let envelope = {
       key: key,
       nextFn: nextFn,
       data: data,
@@ -31,7 +31,7 @@ module.exports = class MemoryStore {
   }
 
   get(key, cb) {
-    var val = this.store[key]
+    let val = this.store[key]
     if (!val) {
       return cb(null, null)
     }

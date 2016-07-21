@@ -6,7 +6,7 @@ const Message = require('./message')
 module.exports = class Receiver extends EventEmitter {
   constructor (opts) {
     super()
-    var self = this
+    let self = this
     opts = opts || {}
 
     this.debug = opts.debug
@@ -72,19 +72,19 @@ module.exports = class Receiver extends EventEmitter {
   }
 
   eventHandler (req, res) {
-    var body = req.body
+    let body = req.body
     this.doEmit('event', body, req.app_details)
     return res.send()
   }
 
   commandHandler (req, res) {
-    var body = req.body
+    let body = req.body
     this.doEmit('command', body, req.app_details)
     return res.send()
   }
 
   interactiveHandler (req, res) {
-    var body = req.body
+    let body = req.body
     if (!body || !body.payload) {
       return res.send('Invalid request: payload missing')
     }
@@ -100,7 +100,7 @@ module.exports = class Receiver extends EventEmitter {
 
     if (this.debug && this.logfn[type]) this.logfn[type](body)
     const meta = Object.assign({}, this.parseMeta(type, body), app_details)
-    var msg = new Message(type, body, meta)
+    let msg = new Message(type, body, meta)
     this.emit('message', msg)
   }
 
@@ -133,7 +133,7 @@ module.exports = class Receiver extends EventEmitter {
   logEvent (evt) {
     if (!evt) return console.log('Event: UNKNOWN')
     if (!evt.event) return console.log('Event: Missing:', evt)
-    var out = evt.event.user + ' -> ' + evt.event.type
+    let out = evt.event.user + ' -> ' + evt.event.type
     switch (evt.event.type) {
       case 'reaction_added':
         out += ' : ' + evt.event.item.type + '[' + evt.event.item.channel + ']' + ' : ' + evt.event.reaction
