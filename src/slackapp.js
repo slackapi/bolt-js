@@ -124,8 +124,12 @@ module.exports = class SlackApp {
 
       // is there a conversation override?
       if (msg.override) {
-        self.convoStore.del(msg.conversation_id)
-        msg.override(msg)
+        self.convoStore.del(msg.conversation_id, (err) => {
+          if (err) {
+            this.onError(err)
+          }
+          msg.override(msg)
+        })
         return
       }
 
