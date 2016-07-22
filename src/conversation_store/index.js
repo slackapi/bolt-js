@@ -1,3 +1,5 @@
+'use strict'
+
 const MemoryStore = require('./memory')
 
 module.exports = (opts) => {

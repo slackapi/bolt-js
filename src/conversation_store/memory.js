@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * In memory implementation of a ConversationStore, primarily for testing
  */
