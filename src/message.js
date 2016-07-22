@@ -37,20 +37,22 @@ module.exports = class Message {
    * Parameters
    * - `fnKey` `string`
    * - `state` `object` arbitrary data to be passed back to your function [optional]
-   * - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 10 minutes [optional]
+   * - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
    */
 
   route(fnKey, state, secondsToExpire) {
-    const tenMinutes = 600
+    const hour = 60 * 60
     if (!state) {
       state = {}
     }
 
     if (!secondsToExpire) {
-      secondsToExpire = tenMinutes
+      secondsToExpire = hour
     }
 
-    this._slackapp.convoStore.set(this.conversation_id, fnKey, state, secondsToExpire)
+    let key = this.conversation_id
+    let expiration = Date.now() + secondsToExpire * 1000
+    this._slackapp.convoStore.set(key, { fnKey, state, expiration })
     return this
   }
 

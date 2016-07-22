@@ -7,44 +7,57 @@ module.exports = class MemoryStore {
     this.store = {}
   }
 
-  set(key, nextFn, data, exp, callback) {
+  /**
+   * Set the next function route handler for conversation id
+   *
+   * Parameters:
+   * - `id` string - the conversation ID
+   * - `params` object
+   *     - `fnKey` sting - next route function key
+   *     - `state` object - arbitrary object of data to be routed with the next function call
+   *     - `expiration` - expiration time in time since unix epoch (milliseconds since 00:00:00 UTC on 1 January 1970)
+   * - `callback` function  - (error) => {}
+   */
+
+  set(id, params, callback) {
     callback = callback || (() => {})
-    if (typeof data === 'function') {
-      callback = data
-      data = {}
-      exp = 0
-    }
-    if (typeof exp === 'function') {
-      callback = exp
-      exp = 0
-    }
-
-    let envelope = {
-      key: key,
-      nextFn: nextFn,
-      data: data,
-      expire: Date.now() + exp * 1000
-    }
-
-    this.store[key] = envelope
+    params.id = id
+    this.store[key] = params
     callback()
   }
 
-  get(key, callback) {
-    let val = this.store[key]
+
+  /**
+   * Get the conversation state for a conversation ID
+   *
+   * Parameters:
+   * - `id` string - the conversation ID
+   * - `callback` function  - (error, value) => {}
+   */
+
+  get(id, callback) {
+    let val = this.store[id]
     if (!val) {
       return callback(null, null)
     }
-    if (val.expire > 0 && val.expire < Date.now()) {
-      delete this.store[key]
+    if (val.expiration > 0 && val.expiration < Date.now()) {
+      delete this.store[id]
       return callback(null, null)
     }
     callback(null, val)
   }
 
-  del(key, callback) {
+  /**
+   * Delete a conversation state by ID
+   *
+   * Parameters:
+   * - `id` string - the conversation ID
+   * - `callback` function  - (error) => {}
+   */
+
+  del(id, callback) {
     callback = callback || (() => {})
-    delete this.store[key]
+    delete this.store[id]
     callback()
   }
 

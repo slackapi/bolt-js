@@ -70,7 +70,7 @@ module.exports = class SlackApp {
         }
 
         if (val) {
-          msg.attachOverrideRoute(val.nextFn, val.data)
+          msg.attachOverrideRoute(val.fnKey, val.state)
         }
 
         next()
@@ -249,7 +249,7 @@ module.exports = class SlackApp {
     let fn = (msg) => {
       if (msg.type === 'event' && msg.body.event && msg.body.event.type === 'message') {
         let text = msg.stripDirectMention()
-        if (criteria.test(text) && msg.isAnyOf(type_filter)) {
+        if (criteria.test(text) && (type_filter.length === 0 || msg.isAnyOf(type_filter))) {
           callback(msg, text)
           return true
         }
