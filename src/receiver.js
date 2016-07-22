@@ -27,7 +27,7 @@ module.exports = class Receiver extends EventEmitter {
     self.logfn = {
       'event': self.logEvent.bind(self),
       'command': self.logCommand.bind(self),
-      'action': self.logInteractive.bind(self)
+      'action': self.logAction.bind(self)
     }
   }
 
@@ -43,11 +43,11 @@ module.exports = class Receiver extends EventEmitter {
              this.tokenMiddleware.bind(this),
              bodyParser.urlencoded({extended: true}),
              this.commandHandler.bind(this))
-    app.post('/slack-interactive',
+    app.post('/slack-action',
              this.tokenMiddleware.bind(this),
              bodyParser.urlencoded({extended: true}),
              bodyParser.text({type: '*/*'}),
-             this.interactiveHandler.bind(this))
+             this.actionHandler.bind(this))
     return app
   }
 
@@ -82,7 +82,7 @@ module.exports = class Receiver extends EventEmitter {
     return res.send()
   }
 
-  interactiveHandler (req, res) {
+  actionHandler (req, res) {
     let body = req.body
     if (!body || !body.payload) {
       return res.send('Invalid request: payload missing')
@@ -154,9 +154,9 @@ module.exports = class Receiver extends EventEmitter {
     console.log(cmd.user_id + ' -> ' + cmd.command + ' ' + cmd.text)
   }
 
-  logInteractive (interactive) {
-    if (!interactive) return console.log('Interactive: UNKNOWN')
-    console.log('Interactive:', interactive)
+  logAction (action) {
+    if (!action) return console.log('Action: UNKNOWN')
+    console.log('Action:', action)
   }
 
 }

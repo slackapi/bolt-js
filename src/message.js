@@ -91,10 +91,10 @@ module.exports = class Message {
   }
 
   /**
-   * Use a `response_url` from a Slash command or interactive message
+   * Use a `response_url` from a Slash command or interactive message action
    *
    * Parameters
-   * - `responseUrl` string - URL provided by a Slack interactive message or slash command
+   * - `responseUrl` string - URL provided by a Slack interactive message action or slash command
    * - `input` string or object or Array
    *     * type `object`: raw object that would be past to `chat.postmessage`
    *     * type `string`: text of a message that will be used to construct object sent to `chat.postmessage`

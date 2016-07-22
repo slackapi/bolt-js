@@ -159,7 +159,7 @@ module.exports = class SlackApp {
    * Routes are:
    * - POST `/slack-event`
    * - POST `/slack-command`
-   * - POST `/slack-interactive`
+   * - POST `/slack-action`
    */
 
   attachToExpress (app) {
