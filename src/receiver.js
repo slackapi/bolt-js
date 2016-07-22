@@ -20,7 +20,7 @@ module.exports = class Receiver extends EventEmitter {
       self.started = Date.now()
       fs.writeFileSync(opts.record, '')
       self.on('message', (obj) => {
-        fs.appendFile(opts.record, JSON.stringify(Object.assign({}, obj, { delay: Date.now() - this.started})) + '\n')
+        fs.appendFile(opts.record, JSON.stringify(Object.assign({}, obj, { delay: Date.now() - this.started })) + '\n')
       })
     }
 
@@ -29,7 +29,6 @@ module.exports = class Receiver extends EventEmitter {
       'command': self.logCommand.bind(self),
       'action': self.logInteractive.bind(self)
     }
-
   }
 
   /**
@@ -42,30 +41,30 @@ module.exports = class Receiver extends EventEmitter {
              this.eventHandler.bind(this))
     app.post('/slack-command',
              this.tokenMiddleware.bind(this),
-             bodyParser.urlencoded({extended:true}),
+             bodyParser.urlencoded({extended: true}),
              this.commandHandler.bind(this))
     app.post('/slack-interactive',
              this.tokenMiddleware.bind(this),
-             bodyParser.urlencoded({extended:true}),
+             bodyParser.urlencoded({extended: true}),
              bodyParser.text({type: '*/*'}),
              this.interactiveHandler.bind(this))
     return app
   }
 
   tokenMiddleware (req, res, next) {
-    if (req.headers["bb-error"]) {
-      console.error("Event: Error: " + req.headers["bb-error"])
-      return res.send(req.headers["bb-error"])
+    if (req.headers['bb-error']) {
+      console.error('Event: Error: ' + req.headers['bb-error'])
+      return res.send(req.headers['bb-error'])
     }
     req.app_details = {
       // token for the user for the app
-      app_token: req.headers["bb-slackaccesstoken"] || this.app_token,
+      app_token: req.headers['bb-slackaccesstoken'] || this.app_token,
       // userID for the user who install ed the app
-      app_user_id: req.headers["bb-slackuserid"] || this.app_user_id,
+      app_user_id: req.headers['bb-slackuserid'] || this.app_user_id,
       // token for a bot user of the app
-      bot_token: req.headers["bb-slackbotaccesstoken"] || this.bot_token,
+      bot_token: req.headers['bb-slackbotaccesstoken'] || this.bot_token,
       // userID of the bot user of the app
-      bot_user_id: req.headers["bb-slackbotuserid"] || this.bot_user_id,
+      bot_user_id: req.headers['bb-slackbotuserid'] || this.bot_user_id
     }
 
     next()
@@ -93,13 +92,13 @@ module.exports = class Receiver extends EventEmitter {
     return res.send()
   }
 
-  doEmit (type, body, app_details) {
+  doEmit (type, body, appDetails) {
     if (!body || body && body.ssl_check) {
       return
     }
 
     if (this.debug && this.logfn[type]) this.logfn[type](body)
-    const meta = Object.assign({}, this.parseMeta(type, body), app_details)
+    const meta = Object.assign({}, this.parseMeta(type, body), appDetails)
     let msg = new Message(type, body, meta)
     this.emit('message', msg)
   }

@@ -3,7 +3,7 @@
  */
 
 module.exports = class MemoryStore {
-  constructor(opts) {
+  constructor (opts) {
     this.store = {}
   }
 
@@ -19,13 +19,12 @@ module.exports = class MemoryStore {
    * - `callback` function  - (error) => {}
    */
 
-  set(id, params, callback) {
+  set (id, params, callback) {
     callback = callback || (() => {})
     params.id = id
     this.store[id] = params
     callback()
   }
-
 
   /**
    * Get the conversation state for a conversation ID
@@ -35,7 +34,7 @@ module.exports = class MemoryStore {
    * - `callback` function  - (error, value) => {}
    */
 
-  get(id, callback) {
+  get (id, callback) {
     let val = this.store[id]
     if (!val) {
       return callback(null, null)
@@ -55,7 +54,7 @@ module.exports = class MemoryStore {
    * - `callback` function  - (error) => {}
    */
 
-  del(id, callback) {
+  del (id, callback) {
     callback = callback || (() => {})
     delete this.store[id]
     callback()

@@ -19,7 +19,7 @@ module.exports = class SlackApp {
    * - `error`       Error handler function `(error) => {}`
    */
 
-  constructor(opts) {
+  constructor (opts) {
     opts = opts || {}
     this._middleware = []
     this._matchers = []
@@ -100,7 +100,7 @@ module.exports = class SlackApp {
    * `fn` : (msg, next) => { }
    */
 
-  use(fn) {
+  use (fn) {
     this._middleware.push(fn)
   }
 
@@ -110,7 +110,7 @@ module.exports = class SlackApp {
    * @api private
    */
 
-  _handle(msg) {
+  _handle (msg) {
     let self = this
     msg.attachSlackApp(self)
     let idx = 0
@@ -130,7 +130,7 @@ module.exports = class SlackApp {
       }
 
       // consider the matchers
-      for (let i=0; i < self._matchers.length; i++) {
+      for (let i = 0; i < self._matchers.length; i++) {
         // if match is a regex, text the regex against the text of a message (if it is a message)
         let matcher = self._matchers[i]
         if (matcher(msg)) {
@@ -151,7 +151,7 @@ module.exports = class SlackApp {
    * - POST `/slack-interactive`
    */
 
-  attachToExpress(app) {
+  attachToExpress (app) {
     return this.receiver.attachToExpress(app)
   }
 
@@ -163,7 +163,7 @@ module.exports = class SlackApp {
    * - `fn`  function - `(msg) => {}`
    */
 
-  route(fnKey, fn) {
+  route (fnKey, fn) {
     this._registry[fnKey] = fn
   }
 
@@ -174,7 +174,7 @@ module.exports = class SlackApp {
    * - `fnKey` string - unique key to refer to function
    */
 
-  getRoute(fnKey) {
+  getRoute (fnKey) {
     return this._registry[fnKey]
   }
 
@@ -196,16 +196,16 @@ module.exports = class SlackApp {
    * - `fn` function - match function `(msg) => { return bool }`
    */
 
-   match(fn) {
-     this._matchers.push(fn)
-   }
+  match (fn) {
+    this._matchers.push(fn)
+  }
 
   /**
    * Register a new message handler function for the criteria
    *
    * Parameters:
    * - `criteria` string or RegExp - message is string or match RegExp
-   * - `type_filter` Array for list of values or string for one value [optional]
+   * - `typeFilter` Array for list of values or string for one value [optional]
    *     * `direct_message`
    *     * `direct_mention`
    *     * `mention`
@@ -234,22 +234,22 @@ module.exports = class SlackApp {
    *    }
    */
 
-  message(criteria, type_filter, callback) {
+  message (criteria, typeFilter, callback) {
     if (typeof criteria === 'string') {
       criteria = new RegExp(criteria, 'i')
     }
-    if (typeof type_filter === 'function') {
-      callback = type_filter
-      type_filter = []
+    if (typeof typeFilter === 'function') {
+      callback = typeFilter
+      typeFilter = []
     }
-    if (typeof type_filter === 'string') {
-      type_filter = [type_filter]
+    if (typeof typeFilter === 'string') {
+      typeFilter = [typeFilter]
     }
 
     let fn = (msg) => {
       if (msg.type === 'event' && msg.body.event && msg.body.event.type === 'message') {
         let text = msg.stripDirectMention()
-        if (criteria.test(text) && (type_filter.length === 0 || msg.isAnyOf(type_filter))) {
+        if (criteria.test(text) && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
           callback(msg, text)
           return true
         }
@@ -289,7 +289,7 @@ module.exports = class SlackApp {
    *    }
    */
 
-  event(criteria, callback) {
+  event (criteria, callback) {
     if (typeof criteria === 'string') {
       criteria = new RegExp('^' + criteria + '$', 'i')
     }
@@ -304,11 +304,11 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Register a new action handler for an action_name_criteria
+   * Register a new action handler for an actionNameCriteria
    *
    * Parameters:
-   * - `callback_id` string
-   * - `action_name_criteria` string or RegExp - the name of the action [optional]
+   * - `callbackId` string
+   * - `actionNameCriteria` string or RegExp - the name of the action [optional]
    * - `callback` function - `(msg) => {}`
    *
    * Example `msg` object:
@@ -379,21 +379,21 @@ module.exports = class SlackApp {
    *
    */
 
-  action(callback_id, action_name_criteria, callback) {
-    if (typeof action_name_criteria === 'function') {
-      callback = action_name_criteria
-      action_name_criteria = /.*/
+  action (callbackId, actionNameCriteria, callback) {
+    if (typeof actionNameCriteria === 'function') {
+      callback = actionNameCriteria
+      actionNameCriteria = /.*/
     }
 
-    if (typeof action_name_criteria === 'string') {
-      action_name_criteria = new RegExp('^' + action_name_criteria + '$', 'i')
+    if (typeof actionNameCriteria === 'string') {
+      actionNameCriteria = new RegExp('^' + actionNameCriteria + '$', 'i')
     }
 
     let fn = (msg) => {
-      if (msg.type === 'action' && msg.body.actions && msg.body.callback_id === callback_id) {
-        for (let i=0; i < msg.body.actions.length; i++) {
+      if (msg.type === 'action' && msg.body.actions && msg.body.callback_id === callbackId) {
+        for (let i = 0; i < msg.body.actions.length; i++) {
           let action = msg.body.actions[i]
-          if (action_name_criteria.test(action.name)) {
+          if (actionNameCriteria.test(action.name)) {
             callback(msg, action.value)
             return true
           }
@@ -442,7 +442,7 @@ module.exports = class SlackApp {
    *     }
    */
 
-  command(command, criteria, callback) {
+  command (command, criteria, callback) {
     if (typeof criteria === 'function') {
       callback = criteria
       criteria = /.*/
