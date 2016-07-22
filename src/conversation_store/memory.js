@@ -22,7 +22,7 @@ module.exports = class MemoryStore {
   set(id, params, callback) {
     callback = callback || (() => {})
     params.id = id
-    this.store[key] = params
+    this.store[id] = params
     callback()
   }
 
