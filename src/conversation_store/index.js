@@ -2,6 +2,10 @@
 
 const MemoryStore = require('./memory')
 
+/**
+ * Conversation store
+ * @private
+ */
 module.exports = (opts) => {
   opts = opts || {}
   let storage

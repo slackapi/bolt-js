@@ -3,6 +3,10 @@
 const request = require('request')
 const slack = require('slack')
 
+/**
+ * Message
+ * @class
+ */
 module.exports = class Message {
   constructor (type, body, meta) {
     this.type = type
@@ -32,14 +36,12 @@ module.exports = class Message {
   }
 
   /**
-   * Register the next function to route to in a conversation.
+   * Register the next function to route to in a conversation. The route should
+   * be registered already through `slackapp.route`
    *
-   * The route should be registered already through `slackapp.route`
-   *
-   * Parameters
-   * - `fnKey` `string`
-   * - `state` `object` arbitrary data to be passed back to your function [optional]
-   * - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
+   * @param {string} fnKey - unique key to register function
+   * @param {Object={}} state - arbitrary data to be passed back to your function [optional]
+   * @param {number=3600} secondsToExpire - seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
    */
 
   route (fnKey, state, secondsToExpire) {
@@ -69,13 +71,15 @@ module.exports = class Message {
   /**
    * Send a message through `chat.postmessage` that defaults to current channel and tokens
    *
-   * Parameters
-   * - `input` `string` or `object` or `Array`
-   *     * type `object`: raw object that would be past to `chat.postmessage`
-   *     * type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
-   *     * type `Array`: of strings or objects above to be picked randomly (can be mixed!)
+   * `input` may be one of:
+   * - type `object`: raw object that would be past to `chat.postmessage`
+   * - type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
+   * - type `Array`: of strings or objects above to be picked randomly (can be mixed!)
    *
-   * - `callback` string - (err, data) => {}
+   * @param {string|Object|Array} input
+   * @param {function} callback - (err, data) => {}
+   * @param {Error} callback.err - error object
+   * @param {Object} callback.data - data returned from call
    */
 
   say (input, callback) {
@@ -95,14 +99,16 @@ module.exports = class Message {
   /**
    * Use a `response_url` from a Slash command or interactive message action
    *
-   * Parameters
-   * - `responseUrl` string - URL provided by a Slack interactive message action or slash command
-   * - `input` string or object or Array
-   *     * type `object`: raw object that would be past to `chat.postmessage`
-   *     * type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
-   *     * type `Array`: of strings or objects above to be picked randomly (can be mixed!)
+   * `input` may be one of:
+   * - type `object`: raw object that would be past to `chat.postmessage`
+   * - type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
+   * - type `Array`: of strings or objects above to be picked randomly (can be mixed!)
    *
-   * - `callback` string - (err, data) => {}
+   * @param {string} responseUrl - URL provided by a Slack interactive message action or slash command
+   * @param {string|Object|Array} input
+   * @param {function} callback - (err, data) => {}
+   * @param {Error} callback.err - error object
+   * @param {Object} callback.data - data returned from call
    */
 
   respond (responseUrl, input, callback) {
@@ -136,7 +142,7 @@ module.exports = class Message {
   }
 
   /**
-   * Is this an `event` of type `message`?
+   * @return {boolean} Is this an `event` of type `message`?
    */
 
   isMessage () {
@@ -197,9 +203,9 @@ module.exports = class Message {
   }
 
   /**
-   * Return the user IDs of any users mentioned in the message
+   * Users mentioned in the message
    *
-   * Returns an Array of IDs
+   * @return {Array<string>} array of user IDs
    */
 
   usersMentioned () {
@@ -207,9 +213,9 @@ module.exports = class Message {
   }
 
   /**
-   * Return the channel IDs of any channels mentioned in the message
+   * Channels mentioned in the message
    *
-   * Returns an Array of IDs
+   * @return {Array<string>} array of channel IDs
    */
 
   channelsMentioned () {
@@ -217,9 +223,9 @@ module.exports = class Message {
   }
 
   /**
-   * Return the IDs of any subteams (groups) mentioned in the message
+   * Subteams (groups) mentioned in the message
    *
-   * Returns an Array of IDs
+   * @return {Array<string>} array of subteam IDs
    */
   subteamGroupsMentioned () {
     return this._regexMentions(new RegExp('<!subteam\\^(S[A-Za-z0-9]+)[^>]+>', 'g'))
@@ -290,7 +296,7 @@ module.exports = class Message {
   /**
    * Returns array of regex matches from the text of a message
    *
-   * @api private
+   * @private
    */
 
   _regexMentions (re) {
@@ -314,7 +320,7 @@ module.exports = class Message {
    * If an array, pick a random item of the array.
    * If a string, wrap in a `chat.postmessage` params object
    *
-   * @api private
+   * @private
    */
 
   _processInput (input) {

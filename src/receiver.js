@@ -5,6 +5,10 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const Message = require('./message')
 
+/**
+ * Receives HTTP requests with Events, Slash Commands, and Actions
+ * @private
+ */
 module.exports = class Receiver extends EventEmitter {
   constructor (opts) {
     super()
