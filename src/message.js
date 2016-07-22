@@ -2,7 +2,7 @@ const request = require('request')
 const slack = require('slack')
 
 module.exports = class Message {
-  constructor(type, body, meta) {
+  constructor (type, body, meta) {
     this.type = type
     this.body = body
     this.meta = meta
@@ -11,11 +11,11 @@ module.exports = class Message {
     this._slackapp = null
   }
 
-  attachSlackApp(slackapp) {
+  attachSlackApp (slackapp) {
     this._slackapp = slackapp
   }
 
-  attachOverrideRoute(fnKey, state) {
+  attachOverrideRoute (fnKey, state) {
     let fn = this._slackapp.getRoute(fnKey)
 
     // TODO: should we bubble up if a function doesn't exist?
@@ -40,7 +40,7 @@ module.exports = class Message {
    * - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
    */
 
-  route(fnKey, state, secondsToExpire) {
+  route (fnKey, state, secondsToExpire) {
     const hour = 60 * 60
     if (!state) {
       state = {}
@@ -60,7 +60,7 @@ module.exports = class Message {
    * Explicity cancel `route` registration.
    */
 
-  cancel() {
+  cancel () {
     this._slackapp.convoStore.del(this.conversation_id)
   }
 
@@ -76,8 +76,8 @@ module.exports = class Message {
    * - `callback` string - (err, data) => {}
    */
 
-  say(input, callback) {
-    if (!callback) callback = (() => {})
+  say (input, callback) {
+    if (!callback) callback = () => {}
 
     input = this._processInput(input)
 
@@ -94,7 +94,7 @@ module.exports = class Message {
    * Use a `response_url` from a Slash command or interactive message
    *
    * Parameters
-   * - `response_url` string - URL provided by a Slack interactive message or slash command
+   * - `responseUrl` string - URL provided by a Slack interactive message or slash command
    * - `input` string or object or Array
    *     * type `object`: raw object that would be past to `chat.postmessage`
    *     * type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
@@ -103,15 +103,14 @@ module.exports = class Message {
    * - `callback` string - (err, data) => {}
    */
 
-  respond(response_url, input, callback) {
-    if (!callback) callback = (() => {})
+  respond (responseUrl, input, callback) {
+    if (!callback) callback = () => {}
 
     input = this._processInput(input)
 
-
     // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
     request({
-      uri: response_url,
+      uri: responseUrl,
       method: 'POST',
       json: input
     }, (err, res, body) => {
@@ -138,7 +137,7 @@ module.exports = class Message {
    * Is this an `event` of type `message`?
    */
 
-  isMessage() {
+  isMessage () {
     return this.type === 'event' && this.body.event && this.body.event.type === 'message'
   }
 
@@ -146,7 +145,7 @@ module.exports = class Message {
    * Is this a message that is a direct mention ("@botusername: hi there", "@botusername goodbye!")
    */
 
-  isDirectMention() {
+  isDirectMention () {
     return this.isMessage() && new RegExp(`^<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
   }
 
@@ -154,7 +153,7 @@ module.exports = class Message {
    * Is this a message in a direct message channel (one on one)
    */
 
-  isDirectMessage() {
+  isDirectMessage () {
     return this.isMessage() && this.meta.channel_id[0] === 'D'
   }
 
@@ -163,7 +162,7 @@ module.exports = class Message {
    * This only checks for the bot user and does not consider any other users
    */
 
-  isMention() {
+  isMention () {
     return this.isMessage() && new RegExp(`<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
   }
 
@@ -172,7 +171,7 @@ module.exports = class Message {
    * all (other users could be mentioned)
    */
 
-  isAmbient() {
+  isAmbient () {
     return this.isMessage() && !this.isMention() && !this.isDirectMessage()
   }
 
@@ -180,19 +179,19 @@ module.exports = class Message {
    * Is this a message that matches any one of these filter types
    *
    * Parameters:
-   * - `message_filters` Array - any of direct_message, direct_mention, mention or ambient
+   * - `messageFilters` Array - any of direct_message, direct_mention, mention or ambient
    */
 
-  isAnyOf(message_filters) {
+  isAnyOf (messageFilters) {
     let found = false
-    for (let i=0; i < message_filters.length; i++) {
-      var filter = message_filters[i]
-      found = found || (filter ==='direct_message' && this.isDirectMessage())
-      found = found || (filter ==='direct_mention' && this.isDirectMention())
-      found = found || (filter ==='ambient' && this.isAmbient())
-      found = found || (filter ==='mention' && this.isMention())
+    for (let i = 0; i < messageFilters.length; i++) {
+      var filter = messageFilters[i]
+      found = found || (filter === 'direct_message' && this.isDirectMessage())
+      found = found || (filter === 'direct_mention' && this.isDirectMention())
+      found = found || (filter === 'ambient' && this.isAmbient())
+      found = found || (filter === 'mention' && this.isMention())
     }
-    console.log('Found', found, message_filters)
+    console.log('Found', found, messageFilters)
     return found
   }
 
@@ -202,7 +201,7 @@ module.exports = class Message {
    * Returns an Array of IDs
    */
 
-  usersMentioned() {
+  usersMentioned () {
     return this._regexMentions(new RegExp('<@(U[A-Za-z0-9]+)>', 'g'))
   }
 
@@ -212,7 +211,7 @@ module.exports = class Message {
    * Returns an Array of IDs
    */
 
-  channelsMentioned() {
+  channelsMentioned () {
     return this._regexMentions(new RegExp('<#(C[A-Za-z0-9]+)>', 'g'))
   }
 
@@ -221,7 +220,7 @@ module.exports = class Message {
    *
    * Returns an Array of IDs
    */
-  subteamGroupsMentioned() {
+  subteamGroupsMentioned () {
     return this._regexMentions(new RegExp('<!subteam\\^(S[A-Za-z0-9]+)[^>]+>', 'g'))
   }
 
@@ -229,7 +228,7 @@ module.exports = class Message {
    * Was "@everyone" mentioned in the message
    */
 
-  everyoneMentioned() {
+  everyoneMentioned () {
     return this._regexMentions(new RegExp('<!everyone>', 'g')).length > 0
   }
 
@@ -237,7 +236,7 @@ module.exports = class Message {
    * Was the current "@channel" mentioned in the message
    */
 
-  channelMentioned() {
+  channelMentioned () {
     return this._regexMentions(new RegExp('<!(channel)[^>]*>', 'g')).length > 0
   }
 
@@ -245,7 +244,7 @@ module.exports = class Message {
    * Was the current "@channel" mentioned in the message
    */
 
-  hereMentioned() {
+  hereMentioned () {
     return this._regexMentions(new RegExp('<!(here)[^>]*>', 'g')).length > 0
   }
 
@@ -253,17 +252,17 @@ module.exports = class Message {
    * Return the URLs of any links mentioned in the message
    */
 
-  linksMentioned() {
+  linksMentioned () {
     let links = []
     let re = new RegExp('<([^@^>]+)>', 'g')
     let matcher
 
     if (this.isMessage()) {
       do {
-          matcher = re.exec(this.body.event.text);
-          if (matcher) {
-            links.push(matcher[1].split('|')[0])
-          }
+        matcher = re.exec(this.body.event.text)
+        if (matcher) {
+          links.push(matcher[1].split('|')[0])
+        }
       } while (matcher)
     }
 
@@ -275,7 +274,7 @@ module.exports = class Message {
    * original text is not modified
    */
 
-  stripDirectMention() {
+  stripDirectMention () {
     var text = ''
     if (this.isMessage()) {
       text = this.body.event.text
@@ -293,21 +292,20 @@ module.exports = class Message {
    * @api private
    */
 
-  _regexMentions(re) {
+  _regexMentions (re) {
     let matches = []
     let matcher
 
     if (this.isMessage()) {
       do {
-          matcher = re.exec(this.body.event.text);
-          if (matcher) {
-              matches.push(matcher[1])
-          }
+        matcher = re.exec(this.body.event.text)
+        if (matcher) {
+          matches.push(matcher[1])
+        }
       } while (matcher)
     }
     return matches
   }
-
 
   /**
    * Preprocess `chat.postmessage` input.
@@ -318,7 +316,7 @@ module.exports = class Message {
    * @api private
    */
 
-  _processInput(input) {
+  _processInput (input) {
     // if input is an array, randomly pick one of the values
     if (Array.isArray(input)) {
       input = input[Math.floor(Math.random() * input.length)]
