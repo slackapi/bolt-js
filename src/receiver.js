@@ -1,3 +1,5 @@
+'use strict'
+
 const EventEmitter = require('events')
 const bodyParser = require('body-parser')
 const fs = require('fs')

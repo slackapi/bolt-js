@@ -1,3 +1,5 @@
+'use strict'
+
 const slack = require('slack')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver')
@@ -109,15 +111,21 @@ module.exports = class SlackApp {
 
   use (fn) {
     this._middleware.push(fn)
+
+    return this
   }
 
   /**
    * Handle new events (slack events, commands, actions, webhooks, etc.)
+   * Parameters
+   * - `msg` `Message`
+   * - `done` `function(err, bool)` Callback called once complete, called with error and boolean indicating message was handled [optional]
    *
    * @api private
    */
 
-  _handle (msg) {
+  _handle (msg, done) {
+    done = done || (() => {})
     let self = this
     msg.attachSlackApp(self)
     let idx = 0
@@ -135,7 +143,11 @@ module.exports = class SlackApp {
           if (err) {
             this.onError(err)
           }
-          msg.override(msg)
+          // invoking override w/o context explicitly
+          // don't want to confuse consumers w/ a msg as `this` scope
+          msg.override.call(null, msg)
+
+          done(err || null, true)
         })
         return
       }
@@ -145,12 +157,16 @@ module.exports = class SlackApp {
         // if match is a regex, text the regex against the text of a message (if it is a message)
         let matcher = self._matchers[i]
         if (matcher(msg)) {
-          return
+          return done(null, true)
         }
       }
+
+      done(null, false)
     }
 
     next()
+
+    return this
   }
 
   /**
@@ -176,6 +192,8 @@ module.exports = class SlackApp {
 
   route (fnKey, fn) {
     this._registry[fnKey] = fn
+
+    return this
   }
 
   /**
@@ -209,6 +227,8 @@ module.exports = class SlackApp {
 
   match (fn) {
     this._matchers.push(fn)
+
+    return this
   }
 
   /**
@@ -266,7 +286,7 @@ module.exports = class SlackApp {
         }
       }
     }
-    this.match(fn)
+    return this.match(fn)
   }
 
   /**
@@ -311,7 +331,7 @@ module.exports = class SlackApp {
       }
     }
 
-    this.match(fn)
+    return this.match(fn)
   }
 
   /**
@@ -412,7 +432,7 @@ module.exports = class SlackApp {
       }
     }
 
-    this.match(fn)
+    return this.match(fn)
   }
 
   /**
@@ -469,6 +489,6 @@ module.exports = class SlackApp {
       }
     }
 
-    this.match(fn)
+    return this.match(fn)
   }
 }

@@ -4,7 +4,10 @@
   "description": "A module for Slack App integrations",
   "main": "src/index.js",
   "scripts": {
-    "test": "standard"
+    "test": "npm run lint && npm run coverage",
+    "lint": "standard",
+    "unit": "ava",
+    "coverage": "nyc ava"
   },
   "repository": {
     "type": "git",
@@ -30,6 +33,9 @@
     "slack": "^7.5.7"
   },
   "devDependencies": {
+    "ava": "^0.15.2",
+    "nyc": "^7.0.0",
+    "sinon": "^1.17.4",
     "standard": "^7.1.2"
   }
 }
