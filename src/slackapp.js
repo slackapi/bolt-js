@@ -47,12 +47,19 @@ module.exports = class SlackApp {
     this.onError = opts.error || (() => {})
     this.client = slack
     this.receiver = new Receiver(opts)
+  }
 
+  /**
+   * Initialize app w/ default middleware and receiver listener
+   */
+  init () {
     // call `handle` for each new request
     // TODO: make overridable for testing
     this.receiver.on('message', this._handle.bind(this))
     this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
+
+    return this
   }
 
   /**
