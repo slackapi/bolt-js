@@ -132,43 +132,126 @@ module.exports = class Message {
     return this
   }
 
+  /**
+   * Is this an `event` of type `message`?
+   */
+
   isMessage() {
     return this.type === 'event' && this.body.event && this.body.event.type === 'message'
   }
 
+  /**
+   * Is this a message that is a direct mention ("@botusername: hi there", "@botusername goodbye!")
+   */
+
   isDirectMention() {
-    return this.isMessage() && new RegExp(`^<@${this.meta.bot_user_id}>`, 'i').text(this.body.event.text)
+    return this.isMessage() && new RegExp(`^<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
   }
+
+  /**
+   * Is this a message in a direct message channel (one on one)
+   */
 
   isDirectMessage() {
     return this.isMessage() && this.meta.channel_id[0] === 'D'
   }
 
+  /**
+   * Is this a message where the bot user mentioned anywhere in the message.
+   * This only checks for the bot user and does not consider any other users
+   */
+
   isMention() {
-    this.isMessage() && new RegExp(`<@${this.meta.bot_user_id}>`, 'i').text(this.body.event.text)
+    return this.isMessage() && new RegExp(`<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
   }
+
+  /**
+   * Is this a message that's not a direct message or that mentions that bot at
+   * all (other users could be mentioned)
+   */
 
   isAmbient() {
-    return this.isMessage() && !this.isMention() && !this.isDirectMention()
+    return this.isMessage() && !this.isMention() && !this.isDirectMessage()
   }
+
+  /**
+   * Is this a message that matches any one of these filter types
+   *
+   * Parameters:
+   * - `message_filters` Array - any of direct_message, direct_mention, mention or ambient
+   */
+
+  isAnyOf(message_filters) {
+    let found = false
+    for (let i=0; i < message_filters.length; i++) {
+      var filter = message_filters[i]
+      found = found || (filter ==='direct_message' && this.isDirectMessage())
+      found = found || (filter ==='direct_mention' && this.isDirectMention())
+      found = found || (filter ==='ambient' && this.isAmbient())
+      found = found || (filter ==='mention' && this.isMention())
+    }
+    console.log('Found', found, message_filters)
+    return found
+  }
+
+  /**
+   * Return the user IDs of any users mentioned in the message
+   *
+   * Returns an Array of IDs
+   */
 
   usersMentioned() {
-    let ids = []
-    let re = new RegExp('<@([A-Za-z0-9]+)>', 'g')
-    let matcher
-
-    if (this.isMessage()) {
-      do {
-          matcher = re.exec(this.body.event.text);
-          if (matcher) {
-              ids.push(matcher[1])
-          }
-      } while (matcher)
-    }
-    return ids
+    return this._regexMentions(new RegExp('<@(U[A-Za-z0-9]+)>', 'g'))
   }
 
-  links() {
+  /**
+   * Return the channel IDs of any channels mentioned in the message
+   *
+   * Returns an Array of IDs
+   */
+
+  channelsMentioned() {
+    return this._regexMentions(new RegExp('<#(C[A-Za-z0-9]+)>', 'g'))
+  }
+
+  /**
+   * Return the IDs of any subteams (groups) mentioned in the message
+   *
+   * Returns an Array of IDs
+   */
+  subteamGroupsMentioned() {
+    return this._regexMentions(new RegExp('<!subteam\\^(S[A-Za-z0-9]+)[^>]+>', 'g'))
+  }
+
+  /**
+   * Was "@everyone" mentioned in the message
+   */
+
+  everyoneMentioned() {
+    return this._regexMentions(new RegExp('<!everyone>', 'g')).length > 0
+  }
+
+  /**
+   * Was the current "@channel" mentioned in the message
+   */
+
+  channelMentioned() {
+    return this._regexMentions(new RegExp('<!(channel)[^>]*>', 'g')).length > 0
+  }
+
+  /**
+   * Was the current "@channel" mentioned in the message
+   */
+
+  hereMentioned() {
+    return this._regexMentions(new RegExp('<!(here)[^>]*>', 'g')).length > 0
+  }
+
+  /**
+   * Return the URLs of any links mentioned in the message
+   */
+
+  linksMentioned() {
     let links = []
     let re = new RegExp('<([^@^>]+)>', 'g')
     let matcher
@@ -185,6 +268,11 @@ module.exports = class Message {
     return links
   }
 
+  /**
+   * Strip the direct mention prefix from the message text and return it. The
+   * original text is not modified
+   */
+
   stripDirectMention() {
     var text = ''
     if (this.isMessage()) {
@@ -196,6 +284,37 @@ module.exports = class Message {
     }
     return text
   }
+
+  /**
+   * Returns array of regex matches from the text of a message
+   *
+   * @api private
+   */
+
+  _regexMentions(re) {
+    let matches = []
+    let matcher
+
+    if (this.isMessage()) {
+      do {
+          matcher = re.exec(this.body.event.text);
+          if (matcher) {
+              matches.push(matcher[1])
+          }
+      } while (matcher)
+    }
+    return matches
+  }
+
+
+  /**
+   * Preprocess `chat.postmessage` input.
+   *
+   * If an array, pick a random item of the array.
+   * If a string, wrap in a `chat.postmessage` params object
+   *
+   * @api private
+   */
 
   _processInput(input) {
     // if input is an array, randomly pick one of the values
@@ -211,6 +330,5 @@ module.exports = class Message {
 
     return input
   }
-
 
 }
