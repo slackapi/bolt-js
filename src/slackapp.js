@@ -95,7 +95,8 @@ module.exports = class SlackApp {
 
   ignoreBotsMiddleware () {
     return (msg, next) => {
-      if (msg.meta.bot_id || msg.meta.user_id === msg.meta.bot_user_id) {
+      // avoid the case where both user_id and bot_user_id not set
+      if (msg.meta.bot_id || (msg.meta.user_id && msg.meta.user_id === msg.meta.bot_user_id)) {
         return
       }
       next()
@@ -278,7 +279,7 @@ module.exports = class SlackApp {
     }
 
     let fn = (msg) => {
-      if (msg.type === 'event' && msg.body.event && msg.body.event.type === 'message') {
+      if (msg.isMessage()) {
         let text = msg.stripDirectMention()
         if (criteria.test(text) && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
           callback(msg, text)

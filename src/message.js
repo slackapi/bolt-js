@@ -193,7 +193,6 @@ module.exports = class Message {
       found = found || (filter === 'ambient' && this.isAmbient())
       found = found || (filter === 'mention' && this.isMention())
     }
-    console.log('Found', found, messageFilters)
     return found
   }
 
