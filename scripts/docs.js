@@ -1,15 +1,18 @@
 const dox = require('dox')
 const fs = require('fs')
+const path = require('path')
+
+const readmePath = path.join(__dirname, '/../README.md')
 
 // read source
 const src = [
   {
     name: 'SlackApp',
-    src: fs.readFileSync(__dirname + '/../src/slackapp.js', { encoding: 'utf8' })
+    src: fs.readFileSync(path.join(__dirname, '/../src/slackapp.js', { encoding: 'utf8' }))
   },
   {
     name: 'Message',
-    src: fs.readFileSync(__dirname + '/../src/message.js', { encoding: 'utf8' })
+    src: fs.readFileSync(path.join(__dirname, '/../src/message.js', { encoding: 'utf8' }))
   }
 ]
 
@@ -26,11 +29,11 @@ src.forEach((item) => {
 })
 
 let api = apiLines.join('\n\n')
-let readme = fs.readFileSync(__dirname + '/../README.md', { encoding: 'utf8' })
+let readme = fs.readFileSync(readmePath, { encoding: 'utf8' })
 let parts = readme.split('# API\n')
 let preamble = parts[0]
 parts = parts[1].split('# Contributing\n')
 let postamble = parts[1]
 
-let updatedReadme = [preamble, "# API", api, '# Contributing', postamble].join('\n\n')
-fs.writeFileSync(__dirname + '/../README.md', updatedReadme)
+let updatedReadme = [preamble, '# API', api, '# Contributing', postamble].join('\n\n')
+fs.writeFileSync(readmePath, updatedReadme)
