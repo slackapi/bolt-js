@@ -5,31 +5,20 @@ const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver')
 
 /**
- * `slackapp` exposes a factory that takes an options object.
- *
- * ```
- *     var SlackApp = require('slackapp')
- *     var slackapp = SlackApp(opts)
- * ```
- *
- * @class
- * @param {Object} opts
- * @param {string} opts.app_token - Slack App token override
- * @param {string} opts.app_user_id - Slack App User ID (who installed the app)
- * @param {string} opts.bot_token - Slack App Bot token
- * @param {string} opts.bot_user_id - Slack App Bot ID
- * @param {Object} opts.convo_store - Implementation of ConversationStore, defaults to memory
- * @param {string} opts.error - Error handler function `(error) => {}`
- * @returns {Object} SlackApp
+ * SlackApp module
  */
-
 module.exports = class SlackApp {
 
   /**
-   * SlackApp constructor
+   * Initialize a SlackApp, accepts an options object
    *
-   * Documented in index.js
-   * @private
+   * Options:
+   * - `app_token`   Slack App token
+   * - `app_user_id` Slack App User ID (who installed the app)
+   * - `bot_token`   Slack App Bot token
+   * - `bot_user_id` Slack App Bot ID
+   * - `convo_store` `string` of type of Conversation store (`memory`, etc.) or `object` implementation
+   * - `error`       Error handler function `(error) => {}`
    */
 
   constructor (opts) {
@@ -64,8 +53,6 @@ module.exports = class SlackApp {
 
   /**
    * Initialize app w/ default middleware and receiver listener
-   *
-   * @private
    */
   init () {
     // call `handle` for each new request
@@ -81,7 +68,7 @@ module.exports = class SlackApp {
    * Middleware that gets an existing conversation from the conversation store
    * or initialize a new one.
    *
-   * @private
+   * @api private
    */
 
   preprocessConversationMiddleware () {
@@ -103,7 +90,7 @@ module.exports = class SlackApp {
   /**
    * Middleware that ignores messages from any bot user when we can tell
    *
-   * @private
+   * @api private
    */
 
   ignoreBotsMiddleware () {
@@ -116,12 +103,11 @@ module.exports = class SlackApp {
     }
   }
 
-
   /**
-   * Register a new middleware, considered in order of registration
-   * @param {function} fn - (msg, next) => { }
-   * @param {message} fn.msg - instance of message
-   * @param {function} fn.next - next callback
+   * Register a new middleware
+   *
+   * Middleware is processed in the order registered.
+   * `fn` : (msg, next) => { }
    */
 
   use (fn) {
@@ -136,7 +122,7 @@ module.exports = class SlackApp {
    * - `msg` `Message`
    * - `done` `function(err, bool)` Callback called once complete, called with error and boolean indicating message was handled [optional]
    *
-   * @private
+   * @api private
    */
 
   _handle (msg, done) {
@@ -185,13 +171,12 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Attach HTTP routes to an [Express](https://expressjs.com/) app and registers the following routes:
-   * - `POST` `/slack-event`
-   * - `POST` `/slack-command`
-   * - `POST` `/slack-action`
+   * Attach HTTP routes to an Express app
    *
-   * @param {Object} app - instance of an express app
-   *
+   * Routes are:
+   * - POST `/slack-event`
+   * - POST `/slack-command`
+   * - POST `/slack-action`
    */
 
   attachToExpress (app) {
@@ -201,9 +186,9 @@ module.exports = class SlackApp {
   /**
    * Register a new function route
    *
-   * @param {string} fnKey - unique function key
-   * @param {function} fn - callback (msg) => {}
-   * @param {message} fn.msg - instance of message
+   * Parameters
+   * - `fnKey` string - unique key to refer to function
+   * - `fn`  function - `(msg) => {}`
    */
 
   route (fnKey, fn) {
@@ -215,7 +200,8 @@ module.exports = class SlackApp {
   /**
    * Return a registered route
    *
-   * @param {string} fnKey - unique function key
+   * Parameters
+   * - `fnKey` string - unique key to refer to function
    */
 
   getRoute (fnKey) {
@@ -236,9 +222,8 @@ module.exports = class SlackApp {
    * that they are efficient. However you may do asyncronous tasks within to
    * your hearts content.
    *
-   * @param {function} fn - match function `(msg) => { return bool }`
-   * @param {message} fn.msg - instance of Message
-   * @return {boolean} - was a match found and the message handled (otherwise continue looking)
+   * Parameters
+   * - `fn` function - match function `(msg) => { return bool }`
    */
 
   match (fn) {
@@ -248,20 +233,19 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Register a new message handler function for the provided criteria. Types should be one or
-   * more of:
+   * Register a new message handler function for the criteria
    *
-   * - `direct_message`
-   * - `direct_mention`
-   * - `mention`
-   * - `ambient`
-   * -  default: matches all if none provided
+   * Parameters:
+   * - `criteria` string or RegExp - message is string or match RegExp
+   * - `typeFilter` Array for list of values or string for one value [optional]
+   *     * `direct_message`
+   *     * `direct_mention`
+   *     * `mention`
+   *     * `ambient`
+   *     *  default: matches all if none provided
+   * - `callback` function - `(msg) => {}`
    *
-   * @param {(string|RegExp)} criteria - string of a regular expression or RexExp object
-   * @param {(string=|Array=)} typeFilter - list of types or string if just one
-   * @param {function} callback - (msg) => {}
-   * @param {message} callback.msg - instance of Message
-   * @example `msg` object:
+   * Example `msg` object:
    *
    *    {
    *       "token":"dxxxxxxxxxxxxxxxxxxxx",
@@ -309,10 +293,11 @@ module.exports = class SlackApp {
   /**
    * Register a new event handler for an actionName
    *
-   * @param {(string|RegExp)} criteria - type of event or RegExp for more flexible matching
-   * @param {function} callback - (msg) => {}
-   * @param {message} callback.msg - instance of Message
-   * @example `msg` object:
+   * Parameters:
+   * - `criteria` string or RegExp - the type of event
+   * - `callback` function - `(msg) => {}`
+   *
+   * Example `msg` object:
    *
    *    {
    *       "token":"dxxxxxxxxxxxxxxxxxxxx",
@@ -353,11 +338,12 @@ module.exports = class SlackApp {
   /**
    * Register a new action handler for an actionNameCriteria
    *
-   * @param {string} callbackId - Slack interactive message callback_id
-   * @param {(string|RegExp)=} actionNameCriteria - type of action or RegExp for more flexible matching
-   * @param {function} callback - (msg) => {}
-   * @param {message} callback.msg - instance of Message
-   * @example `msg` object:
+   * Parameters:
+   * - `callbackId` string
+   * - `actionNameCriteria` string or RegExp - the name of the action [optional]
+   * - `callback` function - `(msg) => {}`
+   *
+   * Example `msg` object:
    *
    * {
    *    "actions":[
@@ -453,11 +439,12 @@ module.exports = class SlackApp {
   /**
    * Register a new slash command handler
    *
-   * @param {string} command - the slash command (e.g. "/doit")
-   * @param {(string|RegExp)=} criteria - matching criteria for slash command name (e.g "/^create.*$/")
-   * @param {function} callback - (msg) => {}
-   * @param {message} callback.msg - instance of Message
-   * @example `msg` object:
+   * Parameters:
+   * - `command` string - the slash command (e.g. "/doit")
+   * - `criteria` string or RegExp (e.g "/^create.*$/") [optional]
+   * - `callback` function - `(msg) => {}`
+   *
+   * Example `msg` object:
    *
    *     {
    *        "type":"command",

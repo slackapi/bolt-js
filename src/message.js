@@ -40,8 +40,8 @@ module.exports = class Message {
    * be registered already through `slackapp.route`
    *
    * @param {string} fnKey - unique key to register function
-   * @param {Object={}} state - arbitrary data to be passed back to your function [optional]
-   * @param {number=3600} secondsToExpire - seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
+   * @param {Object=} state - arbitrary data to be passed back to your function [optional]
+   * @param {number} secondsToExpire - seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
    */
 
   route (fnKey, state, secondsToExpire) {
@@ -296,7 +296,7 @@ module.exports = class Message {
   /**
    * Returns array of regex matches from the text of a message
    *
-   * @private
+   * @api private
    */
 
   _regexMentions (re) {
@@ -320,7 +320,7 @@ module.exports = class Message {
    * If an array, pick a random item of the array.
    * If a string, wrap in a `chat.postmessage` params object
    *
-   * @private
+   * @api private
    */
 
   _processInput (input) {
