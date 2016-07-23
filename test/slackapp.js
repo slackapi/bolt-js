@@ -3,6 +3,7 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const SlackApp = require('../src/slackapp')
+const Message = require('../src/message')
 
 test('SlackApp()', t => {
   let options = {
@@ -40,6 +41,14 @@ test('Slackapp.use()', t => {
 
   t.is(app._middleware.length, 1)
   t.deepEqual(app._middleware, [mw])
+})
+
+test('SlackApp.init()', t => {
+  let app = new SlackApp()
+
+  app.init()
+
+  t.is(app._middleware.length, 2)
 })
 
 test('Slackapp.attachToExpress()', t => {
@@ -197,6 +206,343 @@ test.cb('SlackApp._handle() with override and del error', t => {
     t.true(delStub.calledWith(message.conversation_id))
     t.true(onErrorSpy.calledOnce)
 
+    t.end()
+  })
+})
+
+test.cb('SlackApp.command() w/o criteria', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'command',
+    body: {
+      command: 'test'
+    }
+  }
+
+  app
+    .command(message.body.command, (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.command() w/ criteria string', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'command',
+    body: {
+      command: 'test',
+      text: 'hello'
+    }
+  }
+
+  app
+    .command(message.body.command, 'hel', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.command() w/ criteria regex', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'command',
+    body: {
+      command: 'test',
+      text: 'hello'
+    }
+  }
+
+  app
+    .command(message.body.command, /llo$/, (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.command() w/ non-matching string criteria', t => {
+  t.plan(2)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'command',
+    body: {
+      command: 'test',
+      text: 'hello'
+    }
+  }
+
+  app
+    .command(message.body.command, 'derp', () => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.command() w/ non-matching regex criteria', t => {
+  t.plan(2)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'command',
+    body: {
+      command: 'test',
+      text: 'hello'
+    }
+  }
+
+  app
+    .command(message.body.command, /^derp$/, () => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.action() w/o criteria', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'action',
+    body: {
+      actions: [
+        { name: 'beep' }
+      ],
+      callback_id: 'my_callback',
+      command: 'test'
+    }
+  }
+
+  app
+    .action(message.body.callback_id, (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.action() w/ criteria string', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'action',
+    body: {
+      actions: [
+        { name: 'beep' }
+      ],
+      callback_id: 'my_callback',
+      command: 'test'
+    }
+  }
+
+  app
+    .action(message.body.callback_id, 'beep', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.action() w/ non-matching criteria', t => {
+  t.plan(2)
+
+  let app = new SlackApp()
+  let message = {
+    attachSlackApp () {},
+    type: 'action',
+    body: {
+      actions: [
+        { name: 'beep' }
+      ],
+      callback_id: 'my_callback',
+      command: 'test'
+    }
+  }
+
+  app
+    .action(message.body.callback_id, 'boop', () => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.message() w/o filter', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep boop'
+    }
+  }, {})
+
+  app
+    .message('beep', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.message() w/ filter', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep boop'
+    }
+  }, {
+    bot_user_id: 'asdf',
+    channel_id: 'qwertyg'
+  })
+
+  app
+    .message('beep', 'ambient', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.event() w/ string criteria', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep boop'
+    }
+  }, {})
+
+  app
+    .event('message', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.event() w/ regex criteria', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep boop'
+    }
+  }, {})
+
+  app
+    .event(/^mess/, (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp._handle() w/ init()', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep boop'
+    }
+  }, {})
+
+  app
+    .init()
+    .event('message', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('SlackApp.ignoreBotsMiddleware() with bot message', t => {
+  let app = new SlackApp()
+  let mw = app.ignoreBotsMiddleware()
+
+  let message = new Message('event', {}, {
+    bot_id: 'asdf'
+  })
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.fail()
+  })
+  t.pass()
+  t.end()
+})
+
+test.cb('SlackApp.ignoreBotsMiddleware() w/o bot message', t => {
+  let app = new SlackApp()
+  let mw = app.ignoreBotsMiddleware()
+
+  let message = new Message('event', {}, {})
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.pass()
     t.end()
   })
 })
