@@ -3,248 +3,579 @@
 # slackapp-js
 A node.js module for Slack App integrations
 
-
-
-
 # API
 
-## undefined
+# slackapp
+
+  - [slackapp()](#slackappoptsobject)
+
+## slackapp(opts:Object)
+
+  Create a new SlackApp, accepts an options object
+  
+  Parameters
+  - `opts.app_token`   Slack App token override
+  - `opts.app_user_id` Slack App User ID (who installed the app)
+  - `opts.bot_token`   Slack App Bot token
+  - `opts.bot_user_id` Slack App Bot ID
+  - `opts.convo_store` Implementation of ConversationStore, defaults to memory
+  - `opts.error`       Error handler function `(error) => {}`
+  
+  Example
+  
+  
+```js
+  var SlackApp = require('slackapp')
+  var BeepBoopConvoStore = require('slackapp-convo-beepboop')
+  var slackapp = SlackApp({
+    debug: true,
+    record: 'out.jsonl',
+    convo_store: BeepBoopConvoStore({ debug: true }),
+    error: (err) => { console.error('Error: ', err) }
+  })
+```
+
+
+
+# SlackApp
+
+  - [SlackApp.use()](#slackappusefnfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.attachToExpress()](#slackappattachtoexpressappobject)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.route()](#slackapproutefnkeystringfnfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.getRoute()](#slackappgetroutefnkeystring)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.match()](#slackappmatchfnfunction)
+  - [Returns `true` if there is a match AND you handled the msg.](#returnstrueifthereisamatchandyouhandledthemsg)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.message()](#slackappmessagecriteriastringtypefilterstringarray)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.event()](#slackappeventcriteriastringregexpcallbackfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.action()](#slackappactioncallbackidstringactionnamecriteriastringregexpcallbackfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [SlackApp.command()](#slackappcommandcommandstringcriteriastringregexpcallbackfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+
+## SlackApp.use(fn:function)
+
+  Register a new middleware, processed in the order registered.
+  
+#### Parameters
+  - `fn`: middleware function `(msg, next) => { }`
+  
+  
+#### Returns
+  - `this` (chainable)
+
+## SlackApp.attachToExpress(app:Object)
+
+  Attach HTTP routes to an Express app
+  
+  Routes are:
+  - POST `/slack-event`
+  - POST `/slack-command`
+  - POST `/slack-action`
+  
+#### Parameters
+  - `app` instance of Express app
+  
+  
+#### Returns
+  - `app` reference to Express app passed in
+
+## SlackApp.route(fnKey:string, fn:function)
+
+  Register a new function route
+  
+#### Parameters
+  - `fnKey` unique key to refer to function
+  - `fn` `(msg, state) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+
+## SlackApp.getRoute(fnKey:string)
+
+  Return a registered route
+  
+#### Parameters
+  - `fnKey` string - unique key to refer to function
+  
+  
+#### Returns
+  - `(msg, state) => {}`
+
+## SlackApp.match(fn:function)
+
+  Register a custom Match function (fn)
+  
+#### Returns `true` if there is a match AND you handled the msg.
+  Return `false` if there is not a match and you pass on the message.
+  
+  All of the higher level matching convenience functions
+  generate a match function and call `match` to register it.
+  
+  Only one matcher can return true, and they are executed in the order they are
+  defined. Match functions should return as fast as possible because it's important
+  that they are efficient. However you may do asyncronous tasks within to
+  your hearts content.
+  
+#### Parameters
+  - `fn` function - match function `(msg) => { return bool }`
+  
+  
+#### Returns
+  - `this` (chainable)
+
+## SlackApp.message(criteria:string, typeFilter:string|Array)
+
+  Register a new message handler function for the criteria
+  
+#### Parameters
+  - `criteria` text that message contains or regex (e.g. "^hi")
+  - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`, `direct_mention`, `mention`, `ambient`
+  - `callback` function - `(msg) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  
+  Example `msg` object:
+  
+```js
+ {
+    "token":"dxxxxxxxxxxxxxxxxxxxx",
+    "team_id":"TXXXXXXXX",
+    "api_app_id":"AXXXXXXXX",
+    "event":{
+       "type":"message",
+       "user":"UXXXXXXXX",
+       "text":"hello!",
+       "ts":"1469130107.000088",
+       "channel":"DXXXXXXXX"
+    },
+    "event_ts":"1469130107.000088",
+    "type":"event_callback",
+    "authed_users":[
+       "UXXXXXXXX"
+    ]
+ }
+```
+
+## SlackApp.event(criteria:string|RegExp, callback:function)
+
+  Register a new event handler for an actionName
+  
+#### Parameters
+  - `criteria` the type of event
+  - `callback` `(msg) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  
+  Example `msg` object:
+  
+```js
+  {
+     "token":"dxxxxxxxxxxxxxxxxxxxx",
+     "team_id":"TXXXXXXXX",
+     "api_app_id":"AXXXXXXXX",
+     "event":{
+        "type":"reaction_added",
+        "user":"UXXXXXXXX",
+        "item":{
+           "type":"message",
+           "channel":"DXXXXXXXX",
+           "ts":"1469130181.000096"
+        },
+        "reaction":"grinning"
+     },
+     "event_ts":"1469131201.822817",
+     "type":"event_callback",
+     "authed_users":[
+        "UXXXXXXXX"
+     ]
+  }
+```
+
+## SlackApp.action(callbackId:string, actionNameCriteria:string|RegExp, callback:function)
+
+  Register a new action handler for an actionNameCriteria
+  
+#### Parameters
+  - `callbackId` string
+  - `actionNameCriteria` string or RegExp - the name of the action [optional]
+  - `callback` function - `(msg) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  
+  Example `msg` object:
+  
+```js
+  {
+     "actions":[
+        {
+           "name":"answer",
+           "value":":wine_glass:"
+        }
+     ],
+     "callback_id":"in_or_out_callback",
+     "team":{
+        "id":"TXXXXXXXX",
+        "domain":"companydomain"
+     },
+     "channel":{
+        "id":"DXXXXXXXX",
+        "name":"directmessage"
+     },
+     "user":{
+        "id":"UXXXXXXXX",
+        "name":"mike.brevoort"
+     },
+     "action_ts":"1469129995.067370",
+     "message_ts":"1469129988.000084",
+     "attachment_id":"1",
+     "token":"dxxxxxxxxxxxxxxxxxxxx",
+     "original_message":{
+        "text":"What?",
+        "username":"In or Out",
+        "bot_id":"BXXXXXXXX",
+        "attachments":[
+           {
+              "callback_id":"in_or_out_callback",
+              "fallback":"Pick one",
+              "id":1,
+              "actions":[
+                 {
+                    "id":"1",
+                    "name":"answer",
+                    "text":":beer:",
+                    "type":"button",
+                    "value":":beer:",
+                    "style":""
+                 },
+                 {
+                    "id":"2",
+                    "name":"answer",
+                    "text":":beers:",
+                    "type":"button",
+                    "value":":wine:",
+                    "style":""
+                 },
+              ]
+           },
+           {
+              "text":":beers: • mike.brevoort",
+              "id":2,
+              "fallback":"who picked beers"
+           }
+        ],
+        "type":"message",
+        "subtype":"bot_message",
+        "ts":"1469129988.000084"
+     },
+     "response_url":"https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx"
+  }
+```
+
+## SlackApp.command(command:string, criteria:string|RegExp, callback:function)
+
+  Register a new slash command handler
+  
+#### Parameters
+  - `command` string - the slash command (e.g. "/doit")
+  - `criteria` string or RegExp (e.g "/^create.+$/") [optional]
+  - `callback` function - `(msg) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  
+  Example `msg` object:
+  
+```js
+  {
+     "type":"command",
+     "body":{
+        "token":"xxxxxxxxxxxxxxxxxxx",
+        "team_id":"TXXXXXXXX",
+        "team_domain":"teamxxxxxxx",
+        "channel_id":"Dxxxxxxxx",
+        "channel_name":"directmessage",
+        "user_id":"Uxxxxxxxx",
+        "user_name":"xxxx.xxxxxxxx",
+        "command":"/doit",
+        "text":"whatever was typed after command",
+        "response_url":"https://hooks.slack.com/commands/TXXXXXXXX/111111111111111111111111111"
+     },
+     "resource":{
+        "app_token":"xoxp-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX",
+        "app_user_id":"UXXXXXXXX",
+        "bot_token":"xoxb-XXXXXXXXXX-XXXXXXXXXXXXXXXXXXXX",
+        "bot_user_id":"UXXXXXXXX"
+     },
+     "meta":{
+        "user_id":"UXXXXXXXX",
+        "channel_id":"DXXXXXXXX",
+        "team_id":"TXXXXXXXX"
+     },
+  }
+```
+
+
+
+# Message
+
+
+A Message object is created for every incoming Slack event, slash command, and interactive message action.
+It is generally always passed as `msg`.
+
+`msg` has three main top level properties
+- `type` - one of `event`, `command`, `action`
+- `body` - the unmodified payload of the original event
+- `meta` - derived or normalized properties and anything appended by middleware.
+
+
+`meta` should at least have these properties
+- ``
+- `app_token` - token for the user for the app
+- `app_user_id` - userID for the user who install ed the app
+- `bot_token` - token for a bot user of the app
+- `bot_user_id` -  userID of the bot user of the app
+    
+
+  - [Message.constructor()](#messageconstructortypestringbodyobjectmetaobject)
+  - [Parameters](#parameters)
+  - [Message.route()](#messageroutefnkeystringstateobjectsecondstoexpirenumber)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [Message.cancel()](#messagecancel)
+  - [Message.say()](#messagesayinputstringobjectarraycallbackfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [Message.respond()](#messagerespondresponseurlstringinputstringobjectarraycallbackfunction)
+  - [Parameters](#parameters)
+  - [Returns](#returns)
+  - [Message.isMessage()](#messageismessage)
+  - [Returns `bool` true if `this` is a message event type](#returnsbooltrueifthisisamessageeventtype)
+  - [Message.isDirectMention()](#messageisdirectmention)
+  - [Returns `bool` true if `this` is a direct mention](#returnsbooltrueifthisisadirectmention)
+  - [Message.isDirectMessage()](#messageisdirectmessage)
+  - [Returns `bool` true if `this` is a direct message](#returnsbooltrueifthisisadirectmessage)
+  - [Message.isMention()](#messageismention)
+  - [Returns `bool` true if `this` mentions the bot user](#returnsbooltrueifthismentionsthebotuser)
+  - [Message.isAmbient()](#messageisambient)
+  - [Returns `bool` true if `this` is an ambient message](#returnsbooltrueifthisisanambientmessage)
+  - [Message.isAnyOf()](#messageisanyofofarray)
+  - [Parameters](#parameters)
+  - [Returns `bool` true if `this` is a message that matches any of the filters](#returnsbooltrueifthisisamessagethatmatchesanyofthefilters)
+  - [Message.usersMentioned()](#messageusersmentioned)
+  - [Returns an Array of user IDs](#returnsanarrayofuserids)
+  - [Message.channelsMentioned()](#messagechannelsmentioned)
+  - [Returns an Array of channel IDs](#returnsanarrayofchannelids)
+  - [Message.subteamGroupsMentioned()](#messagesubteamgroupsmentioned)
+  - [Returns an Array of subteam IDs](#returnsanarrayofsubteamids)
+  - [Message.everyoneMentioned()](#messageeveryonementioned)
+  - [Returns `bool` true if `@everyone` was mentioned](#returnsbooltrueifeveryonewasmentioned)
+  - [Message.channelMentioned()](#messagechannelmentioned)
+  - [Returns `bool` true if `@channel` was mentioned](#returnsbooltrueifchannelwasmentioned)
+  - [Message.hereMentioned()](#messageherementioned)
+  - [Returns `bool` true if `@here` was mentioned](#returnsbooltrueifherewasmentioned)
+  - [Message.linksMentioned()](#messagelinksmentioned)
+  - [Returns `Array:string` of URLs of links mentioned in the message](#returnsarraystringofurlsoflinksmentionedinthemessage)
+  - [Message.stripDirectMention()](#messagestripdirectmention)
+  - [Returns `string` original `text` of message with a direct mention of the bot](#returnsstringoriginaltextofmessagewithadirectmentionofthebot)
+
+## Message.constructor(type:string, body:Object, meta:Object)
+
+  Construct a new Message
+  
+#### Parameters
+  - `type` the type of message (event, command, action, etc.)
+
+## Message.route(fnKey:string, state:Object, secondsToExpire:number)
+
+  Register the next function to route to in a conversation.
+  
+  The route should be registered already through `slackapp.route`
+  
+#### Parameters
+  - `fnKey` `string`
+  - `state` `object` arbitrary data to be passed back to your function [optional]
+  - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
+  
+  
+#### Returns
+  - `this` (chainable)
+
+## Message.cancel()
+
+  Explicity cancel pending `route` registration.
+
+## Message.say(input:string|Object|Array, callback:function)
+
+  Send a message through [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage).
+  
+  The current channel and inferred tokens are used as defaults. `input` maybe a
+  `string`, `Object` or mixed `Array` of `strings` and `Objects`. If a string,
+  the value will be set to `text` of the `chat.postmessage` object. Otherwise pass
+  a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) `Object`.
+  
+  If `input` is an `Array`, a random value in the array will be selected.
+  
+#### Parameters
+  - `input` the payload to send, maybe a string, Object or Array.
+  - `callback` (err, data) => {}
+  
+  
+#### Returns
+  - `this` (chainable)
+
+## Message.respond(responseUrl:string, input:string|Object|Array, callback:function)
+
+  Use a `response_url` from a Slash command or interactive message action with
+  a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) payload.
+  `input` options are the same as [`say`](#messagesay)
+  
+#### Parameters
+  - `responseUrl` string - URL provided by a Slack interactive message action or slash command
+  - `input` the payload to send, maybe a string, Object or Array.
+  - `callback` (err, data) => {}
+  
+  
+#### Returns
+  - `this` (chainable)
+
+## Message.isMessage()
+
+  Is this an `event` of type `message`?
+  
+  
+#### Returns `bool` true if `this` is a message event type
+
+## Message.isDirectMention()
+
+  Is this a message that is a direct mention ("@botusername: hi there", "@botusername goodbye!")
+  
+  
+#### Returns `bool` true if `this` is a direct mention
+
+## Message.isDirectMessage()
+
+  Is this a message in a direct message channel (one on one)
+  
+  
+#### Returns `bool` true if `this` is a direct message
+
+## Message.isMention()
+
+  Is this a message where the bot user mentioned anywhere in the message.
+  Only checks for mentions of the bot user and does not consider any other users.
+  
+  
+#### Returns `bool` true if `this` mentions the bot user
+
+## Message.isAmbient()
+
+  Is this a message that's not a direct message or that mentions that bot at
+  all (other users could be mentioned)
+  
+  
+#### Returns `bool` true if `this` is an ambient message
+
+## Message.isAnyOf(of:Array)
+
+  Is this a message that matches any one of the filters
+  
+#### Parameters
+  - `messageFilters` Array - any of `direct_message`, `direct_mention`, `mention` and `ambient`
+  
+  
+#### Returns `bool` true if `this` is a message that matches any of the filters
+
+## Message.usersMentioned()
+
+  Return the user IDs of any users mentioned in the message
+  
+#### Returns an Array of user IDs
+
+## Message.channelsMentioned()
+
+  Return the channel IDs of any channels mentioned in the message
+  
+#### Returns an Array of channel IDs
+
+## Message.subteamGroupsMentioned()
+
+  Return the IDs of any subteams (groups) mentioned in the message
+  
+#### Returns an Array of subteam IDs
+
+## Message.everyoneMentioned()
+
+  Was "@everyone" mentioned in the message
+  
+#### Returns `bool` true if `@everyone` was mentioned
+
+## Message.channelMentioned()
+
+  Was the current "@channel" mentioned in the message
+  
+#### Returns `bool` true if `@channel` was mentioned
+
+## Message.hereMentioned()
+
+  Was the "@here" mentioned in the message
+  
+#### Returns `bool` true if `@here` was mentioned
+
+## Message.linksMentioned()
+
+  Return the URLs of any links mentioned in the message
+  
+#### Returns `Array:string` of URLs of links mentioned in the message
+
+## Message.stripDirectMention()
+
+  Strip the direct mention prefix from the message text and return it. The
+  original text is not modified
+  
+  
+#### Returns `string` original `text` of message with a direct mention of the bot
+  user removed. For example, `@botuser hi` or `@botuser: hi` would produce `hi`.
+  `@notbotuser hi` would produce `@notbotuser hi`
 
-### SlackApp.module.exports
-
-<p>SlackApp module</p>
-
-### SlackApp.constructor()
-
-<p>Initialize a SlackApp, accepts an options object</p><p>Options:</p><ul>
-<li><code>app_token</code>   Slack App token</li>
-<li><code>app_user_id</code> Slack App User ID (who installed the app)</li>
-<li><code>bot_token</code>   Slack App Bot token</li>
-<li><code>bot_user_id</code> Slack App Bot ID</li>
-<li><code>convo_store</code> <code>string</code> of type of Conversation store (<code>memory</code>, etc.) or <code>object</code> implementation</li>
-<li><code>error</code>       Error handler function <code>(error) =&gt; {}</code></li>
-</ul>
-
-
-### SlackApp.init()
-
-<p>Initialize app w/ default middleware and receiver listener</p>
-
-### SlackApp.preprocessConversationMiddleware()
-
-<p>Middleware that gets an existing conversation from the conversation store<br />or initialize a new one.</p>
-
-### SlackApp.ignoreBotsMiddleware()
-
-<p>Middleware that ignores messages from any bot user when we can tell</p>
-
-### SlackApp.use()
-
-<p>Register a new middleware</p><p>Middleware is processed in the order registered.<br /><code>fn</code> : (msg, next) =&gt; { }</p>
-
-### SlackApp._handle()
-
-<p>Handle new events (slack events, commands, actions, webhooks, etc.)</p>
-
-### SlackApp.attachToExpress()
-
-<p>Attach HTTP routes to an Express app</p><p>Routes are:</p><ul>
-<li>POST <code>/slack-event</code></li>
-<li>POST <code>/slack-command</code></li>
-<li>POST <code>/slack-action</code></li>
-</ul>
-
-
-### SlackApp.route()
-
-<p>Register a new function route</p><p>Parameters</p><ul>
-<li><code>fnKey</code> string - unique key to refer to function</li>
-<li><code>fn</code>  function - <code>(msg) =&gt; {}</code></li>
-</ul>
-
-
-### SlackApp.getRoute()
-
-<p>Return a registered route</p><p>Parameters</p><ul>
-<li><code>fnKey</code> string - unique key to refer to function</li>
-</ul>
-
-
-### SlackApp.match()
-
-<p>Register a custom Match function (fn)</p><p>$eturns <code>true</code> if there is a match AND you handled the msg.<br />Return <code>false</code> if there is not a match and you pass on the message.</p><p>All of the higher level matching convenience functions<br />generate a match function and call match to register it.</p><p>Only one matcher can return true and they are executed in the order they are<br />defined. Match functions should return as fast as possible because it&#39;s important<br />that they are efficient. However you may do asyncronous tasks within to<br />your hearts content.</p><p>Parameters</p><ul>
-<li><code>fn</code> function - match function <code>(msg) =&gt; { return bool }</code></li>
-</ul>
-
-
-### SlackApp.message()
-
-<p>Register a new message handler function for the criteria</p><p>Parameters:</p><ul>
-<li><code>criteria</code> string or RegExp - message is string or match RegExp</li>
-<li><code>typeFilter</code> Array for list of values or string for one value [optional]<ul>
-<li><code>direct_message</code></li>
-<li><code>direct_mention</code></li>
-<li><code>mention</code></li>
-<li><code>ambient</code></li>
-<li>default: matches all if none provided</li>
-</ul>
-</li>
-<li><code>callback</code> function - <code>(msg) =&gt; {}</code></li>
-</ul>
-<p>Example <code>msg</code> object:</p><p>   {<br />      &quot;token&quot;:&quot;dxxxxxxxxxxxxxxxxxxxx&quot;,<br />      &quot;team_id&quot;:&quot;TXXXXXXXX&quot;,<br />      &quot;api_app_id&quot;:&quot;AXXXXXXXX&quot;,<br />      &quot;event&quot;:{<br />         &quot;type&quot;:&quot;message&quot;,<br />         &quot;user&quot;:&quot;UXXXXXXXX&quot;,<br />         &quot;text&quot;:&quot;hello!&quot;,<br />         &quot;ts&quot;:&quot;1469130107.000088&quot;,<br />         &quot;channel&quot;:&quot;DXXXXXXXX&quot;<br />      },<br />      &quot;event_ts&quot;:&quot;1469130107.000088&quot;,<br />      &quot;type&quot;:&quot;event_callback&quot;,<br />      &quot;authed_users&quot;:[<br />         &quot;UXXXXXXXX&quot;<br />      ]<br />   }</p>
-
-### SlackApp.event()
-
-<p>Register a new event handler for an actionName</p><p>Parameters:</p><ul>
-<li><code>criteria</code> string or RegExp - the type of event</li>
-<li><code>callback</code> function - <code>(msg) =&gt; {}</code></li>
-</ul>
-<p>Example <code>msg</code> object:</p><p>   {<br />      &quot;token&quot;:&quot;dxxxxxxxxxxxxxxxxxxxx&quot;,<br />      &quot;team_id&quot;:&quot;TXXXXXXXX&quot;,<br />      &quot;api_app_id&quot;:&quot;AXXXXXXXX&quot;,<br />      &quot;event&quot;:{<br />         &quot;type&quot;:&quot;reaction_added&quot;,<br />         &quot;user&quot;:&quot;UXXXXXXXX&quot;,<br />         &quot;item&quot;:{<br />            &quot;type&quot;:&quot;message&quot;,<br />            &quot;channel&quot;:&quot;DXXXXXXXX&quot;,<br />            &quot;ts&quot;:&quot;1469130181.000096&quot;<br />         },<br />         &quot;reaction&quot;:&quot;grinning&quot;<br />      },<br />      &quot;event_ts&quot;:&quot;1469131201.822817&quot;,<br />      &quot;type&quot;:&quot;event_callback&quot;,<br />      &quot;authed_users&quot;:[<br />         &quot;UXXXXXXXX&quot;<br />      ]<br />   }</p>
-
-### SlackApp.action()
-
-<p>Register a new action handler for an actionNameCriteria</p><p>Parameters:</p><ul>
-<li><code>callbackId</code> string</li>
-<li><code>actionNameCriteria</code> string or RegExp - the name of the action [optional]</li>
-<li><code>callback</code> function - <code>(msg) =&gt; {}</code></li>
-</ul>
-<p>Example <code>msg</code> object:</p><p>{<br />   &quot;actions&quot;:[<br />      {<br />         &quot;name&quot;:&quot;answer&quot;,<br />         &quot;value&quot;:&quot;:wine_glass:&quot;<br />      }<br />   ],<br />   &quot;callback_id&quot;:&quot;in_or_out_callback&quot;,<br />   &quot;team&quot;:{<br />      &quot;id&quot;:&quot;TXXXXXXXX&quot;,<br />      &quot;domain&quot;:&quot;companydomain&quot;<br />   },<br />   &quot;channel&quot;:{<br />      &quot;id&quot;:&quot;DXXXXXXXX&quot;,<br />      &quot;name&quot;:&quot;directmessage&quot;<br />   },<br />   &quot;user&quot;:{<br />      &quot;id&quot;:&quot;UXXXXXXXX&quot;,<br />      &quot;name&quot;:&quot;mike.brevoort&quot;<br />   },<br />   &quot;action_ts&quot;:&quot;1469129995.067370&quot;,<br />   &quot;message_ts&quot;:&quot;1469129988.000084&quot;,<br />   &quot;attachment_id&quot;:&quot;1&quot;,<br />   &quot;token&quot;:&quot;dxxxxxxxxxxxxxxxxxxxx&quot;,<br />   &quot;original_message&quot;:{<br />      &quot;text&quot;:&quot;What?&quot;,<br />      &quot;username&quot;:&quot;In or Out&quot;,<br />      &quot;bot_id&quot;:&quot;BXXXXXXXX&quot;,<br />      &quot;attachments&quot;:[<br />         {<br />            &quot;callback_id&quot;:&quot;in_or_out_callback&quot;,<br />            &quot;fallback&quot;:&quot;Pick one&quot;,<br />            &quot;id&quot;:1,<br />            &quot;actions&quot;:[<br />               {<br />                  &quot;id&quot;:&quot;1&quot;,<br />                  &quot;name&quot;:&quot;answer&quot;,<br />                  &quot;text&quot;:&quot;:beer:&quot;,<br />                  &quot;type&quot;:&quot;button&quot;,<br />                  &quot;value&quot;:&quot;:beer:&quot;,<br />                  &quot;style&quot;:&quot;&quot;<br />               },<br />               {<br />                  &quot;id&quot;:&quot;2&quot;,<br />                  &quot;name&quot;:&quot;answer&quot;,<br />                  &quot;text&quot;:&quot;:beers:&quot;,<br />                  &quot;type&quot;:&quot;button&quot;,<br />                  &quot;value&quot;:&quot;:wine:&quot;,<br />                  &quot;style&quot;:&quot;&quot;<br />               },<br />            ]<br />         },<br />         {<br />            &quot;text&quot;:&quot;:beers: • mike.brevoort&quot;,<br />            &quot;id&quot;:2,<br />            &quot;fallback&quot;:&quot;who picked beers&quot;<br />         }<br />      ],<br />      &quot;type&quot;:&quot;message&quot;,<br />      &quot;subtype&quot;:&quot;bot_message&quot;,<br />      &quot;ts&quot;:&quot;1469129988.000084&quot;<br />   },<br />   &quot;response_url&quot;:&quot;<a href="https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx">https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx</a>&quot;</p>
-
-### SlackApp.command()
-
-<p>Register a new slash command handler</p><p>Parameters:</p><ul>
-<li><code>command</code> string - the slash command (e.g. &quot;/doit&quot;)</li>
-<li><code>criteria</code> string or RegExp (e.g &quot;/^create.*$/&quot;) [optional]</li>
-<li><code>callback</code> function - <code>(msg) =&gt; {}</code></li>
-</ul>
-<p>Example <code>msg</code> object:</p><pre><code>{
-   &quot;type&quot;:&quot;command&quot;,
-   &quot;body&quot;:{
-      &quot;token&quot;:&quot;xxxxxxxxxxxxxxxxxxx&quot;,
-      &quot;team_id&quot;:&quot;TXXXXXXXX&quot;,
-      &quot;team_domain&quot;:&quot;teamxxxxxxx&quot;,
-      &quot;channel_id&quot;:&quot;Dxxxxxxxx&quot;,
-      &quot;channel_name&quot;:&quot;directmessage&quot;,
-      &quot;user_id&quot;:&quot;Uxxxxxxxx&quot;,
-      &quot;user_name&quot;:&quot;xxxx.xxxxxxxx&quot;,
-      &quot;command&quot;:&quot;/doit&quot;,
-      &quot;text&quot;:&quot;whatever was typed after command&quot;,
-      &quot;response_url&quot;:&quot;https://hooks.slack.com/commands/TXXXXXXXX/111111111111111111111111111&quot;
-   },
-   &quot;resource&quot;:{
-      &quot;app_token&quot;:&quot;xoxp-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX&quot;,
-      &quot;app_user_id&quot;:&quot;UXXXXXXXX&quot;,
-      &quot;bot_token&quot;:&quot;xoxb-XXXXXXXXXX-XXXXXXXXXXXXXXXXXXXX&quot;,
-      &quot;bot_user_id&quot;:&quot;UXXXXXXXX&quot;
-   },
-   &quot;meta&quot;:{
-      &quot;user_id&quot;:&quot;UXXXXXXXX&quot;,
-      &quot;channel_id&quot;:&quot;DXXXXXXXX&quot;,
-      &quot;team_id&quot;:&quot;TXXXXXXXX&quot;
-   },
-}
-</code></pre>
-
-## undefined
-
-### Message.module.exports
-
-<p>Message</p>
-
-### Message.route()
-
-<p>Register the next function to route to in a conversation. The route should<br />be registered already through <code>slackapp.route</code></p>
-
-### Message.cancel()
-
-<p>Explicity cancel <code>route</code> registration.</p>
-
-### Message.say()
-
-<p>Send a message through <code>chat.postmessage</code> that defaults to current channel and tokens</p><p><code>input</code> may be one of:</p><ul>
-<li>type <code>object</code>: raw object that would be past to <code>chat.postmessage</code></li>
-<li>type <code>string</code>: text of a message that will be used to construct object sent to <code>chat.postmessage</code></li>
-<li>type <code>Array</code>: of strings or objects above to be picked randomly (can be mixed!)</li>
-</ul>
-
-
-### Message.respond()
-
-<p>Use a <code>response_url</code> from a Slash command or interactive message action</p><p><code>input</code> may be one of:</p><ul>
-<li>type <code>object</code>: raw object that would be past to <code>chat.postmessage</code></li>
-<li>type <code>string</code>: text of a message that will be used to construct object sent to <code>chat.postmessage</code></li>
-<li>type <code>Array</code>: of strings or objects above to be picked randomly (can be mixed!)</li>
-</ul>
-
-
-### Message.isMessage()
-
-
-
-### Message.isDirectMention()
-
-<p>Is this a message that is a direct mention (&quot;@botusername: hi there&quot;, &quot;@botusername goodbye!&quot;)</p>
-
-### Message.isDirectMessage()
-
-<p>Is this a message in a direct message channel (one on one)</p>
-
-### Message.isMention()
-
-<p>Is this a message where the bot user mentioned anywhere in the message.<br />This only checks for the bot user and does not consider any other users</p>
-
-### Message.isAmbient()
-
-<p>Is this a message that&#39;s not a direct message or that mentions that bot at<br />all (other users could be mentioned)</p>
-
-### Message.isAnyOf()
-
-<p>Is this a message that matches any one of these filter types</p><p>Parameters:</p><ul>
-<li><code>messageFilters</code> Array - any of direct_message, direct_mention, mention or ambient</li>
-</ul>
-
-
-### Message.usersMentioned()
-
-<p>Users mentioned in the message</p>
-
-### Message.channelsMentioned()
-
-<p>Channels mentioned in the message</p>
-
-### Message.subteamGroupsMentioned()
-
-<p>Subteams (groups) mentioned in the message</p>
-
-### Message.everyoneMentioned()
-
-<p>Was &quot;@everyone&quot; mentioned in the message</p>
-
-### Message.channelMentioned()
-
-<p>Was the current &quot;@channel&quot; mentioned in the message</p>
-
-### Message.hereMentioned()
-
-<p>Was the current &quot;@channel&quot; mentioned in the message</p>
-
-### Message.linksMentioned()
-
-<p>Return the URLs of any links mentioned in the message</p>
-
-### Message.stripDirectMention()
-
-<p>Strip the direct mention prefix from the message text and return it. The<br />original text is not modified</p>
-
-### Message._regexMentions()
-
-<p>Returns array of regex matches from the text of a message</p>
-
-### Message._processInput()
-
-<p>Preprocess <code>chat.postmessage</code> input.</p><p>If an array, pick a random item of the array.<br />If a string, wrap in a <code>chat.postmessage</code> params object</p>
 
 # Contributing
 
+We adore contributions. Please include the details of the proposed changes in a Pull Request and ensure `npm run test` pass. 👻
+
+### Scripts
+- `npm test` - runs linter and tests with coverage
+- `npm run unit` - runs unit tests without coverage
+- `npm run lint` - just runs JS standard linter
+- `npm run coverage` - runs tests with coverage
+- `npm run docs` - regenerates API docs in this README.md
 
 # License
+MIT Copyright (c) 2016 Beep Boop, Robots & Pencils
