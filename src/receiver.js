@@ -16,6 +16,8 @@ module.exports = class Receiver extends EventEmitter {
     opts = opts || {}
 
     this.debug = opts.debug
+    this.verify_token = opts.verify_token
+
     this.app_token = opts.app_token
     this.app_user_id = opts.app_user_id
     this.bot_token = opts.bot_token
@@ -78,12 +80,26 @@ module.exports = class Receiver extends EventEmitter {
 
   eventHandler (req, res) {
     let body = req.body
+
+    // test verify token
+    if (this.verify_token && this.verify_token !== body.token) {
+      res.status(403).send('Invalid token')
+      return
+    }
+
     this.doEmit('event', body, req.app_details)
     return res.send()
   }
 
   commandHandler (req, res) {
     let body = req.body
+
+    // test verify token
+    if (this.verify_token && this.verify_token !== body.token) {
+      res.status(403).send('Invalid token')
+      return
+    }
+
     this.doEmit('command', body, req.app_details)
     return res.send()
   }
@@ -94,6 +110,13 @@ module.exports = class Receiver extends EventEmitter {
       return res.send('Invalid request: payload missing')
     }
     body = JSON.parse(body.payload)
+
+    // test verify token
+    if (this.verify_token && this.verify_token !== body.token) {
+      res.status(403).send('Invalid token')
+      return
+    }
+
     this.doEmit('action', body, req.app_details)
     return res.send()
   }

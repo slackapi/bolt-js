@@ -41,33 +41,14 @@ A node.js module for Slack App integrations
 # SlackApp
 
   - [SlackApp.use()](#slackappusefnfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.attachToExpress()](#slackappattachtoexpressappobject)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.route()](#slackapproutefnkeystringfnfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.getRoute()](#slackappgetroutefnkeystring)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.match()](#slackappmatchfnfunction)
-  - [Returns `true` if there is a match AND you handled the msg.](#returnstrueifthereisamatchandyouhandledthemsg)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.message()](#slackappmessagecriteriastringtypefilterstringarray)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.event()](#slackappeventcriteriastringregexpcallbackfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.action()](#slackappactioncallbackidstringactionnamecriteriastringregexpcallbackfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [SlackApp.command()](#slackappcommandcommandstringcriteriastringregexpcallbackfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
 
 ## SlackApp.use(fn:function)
 
@@ -155,7 +136,7 @@ A node.js module for Slack App integrations
   - `this` (chainable)
   
   
-  Example `msg` object:
+  Example `msg.body`:
   
 ```js
  {
@@ -229,7 +210,7 @@ A node.js module for Slack App integrations
   - `this` (chainable)
   
   
-  Example `msg` object:
+  Example `msg.body` object:
   
 ```js
   {
@@ -364,46 +345,24 @@ It is generally always passed as `msg`.
     
 
   - [Message.constructor()](#messageconstructortypestringbodyobjectmetaobject)
-  - [Parameters](#parameters)
   - [Message.route()](#messageroutefnkeystringstateobjectsecondstoexpirenumber)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [Message.cancel()](#messagecancel)
   - [Message.say()](#messagesayinputstringobjectarraycallbackfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [Message.respond()](#messagerespondresponseurlstringinputstringobjectarraycallbackfunction)
-  - [Parameters](#parameters)
-  - [Returns](#returns)
   - [Message.isMessage()](#messageismessage)
-  - [Returns `bool` true if `this` is a message event type](#returnsbooltrueifthisisamessageeventtype)
   - [Message.isDirectMention()](#messageisdirectmention)
-  - [Returns `bool` true if `this` is a direct mention](#returnsbooltrueifthisisadirectmention)
   - [Message.isDirectMessage()](#messageisdirectmessage)
-  - [Returns `bool` true if `this` is a direct message](#returnsbooltrueifthisisadirectmessage)
   - [Message.isMention()](#messageismention)
-  - [Returns `bool` true if `this` mentions the bot user](#returnsbooltrueifthismentionsthebotuser)
   - [Message.isAmbient()](#messageisambient)
-  - [Returns `bool` true if `this` is an ambient message](#returnsbooltrueifthisisanambientmessage)
   - [Message.isAnyOf()](#messageisanyofofarray)
-  - [Parameters](#parameters)
-  - [Returns `bool` true if `this` is a message that matches any of the filters](#returnsbooltrueifthisisamessagethatmatchesanyofthefilters)
   - [Message.usersMentioned()](#messageusersmentioned)
-  - [Returns an Array of user IDs](#returnsanarrayofuserids)
   - [Message.channelsMentioned()](#messagechannelsmentioned)
-  - [Returns an Array of channel IDs](#returnsanarrayofchannelids)
   - [Message.subteamGroupsMentioned()](#messagesubteamgroupsmentioned)
-  - [Returns an Array of subteam IDs](#returnsanarrayofsubteamids)
   - [Message.everyoneMentioned()](#messageeveryonementioned)
-  - [Returns `bool` true if `@everyone` was mentioned](#returnsbooltrueifeveryonewasmentioned)
   - [Message.channelMentioned()](#messagechannelmentioned)
-  - [Returns `bool` true if `@channel` was mentioned](#returnsbooltrueifchannelwasmentioned)
   - [Message.hereMentioned()](#messageherementioned)
-  - [Returns `bool` true if `@here` was mentioned](#returnsbooltrueifherewasmentioned)
   - [Message.linksMentioned()](#messagelinksmentioned)
-  - [Returns `Array:string` of URLs of links mentioned in the message](#returnsarraystringofurlsoflinksmentionedinthemessage)
   - [Message.stripDirectMention()](#messagestripdirectmention)
-  - [Returns `string` original `text` of message with a direct mention of the bot](#returnsstringoriginaltextofmessagewithadirectmentionofthebot)
 
 ## Message.constructor(type:string, body:Object, meta:Object)
 

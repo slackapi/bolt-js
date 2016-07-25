@@ -62,7 +62,7 @@ fs.writeFileSync(readmePath, updatedReadme)
 function formatDoxComments (comments) {
   var buf = []
 
-  comments.forEach(function (comment) {
+  comments.forEach((comment) => {
     if (comment.isPrivate) return
     if (comment.ignore) return
     var ctx = comment.ctx
@@ -82,7 +82,7 @@ function formatDoxComments (comments) {
 
   var code = buf.match(/^( {4}[^\n]+\n*)+/gm) || []
 
-  code.forEach(function (block) {
+  code.forEach((block) => {
     var code = block.replace(/^ {4}/gm, '')
     buf = buf.replace(block, '```js\n' + code.trimRight() + '\n```\n\n')
   })
@@ -91,7 +91,7 @@ function formatDoxComments (comments) {
 }
 
 function toc (str) {
-  return headings(str).map(function (h) {
+  return headings(str).filter((h) => { return h.level <= 2 }).map((h) => {
     var clean = h.title.replace(/\(.*?\)/, '()')
     return '  - [' + clean + '](#' + slug(h.title) + ')'
   }).join('\n')
@@ -102,7 +102,7 @@ function slug (str) {
 }
 
 function headings (str) {
-  return (str.match(/^#+ *([^\n]+)/gm) || []).map(function (str) {
+  return (str.match(/^#+ *([^\n]+)/gm) || []).map((str) => {
     str = str.replace(/^(#+) */, '')
     return {
       title: str,
@@ -115,7 +115,7 @@ function context (comment) {
   var ctx = comment.ctx
   var tags = comment.tags
 
-  var alias = tags.map(function (tag) {
+  var alias = tags.map((tag) => {
     return tag.type === 'alias' && tag.string
   }).filter(Boolean)
 
@@ -135,9 +135,9 @@ function context (comment) {
 }
 
 function params (tags) {
-  return tags.filter(function (tag) {
+  return tags.filter((tag) => {
     return tag.type === 'param'
-  }).map(function (param) {
+  }).map((param) => {
     return param.name + ':' + param.types.join('|')
   }).join(', ')
 }
