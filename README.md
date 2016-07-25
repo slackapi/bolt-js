@@ -85,9 +85,9 @@ A node.js module for Slack App integrations
   Attach HTTP routes to an Express app
   
   Routes are:
-  - POST `/slack-event`
-  - POST `/slack-command`
-  - POST `/slack-action`
+  - POST `/slackapp/event`
+  - POST `/slackapp/command`
+  - POST `/slackapp/action`
   
 #### Parameters
   - `app` instance of Express app
@@ -356,9 +356,7 @@ It is generally always passed as `msg`.
 - `body` - the unmodified payload of the original event
 - `meta` - derived or normalized properties and anything appended by middleware.
 
-
 `meta` should at least have these properties
-- ``
 - `app_token` - token for the user for the app
 - `app_user_id` - userID for the user who install ed the app
 - `bot_token` - token for a bot user of the app

@@ -41,15 +41,15 @@ module.exports = class Receiver extends EventEmitter {
    * Attach receiver HTTP route to an express app
    */
   attachToExpress (app) {
-    app.post('/slack-event',
+    app.post('/slackapp/event',
              this.tokenMiddleware.bind(this),
              bodyParser.json(),
              this.eventHandler.bind(this))
-    app.post('/slack-command',
+    app.post('/slackapp/command',
              this.tokenMiddleware.bind(this),
              bodyParser.urlencoded({extended: true}),
              this.commandHandler.bind(this))
-    app.post('/slack-action',
+    app.post('/slackapp/action',
              this.tokenMiddleware.bind(this),
              bodyParser.urlencoded({extended: true}),
              bodyParser.text({type: '*/*'}),

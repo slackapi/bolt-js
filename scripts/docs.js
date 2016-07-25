@@ -61,7 +61,6 @@ fs.writeFileSync(readmePath, updatedReadme)
 
 function formatDoxComments (comments) {
   var buf = []
-  console.log(JSON.stringify(comments))
 
   comments.forEach(function (comment) {
     if (comment.isPrivate) return
