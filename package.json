@@ -8,6 +8,7 @@
     "lint": "standard",
     "unit": "ava --verbose  test/*.test.js",
     "coverage": "nyc ava --verbose test/*.test.js",
+    "lcov": "npm run coverage -- --reporter=lcov",
     "docs": "node scripts/docs.js",
     "coveralls": "npm run coverage -- --reporter=lcov && cat ./coverage/lcov.info | coveralls"
   },
