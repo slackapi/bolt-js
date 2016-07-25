@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/BeepBoopHQ/slackapp-js.svg)](https://travis-ci.org/BeepBoopHQ/slackapp-js)
+[![Coverage Status](https://coveralls.io/repos/github/BeepBoopHQ/slackapp-js/badge.svg?branch=master)](https://coveralls.io/github/BeepBoopHQ/slackapp-js?branch=master)
 
 # slackapp-js
 A node.js module for Slack App integrations

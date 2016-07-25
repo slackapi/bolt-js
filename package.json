@@ -8,7 +8,8 @@
     "lint": "standard",
     "unit": "ava --verbose  test/*.test.js",
     "coverage": "nyc ava --verbose test/*.test.js",
-    "docs": "node scripts/docs.js"
+    "docs": "node scripts/docs.js",
+    "coveralls": "npm run coverage -- --reporter=lcov && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -35,9 +36,10 @@
   },
   "devDependencies": {
     "ava": "^0.15.2",
+    "coveralls": "^2.11.11",
+    "dox": "^0.8.1",
     "nyc": "^7.0.0",
     "sinon": "^1.17.4",
-    "dox": "^0.8.1",
     "standard": "^7.1.2"
   }
 }
