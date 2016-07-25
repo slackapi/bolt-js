@@ -1,9 +1,25 @@
 'use strict'
-
 const request = require('request')
 const slack = require('slack')
 
-module.exports = class Message {
+/**
+ * A Slack event message (command, action, event, etc.)
+ * @class Message
+ * @api private
+ */
+class Message {
+
+  /**
+   * Construct a new Message
+   *
+   * ##### Parameters
+   * - `type` the type of message (event, command, action, etc.)
+   *
+   * @param {string} type
+   * @param {Object} body
+   * @param {Object} meta
+   * @constructor
+   */
   constructor (type, body, meta) {
     this.type = type
     this.body = body
@@ -13,10 +29,34 @@ module.exports = class Message {
     this._slackapp = null
   }
 
+  /**
+   * Attach a SlackApp reference
+   *
+   * ##### Parameters
+   * - `slackapp` instance of SlackApp
+   *
+   * @param {SlackApp} slackapp
+   * @api private
+   */
   attachSlackApp (slackapp) {
     this._slackapp = slackapp
   }
 
+  /**
+   * Attach override handler in a conversation
+   *
+   * ##### Parameters
+   * - `fnKey` function key
+   * - `state` saved state to be passed onto router handler
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {string} fnKey
+   * @param {Object} state
+   * @api private
+   */
   attachOverrideRoute (fnKey, state) {
     let fn = this._slackapp.getRoute(fnKey)
 
@@ -36,10 +76,18 @@ module.exports = class Message {
    *
    * The route should be registered already through `slackapp.route`
    *
-   * Parameters
+   * ##### Parameters
    * - `fnKey` `string`
    * - `state` `object` arbitrary data to be passed back to your function [optional]
    * - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {string} fnKey
+   * @param {Object} state
+   * @param {number} secondsToExpire
    */
 
   route (fnKey, state, secondsToExpire) {
@@ -59,7 +107,7 @@ module.exports = class Message {
   }
 
   /**
-   * Explicity cancel `route` registration.
+   * Explicity cancel pending `route` registration.
    */
 
   cancel () {
@@ -67,15 +115,25 @@ module.exports = class Message {
   }
 
   /**
-   * Send a message through `chat.postmessage` that defaults to current channel and tokens
+   * Send a message through [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage).
    *
-   * Parameters
-   * - `input` `string` or `object` or `Array`
-   *     * type `object`: raw object that would be past to `chat.postmessage`
-   *     * type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
-   *     * type `Array`: of strings or objects above to be picked randomly (can be mixed!)
+   * The current channel and inferred tokens are used as defaults. `input` maybe a
+   * `string`, `Object` or mixed `Array` of `strings` and `Objects`. If a string,
+   * the value will be set to `text` of the `chat.postmessage` object. Otherwise pass
+   * a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) `Object`.
    *
-   * - `callback` string - (err, data) => {}
+   * If `input` is an `Array`, a random value in the array will be selected.
+   *
+   * ##### Parameters
+   * - `input` the payload to send, maybe a string, Object or Array.
+   * - `callback` (err, data) => {}
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {(string|Object|Array)} input
+   * @param {function} callback
    */
 
   say (input, callback) {
@@ -93,16 +151,22 @@ module.exports = class Message {
   }
 
   /**
-   * Use a `response_url` from a Slash command or interactive message action
+   * Use a `response_url` from a Slash command or interactive message action with
+   * a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) payload.
+   * `input` options are the same as [`say`](#messagesay)
    *
-   * Parameters
+   * ##### Parameters
    * - `responseUrl` string - URL provided by a Slack interactive message action or slash command
-   * - `input` string or object or Array
-   *     * type `object`: raw object that would be past to `chat.postmessage`
-   *     * type `string`: text of a message that will be used to construct object sent to `chat.postmessage`
-   *     * type `Array`: of strings or objects above to be picked randomly (can be mixed!)
+   * - `input` the payload to send, maybe a string, Object or Array.
+   * - `callback` (err, data) => {}
    *
-   * - `callback` string - (err, data) => {}
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {string} responseUrl
+   * @param {(string|Object|Array)} input
+   * @param {function} callback
    */
 
   respond (responseUrl, input, callback) {
@@ -137,6 +201,9 @@ module.exports = class Message {
 
   /**
    * Is this an `event` of type `message`?
+   *
+   *
+   * ##### Returns `bool` true if `this` is a message event type
    */
 
   isMessage () {
@@ -145,6 +212,9 @@ module.exports = class Message {
 
   /**
    * Is this a message that is a direct mention ("@botusername: hi there", "@botusername goodbye!")
+   *
+   *
+   * ##### Returns `bool` true if `this` is a direct mention
    */
 
   isDirectMention () {
@@ -153,6 +223,9 @@ module.exports = class Message {
 
   /**
    * Is this a message in a direct message channel (one on one)
+   *
+   *
+   * ##### Returns `bool` true if `this` is a direct message
    */
 
   isDirectMessage () {
@@ -161,7 +234,10 @@ module.exports = class Message {
 
   /**
    * Is this a message where the bot user mentioned anywhere in the message.
-   * This only checks for the bot user and does not consider any other users
+   * Only checks for mentions of the bot user and does not consider any other users.
+   *
+   *
+   * ##### Returns `bool` true if `this` mentions the bot user
    */
 
   isMention () {
@@ -171,6 +247,9 @@ module.exports = class Message {
   /**
    * Is this a message that's not a direct message or that mentions that bot at
    * all (other users could be mentioned)
+   *
+   *
+   * ##### Returns `bool` true if `this` is an ambient message
    */
 
   isAmbient () {
@@ -178,10 +257,15 @@ module.exports = class Message {
   }
 
   /**
-   * Is this a message that matches any one of these filter types
+   * Is this a message that matches any one of the filters
    *
-   * Parameters:
-   * - `messageFilters` Array - any of direct_message, direct_mention, mention or ambient
+   * ##### Parameters
+   * - `messageFilters` Array - any of `direct_message`, `direct_mention`, `mention` and `ambient`
+   *
+   *
+   * ##### Returns `bool` true if `this` is a message that matches any of the filters
+   *
+   * @param {Array} of {string} messageFilters
    */
 
   isAnyOf (messageFilters) {
@@ -199,7 +283,7 @@ module.exports = class Message {
   /**
    * Return the user IDs of any users mentioned in the message
    *
-   * Returns an Array of IDs
+   * ##### Returns an Array of user IDs
    */
 
   usersMentioned () {
@@ -209,7 +293,7 @@ module.exports = class Message {
   /**
    * Return the channel IDs of any channels mentioned in the message
    *
-   * Returns an Array of IDs
+   * ##### Returns an Array of channel IDs
    */
 
   channelsMentioned () {
@@ -219,7 +303,7 @@ module.exports = class Message {
   /**
    * Return the IDs of any subteams (groups) mentioned in the message
    *
-   * Returns an Array of IDs
+   * ##### Returns an Array of subteam IDs
    */
   subteamGroupsMentioned () {
     return this._regexMentions(new RegExp('<!subteam\\^(S[A-Za-z0-9]+)[^>]+>', 'g'))
@@ -227,6 +311,8 @@ module.exports = class Message {
 
   /**
    * Was "@everyone" mentioned in the message
+   *
+   * ##### Returns `bool` true if `@everyone` was mentioned
    */
 
   everyoneMentioned () {
@@ -235,6 +321,8 @@ module.exports = class Message {
 
   /**
    * Was the current "@channel" mentioned in the message
+   *
+   * ##### Returns `bool` true if `@channel` was mentioned
    */
 
   channelMentioned () {
@@ -242,7 +330,9 @@ module.exports = class Message {
   }
 
   /**
-   * Was the current "@channel" mentioned in the message
+   * Was the "@here" mentioned in the message
+   *
+   * ##### Returns `bool` true if `@here` was mentioned
    */
 
   hereMentioned () {
@@ -251,6 +341,8 @@ module.exports = class Message {
 
   /**
    * Return the URLs of any links mentioned in the message
+   *
+   * ##### Returns `Array:string` of URLs of links mentioned in the message
    */
 
   linksMentioned () {
@@ -273,6 +365,11 @@ module.exports = class Message {
   /**
    * Strip the direct mention prefix from the message text and return it. The
    * original text is not modified
+   *
+   *
+   * ##### Returns `string` original `text` of message with a direct mention of the bot
+   * user removed. For example, `@botuser hi` or `@botuser: hi` would produce `hi`.
+   * `@notbotuser hi` would produce `@notbotuser hi`
    */
 
   stripDirectMention () {
@@ -288,7 +385,7 @@ module.exports = class Message {
   }
 
   /**
-   * Returns array of regex matches from the text of a message
+   * ##### Returns array of regex matches from the text of a message
    *
    * @api private
    */
@@ -333,3 +430,5 @@ module.exports = class Message {
   }
 
 }
+
+module.exports = Message

@@ -2,6 +2,7 @@
 
 /**
  * In memory implementation of a ConversationStore, primarily for testing
+ * @private
  */
 
 module.exports = class MemoryStore {

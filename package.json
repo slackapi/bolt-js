@@ -7,7 +7,8 @@
     "test": "npm run lint && npm run coverage",
     "lint": "standard",
     "unit": "ava --verbose",
-    "coverage": "nyc ava --verbose"
+    "coverage": "nyc ava --verbose",
+    "docs": "node scripts/docs.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "ava": "^0.15.2",
     "nyc": "^7.0.0",
     "sinon": "^1.17.4",
+    "dox": "^0.8.1",
     "standard": "^7.1.2"
   }
 }

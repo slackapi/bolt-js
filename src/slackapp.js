@@ -5,20 +5,27 @@ const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver')
 
 /**
- * SlackApp module
+ * A Slack App
+ * @class SlackApp
+ * @api private
  */
-module.exports = class SlackApp {
+class SlackApp {
 
   /**
-   * Initialize a SlackApp, accepts an options object
+   * Construct a SlackApp, accepts an options object
    *
-   * Options:
-   * - `app_token`   Slack App token
-   * - `app_user_id` Slack App User ID (who installed the app)
-   * - `bot_token`   Slack App Bot token
-   * - `bot_user_id` Slack App Bot ID
-   * - `convo_store` `string` of type of Conversation store (`memory`, etc.) or `object` implementation
-   * - `error`       Error handler function `(error) => {}`
+   * ##### Parameters
+   * - `opts.app_token`   Slack App token override
+   * - `opts.app_user_id` Slack App User ID (who installed the app)
+   * - `opts.bot_token`   Slack App Bot token
+   * - `opts.bot_user_id` Slack App Bot ID
+   * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
+   * - `opts.error`       Error handler function `(error) => {}`
+   *
+   * @api private
+   * @constructor
+   * @param {Object} opts
+   * @returns {Object} SlackApp
    */
 
   constructor (opts) {
@@ -53,6 +60,12 @@ module.exports = class SlackApp {
 
   /**
    * Initialize app w/ default middleware and receiver listener
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @api private
    */
   init () {
     // call `handle` for each new request
@@ -104,10 +117,17 @@ module.exports = class SlackApp {
   }
 
   /**
-   * Register a new middleware
+   * Register a new middleware, processed in the order registered.
    *
-   * Middleware is processed in the order registered.
-   * `fn` : (msg, next) => { }
+   * ##### Parameters
+   * - `fn`: middleware function `(msg, next) => { }`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {function} fn
+   * @api public
    */
 
   use (fn) {
@@ -118,10 +138,13 @@ module.exports = class SlackApp {
 
   /**
    * Handle new events (slack events, commands, actions, webhooks, etc.)
-   * Parameters
+   *
+   * ##### Parameters
    * - `msg` `Message`
    * - `done` `function(err, bool)` Callback called once complete, called with error and boolean indicating message was handled [optional]
    *
+   * @param {Message} msg
+   * @param {function} done
    * @api private
    */
 
@@ -177,6 +200,15 @@ module.exports = class SlackApp {
    * - POST `/slack-event`
    * - POST `/slack-command`
    * - POST `/slack-action`
+   *
+   * ##### Parameters
+   * - `app` instance of Express app
+   *
+   *
+   * ##### Returns
+   * - `app` reference to Express app passed in
+   *
+   * @param {Object} app - instance of Express app
    */
 
   attachToExpress (app) {
@@ -186,9 +218,16 @@ module.exports = class SlackApp {
   /**
    * Register a new function route
    *
-   * Parameters
-   * - `fnKey` string - unique key to refer to function
-   * - `fn`  function - `(msg) => {}`
+   * ##### Parameters
+   * - `fnKey` unique key to refer to function
+   * - `fn` `(msg, state) => {}`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {string} fnKey
+   * @param {function} fn
    */
 
   route (fnKey, fn) {
@@ -200,8 +239,14 @@ module.exports = class SlackApp {
   /**
    * Return a registered route
    *
-   * Parameters
+   * ##### Parameters
    * - `fnKey` string - unique key to refer to function
+   *
+   *
+   * ##### Returns
+   * - `(msg, state) => {}`
+   *
+   * @param {string} fnKey
    */
 
   getRoute (fnKey) {
@@ -210,20 +255,26 @@ module.exports = class SlackApp {
 
   /**
    * Register a custom Match function (fn)
-
-   * $eturns `true` if there is a match AND you handled the msg.
-   * Return `false` if there is not a match and you pass on the message.
-
-   * All of the higher level matching convenience functions
-   * generate a match function and call match to register it.
    *
-   * Only one matcher can return true and they are executed in the order they are
+   * ##### Returns `true` if there is a match AND you handled the msg.
+   * Return `false` if there is not a match and you pass on the message.
+   *
+   * All of the higher level matching convenience functions
+   * generate a match function and call `match` to register it.
+   *
+   * Only one matcher can return true, and they are executed in the order they are
    * defined. Match functions should return as fast as possible because it's important
    * that they are efficient. However you may do asyncronous tasks within to
    * your hearts content.
    *
-   * Parameters
+   * ##### Parameters
    * - `fn` function - match function `(msg) => { return bool }`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {function} fn
    */
 
   match (fn) {
@@ -235,15 +286,15 @@ module.exports = class SlackApp {
   /**
    * Register a new message handler function for the criteria
    *
-   * Parameters:
-   * - `criteria` string or RegExp - message is string or match RegExp
-   * - `typeFilter` Array for list of values or string for one value [optional]
-   *     * `direct_message`
-   *     * `direct_mention`
-   *     * `mention`
-   *     * `ambient`
-   *     *  default: matches all if none provided
+   * ##### Parameters
+   * - `criteria` text that message contains or regex (e.g. "^hi")
+   * - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`, `direct_mention`, `mention`, `ambient`
    * - `callback` function - `(msg) => {}`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
    *
    * Example `msg` object:
    *
@@ -264,6 +315,9 @@ module.exports = class SlackApp {
    *          "UXXXXXXXX"
    *       ]
    *    }
+   *
+   * @param {(string)} criteria
+   * @param {(string|Array)} typeFilter
    */
 
   message (criteria, typeFilter, callback) {
@@ -287,38 +341,47 @@ module.exports = class SlackApp {
         }
       }
     }
-    return this.match(fn)
+    this.match(fn)
+    return this
   }
 
   /**
    * Register a new event handler for an actionName
    *
-   * Parameters:
-   * - `criteria` string or RegExp - the type of event
-   * - `callback` function - `(msg) => {}`
+   * ##### Parameters
+   * - `criteria` the type of event
+   * - `callback` `(msg) => {}`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
    *
    * Example `msg` object:
    *
-   *    {
-   *       "token":"dxxxxxxxxxxxxxxxxxxxx",
-   *       "team_id":"TXXXXXXXX",
-   *       "api_app_id":"AXXXXXXXX",
-   *       "event":{
-   *          "type":"reaction_added",
-   *          "user":"UXXXXXXXX",
-   *          "item":{
-   *             "type":"message",
-   *             "channel":"DXXXXXXXX",
-   *             "ts":"1469130181.000096"
-   *          },
-   *          "reaction":"grinning"
-   *       },
-   *       "event_ts":"1469131201.822817",
-   *       "type":"event_callback",
-   *       "authed_users":[
-   *          "UXXXXXXXX"
-   *       ]
-   *    }
+   *     {
+   *        "token":"dxxxxxxxxxxxxxxxxxxxx",
+   *        "team_id":"TXXXXXXXX",
+   *        "api_app_id":"AXXXXXXXX",
+   *        "event":{
+   *           "type":"reaction_added",
+   *           "user":"UXXXXXXXX",
+   *           "item":{
+   *              "type":"message",
+   *              "channel":"DXXXXXXXX",
+   *              "ts":"1469130181.000096"
+   *           },
+   *           "reaction":"grinning"
+   *        },
+   *        "event_ts":"1469131201.822817",
+   *        "type":"event_callback",
+   *        "authed_users":[
+   *           "UXXXXXXXX"
+   *        ]
+   *     }
+   *
+   * @param {(string|RegExp)} criteria
+   * @param {function} callback
    */
 
   event (criteria, callback) {
@@ -338,77 +401,86 @@ module.exports = class SlackApp {
   /**
    * Register a new action handler for an actionNameCriteria
    *
-   * Parameters:
+   * ##### Parameters
    * - `callbackId` string
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
    * - `callback` function - `(msg) => {}`
    *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   *
    * Example `msg` object:
    *
-   * {
-   *    "actions":[
-   *       {
-   *          "name":"answer",
-   *          "value":":wine_glass:"
-   *       }
-   *    ],
-   *    "callback_id":"in_or_out_callback",
-   *    "team":{
-   *       "id":"TXXXXXXXX",
-   *       "domain":"companydomain"
-   *    },
-   *    "channel":{
-   *       "id":"DXXXXXXXX",
-   *       "name":"directmessage"
-   *    },
-   *    "user":{
-   *       "id":"UXXXXXXXX",
-   *       "name":"mike.brevoort"
-   *    },
-   *    "action_ts":"1469129995.067370",
-   *    "message_ts":"1469129988.000084",
-   *    "attachment_id":"1",
-   *    "token":"dxxxxxxxxxxxxxxxxxxxx",
-   *    "original_message":{
-   *       "text":"What?",
-   *       "username":"In or Out",
-   *       "bot_id":"BXXXXXXXX",
-   *       "attachments":[
-   *          {
-   *             "callback_id":"in_or_out_callback",
-   *             "fallback":"Pick one",
-   *             "id":1,
-   *             "actions":[
-   *                {
-   *                   "id":"1",
-   *                   "name":"answer",
-   *                   "text":":beer:",
-   *                   "type":"button",
-   *                   "value":":beer:",
-   *                   "style":""
-   *                },
-   *                {
-   *                   "id":"2",
-   *                   "name":"answer",
-   *                   "text":":beers:",
-   *                   "type":"button",
-   *                   "value":":wine:",
-   *                   "style":""
-   *                },
-   *             ]
-   *          },
-   *          {
-   *             "text":":beers: • mike.brevoort",
-   *             "id":2,
-   *             "fallback":"who picked beers"
-   *          }
-   *       ],
-   *       "type":"message",
-   *       "subtype":"bot_message",
-   *       "ts":"1469129988.000084"
-   *    },
-   *    "response_url":"https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx"
+   *     {
+   *        "actions":[
+   *           {
+   *              "name":"answer",
+   *              "value":":wine_glass:"
+   *           }
+   *        ],
+   *        "callback_id":"in_or_out_callback",
+   *        "team":{
+   *           "id":"TXXXXXXXX",
+   *           "domain":"companydomain"
+   *        },
+   *        "channel":{
+   *           "id":"DXXXXXXXX",
+   *           "name":"directmessage"
+   *        },
+   *        "user":{
+   *           "id":"UXXXXXXXX",
+   *           "name":"mike.brevoort"
+   *        },
+   *        "action_ts":"1469129995.067370",
+   *        "message_ts":"1469129988.000084",
+   *        "attachment_id":"1",
+   *        "token":"dxxxxxxxxxxxxxxxxxxxx",
+   *        "original_message":{
+   *           "text":"What?",
+   *           "username":"In or Out",
+   *           "bot_id":"BXXXXXXXX",
+   *           "attachments":[
+   *              {
+   *                 "callback_id":"in_or_out_callback",
+   *                 "fallback":"Pick one",
+   *                 "id":1,
+   *                 "actions":[
+   *                    {
+   *                       "id":"1",
+   *                       "name":"answer",
+   *                       "text":":beer:",
+   *                       "type":"button",
+   *                       "value":":beer:",
+   *                       "style":""
+   *                    },
+   *                    {
+   *                       "id":"2",
+   *                       "name":"answer",
+   *                       "text":":beers:",
+   *                       "type":"button",
+   *                       "value":":wine:",
+   *                       "style":""
+   *                    },
+   *                 ]
+   *              },
+   *              {
+   *                 "text":":beers: • mike.brevoort",
+   *                 "id":2,
+   *                 "fallback":"who picked beers"
+   *              }
+   *           ],
+   *           "type":"message",
+   *           "subtype":"bot_message",
+   *           "ts":"1469129988.000084"
+   *        },
+   *        "response_url":"https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx"
+   *     }
    *
+   * @param {string} callbackId
+   * @param {(string|RegExp)} actionNameCriteria
+   * @param {function} callback
    */
 
   action (callbackId, actionNameCriteria, callback) {
@@ -439,10 +511,15 @@ module.exports = class SlackApp {
   /**
    * Register a new slash command handler
    *
-   * Parameters:
+   * ##### Parameters
    * - `command` string - the slash command (e.g. "/doit")
-   * - `criteria` string or RegExp (e.g "/^create.*$/") [optional]
+   * - `criteria` string or RegExp (e.g "/^create.+$/") [optional]
    * - `callback` function - `(msg) => {}`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
    *
    * Example `msg` object:
    *
@@ -472,6 +549,9 @@ module.exports = class SlackApp {
    *           "team_id":"TXXXXXXXX"
    *        },
    *     }
+   * @param {string} command
+   * @param {(string|RegExp)} criteria
+   * @param {function} callback
    */
 
   command (command, criteria, callback) {
@@ -493,3 +573,5 @@ module.exports = class SlackApp {
     return this.match(fn)
   }
 }
+
+module.exports = SlackApp
