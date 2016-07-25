@@ -15,6 +15,7 @@ class SlackApp {
    * Construct a SlackApp, accepts an options object
    *
    * ##### Parameters
+   * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
    * - `opts.app_token`   Slack App token override
    * - `opts.app_user_id` Slack App User ID (who installed the app)
    * - `opts.bot_token`   Slack App Bot token
@@ -33,6 +34,8 @@ class SlackApp {
     this._middleware = []
     this._matchers = []
     this._registry = {}
+
+    this.verify_token = opts.verify_token = opts.verify_token || process.env.SLACK_VERIFY_TOKEN
 
     this.app_token = opts.app_token
     this.app_user_id = opts.app_user_id
@@ -296,7 +299,7 @@ class SlackApp {
    * - `this` (chainable)
    *
    *
-   * Example `msg` object:
+   * Example `msg.body`:
    *
    *    {
    *       "token":"dxxxxxxxxxxxxxxxxxxxx",
@@ -411,7 +414,7 @@ class SlackApp {
    * - `this` (chainable)
    *
    *
-   * Example `msg` object:
+   * Example `msg.body` object:
    *
    *     {
    *        "actions":[
