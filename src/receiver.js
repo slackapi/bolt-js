@@ -87,6 +87,13 @@ module.exports = class Receiver extends EventEmitter {
       return
     }
 
+    // if this is a Slack challenge request, respond with the challenge and
+    // don't emit the event
+    if (body.challenge) {
+      res.send({ challenge: body.challenge })
+      return
+    }
+
     this.doEmit('event', body, req.app_details)
     return res.send()
   }
