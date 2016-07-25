@@ -529,5 +529,26 @@ test('Message.hereMentioned() false', t => {
   t.false(msg.hereMentioned())
 })
 
-// TODO: Add tests for Message.linksMentioned()
+test('Message.linksMentioned()', t => {
+  let msg = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'some links <https://beepboophq.com|beepboop> <http://google.com>'
+    }
+  })
 
+  let links = msg.linksMentioned()
+  t.deepEqual(links, ['https://beepboophq.com', 'http://google.com'])
+})
+
+test('Message.linksMentioned() no links', t => {
+  let msg = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'hi'
+    }
+  })
+
+  let links = msg.linksMentioned()
+  t.deepEqual(links, [])
+})
