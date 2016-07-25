@@ -197,9 +197,9 @@ class SlackApp {
    * Attach HTTP routes to an Express app
    *
    * Routes are:
-   * - POST `/slack-event`
-   * - POST `/slack-command`
-   * - POST `/slack-action`
+   * - POST `/slackapp/event`
+   * - POST `/slackapp/command`
+   * - POST `/slackapp/action`
    *
    * ##### Parameters
    * - `app` instance of Express app
