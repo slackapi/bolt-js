@@ -1,6 +1,7 @@
 'use strict'
 const request = require('request')
 const slack = require('slack')
+const HOUR = 60 * 60
 
 /**
  * A Slack event message (command, action, event, etc.)
@@ -22,9 +23,13 @@ class Message {
    */
   constructor (type, body, meta) {
     this.type = type
-    this.body = body
-    this.meta = meta
-    this.conversation_id = [meta.team_id, meta.channel_id, meta.user_id || meta.bot_id].join('::')
+    this.body = body || {}
+    this.meta = meta || {}
+    this.conversation_id = [
+      this.meta.team_id,
+      this.meta.channel_id,
+      this.meta.user_id || this.meta.bot_id
+    ].join('::')
 
     this._slackapp = null
   }
@@ -91,13 +96,12 @@ class Message {
    */
 
   route (fnKey, state, secondsToExpire) {
-    const hour = 60 * 60
     if (!state) {
       state = {}
     }
 
     if (!secondsToExpire) {
-      secondsToExpire = hour
+      secondsToExpire = HOUR
     }
 
     let key = this.conversation_id
@@ -141,10 +145,10 @@ class Message {
 
     input = this._processInput(input)
 
-    let payload = Object.assign({}, input, {
+    let payload = Object.assign({
       token: this.meta.bot_token || this.meta.app_token,
       channel: this.meta.channel_id
-    })
+    }, input)
 
     slack.chat.postMessage(payload, callback)
     return this
@@ -172,14 +176,7 @@ class Message {
   respond (responseUrl, input, callback) {
     if (!callback) callback = () => {}
 
-    input = this._processInput(input)
-
-    // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
-    request({
-      uri: responseUrl,
-      method: 'POST',
-      json: input
-    }, (err, res, body) => {
+    this._request(responseUrl, this._processInput(input), (err, res, body) => {
       let rateLimit = 'You are sending too many requests. Please relax.'
       if (err) {
         callback(err)
@@ -199,6 +196,15 @@ class Message {
     return this
   }
 
+  // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
+  _request (responseUrl, input, callback) {
+    request({
+      uri: responseUrl,
+      method: 'POST',
+      json: input
+    }, callback)
+  }
+
   /**
    * Is this an `event` of type `message`?
    *
@@ -207,7 +213,7 @@ class Message {
    */
 
   isMessage () {
-    return this.type === 'event' && this.body.event && this.body.event.type === 'message'
+    return !!(this.type === 'event' && this.body.event && this.body.event.type === 'message')
   }
 
   /**
