@@ -6,8 +6,8 @@
   "scripts": {
     "test": "npm run lint && npm run coverage",
     "lint": "standard",
-    "unit": "ava --verbose",
-    "coverage": "nyc ava --verbose",
+    "unit": "ava --verbose  test/*.test.js",
+    "coverage": "nyc ava --verbose test/*.test.js",
     "docs": "node scripts/docs.js"
   },
   "repository": {
