@@ -10,7 +10,7 @@ module.exports = (options) => {
       return res.send(req.headers['bb-error'])
     }
 
-    if (!req.slackapp || !req.slackapp) {
+    if (!req.slackapp) {
       return res.send('Missing req.slackapp')
     }
 

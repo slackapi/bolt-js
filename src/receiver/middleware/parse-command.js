@@ -2,10 +2,10 @@
 
 const bodyParser = require('body-parser')
 
-module.export = () => {
+module.exports = () => {
   return [
     bodyParser.urlencoded({extended: true}),
-    (req, res, next) => {
+    function parseCommand (req, res, next) {
       let body = req.body
 
       req.slackapp = {
@@ -18,6 +18,8 @@ module.export = () => {
           team_id: body.team_id
         }
       }
+
+      next()
     }
   ]
 }

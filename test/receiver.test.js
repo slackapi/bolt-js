@@ -10,7 +10,7 @@ test('Receiver() w/ record', t => {
   let appendStub = sinon.stub(fs, 'appendFile', () => {})
 
   let rec = new Receiver({
-    record: true
+    record: 'slack-events.log'
   })
 
   t.true(writeStub.calledOnce)

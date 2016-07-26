@@ -2,11 +2,22 @@
 
 const bodyParser = require('body-parser')
 
-module.export = () => {
+module.exports = () => {
   return [
-    bodyParser.json(),
-    (req, res, next) => {
+    bodyParser.urlencoded({extended: true}),
+    bodyParser.text({type: '*/*'}),
+    function parseAction (req, res, next) {
       let body = req.body
+
+      if (!body || !body.payload) {
+        return res.send('Invalid request: payload missing')
+      }
+
+      try {
+        body = JSON.parse(body.payload)
+      } catch (e) {
+        return res.send('Error parsing payload')
+      }
 
       req.slackapp = {
         type: 'action',
@@ -18,6 +29,8 @@ module.export = () => {
           team_id: body.team.id
         }
       }
+
+      next()
     }
   ]
 }

@@ -2,32 +2,22 @@
 
 const bodyParser = require('body-parser')
 
-module.export = () => {
+module.exports = () => {
   return [
-    bodyParser.urlencoded({extended: true}),
-    bodyParser.text({type: '*/*'}),
+    bodyParser.json(),
     function handleChallenge (req, res, next) {
       let body = req.body
 
       // if this is a Slack challenge request, respond with the challenge and
       // don't emit the event
       if (body.challenge) {
-        res.send({ challenge: body.challenge })
-        return
+        return res.send({ challenge: body.challenge })
       }
+
+      next()
     },
     function parseEvent (req, res, next) {
       let body = req.body
-
-      if (!body || !body.payload) {
-        return res.send('Invalid request: payload missing')
-      }
-
-      try {
-        body = JSON.parse(body.payload)
-      } catch (e) {
-        return res.send('Error parsing payload')
-      }
 
       req.slackapp = {
         type: 'event',
@@ -40,6 +30,8 @@ module.export = () => {
           team_id: body.team_id
         }
       }
+
+      next()
     }
   ]
 }
