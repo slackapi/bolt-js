@@ -10,7 +10,7 @@
     "coverage": "nyc ava --verbose test/*.test.js",
     "lcov": "npm run coverage -- --reporter=lcov",
     "docs": "node scripts/docs.js",
-    "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
+    "coveralls": "./node_modules/.bin/nyc ./node_modules/.bin/ava --reporter=lcov test/*.test.js && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
