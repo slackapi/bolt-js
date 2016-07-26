@@ -52,7 +52,7 @@ module.exports = class Receiver extends EventEmitter {
 
     // replace any `true` values w/ default paths
     Object.keys(options).forEach((type) => {
-      options[type] === true ? defaults[type] : options[type]
+      options[type] = options[type] === true ? defaults[type] : options[type]
     })
 
     let emitHandler = this.emitHandler.bind(this)
@@ -92,7 +92,7 @@ module.exports = class Receiver extends EventEmitter {
     return app
   }
 
-  emitHandler (req, res, next) {
+  emitHandler (req, res) {
     let message = req.slackapp
 
     if (!message) {
@@ -108,19 +108,20 @@ module.exports = class Receiver extends EventEmitter {
     res.send()
   }
 
+  // TODO: extract log fns into an overridable logger
   logEvent (evt) {
     if (!evt) return console.log('Event: UNKNOWN')
     if (!evt.event) return console.log('Event: Missing:', evt)
-    let out = evt.event.user + ' -> ' + evt.event.type
+    let out = `${evt.event.user} -> ${evt.event.type}`
     switch (evt.event.type) {
       case 'reaction_added':
-        out += ' : ' + evt.event.item.type + '[' + evt.event.item.channel + ']' + ' : ' + evt.event.reaction
+        out += ` : ${evt.event.item.type} [${evt.event.item.channel}] : ${evt.event.reaction}`
         break
       case 'message':
         if (evt.event.subtype) {
-          out += ' : ' + evt.event.subtype + '[' + evt.event.channel + ']' + ' : ' + evt.event.text
+          out += ` : ${evt.event.subtype} [${evt.event.channel}] : ${evt.event.text}`
         } else {
-          out += ' : ' + evt.event.channel + ' : ' + evt.event.text
+          out += ` : ${evt.event.channel} : ${evt.event.text}`
         }
         break
     }
@@ -130,7 +131,7 @@ module.exports = class Receiver extends EventEmitter {
   logCommand (cmd) {
     if (!cmd) return console.log('Command: UNKNOWN')
     if (!cmd.command) return console.log('Command: Missing:', cmd)
-    console.log(cmd.user_id + ' -> ' + cmd.command + ' ' + cmd.text)
+    console.log(`${cmd.user_id} -> ${cmd.command} ${cmd.text}`)
   }
 
   logAction (action) {
