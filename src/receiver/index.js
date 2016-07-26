@@ -1,15 +1,14 @@
 'use strict'
-// TODO: Move this file to src/receiver/index.js
 
 const EventEmitter = require('events')
 const fs = require('fs')
-const Message = require('./message')
-const ParseEvent = require('./receiver/middleware/parse-event')
-const ParseCommand = require('./receiver/middleware/parse-command')
-const ParseAction = require('./receiver/middleware/parse-action')
-const LookupTokens = require('./receiver/middleware/lookup-tokens')
-const VerifyToken = require('./receiver/middleware/verify-token')
-const SSLCheck = require('./receiver/middleware/ssl-check')
+const Message = require('../message')
+const ParseEvent = require('./middleware/parse-event')
+const ParseCommand = require('./middleware/parse-command')
+const ParseAction = require('./middleware/parse-action')
+const LookupTokens = require('./middleware/lookup-tokens')
+const VerifyToken = require('./middleware/verify-token')
+const SSLCheck = require('./middleware/ssl-check')
 
 /**
  * Receives HTTP requests with Events, Slash Commands, and Actions

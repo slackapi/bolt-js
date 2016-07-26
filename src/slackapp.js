@@ -2,7 +2,7 @@
 
 const slack = require('slack')
 const conversationStore = require('./conversation_store')
-const Receiver = require('./receiver')
+const Receiver = require('./receiver/')
 
 /**
  * A Slack App
