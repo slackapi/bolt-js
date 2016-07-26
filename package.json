@@ -6,9 +6,9 @@
   "scripts": {
     "test": "npm run lint && npm run coverage",
     "lint": "standard",
-    "unit": "ava --verbose -T 10000",
-    "coverage": "nyc ava --verbose -T 10000",
-    "lcov": "nyc --reporter lcov ava -T 10000",
+    "unit": "ava --verbose -T 30000",
+    "coverage": "nyc ava --verbose -T 30000",
+    "lcov": "nyc --reporter lcov ava -T 30000",
     "docs": "node scripts/docs.js",
     "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
   },
