@@ -7,7 +7,7 @@
     "test": "npm run lint && npm run coverage",
     "lint": "standard",
     "unit": "ava --verbose",
-    "coverage": "nyc ava --verbose",
+    "coverage": "nyc --check-coverage --statements 95 ava --verbose",
     "lcov": "nyc --reporter lcov ava",
     "docs": "node scripts/docs.js",
     "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
