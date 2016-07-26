@@ -1,9 +1,14 @@
 'use strict'
+// TODO: Move this file to src/receiver/index.js
 
 const EventEmitter = require('events')
-const bodyParser = require('body-parser')
 const fs = require('fs')
 const Message = require('./message')
+const ParseEvent = require('./receiver/middleware/parse-event')
+const ParseCommand = require('./receiver/middleware/parse-command')
+const ParseAction = require('./receiver/middleware/parse-action')
+const LookupTokens = require('./receiver/middleware/tokens')
+const VerifyToken = require('./receiver/middleware/verify-token')
 
 /**
  * Receives HTTP requests with Events, Slash Commands, and Actions
@@ -17,11 +22,7 @@ module.exports = class Receiver extends EventEmitter {
 
     this.debug = opts.debug
     this.verify_token = opts.verify_token
-
-    this.app_token = opts.app_token
-    this.app_user_id = opts.app_user_id
-    this.bot_token = opts.bot_token
-    this.bot_user_id = opts.bot_user_id
+    this.tokensLookup = opts.tokensLookup || LookupTokens(opts)
 
     // record all events to a JSON line delimited file if record is set
     if (opts.record) {
@@ -42,21 +43,59 @@ module.exports = class Receiver extends EventEmitter {
   /**
    * Attach receiver HTTP route to an express app
    */
-  attachToExpress (app) {
-    app.post('/slackapp/event',
-             this.tokenMiddleware.bind(this),
-             bodyParser.json(),
-             this.eventHandler.bind(this))
-    app.post('/slackapp/command',
-             this.tokenMiddleware.bind(this),
-             bodyParser.urlencoded({extended: true}),
-             this.commandHandler.bind(this))
-    app.post('/slackapp/action',
-             this.tokenMiddleware.bind(this),
-             bodyParser.urlencoded({extended: true}),
-             bodyParser.text({type: '*/*'}),
-             this.actionHandler.bind(this))
+  attachToExpress (app, options) {
+    options = Object.assign({
+      event: true,
+      command: true,
+      action: true
+    }, options || {})
+
+    let emitHandler = this.emitHandler.bind(this)
+    let verifyToken = VerifyToken(this.verify_token)
+
+    if (options.event) {
+      app.post('slackapp/event',
+        ParseEvent(),
+        verifyToken,
+        this.tokensLookup,
+        emitHandler
+      )
+    }
+
+    if (options.command) {
+      app.post('/slackapp/command',
+        ParseCommand(),
+        verifyToken,
+        this.tokensLookup,
+        emitHandler
+      )
+    }
+
+    if (options.action) {
+      app.post('/slackapp/action',
+        ParseAction(),
+        verifyToken,
+        this.tokensLookup,
+        emitHandler
+      )
+    }
+
     return app
+  }
+
+  emitHandler (req, res, next) {
+    let message = req.slackapp
+
+    if (!message) {
+      return res.send('Missing req.slackapp')
+    }
+
+    if (this.debug && this.logfn[message.type]) {
+      this.logfn[message.type](message.body)
+    }
+
+    let msg = new Message(message.type, message.body, message.meta)
+    this.emit('message', msg)
   }
 
   tokenMiddleware (req, res, next) {
@@ -82,17 +121,17 @@ module.exports = class Receiver extends EventEmitter {
     let body = req.body
 
     // test verify token
-    if (this.verify_token && this.verify_token !== body.token) {
-      res.status(403).send('Invalid token')
-      return
-    }
+    // if (this.verify_token && this.verify_token !== body.token) {
+    //   res.status(403).send('Invalid token')
+    //   return
+    // }
 
     // if this is a Slack challenge request, respond with the challenge and
     // don't emit the event
-    if (body.challenge) {
-      res.send({ challenge: body.challenge })
-      return
-    }
+    // if (body.challenge) {
+    //   res.send({ challenge: body.challenge })
+    //   return
+    // }
 
     this.doEmit('event', body, req.app_details)
     return res.send()
@@ -102,27 +141,27 @@ module.exports = class Receiver extends EventEmitter {
     let body = req.body
 
     // test verify token
-    if (this.verify_token && this.verify_token !== body.token) {
-      res.status(403).send('Invalid token')
-      return
-    }
+    // if (this.verify_token && this.verify_token !== body.token) {
+    //   res.status(403).send('Invalid token')
+    //   return
+    // }
 
     this.doEmit('command', body, req.app_details)
     return res.send()
   }
 
   actionHandler (req, res) {
-    let body = req.body
-    if (!body || !body.payload) {
-      return res.send('Invalid request: payload missing')
-    }
-    body = JSON.parse(body.payload)
+    // let body = req.body
+    // if (!body || !body.payload) {
+    //   return res.send('Invalid request: payload missing')
+    // }
+    // body = JSON.parse(body.payload)
 
     // test verify token
-    if (this.verify_token && this.verify_token !== body.token) {
-      res.status(403).send('Invalid token')
-      return
-    }
+    // if (this.verify_token && this.verify_token !== body.token) {
+    //   res.status(403).send('Invalid token')
+    //   return
+    // }
 
     this.doEmit('action', body, req.app_details)
     return res.send()

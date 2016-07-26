@@ -206,16 +206,20 @@ class SlackApp {
    *
    * ##### Parameters
    * - `app` instance of Express app
+   * - `opts.event` `boolean` - add event route (defaults to `true`) [optional]
+   * - `opts.command` `boolean` - add command route (defaults to `true`) [optional]
+   * - `opts.action` `boolean` - add action route (defaults to `true`) [optional]
    *
    *
    * ##### Returns
    * - `app` reference to Express app passed in
    *
    * @param {Object} app - instance of Express app
+   * @param {Object} opts - options for attaching routes
    */
 
-  attachToExpress (app) {
-    return this.receiver.attachToExpress(app)
+  attachToExpress (app, opts) {
+    return this.receiver.attachToExpress(app, opts)
   }
 
   /**
