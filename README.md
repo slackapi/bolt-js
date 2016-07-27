@@ -60,7 +60,7 @@ var slackapp = SlackApp({
 ```
 
 ### Token Lookup
-One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. If you're running on [Beep Boop][beepboop], this data is saved for you automatically. SlackApp has a `token_lookup` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, you must set these properties on `req.slackapp.meta` for SlackApp to process requests:
+One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. If you're running on [Beep Boop][beepboop], this data is saved for you automatically. SlackApp has a `token_lookup` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, you must set the follwing properties on `req.slackapp.meta` for SlackApp to process requests:
 
 + `app_token` - OAuth `access_token` property
 + `app_user_id` - `user_id` prop from an [auth.test()](https://api.slack.com/methods/auth.test) call using the OAuth `access_token` value
@@ -94,8 +94,7 @@ var slackapp = SlackApp({
     myDB.getTeamData(meta.team_id, (err, data) => {
       if (err) {
         console.error('Error loading team data: ', err)
-        // calling next() w/o setting data will let the message pass-through, but it won't be processed
-        return next()
+        return res.send(err)
       }
 
       // mixin necessary team meta-data
