@@ -39,11 +39,76 @@ npm install --save slackapp
 ```
 
 ## Setup
-//TODO
+You can call the SlackApp function with the following options:
+```js
+const SlackApp = require('slackapp')
+const ConvoStore = require('slackapp-convo-beepboop')
+
+var slackapp = SlackApp({
+  verify_token: process.env.SLACK_VERIFY_TOKEN,
+  convo_store: ConvoStore(),
+  error: (err) => console.log(err),
+
+  // These properties should only be used in testing
+  // if you want to peg it to a specific team's config
+  app_token: '<APP_TOKEN>',
+  app_user_id: '<USER_ID>',
+  bot_token: '<BOT_TOKEN>',
+  bot_user_id: '<BOT_USER_ID>'
+})
+```
 
 ### Token Lookup
-//TODO
-With Beep Boop this is handled out of the box...
+One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. If you're running on [Beep Boop][beepboop], this data is saved for you automatically. SlackApp has a `token_lookup` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, you must set the follwing properties on `req.slackapp.meta` for SlackApp to process requests:
+
++ `app_token` - OAuth `access_token` property
++ `app_user_id` - `user_id` prop from an [auth.test()](https://api.slack.com/methods/auth.test) call using the OAuth `access_token` value
++ `bot_token` - OAuth `bot.bot_access_token` property
++ `bot_user_id` - OAuth `bot.bot_user_id` property
+
+The incoming request from Slack has been parsed and normalized by the time the `token_lookup` function runs, and is available via `req.slackapp`.  You can rely on this data in your `token_lookup` function to assist you in looking up the necessary tokens and meta-data.
+
+`req.slackapp` has the following structure:
+```js
+{
+  type: 'event|command|action',
+  body: {}, // original payload from Slack
+  meta: {
+    user_id: '<USER_ID>',
+    channel_id: '<CHANNEL_ID>',
+    team_id: '<TEAM_ID>'
+  }
+}
+```
+
+These properties should be added to the `req.slackapp.meta` object in your `token_lookup` middleware function. If you're running on [Beep Boop][beepboop], these values are stored and added automatically for you, otherwise it's up to you. If you're not on [Beep Boop][beepboop], your `token_lookup` function could look something like this:
+```js
+// your database module...
+var myDB = require('./my-db')
+
+var slackapp = SlackApp({
+  token_lookup (req, res, next) {
+    var meta = req.slackapp.meta
+
+    myDB.getTeamData(meta.team_id, (err, data) => {
+      if (err) {
+        console.error('Error loading team data: ', err)
+        return res.send(err)
+      }
+
+      // mixin necessary team meta-data
+      req.slackapp.meta = Object.assign(req.slackapp.meta, {
+        app_token: data.app_token,
+        app_user_id: data.app_user_id,
+        bot_token: data.bot_token,
+        bot_user_id: data.bot_user_id,
+        // you can add your own team meta-data as well
+        other_value: data.other_value
+      })
+    })
+  }
+})
+```
 
 ### Message Middleware
 //TODO
@@ -775,3 +840,5 @@ We adore contributions. Please include the details of the proposed changes in a 
 
 # License
 MIT Copyright (c) 2016 Beep Boop, Robots & Pencils
+
+[beepboop]: https://beepboophq.com
