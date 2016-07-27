@@ -197,6 +197,7 @@ class Message {
   }
 
   // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
+  /* istanbul ignore next */
   _request (responseUrl, input, callback) {
     request({
       uri: responseUrl,

@@ -301,6 +301,22 @@ test.cb('Message.respond() w/ rate_limit error', t => {
   })
 })
 
+test('Message.respond() w/o callback', t => {
+  let msg = new Message()
+  let url = 'http://beepboophq.com'
+  let input = 'beepboop'
+
+  let reqStub = sinon.stub(msg, '_request', (responseUrl, input, cb) => {
+    t.is(responseUrl, url)
+    t.is(input, input)
+
+    cb(null, {}, { ok: true })
+  })
+
+  msg.respond(url, input)
+  t.true(reqStub.calledOnce)
+})
+
 test('Message.isMessage()', t => {
   let msg = new Message('event', {
     event: {

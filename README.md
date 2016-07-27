@@ -763,13 +763,14 @@ It is generally always passed as `msg`.
 
 # Contributing
 
-We adore contributions. Please include the details of the proposed changes in a Pull Request and ensure `npm run test` pass. 👻
+We adore contributions. Please include the details of the proposed changes in a Pull Request and ensure `npm test` pass. 👻
 
 ### Scripts
 - `npm test` - runs linter and tests with coverage
 - `npm run unit` - runs unit tests without coverage
 - `npm run lint` - just runs JS standard linter
 - `npm run coverage` - runs tests with coverage
+- `npm run lcov` - runs tests with coverage and output lcov report
 - `npm run docs` - regenerates API docs in this README.md
 
 # License

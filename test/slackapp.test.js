@@ -43,6 +43,14 @@ test('Slackapp.use()', t => {
   t.deepEqual(app._middleware, [mw])
 })
 
+test('SlackApp() convo_store string', t => {
+  let app = new SlackApp({
+    convo_store: 'memory'
+  })
+
+  t.is(typeof app.convoStore, 'object')
+})
+
 test('SlackApp.init()', t => {
   let app = new SlackApp()
 
@@ -545,4 +553,78 @@ test.cb('SlackApp.ignoreBotsMiddleware() w/o bot message', t => {
     t.pass()
     t.end()
   })
+})
+
+test.cb('SlackApp.preprocessConversationMiddleware() w/ conversation', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let mw = app.preprocessConversationMiddleware()
+  let message = new Message('event', {}, {})
+  message.conversation_id = 'convo_id'
+  let convo = {
+    fnKey: 'next-route',
+    state: {
+      beep: 'boop'
+    }
+  }
+
+  let overrideStub = sinon.stub(message, 'attachOverrideRoute')
+  let getStub = sinon.stub(app.convoStore, 'get', (id, cb) => {
+    t.is(id, message.conversation_id)
+
+    cb(null, convo)
+  })
+
+  mw(message, () => {
+    t.true(overrideStub.calledWith(convo.fnKey, convo.state))
+    t.true(getStub.calledOnce)
+    t.end()
+  })
+})
+
+test.cb('SlackApp.preprocessConversationMiddleware() w/o conversation', t => {
+  t.plan(3)
+
+  let app = new SlackApp()
+  let mw = app.preprocessConversationMiddleware()
+  let message = new Message('event', {}, {})
+  message.conversation_id = 'convo_id'
+
+  let overrideStub = sinon.stub(message, 'attachOverrideRoute')
+  let getStub = sinon.stub(app.convoStore, 'get', (id, cb) => {
+    t.is(id, message.conversation_id)
+
+    cb(null, null)
+  })
+
+  mw(message, () => {
+    t.false(overrideStub.called)
+    t.true(getStub.calledOnce)
+    t.end()
+  })
+})
+
+test.cb('SlackApp.preprocessConversationMiddleware() w/ error', t => {
+  t.plan(4)
+
+  let app = new SlackApp()
+  let mw = app.preprocessConversationMiddleware()
+  let message = new Message('event', {}, {})
+  message.conversation_id = 'convo_id'
+
+  let onErrorStub = sinon.stub(app, 'onError')
+  let overrideStub = sinon.stub(message, 'attachOverrideRoute')
+  let getStub = sinon.stub(app.convoStore, 'get', (id, cb) => {
+    t.is(id, message.conversation_id)
+
+    cb(new Error('kaboom'))
+  })
+
+  mw(message, () => t.fail())
+
+  t.false(overrideStub.called)
+  t.true(getStub.calledOnce)
+  t.true(onErrorStub.calledOnce)
+  t.end()
 })

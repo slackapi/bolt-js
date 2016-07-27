@@ -2,7 +2,7 @@
 
 const slack = require('slack')
 const conversationStore = require('./conversation_store')
-const Receiver = require('./receiver')
+const Receiver = require('./receiver/')
 
 /**
  * A Slack App
@@ -21,6 +21,7 @@ class SlackApp {
    * - `opts.bot_token`   Slack App Bot token
    * - `opts.bot_user_id` Slack App Bot ID
    * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
+   * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
    * - `opts.error`       Error handler function `(error) => {}`
    *
    * @api private
@@ -206,16 +207,35 @@ class SlackApp {
    *
    * ##### Parameters
    * - `app` instance of Express app
+   * - `opts.event` `boolean|string` - event route (defaults to `/slackapp/event`) [optional]
+   * - `opts.command` `boolean|string` - command route (defaults to `/slackapp/command`) [optional]
+   * - `opts.action` `boolean|string` - action route (defaults to `/slackapp/action`) [optional]
    *
    *
    * ##### Returns
    * - `app` reference to Express app passed in
    *
+   * ```
+   * // would attach all routes w/ default paths
+   * slackapp.attachToExpress(app)
+   *
+   * slackapp.attachToExpress(app, {
+   *   event: true, // would register event route with default of /slackapp/event
+   *   command: false, // would not register a route for commands
+   *   action: '/slack-action' // custom route for actions
+   * })
+   *
+   * // would only attach a route for events w/ default path
+   * slackapp.attachToExpress(app, {
+   *   event: true
+   * })
+   * ````
    * @param {Object} app - instance of Express app
+   * @param {Object} opts - options for attaching routes
    */
 
-  attachToExpress (app) {
-    return this.receiver.attachToExpress(app)
+  attachToExpress (app, opts) {
+    return this.receiver.attachToExpress(app, opts)
   }
 
   /**
