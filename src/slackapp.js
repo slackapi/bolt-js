@@ -16,10 +16,6 @@ class SlackApp {
    *
    * ##### Parameters
    * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
-   * - `opts.app_token`   Slack App token override
-   * - `opts.app_user_id` Slack App User ID (who installed the app)
-   * - `opts.bot_token`   Slack App Bot token
-   * - `opts.bot_user_id` Slack App Bot ID
    * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
    * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
    * - `opts.error`       Error handler function `(error) => {}`
@@ -38,10 +34,6 @@ class SlackApp {
 
     this.verify_token = opts.verify_token = opts.verify_token || process.env.SLACK_VERIFY_TOKEN
 
-    this.app_token = opts.app_token
-    this.app_user_id = opts.app_user_id
-    this.bot_token = opts.bot_token
-    this.bot_user_id = opts.bot_user_id
     this.debug = opts.debug
 
     // If convo_store is a string, initialize that type of conversation store

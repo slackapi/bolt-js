@@ -7,10 +7,6 @@ const Message = require('../src/message')
 
 test('SlackApp()', t => {
   let options = {
-    app_token: 'token',
-    app_user_id: 'app_user_id',
-    bot_token: 'bot_token',
-    bot_user_id: 'bot_user_id',
     debug: true,
     convo_store: () => {},
     error: () => {}

@@ -16,13 +16,13 @@ module.exports = (options) => {
 
     req.slackapp.meta = Object.assign(req.slackapp.meta || {}, {
       // token for the user for the app
-      app_token: req.headers['bb-slackaccesstoken'] || options.app_token,
+      app_token: req.headers['bb-slackaccesstoken'],
       // userID for the user who install ed the app
-      app_user_id: req.headers['bb-slackuserid'] || options.app_user_id,
+      app_user_id: req.headers['bb-slackuserid'],
       // token for a bot user of the app
-      bot_token: req.headers['bb-slackbotaccesstoken'] || options.bot_token,
+      bot_token: req.headers['bb-slackbotaccesstoken'],
       // userID of the bot user of the app
-      bot_user_id: req.headers['bb-slackbotuserid'] || options.bot_user_id
+      bot_user_id: req.headers['bb-slackbotuserid']
     })
 
     next()
