@@ -23,6 +23,9 @@ exports.getMockHeaders = function (headers) {
     'bb-slackaccesstoken': 'slackaccesstoken',
     'bb-slackuserid': 'slackuserid',
     'bb-slackbotaccesstoken': 'slackbotaccesstoken',
-    'bb-slackbotuserid': 'slackbotuserid'
+    'bb-slackbotuserid': 'slackbotuserid',
+    'bb-slackbotusername': 'slackbotusername',
+    'bb-slackteamname': 'slackteamname',
+    'bb-slackteamdomain': 'slackteamdomain'
   }, headers || {})
 }
