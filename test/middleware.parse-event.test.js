@@ -15,15 +15,15 @@ test.cb('ParseEvent() no payload', t => {
   let req = { body: {} }
 
   mw(req, {}, () => {
-    let slackapp = req.slackapp
+    let slapp = req.slapp
 
-    t.is(slackapp.type, 'event')
-    t.deepEqual(slackapp.body, req.body)
-    t.is(slackapp.meta.verify_token, undefined)
-    t.is(slackapp.meta.user_id, undefined)
-    t.is(slackapp.meta.bot_id, undefined)
-    t.is(slackapp.meta.channel_id, undefined)
-    t.is(slackapp.meta.team_id, undefined)
+    t.is(slapp.type, 'event')
+    t.deepEqual(slapp.body, req.body)
+    t.is(slapp.meta.verify_token, undefined)
+    t.is(slapp.meta.user_id, undefined)
+    t.is(slapp.meta.bot_id, undefined)
+    t.is(slapp.meta.channel_id, undefined)
+    t.is(slapp.meta.team_id, undefined)
     t.end()
   })
 })
@@ -34,15 +34,15 @@ test.cb('ParseEvent() with payload', t => {
   let req = { body: payload }
 
   mw(req, {}, () => {
-    let slackapp = req.slackapp
+    let slapp = req.slapp
 
-    t.is(slackapp.type, 'event')
-    t.deepEqual(slackapp.body, req.body)
-    t.is(slackapp.meta.verify_token, payload.token)
-    t.is(slackapp.meta.user_id, payload.event.user)
-    t.is(slackapp.meta.bot_id, payload.event.bot_id)
-    t.is(slackapp.meta.channel_id, payload.event.channel)
-    t.is(slackapp.meta.team_id, payload.team_id)
+    t.is(slapp.type, 'event')
+    t.deepEqual(slapp.body, req.body)
+    t.is(slapp.meta.verify_token, payload.token)
+    t.is(slapp.meta.user_id, payload.event.user)
+    t.is(slapp.meta.bot_id, payload.event.bot_id)
+    t.is(slapp.meta.channel_id, payload.event.channel)
+    t.is(slapp.meta.team_id, payload.team_id)
     t.end()
   })
 })

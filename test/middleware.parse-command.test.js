@@ -13,14 +13,14 @@ test.cb('ParseCommand() no payload', t => {
   let req = { body: {} }
 
   mw(req, {}, () => {
-    let slackapp = req.slackapp
+    let slapp = req.slapp
 
-    t.is(slackapp.type, 'command')
-    t.deepEqual(slackapp.body, req.body)
-    t.is(slackapp.meta.verify_token, undefined)
-    t.is(slackapp.meta.user_id, undefined)
-    t.is(slackapp.meta.channel_id, undefined)
-    t.is(slackapp.meta.team_id, undefined)
+    t.is(slapp.type, 'command')
+    t.deepEqual(slapp.body, req.body)
+    t.is(slapp.meta.verify_token, undefined)
+    t.is(slapp.meta.user_id, undefined)
+    t.is(slapp.meta.channel_id, undefined)
+    t.is(slapp.meta.team_id, undefined)
     t.end()
   })
 })
@@ -31,14 +31,14 @@ test.cb('ParseCommand() with payload', t => {
   let req = { body: payload }
 
   mw(req, {}, () => {
-    let slackapp = req.slackapp
+    let slapp = req.slapp
 
-    t.is(slackapp.type, 'command')
-    t.deepEqual(slackapp.body, req.body)
-    t.is(slackapp.meta.verify_token, payload.token)
-    t.is(slackapp.meta.user_id, payload.user_id)
-    t.is(slackapp.meta.channel_id, payload.channel_id)
-    t.is(slackapp.meta.team_id, payload.team_id)
+    t.is(slapp.type, 'command')
+    t.deepEqual(slapp.body, req.body)
+    t.is(slapp.meta.verify_token, payload.token)
+    t.is(slapp.meta.user_id, payload.user_id)
+    t.is(slapp.meta.channel_id, payload.channel_id)
+    t.is(slapp.meta.team_id, payload.team_id)
     t.end()
   })
 })

@@ -1,9 +1,9 @@
 'use strict'
 
-const SlackApp = require('./slackapp')
+const Slapp = require('./slapp')
 
 /**
- * Create a new SlackApp, accepts an options object
+ * Create a new Slapp, accepts an options object
  *
  * Parameters
  * - `opts.app_token`   Slack App token override
@@ -16,9 +16,9 @@ const SlackApp = require('./slackapp')
  * Example
  *
  *
- *     var SlackApp = require('slackapp')
- *     var BeepBoopConvoStore = require('slackapp-convo-beepboop')
- *     var slackapp = SlackApp({
+ *     var Slapp = require('slapp')
+ *     var BeepBoopConvoStore = require('slapp-convo-beepboop')
+ *     var slapp = Slapp({
  *       debug: true,
  *       record: 'out.jsonl',
  *       convo_store: BeepBoopConvoStore({ debug: true }),
@@ -27,13 +27,13 @@ const SlackApp = require('./slackapp')
  *
  *
  * @param {Object} opts
- * @returns {Object} SlackApp
- * @function slackapp
- * @alias slackapp
+ * @returns {Object} Slapp
+ * @function slapp
+ * @alias slapp
  */
 
 function factory (opts) {
-  let app = new SlackApp(opts)
+  let app = new Slapp(opts)
 
   return app.init()
 }

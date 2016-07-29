@@ -21,7 +21,7 @@ test('Message() w/ user_id', t => {
   t.is(msg.type, type)
   t.deepEqual(msg.body, body)
   t.deepEqual(msg.meta, meta)
-  t.is(msg._slackapp, null)
+  t.is(msg._slapp, null)
   t.is(msg.conversation_id, 'team_id::channel_id::user_id')
 })
 
@@ -40,7 +40,7 @@ test('Message() w/o user_id', t => {
   t.is(msg.type, type)
   t.deepEqual(msg.body, body)
   t.deepEqual(msg.meta, meta)
-  t.is(msg._slackapp, null)
+  t.is(msg._slapp, null)
   t.is(msg.conversation_id, 'team_id::channel_id::bot_id')
 })
 
@@ -48,7 +48,7 @@ test('Message() defaults', t => {
   let msg = new Message()
 
   t.is(msg.type, undefined)
-  t.is(msg._slackapp, null)
+  t.is(msg._slapp, null)
   t.deepEqual(msg.body, {})
   t.deepEqual(msg.meta, {})
 })
@@ -71,7 +71,7 @@ test('Message.attachOverrideRoute()', t => {
     return overrideFn
   })
 
-  msg._slackapp = app
+  msg._slapp = app
   msg.attachOverrideRoute('key', state)
   msg.override(msg)
 
@@ -100,7 +100,7 @@ test('Message.route()', t => {
     t.true(data.expiration > Date.now())
   })
 
-  msg._slackapp = app
+  msg._slapp = app
   msg.route(fnKey, state, 60)
   t.true(setStub.calledOnce)
 })
@@ -124,7 +124,7 @@ test('Message.route() defaults', t => {
     t.true(data.expiration > Date.now())
   })
 
-  msg._slackapp = app
+  msg._slapp = app
   msg.route(fnKey)
   t.true(setStub.calledOnce)
 })
@@ -143,7 +143,7 @@ test('Message.cancel()', t => {
     t.is(convoId, msg.conversation_id)
   })
 
-  msg._slackapp = app
+  msg._slapp = app
   msg.cancel()
   t.true(delStub.calledOnce)
 })

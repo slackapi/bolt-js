@@ -20,7 +20,7 @@ module.exports = () => {
       let body = req.body || {}
       let event = body.event || {}
 
-      req.slackapp = {
+      req.slapp = {
         type: 'event',
         body: body,
         meta: {

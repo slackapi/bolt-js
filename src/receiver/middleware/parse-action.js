@@ -19,7 +19,7 @@ module.exports = () => {
         return res.send('Error parsing payload')
       }
 
-      req.slackapp = {
+      req.slapp = {
         type: 'action',
         body: body,
         meta: {

@@ -31,20 +31,20 @@ class Message {
       this.meta.user_id || this.meta.bot_id
     ].join('::')
 
-    this._slackapp = null
+    this._slapp = null
   }
 
   /**
-   * Attach a SlackApp reference
+   * Attach a Slapp reference
    *
    * ##### Parameters
-   * - `slackapp` instance of SlackApp
+   * - `slapp` instance of Slapp
    *
-   * @param {SlackApp} slackapp
+   * @param {Slapp} slapp
    * @api private
    */
-  attachSlackApp (slackapp) {
-    this._slackapp = slackapp
+  attachSlapp (slapp) {
+    this._slapp = slapp
   }
 
   /**
@@ -63,7 +63,7 @@ class Message {
    * @api private
    */
   attachOverrideRoute (fnKey, state) {
-    let fn = this._slackapp.getRoute(fnKey)
+    let fn = this._slapp.getRoute(fnKey)
 
     // TODO: should we bubble up if a function doesn't exist?
     // It may be that it did exist but a new version was deployed that removed it.
@@ -79,7 +79,7 @@ class Message {
   /**
    * Register the next function to route to in a conversation.
    *
-   * The route should be registered already through `slackapp.route`
+   * The route should be registered already through `slapp.route`
    *
    * ##### Parameters
    * - `fnKey` `string`
@@ -106,7 +106,7 @@ class Message {
 
     let key = this.conversation_id
     let expiration = Date.now() + secondsToExpire * 1000
-    this._slackapp.convoStore.set(key, { fnKey, state, expiration })
+    this._slapp.convoStore.set(key, { fnKey, state, expiration })
     return this
   }
 
@@ -115,7 +115,7 @@ class Message {
    */
 
   cancel () {
-    this._slackapp.convoStore.del(this.conversation_id)
+    this._slapp.convoStore.del(this.conversation_id)
   }
 
   /**

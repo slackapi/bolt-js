@@ -1,6 +1,6 @@
 'use strict'
 
-// Enrich `req.slackapp.meta` with tokens and user ids parsed from Beep Boop headers
+// Enrich `req.slapp.meta` with tokens and user ids parsed from Beep Boop headers
 module.exports = (options) => {
   options = options || {}
 
@@ -10,11 +10,11 @@ module.exports = (options) => {
       return res.send(req.headers['bb-error'])
     }
 
-    if (!req.slackapp) {
-      return res.send('Missing req.slackapp')
+    if (!req.slapp) {
+      return res.send('Missing req.slapp')
     }
 
-    req.slackapp.meta = Object.assign(req.slackapp.meta || {}, {
+    req.slapp.meta = Object.assign(req.slapp.meta || {}, {
       // token for the user for the app
       app_token: req.headers['bb-slackaccesstoken'],
       // userID for the user who install ed the app

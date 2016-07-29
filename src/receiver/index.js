@@ -44,9 +44,9 @@ module.exports = class Receiver extends EventEmitter {
    */
   attachToExpress (app, opts) {
     let defaults = {
-      event: '/slackapp/event',
-      command: '/slackapp/command',
-      action: '/slackapp/action'
+      event: '/slack/event',
+      command: '/slack/command',
+      action: '/slack/action'
     }
     let options = opts || defaults
 
@@ -93,10 +93,10 @@ module.exports = class Receiver extends EventEmitter {
   }
 
   emitHandler (req, res) {
-    let message = req.slackapp
+    let message = req.slapp
 
     if (!message) {
-      return res.send('Missing req.slackapp')
+      return res.send('Missing req.slapp')
     }
 
     if (this.debug && this.logfn[message.type]) {

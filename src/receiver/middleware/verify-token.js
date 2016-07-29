@@ -7,7 +7,7 @@ module.exports = (token) => {
       return next()
     }
 
-    let message = req.slackapp
+    let message = req.slapp
     let verifyToken = message && message.meta && message.meta.verify_token
 
     // test verify token

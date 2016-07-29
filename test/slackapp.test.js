@@ -2,17 +2,17 @@
 
 const test = require('ava').test
 const sinon = require('sinon')
-const SlackApp = require('../src/slackapp')
+const Slapp = require('../src/slapp')
 const Message = require('../src/message')
 
-test('SlackApp()', t => {
+test('Slapp()', t => {
   let options = {
     debug: true,
     convo_store: () => {},
     error: () => {}
   }
 
-  let app = new SlackApp(options)
+  let app = new Slapp(options)
 
   t.is(app.app_token, options.app_token)
   t.is(app.app_user_id, options.app_user_id)
@@ -29,7 +29,7 @@ test('SlackApp()', t => {
 
 test('Slackapp.use()', t => {
   let mw = () => {}
-  let app = new SlackApp()
+  let app = new Slapp()
 
   t.is(app._middleware.length, 0)
 
@@ -39,16 +39,16 @@ test('Slackapp.use()', t => {
   t.deepEqual(app._middleware, [mw])
 })
 
-test('SlackApp() convo_store string', t => {
-  let app = new SlackApp({
+test('Slapp() convo_store string', t => {
+  let app = new Slapp({
     convo_store: 'memory'
   })
 
   t.is(typeof app.convoStore, 'object')
 })
 
-test('SlackApp.init()', t => {
-  let app = new SlackApp()
+test('Slapp.init()', t => {
+  let app = new Slapp()
 
   app.init()
 
@@ -56,7 +56,7 @@ test('SlackApp.init()', t => {
 })
 
 test('Slackapp.attachToExpress()', t => {
-  let app = new SlackApp()
+  let app = new Slapp()
   let stub = sinon.stub(app.receiver, 'attachToExpress')
 
   app.attachToExpress({})
@@ -64,8 +64,8 @@ test('Slackapp.attachToExpress()', t => {
   t.true(stub.calledOnce)
 })
 
-test('SlackApp.route()', t => {
-  let app = new SlackApp()
+test('Slapp.route()', t => {
+  let app = new Slapp()
   let key = 'routeKey'
   let fn = () => {}
 
@@ -74,8 +74,8 @@ test('SlackApp.route()', t => {
   t.deepEqual(app._registry[key], fn)
 })
 
-test('SlackApp.getRoute()', t => {
-  let app = new SlackApp()
+test('Slapp.getRoute()', t => {
+  let app = new Slapp()
   let key = 'routeKey'
   let fn = () => {}
 
@@ -84,8 +84,8 @@ test('SlackApp.getRoute()', t => {
   t.deepEqual(app.getRoute(key), fn)
 })
 
-test('SlackApp.match()', t => {
-  let app = new SlackApp()
+test('Slapp.match()', t => {
+  let app = new Slapp()
   let fn = () => {}
 
   t.is(app._matchers.length, 0)
@@ -96,15 +96,15 @@ test('SlackApp.match()', t => {
   t.deepEqual(app._matchers, [fn])
 })
 
-test.cb('SlackApp._handle() 1 mw, no override, no matchers', t => {
+test.cb('Slapp._handle() 1 mw, no override, no matchers', t => {
   t.plan(4)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
     override: false,
-    attachSlackApp: () => {}
+    attachSlapp: () => {}
   }
-  let attachSlackAppStub = sinon.stub(message, 'attachSlackApp')
+  let attachSlappStub = sinon.stub(message, 'attachSlapp')
 
   app.use((msg, next) => {
     t.deepEqual(msg, message)
@@ -113,35 +113,35 @@ test.cb('SlackApp._handle() 1 mw, no override, no matchers', t => {
   })
 
   app._handle(message, (err, handled) => {
-    t.true(attachSlackAppStub.calledOnce)
+    t.true(attachSlappStub.calledOnce)
     t.is(err, null)
     t.false(handled)
     t.end()
   })
 })
 
-test('SlackApp._handle() no callback provided', t => {
-  let app = new SlackApp()
+test('Slapp._handle() no callback provided', t => {
+  let app = new Slapp()
   let message = {
     override: false,
-    attachSlackApp: () => {}
+    attachSlapp: () => {}
   }
-  let attachSlackAppStub = sinon.stub(message, 'attachSlackApp')
+  let attachSlappStub = sinon.stub(message, 'attachSlapp')
 
   app._handle(message)
 
-  t.true(attachSlackAppStub.calledOnce)
+  t.true(attachSlappStub.calledOnce)
 })
 
-test.cb('SlackApp._handle() 1 mw, no override, 1 matchers', t => {
+test.cb('Slapp._handle() 1 mw, no override, 1 matchers', t => {
   t.plan(4)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
     override: false,
-    attachSlackApp: () => {}
+    attachSlapp: () => {}
   }
-  let attachSlackAppStub = sinon.stub(message, 'attachSlackApp')
+  let attachSlappStub = sinon.stub(message, 'attachSlapp')
 
   app
     .use((msg, next) => {
@@ -154,29 +154,29 @@ test.cb('SlackApp._handle() 1 mw, no override, 1 matchers', t => {
     })
 
   app._handle(message, (err, handled) => {
-    t.true(attachSlackAppStub.calledOnce)
+    t.true(attachSlappStub.calledOnce)
     t.is(err, null)
     t.true(handled)
     t.end()
   })
 })
 
-test.cb('SlackApp._handle() no mw, with override, no matchers', t => {
+test.cb('Slapp._handle() no mw, with override, no matchers', t => {
   t.plan(5)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
     override: (msg) => {
       t.deepEqual(msg, message)
     },
     conversation_id: 'asdf',
-    attachSlackApp: () => {}
+    attachSlapp: () => {}
   }
-  let attachSlackAppStub = sinon.stub(message, 'attachSlackApp')
+  let attachSlappStub = sinon.stub(message, 'attachSlapp')
   let delSpy = sinon.spy(app.convoStore, 'del')
 
   app._handle(message, (err, handled) => {
-    t.true(attachSlackAppStub.calledOnce)
+    t.true(attachSlappStub.calledOnce)
     t.is(err, null)
     t.true(handled)
     t.true(delSpy.calledWith(message.conversation_id))
@@ -185,26 +185,26 @@ test.cb('SlackApp._handle() no mw, with override, no matchers', t => {
   })
 })
 
-test.cb('SlackApp._handle() with override and del error', t => {
+test.cb('Slapp._handle() with override and del error', t => {
   t.plan(6)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
     onError: () => {},
     override: (msg) => {
       t.deepEqual(msg, message)
     },
     conversation_id: 'asdf',
-    attachSlackApp: () => {}
+    attachSlapp: () => {}
   }
-  let attachSlackAppStub = sinon.stub(message, 'attachSlackApp')
+  let attachSlappStub = sinon.stub(message, 'attachSlapp')
   let onErrorSpy = sinon.stub(app, 'onError')
   let delStub = sinon.stub(app.convoStore, 'del', (id, cb) => {
     cb(new Error('kaboom'))
   })
 
   app._handle(message, (err, handled) => {
-    t.true(attachSlackAppStub.calledOnce)
+    t.true(attachSlappStub.calledOnce)
     t.is(err.message, 'kaboom')
     t.true(handled)
     t.true(delStub.calledWith(message.conversation_id))
@@ -214,12 +214,12 @@ test.cb('SlackApp._handle() with override and del error', t => {
   })
 })
 
-test.cb('SlackApp.command() w/o criteria', t => {
+test.cb('Slapp.command() w/o criteria', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'command',
     body: {
       command: 'test'
@@ -237,12 +237,12 @@ test.cb('SlackApp.command() w/o criteria', t => {
     })
 })
 
-test.cb('SlackApp.command() w/ criteria string', t => {
+test.cb('Slapp.command() w/ criteria string', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'command',
     body: {
       command: 'test',
@@ -261,12 +261,12 @@ test.cb('SlackApp.command() w/ criteria string', t => {
     })
 })
 
-test.cb('SlackApp.command() w/ criteria regex', t => {
+test.cb('Slapp.command() w/ criteria regex', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'command',
     body: {
       command: 'test',
@@ -285,12 +285,12 @@ test.cb('SlackApp.command() w/ criteria regex', t => {
     })
 })
 
-test.cb('SlackApp.command() w/ non-matching string criteria', t => {
+test.cb('Slapp.command() w/ non-matching string criteria', t => {
   t.plan(2)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'command',
     body: {
       command: 'test',
@@ -307,12 +307,12 @@ test.cb('SlackApp.command() w/ non-matching string criteria', t => {
     })
 })
 
-test.cb('SlackApp.command() w/ non-matching regex criteria', t => {
+test.cb('Slapp.command() w/ non-matching regex criteria', t => {
   t.plan(2)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'command',
     body: {
       command: 'test',
@@ -329,12 +329,12 @@ test.cb('SlackApp.command() w/ non-matching regex criteria', t => {
     })
 })
 
-test.cb('SlackApp.action() w/o criteria', t => {
+test.cb('Slapp.action() w/o criteria', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'action',
     body: {
       actions: [
@@ -356,12 +356,12 @@ test.cb('SlackApp.action() w/o criteria', t => {
     })
 })
 
-test.cb('SlackApp.action() w/ criteria string', t => {
+test.cb('Slapp.action() w/ criteria string', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'action',
     body: {
       actions: [
@@ -383,12 +383,12 @@ test.cb('SlackApp.action() w/ criteria string', t => {
     })
 })
 
-test.cb('SlackApp.action() w/ non-matching criteria', t => {
+test.cb('Slapp.action() w/ non-matching criteria', t => {
   t.plan(2)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = {
-    attachSlackApp () {},
+    attachSlapp () {},
     type: 'action',
     body: {
       actions: [
@@ -408,10 +408,10 @@ test.cb('SlackApp.action() w/ non-matching criteria', t => {
     })
 })
 
-test.cb('SlackApp.message() w/o filter', t => {
+test.cb('Slapp.message() w/o filter', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -430,10 +430,10 @@ test.cb('SlackApp.message() w/o filter', t => {
     })
 })
 
-test.cb('SlackApp.message() w/ filter', t => {
+test.cb('Slapp.message() w/ filter', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -455,10 +455,10 @@ test.cb('SlackApp.message() w/ filter', t => {
     })
 })
 
-test.cb('SlackApp.event() w/ string criteria', t => {
+test.cb('Slapp.event() w/ string criteria', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -477,10 +477,10 @@ test.cb('SlackApp.event() w/ string criteria', t => {
     })
 })
 
-test.cb('SlackApp.event() w/ regex criteria', t => {
+test.cb('Slapp.event() w/ regex criteria', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -499,10 +499,10 @@ test.cb('SlackApp.event() w/ regex criteria', t => {
     })
 })
 
-test.cb('SlackApp._handle() w/ init()', t => {
+test.cb('Slapp._handle() w/ init()', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -522,8 +522,8 @@ test.cb('SlackApp._handle() w/ init()', t => {
     })
 })
 
-test.cb('SlackApp.ignoreBotsMiddleware() with bot message', t => {
-  let app = new SlackApp()
+test.cb('Slapp.ignoreBotsMiddleware() with bot message', t => {
+  let app = new Slapp()
   let mw = app.ignoreBotsMiddleware()
 
   let message = new Message('event', {}, {
@@ -538,8 +538,8 @@ test.cb('SlackApp.ignoreBotsMiddleware() with bot message', t => {
   t.end()
 })
 
-test.cb('SlackApp.ignoreBotsMiddleware() w/o bot message', t => {
-  let app = new SlackApp()
+test.cb('Slapp.ignoreBotsMiddleware() w/o bot message', t => {
+  let app = new Slapp()
   let mw = app.ignoreBotsMiddleware()
 
   let message = new Message('event', {}, {})
@@ -551,10 +551,10 @@ test.cb('SlackApp.ignoreBotsMiddleware() w/o bot message', t => {
   })
 })
 
-test.cb('SlackApp.preprocessConversationMiddleware() w/ conversation', t => {
+test.cb('Slapp.preprocessConversationMiddleware() w/ conversation', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let mw = app.preprocessConversationMiddleware()
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
@@ -579,10 +579,10 @@ test.cb('SlackApp.preprocessConversationMiddleware() w/ conversation', t => {
   })
 })
 
-test.cb('SlackApp.preprocessConversationMiddleware() w/o conversation', t => {
+test.cb('Slapp.preprocessConversationMiddleware() w/o conversation', t => {
   t.plan(3)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let mw = app.preprocessConversationMiddleware()
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
@@ -601,10 +601,10 @@ test.cb('SlackApp.preprocessConversationMiddleware() w/o conversation', t => {
   })
 })
 
-test.cb('SlackApp.preprocessConversationMiddleware() w/ error', t => {
+test.cb('Slapp.preprocessConversationMiddleware() w/ error', t => {
   t.plan(4)
 
-  let app = new SlackApp()
+  let app = new Slapp()
   let mw = app.preprocessConversationMiddleware()
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
