@@ -6,13 +6,13 @@ const Receiver = require('./receiver/')
 
 /**
  * A Slack App
- * @class SlackApp
+ * @class Slapp
  * @api private
  */
-class SlackApp {
+class Slapp {
 
   /**
-   * Construct a SlackApp, accepts an options object
+   * Construct a Slapp, accepts an options object
    *
    * ##### Parameters
    * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
@@ -23,7 +23,7 @@ class SlackApp {
    * @api private
    * @constructor
    * @param {Object} opts
-   * @returns {Object} SlackApp
+   * @returns {Object} Slapp
    */
 
   constructor (opts) {
@@ -147,7 +147,7 @@ class SlackApp {
   _handle (msg, done) {
     done = done || (() => {})
     let self = this
-    msg.attachSlackApp(self)
+    msg.attachSlapp(self)
     let idx = 0
 
     let next = () => {
@@ -193,15 +193,15 @@ class SlackApp {
    * Attach HTTP routes to an Express app
    *
    * Routes are:
-   * - POST `/slackapp/event`
-   * - POST `/slackapp/command`
-   * - POST `/slackapp/action`
+   * - POST `/slack/event`
+   * - POST `/slack/command`
+   * - POST `/slack/action`
    *
    * ##### Parameters
    * - `app` instance of Express app
-   * - `opts.event` `boolean|string` - event route (defaults to `/slackapp/event`) [optional]
-   * - `opts.command` `boolean|string` - command route (defaults to `/slackapp/command`) [optional]
-   * - `opts.action` `boolean|string` - action route (defaults to `/slackapp/action`) [optional]
+   * - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
+   * - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
+   * - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
    *
    *
    * ##### Returns
@@ -209,16 +209,16 @@ class SlackApp {
    *
    * ```
    * // would attach all routes w/ default paths
-   * slackapp.attachToExpress(app)
+   * slapp.attachToExpress(app)
    *
-   * slackapp.attachToExpress(app, {
-   *   event: true, // would register event route with default of /slackapp/event
+   * slapp.attachToExpress(app, {
+   *   event: true, // would register event route with default of /slack/event
    *   command: false, // would not register a route for commands
    *   action: '/slack-action' // custom route for actions
    * })
    *
    * // would only attach a route for events w/ default path
-   * slackapp.attachToExpress(app, {
+   * slapp.attachToExpress(app, {
    *   event: true
    * })
    * ````
@@ -589,4 +589,4 @@ class SlackApp {
   }
 }
 
-module.exports = SlackApp
+module.exports = Slapp

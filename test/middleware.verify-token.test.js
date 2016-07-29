@@ -30,7 +30,7 @@ test.cb('VerifyToken() token option matching verify_token', t => {
   let token = 'beepboop'
   let mw = VerifyToken(token)
   let req = fixtures.getMockReq({
-    slackapp: {
+    slapp: {
       meta: {
         verify_token: token
       }
@@ -48,7 +48,7 @@ test('VerifyToken() token option matching verify_token', t => {
   let token = 'beepboop'
   let mw = VerifyToken(token)
   let req = fixtures.getMockReq({
-    slackapp: {
+    slapp: {
       meta: {
         verify_token: 'derp'
       }

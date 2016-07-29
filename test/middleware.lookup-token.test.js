@@ -15,10 +15,10 @@ test.cb('LookupToken()', t => {
   let res = fixtures.getMockRes()
 
   mw(req, res, () => {
-    t.is(req.slackapp.meta.app_token, headers['bb-slackaccesstoken'])
-    t.is(req.slackapp.meta.app_user_id, headers['bb-slackuserid'])
-    t.is(req.slackapp.meta.bot_token, headers['bb-slackbotaccesstoken'])
-    t.is(req.slackapp.meta.bot_user_id, headers['bb-slackbotuserid'])
+    t.is(req.slapp.meta.app_token, headers['bb-slackaccesstoken'])
+    t.is(req.slapp.meta.app_user_id, headers['bb-slackuserid'])
+    t.is(req.slapp.meta.bot_token, headers['bb-slackbotaccesstoken'])
+    t.is(req.slapp.meta.bot_user_id, headers['bb-slackbotuserid'])
     t.end()
   })
 })
@@ -41,14 +41,14 @@ test('LookupToken() error header', t => {
   t.true(sendStub.calledOnce)
 })
 
-test('LookupToken() missing req.slackapp', t => {
+test('LookupToken() missing req.slapp', t => {
   let mw = LookupTokens()
   let headers = fixtures.getMockHeaders()
 
   let req = fixtures.getMockReq({ headers })
   let res = fixtures.getMockRes()
 
-  delete req.slackapp
+  delete req.slapp
 
   let sendStub = sinon.stub(res, 'send')
 

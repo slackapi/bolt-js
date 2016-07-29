@@ -3,7 +3,7 @@
 exports.getMockReq = function (req) {
   return Object.assign({
     body: {},
-    slackapp: {
+    slapp: {
       meta: {}
     }
   }, req || {})

@@ -1,6 +1,6 @@
 {
-  "name": "slackapp",
-  "version": "0.0.10",
+  "name": "slapp",
+  "version": "0.1.0",
   "description": "A module for Slack App integrations",
   "main": "src/index.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BeepBoopHQ/slackapp-js.git"
+    "url": "git+https://github.com/BeepBoopHQ/slapp.git"
   },
   "keywords": [
     "slack",
@@ -24,9 +24,9 @@
   "author": "Mike Brevoort",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BeepBoopHQ/slackapp-js/issues"
+    "url": "https://github.com/BeepBoopHQ/slapp/issues"
   },
-  "homepage": "https://github.com/BeepBoopHQ/slackapp-js#readme",
+  "homepage": "https://github.com/BeepBoopHQ/slapp#readme",
   "engines": {
     "node": ">=6.0.0"
   },

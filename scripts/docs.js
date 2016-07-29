@@ -8,12 +8,12 @@ const readmePath = path.join(__dirname, '/../README.md')
 // read source
 const src = [
   {
-    name: 'slackapp',
+    name: 'slapp',
     src: fs.readFileSync(path.join(__dirname, '/../src/index.js'), { encoding: 'utf8' })
   },
   {
-    name: 'SlackApp',
-    src: fs.readFileSync(path.join(__dirname, '/../src/slackapp.js'), { encoding: 'utf8' })
+    name: 'Slapp',
+    src: fs.readFileSync(path.join(__dirname, '/../src/slapp.js'), { encoding: 'utf8' })
   },
   {
     name: 'Message',

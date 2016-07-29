@@ -38,14 +38,14 @@ test.cb('ParseAction() valid payload', t => {
   let req = { body: { payload: JSON.stringify(payload) } }
 
   mw(req, fixtures.getMockRes(), () => {
-    let slackapp = req.slackapp
+    let slapp = req.slapp
 
-    t.is(slackapp.type, 'action')
-    t.deepEqual(slackapp.body, payload)
-    t.is(slackapp.meta.verify_token, payload.token)
-    t.is(slackapp.meta.user_id, payload.user.id)
-    t.is(slackapp.meta.channel_id, payload.channel.id)
-    t.is(slackapp.meta.team_id, payload.team.id)
+    t.is(slapp.type, 'action')
+    t.deepEqual(slapp.body, payload)
+    t.is(slapp.meta.verify_token, payload.token)
+    t.is(slapp.meta.user_id, payload.user.id)
+    t.is(slapp.meta.channel_id, payload.channel.id)
+    t.is(slapp.meta.team_id, payload.team.id)
     t.end()
   })
 })

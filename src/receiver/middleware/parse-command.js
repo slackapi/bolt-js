@@ -8,7 +8,7 @@ module.exports = () => {
     function parseCommand (req, res, next) {
       let body = req.body
 
-      req.slackapp = {
+      req.slapp = {
         type: 'command',
         body: body,
         meta: {

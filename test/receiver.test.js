@@ -34,9 +34,9 @@ test('Receiver.attachToExpress() defaults', t => {
   receiver.attachToExpress(app)
 
   t.true(appStub.calledThrice)
-  t.true(appStub.calledWith('/slackapp/event'))
-  t.true(appStub.calledWith('/slackapp/command'))
-  t.true(appStub.calledWith('/slackapp/action'))
+  t.true(appStub.calledWith('/slack/event'))
+  t.true(appStub.calledWith('/slack/command'))
+  t.true(appStub.calledWith('/slack/action'))
 })
 
 test('Receiver.attachToExpress() true, false, string', t => {
@@ -55,18 +55,18 @@ test('Receiver.attachToExpress() true, false, string', t => {
   })
 
   t.true(appStub.calledTwice)
-  t.true(appStub.calledWith('/slackapp/event'))
+  t.true(appStub.calledWith('/slack/event'))
   t.true(appStub.calledWith(actionRoute))
 })
 
-test('Receiver.emitHandler() no req.slackapp', t => {
+test('Receiver.emitHandler() no req.slapp', t => {
   let receiver = new Receiver()
 
   let res = fixtures.getMockRes()
   let sendStub = sinon.stub(res, 'send')
 
   receiver.emitHandler({}, res, () => t.fail())
-  t.true(sendStub.calledWith('Missing req.slackapp'))
+  t.true(sendStub.calledWith('Missing req.slapp'))
 })
 
 test('Receiver.emitHandler() w/ debug', t => {
@@ -80,7 +80,7 @@ test('Receiver.emitHandler() w/ debug', t => {
   let emitStub = sinon.stub(receiver, 'emit')
   let sendStub = sinon.stub(res, 'send')
 
-  receiver.emitHandler({ slackapp: msg }, res, () => t.fail())
+  receiver.emitHandler({ slapp: msg }, res, () => t.fail())
 
   t.true(logStub.calledOnce)
   t.deepEqual(logStub.getCall(0).args[0], msg.body)
@@ -97,7 +97,7 @@ test('Receiver.emitHandler() w/o debug', t => {
   let emitStub = sinon.stub(receiver, 'emit')
   let sendStub = sinon.stub(res, 'send')
 
-  receiver.emitHandler({ slackapp: msg }, res, () => t.fail())
+  receiver.emitHandler({ slapp: msg }, res, () => t.fail())
 
   t.false(logStub.calledOnce)
   t.true(emitStub.calledOnce)
