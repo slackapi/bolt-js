@@ -198,14 +198,14 @@ class Slapp {
    * - POST `/slack/action`
    *
    * ##### Parameters
-   * - `app` instance of Express app
+   * - `app` instance of Express app or Express.Router
    * - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
    * - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
    * - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
    *
    *
    * ##### Returns
-   * - `app` reference to Express app passed in
+   * - `app` reference to Express app or Express.Router passed in
    *
    * ```
    * // would attach all routes w/ default paths
