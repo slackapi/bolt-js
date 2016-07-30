@@ -116,7 +116,7 @@ module.exports = class Receiver extends EventEmitter {
     if (!evt) return this.log.debug('Event: UNKNOWN')
     if (!evt.event) return this.log.debug('Event: Missing:', evt)
 
-    let out = `${evt.event.user} -> ${evt.event.type}`
+    let out = `${evt.event.user || '-'} -> ${evt.event.type}`
     switch (evt.event.type) {
       case 'reaction_added':
         out += ` : ${evt.event.item.type} [${evt.event.item.channel}] : ${evt.event.reaction}`
