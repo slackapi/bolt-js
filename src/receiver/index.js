@@ -112,7 +112,6 @@ module.exports = class Receiver extends EventEmitter {
     res.send()
   }
 
-  // TODO: extract log fns into an overridable logger
   logEvent (evt) {
     if (!evt) return this.log.debug('Event: UNKNOWN')
     if (!evt.event) return this.log.debug('Event: Missing:', evt)

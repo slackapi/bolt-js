@@ -9,7 +9,9 @@ const Slapp = require('./slapp')
  * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
  * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
  * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
- * - `opts.error`       Error handler function `(error) => {}`
+ * - `opts.error` Error handler function `(error) => {}`
+ * - `opts.debug` - defaults to `false` - if `true` default logger will be enabled
+ * - `opts.logger` - defaults to null - Should be an object w/ a `debug` and `error` function
  *
  * Example
  *
