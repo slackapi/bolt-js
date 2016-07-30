@@ -14,17 +14,13 @@ test('Slapp()', t => {
 
   let app = new Slapp(options)
 
-  t.is(app.app_token, options.app_token)
-  t.is(app.app_user_id, options.app_user_id)
-  t.is(app.bot_token, options.bot_token)
-  t.is(app.bot_user_id, options.bot_user_id)
   t.is(app.debug, options.debug)
   t.is(app.convoStore, options.convo_store)
-  t.is(app.onError, options.error)
   t.is(typeof app.client, 'object')
   t.is(typeof app.receiver, 'object')
   t.true(Array.isArray(app._middleware))
   t.is(app._middleware.length, 0)
+  t.is(typeof app.emit, 'function')
 })
 
 test('Slapp.use()', t => {
@@ -53,6 +49,15 @@ test('Slapp.init()', t => {
   app.init()
 
   t.is(app._middleware.length, 2)
+})
+
+test('Slapp.emit(error)', t => {
+  let app = new Slapp()
+  let logSpy = sinon.spy(app.log, 'error')
+
+  app.init().emit('error', 'kaboom')
+  t.is(app._middleware.length, 2)
+  t.true(logSpy.calledOnce)
 })
 
 test('Slapp.attachToExpress()', t => {
@@ -190,7 +195,6 @@ test.cb('Slapp._handle() with override and del error', t => {
 
   let app = new Slapp()
   let message = {
-    onError: () => {},
     override: (msg) => {
       t.deepEqual(msg, message)
     },
@@ -198,7 +202,7 @@ test.cb('Slapp._handle() with override and del error', t => {
     attachSlapp: () => {}
   }
   let attachSlappStub = sinon.stub(message, 'attachSlapp')
-  let onErrorSpy = sinon.stub(app, 'onError')
+  let emitSpy = sinon.stub(app, 'emit')
   let delStub = sinon.stub(app.convoStore, 'del', (id, cb) => {
     cb(new Error('kaboom'))
   })
@@ -208,7 +212,7 @@ test.cb('Slapp._handle() with override and del error', t => {
     t.is(err.message, 'kaboom')
     t.true(handled)
     t.true(delStub.calledWith(message.conversation_id))
-    t.true(onErrorSpy.calledOnce)
+    t.true(emitSpy.calledWith('error'))
 
     t.end()
   })
@@ -634,7 +638,7 @@ test.cb('Slapp.preprocessConversationMiddleware() w/ error', t => {
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
 
-  let onErrorStub = sinon.stub(app, 'onError')
+  let emitSpy = sinon.stub(app, 'emit')
   let overrideStub = sinon.stub(message, 'attachOverrideRoute')
   let getStub = sinon.stub(app.convoStore, 'get', (id, cb) => {
     t.is(id, message.conversation_id)
@@ -646,6 +650,6 @@ test.cb('Slapp.preprocessConversationMiddleware() w/ error', t => {
 
   t.false(overrideStub.called)
   t.true(getStub.calledOnce)
-  t.true(onErrorStub.calledOnce)
+  t.true(emitSpy.calledWith('error'))
   t.end()
 })

@@ -1,7 +1,28 @@
 'use strict'
 
 const test = require('ava').test
+const Store = require('../src/conversation_store/')
 const Memory = require('../src/conversation_store/memory')
+
+test('Store() w/ no type', t => {
+  let store = Store()
+
+  t.true(store instanceof Memory)
+})
+
+test('Store() w/ memory type', t => {
+  let store = Store({
+    type: 'memory'
+  })
+
+  t.true(store instanceof Memory)
+})
+
+test('Store() w/ invalid type', t => {
+  t.throws(() => {
+    Store({ type: 'invalid' })
+  })
+})
 
 test.cb('Memory() crud', t => {
   t.plan(5)

@@ -1,15 +1,17 @@
 'use strict'
 
+const EventEmitter = require('events')
 const slack = require('slack')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
+const Logger = require('./logger')
 
 /**
  * A Slack App
  * @class Slapp
  * @api private
  */
-class Slapp {
+class Slapp extends EventEmitter {
 
   /**
    * Construct a Slapp, accepts an options object
@@ -27,29 +29,29 @@ class Slapp {
    */
 
   constructor (opts) {
+    super()
     opts = opts || {}
     this._middleware = []
     this._matchers = []
     this._registry = {}
 
     this.verify_token = opts.verify_token = opts.verify_token || process.env.SLACK_VERIFY_TOKEN
-
     this.debug = opts.debug
+    this.log = opts.logger || Logger(opts.debug)
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an impmementation of
     // a converation store
-    if (opts.convo_store) {
-      if (typeof opts.convo_store === 'string') {
-        this.convoStore = conversationStore({ type: opts.convo_store })
-      } else {
-        this.convoStore = opts.convo_store
-      }
+    if (!opts.convo_store || typeof opts.convo_store === 'string') {
+      this.convoStore = conversationStore({ type: opts.convo_store })
     } else {
-      this.convoStore = conversationStore()
+      this.convoStore = opts.convo_store
     }
 
-    this.onError = opts.error || (() => {})
+    // TODO: should we drop this option, and users can just slapp.on('error', ...)?
+    if (opts.error) {
+      this.on('error', opts.error)
+    }
     this.client = slack
     this.receiver = new Receiver(opts)
   }
@@ -64,8 +66,11 @@ class Slapp {
    * @api private
    */
   init () {
+    // Setup a default error handler
+    this.on('error', (err) => {
+      this.log.error(err.message || err)
+    })
     // call `handle` for each new request
-    // TODO: make overridable for testing
     this.receiver.on('message', this._handle.bind(this))
     this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
@@ -84,7 +89,7 @@ class Slapp {
     return (msg, next) => {
       this.convoStore.get(msg.conversation_id, (err, val) => {
         if (err) {
-          return this.onError(err)
+          return this.emit('error', err)
         }
 
         if (val) {
@@ -161,7 +166,7 @@ class Slapp {
       if (msg.override) {
         self.convoStore.del(msg.conversation_id, (err) => {
           if (err) {
-            this.onError(err)
+            self.emit('error', err)
           }
           // invoking override w/o context explicitly
           // don't want to confuse consumers w/ a msg as `this` scope

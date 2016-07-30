@@ -3,6 +3,7 @@
 const EventEmitter = require('events')
 const fs = require('fs')
 const Message = require('../message')
+const Logger = require('../logger')
 const ParseEvent = require('./middleware/parse-event')
 const ParseCommand = require('./middleware/parse-command')
 const ParseAction = require('./middleware/parse-action')
@@ -21,7 +22,10 @@ module.exports = class Receiver extends EventEmitter {
 
     this.debug = opts.debug
     this.verify_token = opts.verify_token
-    this.tokens_lookup = opts.tokens_lookup || LookupTokens(opts)
+    this.log = opts.logger || Logger(opts.debug)
+    this.tokens_lookup = opts.tokens_lookup || LookupTokens({
+      logger: this.log
+    })
 
     // record all events to a JSON line delimited file if record is set
     if (opts.record) {
@@ -110,8 +114,9 @@ module.exports = class Receiver extends EventEmitter {
 
   // TODO: extract log fns into an overridable logger
   logEvent (evt) {
-    if (!evt) return console.log('Event: UNKNOWN')
-    if (!evt.event) return console.log('Event: Missing:', evt)
+    if (!evt) return this.log.debug('Event: UNKNOWN')
+    if (!evt.event) return this.log.debug('Event: Missing:', evt)
+
     let out = `${evt.event.user} -> ${evt.event.type}`
     switch (evt.event.type) {
       case 'reaction_added':
@@ -125,18 +130,21 @@ module.exports = class Receiver extends EventEmitter {
         }
         break
     }
-    console.log(out)
+
+    this.log.debug(out)
   }
 
   logCommand (cmd) {
-    if (!cmd) return console.log('Command: UNKNOWN')
-    if (!cmd.command) return console.log('Command: Missing:', cmd)
-    console.log(`${cmd.user_id} -> ${cmd.command} ${cmd.text}`)
+    if (!cmd) return this.log.debug('Command: UNKNOWN')
+    if (!cmd.command) return this.log.debug('Command: Missing:', cmd)
+
+    this.log.debug(`${cmd.user_id} -> ${cmd.command} ${cmd.text}`)
   }
 
   logAction (action) {
-    if (!action) return console.log('Action: UNKNOWN')
-    console.log('Action:', action)
+    if (!action) return this.log.debug('Action: UNKNOWN')
+
+    this.log.debug('Action:', action)
   }
 
 }
