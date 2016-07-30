@@ -27,7 +27,7 @@ test('Slapp()', t => {
   t.is(app._middleware.length, 0)
 })
 
-test('Slackapp.use()', t => {
+test('Slapp.use()', t => {
   let mw = () => {}
   let app = new Slapp()
 
@@ -55,7 +55,7 @@ test('Slapp.init()', t => {
   t.is(app._middleware.length, 2)
 })
 
-test('Slackapp.attachToExpress()', t => {
+test('Slapp.attachToExpress()', t => {
   let app = new Slapp()
   let stub = sinon.stub(app.receiver, 'attachToExpress')
 
