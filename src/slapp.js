@@ -350,8 +350,9 @@ class Slapp {
     let fn = (msg) => {
       if (msg.isMessage()) {
         let text = msg.stripDirectMention()
-        if (criteria.test(text) && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
-          callback(msg, text)
+        let match = text.match(criteria)
+        if (match && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
+          callback.apply(null, [msg].concat(match))
           return true
         }
       }

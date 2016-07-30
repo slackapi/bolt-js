@@ -430,6 +430,31 @@ test.cb('Slapp.message() w/o filter', t => {
     })
 })
 
+test.cb('Slapp.message() w/ matchers', t => {
+  t.plan(6)
+
+  let app = new Slapp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep one Two'
+    }
+  }, {})
+
+  app
+    .message('beep ([oO]ne) ([tT]wo)', (msg, text, match1, match2) => {
+      t.deepEqual(msg, message)
+      t.is(text, 'beep one Two')
+      t.is(match1, 'one')
+      t.is(match2, 'Two')
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
 test.cb('Slapp.message() w/ filter', t => {
   t.plan(3)
 
