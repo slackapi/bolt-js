@@ -99,7 +99,7 @@ test('Receiver.emitHandler() w/o debug', t => {
 
   receiver.emitHandler({ slapp: msg }, res, () => t.fail())
 
-  t.true(logStub.calledOnce)
+  t.false(logStub.calledOnce)
   t.true(emitStub.calledOnce)
   t.true(sendStub.calledOnce)
 })
