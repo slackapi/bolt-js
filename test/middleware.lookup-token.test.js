@@ -6,7 +6,7 @@ const fixtures = require('./fixtures/')
 const LookupTokens = require('../src/receiver/middleware/lookup-tokens')
 
 test.cb('LookupToken()', t => {
-  t.plan(4)
+  t.plan(7)
 
   let mw = LookupTokens()
   let headers = fixtures.getMockHeaders()
@@ -19,6 +19,9 @@ test.cb('LookupToken()', t => {
     t.is(req.slapp.meta.app_user_id, headers['bb-slackuserid'])
     t.is(req.slapp.meta.bot_token, headers['bb-slackbotaccesstoken'])
     t.is(req.slapp.meta.bot_user_id, headers['bb-slackbotuserid'])
+    t.is(req.slapp.meta.bot_user_name, headers['bb-slackbotusername'])
+    t.is(req.slapp.meta.team_name, headers['bb-slackteamname'])
+    t.is(req.slapp.meta.team_domain, headers['bb-slackteamdomain'])
     t.end()
   })
 })
