@@ -8,7 +8,7 @@ const Slapp = require('./slapp')
  * Parameters
  * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
  * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
- * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
+ * - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
  * - `opts.log` defaults to `true`, `false` to disable logging
  * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
  *
@@ -17,8 +17,10 @@ const Slapp = require('./slapp')
  *
  *     var Slapp = require('slapp')
  *     var BeepBoopConvoStore = require('slapp-convo-beepboop')
+ *     var BeepBoopContext = require('slapp-context-beepboop')
  *     var slapp = Slapp({
  *       record: 'out.jsonl',
+ *       context: BeepBoopContext(),
  *       convo_store: BeepBoopConvoStore({ debug: true })
  *     })
  *

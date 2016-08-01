@@ -6,7 +6,6 @@ const Message = require('../message')
 const ParseEvent = require('./middleware/parse-event')
 const ParseCommand = require('./middleware/parse-command')
 const ParseAction = require('./middleware/parse-action')
-const LookupTokens = require('./middleware/lookup-tokens')
 const VerifyToken = require('./middleware/verify-token')
 const SSLCheck = require('./middleware/ssl-check')
 
@@ -20,7 +19,7 @@ module.exports = class Receiver extends EventEmitter {
     opts = opts || {}
 
     this.verify_token = opts.verify_token
-    this.tokens_lookup = opts.tokens_lookup || LookupTokens()
+    this.tokens_lookup = opts.tokens_lookup
 
     // record all events to a JSON line delimited file if record is set
     if (opts.record) {

@@ -11,7 +11,7 @@ test('Slapp()', t => {
     colors: true,
     verify_token: 'verify_token',
     convo_store: () => {},
-    tokens_lookup: () => {}
+    context
   }
 
   let app = new Slapp(options)
@@ -28,7 +28,7 @@ test('Slapp()', t => {
 
 test('Slapp.use()', t => {
   let mw = () => {}
-  let app = new Slapp()
+  let app = new Slapp({ context })
 
   t.is(app._middleware.length, 0)
 
@@ -40,6 +40,7 @@ test('Slapp.use()', t => {
 
 test('Slapp() convo_store string', t => {
   let app = new Slapp({
+    context,
     convo_store: 'memory'
   })
 
@@ -47,7 +48,7 @@ test('Slapp() convo_store string', t => {
 })
 
 test('Slapp.init()', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
 
   app.init()
 
@@ -55,7 +56,7 @@ test('Slapp.init()', t => {
 })
 
 test('Slapp.attachToExpress()', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let stub = sinon.stub(app.receiver, 'attachToExpress')
 
   app.attachToExpress({})
@@ -64,7 +65,7 @@ test('Slapp.attachToExpress()', t => {
 })
 
 test('Slapp.route()', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let key = 'routeKey'
   let fn = () => {}
 
@@ -74,7 +75,7 @@ test('Slapp.route()', t => {
 })
 
 test('Slapp.getRoute()', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let key = 'routeKey'
   let fn = () => {}
 
@@ -84,7 +85,7 @@ test('Slapp.getRoute()', t => {
 })
 
 test('Slapp.match()', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let fn = () => {}
 
   t.is(app._matchers.length, 0)
@@ -98,7 +99,7 @@ test('Slapp.match()', t => {
 test.cb('Slapp._handle() 1 mw, no override, no matchers', t => {
   t.plan(4)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     override: false,
     attachSlapp: () => {}
@@ -120,7 +121,7 @@ test.cb('Slapp._handle() 1 mw, no override, no matchers', t => {
 })
 
 test('Slapp._handle() no callback provided', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     override: false,
     attachSlapp: () => {}
@@ -135,7 +136,7 @@ test('Slapp._handle() no callback provided', t => {
 test.cb('Slapp._handle() 1 mw, no override, 1 matchers', t => {
   t.plan(4)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     override: false,
     attachSlapp: () => {}
@@ -163,7 +164,7 @@ test.cb('Slapp._handle() 1 mw, no override, 1 matchers', t => {
 test.cb('Slapp._handle() no mw, with override, no matchers', t => {
   t.plan(5)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     override: (msg) => {
       t.deepEqual(msg, message)
@@ -187,7 +188,7 @@ test.cb('Slapp._handle() no mw, with override, no matchers', t => {
 test.cb('Slapp._handle() with override and del error', t => {
   t.plan(6)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     override: (msg) => {
       t.deepEqual(msg, message)
@@ -215,7 +216,7 @@ test.cb('Slapp._handle() with override and del error', t => {
 test.cb('Slapp.command() w/o criteria', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'command',
@@ -238,7 +239,7 @@ test.cb('Slapp.command() w/o criteria', t => {
 test.cb('Slapp.command() w/ criteria string', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'command',
@@ -262,7 +263,7 @@ test.cb('Slapp.command() w/ criteria string', t => {
 test.cb('Slapp.command() w/ criteria regex', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'command',
@@ -286,7 +287,7 @@ test.cb('Slapp.command() w/ criteria regex', t => {
 test.cb('Slapp.command() w/ non-matching string criteria', t => {
   t.plan(2)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'command',
@@ -308,7 +309,7 @@ test.cb('Slapp.command() w/ non-matching string criteria', t => {
 test.cb('Slapp.command() w/ non-matching regex criteria', t => {
   t.plan(2)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'command',
@@ -330,7 +331,7 @@ test.cb('Slapp.command() w/ non-matching regex criteria', t => {
 test.cb('Slapp.action() w/o criteria', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'action',
@@ -357,7 +358,7 @@ test.cb('Slapp.action() w/o criteria', t => {
 test.cb('Slapp.action() w/ criteria string', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'action',
@@ -384,7 +385,7 @@ test.cb('Slapp.action() w/ criteria string', t => {
 test.cb('Slapp.action() w/ non-matching criteria', t => {
   t.plan(2)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = {
     attachSlapp () {},
     type: 'action',
@@ -409,7 +410,7 @@ test.cb('Slapp.action() w/ non-matching criteria', t => {
 test.cb('Slapp.message() w/o filter', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -431,7 +432,7 @@ test.cb('Slapp.message() w/o filter', t => {
 test.cb('Slapp.message() w/ matchers', t => {
   t.plan(6)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -456,7 +457,7 @@ test.cb('Slapp.message() w/ matchers', t => {
 test.cb('Slapp.message() w/ filter', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -481,7 +482,7 @@ test.cb('Slapp.message() w/ filter', t => {
 test.cb('Slapp.event() w/ string criteria', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -503,7 +504,7 @@ test.cb('Slapp.event() w/ string criteria', t => {
 test.cb('Slapp.event() w/ regex criteria', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -525,7 +526,7 @@ test.cb('Slapp.event() w/ regex criteria', t => {
 test.cb('Slapp._handle() w/ init()', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let message = new Message('event', {
     event: {
       type: 'message',
@@ -546,7 +547,7 @@ test.cb('Slapp._handle() w/ init()', t => {
 })
 
 test.cb('Slapp.ignoreBotsMiddleware() with bot message', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let mw = app.ignoreBotsMiddleware()
 
   let message = new Message('event', {}, {
@@ -562,7 +563,7 @@ test.cb('Slapp.ignoreBotsMiddleware() with bot message', t => {
 })
 
 test.cb('Slapp.ignoreBotsMiddleware() w/o bot message', t => {
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let mw = app.ignoreBotsMiddleware()
 
   let message = new Message('event', {}, {})
@@ -577,7 +578,7 @@ test.cb('Slapp.ignoreBotsMiddleware() w/o bot message', t => {
 test.cb('Slapp.preprocessConversationMiddleware() w/ conversation', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let mw = app.preprocessConversationMiddleware()
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
@@ -605,7 +606,7 @@ test.cb('Slapp.preprocessConversationMiddleware() w/ conversation', t => {
 test.cb('Slapp.preprocessConversationMiddleware() w/o conversation', t => {
   t.plan(3)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let mw = app.preprocessConversationMiddleware()
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
@@ -627,7 +628,7 @@ test.cb('Slapp.preprocessConversationMiddleware() w/o conversation', t => {
 test.cb('Slapp.preprocessConversationMiddleware() w/ error', t => {
   t.plan(4)
 
-  let app = new Slapp()
+  let app = new Slapp({ context })
   let mw = app.preprocessConversationMiddleware()
   let message = new Message('event', {}, {})
   message.conversation_id = 'convo_id'
@@ -647,3 +648,8 @@ test.cb('Slapp.preprocessConversationMiddleware() w/ error', t => {
   t.true(emitSpy.calledWith('error'))
   t.end()
 })
+
+// Test context fn
+function context (req, res, next) {
+  next()
+}
