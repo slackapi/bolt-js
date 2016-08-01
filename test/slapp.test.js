@@ -4,7 +4,6 @@ const test = require('ava').test
 const sinon = require('sinon')
 const Slapp = require('../src/slapp')
 const Message = require('../src/message')
-const fixtures = require('./fixtures/')
 
 const meta = {
   app_token: 'asdf'
