@@ -1,0 +1,31 @@
+{
+  "type": "event",
+  "body": {
+    "token": "UXXXXXXXXXXXXXXX",
+    "team_id": "TXXXXXXXX",
+    "api_app_id": "AXXXXXXXX",
+    "event": {
+      "type": "message",
+      "user": "UXXXXXXXX",
+      "text": "help",
+      "ts": "1469983827.000002",
+      "channel": "DXXXXXXXX",
+      "event_ts": "1469983827.000002"
+    },
+    "type": "event_callback",
+    "authed_users": ["UXXXXXXXX"]
+  },
+  "meta": {
+    "verify_token": "UXXXXXXXXXXXXXXX",
+    "user_id": "UXXXXXXXX",
+    "channel_id": "DXXXXXXXX",
+    "team_id": "TXXXXXXXX",
+    "app_token": "xoxp-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx",
+    "app_user_id": "UXXXXXXXX",
+    "bot_token": "xoxb-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+    "bot_user_id": "UXXXXXXXX"
+  },
+  "conversation_id": "TXXXXXXXX::DXXXXXXXX::UXXXXXXXX",
+  "_slapp": null,
+  "delay": 11678
+}

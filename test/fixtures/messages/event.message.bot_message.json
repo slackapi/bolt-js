@@ -1,0 +1,32 @@
+{
+  "type": "event",
+  "body": {
+    "token": "UXXXXXXXXXXXXXXX",
+    "team_id": "TXXXXXXXX",
+    "api_app_id": "AXXXXXXXX",
+    "event": {
+      "text": "Q: Why did the tomato turn red?\nA: Because it saw the salad dressing!",
+      "bot_id": "BXXXXXXXX",
+      "type": "message",
+      "subtype": "bot_message",
+      "ts": "1469983849.000004",
+      "channel": "DXXXXXXXX",
+      "event_ts": "1469983849.000004"
+    },
+    "type": "event_callback",
+    "authed_users": ["UXXXXXXXX"]
+  },
+  "meta": {
+    "verify_token": "UXXXXXXXXXXXXXXX",
+    "bot_id": "BXXXXXXXX",
+    "channel_id": "DXXXXXXXX",
+    "team_id": "TXXXXXXXX",
+    "app_token": "xoxb-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+    "app_user_id": "UXXXXXXXX",
+    "bot_token": "xoxb-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+    "bot_user_id": "UXXXXXXXX"
+  },
+  "conversation_id": "TXXXXXXXX::DXXXXXXXX::BXXXXXXXX",
+  "_slapp": null,
+  "delay": 32315
+}

@@ -2,9 +2,11 @@
 
 const EventEmitter = require('events')
 const slack = require('slack')
+const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
-const Logger = require('./logger')
+const Formatter = require('./message-formatter')
+const logger = require('./logger')
 
 /**
  * A Slack App
@@ -20,9 +22,8 @@ class Slapp extends EventEmitter {
    * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
    * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
    * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
-   * - `opts.error` Error handler function `(error) => {}`
-   * - `opts.debug` - defaults to `false` - if `true` default logger will be enabled
-   * - `opts.logger` - defaults to null - Should be an object w/ a `debug` and `error` function
+   * - `opts.log` defaults to `true`, `false` to disable logging
+   * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
    *
    * @api private
    * @constructor
@@ -32,14 +33,23 @@ class Slapp extends EventEmitter {
 
   constructor (opts) {
     super()
-    opts = opts || {}
+    opts = deap.update({
+      verify_token: process.env.SLACK_VERIFY_TOKEN,
+      convo_store: null,
+      tokens_lookup: null,
+      log: true,
+      colors: !!process.stdout.isTTY
+    }, opts || {})
+
     this._middleware = []
     this._matchers = []
     this._registry = {}
 
-    this.verify_token = opts.verify_token = opts.verify_token || process.env.SLACK_VERIFY_TOKEN
-    this.debug = opts.debug
-    this.log = opts.logger || Logger(opts.debug)
+    this.verify_token = opts.verify_token
+    this.log = opts.log
+    this.formatter = Formatter({
+      colors: opts.colors
+    })
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an impmementation of
@@ -50,10 +60,6 @@ class Slapp extends EventEmitter {
       this.convoStore = opts.convo_store
     }
 
-    // TODO: should we drop this option, and users can just slapp.on('error', ...)?
-    if (opts.error) {
-      this.on('error', opts.error)
-    }
     this.client = slack
     this.receiver = new Receiver(opts)
   }
@@ -68,10 +74,10 @@ class Slapp extends EventEmitter {
    * @api private
    */
   init () {
-    // Setup a default error handler
-    this.on('error', (err) => {
-      this.log.error(err.message || err)
-    })
+    // attach default logging if enabled
+    if (this.log) {
+      logger(this)
+    }
     // call `handle` for each new request
     this.receiver.on('message', this._handle.bind(this))
     this.use(this.ignoreBotsMiddleware())
@@ -154,6 +160,7 @@ class Slapp extends EventEmitter {
   _handle (msg, done) {
     done = done || (() => {})
     let self = this
+    this.emit('info', this.formatter(msg))
     msg.attachSlapp(self)
     let idx = 0
 

@@ -1,15 +1,10 @@
 'use strict'
 
 // Enrich `req.slapp.meta` with tokens and user ids parsed from Beep Boop headers
-module.exports = (options) => {
-  options = options || {}
-  let log = options.logger
-
+module.exports = () => {
   return function tokenMiddleware (req, res, next) {
     if (req.headers['bb-error']) {
-      if (log && log.error) {
-        log.error('Event: Error: ' + req.headers['bb-error'])
-      }
+      console.log('Event: Error: ' + req.headers['bb-error'])
       return res.send(req.headers['bb-error'])
     }
 

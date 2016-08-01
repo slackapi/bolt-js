@@ -9,9 +9,8 @@ const Slapp = require('./slapp')
  * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
  * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
  * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
- * - `opts.error` Error handler function `(error) => {}`
- * - `opts.debug` - defaults to `false` - if `true` default logger will be enabled
- * - `opts.logger` - defaults to null - Should be an object w/ a `debug` and `error` function
+ * - `opts.log` defaults to `true`, `false` to disable logging
+ * - `opts.colors` defaults to `true`, `false` to disable colors in logging
  *
  * Example
  *
@@ -19,10 +18,8 @@ const Slapp = require('./slapp')
  *     var Slapp = require('slapp')
  *     var BeepBoopConvoStore = require('slapp-convo-beepboop')
  *     var slapp = Slapp({
- *       debug: true,
  *       record: 'out.jsonl',
- *       convo_store: BeepBoopConvoStore({ debug: true }),
- *       error: (err) => { console.error('Error: ', err) }
+ *       convo_store: BeepBoopConvoStore({ debug: true })
  *     })
  *
  *
