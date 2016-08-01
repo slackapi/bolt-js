@@ -160,21 +160,44 @@ class Message {
    * `input` options are the same as [`say`](#messagesay)
    *
    * ##### Parameters
-   * - `responseUrl` string - URL provided by a Slack interactive message action or slash command
+   * - `responseUrl` string - URL provided by a Slack interactive message action or slash command [optional]
    * - `input` the payload to send, maybe a string, Object or Array.
    * - `callback` (err, data) => {}
+   *
+   * Example:
+   *
+   *     // responseUrl implied from body.response_url if this is an action or command
+   *     msg.respond('thanks!', (err) => {})
+   *
+   *     // responseUrl explicitly provided
+   *     msg.respond(responseUrl, 'thanks!', (err) => {})
+   *
+   *     // input provided as object
+   *     msg.respond({ text: 'thanks!' }, (err) => {})
+   *
+   *     // input provided as Array
+   *     msg.respond(['thanks!', 'I :heart: u'], (err) => {})
    *
    *
    * ##### Returns
    * - `this` (chainable)
    *
-   * @param {string} responseUrl
+   * @param {string} [responseUrl]
    * @param {(string|Object|Array)} input
    * @param {function} callback
    */
 
   respond (responseUrl, input, callback) {
+    if (!input || typeof input === 'function') {
+      callback = input
+      input = responseUrl
+      responseUrl = this.body.response_url
+    }
     if (!callback) callback = () => {}
+
+    if (!responseUrl) {
+      return callback(new Error('responseUrl not provided or not included as response_url with this type of Slack event'))
+    }
 
     this._request(responseUrl, this._processInput(input), (err, res, body) => {
       let rateLimit = 'You are sending too many requests. Please relax.'

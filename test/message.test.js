@@ -317,6 +317,35 @@ test('Message.respond() w/o callback', t => {
   t.true(reqStub.calledOnce)
 })
 
+test('Message.respond() w/o responseUrl', t => {
+  let msg = new Message()
+  let url = 'https://slack'
+  let input = 'beepboop'
+
+  msg.body.response_url = url
+
+  let reqStub = sinon.stub(msg, '_request', (responseUrl, input, cb) => {
+    t.is(responseUrl, url)
+    t.is(input, input)
+
+    cb(null, {}, { ok: true })
+  })
+
+  msg.respond(input)
+  t.true(reqStub.calledOnce)
+})
+
+test('Message.respond() w/o responseUrl and response_url missing from body', t => {
+  t.plan(2)
+  let msg = new Message()
+  let input = 'beepboop'
+
+  msg.respond(input, (err) => {
+    t.truthy(err)
+    t.is(err.message, 'responseUrl not provided or not included as response_url with this type of Slack event')
+  })
+})
+
 test('Message.isMessage()', t => {
   let msg = new Message('event', {
     event: {
