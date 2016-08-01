@@ -1,15 +1,31 @@
 {
-  "type": "event",
+  "type": "action",
   "body": {
-    "token": "UXXXXXXXXXXXXXXX",
-    "team_id": "TXXXXXXXX",
-    "api_app_id": "AXXXXXXXX",
-    "event": {
-      "type": "message",
-      "user": "UXXXXXXXX",
-      "text": "help",
-      "ts": "1469983827.000002",
-      "channel": "DXXXXXXXX",
+    "actions": [{
+      "name": "answer",
+      "value": "in"
+    }],
+    "callback_id": "in_or_out_callback",
+    "team": {
+      "id": "TXXXXXXXX",
+      "domain": "norrischuck"
+    },
+    "channel": {
+      "id": "DXXXXXXXX",
+      "name": "directmessage"
+    },
+    "user": {
+      "id": "UXXXXXXXX",
+      "name": "brad"
+    },
+    "action_ts": "1470062914.569030",
+    "message_ts": "1470062905.000002",
+    "attachment_id": "1",
+    "token": "XXXXXXXXXXXXXXX",
+    "original_message": {
+      "text": "",
+      "username": "In or Out",
+      "bot_id": "B1VL5FJKD",
       "attachments": [{
         "callback_id": "in_or_out_callback",
         "text": "In or Out?",
@@ -44,22 +60,23 @@
         }],
         "fallback": "NO FALLBACK DEFINED"
       }],
-      "event_ts": "1469983827.000002"
+      "type": "message",
+      "subtype": "bot_message",
+      "ts": "1470062905.000002"
     },
-    "type": "event_callback",
-    "authed_users": ["UXXXXXXXX"]
+    "response_url": "https://hooks.slack.com/actions/TXXXXXXXX/65070116791/jenjzX5R5MpDHXrCPPZIKulu"
   },
   "meta": {
-    "verify_token": "UXXXXXXXXXXXXXXX",
+    "verify_token": "XXXXXXXXXXXXXXX",
     "user_id": "UXXXXXXXX",
     "channel_id": "DXXXXXXXX",
     "team_id": "TXXXXXXXX",
-    "app_token": "xoxp-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx",
+    "app_token": "xoxp-XXXXXXXXXXX-XXXXXXXXXXX-XXXXXXXXXXX-XXXXXXXXXXX",
     "app_user_id": "UXXXXXXXX",
-    "bot_token": "xoxb-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+    "bot_token": "xoxb-XXXXXXXXXXX-XXXXXXXXXXXXX",
     "bot_user_id": "UXXXXXXXX"
   },
   "conversation_id": "TXXXXXXXX::DXXXXXXXX::UXXXXXXXX",
   "_slapp": null,
-  "delay": 11678
+  "delay": 19919
 }

@@ -7,15 +7,18 @@ const Message = require('../src/message')
 
 test('Slapp()', t => {
   let options = {
-    debug: true,
+    log: true,
+    colors: true,
+    verify_token: 'verify_token',
     convo_store: () => {},
-    error: () => {}
+    tokens_lookup: () => {}
   }
 
   let app = new Slapp(options)
 
-  t.is(app.debug, options.debug)
+  t.is(app.log, options.log)
   t.is(app.convoStore, options.convo_store)
+  t.is(app.verify_token, options.verify_token)
   t.is(typeof app.client, 'object')
   t.is(typeof app.receiver, 'object')
   t.true(Array.isArray(app._middleware))
@@ -49,15 +52,6 @@ test('Slapp.init()', t => {
   app.init()
 
   t.is(app._middleware.length, 2)
-})
-
-test('Slapp.emit(error)', t => {
-  let app = new Slapp()
-  let logSpy = sinon.spy(app.log, 'error')
-
-  app.init().emit('error', 'kaboom')
-  t.is(app._middleware.length, 2)
-  t.true(logSpy.calledOnce)
 })
 
 test('Slapp.attachToExpress()', t => {

@@ -1,11 +1,20 @@
+'use strict'
+
 const chalk = require('chalk')
 
-module.exports = (app) => {
+module.exports = (app, opts) => {
+  opts = opts || {}
+  let colors = opts.colors
+
+  function c (val, color) {
+    return colors ? chalk[color](val) : val
+  }
+
   app
     .on('info', info => {
-      console.log([chalk.green('slapp:info'), info].join(' '))
+      console.log([c('slapp:info', 'green'), info].join(' '))
     })
     .on('error', err => {
-      console.log([chalk.red('slapp:error'), err.message || err].join(' '))
+      console.log([c('slapp:error', 'red'), (err && err.message) || err].join(' '))
     })
 }

@@ -34,12 +34,15 @@ module.exports = (opts) => {
       let actions = (msg.body.actions || []).map(action => {
         return `${action.name}=${action.value}`
       })
+      let teamId = msg.body.team && msg.body.team.id || 'UNKNOWN'
+      let channelId = msg.body.channel && msg.body.channel.id || 'UNKNOWN'
+      let userId = msg.body.user && msg.body.user.id || 'UNKNOWN'
 
       return [
         `${type(msg.type)}`,
-        `${team(msg.body.team.id)}`,
-        `${channel(msg.body.channel.id)}`,
-        `${user(msg.body.user.id)}`,
+        `${team(teamId)}`,
+        `${channel(channelId)}`,
+        `${user(userId)}`,
         `${actions.join(',')}`
       ].join(' ')
     },
@@ -66,7 +69,7 @@ module.exports = (opts) => {
       'action': 'act',
       'event': 'evt',
       'command': 'cmd'
-    }[val]
+    }[val] || val
 
     return c(`[${val}]`, 'gray')
   }

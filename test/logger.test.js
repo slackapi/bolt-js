@@ -3,35 +3,45 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const Logger = require('../src/logger')
+const EventEmitter = require('events')
 
-test('Logger() w/ debug', t => {
-  let logger = Logger(true)
+test('Logger()', t => {
+  let app = new EventEmitter()
+
+  Logger(app)
+
+  t.is(app.listenerCount('info'), 1)
+  t.is(app.listenerCount('error'), 1)
+})
+
+test('Logger() info', t => {
+  let app = new EventEmitter()
+
+  Logger(app)
 
   let logStub = sinon.stub(console, 'log')
 
-  logger.debug('one')
-  logger.error('two')
+  app.emit('info')
 
-  t.true(logStub.calledTwice)
-
-  let logArg = logStub.getCall(0).args[0]
-  let errorArg = logStub.getCall(1).args[0]
-
-  t.true(logArg.indexOf('debug:') >= 0)
-  t.true(errorArg.indexOf('error:') >= 0)
+  let info = logStub.getCall(0).args[0]
+  t.true(logStub.calledOnce)
+  t.true(info.indexOf('slapp:info') >= 0)
 
   console.log.restore()
 })
 
-test('Logger() w/o debug', t => {
-  let logger = Logger()
+test('Logger() error', t => {
+  let app = new EventEmitter()
+
+  Logger(app)
 
   let logStub = sinon.stub(console, 'log')
 
-  logger.debug('one')
-  logger.error('two')
+  app.emit('error')
 
-  t.false(logStub.called)
+  let info = logStub.getCall(0).args[0]
+  t.true(logStub.calledOnce)
+  t.true(info.indexOf('slapp:error') >= 0)
 
   console.log.restore()
 })
