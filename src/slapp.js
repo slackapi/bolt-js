@@ -47,6 +47,7 @@ class Slapp extends EventEmitter {
 
     this.verify_token = opts.verify_token
     this.log = opts.log
+    this.colors = opts.colors
     this.formatter = Formatter({
       colors: opts.colors
     })
@@ -65,7 +66,7 @@ class Slapp extends EventEmitter {
   }
 
   /**
-   * Initialize app w/ default middleware and receiver listener
+   * Initialize app w/ logger, default middleware and receiver listener
    *
    *
    * ##### Returns
@@ -76,7 +77,9 @@ class Slapp extends EventEmitter {
   init () {
     // attach default logging if enabled
     if (this.log) {
-      logger(this)
+      logger(this, {
+        colors: this.colors
+      })
     }
     // call `handle` for each new request
     this.receiver.on('message', this._handle.bind(this))

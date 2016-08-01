@@ -4,7 +4,7 @@
 module.exports = () => {
   return function tokenMiddleware (req, res, next) {
     if (req.headers['bb-error']) {
-      console.log('Event: Error: ' + req.headers['bb-error'])
+      console.error('Event: Error: ' + req.headers['bb-error'])
       return res.send(req.headers['bb-error'])
     }
 

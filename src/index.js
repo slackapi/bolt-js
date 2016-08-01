@@ -10,7 +10,7 @@ const Slapp = require('./slapp')
  * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
  * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
  * - `opts.log` defaults to `true`, `false` to disable logging
- * - `opts.colors` defaults to `true`, `false` to disable colors in logging
+ * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
  *
  * Example
  *
