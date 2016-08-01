@@ -27,7 +27,7 @@ test('Slapp()', t => {
   t.is(app._middleware.length, 0)
 })
 
-test('Slackapp.use()', t => {
+test('Slapp.use()', t => {
   let mw = () => {}
   let app = new Slapp()
 
@@ -55,7 +55,7 @@ test('Slapp.init()', t => {
   t.is(app._middleware.length, 2)
 })
 
-test('Slackapp.attachToExpress()', t => {
+test('Slapp.attachToExpress()', t => {
   let app = new Slapp()
   let stub = sinon.stub(app.receiver, 'attachToExpress')
 
@@ -422,6 +422,31 @@ test.cb('Slapp.message() w/o filter', t => {
   app
     .message('beep', (msg) => {
       t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.message() w/ matchers', t => {
+  t.plan(6)
+
+  let app = new Slapp()
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep one Two'
+    }
+  }, {})
+
+  app
+    .message('beep ([oO]ne) ([tT]wo)', (msg, text, match1, match2) => {
+      t.deepEqual(msg, message)
+      t.is(text, 'beep one Two')
+      t.is(match1, 'one')
+      t.is(match2, 'Two')
     })
     ._handle(message, (err, handled) => {
       t.is(err, null)

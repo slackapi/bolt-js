@@ -304,12 +304,25 @@ class Slapp {
    * ##### Parameters
    * - `criteria` text that message contains or regex (e.g. "^hi")
    * - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`, `direct_mention`, `mention`, `ambient`
-   * - `callback` function - `(msg) => {}`
+   * - `callback` function - `(msg, text, [match1], [match2]...) => {}`
    *
    *
    * ##### Returns
    * - `this` (chainable)
    *
+   * Example with regex matchers:
+   *
+   *     slapp.message('^play (song|artist) <([^>]+)>', (msg, text, type, toplay) => {
+   *       // text = 'play artist spotify:track:1yJiE307EBIzOB9kqH1deb'
+   *       // type = 'artist'
+   *       // toplay = 'spotify:track:1yJiE307EBIzOB9kqH1deb'
+   *     }
+   *
+   * Example without matchers:
+   *
+   *     slapp.message('play', (msg, text) => {
+   *       // text = 'play'
+   *     }
    *
    * Example `msg.body`:
    *
@@ -350,8 +363,9 @@ class Slapp {
     let fn = (msg) => {
       if (msg.isMessage()) {
         let text = msg.stripDirectMention()
-        if (criteria.test(text) && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
-          callback(msg, text)
+        let match = text.match(criteria)
+        if (match && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
+          callback.apply(null, [msg].concat(match))
           return true
         }
       }
