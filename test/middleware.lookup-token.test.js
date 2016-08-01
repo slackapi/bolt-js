@@ -57,7 +57,7 @@ test('LookupToken() error header w/ logger', t => {
   let res = fixtures.getMockRes()
 
   let sendStub = sinon.stub(res, 'send')
-  let logStub = sinon.stub(console, 'log')
+  let logStub = sinon.stub(console, 'error')
 
   mw(req, res, () => {
     t.fail()
@@ -65,7 +65,7 @@ test('LookupToken() error header w/ logger', t => {
 
   t.true(sendStub.calledOnce)
   t.true(logStub.calledOnce)
-  console.log.restore()
+  console.error.restore()
 })
 
 test('LookupToken() missing req.slapp', t => {
