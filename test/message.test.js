@@ -44,6 +44,26 @@ test('Message() w/o user_id', t => {
   t.is(msg.conversation_id, 'team_id::channel_id::bot_id')
 })
 
+test('Message() w/o user_id, bot_id, or channel_id', t => {
+  let type = 'event'
+  let body = {
+    text: 'beepboop'
+  }
+  let meta = {
+    app_token: 'asdf',
+    team_id: 'team_id'
+  }
+  let msg = new Message(type, body, meta)
+  let err = msg.verifyProps()
+
+  t.is(err, null)
+  t.is(msg.type, type)
+  t.deepEqual(msg.body, body)
+  t.deepEqual(msg.meta, meta)
+  t.is(msg._slapp, null)
+  t.is(msg.conversation_id, 'team_id::nochannel::nouser')
+})
+
 test('Message() defaults', t => {
   let msg = new Message()
 

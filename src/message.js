@@ -27,8 +27,8 @@ class Message {
     this.meta = meta || {}
     this.conversation_id = [
       this.meta.team_id,
-      this.meta.channel_id,
-      this.meta.user_id || this.meta.bot_id
+      this.meta.channel_id || 'nochannel',
+      this.meta.user_id || this.meta.bot_id || 'nouser'
     ].join('::')
 
     this._slapp = null
@@ -464,8 +464,6 @@ class Message {
 
     if (!this.meta.app_token) missing.push('app_token')
     if (!this.meta.team_id) missing.push('team_id')
-    if (!this.meta.channel_id) missing.push('channel_id')
-    if (!this.meta.user_id && !this.meta.bot_id) missing.push('user_id||bot_id')
 
     if (missing.length === 0) {
       return null
