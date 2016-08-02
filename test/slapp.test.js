@@ -33,6 +33,14 @@ test('Slapp()', t => {
   t.is(typeof app.emit, 'function')
 })
 
+test('Slapp() w/o context', t => {
+  t.throws(() => {
+    let app = new Slapp()
+    t.is(null, app)
+    t.fail()
+  })
+})
+
 test('Slapp.use()', t => {
   let mw = () => {}
   let app = new Slapp({ context })
@@ -101,6 +109,20 @@ test('Slapp.match()', t => {
 
   t.is(app._matchers.length, 1)
   t.deepEqual(app._matchers, [fn])
+})
+
+test.cb('Slapp._handle() w/ a bad message', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('event', {}, {})
+
+  let emitSpy = sinon.stub(app, 'emit')
+  app._handle(message, (err) => {
+    t.not(err, null)
+    t.true(emitSpy.calledWith('error'))
+    t.end()
+  })
 })
 
 test.cb('Slapp._handle() 1 mw, no override, no matchers', t => {
