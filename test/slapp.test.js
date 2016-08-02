@@ -207,6 +207,7 @@ test.cb('Slapp._handle() with override and del error', t => {
 
   let app = new Slapp({ context })
   let message = new Message('event', {}, meta)
+  message.conversation_id = 'asdf'
   message.override = (msg) => {
     t.deepEqual(msg, message)
   }
