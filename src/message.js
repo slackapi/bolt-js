@@ -459,6 +459,21 @@ class Message {
     return input
   }
 
+  verifyProps () {
+    let missing = []
+
+    if (!this.meta.app_token) missing.push('app_token')
+    if (!this.meta.team_id) missing.push('team_id')
+    if (!this.meta.channel_id) missing.push('channel_id')
+    if (!this.meta.user_id && !this.meta.bot_id) missing.push('user_id||bot_id')
+
+    if (missing.length === 0) {
+      return null
+    }
+
+    return new Error(`Cannot process message because the following properties are missing from message.meta: ${missing.join(',')}`)
+  }
+
 }
 
 module.exports = Message

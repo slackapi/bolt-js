@@ -169,9 +169,8 @@ class Slapp extends EventEmitter {
     done = done || (() => {})
     let self = this
 
-    if (!msg.meta || (!msg.meta.app_token && !msg.meta.bot_token)) {
-      // TODO: Add link to context fn section of github readme
-      let err = new Error('Message is missing either a bot_token or app_token. Make sure your context function is populating that correctly.')
+    let err = msg.verifyProps()
+    if (err) {
       self.emit('error', err)
       return done(err, false)
     }

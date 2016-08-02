@@ -6,7 +6,10 @@ const Slapp = require('../src/slapp')
 const Message = require('../src/message')
 
 const meta = {
-  app_token: 'asdf'
+  app_token: 'app_token',
+  team_id: 'team_id',
+  channel_id: 'channel_id',
+  user_id: 'user_id'
 }
 
 test('Slapp()', t => {
@@ -420,11 +423,7 @@ test.cb('Slapp.message() w/ filter', t => {
       type: 'message',
       text: 'beep boop'
     }
-  }, {
-    app_token: 'asdf',
-    bot_user_id: 'asdf',
-    channel_id: 'qwertyg'
-  })
+  }, meta)
 
   app
     .message('beep', 'ambient', (msg) => {
