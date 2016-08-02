@@ -44,6 +44,30 @@ test('LookupToken() error header', t => {
   t.true(sendStub.calledOnce)
 })
 
+test('LookupToken() error header w/ logger', t => {
+  let logger = {
+    error: () => {}
+  }
+  let mw = LookupTokens({ logger })
+  let headers = fixtures.getMockHeaders({
+    'bb-error': 'kaboom'
+  })
+
+  let req = fixtures.getMockReq({ headers })
+  let res = fixtures.getMockRes()
+
+  let sendStub = sinon.stub(res, 'send')
+  let logStub = sinon.stub(console, 'error')
+
+  mw(req, res, () => {
+    t.fail()
+  })
+
+  t.true(sendStub.calledOnce)
+  t.true(logStub.calledOnce)
+  console.error.restore()
+})
+
 test('LookupToken() missing req.slapp', t => {
   let mw = LookupTokens()
   let headers = fixtures.getMockHeaders()

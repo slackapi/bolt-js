@@ -19,9 +19,8 @@ module.exports = class Receiver extends EventEmitter {
     super()
     opts = opts || {}
 
-    this.debug = opts.debug
     this.verify_token = opts.verify_token
-    this.tokens_lookup = opts.tokens_lookup || LookupTokens(opts)
+    this.tokens_lookup = opts.tokens_lookup || LookupTokens()
 
     // record all events to a JSON line delimited file if record is set
     if (opts.record) {
@@ -30,12 +29,6 @@ module.exports = class Receiver extends EventEmitter {
       this.on('message', (obj) => {
         fs.appendFile(opts.record, JSON.stringify(Object.assign({}, obj, { delay: Date.now() - this.started })) + '\n')
       })
-    }
-
-    this.logfn = {
-      'event': this.logEvent.bind(this),
-      'command': this.logCommand.bind(this),
-      'action': this.logAction.bind(this)
     }
   }
 
@@ -99,44 +92,10 @@ module.exports = class Receiver extends EventEmitter {
       return res.send('Missing req.slapp')
     }
 
-    if (this.debug && this.logfn[message.type]) {
-      this.logfn[message.type](message.body)
-    }
-
     let msg = new Message(message.type, message.body, message.meta)
+
     this.emit('message', msg)
     res.send()
-  }
-
-  // TODO: extract log fns into an overridable logger
-  logEvent (evt) {
-    if (!evt) return console.log('Event: UNKNOWN')
-    if (!evt.event) return console.log('Event: Missing:', evt)
-    let out = `${evt.event.user} -> ${evt.event.type}`
-    switch (evt.event.type) {
-      case 'reaction_added':
-        out += ` : ${evt.event.item.type} [${evt.event.item.channel}] : ${evt.event.reaction}`
-        break
-      case 'message':
-        if (evt.event.subtype) {
-          out += ` : ${evt.event.subtype} [${evt.event.channel}] : ${evt.event.text}`
-        } else {
-          out += ` : ${evt.event.channel} : ${evt.event.text}`
-        }
-        break
-    }
-    console.log(out)
-  }
-
-  logCommand (cmd) {
-    if (!cmd) return console.log('Command: UNKNOWN')
-    if (!cmd.command) return console.log('Command: Missing:', cmd)
-    console.log(`${cmd.user_id} -> ${cmd.command} ${cmd.text}`)
-  }
-
-  logAction (action) {
-    if (!action) return console.log('Action: UNKNOWN')
-    console.log('Action:', action)
   }
 
 }

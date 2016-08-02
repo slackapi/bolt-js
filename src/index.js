@@ -6,12 +6,11 @@ const Slapp = require('./slapp')
  * Create a new Slapp, accepts an options object
  *
  * Parameters
- * - `opts.app_token`   Slack App token override
- * - `opts.app_user_id` Slack App User ID (who installed the app)
- * - `opts.bot_token`   Slack App Bot token
- * - `opts.bot_user_id` Slack App Bot ID
+ * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
  * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
- * - `opts.error`       Error handler function `(error) => {}`
+ * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
+ * - `opts.log` defaults to `true`, `false` to disable logging
+ * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
  *
  * Example
  *
@@ -19,10 +18,8 @@ const Slapp = require('./slapp')
  *     var Slapp = require('slapp')
  *     var BeepBoopConvoStore = require('slapp-convo-beepboop')
  *     var slapp = Slapp({
- *       debug: true,
  *       record: 'out.jsonl',
- *       convo_store: BeepBoopConvoStore({ debug: true }),
- *       error: (err) => { console.error('Error: ', err) }
+ *       convo_store: BeepBoopConvoStore({ debug: true })
  *     })
  *
  *

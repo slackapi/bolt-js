@@ -1,0 +1,65 @@
+{
+  "type": "event",
+  "body": {
+    "token": "UXXXXXXXXXXXXXXX",
+    "team_id": "TXXXXXXXX",
+    "api_app_id": "AXXXXXXXX",
+    "event": {
+      "type": "message",
+      "user": "UXXXXXXXX",
+      "text": "help",
+      "ts": "1469983827.000002",
+      "channel": "DXXXXXXXX",
+      "attachments": [{
+        "callback_id": "in_or_out_callback",
+        "text": "In or Out?",
+        "id": 1,
+        "color": "47EEBC",
+        "actions": [{
+          "id": "1",
+          "name": "answer",
+          "text": "In",
+          "type": "button",
+          "value": "in",
+          "style": "default"
+        }, {
+          "id": "2",
+          "name": "answer",
+          "text": "Out",
+          "type": "button",
+          "value": "out",
+          "style": "default"
+        }],
+        "fallback": "NO FALLBACK DEFINED"
+      }, {
+        "callback_id": "in_or_out_callback",
+        "id": 2,
+        "actions": [{
+          "id": "3",
+          "name": "recycle",
+          "text": ":recycle:",
+          "type": "button",
+          "value": "",
+          "style": "primary"
+        }],
+        "fallback": "NO FALLBACK DEFINED"
+      }],
+      "event_ts": "1469983827.000002"
+    },
+    "type": "event_callback",
+    "authed_users": ["UXXXXXXXX"]
+  },
+  "meta": {
+    "verify_token": "UXXXXXXXXXXXXXXX",
+    "user_id": "UXXXXXXXX",
+    "channel_id": "DXXXXXXXX",
+    "team_id": "TXXXXXXXX",
+    "app_token": "xoxp-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx",
+    "app_user_id": "UXXXXXXXX",
+    "bot_token": "xoxb-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+    "bot_user_id": "UXXXXXXXX"
+  },
+  "conversation_id": "TXXXXXXXX::DXXXXXXXX::UXXXXXXXX",
+  "_slapp": null,
+  "delay": 11678
+}

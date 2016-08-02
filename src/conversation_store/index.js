@@ -14,5 +14,9 @@ module.exports = (opts) => {
     storage = new MemoryStore()
   }
 
+  if (!storage) {
+    throw new Error('Could not define storage for type ' + opts.type)
+  }
+
   return storage
 }

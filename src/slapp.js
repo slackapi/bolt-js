@@ -1,15 +1,19 @@
 'use strict'
 
+const EventEmitter = require('events')
 const slack = require('slack')
+const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
+const Formatter = require('./message-formatter')
+const logger = require('./logger')
 
 /**
  * A Slack App
  * @class Slapp
  * @api private
  */
-class Slapp {
+class Slapp extends EventEmitter {
 
   /**
    * Construct a Slapp, accepts an options object
@@ -18,7 +22,8 @@ class Slapp {
    * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
    * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
    * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
-   * - `opts.error`       Error handler function `(error) => {}`
+   * - `opts.log` defaults to `true`, `false` to disable logging
+   * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
    *
    * @api private
    * @constructor
@@ -27,35 +32,41 @@ class Slapp {
    */
 
   constructor (opts) {
-    opts = opts || {}
+    super()
+    opts = deap.update({
+      verify_token: process.env.SLACK_VERIFY_TOKEN,
+      convo_store: null,
+      tokens_lookup: null,
+      log: true,
+      colors: !!process.stdout.isTTY
+    }, opts || {})
+
     this._middleware = []
     this._matchers = []
     this._registry = {}
 
-    this.verify_token = opts.verify_token = opts.verify_token || process.env.SLACK_VERIFY_TOKEN
-
-    this.debug = opts.debug
+    this.verify_token = opts.verify_token
+    this.log = opts.log
+    this.colors = opts.colors
+    this.formatter = Formatter({
+      colors: opts.colors
+    })
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an impmementation of
     // a converation store
-    if (opts.convo_store) {
-      if (typeof opts.convo_store === 'string') {
-        this.convoStore = conversationStore({ type: opts.convo_store })
-      } else {
-        this.convoStore = opts.convo_store
-      }
+    if (!opts.convo_store || typeof opts.convo_store === 'string') {
+      this.convoStore = conversationStore({ type: opts.convo_store })
     } else {
-      this.convoStore = conversationStore()
+      this.convoStore = opts.convo_store
     }
 
-    this.onError = opts.error || (() => {})
     this.client = slack
     this.receiver = new Receiver(opts)
   }
 
   /**
-   * Initialize app w/ default middleware and receiver listener
+   * Initialize app w/ logger, default middleware and receiver listener
    *
    *
    * ##### Returns
@@ -64,8 +75,13 @@ class Slapp {
    * @api private
    */
   init () {
+    // attach default logging if enabled
+    if (this.log) {
+      logger(this, {
+        colors: this.colors
+      })
+    }
     // call `handle` for each new request
-    // TODO: make overridable for testing
     this.receiver.on('message', this._handle.bind(this))
     this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
@@ -84,7 +100,7 @@ class Slapp {
     return (msg, next) => {
       this.convoStore.get(msg.conversation_id, (err, val) => {
         if (err) {
-          return this.onError(err)
+          return this.emit('error', err)
         }
 
         if (val) {
@@ -147,6 +163,7 @@ class Slapp {
   _handle (msg, done) {
     done = done || (() => {})
     let self = this
+    this.emit('info', this.formatter(msg))
     msg.attachSlapp(self)
     let idx = 0
 
@@ -161,7 +178,7 @@ class Slapp {
       if (msg.override) {
         self.convoStore.del(msg.conversation_id, (err) => {
           if (err) {
-            this.onError(err)
+            self.emit('error', err)
           }
           // invoking override w/o context explicitly
           // don't want to confuse consumers w/ a msg as `this` scope
