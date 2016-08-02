@@ -450,7 +450,7 @@ class Slapp extends EventEmitter {
    * ##### Parameters
    * - `callbackId` string
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
-   * - `callback` function - `(msg) => {}`
+   * - `callback` function - `(msg, text, [match1], [match2]...) => {}`
    *
    *
    * ##### Returns
@@ -566,6 +566,21 @@ class Slapp extends EventEmitter {
    * ##### Returns
    * - `this` (chainable)
    *
+   * Example without parameters:
+   *
+   *     // "/acommand"
+   *     slapp.command('acommand', (msg) => {
+   *     }
+   *
+   *
+   * Example with RegExp matcher criteria:
+   *
+   *     // "/acommand create flipper"
+   *     slapp.command('acommand', 'create (.*)'(msg, text, name) => {
+   *       // text = 'create flipper'
+   *       // name = 'flipper'
+   *     }
+   *
    *
    * Example `msg` object:
    *
@@ -610,9 +625,13 @@ class Slapp extends EventEmitter {
     }
 
     let fn = (msg) => {
-      if (msg.type === 'command' && msg.body.command === command && criteria.test(msg.body.text)) {
-        callback(msg)
-        return true
+      if (msg.type === 'command' && msg.body.command === command) {
+        let text = msg.body.text || ''
+        let match = text.match(criteria)
+        if (match) {
+          callback.apply(null, [msg].concat(match))
+          return true
+        }
       }
     }
 

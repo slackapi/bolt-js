@@ -283,6 +283,33 @@ test.cb('Slapp.command() w/ criteria regex', t => {
     })
 })
 
+test.cb('Slapp.command() w/ criteria matcher', t => {
+  t.plan(6)
+
+  let app = new Slapp()
+  let message = {
+    attachSlapp () {},
+    type: 'command',
+    body: {
+      command: 'test',
+      text: 'one two'
+    }
+  }
+
+  app
+    .command(message.body.command, '([oO]ne) ([tT]wo)', (msg, text, match1, match2) => {
+      t.deepEqual(msg, message)
+      t.is(text, message.body.text)
+      t.is(match1, 'one')
+      t.is(match2, 'two')
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
 test.cb('Slapp.command() w/ non-matching string criteria', t => {
   t.plan(2)
 
