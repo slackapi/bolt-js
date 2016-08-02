@@ -7,14 +7,15 @@ Slapp is a node.js module for creating Slack integrations from simple slash comm
 
 Slapp heavily favors the new HTTP based [Slack Events API]() over [Realtime Messaging API](https://api.slack.com/rtm) websockets for creating more scalable and manageable bots. It supports simple conversation flows with state managed out of process to survive restarts and horizontal scaling. Conversation flows aren't just message based but may include any Slack event, [interactive buttons](https://api.slack.com/docs/message-buttons), [slash commands](https://api.slack.com/slash-commands), etc.
 
-Slapp is build on a strong foundation with a test suite with nearly 100% test coverage and depends on the [smallwins/slack](https://github.com/smallwins/slack) client.
+Slapp is built on a strong foundation with a test suite with 100% test coverage and depends on the [smallwins/slack](https://github.com/smallwins/slack) client.
 
 Here is a basic example:
 ```js
 const Slapp = require('slapp')
+const BeepBoopContext = require('slapp-context-beepboop')
 if (!process.env.PORT) throw Error('PORT missing but required')
 
-var slapp = Slapp()
+var slapp = Slapp({ context: BeepBoopContext() })
 
 slapp.message('^(hi|hello|hey).*', ['direct_mention', 'direct_message'], (msg, text, greeting) => {
   msg
@@ -43,30 +44,25 @@ You can call the Slapp function with the following options:
 ```js
 const Slapp = require('slapp')
 const ConvoStore = require('slapp-convo-beepboop')
+const BeepBoopContext = require('slapp-context-beepboop')
 
 var slapp = Slapp({
   verify_token: process.env.SLACK_VERIFY_TOKEN,
   convo_store: ConvoStore(),
+  context: BeepBoopContext(),
   log: true,
-
-  // These properties should only be used in testing
-  // if you want to peg it to a specific team's config
-  app_token: '<APP_TOKEN>',
-  app_user_id: '<USER_ID>',
-  bot_token: '<BOT_TOKEN>',
-  bot_user_id: '<BOT_USER_ID>'
+  colors: true
 })
 ```
 
-### Token Lookup
-One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. If you're running on [Beep Boop][beepboop], this data is saved for you automatically. Slapp has a `token_lookup` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, you must set the follwing properties on `req.slapp.meta` for Slapp to process requests:
+### Context Lookup
+One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. If you're running on [Beep Boop][beepboop], this data is saved for you automatically. Slapp has a required `context` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, there are a few required properties that need to be set on `req.slapp.meta` for Slapp to process requests:
 
-+ `app_token` - OAuth `access_token` property
-+ `app_user_id` - `user_id` prop from an [auth.test()](https://api.slack.com/methods/auth.test) call using the OAuth `access_token` value
-+ `bot_token` - OAuth `bot.bot_access_token` property
-+ `bot_user_id` - OAuth `bot.bot_user_id` property
++ `app_token` - **required** OAuth `access_token` property
++ `bot_token` - **required if you have a bot user** OAuth `bot.bot_access_token` property
++ `bot_user_id` - **required if you have a bot user** OAuth `bot.bot_user_id` property
 
-The incoming request from Slack has been parsed and normalized by the time the `token_lookup` function runs, and is available via `req.slapp`.  You can rely on this data in your `token_lookup` function to assist you in looking up the necessary tokens and meta-data.
+The incoming request from Slack has been parsed and normalized by the time the `context` function runs, and is available via `req.slapp`.  You can rely on this data in your `context` function to assist you in looking up the necessary tokens and meta-data.
 
 `req.slapp` has the following structure:
 ```js
@@ -81,13 +77,13 @@ The incoming request from Slack has been parsed and normalized by the time the `
 }
 ```
 
-These properties should be added to the `req.slapp.meta` object in your `token_lookup` middleware function. If you're running on [Beep Boop][beepboop], these values are stored and added automatically for you, otherwise it's up to you. If you're not on [Beep Boop][beepboop], your `token_lookup` function could look something like this:
+If you're running on [Beep Boop][beepboop], these values are stored and added automatically for you, otherwise you'll need to set these properties on `req.slapp.meta` with data retreived from wherever you're storing your OAuth data. That might look something like this:
 ```js
 // your database module...
 var myDB = require('./my-db')
 
 var slapp = Slapp({
-  token_lookup (req, res, next) {
+  context (req, res, next) {
     var meta = req.slapp.meta
 
     myDB.getTeamData(meta.team_id, (err, data) => {
@@ -99,7 +95,6 @@ var slapp = Slapp({
       // mixin necessary team meta-data
       req.slapp.meta = Object.assign(req.slapp.meta, {
         app_token: data.app_token,
-        app_user_id: data.app_user_id,
         bot_token: data.bot_token,
         bot_user_id: data.bot_user_id,
         // you can add your own team meta-data as well
@@ -111,7 +106,7 @@ var slapp = Slapp({
 ```
 
 ### Message Middleware
-Slapp supports middleware for incoming events allowing you to stop the propagation
+Slapp supports middleware for incoming events, allowing you to stop the propagation
 of the event by not calling `next()`, passively observing, or appending metadata
 to the message by adding properties to `msg.meta`. Middleware is processed in the
 order it is added.
@@ -144,7 +139,7 @@ slapp.use((msg, next) => {
 ```
 
 ## Slack Events
-Listen for any Slack with `slapp.event(event_name, (msg) => {})`.
+Listen for any Slack event with `slapp.event(event_name, (msg) => {})`.
 
 ```js
 // add a smile reaction by the bot for any message reacted to
@@ -161,7 +156,7 @@ slapp.event('reaction_added', (msg) => {
 ![Slack Events Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-event.gif)
 
 ## Slack Event Messages
-A message is just a subtype a Slack event but has a special convenience method `slapp.message(regex, [types], (msg) => {})`:
+A message is just a subtype of Slack event but has a special convenience method `slapp.message(regex, [types], (msg) => {})`:
 
 ```js
 slapp.message('goodnight', 'mention', (msg) => {
@@ -172,7 +167,7 @@ slapp.message('goodnight', 'mention', (msg) => {
 
 
 ## Interactive Messages
-`msg.say()` may be passed text or an object to be sent to [`chat.postMessage`](https://api.slack.com/methods/chat.postMessage). It defaults to the current channel and the bot user token (or app token if there is not bot user). Here's an example of using `msg.say()` to send an interactive message and registering a handler to receive the button action:
+`msg.say()` may be passed text, an array of text values (one is chosen randomly), or an object to be sent to [`chat.postMessage`](https://api.slack.com/methods/chat.postMessage). It defaults to the current channel and the bot user token (or app token if there is not bot user). Here's an example of using `msg.say()` to send an interactive message and registering a handler to receive the button action:
 
 ```js
 slapp.message('yesno', (msg) => {
@@ -275,10 +270,9 @@ object and expiration time in seconds.
 Consider the example below. If a user says "do it" in a direct message then ask
 for confirmation using an interactive message. If they do something other than
 answer by pressing a button, redirect them to choose one of the options, yes or no.
-When they choose handle the response accordingly.
+When they choose, handle the response accordingly.
 
-Notice the `state` object the is passed to `msg.route` and into `slapp.route` and
-the each time `msg.route` is called an expiration time of 60 seconds is set. If
+Notice the `state` object that is passed to `msg.route` and into `slapp.route`. Each time `msg.route` is called an expiration time of 60 seconds is set. If
 there is not activity by the user for 60 seconds, we expire the conversation flow.
 
 
@@ -330,7 +324,7 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
     return
   }
 
-  // use the state that's been pass through the flow to figure out the
+  // use the state that's been passed through the flow to figure out the
   // elapsed time
   var elapsed = (Date.now() - state.requested)/1000
   msg.respond(msg.body.response_url, {
@@ -945,7 +939,7 @@ It is generally always passed as `msg`.
 
 # Contributing
 
-We adore contributions. Please include the details of the proposed changes in a Pull Request and ensure `npm test` pass. 👻
+We adore contributions. Please include the details of the proposed changes in a Pull Request and ensure `npm test` passes. 👻
 
 ### Scripts
 - `npm test` - runs linter and tests with coverage
