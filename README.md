@@ -1,6 +1,6 @@
 [![Sponsored by Beep Boop](https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F_sponsored_by-%E2%9C%A8_Robots%20%26%20Pencils%20%2F%20Beep%20Boop_%E2%9C%A8-FB6CBE.svg)](https://beepboophq.com)
-[![Build Status](https://travis-ci.org/BeepBoopHQ/slapp-js.svg)](https://travis-ci.org/BeepBoopHQ/slapp-js)
-[![Coverage Status](https://coveralls.io/repos/github/BeepBoopHQ/slapp-js/badge.svg)](https://coveralls.io/github/BeepBoopHQ/slapp-js)
+[![Build Status](https://travis-ci.org/BeepBoopHQ/slapp.svg)](https://travis-ci.org/BeepBoopHQ/slapp)
+[![Coverage Status](https://coveralls.io/repos/github/BeepBoopHQ/slapp/badge.svg)](https://coveralls.io/github/BeepBoopHQ/slapp)
 
 # Slapp
 Slapp is a node.js module for creating Slack integrations from simple slash commands to complex bots. It is specifically for Slack --not a generic bot framework-- because we believe the best restaurants in the world are not buffets. 🍴😉
@@ -235,7 +235,7 @@ You can pass a conversation store implementation into the Slapp factory with the
   del (id, callback) {}         // callback(err)
 ```
 
-The [in memory implementation](https://github.com/BeepBoopHQ/slapp-js/blob/master/src/conversation_store/memory.js) can be used for testing and as an example when creating your own implementation.
+The [in memory implementation](https://github.com/BeepBoopHQ/slapp/blob/master/src/conversation_store/memory.js) can be used for testing and as an example when creating your own implementation.
 
 ### What is a conversation?
 A conversation is scoped by the combination of Slack Team, Channel, and User. When
@@ -356,17 +356,17 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ## slapp(opts:Object)
 
   Create a new Slapp, accepts an options object
-  
+
   Parameters
   - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
   - `opts.convo_store` Implementation of ConversationStore, defaults to memory
   - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
   - `opts.log` defaults to `true`, `false` to disable logging
   - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
-  
+
   Example
-  
-  
+
+
 ```js
   var Slapp = require('slapp')
   var BeepBoopConvoStore = require('slapp-convo-beepboop')
@@ -393,42 +393,42 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ## Slapp.use(fn:function)
 
   Register a new middleware, processed in the order registered.
-  
+
 #### Parameters
   - `fn`: middleware function `(msg, next) => { }`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
 
 ## Slapp.attachToExpress(app:Object, opts:Object)
 
   Attach HTTP routes to an Express app
-  
+
   Routes are:
   - POST `/slack/event`
   - POST `/slack/command`
   - POST `/slack/action`
-  
+
 #### Parameters
   - `app` instance of Express app or Express.Router
   - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
   - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
   - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
-  
-  
+
+
 #### Returns
   - `app` reference to Express app or Express.Router passed in
-  
-  
+
+
   Examples:
-  
+
 ```js
   // would attach all routes w/ default paths
   slapp.attachToExpress(app)
 ```
 
-  
+
 ```js
   // with options
   slapp.attachToExpress(app, {
@@ -438,7 +438,7 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
   })
 ```
 
-  
+
 ```js
   // would only attach a route for events w/ default path
   slapp.attachToExpress(app, {
@@ -449,63 +449,63 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ## Slapp.route(fnKey:string, fn:function)
 
   Register a new function route
-  
+
 #### Parameters
   - `fnKey` unique key to refer to function
   - `fn` `(msg, state) => {}`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
 
 ## Slapp.getRoute(fnKey:string)
 
   Return a registered route
-  
+
 #### Parameters
   - `fnKey` string - unique key to refer to function
-  
-  
+
+
 #### Returns
   - `(msg, state) => {}`
 
 ## Slapp.match(fn:function)
 
   Register a custom Match function (fn)
-  
+
 #### Returns `true` if there is a match AND you handled the msg.
   Return `false` if there is not a match and you pass on the message.
-  
+
   All of the higher level matching convenience functions
   generate a match function and call `match` to register it.
-  
+
   Only one matcher can return true, and they are executed in the order they are
   defined. Match functions should return as fast as possible because it's important
   that they are efficient. However you may do asyncronous tasks within to
   your hearts content.
-  
+
 #### Parameters
   - `fn` function - match function `(msg) => { return bool }`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
 
 ## Slapp.message(criteria:string, typeFilter:string|Array)
 
   Register a new message handler function for the criteria
-  
+
 #### Parameters
   - `criteria` text that message contains or regex (e.g. "^hi")
   - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`, `direct_mention`, `mention`, `ambient`
   - `callback` function - `(msg, text, [match1], [match2]...) => {}`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
-  
+
   Example with regex matchers:
-  
+
 ```js
   slapp.message('^play (song|artist) <([^>]+)>', (msg, text, type, toplay) => {
     // text = 'play artist spotify:track:1yJiE307EBIzOB9kqH1deb'
@@ -514,18 +514,18 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
   }
 ```
 
-  
+
   Example without matchers:
-  
+
 ```js
   slapp.message('play', (msg, text) => {
     // text = 'play'
   }
 ```
 
-  
+
   Example `msg.body`:
-  
+
 ```js
  {
     "token":"dxxxxxxxxxxxxxxxxxxxx",
@@ -549,18 +549,18 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ## Slapp.event(criteria:string|RegExp, callback:function)
 
   Register a new event handler for an actionName
-  
+
 #### Parameters
   - `criteria` the type of event
   - `callback` `(msg) => {}`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
-  
-  
+
+
   Example `msg` object:
-  
+
 ```js
   {
      "token":"dxxxxxxxxxxxxxxxxxxxx",
@@ -587,19 +587,19 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ## Slapp.action(callbackId:string, actionNameCriteria:string|RegExp, callback:function)
 
   Register a new action handler for an actionNameCriteria
-  
+
 #### Parameters
   - `callbackId` string
   - `actionNameCriteria` string or RegExp - the name of the action [optional]
   - `callback` function - `(msg) => {}`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
-  
-  
+
+
   Example `msg.body` object:
-  
+
 ```js
   {
      "actions":[
@@ -670,19 +670,19 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ## Slapp.command(command:string, criteria:string|RegExp, callback:function)
 
   Register a new slash command handler
-  
+
 #### Parameters
   - `command` string - the slash command (e.g. "/doit")
   - `criteria` string or RegExp (e.g "/^create.+$/") [optional]
   - `callback` function - `(msg) => {}`
-  
-  
+
+
 #### Returns
   - `this` (chainable)
-  
-  
+
+
   Example `msg` object:
-  
+
 ```js
   {
      "type":"command",
@@ -730,7 +730,7 @@ It is generally always passed as `msg`.
 - `app_user_id` - userID for the user who install ed the app
 - `bot_token` - token for a bot user of the app
 - `bot_user_id` -  userID of the bot user of the app
-    
+
 
   - [Message.constructor()](#messageconstructortypestringbodyobjectmetaobject)
   - [Message.route()](#messageroutefnkeystringstateobjectsecondstoexpirenumber)
@@ -756,22 +756,22 @@ It is generally always passed as `msg`.
 ## Message.constructor(type:string, body:Object, meta:Object)
 
   Construct a new Message
-  
+
 #### Parameters
   - `type` the type of message (event, command, action, etc.)
 
 ## Message.route(fnKey:string, state:Object, secondsToExpire:number)
 
   Register the next function to route to in a conversation.
-  
+
   The route should be registered already through `slapp.route`
-  
+
 #### Parameters
   - `fnKey` `string`
   - `state` `object` arbitrary data to be passed back to your function [optional]
   - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
-  
-  
+
+
 #### Returns
   - `this` (chainable)
 
@@ -782,19 +782,19 @@ It is generally always passed as `msg`.
 ## Message.say(input:string|Object|Array, callback:function)
 
   Send a message through [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage).
-  
+
   The current channel and inferred tokens are used as defaults. `input` maybe a
   `string`, `Object` or mixed `Array` of `strings` and `Objects`. If a string,
   the value will be set to `text` of the `chat.postmessage` object. Otherwise pass
   a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) `Object`.
-  
+
   If `input` is an `Array`, a random value in the array will be selected.
-  
+
 #### Parameters
   - `input` the payload to send, maybe a string, Object or Array.
   - `callback` (err, data) => {}
-  
-  
+
+
 #### Returns
   - `this` (chainable)
 
@@ -803,39 +803,39 @@ It is generally always passed as `msg`.
   Use a `response_url` from a Slash command or interactive message action with
   a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) payload.
   `input` options are the same as [`say`](#messagesay)
-  
+
 #### Parameters
   - `responseUrl` string - URL provided by a Slack interactive message action or slash command [optional]
   - `input` the payload to send, maybe a string, Object or Array.
   - `callback` (err, data) => {}
-  
+
   Example:
-  
+
 ```js
   // responseUrl implied from body.response_url if this is an action or command
   msg.respond('thanks!', (err) => {})
 ```
 
-  
+
 ```js
   // responseUrl explicitly provided
   msg.respond(responseUrl, 'thanks!', (err) => {})
 ```
 
-  
+
 ```js
   // input provided as object
   msg.respond({ text: 'thanks!' }, (err) => {})
 ```
 
-  
+
 ```js
   // input provided as Array
   msg.respond(['thanks!', 'I :heart: u'], (err) => {})
 ```
 
-  
-  
+
+
 #### Returns
   - `this` (chainable)
 
@@ -846,98 +846,98 @@ It is generally always passed as `msg`.
 ## Message.isMessage()
 
   Is this an `event` of type `message`?
-  
-  
+
+
 #### Returns `bool` true if `this` is a message event type
 
 ## Message.isDirectMention()
 
   Is this a message that is a direct mention ("@botusername: hi there", "@botusername goodbye!")
-  
-  
+
+
 #### Returns `bool` true if `this` is a direct mention
 
 ## Message.isDirectMessage()
 
   Is this a message in a direct message channel (one on one)
-  
-  
+
+
 #### Returns `bool` true if `this` is a direct message
 
 ## Message.isMention()
 
   Is this a message where the bot user mentioned anywhere in the message.
   Only checks for mentions of the bot user and does not consider any other users.
-  
-  
+
+
 #### Returns `bool` true if `this` mentions the bot user
 
 ## Message.isAmbient()
 
   Is this a message that's not a direct message or that mentions that bot at
   all (other users could be mentioned)
-  
-  
+
+
 #### Returns `bool` true if `this` is an ambient message
 
 ## Message.isAnyOf(of:Array)
 
   Is this a message that matches any one of the filters
-  
+
 #### Parameters
   - `messageFilters` Array - any of `direct_message`, `direct_mention`, `mention` and `ambient`
-  
-  
+
+
 #### Returns `bool` true if `this` is a message that matches any of the filters
 
 ## Message.usersMentioned()
 
   Return the user IDs of any users mentioned in the message
-  
+
 #### Returns an Array of user IDs
 
 ## Message.channelsMentioned()
 
   Return the channel IDs of any channels mentioned in the message
-  
+
 #### Returns an Array of channel IDs
 
 ## Message.subteamGroupsMentioned()
 
   Return the IDs of any subteams (groups) mentioned in the message
-  
+
 #### Returns an Array of subteam IDs
 
 ## Message.everyoneMentioned()
 
   Was "@everyone" mentioned in the message
-  
+
 #### Returns `bool` true if `@everyone` was mentioned
 
 ## Message.channelMentioned()
 
   Was the current "@channel" mentioned in the message
-  
+
 #### Returns `bool` true if `@channel` was mentioned
 
 ## Message.hereMentioned()
 
   Was the "@here" mentioned in the message
-  
+
 #### Returns `bool` true if `@here` was mentioned
 
 ## Message.linksMentioned()
 
   Return the URLs of any links mentioned in the message
-  
+
 #### Returns `Array:string` of URLs of links mentioned in the message
 
 ## Message.stripDirectMention()
 
   Strip the direct mention prefix from the message text and return it. The
   original text is not modified
-  
-  
+
+
 #### Returns `string` original `text` of message with a direct mention of the bot
   user removed. For example, `@botuser hi` or `@botuser: hi` would produce `hi`.
   `@notbotuser hi` would produce `@notbotuser hi`
