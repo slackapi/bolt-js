@@ -21,7 +21,7 @@ class Slapp extends EventEmitter {
    * ##### Parameters
    * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
    * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
-   * - `opts.tokens_lookup` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with tokens
+   * - `opts.context` `Function (req, res, next)` Required HTTP Middleware function to enrich incoming request with context
    * - `opts.log` defaults to `true`, `false` to disable logging
    * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
    *
@@ -36,10 +36,15 @@ class Slapp extends EventEmitter {
     opts = deap.update({
       verify_token: process.env.SLACK_VERIFY_TOKEN,
       convo_store: null,
-      tokens_lookup: null,
+      context: null,
       log: true,
       colors: !!process.stdout.isTTY
     }, opts || {})
+
+    if (!opts.context) {
+      // TODO: Add a link to the github readme section talking about the context function
+      throw new Error('No context function provided. Please provide a context function to enrich Slack requests with necessary data.')
+    }
 
     this._middleware = []
     this._matchers = []
@@ -163,6 +168,13 @@ class Slapp extends EventEmitter {
   _handle (msg, done) {
     done = done || (() => {})
     let self = this
+
+    let err = msg.verifyProps()
+    if (err) {
+      self.emit('error', err)
+      return done(err, false)
+    }
+
     this.emit('info', this.formatter(msg))
     msg.attachSlapp(self)
     let idx = 0
