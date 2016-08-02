@@ -19,7 +19,7 @@ module.exports = class Receiver extends EventEmitter {
     opts = opts || {}
 
     this.verify_token = opts.verify_token
-    this.tokens_lookup = opts.tokens_lookup
+    this.context = opts.context
 
     // record all events to a JSON line delimited file if record is set
     if (opts.record) {
@@ -56,7 +56,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseEvent(),
         sslCheck,
         verifyToken,
-        this.tokens_lookup,
+        this.context,
         emitHandler
       )
     }
@@ -66,7 +66,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseCommand(),
         sslCheck,
         verifyToken,
-        this.tokens_lookup,
+        this.context,
         emitHandler
       )
     }
@@ -76,7 +76,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseAction(),
         sslCheck,
         verifyToken,
-        this.tokens_lookup,
+        this.context,
         emitHandler
       )
     }
