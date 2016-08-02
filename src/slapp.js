@@ -236,21 +236,24 @@ class Slapp extends EventEmitter {
    * ##### Returns
    * - `app` reference to Express app or Express.Router passed in
    *
-   * ```
-   * // would attach all routes w/ default paths
-   * slapp.attachToExpress(app)
    *
-   * slapp.attachToExpress(app, {
-   *   event: true, // would register event route with default of /slack/event
-   *   command: false, // would not register a route for commands
-   *   action: '/slack-action' // custom route for actions
-   * })
+   * Examples:
    *
-   * // would only attach a route for events w/ default path
-   * slapp.attachToExpress(app, {
-   *   event: true
-   * })
-   * ````
+   *     // would attach all routes w/ default paths
+   *     slapp.attachToExpress(app)
+   *
+   *     // with options
+   *     slapp.attachToExpress(app, {
+   *       event: true, // would register event route with default of /slack/event
+   *       command: false, // would not register a route for commands
+   *       action: '/slack-action' // custom route for actions
+   *     })
+   *
+   *     // would only attach a route for events w/ default path
+   *     slapp.attachToExpress(app, {
+   *       event: true
+   *     })
+   *
    * @param {Object} app - instance of Express app
    * @param {Object} opts - options for attaching routes
    */
