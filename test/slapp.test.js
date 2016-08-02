@@ -290,15 +290,11 @@ test.cb('Slapp.command() w/ criteria regex', t => {
 test.cb('Slapp.command() w/ criteria matcher', t => {
   t.plan(6)
 
-  let app = new Slapp()
-  let message = {
-    attachSlapp () {},
-    type: 'command',
-    body: {
-      command: 'test',
-      text: 'one two'
-    }
-  }
+  let app = new Slapp({ context })
+  let message = new Message('command', {
+    command: 'test',
+    text: 'one two'
+  }, meta)
 
   app
     .command(message.body.command, '([oO]ne) ([tT]wo)', (msg, text, match1, match2) => {
