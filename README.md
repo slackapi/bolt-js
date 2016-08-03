@@ -5,7 +5,7 @@
 # Slapp
 Slapp is a node.js module for creating Slack integrations from simple slash commands to complex bots. It is specifically for Slack --not a generic bot framework-- because we believe the best restaurants in the world are not buffets. 🍴😉
 
-Slapp heavily favors the new HTTP based [Slack Events API]() over [Realtime Messaging API](https://api.slack.com/rtm) websockets for creating more scalable and manageable bots. It supports simple conversation flows with state managed out of process to survive restarts and horizontal scaling. Conversation flows aren't just message based but may include any Slack event, [interactive buttons](https://api.slack.com/docs/message-buttons), [slash commands](https://api.slack.com/slash-commands), etc.
+Slapp heavily favors the new HTTP based [Slack Events API](https://api.slack.com/events-api) over [Realtime Messaging API](https://api.slack.com/rtm) websockets for creating more scalable and manageable bots. It supports simple conversation flows with state managed out of process to survive restarts and horizontal scaling. Conversation flows aren't just message based but may include any Slack event, [interactive buttons](https://api.slack.com/docs/message-buttons), [slash commands](https://api.slack.com/slash-commands), etc.
 
 Slapp is built on a strong foundation with a test suite with 100% test coverage and depends on the [smallwins/slack](https://github.com/smallwins/slack) client.
 
