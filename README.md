@@ -19,7 +19,7 @@ var slapp = Slapp({ context: BeepBoopContext() })
 
 slapp.message('^(hi|hello|hey).*', ['direct_mention', 'direct_message'], (msg, text, greeting) => {
   msg
-    .say(greeting + ', how are you?')
+    .say(`${greeting}, how are you?`)
     .route('handleHowAreYou')  // where to route the next msg in the conversation
 })
 
