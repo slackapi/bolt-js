@@ -39,6 +39,15 @@ slapp.attachToExpress(require('express')()).listen(process.env.PORT)
 npm install --save slapp
 ```
 
+## Getting Started
+We recommend you watch this [quick tutorial](https://www.youtube.com/watch?v=q9iMeRbrgpw) on how to get started with Slapp on BeepBoop! It'll talk you through some of these key points:
+
+* Creating your first Slapp application
+* Adding your application to [Beep Boop](beepboophq.com)
+* Setting up a slack application ready to work with Slapp / Beep Boop
+
+Even if you're not using Beep Boop the video should help you understand how to get your slack app setup properly so you can make the most of Slapp.
+
 ## Setup
 You can call the Slapp function with the following options:
 ```js
