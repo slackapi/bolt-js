@@ -149,6 +149,32 @@ test('Message.route() defaults', t => {
   t.true(setStub.calledOnce)
 })
 
+test('Message.route() w/ convoStore.set error', t => {
+  t.plan(2)
+
+  let msg = new Message()
+  msg.conversation_id = 'beepboop'
+  let fnKey = 'next:route'
+  let state = {
+    beep: 'boop'
+  }
+  let app = {
+    emit: () => {},
+    convoStore: {
+      set: () => {}
+    }
+  }
+  let setStub = sinon.stub(app.convoStore, 'set', (key, data, done) => {
+    done('boom')
+  })
+  let emitSpy = sinon.spy(app, 'emit')
+
+  msg._slapp = app
+  msg.route(fnKey, state, 60)
+  t.true(setStub.calledOnce)
+  t.true(emitSpy.calledWith('error', 'boom'))
+})
+
 test('Message.cancel()', t => {
   t.plan(2)
 
