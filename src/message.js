@@ -1,6 +1,7 @@
 'use strict'
 const request = require('request')
 const slack = require('slack')
+const Queue = require('js-queue')
 const HOUR = 60 * 60
 
 /**
@@ -32,6 +33,7 @@ class Message {
     ].join('::')
 
     this._slapp = null
+    this._queue = null
   }
 
   /**
@@ -145,17 +147,23 @@ class Message {
    */
 
   say (input, callback) {
+    var self = this
     if (!callback) callback = () => {}
 
-    input = this._processInput(input)
+    input = self._processInput(input)
 
     let payload = Object.assign({
-      token: this.meta.bot_token || this.meta.app_token,
-      channel: this.meta.channel_id
+      token: self.meta.bot_token || self.meta.app_token,
+      channel: self.meta.channel_id
     }, input)
 
-    slack.chat.postMessage(payload, callback)
-    return this
+    self._queueRequest(() => {
+      slack.chat.postMessage(payload, (err, data) => {
+        callback(err, data)
+        self._queue.next()
+      })
+    })
+    return self
   }
 
   /**
@@ -192,10 +200,11 @@ class Message {
    */
 
   respond (responseUrl, input, callback) {
+    var self = this
     if (!input || typeof input === 'function') {
       callback = input
       input = responseUrl
-      responseUrl = this.body.response_url
+      responseUrl = self.body.response_url
     }
     if (!callback) callback = () => {}
 
@@ -203,24 +212,27 @@ class Message {
       return callback(new Error('responseUrl not provided or not included as response_url with this type of Slack event'))
     }
 
-    this._request(responseUrl, this._processInput(input), (err, res, body) => {
-      let rateLimit = 'You are sending too many requests. Please relax.'
-      if (err) {
-        callback(err)
-      } else if (body.error) {
-        // if Slack returns an error bubble the error
-        callback(Error(body.error))
-      } else if (typeof body === 'string' && body.includes(rateLimit)) {
-        // sometimes you need to chill out
-        callback(Error('rate_limit'))
-      } else {
-        // success! clean up the response
-        delete body.ok
-        callback(null, body)
-      }
+    self._queueRequest(() => {
+      self._request(responseUrl, self._processInput(input), (err, res, body) => {
+        let rateLimit = 'You are sending too many requests. Please relax.'
+        if (err) {
+          callback(err)
+        } else if (body.error) {
+          // if Slack returns an error bubble the error
+          callback(Error(body.error))
+        } else if (typeof body === 'string' && body.includes(rateLimit)) {
+          // sometimes you need to chill out
+          callback(Error('rate_limit'))
+        } else {
+          // success! clean up the response
+          delete body.ok
+          callback(null, body)
+        }
+        self._queue.next()
+      })
     })
 
-    return this
+    return self
   }
 
   // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
@@ -461,6 +473,13 @@ class Message {
     }
 
     return input
+  }
+
+  _queueRequest (fn) {
+    if (!this._queue) {
+      this._queue = new Queue()
+    }
+    this._queue.add(fn)
   }
 
   verifyProps () {

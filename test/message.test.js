@@ -216,6 +216,33 @@ test('Message.say() w/ string using bot_token', t => {
   slack.chat.postMessage.restore()
 })
 
+test('Message.say() w/ callback', t => {
+  t.plan(6)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let msg = new Message('event', {}, meta)
+  let input = 'beepboop'
+  let result = { data: 'data' }
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload, callback) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    callback(null, result)
+  })
+
+  msg.say(input, (err, data) => {
+    t.is(err, null)
+    t.is(data, result)
+  })
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
 test('Message.say() w/ string using app_token', t => {
   t.plan(4)
 
@@ -260,6 +287,35 @@ test('Message.say() w/ object override token & channel', t => {
 
   t.true(postStub.calledOnce)
   slack.chat.postMessage.restore()
+})
+
+test.cb('Message.say() multiple in series', t => {
+  t.plan(2)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let msg = new Message('event', {}, meta)
+  let expected = '012345678910111213141516171819'
+  let accumulated = ''
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload, callback) => {
+    setTimeout(() => {
+      callback()
+      accumulated += payload.text
+      if (accumulated.length === 30) {
+        t.is(expected, accumulated)
+        t.is(postStub.callCount, 20)
+        slack.chat.postMessage.restore()
+        t.end()
+      }
+    }, Math.floor(Math.random() * 5))
+  })
+
+  for (let i = 0; i < 20; i++) {
+    msg.say(String(i))
+  }
 })
 
 test.cb('Message.respond()', t => {
@@ -390,6 +446,33 @@ test('Message.respond() w/o responseUrl and response_url missing from body', t =
     t.truthy(err)
     t.is(err.message, 'responseUrl not provided or not included as response_url with this type of Slack event')
   })
+})
+
+test.cb('Message.respond() multiple in series', t => {
+  t.plan(2)
+  let msg = new Message()
+  let url = 'https://slack'
+
+  msg.body.response_url = url
+
+  let expected = '012345678910111213141516171819'
+  let accumulated = ''
+  let reqStub = sinon.stub(msg, '_request', (responseUrl, input, cb) => {
+    setTimeout(() => {
+      cb(null, {}, { ok: true })
+      accumulated += input.text
+      if (accumulated.length === 30) {
+        t.is(expected, accumulated)
+        t.is(reqStub.callCount, 20)
+        msg._request.restore()
+        t.end()
+      }
+    }, Math.floor(Math.random() * 5))
+  })
+
+  for (let i = 0; i < 20; i++) {
+    msg.respond(String(i))
+  }
 })
 
 test('Message.isMessage()', t => {
