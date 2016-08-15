@@ -3,6 +3,7 @@ const request = require('request')
 const slack = require('slack')
 const Queue = require('js-queue')
 const HOUR = 60 * 60
+const RATE_LIMIT = 'You are sending too many requests. Please relax.'
 
 /**
  * A Slack event message (command, action, event, etc.)
@@ -159,6 +160,9 @@ class Message {
 
     self._queueRequest(() => {
       slack.chat.postMessage(payload, (err, data) => {
+        if (err) {
+          self._slapp.emit('error', err)
+        }
         callback(err, data)
         self._queue.next()
       })
@@ -214,20 +218,23 @@ class Message {
 
     self._queueRequest(() => {
       self._request(responseUrl, self._processInput(input), (err, res, body) => {
-        let rateLimit = 'You are sending too many requests. Please relax.'
-        if (err) {
-          callback(err)
-        } else if (body.error) {
-          // if Slack returns an error bubble the error
-          callback(Error(body.error))
-        } else if (typeof body === 'string' && body.includes(rateLimit)) {
-          // sometimes you need to chill out
-          callback(Error('rate_limit'))
-        } else {
-          // success! clean up the response
-          delete body.ok
-          callback(null, body)
+        // Normalize error for different error cases
+        if (!err && body.error) {
+          err = new Error(body.error)
         }
+        if (!err && typeof body === 'string' && body.includes(RATE_LIMIT)) {
+          err = new Error('rate_limit')
+        }
+
+        if (err) {
+          self._slapp.emit('error', err)
+          callback(err)
+          return self._queue.next()
+        }
+
+        // success! clean up the response
+        delete body.ok
+        callback(null, body)
         self._queue.next()
       })
     })
