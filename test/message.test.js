@@ -3,6 +3,7 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const slack = require('slack')
+const EventEmitter = require('events')
 const Message = require('../src/message')
 
 test('Message() w/ user_id', t => {
@@ -318,6 +319,35 @@ test.cb('Message.say() multiple in series', t => {
   }
 })
 
+test('Message.say() api error', t => {
+  t.plan(5)
+
+  let meta = {
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let msg = new Message('event', {}, meta)
+  let slapp = new EventEmitter()
+  msg.attachSlapp(slapp)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload, done) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.app_token)
+    t.is(payload.channel, meta.channel_id)
+
+    // simulate an error in the api call
+    done('kaboom')
+  })
+  let emitStub = sinon.stub(slapp, 'emit')
+
+  msg.say(input)
+
+  t.true(postStub.calledOnce)
+  t.true(emitStub.calledWith('error', 'kaboom'))
+
+  slack.chat.postMessage.restore()
+})
+
 test.cb('Message.respond()', t => {
   t.plan(5)
 
@@ -341,9 +371,11 @@ test.cb('Message.respond()', t => {
 })
 
 test.cb('Message.respond() w/ error', t => {
-  t.plan(4)
+  t.plan(5)
 
+  let slapp = new EventEmitter()
   let msg = new Message()
+  msg.attachSlapp(slapp)
   let url = 'http://beepboophq.com'
   let input = 'beepboop'
 
@@ -353,18 +385,22 @@ test.cb('Message.respond() w/ error', t => {
 
     cb(new Error('kaboom'))
   })
+  let emitStub = sinon.stub(slapp, 'emit')
 
   msg.respond(url, input, (err, body) => {
     t.true(reqStub.calledOnce)
     t.is(err.message, 'kaboom')
+    t.true(emitStub.calledWith('error'))
     t.end()
   })
 })
 
 test.cb('Message.respond() w/ body.error', t => {
-  t.plan(4)
+  t.plan(5)
 
+  let slapp = new EventEmitter()
   let msg = new Message()
+  msg.attachSlapp(slapp)
   let url = 'http://beepboophq.com'
   let input = 'beepboop'
 
@@ -374,18 +410,22 @@ test.cb('Message.respond() w/ body.error', t => {
 
     cb(null, {}, { error: 'kaboom' })
   })
+  let emitStub = sinon.stub(slapp, 'emit')
 
   msg.respond(url, input, (err, body) => {
     t.true(reqStub.calledOnce)
     t.is(err.message, 'kaboom')
+    t.true(emitStub.calledWith('error'))
     t.end()
   })
 })
 
 test.cb('Message.respond() w/ rate_limit error', t => {
-  t.plan(4)
+  t.plan(5)
 
+  let slapp = new EventEmitter()
   let msg = new Message()
+  msg.attachSlapp(slapp)
   let url = 'http://beepboophq.com'
   let input = 'beepboop'
 
@@ -395,10 +435,12 @@ test.cb('Message.respond() w/ rate_limit error', t => {
 
     cb(null, {}, 'You are sending too many requests. Please relax.')
   })
+  let emitStub = sinon.stub(slapp, 'emit')
 
   msg.respond(url, input, (err, body) => {
     t.true(reqStub.calledOnce)
     t.is(err.message, 'rate_limit')
+    t.true(emitStub.calledWith('error'))
     t.end()
   })
 })
