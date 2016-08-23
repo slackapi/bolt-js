@@ -465,12 +465,25 @@ class Slapp extends EventEmitter {
    * ##### Parameters
    * - `callbackId` string
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
+   * - `actionValueCriteria` string or RegExp - the value of the action [optional]
    * - `callback` function - `(msg, text, [match1], [match2]...) => {}`
    *
    *
    * ##### Returns
    * - `this` (chainable)
    *
+   * Example:
+   *
+   *     // match name and value
+   *     slapp.action('dinner_callback', 'drink', 'beer', (msg, val) => {}
+   *     // match name and value either beer or wine
+   *     slapp.action('dinner_callback', 'drink', '(beer|wine)', (msg, val) => {}
+   *     // match name drink, any value
+   *     slapp.action('dinner_callback', 'drink', (msg, val) => {}
+   *     // match dinner_callback, any name or value
+   *     slapp.action('dinner_callback', 'drink', (msg, val) => {}
+   *     // match with regex
+   *     slapp.action('dinner_callback', /^drink$/, /^b[e]{2}r$/, (msg, val) => {}
    *
    * Example `msg.body` object:
    *
@@ -544,21 +557,31 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  action (callbackId, actionNameCriteria, callback) {
+  action (callbackId, actionNameCriteria, actionValueCriteria, callback) {
+    if (typeof actionValueCriteria === 'function') {
+      callback = actionValueCriteria
+      actionValueCriteria = /.*/
+    }
+
     if (typeof actionNameCriteria === 'function') {
       callback = actionNameCriteria
       actionNameCriteria = /.*/
+      actionValueCriteria = /.*/
     }
 
     if (typeof actionNameCriteria === 'string') {
       actionNameCriteria = new RegExp('^' + actionNameCriteria + '$', 'i')
     }
 
+    if (typeof actionValueCriteria === 'string') {
+      actionValueCriteria = new RegExp('^' + actionValueCriteria + '$', 'i')
+    }
+
     let fn = (msg) => {
       if (msg.type === 'action' && msg.body.actions && msg.body.callback_id === callbackId) {
         for (let i = 0; i < msg.body.actions.length; i++) {
           let action = msg.body.actions[i]
-          if (actionNameCriteria.test(action.name)) {
+          if (actionNameCriteria.test(action.name) && actionValueCriteria.test(action.value)) {
             callback(msg, action.value)
             return true
           }
