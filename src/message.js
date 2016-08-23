@@ -253,6 +253,15 @@ class Message {
   }
 
   /**
+   * Is this from a bot user?
+   *
+   * ##### Returns `bool` true if `this` is a message from a bot user
+   */
+  isBot () {
+    return !!(this.meta.bot_id || (this.meta.user_id && this.meta.user_id === this.meta.bot_user_id))
+  }
+
+  /**
    * Is this an `event` of type `message`?
    *
    *
