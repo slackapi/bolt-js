@@ -125,8 +125,7 @@ class Slapp extends EventEmitter {
 
   ignoreBotsMiddleware () {
     return (msg, next) => {
-      // avoid the case where both user_id and bot_user_id not set
-      if (msg.meta.bot_id || (msg.meta.user_id && msg.meta.user_id === msg.meta.bot_user_id)) {
+      if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
         return
       }
       next()

@@ -517,6 +517,43 @@ test.cb('Message.respond() multiple in series', t => {
   }
 })
 
+test('Message.isBot() w/ bot_id', t => {
+  let msg = new Message('event', {}, {
+    bot_id: 'bot_id'
+  })
+  t.true(msg.isBot())
+})
+
+test('Message.isBot() w/o any ids', t => {
+  let msg = new Message('event', {}, {})
+  t.false(msg.isBot())
+})
+
+test('Message.isBot() w/o matching user_id and bot_user_id', t => {
+  let msg = new Message('event', {}, {
+    user_id: 'asdf',
+    bot_user_id: 'fdsa'
+  })
+  t.false(msg.isBot())
+})
+
+test('Message.isBot() w/ matching user_id and bot_user_id', t => {
+  let msg = new Message('event', {}, {
+    user_id: 'asdf',
+    bot_user_id: 'asdf'
+  })
+  t.true(msg.isBot())
+})
+
+test('Message.isBot() w/ bot_id and matching user_id and bot_user_id', t => {
+  let msg = new Message('event', {}, {
+    bot_id: 'bot_id',
+    user_id: 'asdf',
+    bot_user_id: 'asdf'
+  })
+  t.true(msg.isBot())
+})
+
 test('Message.isMessage()', t => {
   let msg = new Message('event', {
     event: {

@@ -595,11 +595,16 @@ test.cb('Slapp._handle() w/ init()', t => {
     })
 })
 
-test.cb('Slapp.ignoreBotsMiddleware() with bot message', t => {
+test.cb('Slapp.ignoreBotsMiddleware() with bot_message and bot_id', t => {
   let app = new Slapp({ context })
   let mw = app.ignoreBotsMiddleware()
 
-  let message = new Message('event', {}, {
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  }, {
     bot_id: 'asdf'
   }, meta)
 
@@ -609,6 +614,24 @@ test.cb('Slapp.ignoreBotsMiddleware() with bot message', t => {
   })
   t.pass()
   t.end()
+})
+
+test.cb('Slapp.ignoreBotsMiddleware() with bot_message no bot_id', t => {
+  let app = new Slapp({ context })
+  let mw = app.ignoreBotsMiddleware()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  }, {}, meta)
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.pass()
+    t.end()
+  })
 })
 
 test.cb('Slapp.ignoreBotsMiddleware() w/o bot message', t => {
