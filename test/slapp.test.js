@@ -369,7 +369,7 @@ test.cb('Slapp.action() w/o criteria', t => {
     })
 })
 
-test.cb('Slapp.action() w/ criteria string', t => {
+test.cb('Slapp.action() w/ name criteria string', t => {
   t.plan(3)
 
   let app = new Slapp({ context })
@@ -383,6 +383,52 @@ test.cb('Slapp.action() w/ criteria string', t => {
 
   app
     .action(message.body.callback_id, 'beep', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.action() w/ name and value criteria string', t => {
+  t.plan(3)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep', value: 'boop' }
+    ],
+    callback_id: 'my_callback',
+    command: 'test'
+  }, meta)
+
+  app
+    .action(message.body.callback_id, 'beep', 'boop', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.action() w/ name and value criteria regex', t => {
+  t.plan(3)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep', value: 'Boop' }
+    ],
+    callback_id: 'my_callback',
+    command: 'test'
+  }, meta)
+
+  app
+    .action(message.body.callback_id, /^beep.*/, /B[o]{2}p/, (msg) => {
       t.deepEqual(msg, message)
     })
     ._handle(message, (err, handled) => {

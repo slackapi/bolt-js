@@ -8,7 +8,7 @@
     "lint": "standard",
     "unit": "ava --verbose --serial",
     "coverage": "nyc --check-coverage --statements 100 ava --verbose --serial",
-    "lcov": "nyc --reporter lcov ava",
+    "lcov": "nyc --reporter lcov ava --serial",
     "docs": "node scripts/docs.js",
     "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
   },

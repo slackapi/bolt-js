@@ -596,12 +596,28 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 #### Parameters
   - `callbackId` string
   - `actionNameCriteria` string or RegExp - the name of the action [optional]
+  - `actionValueCriteria` string or RegExp - the value of the action [optional]
   - `callback` function - `(msg, text, [match1], [match2]...) => {}`
   
   
 #### Returns
   - `this` (chainable)
   
+  Example:
+  
+```js
+  // match name and value
+  slapp.action('dinner_callback', 'drink', 'beer', (msg, val) => {}
+  // match name and value either beer or wine
+  slapp.action('dinner_callback', 'drink', '(beer|wine)', (msg, val) => {}
+  // match name drink, any value
+  slapp.action('dinner_callback', 'drink', (msg, val) => {}
+  // match dinner_callback, any name or value
+  slapp.action('dinner_callback', 'drink', (msg, val) => {}
+  // match with regex
+  slapp.action('dinner_callback', /^drink$/, /^b[e]{2}r$/, (msg, val) => {}
+```
+
   
   Example `msg.body` object:
   
