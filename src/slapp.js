@@ -554,6 +554,7 @@ class Slapp extends EventEmitter {
    *
    * @param {string} callbackId
    * @param {(string|RegExp)} actionNameCriteria
+   * @param {(string|RegExp)} actionValueCriteria
    * @param {function} callback
    */
 

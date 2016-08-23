@@ -392,7 +392,7 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
   - [Slapp.match()](#slappmatchfnfunction)
   - [Slapp.message()](#slappmessagecriteriastringtypefilterstringarray)
   - [Slapp.event()](#slappeventcriteriastringregexpcallbackfunction)
-  - [Slapp.action()](#slappactioncallbackidstringactionnamecriteriastringregexpcallbackfunction)
+  - [Slapp.action()](#slappactioncallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
 
 ## Slapp.use(fn:function)
@@ -589,7 +589,7 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
   }
 ```
 
-## Slapp.action(callbackId:string, actionNameCriteria:string|RegExp, callback:function)
+## Slapp.action(callbackId:string, actionNameCriteria:string|RegExp, actionValueCriteria:string|RegExp, callback:function)
 
   Register a new action handler for an actionNameCriteria
   
