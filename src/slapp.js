@@ -446,7 +446,7 @@ class Slapp extends EventEmitter {
 
   event (criteria, callback) {
     if (typeof criteria === 'string') {
-      criteria = new RegExp('^' + criteria + '$', 'i')
+      criteria = new RegExp(`^${criteria}$`, 'i')
     }
     let fn = (msg) => {
       if (msg.type === 'event' && msg.body.event && criteria.test(msg.body.event.type)) {
@@ -570,11 +570,11 @@ class Slapp extends EventEmitter {
     }
 
     if (typeof actionNameCriteria === 'string') {
-      actionNameCriteria = new RegExp('^' + actionNameCriteria + '$', 'i')
+      actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
     }
 
     if (typeof actionValueCriteria === 'string') {
-      actionValueCriteria = new RegExp('^' + actionValueCriteria + '$', 'i')
+      actionValueCriteria = new RegExp(`^${actionValueCriteria}$`, 'i')
     }
 
     let fn = (msg) => {
@@ -661,9 +661,12 @@ class Slapp extends EventEmitter {
     if (typeof criteria === 'string') {
       criteria = new RegExp(criteria, 'i')
     }
+    if (typeof command === 'string') {
+      command = new RegExp(`^${command}$`, 'i')
+    }
 
     let fn = (msg) => {
-      if (msg.type === 'command' && msg.body.command === command) {
+      if (msg.type === 'command' && msg.body.command && msg.body.command.match(command)) {
         let text = msg.body.text || ''
         let match = text.match(criteria)
         if (match) {
