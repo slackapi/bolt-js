@@ -437,7 +437,7 @@ class Message {
   stripDirectMention () {
     var text = ''
     if (this.isMessage()) {
-      text = this.body.event.text
+      text = this.body.event.text || ''
       let match = text.match(new RegExp(`^<@${this.meta.bot_user_id}>:{0,1}(.*)`))
       if (match) {
         text = match[1].trim()
