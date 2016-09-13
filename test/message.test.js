@@ -635,6 +635,20 @@ test('Message.stripDirectMention()', t => {
   t.is(msg.stripDirectMention(), 'how you doing?')
 })
 
+test('Message.stripDirectMention() w/ undefined text', t => {
+  let botUserId = 'bot_user_id'
+  let msg = new Message('event', {
+    event: {
+      type: 'message',
+      text: undefined
+    }
+  }, {
+    bot_user_id: botUserId
+  })
+
+  t.is(msg.stripDirectMention(), '')
+})
+
 test('Message._processInput() with array', t => {
   let msg = new Message()
   let vals = ['one', 'two', 'three']
