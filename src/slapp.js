@@ -392,7 +392,7 @@ class Slapp extends EventEmitter {
     }
 
     let fn = (msg) => {
-      if (msg.isMessage()) {
+      if (msg.isBaseMessage()) {
         let text = msg.stripDirectMention()
         let match = text.match(criteria)
         if (match && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
