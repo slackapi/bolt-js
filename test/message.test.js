@@ -593,6 +593,25 @@ test('Message.isMessage() wrong event.type', t => {
   t.false(msg.isMessage())
 })
 
+test('Message.isBaseMessage() true', t => {
+  let msg = new Message('event', {
+    event: {
+      type: 'message'
+    }
+  })
+  t.true(msg.isBaseMessage())
+})
+
+test('Message.isBaseMessage() false', t => {
+  let msg = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  })
+  t.false(msg.isBaseMessage())
+})
+
 test('Message.isDirectMention() true', t => {
   let botUserId = 'bot_user_id'
   let msg = new Message('event', {

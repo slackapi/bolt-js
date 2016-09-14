@@ -265,11 +265,24 @@ class Message {
    * Is this an `event` of type `message`?
    *
    *
+   * Marked as private until we figure out how to properly handle all of the other subtypes
+   * @api private
    * ##### Returns `bool` true if `this` is a message event type
    */
 
   isMessage () {
     return !!(this.type === 'event' && this.body.event && this.body.event.type === 'message')
+  }
+
+  /**
+   * Is this an `event` of type `message` without any [subtype](https://api.slack.com/events/message)?
+   *
+   *
+   * ##### Returns `bool` true if `this` is a message event type with no subtype
+   */
+
+  isBaseMessage () {
+    return this.isMessage() && !this.body.event.subtype
   }
 
   /**
@@ -280,7 +293,7 @@ class Message {
    */
 
   isDirectMention () {
-    return this.isMessage() && new RegExp(`^<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
+    return this.isBaseMessage() && new RegExp(`^<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
   }
 
   /**
@@ -291,7 +304,7 @@ class Message {
    */
 
   isDirectMessage () {
-    return this.isMessage() && this.meta.channel_id[0] === 'D'
+    return this.isBaseMessage() && this.meta.channel_id[0] === 'D'
   }
 
   /**
@@ -303,7 +316,7 @@ class Message {
    */
 
   isMention () {
-    return this.isMessage() && new RegExp(`<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
+    return this.isBaseMessage() && new RegExp(`<@${this.meta.bot_user_id}>`, 'i').test(this.body.event.text)
   }
 
   /**
@@ -315,7 +328,7 @@ class Message {
    */
 
   isAmbient () {
-    return this.isMessage() && !this.isMention() && !this.isDirectMessage()
+    return this.isBaseMessage() && !this.isMention() && !this.isDirectMessage()
   }
 
   /**
@@ -412,7 +425,7 @@ class Message {
     let re = new RegExp('<([^@^>]+)>', 'g')
     let matcher
 
-    if (this.isMessage()) {
+    if (this.isBaseMessage()) {
       do {
         matcher = re.exec(this.body.event.text)
         if (matcher) {
@@ -436,7 +449,7 @@ class Message {
 
   stripDirectMention () {
     var text = ''
-    if (this.isMessage()) {
+    if (this.isBaseMessage()) {
       text = this.body.event.text || ''
       let match = text.match(new RegExp(`^<@${this.meta.bot_user_id}>:{0,1}(.*)`))
       if (match) {
@@ -456,7 +469,7 @@ class Message {
     let matches = []
     let matcher
 
-    if (this.isMessage()) {
+    if (this.isBaseMessage()) {
       do {
         matcher = re.exec(this.body.event.text)
         if (matcher) {
