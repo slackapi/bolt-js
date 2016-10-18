@@ -43,7 +43,7 @@ npm install --save slapp
 We recommend you watch this [quick tutorial](https://www.youtube.com/watch?v=q9iMeRbrgpw) on how to get started with Slapp on BeepBoop! It'll talk you through some of these key points:
 
 * Creating your first Slapp application
-* Adding your application to [Beep Boop](beepboophq.com)
+* Adding your application to [Beep Boop](https://beepboophq.com)
 * Setting up a Slack App ready to work with Slapp / Beep Boop
 
 Even if you're not using Beep Boop the video should help you understand how to get your Slack App setup properly so you can make the most of Slapp.
