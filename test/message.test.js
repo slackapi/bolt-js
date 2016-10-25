@@ -705,7 +705,7 @@ test('Message.channelsMentioned()', t => {
   let msg = new Message('event', {
     event: {
       type: 'message',
-      text: 'hi <#C1> do you know <#C2>?'
+      text: 'hi <#C1|channel1> do you know <#C2|channel2>?'
     }
   })
 

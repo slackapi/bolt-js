@@ -372,7 +372,7 @@ class Message {
    */
 
   channelsMentioned () {
-    return this._regexMentions(new RegExp('<#(C[A-Za-z0-9]+)>', 'g'))
+    return this._regexMentions(new RegExp('<#(C[A-Za-z0-9]+)[^>]+>', 'g'))
   }
 
   /**
