@@ -20,7 +20,6 @@ module.exports = class Receiver extends EventEmitter {
 
     this.verify_token = opts.verify_token
     this.context = opts.context
-    this.log = opts.log
 
     // record all events to a JSON line delimited file if record is set
     if (opts.record) {
@@ -49,7 +48,7 @@ module.exports = class Receiver extends EventEmitter {
     })
 
     let emitHandler = this.emitHandler.bind(this)
-    let verifyToken = VerifyToken(this.verify_token, this.log)
+    let verifyToken = VerifyToken(this.verify_token, this.emit.bind(this, 'error'))
     let sslCheck = SSLCheck()
 
     if (options.event) {

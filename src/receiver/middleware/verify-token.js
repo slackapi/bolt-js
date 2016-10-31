@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = (token, shouldLog) => {
+module.exports = (token, onError) => {
   return function verifyTokenMiddleware (req, res, next) {
     // If token isn't set, we're not verifying
     if (!token) {
@@ -12,9 +12,10 @@ module.exports = (token, shouldLog) => {
 
     // test verify token
     if (token !== verifyToken) {
-      // log when there's an inviald verify token
-      if (shouldLog) console.log('Invalid verify token')
-      res.status(403).send('Invalid token')
+      if (onError) {
+        onError('Invalid verify token')
+      }
+      res.status(403).send('Invalid verify token')
       return
     }
 

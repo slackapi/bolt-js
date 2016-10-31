@@ -87,7 +87,9 @@ class Slapp extends EventEmitter {
       })
     }
     // call `handle` for each new request
-    this.receiver.on('message', this._handle.bind(this))
+    this.receiver
+      .on('message', this._handle.bind(this))
+      .on('error', this.emit.bind(this, 'error'))
     this.use(this.ignoreBotsMiddleware())
     this.use(this.preprocessConversationMiddleware())
 
