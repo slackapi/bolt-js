@@ -44,9 +44,9 @@ test.cb('VerifyToken() token option matching verify_token', t => {
   })
 })
 
-test('VerifyToken() token option matching verify_token', t => {
+test('VerifyToken() token option nonmatching verify_token', t => {
   let token = 'beepboop'
-  let mw = VerifyToken(token)
+  let mw = VerifyToken(token, true)
   let req = fixtures.getMockReq({
     slapp: {
       meta: {
