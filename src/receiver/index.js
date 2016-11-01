@@ -48,7 +48,7 @@ module.exports = class Receiver extends EventEmitter {
     })
 
     let emitHandler = this.emitHandler.bind(this)
-    let verifyToken = VerifyToken(this.verify_token)
+    let verifyToken = VerifyToken(this.verify_token, this.emit.bind(this, 'error'))
     let sslCheck = SSLCheck()
 
     if (options.event) {

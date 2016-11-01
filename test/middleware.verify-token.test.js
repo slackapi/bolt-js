@@ -23,7 +23,7 @@ test('VerifyToken() token option no verify_token', t => {
 
   mw(fixtures.getMockReq(), res, () => {})
   t.true(statusStub.calledWith(403))
-  t.true(sendStub.calledWith('Invalid token'))
+  t.true(sendStub.calledWith('Invalid verify token'))
 })
 
 test.cb('VerifyToken() token option matching verify_token', t => {
@@ -44,9 +44,10 @@ test.cb('VerifyToken() token option matching verify_token', t => {
   })
 })
 
-test('VerifyToken() token option matching verify_token', t => {
+test('VerifyToken() token option nonmatching verify_token', t => {
   let token = 'beepboop'
-  let mw = VerifyToken(token)
+  let onError = sinon.stub()
+  let mw = VerifyToken(token, onError)
   let req = fixtures.getMockReq({
     slapp: {
       meta: {
@@ -61,5 +62,6 @@ test('VerifyToken() token option matching verify_token', t => {
 
   mw(req, res, () => {})
   t.true(statusStub.calledWith(403))
-  t.true(sendStub.calledWith('Invalid token'))
+  t.true(sendStub.calledWith('Invalid verify token'))
+  t.true(onError.calledWith('Invalid verify token'))
 })
