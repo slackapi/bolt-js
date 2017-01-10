@@ -24,6 +24,8 @@ class Slapp extends EventEmitter {
    * - `opts.context` `Function (req, res, next)` Required HTTP Middleware function to enrich incoming request with context
    * - `opts.log` defaults to `true`, `false` to disable logging
    * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
+   * - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's bot id.
+   * - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
    *
    * @api private
    * @constructor
@@ -38,7 +40,9 @@ class Slapp extends EventEmitter {
       convo_store: null,
       context: null,
       log: true,
-      colors: !!process.stdout.isTTY
+      colors: !!process.stdout.isTTY,
+      ignoreSelf: true,
+      ignoreBots: false
     }, opts || {})
 
     if (!opts.context) {
@@ -56,6 +60,9 @@ class Slapp extends EventEmitter {
     this.formatter = Formatter({
       colors: opts.colors
     })
+
+    this.ignoreSelf = opts.ignoreSelf
+    this.ignoreBots = opts.ignoreBots
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an impmementation of
@@ -90,7 +97,13 @@ class Slapp extends EventEmitter {
     this.receiver
       .on('message', this._handle.bind(this))
       .on('error', this.emit.bind(this, 'error'))
-    this.use(this.ignoreBotsMiddleware())
+
+    if (this.ignoreBots) {
+      this.use(this.ignoreBotsMiddleware())
+    }
+    if (this.ignoreSelf) {
+      this.use(this.ignoreSelfMiddleware())
+    }
     this.use(this.preprocessConversationMiddleware())
 
     return this
@@ -120,7 +133,25 @@ class Slapp extends EventEmitter {
   }
 
   /**
-   * Middleware that ignores messages from any bot user when we can tell
+   * Middleware that ignores messages from this bot user (self) when we can tell. Requires the
+   * meta context to be populated with `app_bot_id`.
+   *
+   * @api private
+   */
+
+  ignoreSelfMiddleware () {
+    return (msg, next) => {
+      if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
+        if (msg.meta.app_bot_id === msg.meta.bot_id) {
+          return
+        }
+      }
+      next()
+    }
+  }
+
+  /**
+   * Middleware that ignores messages from any bot user
    *
    * @api private
    */

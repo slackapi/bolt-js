@@ -9,7 +9,8 @@ const meta = {
   app_token: 'app_token',
   team_id: 'team_id',
   channel_id: 'channel_id',
-  user_id: 'user_id'
+  user_id: 'user_id',
+  app_bot_id: 'app_bot_id'
 }
 
 test('Slapp()', t => {
@@ -68,6 +69,22 @@ test('Slapp.init()', t => {
   app.init()
 
   t.is(app._middleware.length, 2)
+})
+
+test('Slapp.init() w/ ignoreSelf false', t => {
+  let app = new Slapp({ context, ignoreSelf: false })
+
+  app.init()
+
+  t.is(app._middleware.length, 1)
+})
+
+test('Slapp.init() w/ ignoreBots true', t => {
+  let app = new Slapp({ context, ignoreBots: true })
+
+  app.init()
+
+  t.is(app._middleware.length, 3)
 })
 
 test('Slapp.attachToExpress()', t => {
@@ -666,7 +683,7 @@ test.cb('Slapp.ignoreBotsMiddleware() with bot_message and bot_id', t => {
     }
   }, {
     bot_id: 'asdf'
-  }, meta)
+  })
 
   // this callback is synchronous
   mw(message, () => {
@@ -685,7 +702,7 @@ test.cb('Slapp.ignoreBotsMiddleware() with bot_message no bot_id', t => {
       type: 'message',
       subtype: 'bot_message'
     }
-  }, {}, meta)
+  }, {})
 
   // this callback is synchronous
   mw(message, () => {
@@ -699,6 +716,68 @@ test.cb('Slapp.ignoreBotsMiddleware() w/o bot message', t => {
   let mw = app.ignoreBotsMiddleware()
 
   let message = new Message('event', {}, meta)
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.pass()
+    t.end()
+  })
+})
+
+test.cb('Slapp.ignoreSelfMiddleware() with bot_message and matching bot_id', t => {
+  let app = new Slapp({ context })
+  let mw = app.ignoreSelfMiddleware()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  }, {
+    bot_id: 'app_bot_id',
+    app_bot_id: 'app_bot_id'
+  })
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.fail()
+  })
+  t.pass()
+  t.end()
+})
+
+test.cb('Slapp.ignoreSelfMiddleware() with bot_message and non-matching bot_id', t => {
+  let app = new Slapp({ context })
+  let mw = app.ignoreSelfMiddleware()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  }, {
+    bot_id: 'other_bot_id',
+    app_bot_id: 'app_bot_id'
+  })
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.pass()
+    t.end()
+  })
+})
+
+test.cb('Slapp.ignoreSelfMiddleware() without bot_message', t => {
+  let app = new Slapp({ context })
+  let mw = app.ignoreSelfMiddleware()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message'
+    }
+  }, {
+    app_bot_id: 'app_bot_id'
+  })
 
   // this callback is synchronous
   mw(message, () => {
