@@ -142,7 +142,9 @@ class Slapp extends EventEmitter {
   ignoreSelfMiddleware () {
     return (msg, next) => {
       if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-        if (msg.meta.app_bot_id === msg.meta.bot_id) {
+        let bothFalsy = !msg.meta.app_bot_id && !msg.meta.bot_id
+        let bothEqual = msg.meta.app_bot_id === msg.meta.bot_id
+        if (!bothFalsy && bothEqual) {
           return
         }
       }
