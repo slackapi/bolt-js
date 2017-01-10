@@ -70,6 +70,7 @@ One of the challenges with writing a multi-team Slack app is that you need to ma
 + `app_token` - **required** OAuth `access_token` property
 + `bot_token` - **required if you have a bot user** OAuth `bot.bot_access_token` property
 + `bot_user_id` - **required if you have a bot user** OAuth `bot.bot_user_id` property
++ `app_bot_id` - **required if you have a bot user and use ignoreSelf option** Profile call with bot token, `users.profile.bot_id` property
 
 The incoming request from Slack has been parsed and normalized by the time the `context` function runs, and is available via `req.slapp`.  You can rely on this data in your `context` function to assist you in looking up the necessary tokens and meta-data.
 
@@ -366,6 +367,8 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
   - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
   - `opts.log` defaults to `true`, `false` to disable logging
   - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
+  - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
+  - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
   
   Example
   
@@ -780,7 +783,8 @@ It is generally always passed as `msg`.
   - [Message.say()](#messagesayinputstringobjectarraycallbackfunction)
   - [Message.respond()](#messagerespondresponseurlstringinputstringobjectarraycallbackfunction)
   - [Message._request()](#message_request)
-  - [Message.isMessage()](#messageismessage)
+  - [Message.isBot()](#messageisbot)
+  - [Message.isBaseMessage()](#messageisbasemessage)
   - [Message.isDirectMention()](#messageisdirectmention)
   - [Message.isDirectMessage()](#messageisdirectmessage)
   - [Message.isMention()](#messageismention)
@@ -885,12 +889,18 @@ It is generally always passed as `msg`.
 
   istanbul ignore next
 
-## Message.isMessage()
+## Message.isBot()
 
-  Is this an `event` of type `message`?
+  Is this from a bot user?
+  
+#### Returns `bool` true if `this` is a message from a bot user
+
+## Message.isBaseMessage()
+
+  Is this an `event` of type `message` without any [subtype](https://api.slack.com/events/message)?
   
   
-#### Returns `bool` true if `this` is a message event type
+#### Returns `bool` true if `this` is a message event type with no subtype
 
 ## Message.isDirectMention()
 
