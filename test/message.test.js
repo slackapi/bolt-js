@@ -3,6 +3,8 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const slack = require('slack')
+const fixtures = require('./fixtures/')
+
 const EventEmitter = require('events')
 const Message = require('../src/message')
 
@@ -517,6 +519,28 @@ test.cb('Message.respond() multiple in series', t => {
   }
 })
 
+test.cb('Message.respond() w/response', t => {
+  t.plan(4)
+
+  let res = fixtures.getMockRes()
+  let msg = new Message()
+  let url = 'http://beepboophq.com'
+  let input = 'beepboop'
+
+  let reqStub = sinon.stub(msg, '_request', () => {})
+  let sendStub = sinon.stub(res, 'send')
+
+  msg.attachResponse(res, 100)
+
+  msg.respond(url, input, (err, body) => {
+    t.true(reqStub.notCalled)
+    t.is(err, null)
+    t.is(body.ok, undefined)
+    t.true(sendStub.calledOnce)
+    t.end()
+  })
+})
+
 test('Message.isBot() w/ bot_id', t => {
   let msg = new Message('event', {}, {
     bot_id: 'bot_id'
@@ -837,4 +861,62 @@ test('Message.linksMentioned() no links', t => {
 
   let links = msg.linksMentioned()
   t.deepEqual(links, [])
+})
+
+test('Message.attachResponse()', t => {
+  let clock = sinon.useFakeTimers()
+
+  let res = fixtures.getMockRes()
+  let msg = new Message('event', { event: { type: 'message', text: 'hi' } })
+  let sendStub = sinon.stub(res, 'send')
+
+  msg.attachResponse(res, 2)
+  t.is(msg._response, res)
+  t.truthy(msg._responseTimeout)
+
+  clock.tick(1)
+  t.true(sendStub.notCalled)
+
+  clock.tick(2)
+  t.true(sendStub.calledOnce)
+  t.falsy(msg._response)
+  t.falsy(msg._responseTimeout)
+
+  clock.restore()
+})
+
+test('Message.clearResponse()', t => {
+  let clock = sinon.useFakeTimers()
+
+  let res = fixtures.getMockRes()
+  let msg = new Message('event', { event: { type: 'message', text: 'hi' } })
+  let sendStub = sinon.stub(res, 'send')
+  let clearTimeoutStub = sinon.stub(msg, 'clearTimeout')
+
+  msg.attachResponse(res, 2)
+  t.is(msg._response, res)
+  t.truthy(msg._responseTimeout)
+  let returnedResponse = msg.clearResponse()
+  t.is(returnedResponse, res)
+  t.falsy(msg._response)
+  t.falsy(msg._responseTimeout)
+  t.true(clearTimeoutStub.calledOnce)
+
+  clock.tick(4)
+  t.true(sendStub.notCalled)
+
+  clock.restore()
+})
+
+test('Message.clearResponse() clear', t => {
+  let res = fixtures.getMockRes()
+  let msg = new Message('event', { event: { type: 'message', text: 'hi' } })
+  let sendStub = sinon.stub(res, 'send')
+  let clearTimeoutStub = sinon.stub(msg, 'clearTimeout')
+
+  msg.attachResponse(res, 2)
+  let returnedResponse = msg.clearResponse({ close: true })
+  t.is(returnedResponse, res)
+  t.true(clearTimeoutStub.calledOnce)
+  t.true(sendStub.calledOnce)
 })

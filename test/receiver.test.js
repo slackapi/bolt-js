@@ -5,6 +5,7 @@ const sinon = require('sinon')
 const fs = require('fs')
 const fixtures = require('./fixtures/')
 const Receiver = require('../src/receiver/')
+const Message = require('../src/message')
 
 test('Receiver() w/ record', t => {
   let writeStub = sinon.stub(fs, 'writeFileSync', () => {})
@@ -97,6 +98,34 @@ test('Receiver.emitHandler() w/o debug', t => {
 
   t.true(emitStub.calledOnce)
   t.true(sendStub.calledOnce)
+})
+
+test('Receiver.emitHandler() attachResponse', t => {
+  let receiver = new Receiver()
+  let msg = getMockMessage()
+  let res = fixtures.getMockRes()
+
+  msg.response = res
+  msg.responseTimeout = 100
+
+  let emitStub = sinon.stub(receiver, 'emit')
+  let sendStub = sinon.stub(res, 'send')
+  let attachStub = sinon.stub(receiver, 'attachResponse')
+
+  receiver.emitHandler({ slapp: msg }, res, () => t.fail())
+  t.true(emitStub.calledOnce)
+  t.true(sendStub.notCalled)
+  t.true(attachStub.calledOnce)
+})
+
+test('Receiver.attachResponse()', t => {
+  let receiver = new Receiver()
+  let res = fixtures.getMockRes()
+  let msg = new Message()
+  let attachStub = sinon.stub(msg, 'attachResponse')
+
+  receiver.attachResponse(msg, res, 100)
+  t.true(attachStub.calledOnce)
 })
 
 function getMockMessage () {

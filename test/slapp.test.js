@@ -4,6 +4,7 @@ const test = require('ava').test
 const sinon = require('sinon')
 const Slapp = require('../src/slapp')
 const Message = require('../src/message')
+const fixtures = require('./fixtures/')
 
 const meta = {
   app_token: 'app_token',
@@ -241,6 +242,23 @@ test.cb('Slapp._handle() with override and del error', t => {
     t.true(delStub.calledWith(message.conversation_id))
     t.true(emitSpy.calledWith('error'))
 
+    t.end()
+  })
+})
+
+test.cb('Slapp._handle() w/ attached response', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('event', {}, meta)
+  let res = fixtures.getMockRes()
+  message.attachResponse(res, 100)
+
+  let clearResponseStub = sinon.stub(message, 'clearResponse')
+
+  app._handle(message, (err) => {
+    t.is(err, null)
+    t.true(clearResponseStub.calledOnce)
     t.end()
   })
 })
