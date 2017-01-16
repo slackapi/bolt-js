@@ -242,8 +242,9 @@ class Message {
 
   /**
    * Respond to a Slash command or interactive message action with a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
-   * payload. If `respond` is called within 3000ms of the original request, the original request will be responded to instead or using the
-   * `response_url`. This will keep the action button spinner in sync with an awaiting update and is about 25% more responsive when tested.
+   * payload. If `respond` is called within 2500ms of the original request (hard limit is 3000ms, consider 500ms as a buffer), the original
+   * request will be responded to instead or using the `response_url`. This will keep the action button spinner in sync with an awaiting
+   * update and is about 25% more responsive when tested.
    *
    * `input` options are the same as [`say`](#messagesay)
    *
