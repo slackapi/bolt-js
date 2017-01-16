@@ -244,6 +244,9 @@ class Slapp extends EventEmitter {
         }
       }
 
+      // no matchers
+      msg.clearResponse({ close: true })
+
       done(null, false)
     }
 

@@ -27,7 +27,10 @@ module.exports = () => {
           user_id: body.user.id,
           channel_id: body.channel.id,
           team_id: body.team.id
-        }
+        },
+        // Message actions may be responded to directly within 3000ms
+        response: res,
+        responseTimeout: 2500
       }
 
       next()

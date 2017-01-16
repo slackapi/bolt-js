@@ -35,6 +35,9 @@ class Message {
 
     this._slapp = null
     this._queue = null
+
+    // allow clearTimeout to be stubbed
+    this.clearTimeout = clearTimeout
   }
 
   /**
@@ -77,6 +80,73 @@ class Message {
       }
     }
     return this
+  }
+
+  /**
+   * Attach response for cases the support responding directly to a request from Slack.
+   * This includes slash commands and message actions. If there is a response attached,
+   * `msg.respond` will use the request to respond, otherwise it will use the response_url
+   * to respond asynchronously. The `deadline` parameter controls how
+   * long to wait before timing out then close the HTTP request and fallback to the
+   * `response_url`.
+   *
+   * ##### Parameters
+   * - `response` fhttp response
+   * - `deadline` number of milliseconds before timing the response out
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * @param {Object} resp
+   * @param {number} deadline
+   * @api private
+   */
+  attachResponse (response, deadline) {
+    let self = this
+    self._response = response
+
+    self._responseTimeout = setTimeout(() => {
+      if (self._response && !self._response.headersSent) {
+        let response = self._response
+        self._response = undefined
+        self._responseTimeout = undefined
+        response.send()
+      }
+    }, deadline)
+
+    return this
+  }
+
+  /**
+   * Clears the attached response if it exists and returns that response,
+   * returns null otherwise. Also clear the timeout.
+   *
+   * ##### Parameters
+   * - `options` `Object` options object. Supports `close`, if true then close response
+   *
+   * ##### Returns `response` if attached, otherwise null
+   *
+   * @param {Object} options
+   *
+   * @api private
+   */
+  clearResponse (options) {
+    let self = this
+    options = options || {}
+    if (self._responseTimeout) {
+      self.clearTimeout(self._responseTimeout)
+      self._responseTimeout = undefined
+    }
+    if (self._response) {
+      let response = self._response
+      self._response = undefined
+      if (options.close) {
+        response.send()
+      }
+      return response
+    }
+    return null
   }
 
   /**
@@ -171,8 +241,11 @@ class Message {
   }
 
   /**
-   * Use a `response_url` from a Slash command or interactive message action with
-   * a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) payload.
+   * Respond to a Slash command or interactive message action with a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
+   * payload. If `respond` is called within 2500ms of the original request (hard limit is 3000ms, consider 500ms as a buffer), the original
+   * request will be responded to instead or using the `response_url`. This will keep the action button spinner in sync with an awaiting
+   * update and is about 25% more responsive when tested.
+   *
    * `input` options are the same as [`say`](#messagesay)
    *
    * ##### Parameters
@@ -214,6 +287,12 @@ class Message {
 
     if (!responseUrl) {
       return callback(new Error('responseUrl not provided or not included as response_url with this type of Slack event'))
+    }
+
+    let response = self.clearResponse()
+    if (response) {
+      response.send(input)
+      return callback(null, {})
     }
 
     self._queueRequest(() => {

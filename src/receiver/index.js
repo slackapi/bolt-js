@@ -93,8 +93,19 @@ module.exports = class Receiver extends EventEmitter {
 
     let msg = new Message(message.type, message.body, message.meta)
 
+    if (message.response && message.responseTimeout) {
+      // Attaching the response will delegate responsibility of closing it
+      this.attachResponse(msg, message.response, message.responseTimeout)
+    } else {
+      res.send()
+    }
+
     this.emit('message', msg)
-    res.send()
+  }
+
+  attachResponse (msg, response, timeout) {
+    msg.attachResponse(response, timeout)
   }
 
 }
+
