@@ -598,7 +598,7 @@ test('Message.respond() w/o responseUrl and response_url missing from body', t =
 
   let chainable = msg.respond(input, (err) => {
     t.truthy(err)
-    t.is(err.message, 'responseUrl not provided or not included as response_url with this type of Slack event')
+    t.is(err.message, 'no attached request and responseUrl not provided or not included as response_url with this type of Slack request')
   })
   t.deepEqual(msg, chainable)
 })
@@ -652,6 +652,27 @@ test.cb('Message.respond() w/response', t => {
   })
   t.deepEqual(msg, chainable)
   t.end()
+})
+
+test.cb('Message.respond() w/options', t => {
+  t.plan(2)
+
+  let msg = new Message()
+  let res = fixtures.getMockRes()
+  let stub = sinon.stub(res, 'send')
+  let options = {
+    options: [
+      { text: 'text1', value: 'value1' },
+      { text: 'text1', value: 'value1' }
+    ]
+  }
+  msg.attachResponse(res, 100)
+
+  msg.respond(options, (err) => {
+    t.is(err, null)
+    t.true(stub.calledWith(options))
+    t.end()
+  })
 })
 
 test('Message.isBot() w/ bot_id', t => {

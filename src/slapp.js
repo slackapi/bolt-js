@@ -496,13 +496,15 @@ class Slapp extends EventEmitter {
   }
 
   /**
-   * Register a new action handler for an actionNameCriteria
+   * Register a new handler for button or menu actions. The actionValueCriteria
+   * (optional) for menu options will successfully match if any one of the values
+   * match the criteria.
    *
    * ##### Parameters
    * - `callbackId` string
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
    * - `actionValueCriteria` string or RegExp - the value of the action [optional]
-   * - `callback` function - `(msg, text, [match1], [match2]...) => {}`
+   * - `callback` function - `(msg, value) => {}` - value may be a string or array of strings
    *
    *
    * ##### Returns
@@ -521,7 +523,7 @@ class Slapp extends EventEmitter {
    *     // match with regex
    *     slapp.action('dinner_callback', /^drink$/, /^b[e]{2}r$/, (msg, val) => {}
    *
-   * Example `msg.body` object:
+   * Example button action `msg.body` object:
    *
    *     {
    *        "actions":[
@@ -588,6 +590,64 @@ class Slapp extends EventEmitter {
    *        "response_url":"https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx"
    *     }
    *
+   *
+   * Example menu action `msg.body` object:
+   *
+   *     {
+   *       "actions": [
+   *         {
+   *           "name": "winners_list",
+   *           "selected_options": [
+   *             {
+   *               "value": "U061F1ZUR"
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *         "callback_id": "select_simple_1234",
+   *           "team": {
+   *         "id": "T012AB0A1",
+   *           "domain": "pocket-calculator"
+   *       },
+   *       "channel": {
+   *         "id": "C012AB3CD",
+   *           "name": "general"
+   *       },
+   *       "user": {
+   *         "id": "U012A1BCD",
+   *           "name": "musik"
+   *       },
+   *       "action_ts": "1481579588.685999",
+   *         "message_ts": "1481579582.000003",
+   *           "attachment_id": "1",
+   *             "token": "verification_token_string",
+   *               "original_message": {
+   *         "text": "It's time to nominate the channel of the week",
+   *           "bot_id": "B08BCU62D",
+   *             "attachments": [
+   *               {
+   *                 "callback_id": "select_simple_1234",
+   *                 "fallback": "Upgrade your Slack client to use messages like these.",
+   *                 "id": 1,
+   *                 "color": "3AA3E3",
+   *                 "actions": [
+   *                   {
+   *                     "id": "1",
+   *                     "name": "channels_list",
+   *                     "text": "Which channel changed your life this week?",
+   *                     "type": "select",
+   *                     "data_source": "channels"
+   *                   }
+   *                 ]
+   *               }
+   *             ],
+   *               "type": "message",
+   *                 "subtype": "bot_message",
+   *                   "ts": "1481579582.000003"
+   *       },
+   *       "response_url": "https://hooks.slack.com/actions/T012AB0A1/1234567890/JpmK0yzoZ5eRiqfeduTBYXWQ"
+   *     }
+   *
    * @param {string} callbackId
    * @param {(string|RegExp)} actionNameCriteria
    * @param {(string|RegExp)} actionValueCriteria
@@ -616,12 +676,107 @@ class Slapp extends EventEmitter {
 
     let fn = (msg) => {
       if (msg.type === 'action' && msg.body.actions && msg.body.callback_id === callbackId) {
+        // Don't know how to handle multiple actions in the area. As far as this writing, this isn't ever
+        // expected to happen. Best way to handle this uncertainty is to loop until we find a match and then stop
         for (let i = 0; i < msg.body.actions.length; i++) {
           let action = msg.body.actions[i]
-          if (actionNameCriteria.test(action.name) && actionValueCriteria.test(action.value)) {
-            callback(msg, action.value)
-            return true
+          if (actionNameCriteria.test(action.name)) {
+            // test for message actions
+            if (actionValueCriteria.test(action.value)) {
+              callback(msg, action.value)
+              return true
+            }
+
+            // test for mentu options. There could be multiple options returns to we'll attempt to match
+            // on any of them and if any one matches, we'll consider this a match.
+            if (Array.isArray(action.selected_options)) {
+              for (let j = 0; j < action.selected_options.length; j++) {
+                if (actionValueCriteria.test(action.selected_options[j].value)) {
+                  // return a flattened array of string values.
+                  callback(msg, action.selected_options.map(it => it.value))
+                  return true
+                }
+              }
+            }
           }
+        }
+      }
+    }
+
+    return this.match(fn)
+  }
+
+  /**
+   * Register a new interactive message options handler
+   *
+   * ##### Parameters
+   * - `callbackId` string
+   * - `actionNameCriteria` string or RegExp - the name of the action [optional]   * - `actionValueCriteria` string or RegExp - the value of the action [optional]
+   * - `callback` function - `(msg, value) => {}` - value is the current value of the option (e.g. partially typed)
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * Example matching callback only
+   *
+   *     slapp.options('my_callback', (msg, value) => {}
+   *
+   *
+   * Example with name matcher
+   *
+   *     slapp.options('my_callback', 'my_name', (msg, value) => {}
+   *
+   *
+   * Example with RegExp matcher criteria:
+   *
+   *     slapp.options('my_callback', /my_n.+/, (msg, value) => {}
+   *
+   *
+   * Example `msg.body` object:
+   *
+   *     {
+   *         "name": "musik",
+   *         "value": "",
+   *         "callback_id": "select_remote_1234",
+   *         "team": {
+   *             "id": "T012AB0A1",
+   *             "domain": "pocket-calculator"
+   *         },
+   *         "channel": {
+   *             "id": "C012AB3CD",
+   *             "name": "general"
+   *         },
+   *         "user": {
+   *             "id": "U012A1BCD",
+   *             "name": "musik"
+   *         },
+   *         "action_ts": "1481670445.010908",
+   *         "message_ts": "1481670439.000007",
+   *         "attachment_id": "1",
+   *         "token": "verification_token_string"
+   *     }
+   **
+   * @param {string} callbackId
+   * @param {(string|RegExp)} actionNameCriteria
+   * @param {function} callback
+   */
+
+  options (callbackId, actionNameCriteria, callback) {
+    if (typeof actionNameCriteria === 'function') {
+      callback = actionNameCriteria
+      actionNameCriteria = /.*/
+    }
+
+    if (typeof actionNameCriteria === 'string') {
+      actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
+    }
+
+    let fn = (msg) => {
+      if (msg.type === 'options' && msg.body.callback_id === callbackId) {
+        if (actionNameCriteria.test(msg.body.name)) {
+          callback(msg, msg.body.value)
+          return true
         }
       }
     }

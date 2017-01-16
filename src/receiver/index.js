@@ -6,6 +6,7 @@ const Message = require('../message')
 const ParseEvent = require('./middleware/parse-event')
 const ParseCommand = require('./middleware/parse-command')
 const ParseAction = require('./middleware/parse-action')
+const ParseOptions = require('./middleware/parse-options')
 const VerifyToken = require('./middleware/verify-token')
 const SSLCheck = require('./middleware/ssl-check')
 
@@ -38,7 +39,8 @@ module.exports = class Receiver extends EventEmitter {
     let defaults = {
       event: '/slack/event',
       command: '/slack/command',
-      action: '/slack/action'
+      action: '/slack/action',
+      options: '/slack/options'
     }
     let options = opts || defaults
 
@@ -74,6 +76,16 @@ module.exports = class Receiver extends EventEmitter {
     if (options.action) {
       app.post(options.action,
         ParseAction(),
+        sslCheck,
+        verifyToken,
+        this.context,
+        emitHandler
+      )
+    }
+
+    if (options.options) {
+      app.post(options.options,
+        ParseOptions(),
         sslCheck,
         verifyToken,
         this.context,

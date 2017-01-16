@@ -31,13 +31,14 @@ test('ParseAction() invalid json payload', t => {
 })
 
 test.cb('ParseAction() valid payload', t => {
-  t.plan(6)
+  t.plan(8)
   let mw = ParseAction().pop()
 
   let payload = mockPayload()
   let req = { body: { payload: JSON.stringify(payload) } }
+  let res = fixtures.getMockRes()
 
-  mw(req, fixtures.getMockRes(), () => {
+  mw(req, res, () => {
     let slapp = req.slapp
 
     t.is(slapp.type, 'action')
@@ -46,6 +47,9 @@ test.cb('ParseAction() valid payload', t => {
     t.is(slapp.meta.user_id, payload.user.id)
     t.is(slapp.meta.channel_id, payload.channel.id)
     t.is(slapp.meta.team_id, payload.team.id)
+    t.is(slapp.response, res)
+    t.is(slapp.responseTimeout, 2500)
+
     t.end()
   })
 })

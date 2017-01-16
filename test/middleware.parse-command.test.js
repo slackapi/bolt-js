@@ -2,6 +2,7 @@
 
 const test = require('ava').test
 const ParseCommand = require('../src/receiver/middleware/parse-command')
+const fixtures = require('./fixtures/')
 
 test('ParseCommand()', t => {
   let mw = ParseCommand()
@@ -29,8 +30,9 @@ test.cb('ParseCommand() with payload', t => {
   let mw = ParseCommand().pop()
   let payload = mockPayload()
   let req = { body: payload }
+  let res = fixtures.getMockRes()
 
-  mw(req, {}, () => {
+  mw(req, res, () => {
     let slapp = req.slapp
 
     t.is(slapp.type, 'command')
@@ -39,6 +41,8 @@ test.cb('ParseCommand() with payload', t => {
     t.is(slapp.meta.user_id, payload.user_id)
     t.is(slapp.meta.channel_id, payload.channel_id)
     t.is(slapp.meta.team_id, payload.team_id)
+    t.is(slapp.response, res)
+    t.is(slapp.responseTimeout, 2500)
     t.end()
   })
 })
