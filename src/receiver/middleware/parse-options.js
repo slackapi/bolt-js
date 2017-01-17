@@ -4,9 +4,19 @@ const bodyParser = require('body-parser')
 
 module.exports = () => {
   return [
-    bodyParser.json(),
+    bodyParser.urlencoded({extended: true}),
     function parseOptions (req, res, next) {
-      let body = req.body || {}
+      let body = req.body
+
+      if (!body || !body.payload) {
+        return res.send('Invalid request: payload missing')
+      }
+
+      try {
+        body = JSON.parse(body.payload)
+      } catch (e) {
+        return res.send('Error parsing payload')
+      }
 
       req.slapp = {
         type: 'options',
