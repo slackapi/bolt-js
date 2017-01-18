@@ -243,7 +243,7 @@ class Message {
   /**
    * Respond to a Slash command or interactive message action with a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
    * payload. If `respond` is called within 2500ms of the original request (hard limit is 3000ms, consider 500ms as a buffer), the original
-   * request will be responded to instead or using the `response_url`. This will keep the action button spinner in sync with an awaiting
+   * request will be responded to instead of using the `response_url`. This will keep the action button spinner in sync with an awaiting
    * update and is about 25% more responsive when tested.
    *
    * `input` options are the same as [`say`](#messagesay)
@@ -319,6 +319,11 @@ class Message {
     })
 
     return self
+  }
+
+  reply (input, callback) {
+    input.thread_ts = this.body.ts
+    return this.say(input, callback)
   }
 
   // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
