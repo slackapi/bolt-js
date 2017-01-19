@@ -27,6 +27,7 @@ class Message {
     this.type = type
     this.body = body || {}
     this.meta = meta || {}
+    this.makeThreaded = null
     this.conversation_id = [
       this.meta.team_id,
       this.meta.channel_id || 'nochannel',
@@ -202,6 +203,9 @@ class Message {
    * `string`, `Object` or mixed `Array` of `strings` and `Objects`. If a string,
    * the value will be set to `text` of the `chat.postmessage` object. Otherwise pass
    * a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) `Object`.
+   * If the current message is part of a thread, the new message will remain
+   * in the thread. To control if a message is threaded or not you can use the
+   * `msg.thread()` and `msg.unthread()` functions.
    *
    * If `input` is an `Array`, a random value in the array will be selected.
    *
@@ -227,6 +231,13 @@ class Message {
       token: self.meta.bot_token || self.meta.app_token,
       channel: self.meta.channel_id
     }, input)
+
+    // keep the message threaded unless we've "unthreaded" it
+    if (this.isThreaded() && this.makeThreaded !== false) {
+      payload.thread_ts = this.body.event.thread_ts
+    } else if (this.makeThreaded === true) {
+      payload.thread_ts = this.body.event.ts
+    }
 
     self._queueRequest(() => {
       slack.chat.postMessage(payload, (err, data) => {
@@ -321,9 +332,51 @@ class Message {
     return self
   }
 
-  reply (input, callback) {
-    input.thread_ts = this.body.ts
-    return this.say(input, callback)
+  /**
+   * Ensures all subsequent messages created are under a thread of the current message
+   *
+   * Example:
+   *
+   *     // current msg is not part of a thread (i.e. does not have thread_ts set)
+   *     msg.
+   *      .say('This message will not be part of the thread and will be in the channel')
+   *      .thread()
+   *      .say('This message will remain in the thread')
+   *      .say('This will also be in the thread')
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   */
+
+  thread () {
+    this.makeThreaded = true
+
+    return this
+  }
+
+  /**
+   * Ensures all subsequent messages created are not part of a thread
+   *
+   * Example:
+   *
+   *     // current msg is part of a thread (i.e. has thread_ts set)
+   *     msg.
+   *      .say('This message will remain in the thread')
+   *      .unthread()
+   *      .say('This message will not be part of the thread and will be in the channel')
+   *      .say('This will also not be part of the thread')
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   */
+
+  unthread () {
+    this.makeThreaded = false
+
+    return this
   }
 
   // TODO: PR this into smallwins/slack, below inspired by https://github.com/smallwins/slack/blob/master/src/_exec.js#L20
@@ -367,6 +420,17 @@ class Message {
 
   isBaseMessage () {
     return this.isMessage() && !this.body.event.subtype
+  }
+
+  /**
+   * Is this an `event` of type `message` without any [subtype](https://api.slack.com/events/message)?
+   *
+   *
+   * ##### Returns `bool` true if `this` is an event that is part of a thread
+   */
+
+  isThreaded () {
+    return this.body.event && !!this.body.event.thread_ts
   }
 
   /**
