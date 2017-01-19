@@ -350,6 +350,113 @@ test('Message.say() api error', t => {
   slack.chat.postMessage.restore()
 })
 
+test('Message.say() from threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let body = {
+    event: {
+      thread_ts: 123123123
+    }
+  }
+  let msg = new Message('event', body, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, body.event.thread_ts)
+  })
+
+  msg.say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
+test('Message.say() from non-threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let msg = new Message('event', {}, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, undefined)
+  })
+
+  msg.say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
+test('Message.thread().say() from non-threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let body = {
+    event: {
+      ts: 1232131231
+    }
+  }
+  let msg = new Message('event', body, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, body.event.ts)
+  })
+
+  msg.thread().say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
+test('Message.unthread().say() from threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let body = {
+    event: {
+      thread_ts: 1232131231
+    }
+  }
+  let msg = new Message('event', body, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, undefined)
+  })
+
+  msg.unthread().say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
 test.cb('Message.respond()', t => {
   t.plan(5)
 
