@@ -530,7 +530,7 @@ test.cb('Message.respond() w/ body.error', t => {
 })
 
 test.cb('Message.respond() w/ rate_limit error', t => {
-  t.plan(5)
+  t.plan(6)
 
   let slapp = new EventEmitter()
   let msg = new Message()
@@ -546,12 +546,13 @@ test.cb('Message.respond() w/ rate_limit error', t => {
   })
   let emitStub = sinon.stub(slapp, 'emit')
 
-  msg.respond(url, input, (err, body) => {
+  let chainable = msg.respond(url, input, (err, body) => {
     t.true(reqStub.calledOnce)
     t.is(err.message, 'rate_limit')
     t.true(emitStub.calledWith('error'))
-    t.end()
   })
+  t.deepEqual(msg, chainable)
+  t.end()
 })
 
 test('Message.respond() w/o callback', t => {
@@ -566,8 +567,9 @@ test('Message.respond() w/o callback', t => {
     cb(null, {}, { ok: true })
   })
 
-  msg.respond(url, input)
+  let chainable = msg.respond(url, input)
   t.true(reqStub.calledOnce)
+  t.deepEqual(msg, chainable)
 })
 
 test('Message.respond() w/o responseUrl', t => {
@@ -584,23 +586,25 @@ test('Message.respond() w/o responseUrl', t => {
     cb(null, {}, { ok: true })
   })
 
-  msg.respond(input)
+  let chainable = msg.respond(input)
   t.true(reqStub.calledOnce)
+  t.deepEqual(msg, chainable)
 })
 
 test('Message.respond() w/o responseUrl and response_url missing from body', t => {
-  t.plan(2)
+  t.plan(3)
   let msg = new Message()
   let input = 'beepboop'
 
-  msg.respond(input, (err) => {
+  let chainable = msg.respond(input, (err) => {
     t.truthy(err)
     t.is(err.message, 'responseUrl not provided or not included as response_url with this type of Slack event')
   })
+  t.deepEqual(msg, chainable)
 })
 
 test.cb('Message.respond() multiple in series', t => {
-  t.plan(2)
+  t.plan(22)
   let msg = new Message()
   let url = 'https://slack'
 
@@ -622,12 +626,13 @@ test.cb('Message.respond() multiple in series', t => {
   })
 
   for (let i = 0; i < 20; i++) {
-    msg.respond(String(i))
+    let chainable = msg.respond(String(i))
+    t.deepEqual(msg, chainable)
   }
 })
 
 test.cb('Message.respond() w/response', t => {
-  t.plan(4)
+  t.plan(5)
 
   let res = fixtures.getMockRes()
   let msg = new Message()
@@ -639,13 +644,14 @@ test.cb('Message.respond() w/response', t => {
 
   msg.attachResponse(res, 100)
 
-  msg.respond(url, input, (err, body) => {
+  let chainable = msg.respond(url, input, (err, body) => {
     t.true(reqStub.notCalled)
     t.is(err, null)
     t.is(body.ok, undefined)
     t.true(sendStub.calledOnce)
-    t.end()
   })
+  t.deepEqual(msg, chainable)
+  t.end()
 })
 
 test('Message.isBot() w/ bot_id', t => {
