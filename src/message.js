@@ -297,13 +297,15 @@ class Message {
     if (!callback) callback = () => {}
 
     if (!responseUrl) {
-      return callback(new Error('responseUrl not provided or not included as response_url with this type of Slack event'))
+      callback(new Error('responseUrl not provided or not included as response_url with this type of Slack event'))
+      return self
     }
 
     let response = self.clearResponse()
     if (response) {
       response.send(input)
-      return callback(null, {})
+      callback(null, {})
+      return self
     }
 
     self._queueRequest(() => {
