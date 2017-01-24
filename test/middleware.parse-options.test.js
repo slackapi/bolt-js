@@ -12,16 +12,21 @@ test('ParseOptions()', t => {
 test.cb('ParseOptions() no payload', t => {
   let mw = ParseOptions().pop()
   let req = { body: {} }
+  let res = fixtures.getMockRes()
 
-  mw(req, {}, () => {
-    let slapp = req.slapp
+  mw(req, res, (err) => {
+    t.truthy(err)
+    t.end()
+  })
+})
 
-    t.is(slapp.type, 'options')
-    t.deepEqual(slapp.body, req.body)
-    t.is(slapp.meta.verify_token, undefined)
-    t.is(slapp.meta.user_id, undefined)
-    t.is(slapp.meta.channel_id, undefined)
-    t.is(slapp.meta.team_id, undefined)
+test.cb('ParseOptions() unparsable payload', t => {
+  let mw = ParseOptions().pop()
+  let req = { body: { payload: '"invalid' } }
+  let res = fixtures.getMockRes()
+
+  mw(req, res, (err) => {
+    t.truthy(err)
     t.end()
   })
 })
@@ -29,14 +34,15 @@ test.cb('ParseOptions() no payload', t => {
 test.cb('ParseOptions() with payload', t => {
   let mw = ParseOptions().pop()
   let payload = mockPayload()
-  let req = { body: payload }
+  let req = { body: { payload: JSON.stringify(payload) } }
   let res = fixtures.getMockRes()
 
-  mw(req, res, () => {
+  mw(req, res, (err) => {
+    t.ifError(err)
     let slapp = req.slapp
 
     t.is(slapp.type, 'options')
-    t.deepEqual(slapp.body, req.body)
+    t.deepEqual(slapp.body, payload)
     t.is(slapp.meta.verify_token, payload.token)
     t.is(slapp.meta.user_id, payload.user.id)
     t.is(slapp.meta.channel_id, payload.channel.id)

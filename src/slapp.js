@@ -681,22 +681,18 @@ class Slapp extends EventEmitter {
         for (let i = 0; i < msg.body.actions.length; i++) {
           let action = msg.body.actions[i]
           if (actionNameCriteria.test(action.name)) {
+            // test for menu options. There could be multiple options returned so attempt to match
+            // on any of them and if any one matches, we'll consider this a match.
+            if (Array.isArray(action.selected_options)) {
+              if (action.selected_options.find(option => actionValueCriteria.test(option.value))) {
+                callback(msg, action.selected_options.map(it => it.value))
+                return true
+              }
+            }
             // test for message actions
             if (actionValueCriteria.test(action.value)) {
               callback(msg, action.value)
               return true
-            }
-
-            // test for mentu options. There could be multiple options returns to we'll attempt to match
-            // on any of them and if any one matches, we'll consider this a match.
-            if (Array.isArray(action.selected_options)) {
-              for (let j = 0; j < action.selected_options.length; j++) {
-                if (actionValueCriteria.test(action.selected_options[j].value)) {
-                  // return a flattened array of string values.
-                  callback(msg, action.selected_options.map(it => it.value))
-                  return true
-                }
-              }
             }
           }
         }
@@ -711,7 +707,8 @@ class Slapp extends EventEmitter {
    *
    * ##### Parameters
    * - `callbackId` string
-   * - `actionNameCriteria` string or RegExp - the name of the action [optional]   * - `actionValueCriteria` string or RegExp - the value of the action [optional]
+   * - `actionNameCriteria` string or RegExp - the name of the action [optional]
+   * - `actionValueCriteria` string or RegExp - the value of the action [optional]
    * - `callback` function - `(msg, value) => {}` - value is the current value of the option (e.g. partially typed)
    *
    *
@@ -759,6 +756,7 @@ class Slapp extends EventEmitter {
    **
    * @param {string} callbackId
    * @param {(string|RegExp)} actionNameCriteria
+   * @param {(string|RegExp)} actionValueCriteria
    * @param {function} callback
    */
 

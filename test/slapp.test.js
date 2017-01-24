@@ -869,6 +869,27 @@ test.cb('Slapp.ignoreSelfMiddleware() both ids falsey', t => {
   })
 })
 
+test.cb('Slapp.ignoreSelfMiddleware() one id falsey', t => {
+  let app = new Slapp({ context })
+  let mw = app.ignoreSelfMiddleware()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  }, {
+    bot_id: 'bot_id',
+    app_bot_id: null
+  })
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.pass()
+    t.end()
+  })
+})
+
 test.cb('Slapp.preprocessConversationMiddleware() w/ conversation', t => {
   t.plan(3)
 
