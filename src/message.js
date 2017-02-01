@@ -506,6 +506,25 @@ class Message {
   }
 
   /**
+   * Return true if the event "team_id" is included in the "authed_teams" array.
+   * In other words, this event originated from a team who has installed your app
+   * versus a team who is sharing a channel with a team who has installed the app
+   * but in fact hasn't installed the app into that team explicitly.
+   * There are some events that do not include an "authed_teams" property. In these
+   * cases, error on the side of claiming this IS from an authed team.
+   *
+   * ##### Returns an Array of user IDs
+   */
+
+  isAuthedTeam () {
+    // if the authed_teams property does not exist, error on the side of claiming it is an authed team_id
+    if (!Array.isArray(this.body.authed_teams)) {
+      return true
+    }
+    return this.body.authed_teams.indexOf(this.body.team_id) >= 0
+  }
+
+  /**
    * Return the user IDs of any users mentioned in the message
    *
    * ##### Returns an Array of user IDs
