@@ -1001,10 +1001,10 @@ It is generally always passed as `msg`.
 ## Message.isAuthedTeam()
 
   Return true if the event "team_id" is included in the "authed_teams" array.
-  In other worse, this event originated from a team who has installed your app
+  In other words, this event originated from a team who has installed your app
   versus a team who is sharing a channel with a team who has installed the app
   but in fact hasn't installed the app into that team explicitly.
-  There are some events that do not include an "auth_teams" property. In these
+  There are some events that do not include an "authed_teams" property. In these
   cases, error on the side of claiming this IS from an authed team.
   
 #### Returns an Array of user IDs
