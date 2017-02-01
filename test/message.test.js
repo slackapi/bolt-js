@@ -777,6 +777,32 @@ test('Message.isDirectMention() false', t => {
   t.false(msg.isDirectMention())
 })
 
+test('Message.isAuthedTeam()', t => {
+  let msg = new Message('event', {
+    team_id: 'team_id1',
+    authed_teams: ['team_id1', 'team_id2']
+  })
+
+  t.true(msg.isAuthedTeam())
+})
+
+test('Message.isAuthedTeam() false', t => {
+  let msg = new Message('event', {
+    team_id: 'team_id1',
+    authed_teams: ['team_id2', 'team_id3']
+  })
+
+  t.false(msg.isAuthedTeam())
+})
+
+test('Message.isAuthedTeam() authed_teams missing', t => {
+  let msg = new Message('event', {
+    team_id: 'team_id1'
+  })
+
+  t.true(msg.isAuthedTeam())
+})
+
 test('Message.stripDirectMention()', t => {
   let botUserId = 'bot_user_id'
   let msg = new Message('event', {
