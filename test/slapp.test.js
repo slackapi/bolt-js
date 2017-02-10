@@ -137,7 +137,7 @@ test.cb('Slapp._handle() w/ a bad message', t => {
 
   let emitSpy = sinon.stub(app, 'emit')
   app._handle(message, (err) => {
-    t.not(err, null)
+    t.is(err, null)
     t.true(emitSpy.calledWith('error'))
     t.end()
   })

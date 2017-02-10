@@ -206,7 +206,6 @@ class Slapp extends EventEmitter {
     let err = msg.verifyProps()
     if (err) {
       self.emit('error', err)
-      return done(err, false)
     }
 
     this.emit('info', this.formatter(msg))
