@@ -1,6 +1,10 @@
 # Changelog
 
-## v2.0.1 (20017-01-20)
+## v2.2.0 (2017-02-09)
+
+- [Allow events without app_token to pass](https://github.com/BeepBoopHQ/slapp/pull/71)
+
+## v2.0.1 (2017-01-20)
 
 - Fixed bug where msg.respond() wasn't returning itself so chaining failed.
 
