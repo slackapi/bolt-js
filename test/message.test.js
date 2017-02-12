@@ -844,12 +844,12 @@ test('Message.usersMentioned()', t => {
   let msg = new Message('event', {
     event: {
       type: 'message',
-      text: 'hi <@U1> do you know <@U2>?'
+      text: 'hi <@U1> do you know <@W2> <@T2>?'
     }
   })
 
   let users = msg.usersMentioned()
-  t.deepEqual(users, ['U1', 'U2'])
+  t.deepEqual(users, ['U1', 'W2'])
 })
 
 test('Message.usersMentioned() no users', t => {

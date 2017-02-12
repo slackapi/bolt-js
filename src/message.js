@@ -531,7 +531,7 @@ class Message {
    */
 
   usersMentioned () {
-    return this._regexMentions(new RegExp('<@(U[A-Za-z0-9]+)>', 'g'))
+    return this._regexMentions(new RegExp('<@([UW][A-Za-z0-9]+)>', 'g'))
   }
 
   /**

@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.2.1 (2017-02-11)
+
+- Fixed bug where user Ids beginning with `W` were not recognized by `usersMentioned()`
+
 ## v2.2.0 (2017-02-09)
 
 - [Allow events without app_token to pass](https://github.com/BeepBoopHQ/slapp/pull/71)
