@@ -178,7 +178,9 @@ class Message {
     }
 
     let key = this.conversation_id
-    let expiration = Date.now() + secondsToExpire * 1000
+    let expiration = secondsToExpire === 0
+      ? null
+      : Date.now() + secondsToExpire * 1000
     this._slapp.convoStore.set(key, { fnKey, state, expiration }, (err) => {
       if (err) {
         this._slapp.emit('error', err)
