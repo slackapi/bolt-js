@@ -37,3 +37,6 @@ jspm_packages
 .node_repl_history
 /coverage
 /.nyc_output
+
+# yarn lockfile (not everyone is drinking the koolaid yet)
+yarn.lock
