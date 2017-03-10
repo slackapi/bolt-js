@@ -2,7 +2,6 @@
 const request = require('request')
 const slack = require('slack')
 const Queue = require('js-queue')
-const HOUR = 60 * 60
 const RATE_LIMIT = 'You are sending too many requests. Please relax.'
 
 /**
@@ -174,8 +173,8 @@ class Message {
       state = {}
     }
 
-    if (!secondsToExpire) {
-      secondsToExpire = HOUR
+    if (!secondsToExpire && secondsToExpire !== 0) {
+      secondsToExpire = this._slapp.defaultExpiration
     }
 
     let key = this.conversation_id

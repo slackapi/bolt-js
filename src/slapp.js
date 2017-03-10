@@ -7,6 +7,7 @@ const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
 const Formatter = require('./message-formatter')
 const logger = require('./logger')
+const HOUR = 60 * 60
 
 /**
  * A Slack App
@@ -26,6 +27,7 @@ class Slapp extends EventEmitter {
    * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
    * - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's bot id.
    * - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
+   * - `opts.defaultExpiration` (seconds) defaults to `60 * 60` (1 hour), 0 to never expire
    *
    * @api private
    * @constructor
@@ -42,7 +44,8 @@ class Slapp extends EventEmitter {
       log: true,
       colors: !!process.stdout.isTTY,
       ignoreSelf: true,
-      ignoreBots: false
+      ignoreBots: false,
+      defaultExpiration: HOUR
     }, opts || {})
 
     if (!opts.context) {
@@ -63,6 +66,7 @@ class Slapp extends EventEmitter {
 
     this.ignoreSelf = opts.ignoreSelf
     this.ignoreBots = opts.ignoreBots
+    this.defaultExpiration = opts.defaultExpiration
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an impmementation of
