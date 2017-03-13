@@ -7,7 +7,7 @@
     "test": "npm run lint && npm run coverage",
     "lint": "standard",
     "unit": "ava --verbose --serial",
-    "coverage": "nyc --check-coverage --statements 100 ava --verbose --serial",
+    "coverage": "nyc --check-coverage --branches 100 ava --verbose --serial",
     "lcov": "nyc --reporter lcov ava --serial",
     "docs": "node scripts/docs.js",
     "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "ava": "^0.15.2",
-    "coveralls": "^2.11.11",
+    "coveralls": "2.11.11",
     "dox": "^0.8.1",
     "nyc": "^7.0.0",
     "sinon": "^1.17.4",
