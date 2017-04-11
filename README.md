@@ -155,9 +155,9 @@ Listen for any Slack event with `slapp.event(event_name, (msg) => {})`.
 // add a smile reaction by the bot for any message reacted to
 slapp.event('reaction_added', (msg) => {
   let token = msg.meta.bot_token
-  let id = msg.body.event.item.ts
+  let timestamp = msg.body.event.item.ts
   let channel = msg.body.event.item.channel
-  slapp.client.reactions.add({token, 'smile', id, channel}, (err) => {
+  slapp.client.reactions.add({token, name: 'smile', channel, timestamp}, (err) => {
     if (err) console.log('Error adding reaction', err)
   })
 })
