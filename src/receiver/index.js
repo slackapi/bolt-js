@@ -6,6 +6,7 @@ const Message = require('../message')
 const ParseEvent = require('./middleware/parse-event')
 const ParseCommand = require('./middleware/parse-command')
 const ParseAction = require('./middleware/parse-action')
+const ParseOptions = require('./middleware/parse-options')
 const VerifyToken = require('./middleware/verify-token')
 const SSLCheck = require('./middleware/ssl-check')
 
@@ -38,7 +39,8 @@ module.exports = class Receiver extends EventEmitter {
     let defaults = {
       event: '/slack/event',
       command: '/slack/command',
-      action: '/slack/action'
+      action: '/slack/action',
+      options: '/slack/options'
     }
     let options = opts || defaults
 
@@ -81,6 +83,16 @@ module.exports = class Receiver extends EventEmitter {
       )
     }
 
+    if (options.options) {
+      app.post(options.options,
+        ParseOptions(),
+        sslCheck,
+        verifyToken,
+        this.context,
+        emitHandler
+      )
+    }
+
     return app
   }
 
@@ -93,8 +105,19 @@ module.exports = class Receiver extends EventEmitter {
 
     let msg = new Message(message.type, message.body, message.meta)
 
+    if (message.response && message.responseTimeout) {
+      // Attaching the response will delegate responsibility of closing it
+      this.attachResponse(msg, message.response, message.responseTimeout)
+    } else {
+      res.send()
+    }
+
     this.emit('message', msg)
-    res.send()
+  }
+
+  attachResponse (msg, response, timeout) {
+    msg.attachResponse(response, timeout)
   }
 
 }
+

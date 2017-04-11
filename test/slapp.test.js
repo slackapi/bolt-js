@@ -4,6 +4,7 @@ const test = require('ava').test
 const sinon = require('sinon')
 const Slapp = require('../src/slapp')
 const Message = require('../src/message')
+const fixtures = require('./fixtures/')
 
 const meta = {
   app_token: 'app_token',
@@ -136,7 +137,7 @@ test.cb('Slapp._handle() w/ a bad message', t => {
 
   let emitSpy = sinon.stub(app, 'emit')
   app._handle(message, (err) => {
-    t.not(err, null)
+    t.is(err, null)
     t.true(emitSpy.calledWith('error'))
     t.end()
   })
@@ -241,6 +242,23 @@ test.cb('Slapp._handle() with override and del error', t => {
     t.true(delStub.calledWith(message.conversation_id))
     t.true(emitSpy.calledWith('error'))
 
+    t.end()
+  })
+})
+
+test.cb('Slapp._handle() w/ attached response', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('event', {}, meta)
+  let res = fixtures.getMockRes()
+  message.attachResponse(res, 100)
+
+  let clearResponseStub = sinon.stub(message, 'clearResponse')
+
+  app._handle(message, (err) => {
+    t.is(err, null)
+    t.true(clearResponseStub.calledOnce)
     t.end()
   })
 })
@@ -536,6 +554,50 @@ test.cb('Slapp.action() w/ non-matching criteria', t => {
     })
 })
 
+test.cb('Slapp.action() w/ selected_options', t => {
+  t.plan(5)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep', selected_options: [{ value: 'no match' }, { value: 'Boop' }] }
+    ],
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .action(message.body.callback_id, /^beep.*/, /B[o]{2}p/, (msg, val) => {
+      t.deepEqual(msg, message)
+      t.true(Array.isArray(val))
+      t.same(val, ['no match', 'Boop'])
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.action() w/ selected_options no matches', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep', selected_options: [{ value: 'no match' }] }
+    ],
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .action(message.body.callback_id, /^beep.*/, /B[o]{2}p/, (msg, val) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
 test.cb('Slapp.message() w/o filter', t => {
   t.plan(3)
 
@@ -807,6 +869,27 @@ test.cb('Slapp.ignoreSelfMiddleware() both ids falsey', t => {
   })
 })
 
+test.cb('Slapp.ignoreSelfMiddleware() one id falsey', t => {
+  let app = new Slapp({ context })
+  let mw = app.ignoreSelfMiddleware()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      subtype: 'bot_message'
+    }
+  }, {
+    bot_id: 'bot_id',
+    app_bot_id: null
+  })
+
+  // this callback is synchronous
+  mw(message, () => {
+    t.pass()
+    t.end()
+  })
+})
+
 test.cb('Slapp.preprocessConversationMiddleware() w/ conversation', t => {
   t.plan(3)
 
@@ -879,6 +962,67 @@ test.cb('Slapp.preprocessConversationMiddleware() w/ error', t => {
   t.true(getStub.calledOnce)
   t.true(emitSpy.calledWith('error'))
   t.end()
+})
+
+test.cb('Slapp.options() w/ callback_id only', t => {
+  t.plan(3)
+
+  let app = new Slapp({ context })
+  let message = new Message('options', {
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .options('my_callback', (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.options() w/ string criteria', t => {
+  t.plan(4)
+
+  let app = new Slapp({ context })
+  let message = new Message('options', {
+    name: 'my_name',
+    value: 'my_value',
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .options('my_callback', 'my_name', (msg, val) => {
+      t.deepEqual(msg, message)
+      t.is(val, 'my_value')
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.options() w/ regex criteria', t => {
+  t.plan(3)
+
+  let app = new Slapp({ context })
+  let message = new Message('options', {
+    name: 'my_name',
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .options('my_callback', /^my_n.*/, (msg) => {
+      t.deepEqual(msg, message)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
 })
 
 // Test context fn

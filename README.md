@@ -782,14 +782,18 @@ It is generally always passed as `msg`.
   - [Message.cancel()](#messagecancel)
   - [Message.say()](#messagesayinputstringobjectarraycallbackfunction)
   - [Message.respond()](#messagerespondresponseurlstringinputstringobjectarraycallbackfunction)
+  - [Message.thread()](#messagethread)
+  - [Message.unthread()](#messageunthread)
   - [Message._request()](#message_request)
   - [Message.isBot()](#messageisbot)
   - [Message.isBaseMessage()](#messageisbasemessage)
+  - [Message.isThreaded()](#messageisthreaded)
   - [Message.isDirectMention()](#messageisdirectmention)
   - [Message.isDirectMessage()](#messageisdirectmessage)
   - [Message.isMention()](#messageismention)
   - [Message.isAmbient()](#messageisambient)
   - [Message.isAnyOf()](#messageisanyofofarray)
+  - [Message.isAuthedTeam()](#messageisauthedteam)
   - [Message.usersMentioned()](#messageusersmentioned)
   - [Message.channelsMentioned()](#messagechannelsmentioned)
   - [Message.subteamGroupsMentioned()](#messagesubteamgroupsmentioned)
@@ -833,6 +837,9 @@ It is generally always passed as `msg`.
   `string`, `Object` or mixed `Array` of `strings` and `Objects`. If a string,
   the value will be set to `text` of the `chat.postmessage` object. Otherwise pass
   a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) `Object`.
+  If the current message is part of a thread, the new message will remain
+  in the thread. To control if a message is threaded or not you can use the
+  `msg.thread()` and `msg.unthread()` functions.
   
   If `input` is an `Array`, a random value in the array will be selected.
   
@@ -846,8 +853,11 @@ It is generally always passed as `msg`.
 
 ## Message.respond([responseUrl]:string, input:string|Object|Array, callback:function)
 
-  Use a `response_url` from a Slash command or interactive message action with
-  a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) payload.
+  Respond to a Slash command or interactive message action with a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
+  payload. If `respond` is called within 2500ms of the original request (hard limit is 3000ms, consider 500ms as a buffer), the original
+  request will be responded to instead of using the `response_url`. This will keep the action button spinner in sync with an awaiting
+  update and is about 25% more responsive when tested.
+  
   `input` options are the same as [`say`](#messagesay)
   
 #### Parameters
@@ -885,6 +895,45 @@ It is generally always passed as `msg`.
 #### Returns
   - `this` (chainable)
 
+## Message.thread()
+
+  Ensures all subsequent messages created are under a thread of the current message
+  
+  Example:
+  
+```js
+  // current msg is not part of a thread (i.e. does not have thread_ts set)
+  msg.
+   .say('This message will not be part of the thread and will be in the channel')
+   .thread()
+   .say('This message will remain in the thread')
+   .say('This will also be in the thread')
+```
+
+  
+#### Returns
+  - `this` (chainable)
+
+## Message.unthread()
+
+  Ensures all subsequent messages created are not part of a thread
+  
+  Example:
+  
+```js
+  // current msg is part of a thread (i.e. has thread_ts set)
+  msg.
+   .say('This message will remain in the thread')
+   .unthread()
+   .say('This message will not be part of the thread and will be in the channel')
+   .say('This will also not be part of the thread')
+```
+
+  
+  
+#### Returns
+  - `this` (chainable)
+
 ## Message._request()
 
   istanbul ignore next
@@ -901,6 +950,13 @@ It is generally always passed as `msg`.
   
   
 #### Returns `bool` true if `this` is a message event type with no subtype
+
+## Message.isThreaded()
+
+  Is this an `event` of type `message` without any [subtype](https://api.slack.com/events/message)?
+  
+  
+#### Returns `bool` true if `this` is an event that is part of a thread
 
 ## Message.isDirectMention()
 
@@ -941,6 +997,17 @@ It is generally always passed as `msg`.
   
   
 #### Returns `bool` true if `this` is a message that matches any of the filters
+
+## Message.isAuthedTeam()
+
+  Return true if the event "team_id" is included in the "authed_teams" array.
+  In other words, this event originated from a team who has installed your app
+  versus a team who is sharing a channel with a team who has installed the app
+  but in fact hasn't installed the app into that team explicitly.
+  There are some events that do not include an "authed_teams" property. In these
+  cases, error on the side of claiming this IS from an authed team.
+  
+#### Returns an Array of user IDs
 
 ## Message.usersMentioned()
 

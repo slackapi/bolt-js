@@ -16,7 +16,10 @@ module.exports = () => {
           user_id: body.user_id,
           channel_id: body.channel_id,
           team_id: body.team_id
-        }
+        },
+        // Slash Commands requests may be responded to directly within 3000ms
+        response: res,
+        responseTimeout: 2500
       }
 
       next()

@@ -3,6 +3,8 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const slack = require('slack')
+const fixtures = require('./fixtures/')
+
 const EventEmitter = require('events')
 const Message = require('../src/message')
 
@@ -348,6 +350,113 @@ test('Message.say() api error', t => {
   slack.chat.postMessage.restore()
 })
 
+test('Message.say() from threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let body = {
+    event: {
+      thread_ts: 123123123
+    }
+  }
+  let msg = new Message('event', body, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, body.event.thread_ts)
+  })
+
+  msg.say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
+test('Message.say() from non-threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let msg = new Message('event', {}, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, undefined)
+  })
+
+  msg.say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
+test('Message.thread().say() from non-threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let body = {
+    event: {
+      ts: 1232131231
+    }
+  }
+  let msg = new Message('event', body, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, body.event.ts)
+  })
+
+  msg.thread().say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
+test('Message.unthread().say() from threaded message', t => {
+  t.plan(5)
+
+  let meta = {
+    bot_token: 'bot_token',
+    app_token: 'app_token',
+    channel_id: 'channel_id'
+  }
+  let body = {
+    event: {
+      thread_ts: 1232131231
+    }
+  }
+  let msg = new Message('event', body, meta)
+  let input = 'beepboop'
+  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+    t.is(payload.text, input)
+    t.is(payload.token, meta.bot_token)
+    t.is(payload.channel, meta.channel_id)
+    t.is(payload.thread_ts, undefined)
+  })
+
+  msg.unthread().say(input)
+
+  t.true(postStub.calledOnce)
+  slack.chat.postMessage.restore()
+})
+
 test.cb('Message.respond()', t => {
   t.plan(5)
 
@@ -421,7 +530,7 @@ test.cb('Message.respond() w/ body.error', t => {
 })
 
 test.cb('Message.respond() w/ rate_limit error', t => {
-  t.plan(5)
+  t.plan(6)
 
   let slapp = new EventEmitter()
   let msg = new Message()
@@ -437,12 +546,13 @@ test.cb('Message.respond() w/ rate_limit error', t => {
   })
   let emitStub = sinon.stub(slapp, 'emit')
 
-  msg.respond(url, input, (err, body) => {
+  let chainable = msg.respond(url, input, (err, body) => {
     t.true(reqStub.calledOnce)
     t.is(err.message, 'rate_limit')
     t.true(emitStub.calledWith('error'))
-    t.end()
   })
+  t.deepEqual(msg, chainable)
+  t.end()
 })
 
 test('Message.respond() w/o callback', t => {
@@ -457,8 +567,9 @@ test('Message.respond() w/o callback', t => {
     cb(null, {}, { ok: true })
   })
 
-  msg.respond(url, input)
+  let chainable = msg.respond(url, input)
   t.true(reqStub.calledOnce)
+  t.deepEqual(msg, chainable)
 })
 
 test('Message.respond() w/o responseUrl', t => {
@@ -475,23 +586,25 @@ test('Message.respond() w/o responseUrl', t => {
     cb(null, {}, { ok: true })
   })
 
-  msg.respond(input)
+  let chainable = msg.respond(input)
   t.true(reqStub.calledOnce)
+  t.deepEqual(msg, chainable)
 })
 
 test('Message.respond() w/o responseUrl and response_url missing from body', t => {
-  t.plan(2)
+  t.plan(3)
   let msg = new Message()
   let input = 'beepboop'
 
-  msg.respond(input, (err) => {
+  let chainable = msg.respond(input, (err) => {
     t.truthy(err)
-    t.is(err.message, 'responseUrl not provided or not included as response_url with this type of Slack event')
+    t.is(err.message, 'no attached request and responseUrl not provided or not included as response_url with this type of Slack request')
   })
+  t.deepEqual(msg, chainable)
 })
 
 test.cb('Message.respond() multiple in series', t => {
-  t.plan(2)
+  t.plan(22)
   let msg = new Message()
   let url = 'https://slack'
 
@@ -513,8 +626,53 @@ test.cb('Message.respond() multiple in series', t => {
   })
 
   for (let i = 0; i < 20; i++) {
-    msg.respond(String(i))
+    let chainable = msg.respond(String(i))
+    t.deepEqual(msg, chainable)
   }
+})
+
+test.cb('Message.respond() w/response', t => {
+  t.plan(5)
+
+  let res = fixtures.getMockRes()
+  let msg = new Message()
+  let url = 'http://beepboophq.com'
+  let input = 'beepboop'
+
+  let reqStub = sinon.stub(msg, '_request', () => {})
+  let sendStub = sinon.stub(res, 'send')
+
+  msg.attachResponse(res, 100)
+
+  let chainable = msg.respond(url, input, (err, body) => {
+    t.true(reqStub.notCalled)
+    t.is(err, null)
+    t.is(body.ok, undefined)
+    t.true(sendStub.calledOnce)
+  })
+  t.deepEqual(msg, chainable)
+  t.end()
+})
+
+test.cb('Message.respond() w/options', t => {
+  t.plan(2)
+
+  let msg = new Message()
+  let res = fixtures.getMockRes()
+  let stub = sinon.stub(res, 'send')
+  let options = {
+    options: [
+      { text: 'text1', value: 'value1' },
+      { text: 'text1', value: 'value1' }
+    ]
+  }
+  msg.attachResponse(res, 100)
+
+  msg.respond(options, (err) => {
+    t.is(err, null)
+    t.true(stub.calledWith(options))
+    t.end()
+  })
 })
 
 test('Message.isBot() w/ bot_id', t => {
@@ -640,6 +798,32 @@ test('Message.isDirectMention() false', t => {
   t.false(msg.isDirectMention())
 })
 
+test('Message.isAuthedTeam()', t => {
+  let msg = new Message('event', {
+    team_id: 'team_id1',
+    authed_teams: ['team_id1', 'team_id2']
+  })
+
+  t.true(msg.isAuthedTeam())
+})
+
+test('Message.isAuthedTeam() false', t => {
+  let msg = new Message('event', {
+    team_id: 'team_id1',
+    authed_teams: ['team_id2', 'team_id3']
+  })
+
+  t.false(msg.isAuthedTeam())
+})
+
+test('Message.isAuthedTeam() authed_teams missing', t => {
+  let msg = new Message('event', {
+    team_id: 'team_id1'
+  })
+
+  t.true(msg.isAuthedTeam())
+})
+
 test('Message.stripDirectMention()', t => {
   let botUserId = 'bot_user_id'
   let msg = new Message('event', {
@@ -681,12 +865,12 @@ test('Message.usersMentioned()', t => {
   let msg = new Message('event', {
     event: {
       type: 'message',
-      text: 'hi <@U1> do you know <@U2>?'
+      text: 'hi <@U1> do you know <@W2> <@T2>?'
     }
   })
 
   let users = msg.usersMentioned()
-  t.deepEqual(users, ['U1', 'U2'])
+  t.deepEqual(users, ['U1', 'W2'])
 })
 
 test('Message.usersMentioned() no users', t => {
@@ -837,4 +1021,62 @@ test('Message.linksMentioned() no links', t => {
 
   let links = msg.linksMentioned()
   t.deepEqual(links, [])
+})
+
+test('Message.attachResponse()', t => {
+  let clock = sinon.useFakeTimers()
+
+  let res = fixtures.getMockRes()
+  let msg = new Message('event', { event: { type: 'message', text: 'hi' } })
+  let sendStub = sinon.stub(res, 'send')
+
+  msg.attachResponse(res, 2)
+  t.is(msg._response, res)
+  t.truthy(msg._responseTimeout)
+
+  clock.tick(1)
+  t.true(sendStub.notCalled)
+
+  clock.tick(2)
+  t.true(sendStub.calledOnce)
+  t.falsy(msg._response)
+  t.falsy(msg._responseTimeout)
+
+  clock.restore()
+})
+
+test('Message.clearResponse()', t => {
+  let clock = sinon.useFakeTimers()
+
+  let res = fixtures.getMockRes()
+  let msg = new Message('event', { event: { type: 'message', text: 'hi' } })
+  let sendStub = sinon.stub(res, 'send')
+  let clearTimeoutStub = sinon.stub(msg, 'clearTimeout')
+
+  msg.attachResponse(res, 2)
+  t.is(msg._response, res)
+  t.truthy(msg._responseTimeout)
+  let returnedResponse = msg.clearResponse()
+  t.is(returnedResponse, res)
+  t.falsy(msg._response)
+  t.falsy(msg._responseTimeout)
+  t.true(clearTimeoutStub.calledOnce)
+
+  clock.tick(4)
+  t.true(sendStub.notCalled)
+
+  clock.restore()
+})
+
+test('Message.clearResponse() clear', t => {
+  let res = fixtures.getMockRes()
+  let msg = new Message('event', { event: { type: 'message', text: 'hi' } })
+  let sendStub = sinon.stub(res, 'send')
+  let clearTimeoutStub = sinon.stub(msg, 'clearTimeout')
+
+  msg.attachResponse(res, 2)
+  let returnedResponse = msg.clearResponse({ close: true })
+  t.is(returnedResponse, res)
+  t.true(clearTimeoutStub.calledOnce)
+  t.true(sendStub.calledOnce)
 })
