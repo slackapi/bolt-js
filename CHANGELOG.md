@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3 (2017-04-11)
+
+- Added support for dynamic [Message Menu](https://medium.com/slack-developer-blog/build-an-interactive-slack-app-with-message-menus-1fb2c6298308) options calls through `slapp.options(callback_id)`
+
 ## v2.2.1 (2017-02-11)
 
 - Fixed bug where user Ids beginning with `W` were not recognized by `usersMentioned()`
