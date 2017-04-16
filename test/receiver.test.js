@@ -75,7 +75,7 @@ test('Receiver.emitHandler() w/ debug', t => {
   let receiver = new Receiver({
     debug: true
   })
-  let msg = getMockMessage()
+  let msg = getMockEventMessage()
   let res = fixtures.getMockRes()
 
   let emitStub = sinon.stub(receiver, 'emit')
@@ -89,7 +89,7 @@ test('Receiver.emitHandler() w/ debug', t => {
 
 test('Receiver.emitHandler() w/o debug', t => {
   let receiver = new Receiver()
-  let msg = getMockMessage()
+  let msg = getMockEventMessage()
   let res = fixtures.getMockRes()
 
   let emitStub = sinon.stub(receiver, 'emit')
@@ -103,7 +103,7 @@ test('Receiver.emitHandler() w/o debug', t => {
 
 test('Receiver.emitHandler() attachResponse', t => {
   let receiver = new Receiver()
-  let msg = getMockMessage()
+  let msg = getMockEventMessage()
   let res = fixtures.getMockRes()
 
   msg.response = res
@@ -129,11 +129,71 @@ test('Receiver.attachResponse()', t => {
   t.true(attachStub.calledOnce)
 })
 
-function getMockMessage () {
+test('Receiver.receiveEvent()', t => {
+  let receiver = new Receiver()
+  let msg = getMockEventMessage()
+  let emitStub = sinon.stub(receiver, 'emit')
+
+  receiver.receiveEvent(msg.body)
+
+  const emitted = emitStub.firstCall.args[1]
+
+  t.true(emitStub.calledOnce)
+  t.is(emitted.type, 'event')
+  t.deepEqual(emitted.body, msg.body)
+  t.deepEqual(emitted.meta, msg.meta)
+})
+
+test('Receiver.receiveCommand()', t => {
+  let receiver = new Receiver()
+  let msg = getMockCommandMessage()
+  let emitStub = sinon.stub(receiver, 'emit')
+
+  receiver.receiveCommand(msg.body)
+
+  const emitted = emitStub.firstCall.args[1]
+
+  t.true(emitStub.calledOnce)
+  t.is(emitted.type, 'command')
+  t.deepEqual(emitted.body, msg.body)
+  t.deepEqual(emitted.meta, msg.meta)
+})
+
+test('Receiver.receiveAction()', t => {
+  let receiver = new Receiver()
+  let msg = getMockInteractiveMessage()
+  let emitStub = sinon.stub(receiver, 'emit')
+
+  receiver.receiveAction(msg.body)
+
+  const emitted = emitStub.firstCall.args[1]
+
+  t.true(emitStub.calledOnce)
+  t.is(emitted.type, 'action')
+  t.deepEqual(emitted.body, msg.body)
+  t.deepEqual(emitted.meta, msg.meta)
+})
+
+test('Receiver.receiveOption()', t => {
+  let receiver = new Receiver()
+  let msg = getMockInteractiveMessage()
+  let emitStub = sinon.stub(receiver, 'emit')
+
+  receiver.receiveOptions(msg.body)
+
+  const emitted = emitStub.firstCall.args[1]
+
+  t.true(emitStub.calledOnce)
+  t.is(emitted.type, 'options')
+  t.deepEqual(emitted.body, msg.body)
+  t.deepEqual(emitted.meta, msg.meta)
+})
+
+function getMockEventMessage () {
   return {
     type: 'event',
     body: {
-      token: 'token',
+      token: 'verify_token',
       event: {
         user: 'user_id',
         bot_id: 'bot_id',
@@ -145,6 +205,48 @@ function getMockMessage () {
       verify_token: 'verify_token',
       user_id: 'user_id',
       bot_id: 'bot_id',
+      channel_id: 'channel_id',
+      team_id: 'team_id'
+    }
+  }
+}
+
+function getMockCommandMessage () {
+  return {
+    type: 'command',
+    body: {
+      token: 'verify_token',
+      team_id: 'team_id',
+      channel_id: 'channel_id',
+      user_id: 'user_id'
+    },
+    meta: {
+      verify_token: 'verify_token',
+      user_id: 'user_id',
+      channel_id: 'channel_id',
+      team_id: 'team_id'
+    }
+  }
+}
+
+function getMockInteractiveMessage () {
+  return {
+    type: 'action',
+    body: {
+      token: 'verify_token',
+      user: {
+        id: 'user_id'
+      },
+      channel: {
+        id: 'channel_id'
+      },
+      team: {
+        id: 'team_id'
+      }
+    },
+    meta: {
+      verify_token: 'verify_token',
+      user_id: 'user_id',
       channel_id: 'channel_id',
       team_id: 'team_id'
     }

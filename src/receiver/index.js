@@ -119,5 +119,27 @@ module.exports = class Receiver extends EventEmitter {
     msg.attachResponse(response, timeout)
   }
 
+  receiveHandler (message) {
+    let msg = new Message(message.type, message.body, message.meta)
+
+    this.emit('message', msg)
+  }
+
+  receiveEvent (event) {
+    this.receiveHandler(ParseEvent.slappData(event))
+  }
+
+  receiveCommand (command) {
+    this.receiveHandler(ParseCommand.slappData(command))
+  }
+
+  receiveAction (action) {
+    this.receiveHandler(ParseAction.slappData(action))
+  }
+
+  receiveOptions (option) {
+    this.receiveHandler(ParseOptions.slappData(option))
+  }
+
 }
 

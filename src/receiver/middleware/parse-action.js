@@ -2,7 +2,9 @@
 
 const bodyParser = require('body-parser')
 
-module.exports = () => {
+let parse
+
+module.exports = parse = () => {
   return [
     bodyParser.urlencoded({extended: true}),
     bodyParser.text({type: '*/*'}),
@@ -19,21 +21,26 @@ module.exports = () => {
         return res.send('Error parsing payload')
       }
 
-      req.slapp = {
-        type: 'action',
-        body: body,
-        meta: {
-          verify_token: body.token,
-          user_id: body.user.id,
-          channel_id: body.channel.id,
-          team_id: body.team.id
-        },
-        // Message actions may be responded to directly within 3000ms
-        response: res,
-        responseTimeout: 2500
-      }
+      req.slapp = parse.slappData(body)
+
+      // Message actions may be responded to directly within 3000ms
+      req.slapp.response = res
+      req.slapp.responseTimeout = 2500
 
       next()
     }
   ]
+}
+
+parse.slappData = body => {
+  return {
+    type: 'action',
+    body: body,
+    meta: {
+      verify_token: body.token,
+      user_id: body.user && body.user.id,
+      channel_id: body.channel && body.channel.id,
+      team_id: body.team && body.team.id
+    }
+  }
 }

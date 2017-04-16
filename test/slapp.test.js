@@ -97,6 +97,42 @@ test('Slapp.attachToExpress()', t => {
   t.true(stub.calledOnce)
 })
 
+test('Slapp.receiveEvent()', t => {
+  let app = new Slapp({ context })
+  let stub = sinon.stub(app.receiver, 'emit')
+
+  app.receiveEvent({})
+
+  t.true(stub.calledOnce)
+})
+
+test('Slapp.receiveCommand()', t => {
+  let app = new Slapp({ context })
+  let stub = sinon.stub(app.receiver, 'emit')
+
+  app.receiveCommand({})
+
+  t.true(stub.calledOnce)
+})
+
+test('Slapp.receiveAction()', t => {
+  let app = new Slapp({ context })
+  let stub = sinon.stub(app.receiver, 'emit')
+
+  app.receiveAction({})
+
+  t.true(stub.calledOnce)
+})
+
+test('Slapp.receiveOptions()', t => {
+  let app = new Slapp({ context })
+  let stub = sinon.stub(app.receiver, 'emit')
+
+  app.receiveOptions({})
+
+  t.true(stub.calledOnce)
+})
+
 test('Slapp.route()', t => {
   let app = new Slapp({ context })
   let key = 'routeKey'

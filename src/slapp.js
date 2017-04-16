@@ -299,6 +299,58 @@ class Slapp extends EventEmitter {
   }
 
   /**
+   * Receive a new event from slack, this is useful if you are not using express to handle events from slack
+   *
+   * ##### Parameters
+   * - `event` string - JSON event payload from slack
+   *
+   * @param {Object} event - event payload from slack
+   */
+
+  receiveEvent (event) {
+    return this.receiver.receiveEvent(event)
+  }
+
+  /**
+   * Receive a new slash command from slack, this is useful if you are not using express to handle commands from slack
+   *
+   * ##### Parameters
+   * - `command` string - JSON slash command payload from slack
+   *
+   * @param {Object} command - slash command payload from slack
+   */
+
+  receiveCommand (command) {
+    return this.receiver.receiveCommand(command)
+  }
+
+  /**
+   * Receive a new interactive button action from slack, this is useful if you are not using express to handle actions from slack
+   *
+   * ##### Parameters
+   * - `action` string - JSON button action payload from slack
+   *
+   * @param {Object} action - button action payload from slack
+   */
+
+  receiveAction (action) {
+    return this.receiver.receiveAction(action)
+  }
+
+  /**
+   * Receive a new interactive menu load from slack, this is useful if you are not using express to handle options from slack
+   *
+   * ##### Parameters
+   * - `option` string - JSON option payload from slack
+   *
+   * @param {Object} option - option payload from slack
+   */
+
+  receiveOptions (option) {
+    return this.receiver.receiveOptions(option)
+  }
+
+  /**
    * Register a new function route
    *
    * ##### Parameters

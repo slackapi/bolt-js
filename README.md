@@ -390,6 +390,10 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 
   - [Slapp.use()](#slappusefnfunction)
   - [Slapp.attachToExpress()](#slappattachtoexpressappobjectoptsobject)
+  - [Slapp.receiveEvent()](#slappreceiveeventeventobject)
+  - [Slapp.receiveCommand()](#slappreceivecommandcommandobject)
+  - [Slapp.receiveAction()](#slappreceiveactionactionobject)
+  - [Slapp.receiveOptions()](#slappreceiveoptionsoptionobject)
   - [Slapp.route()](#slapproutefnkeystringfnfunction)
   - [Slapp.getRoute()](#slappgetroutefnkeystring)
   - [Slapp.match()](#slappmatchfnfunction)
@@ -453,6 +457,34 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
     event: true
   })
 ```
+
+## Slapp.receiveEvent(event:Object)
+
+  Receive a new event from slack, this is useful if you are not using express to handle events from slack
+  
+#### Parameters
+  - `event` string - JSON event payload from slack
+
+## Slapp.receiveCommand(command:Object)
+
+  Receive a new slash command from slack, this is useful if you are not using express to handle commands from slack
+  
+#### Parameters
+  - `command` string - JSON slash command payload from slack
+
+## Slapp.receiveAction(action:Object)
+
+  Receive a new interactive button action from slack, this is useful if you are not using express to handle actions from slack
+  
+#### Parameters
+  - `action` string - JSON button action payload from slack
+
+## Slapp.receiveOptions(option:Object)
+
+  Receive a new interactive menu load from slack, this is useful if you are not using express to handle options from slack
+  
+#### Parameters
+  - `option` string - JSON option payload from slack
 
 ## Slapp.route(fnKey:string, fn:function)
 

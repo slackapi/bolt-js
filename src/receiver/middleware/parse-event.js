@@ -2,7 +2,9 @@
 
 const bodyParser = require('body-parser')
 
-module.exports = () => {
+let parse
+
+module.exports = parse = () => {
   return [
     bodyParser.json(),
     function handleChallenge (req, res, next) {
@@ -18,22 +20,27 @@ module.exports = () => {
     },
     function parseEvent (req, res, next) {
       let body = req.body || {}
-      let event = body.event || {}
-      let channelId = event.channel || (event.item && event.item.channel)
 
-      req.slapp = {
-        type: 'event',
-        body: body,
-        meta: {
-          verify_token: body.token,
-          user_id: event.user,
-          bot_id: event.bot_id,
-          channel_id: channelId,
-          team_id: body.team_id
-        }
-      }
+      req.slapp = parse.slappData(body)
 
       next()
     }
   ]
+}
+
+parse.slappData = (body) => {
+  let event = body.event || {}
+  let channelId = event.channel || (event.item && event.item.channel)
+
+  return {
+    type: 'event',
+    body: body,
+    meta: {
+      verify_token: body.token,
+      user_id: event.user,
+      bot_id: event.bot_id,
+      channel_id: channelId,
+      team_id: body.team_id
+    }
+  }
 }
