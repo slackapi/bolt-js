@@ -128,13 +128,40 @@ test('Message.route()', t => {
   t.true(setStub.calledOnce)
 })
 
+test('Message.route() with expiration: 0', t => {
+  t.plan(5)
+
+  let msg = new Message()
+  msg.conversation_id = 'beepboop'
+  let fnKey = 'next:route'
+  let state = {
+    beep: 'boop'
+  }
+  let app = {
+    convoStore: {
+      set: () => {}
+    }
+  }
+  let setStub = sinon.stub(app.convoStore, 'set', (key, data) => {
+    t.is(key, msg.conversation_id)
+    t.is(data.fnKey, fnKey)
+    t.is(data.state, state)
+    t.is(data.expiration, null)
+  })
+
+  msg._slapp = app
+  msg.route(fnKey, state, 0)
+  t.true(setStub.calledOnce)
+})
+
 test('Message.route() defaults', t => {
-  t.plan(6)
+  t.plan(7)
 
   let msg = new Message()
   msg.conversation_id = 'beepboop'
   let fnKey = 'next:route'
   let app = {
+    defaultExpiration: 1,
     convoStore: {
       set: () => {}
     }
@@ -145,6 +172,7 @@ test('Message.route() defaults', t => {
     t.deepEqual(data.state, {})
     t.is(typeof data.expiration, 'number')
     t.true(data.expiration > Date.now())
+    t.true(data.expiration < (Date.now() + 2000))
   })
 
   msg._slapp = app
