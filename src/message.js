@@ -252,19 +252,12 @@ class Message {
   }
 
   /**
-<<<<<<< HEAD
-   * Respond to a Slash command or interactive message action with a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
-   * payload. If `respond` is called within 2500ms of the original request (hard limit is 3000ms, consider 500ms as a buffer), the original
-   * request will be responded to instead of using the `response_url`. This will keep the action button spinner in sync with an awaiting
-   * update and is about 25% more responsive when tested.
-=======
    * Respond to a Slash command, interactive message action, or interactive message options request.
    *
    * Slash commands and message actions responses should be passed a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
    * payload. If `respond` is called within 3000ms (2500ms actually with a 500ms buffer) of the original request,
    * the original request will be responded to instead or using the `response_url`. This will keep the
    * action button spinner in sync with an awaiting update and is about 25% more responsive when tested.
->>>>>>> Support for interactive message menus
    *
    * `input` options are the same as [`say`](#messagesay)
    *
