@@ -119,27 +119,35 @@ module.exports = class Receiver extends EventEmitter {
     msg.attachResponse(response, timeout)
   }
 
-  receiveHandler (message) {
-    let msg = new Message(message.type, message.body, message.meta)
+  receiveHandler (slappData, callback) {
+    let req = { slapp: slappData }
 
-    this.emit('message', msg)
+    this.context(req, null, err => {
+      if (err) {
+        return callback(err)
+      }
+
+      let message = req.slapp
+      let msg = new Message(message.type, message.body, message.meta)
+
+      this.emit('message', msg)
+    })
   }
 
-  receiveEvent (event) {
-    this.receiveHandler(ParseEvent.slappData(event))
+  receiveEvent (event, callback) {
+    this.receiveHandler(ParseEvent.slappData(event), callback)
   }
 
-  receiveCommand (command) {
-    this.receiveHandler(ParseCommand.slappData(command))
+  receiveCommand (command, callback) {
+    this.receiveHandler(ParseCommand.slappData(command), callback)
   }
 
-  receiveAction (action) {
-    this.receiveHandler(ParseAction.slappData(action))
+  receiveAction (action, callback) {
+    this.receiveHandler(ParseAction.slappData(action), callback)
   }
 
-  receiveOptions (option) {
-    this.receiveHandler(ParseOptions.slappData(option))
+  receiveOptions (option, callback) {
+    this.receiveHandler(ParseOptions.slappData(option), callback)
   }
-
 }
 
