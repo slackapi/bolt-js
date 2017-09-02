@@ -352,16 +352,16 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 ![Conversation Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-doit.gif)
 
 ## Logging
-You can pass in your own custom logger instead of using the built-in logger. A custom one would implement:
+You can pass in your own custom logger instead of using the built-in logger. A custom logger would implement:
 
 ```js
 (app, opts) => {
   app
     .on('info', (msg) => {
-
+      ...
     })
     .on('error', (err) => {
-
+      ...
     })
 }
 ```
