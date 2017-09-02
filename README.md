@@ -351,7 +351,7 @@ slapp.route('handleDoitConfirmation', (msg, state) => {
 
 ![Conversation Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-doit.gif)
 
-## Logging
+## Custom Logging
 You can pass in your own custom logger instead of using the built-in logger. A custom logger would implement:
 
 ```js
@@ -365,7 +365,7 @@ You can pass in your own custom logger instead of using the built-in logger. A c
     })
 }
 ```
-The `msg` is the same as the Message type.
+The `msg` is the same as the Message type. `opts` includes the `opts.colors` passed into Slapp initially.
 
 # API
 
@@ -382,7 +382,7 @@ The `msg` is the same as the Message type.
   - `opts.convo_store` Implementation of ConversationStore, defaults to memory
   - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
   - `opts.log` defaults to `true`, `false` to disable logging
-  - `opts.logger` Implementation of a logger. Defaults to built-in Slapp command line logger.
+  - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
   - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
   - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
   - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
