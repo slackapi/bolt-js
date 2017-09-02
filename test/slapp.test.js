@@ -1025,6 +1025,16 @@ test.cb('Slapp.options() w/ regex criteria', t => {
     })
 })
 
+
+test('Slapp default logger', t => {
+  let app = new Slapp({ context })
+
+  app.init()
+
+  t.is(app.listenerCount('info'), 1)
+  t.is(app.listenerCount('error'), 1)
+})
+
 test('Slapp custom logger', t => {
   const logger = (app) => {
     app
