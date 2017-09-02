@@ -5,7 +5,6 @@ const slack = require('slack')
 const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
-const Formatter = require('./message-formatter')
 const logger = require('./logger')
 const HOUR = 60 * 60
 
@@ -42,6 +41,7 @@ class Slapp extends EventEmitter {
       convo_store: null,
       context: null,
       log: true,
+      logger,
       colors: !!process.stdout.isTTY,
       ignoreSelf: true,
       ignoreBots: false,
@@ -60,17 +60,15 @@ class Slapp extends EventEmitter {
     this.verify_token = opts.verify_token
     this.log = opts.log
     this.colors = opts.colors
-    this.formatter = Formatter({
-      colors: opts.colors
-    })
+    this.logger = opts.logger
 
     this.ignoreSelf = opts.ignoreSelf
     this.ignoreBots = opts.ignoreBots
     this.defaultExpiration = opts.defaultExpiration
 
     // If convo_store is a string, initialize that type of conversation store
-    // If it's not a sting and it is defined, assume it is an impmementation of
-    // a converation store
+    // If it's not a sting and it is defined, assume it is an implementation of
+    // a conversation store
     if (!opts.convo_store || typeof opts.convo_store === 'string') {
       this.convoStore = conversationStore({ type: opts.convo_store })
     } else {
@@ -93,7 +91,7 @@ class Slapp extends EventEmitter {
   init () {
     // attach default logging if enabled
     if (this.log) {
-      logger(this, {
+      this.logger(this, {
         colors: this.colors
       })
     }
@@ -212,7 +210,7 @@ class Slapp extends EventEmitter {
       self.emit('error', err)
     }
 
-    this.emit('info', this.formatter(msg))
+    this.emit('info', msg)
     msg.attachSlapp(self)
     let idx = 0
 
