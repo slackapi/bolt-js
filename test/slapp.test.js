@@ -1025,7 +1025,6 @@ test.cb('Slapp.options() w/ regex criteria', t => {
     })
 })
 
-
 test('Slapp default logger', t => {
   let app = new Slapp({ context })
 
