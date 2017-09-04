@@ -1025,6 +1025,81 @@ test.cb('Slapp.options() w/ regex criteria', t => {
     })
 })
 
+test('Slapp default logger', t => {
+  let app = new Slapp({ context })
+
+  app.init()
+
+  t.is(app.listenerCount('info'), 1)
+  t.is(app.listenerCount('error'), 1)
+})
+
+test('Slapp custom logger', t => {
+  const logger = (app) => {
+    app
+      .on('info', () => {})
+      .on('error', () => {})
+  }
+
+  let app = new Slapp({
+    logger,
+    context
+  })
+
+  app.init()
+
+  t.is(app.listenerCount('info'), 1)
+  t.is(app.listenerCount('error'), 1)
+})
+
+test.cb('Slapp custom logger w/ a message', t => {
+  t.plan(1)
+
+  let app = new Slapp({
+    logger: (app) => {
+      app
+        .on('info', (msg) => {
+          t.true(true)
+          t.end()
+        })
+    },
+    context
+  })
+
+  app.init()
+
+  let message = new Message('event', {
+    event: {
+      type: 'message',
+      text: 'beep boop'
+    }
+  }, meta)
+
+  app
+    ._handle(message)
+})
+
+test.cb('Slapp custom logger w/ a bad message', t => {
+  t.plan(1)
+
+  let app = new Slapp({
+    logger: (app) => {
+      app
+        .on('error', () => {
+          t.true(true)
+          t.end()
+        })
+    },
+    context
+  })
+
+  app.init()
+
+  let message = new Message('event', {}, {})
+
+  app._handle(message)
+})
+
 // Test context fn
 function context (req, res, next) {
   next()
