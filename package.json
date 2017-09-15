@@ -35,6 +35,7 @@
     "chalk": "^1.1.3",
     "deap": "^1.0.0",
     "js-queue": "^1.0.0",
+    "path-to-regexp": "^2.0.0",
     "request": "^2.73.0",
     "slack": "^8.2.0"
   },

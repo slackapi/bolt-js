@@ -6,6 +6,7 @@ const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
 const logger = require('./logger')
+const pathToRegexp = require('path-to-regexp')
 const HOUR = 60 * 60
 
 /**
@@ -502,8 +503,21 @@ class Slapp extends EventEmitter {
    * (optional) for menu options will successfully match if any one of the values
    * match the criteria.
    *
+   * The `callbackId` can optionally accept a URL path like pattern matcher that can be
+   * used to match as well as extract values. For example if `callbackId` is `/myaction/:type/:id`,
+   * it _will_ match on `/myaction/a-great-action/abcd1234`. And the resulting `Message` object will
+   * include a `meta.params` object that contains the extracted variables. For example,
+   * `msg.meta.params.type` ==> `a-great-action` and `msg.meta.params.id` ==> `abcd1234`. This allows
+   * you to match on dynamic callbackIds while passing data.
+   *
+   * Note, `callback_id` values must be properly encoded. We suggest you use `encodeURIComponent` and `decodeURIComponent`.
+   *
+   * The underlying module used for matching
+   * is [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) where there are a lot of examples.
+   *
+   *
    * ##### Parameters
-   * - `callbackId` string
+   * - `callbackIdPath` string - may be a simple string or a URL path matcher
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
    * - `actionValueCriteria` string or RegExp - the value of the action [optional]
    * - `callback` function - `(msg, value) => {}` - value may be a string or array of strings
@@ -524,6 +538,8 @@ class Slapp extends EventEmitter {
    *     slapp.action('dinner_callback', 'drink', (msg, val) => {}
    *     // match with regex
    *     slapp.action('dinner_callback', /^drink$/, /^b[e]{2}r$/, (msg, val) => {}
+   *     // callback_id matcher
+   *     slapp.action('/dinner_callback/:drink', (msg, val) => {}
    *
    * Example button action `msg.body` object:
    *
@@ -656,7 +672,7 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  action (callbackId, actionNameCriteria, actionValueCriteria, callback) {
+  action (callbackIdPath, actionNameCriteria, actionValueCriteria, callback) {
     if (typeof actionValueCriteria === 'function') {
       callback = actionValueCriteria
       actionValueCriteria = /.*/
@@ -676,26 +692,37 @@ class Slapp extends EventEmitter {
       actionValueCriteria = new RegExp(`^${actionValueCriteria}$`, 'i')
     }
 
+    var keys = []
+    var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
+
     let fn = (msg) => {
-      if (msg.type === 'action' && msg.body.actions && msg.body.callback_id === callbackId) {
-        // Don't know how to handle multiple actions in the area. As far as this writing, this isn't ever
-        // expected to happen. Best way to handle this uncertainty is to loop until we find a match and then stop
-        for (let i = 0; i < msg.body.actions.length; i++) {
-          let action = msg.body.actions[i]
-          if (actionNameCriteria.test(action.name)) {
-            // test for menu options. There could be multiple options returned so attempt to match
-            // on any of them and if any one matches, we'll consider this a match.
-            if (Array.isArray(action.selected_options)) {
-              if (action.selected_options.find(option => actionValueCriteria.test(option.value))) {
-                callback(msg, action.selected_options.map(it => it.value))
-                return true
-              }
-            }
-            // test for message actions
-            if (actionValueCriteria.test(action.value)) {
-              callback(msg, action.value)
+      if (msg.type !== 'action' || !msg.body.actions) return
+      let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+      if (!callbackIdMatch) return
+
+      let params = {}
+      keys.forEach((key, i) => {
+        params[key.name] = callbackIdMatch[i + 1]
+      })
+      msg.meta.params = params
+
+      // Don't know how to handle multiple actions in the area. As far as this writing, this isn't ever
+      // expected to happen. Best way to handle this uncertainty is to loop until we find a match and then stop
+      for (let i = 0; i < msg.body.actions.length; i++) {
+        let action = msg.body.actions[i]
+        if (actionNameCriteria.test(action.name)) {
+          // test for menu options. There could be multiple options returned so attempt to match
+          // on any of them and if any one matches, we'll consider this a match.
+          if (Array.isArray(action.selected_options)) {
+            if (action.selected_options.find(option => actionValueCriteria.test(option.value))) {
+              callback(msg, action.selected_options.map(it => it.value))
               return true
             }
+          }
+          // test for message actions
+          if (actionValueCriteria.test(action.value)) {
+            callback(msg, action.value)
+            return true
           }
         }
       }
@@ -707,8 +734,10 @@ class Slapp extends EventEmitter {
   /**
    * Register a new interactive message options handler
    *
+   * `options` accepts a `callbackIdPath` like `action`. See `action` for details.
+   *
    * ##### Parameters
-   * - `callbackId` string
+   * - `callbackIdPath` string - may be a simple string or a URL path matcher
    * - `actionNameCriteria` string or RegExp - the name of the action [optional]
    * - `actionValueCriteria` string or RegExp - the value of the action [optional]
    * - `callback` function - `(msg, value) => {}` - value is the current value of the option (e.g. partially typed)
@@ -730,6 +759,11 @@ class Slapp extends EventEmitter {
    * Example with RegExp matcher criteria:
    *
    *     slapp.options('my_callback', /my_n.+/, (msg, value) => {}
+   *
+   * Example with callback_id path criteria:
+   *
+   *     slapp.options('/my_callback/:id', (msg, value) => {}
+   *
    *
    *
    * Example `msg.body` object:
@@ -762,7 +796,7 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  options (callbackId, actionNameCriteria, callback) {
+  options (callbackIdPath, actionNameCriteria, callback) {
     if (typeof actionNameCriteria === 'function') {
       callback = actionNameCriteria
       actionNameCriteria = /.*/
@@ -772,12 +806,23 @@ class Slapp extends EventEmitter {
       actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
     }
 
+    var keys = []
+    var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
+
     let fn = (msg) => {
-      if (msg.type === 'options' && msg.body.callback_id === callbackId) {
-        if (actionNameCriteria.test(msg.body.name)) {
-          callback(msg, msg.body.value)
-          return true
-        }
+      if (msg.type !== 'options') return false
+      let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+      if (!callbackIdMatch) return
+
+      let params = {}
+      keys.forEach((key, i) => {
+        params[key.name] = callbackIdMatch[i + 1]
+      })
+      msg.meta.params = params
+
+      if (actionNameCriteria.test(msg.body.name)) {
+        callback(msg, msg.body.value)
+        return true
       }
     }
 

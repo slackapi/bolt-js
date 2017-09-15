@@ -441,6 +441,45 @@ test.cb('Slapp.command() w/ non-matching regex criteria', t => {
     })
 })
 
+test.cb('Slapp.action() non-matching no actions', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    callback_id: 'my_callback',
+    command: 'test'
+  }, meta)
+
+  app
+    .action(message.body.callback_id, (msg) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.action() non-matching criteria', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep' }
+    ],
+    callback_id: 'my_callback',
+    command: 'test'
+  }, meta)
+
+  app
+    .action('mismatch', (msg) => { })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
 test.cb('Slapp.action() w/o criteria', t => {
   t.plan(3)
 
@@ -594,6 +633,60 @@ test.cb('Slapp.action() w/ selected_options no matches', t => {
     ._handle(message, (err, handled) => {
       t.is(err, null)
       t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.action() w/ callback URL', t => {
+  t.plan(5)
+
+  let app = new Slapp({ context })
+  let callbackIdCriteria = '/account/:one/:two'
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep', value: 'boop' }
+    ],
+    callback_id: '/account/foo/bar',
+    command: 'test'
+  }, meta)
+
+  app
+    .action(callbackIdCriteria, (msg) => {
+      t.deepEqual(msg, message)
+      t.is(msg.meta.params.one, 'foo')
+      t.is(msg.meta.params.two, 'bar')
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.action() w/ callback URL with large encoded value', t => {
+  t.plan(5)
+
+  let app = new Slapp({ context })
+  let longValue = 'long with spaces ?/:¡™£¢∞§¶•ªº–:{"x:":"y"}'
+  let longValueEncoded = encodeURIComponent(longValue)
+  let callbackIdCriteria = '/account/:one/:two'
+  let message = new Message('action', {
+    actions: [
+      { name: 'beep', value: 'boop' }
+    ],
+    callback_id: `/account/foo/${longValueEncoded}`,
+    command: 'test'
+  }, meta)
+
+  app
+    .action(callbackIdCriteria, (msg) => {
+      t.deepEqual(msg, message)
+      t.is(msg.meta.params.one, 'foo')
+      t.is(msg.meta.params.two, longValueEncoded)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
       t.end()
     })
 })
@@ -1021,6 +1114,47 @@ test.cb('Slapp.options() w/ regex criteria', t => {
     ._handle(message, (err, handled) => {
       t.is(err, null)
       t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.options() w/ url style callback criteria', t => {
+  t.plan(4)
+
+  let app = new Slapp({ context })
+  let message = new Message('options', {
+    callback_id: '/my_callback/1234'
+  }, meta)
+
+  app
+    .options('/my_callback/:id', (msg, val) => {
+      t.deepEqual(msg, message)
+      t.is(msg.meta.params.id, '1234')
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.options() non matching criteria', t => {
+  t.plan(4)
+
+  let app = new Slapp({ context })
+  let message = new Message('options', {
+    callback_id: '/my_callback'
+  }, meta)
+
+  app
+    .options('/your_callback', (msg, val) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+    })
+    ._handle(new Message('', {}, meta), (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
       t.end()
     })
 })
