@@ -1159,6 +1159,70 @@ test.cb('Slapp.options() non matching criteria', t => {
     })
 })
 
+test.cb('Slapp.dialog()', t => {
+  t.plan(5)
+
+  let app = new Slapp({ context })
+  let submission = {
+    question: 'answer',
+    another: 'another'
+  }
+  let message = new Message('action', {
+    type: 'dialog_submission',
+    submission: submission,
+    callback_id: '/dialog/12345'
+  }, meta)
+
+  app
+    .dialog('/dialog/:id', (msg, theSubmission) => {
+      t.deepEqual(msg, message)
+      t.deepEqual(submission, theSubmission)
+      t.is('12345', msg.meta.params.id)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialog() no match', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    type: 'dialog_submission',
+    submission: {},
+    callback_id: '/xxxx/xxxx'
+  }, meta)
+
+  app
+    .dialog('/dialog/:id', (msg, theSubmission) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialog() not action, not dialog_submission', t => {
+  t.plan(4)
+
+  let app = new Slapp({ context })
+
+  app
+    .dialog('/dialog/:id', (msg, theSubmission) => { })
+    ._handle(new Message('', {}, meta), (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+    })
+    ._handle(new Message('action', {}, meta), (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
 test('Slapp default logger', t => {
   let app = new Slapp({ context })
 
