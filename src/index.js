@@ -10,6 +10,7 @@ const Slapp = require('./slapp')
  * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
  * - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
  * - `opts.log` defaults to `true`, `false` to disable logging
+ * - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
  * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
  * - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
  * - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
