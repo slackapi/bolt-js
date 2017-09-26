@@ -37,7 +37,7 @@
     "js-queue": "^1.0.0",
     "path-to-regexp": "^2.0.0",
     "request": "^2.73.0",
-    "slack": "^8.4.2"
+    "slack": "^9.0.1"
   },
   "devDependencies": {
     "ava": "^0.15.2",
