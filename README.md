@@ -382,7 +382,6 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - `opts.convo_store` Implementation of ConversationStore, defaults to memory
   - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
   - `opts.log` defaults to `true`, `false` to disable logging
-  - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
   - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
   - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
   - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
@@ -413,7 +412,9 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - [Slapp.message()](#slappmessagecriteriastringtypefilterstringarray)
   - [Slapp.event()](#slappeventcriteriastringregexpcallbackfunction)
   - [Slapp.action()](#slappactioncallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
+  - [Slapp.options()](#slappoptionscallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
+  - [Slapp.dialog()](#slappdialogcallbackidstringcallbackfunction)
 
 ## Slapp.use(fn:function)
 
@@ -611,13 +612,28 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
 
 ## Slapp.action(callbackId:string, actionNameCriteria:string|RegExp, actionValueCriteria:string|RegExp, callback:function)
 
-  Register a new action handler for an actionNameCriteria
+  Register a new handler for button or menu actions. The actionValueCriteria
+  (optional) for menu options will successfully match if any one of the values
+  match the criteria.
+  
+  The `callbackId` can optionally accept a URL path like pattern matcher that can be
+  used to match as well as extract values. For example if `callbackId` is `/myaction/:type/:id`,
+  it _will_ match on `/myaction/a-great-action/abcd1234`. And the resulting `Message` object will
+  include a `meta.params` object that contains the extracted variables. For example,
+  `msg.meta.params.type` ==> `a-great-action` and `msg.meta.params.id` ==> `abcd1234`. This allows
+  you to match on dynamic callbackIds while passing data.
+  
+  Note, `callback_id` values must be properly encoded. We suggest you use `encodeURIComponent` and `decodeURIComponent`.
+  
+  The underlying module used for matching
+  is [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) where there are a lot of examples.
+  
   
 #### Parameters
-  - `callbackId` string
+  - `callbackIdPath` string - may be a simple string or a URL path matcher
   - `actionNameCriteria` string or RegExp - the name of the action [optional]
   - `actionValueCriteria` string or RegExp - the value of the action [optional]
-  - `callback` function - `(msg, text, [match1], [match2]...) => {}`
+  - `callback` function - `(msg, value) => {}` - value may be a string or array of strings
   
   
 #### Returns
@@ -636,10 +652,12 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   slapp.action('dinner_callback', 'drink', (msg, val) => {}
   // match with regex
   slapp.action('dinner_callback', /^drink$/, /^b[e]{2}r$/, (msg, val) => {}
+  // callback_id matcher
+  slapp.action('/dinner_callback/:drink', (msg, val) => {}
 ```
 
   
-  Example `msg.body` object:
+  Example button action `msg.body` object:
   
 ```js
   {
@@ -708,6 +726,143 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   }
 ```
 
+  
+  
+  Example menu action `msg.body` object:
+  
+```js
+  {
+    "actions": [
+      {
+        "name": "winners_list",
+        "selected_options": [
+          {
+            "value": "U061F1ZUR"
+          }
+        ]
+      }
+    ],
+      "callback_id": "select_simple_1234",
+        "team": {
+      "id": "T012AB0A1",
+        "domain": "pocket-calculator"
+    },
+    "channel": {
+      "id": "C012AB3CD",
+        "name": "general"
+    },
+    "user": {
+      "id": "U012A1BCD",
+        "name": "musik"
+    },
+    "action_ts": "1481579588.685999",
+      "message_ts": "1481579582.000003",
+        "attachment_id": "1",
+          "token": "verification_token_string",
+            "original_message": {
+      "text": "It's time to nominate the channel of the week",
+        "bot_id": "B08BCU62D",
+          "attachments": [
+            {
+              "callback_id": "select_simple_1234",
+              "fallback": "Upgrade your Slack client to use messages like these.",
+              "id": 1,
+              "color": "3AA3E3",
+              "actions": [
+                {
+                  "id": "1",
+                  "name": "channels_list",
+                  "text": "Which channel changed your life this week?",
+                  "type": "select",
+                  "data_source": "channels"
+                }
+              ]
+            }
+          ],
+            "type": "message",
+              "subtype": "bot_message",
+                "ts": "1481579582.000003"
+    },
+    "response_url": "https://hooks.slack.com/actions/T012AB0A1/1234567890/JpmK0yzoZ5eRiqfeduTBYXWQ"
+  }
+```
+
+## Slapp.options(callbackId:string, actionNameCriteria:string|RegExp, actionValueCriteria:string|RegExp, callback:function)
+
+  Register a new interactive message options handler
+  
+  `options` accepts a `callbackIdPath` like `action`. See `action` for details.
+  
+#### Parameters
+  - `callbackIdPath` string - may be a simple string or a URL path matcher
+  - `actionNameCriteria` string or RegExp - the name of the action [optional]
+  - `actionValueCriteria` string or RegExp - the value of the action [optional]
+  - `callback` function - `(msg, value) => {}` - value is the current value of the option (e.g. partially typed)
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  Example matching callback only
+  
+```js
+  slapp.options('my_callback', (msg, value) => {}
+```
+
+  
+  
+  Example with name matcher
+  
+```js
+  slapp.options('my_callback', 'my_name', (msg, value) => {}
+```
+
+  
+  
+  Example with RegExp matcher criteria:
+  
+```js
+  slapp.options('my_callback', /my_n.+/, (msg, value) => {}
+```
+
+  
+  Example with callback_id path criteria:
+  
+```js
+  slapp.options('/my_callback/:id', (msg, value) => {}
+```
+
+  
+  
+  
+  Example `msg.body` object:
+  
+```js
+  {
+      "name": "musik",
+      "value": "",
+      "callback_id": "select_remote_1234",
+      "team": {
+          "id": "T012AB0A1",
+          "domain": "pocket-calculator"
+      },
+      "channel": {
+          "id": "C012AB3CD",
+          "name": "general"
+      },
+      "user": {
+          "id": "U012A1BCD",
+          "name": "musik"
+      },
+      "action_ts": "1481670445.010908",
+      "message_ts": "1481670439.000007",
+      "attachment_id": "1",
+      "token": "verification_token_string"
+  }
+```
+
+  *
+
 ## Slapp.command(command:string, criteria:string|RegExp, callback:function)
 
   Register a new slash command handler
@@ -770,6 +925,58 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
         "user_id":"UXXXXXXXX",
         "channel_id":"DXXXXXXXX",
         "team_id":"TXXXXXXXX"
+     },
+  }
+```
+
+## Slapp.dialog(callbackId:string, callback:function)
+
+  Register a dialog submission handler for the given callback_id
+  
+#### Parameters
+  - `callbackId` string - the callback_id of the form
+  - `callback` function - `(msg, submission) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  Example;
+  
+```js
+  // "/acommand"
+  slapp.command('my_callback_id', (msg, submission) => {
+    submission.prop_name_1
+  }
+```
+
+  
+  
+  Example `msg` object:
+  
+```js
+  {
+     "type":"action",
+     "body":{
+       "type": "dialog_submission",
+       "submission": {
+         "anser": "two",
+         "feedback": "test"
+       },
+       "callback_id": "xyz",
+       "team": {
+         "id": "T1PR9DEFS",
+         "domain": "aslackdomain"
+       },
+       "user": {
+         "id": "U1ABCDEF",
+         "name": "mikebrevoort"
+       },
+       "channel": {
+         "id": "C1PR520RRR",
+         "name": "random"
+       },
+       "action_ts": "1503445940.478855"
      },
   }
 ```
@@ -870,12 +1077,29 @@ It is generally always passed as `msg`.
 
 ## Message.respond([responseUrl]:string, input:string|Object|Array, callback:function)
 
-  Respond to a Slash command or interactive message action with a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
-  payload. If `respond` is called within 2500ms of the original request (hard limit is 3000ms, consider 500ms as a buffer), the original
-  request will be responded to instead of using the `response_url`. This will keep the action button spinner in sync with an awaiting
-  update and is about 25% more responsive when tested.
+  Respond to a Slash command, interactive message action, or interactive message options request.
+  
+  Slash commands and message actions responses should be passed a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
+  payload. If `respond` is called within 3000ms (2500ms actually with a 500ms buffer) of the original request,
+  the original request will be responded to instead or using the `response_url`. This will keep the
+  action button spinner in sync with an awaiting update and is about 25% more responsive when tested.
   
   `input` options are the same as [`say`](#messagesay)
+  
+  
+  If a response to an interactive message options request then an array of options should be passed
+  like:
+  
+```js
+   {
+     "options": [
+       { "text": "value" },
+       { "text": "value" }
+     ]
+   }
+```
+
+  
   
 #### Parameters
   - `responseUrl` string - URL provided by a Slack interactive message action or slash command [optional]
