@@ -1,7 +1,7 @@
 'use strict'
 
 const EventEmitter = require('events')
-const slack = require('slack')
+const Slack = require('slack')
 const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
@@ -77,7 +77,7 @@ class Slapp extends EventEmitter {
       this.convoStore = opts.convo_store
     }
 
-    this.client = slack
+    this.client = new Slack()
     this.receiver = new Receiver(opts)
   }
 
@@ -912,6 +912,77 @@ class Slapp extends EventEmitter {
           return true
         }
       }
+    }
+
+    return this.match(fn)
+  }
+
+    /**
+   * Register a dialog submission handler for the given callback_id
+   *
+   * ##### Parameters
+   * - `callbackId` string - the callback_id of the form
+   * - `callback` function - `(msg, submission) => {}`
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * Example;
+   *
+   *     // "/acommand"
+   *     slapp.command('my_callback_id', (msg, submission) => {
+   *       submission.prop_name_1
+   *     }
+   *
+   *
+   * Example `msg` object:
+   *
+   *     {
+   *        "type":"action",
+   *        "body":{
+   *          "type": "dialog_submission",
+   *          "submission": {
+   *            "answer": "two",
+   *            "feedback": "test"
+   *          },
+   *          "callback_id": "xyz",
+   *          "team": {
+   *            "id": "T1PR9DEFS",
+   *            "domain": "aslackdomain"
+   *          },
+   *          "user": {
+   *            "id": "U1ABCDEF",
+   *            "name": "mikebrevoort"
+   *          },
+   *          "channel": {
+   *            "id": "C1PR520RRR",
+   *            "name": "random"
+   *          },
+   *          "action_ts": "1503445940.478855"
+   *        },
+   *     }
+   * @param {string} callbackId
+   * @param {function} callback
+   */
+
+  dialog (callbackIdPath, callback) {
+    var keys = []
+    var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
+
+    let fn = (msg) => {
+      if (msg.type !== 'action' || msg.body.type !== 'dialog_submission') return
+      let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+      if (!callbackIdMatch) return
+
+      let params = {}
+      keys.forEach((key, i) => {
+        params[key.name] = callbackIdMatch[i + 1]
+      })
+      msg.meta.params = params
+
+      callback(msg, msg.body.submission)
+      return true
     }
 
     return this.match(fn)

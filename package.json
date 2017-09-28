@@ -1,6 +1,6 @@
 {
   "name": "slapp",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "A module for Slack App integrations",
   "main": "src/index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "js-queue": "^1.0.0",
     "path-to-regexp": "^2.0.0",
     "request": "^2.73.0",
-    "slack": "^8.4.2"
+    "slack": "^9.0.1"
   },
   "devDependencies": {
     "ava": "^0.15.2",

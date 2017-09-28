@@ -382,7 +382,6 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - `opts.convo_store` Implementation of ConversationStore, defaults to memory
   - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
   - `opts.log` defaults to `true`, `false` to disable logging
-  - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
   - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
   - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
   - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
@@ -415,6 +414,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - [Slapp.action()](#slappactioncallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.options()](#slappoptionscallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
+  - [Slapp.dialog()](#slappdialogcallbackidstringcallbackfunction)
 
 ## Slapp.use(fn:function)
 
@@ -925,6 +925,58 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
         "user_id":"UXXXXXXXX",
         "channel_id":"DXXXXXXXX",
         "team_id":"TXXXXXXXX"
+     },
+  }
+```
+
+## Slapp.dialog(callbackId:string, callback:function)
+
+  Register a dialog submission handler for the given callback_id
+  
+#### Parameters
+  - `callbackId` string - the callback_id of the form
+  - `callback` function - `(msg, submission) => {}`
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  Example;
+  
+```js
+  // "/acommand"
+  slapp.command('my_callback_id', (msg, submission) => {
+    submission.prop_name_1
+  }
+```
+
+  
+  
+  Example `msg` object:
+  
+```js
+  {
+     "type":"action",
+     "body":{
+       "type": "dialog_submission",
+       "submission": {
+         "anser": "two",
+         "feedback": "test"
+       },
+       "callback_id": "xyz",
+       "team": {
+         "id": "T1PR9DEFS",
+         "domain": "aslackdomain"
+       },
+       "user": {
+         "id": "U1ABCDEF",
+         "name": "mikebrevoort"
+       },
+       "channel": {
+         "id": "C1PR520RRR",
+         "name": "random"
+       },
+       "action_ts": "1503445940.478855"
      },
   }
 ```
