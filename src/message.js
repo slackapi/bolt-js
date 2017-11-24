@@ -189,6 +189,27 @@ class Message {
     return this
   }
 
+  dialogState (state, secondsToExpire) {
+    if (!state) {
+      state = {}
+    }
+
+    if (!secondsToExpire && secondsToExpire !== 0) {
+      secondsToExpire = this._slapp.defaultExpiration
+    }
+
+    let key = this.conversation_id + '-dialog'
+    let expiration = secondsToExpire === 0
+      ? null
+      : Date.now() + secondsToExpire * 1000
+    this._slapp.convoStore.set(key, { state, expiration }, (err) => {
+      if (err) {
+        this._slapp.emit('error', err)
+      }
+    })
+    return this
+  }
+
   /**
    * Explicity cancel pending `route` registration.
    */
@@ -249,6 +270,33 @@ class Message {
         self._queue.next()
       })
     })
+    return self
+  }
+
+  dialog (input, state, callback) {
+    var self = this
+    if (state && typeof state == 'function') {
+      callback = state
+      state = {}
+    }
+    if (!callback) callback = () => {}
+
+    let payload = Object.assign({
+      token: self.meta.bot_token || self.meta.app_token,
+      trigger_id: self.body.trigger_id,
+      dialog: input
+    })
+
+    self._queueRequest(() => {
+      slack.dialog.open(payload, (err, data) => {
+        if (err) {
+          self._slapp.emit('error', err)
+        }
+        callback(err, data)
+        self._queue.next()
+      })
+    })
+    this.dialogState(state)
     return self
   }
 

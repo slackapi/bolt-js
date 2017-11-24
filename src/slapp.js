@@ -981,7 +981,14 @@ class Slapp extends EventEmitter {
       })
       msg.meta.params = params
 
-      callback(msg, msg.body.submission)
+      this.convoStore.get(msg.conversation_id+'-dialog', (err, val) => {
+        if (err) {
+          return this.emit('error', err)
+        }
+
+        callback(msg, msg.body.submission, val.state)
+      })
+
       return true
     }
 
