@@ -415,6 +415,8 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - [Slapp.options()](#slappoptionscallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
   - [Slapp.dialog()](#slappdialogcallbackidstringcallbackfunction)
+  - [Slapp.client.dialog.open()](#slappclientdialogopentrigger_id-dialog-tokenobject-errfunction)
+
 
 ## Slapp.use(fn:function)
 
@@ -929,6 +931,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   }
 ```
 
+
 ## Slapp.dialog(callbackId:string, callback:function)
 
   Register a dialog submission handler for the given callback_id
@@ -981,6 +984,22 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
 ```
 
 
+## Slapp.client.dialog.open({trigger_id, dialog, token}:object, (err) => {}:function)
+  Open a dialog in a channel that the trigger message came from
+
+> `Slapp.client === require('slack')` => https://github.com/smallwins/slack
+
+These documents should be helpful
+- https://api.slack.com/methods/dialog.open
+- https://api.slack.com/dialogs
+
+  
+#### Parameters and Callback
+> https://api.slack.com/methods/dialog.open
+
+  - `trigger_id` string - from received message *ex)* `msg.body.trigger_id`
+  - `dialog` object - {callback_id: string, title: string, submit_label: string, elements: array}
+  - `token` string - https://api.slack.com/docs/token-types#verification *ex)* `msg.meta.bot_token`
 
 # Message
 
