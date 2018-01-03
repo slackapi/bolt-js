@@ -66,6 +66,25 @@ test.cb('ParseEvent() with user change payload', t => {
   })
 })
 
+test.cb('ParseEvent() with no user in payload', t => {
+  let mw = ParseEvent().pop()
+  let payload = mockNoUserPayload()
+  let req = { body: payload }
+
+  mw(req, {}, () => {
+    let slapp = req.slapp
+
+    t.is(slapp.type, 'event')
+    t.deepEqual(slapp.body, req.body)
+    t.is(slapp.meta.verify_token, payload.token)
+    t.is(slapp.meta.user_id, undefined)
+    t.is(slapp.meta.bot_id, payload.event.bot_id)
+    t.is(slapp.meta.channel_id, payload.event.channel)
+    t.is(slapp.meta.team_id, payload.team_id)
+    t.end()
+  })
+})
+
 test('ParseEvent() challenge request', t => {
   let mw = ParseEvent()[1]
 
@@ -106,6 +125,17 @@ function mockUserChangePayload () {
         id: 'user_id',
         team_id: 'team_id'
       },
+      bot_id: 'bot_id',
+      channel: 'channel_id'
+    },
+    team_id: 'team_id'
+  }
+}
+
+function mockNoUserPayload () {
+  return {
+    token: 'token',
+    event: {
       bot_id: 'bot_id',
       channel: 'channel_id'
     },
