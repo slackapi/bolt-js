@@ -24,7 +24,7 @@ module.exports = () => {
 
       if (typeof event.user === 'string') {
         userId = event.user
-      } else if (typeof event.user === 'object') {
+      } else if (!!event.user && typeof event.user === 'object') {
         userId = event.user.id
       }
 
