@@ -703,6 +703,15 @@ test.cb('Message.respond() w/options', t => {
   })
 })
 
+test.cb('Message.hasResponse()', t => {
+  let msg = new Message()
+  msg.body.response_url = 'http://null.com'
+  t.true(msg.hasResponse())
+  msg.body.response_url = null
+  t.false(msg.hasResponse())
+  t.end()
+})
+
 test('Message.isBot() w/ bot_id', t => {
   let msg = new Message('event', {}, {
     bot_id: 'bot_id'

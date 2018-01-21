@@ -150,6 +150,19 @@ class Message {
   }
 
   /**
+   * May this message be responded to with `msg.respond` because the originating
+   * event included a `response_url`. If `hasResponse` returns false, you may
+   * still call `msg.respond` while explicitly passing a `response_url`.
+   *
+   * ##### Returns `true` if `msg.respond` may be called on this message, implicitly.
+   *
+   */
+  hasResponse () {
+    let self = this
+    return !!self.body.response_url
+  }
+
+  /**
    * Register the next function to route to in a conversation.
    *
    * The route should be registered already through `slapp.route`

@@ -382,6 +382,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - `opts.convo_store` Implementation of ConversationStore, defaults to memory
   - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
   - `opts.log` defaults to `true`, `false` to disable logging
+  - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
   - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
   - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
   - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
@@ -944,7 +945,8 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   Example;
   
 ```js
-  slapp.dialog('my_callback_id', (msg, submission) => {
+  // "/acommand"
+  slapp.command('my_callback_id', (msg, submission) => {
     submission.prop_name_1
   }
 ```
@@ -959,7 +961,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
      "body":{
        "type": "dialog_submission",
        "submission": {
-         "anser": "two",
+         "answer": "two",
          "feedback": "test"
        },
        "callback_id": "xyz",
@@ -1001,6 +1003,7 @@ It is generally always passed as `msg`.
     
 
   - [Message.constructor()](#messageconstructortypestringbodyobjectmetaobject)
+  - [Message.hasResponse()](#messagehasresponse)
   - [Message.route()](#messageroutefnkeystringstateobjectsecondstoexpirenumber)
   - [Message.cancel()](#messagecancel)
   - [Message.say()](#messagesayinputstringobjectarraycallbackfunction)
@@ -1032,6 +1035,14 @@ It is generally always passed as `msg`.
   
 #### Parameters
   - `type` the type of message (event, command, action, etc.)
+
+## Message.hasResponse()
+
+  May this message be responded to with `msg.respond` because the originating
+  event included a `response_url`. If `hasResponse` returns false, you may
+  still call `msg.respond` while explicitly passing a `response_url`.
+  
+#### Returns `true` if `msg.respond` may be called on this message, implicitly.
 
 ## Message.route(fnKey:string, state:Object, secondsToExpire:number)
 
