@@ -1,6 +1,7 @@
 'use strict'
 
 const test = require('ava').test
+const sinon = require('sinon')
 const ParseOptions = require('../src/receiver/middleware/parse-options')
 const fixtures = require('./fixtures/')
 
@@ -9,26 +10,24 @@ test('ParseOptions()', t => {
   t.is(mw.length, 2)
 })
 
-test.cb('ParseOptions() no payload', t => {
+test('ParseOptions() no payload', t => {
   let mw = ParseOptions().pop()
-  let req = { body: {} }
-  let res = fixtures.getMockRes()
 
-  mw(req, res, (err) => {
-    t.truthy(err)
-    t.end()
-  })
+  let res = fixtures.getMockRes()
+  let sendStub = sinon.stub(res, 'send')
+
+  mw({ body: {} }, res, () => t.fail())
+  t.true(sendStub.calledWith('Invalid request: payload missing'))
 })
 
-test.cb('ParseOptions() unparsable payload', t => {
+test('ParseOptions() unparsable payload', t => {
   let mw = ParseOptions().pop()
-  let req = { body: { payload: '"invalid' } }
-  let res = fixtures.getMockRes()
 
-  mw(req, res, (err) => {
-    t.truthy(err)
-    t.end()
-  })
+  let res = fixtures.getMockRes()
+  let sendStub = sinon.stub(res, 'send')
+
+  mw({ body: { payload: '\\{"' } }, res, () => t.fail())
+  t.true(sendStub.calledWith('Error parsing payload'))
 })
 
 test.cb('ParseOptions() with payload', t => {

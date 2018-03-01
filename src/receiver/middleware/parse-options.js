@@ -9,13 +9,13 @@ module.exports = () => {
       let body = req.body
 
       if (!body || !body.payload) {
-        return next(new Error('Invalid request: payload missing'))
+        return res.send('Invalid request: payload missing')
       }
 
       try {
         body = JSON.parse(body.payload)
       } catch (e) {
-        return next(new Error('Error parsing payload'))
+        return res.send('Error parsing payload')
       }
 
       req.slapp = {
