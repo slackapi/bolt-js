@@ -14,19 +14,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BeepBoopHQ/slapp.git"
+    "url": "git+https://github.com/missionsai/slapp.git"
   },
   "keywords": [
     "slack",
     "bot",
-    "beepboop"
+    "missions"
   ],
   "author": "Mike Brevoort",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BeepBoopHQ/slapp/issues"
+    "url": "https://github.com/missionsai/slapp/issues"
   },
-  "homepage": "https://github.com/BeepBoopHQ/slapp#readme",
+  "homepage": "https://github.com/missionsai/slapp#readme",
   "engines": {
     "node": ">=6.0.0"
   },
