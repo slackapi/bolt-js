@@ -789,6 +789,11 @@ class Slapp extends EventEmitter {
     let fn = (msg) => {
       if (msg.type !== 'action' || msg.body.type !== 'message_action') return
       if (msg.body.callback_id !== callbackId) return
+      // The message action requires a successful http response but you cannot send back a message response.
+      // Instead you use the response_url to respond to the action. Explicitly call respond to close the http
+      // request before calling the users callback. If the user calls msg.respond() it will use the response_url
+      // from the body of the request.
+      msg.respond({})
       callback(msg, msg.body.message)
       return true
     }
