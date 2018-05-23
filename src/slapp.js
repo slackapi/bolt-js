@@ -733,6 +733,75 @@ class Slapp extends EventEmitter {
   }
 
   /**
+   * Register a new handler for a [message action](https://api.slack.com/actions).
+   *
+   * The `callbackId` should match the "Callback ID" registered in the message action.
+   *
+   *
+   * ##### Parameters
+   * - `callbackId` string
+   * - `callback` function - `(msg, message) => {}` - message
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * Example:
+   *
+   *     // match on callback_id
+   *     slapp.messageAction('launch_message_action', (msg, message) => {}
+   *
+   *
+   * Example message action `msg.body` object:
+   *
+   *     {
+   *       "token": "Nj2rfC2hU8mAfgaJLemZgO7H",
+   *       "callback_id": "chirp_message",
+   *       "type": "message_action",
+   *       "trigger_id": "13345224609.8534564800.6f8ab1f53e13d0cd15f96106292d5536",
+   *       "response_url": "https://hooks.slack.com/app-actions/T0MJR11A4/21974584944/yk1S9ndf35Q1flupVG5JbpM6",
+   *       "team": {
+   *         "id": "T0MJRM1A7",
+   *         "domain": "pandamonium",
+   *       },
+   *       "channel": {
+   *         "id": "D0LFFBKLZ",
+   *         "name": "cats"
+   *       },
+   *       "user": {
+   *         "id": "U0D15K92L",
+   *         "name": "dr_maomao"
+   *       },
+   *       "message": {
+   *         "type": "message",
+   *         "user": "U0MJRG1AL",
+   *         "ts": "1516229207.000133",
+   *         "text": "World's smallest big cat! <https://youtube.com/watch?v=W86cTIoMv2U>"
+   *       }
+   *     }
+   *
+   *
+   * @param {string} callbackId
+   * @param {function} callback
+   */
+
+  messageAction (callbackId, callback) {
+    let fn = (msg) => {
+      if (msg.type !== 'action' || msg.body.type !== 'message_action') return
+      if (msg.body.callback_id !== callbackId) return
+      // The message action requires a successful http response but you cannot send back a message response.
+      // Instead you use the response_url to respond to the action. Explicitly call respond to close the http
+      // request before calling the users callback. If the user calls msg.respond() it will use the response_url
+      // from the body of the request.
+      msg.respond({})
+      callback(msg, msg.body.message)
+      return true
+    }
+
+    return this.match(fn)
+  }
+
+  /**
    * Register a new interactive message options handler
    *
    * `options` accepts a `callbackIdPath` like `action`. See `action` for details.

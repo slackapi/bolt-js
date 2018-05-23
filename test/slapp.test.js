@@ -691,6 +691,65 @@ test.cb('Slapp.action() w/ callback URL with large encoded value', t => {
     })
 })
 
+test.cb('Slapp.messageAction() w/ no match not message_action', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    type: 'not_message_action',
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .messageAction(message.body.callback_id, (msg, messageParsed) => { })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.messageAction() w/ no match on callback_id', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    type: 'message_action',
+    callback_id: 'my_callback'
+  }, meta)
+
+  app
+    .messageAction('no_match', (msg, messageParsed) => { })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.messageAction() w/ match', t => {
+  t.plan(3)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    type: 'message_action',
+    callback_id: 'my_callback',
+    message: {
+      ts: 'ts'
+    }
+  }, meta)
+
+  app
+    .messageAction(message.body.callback_id, (msg, messageParsed) => {
+      t.deepEqual(message.body.message, messageParsed)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
 test.cb('Slapp.message() w/o filter', t => {
   t.plan(3)
 

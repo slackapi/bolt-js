@@ -413,6 +413,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - [Slapp.message()](#slappmessagecriteriastringtypefilterstringarray)
   - [Slapp.event()](#slappeventcriteriastringregexpcallbackfunction)
   - [Slapp.action()](#slappactioncallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
+  - [Slapp.messageAction()](#slappmessageactioncallbackidstringcallbackfunction)
   - [Slapp.options()](#slappoptionscallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
   - [Slapp.dialog()](#slappdialogcallbackidstringcallbackfunction)
@@ -785,6 +786,60 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
                 "ts": "1481579582.000003"
     },
     "response_url": "https://hooks.slack.com/actions/T012AB0A1/1234567890/JpmK0yzoZ5eRiqfeduTBYXWQ"
+  }
+```
+
+## Slapp.messageAction(callbackId:string, callback:function)
+
+  Register a new handler for a [message action](https://api.slack.com/actions).
+  
+  The `callbackId` should match the "Callback ID" registered in the message action.
+  
+  
+#### Parameters
+  - `callbackId` string
+  - `callback` function - `(msg, message) => {}` - message
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  Example:
+  
+```js
+  // match on callback_id
+  slapp.messageAction('launch_message_action', (msg, message) => {}
+```
+
+  
+  
+  Example message action `msg.body` object:
+  
+```js
+  {
+    "token": "Nj2rfC2hU8mAfgaJLemZgO7H",
+    "callback_id": "chirp_message",
+    "type": "message_action",
+    "trigger_id": "13345224609.8534564800.6f8ab1f53e13d0cd15f96106292d5536",
+    "response_url": "https://hooks.slack.com/app-actions/T0MJR11A4/21974584944/yk1S9ndf35Q1flupVG5JbpM6",
+    "team": {
+      "id": "T0MJRM1A7",
+      "domain": "pandamonium",
+    },
+    "channel": {
+      "id": "D0LFFBKLZ",
+      "name": "cats"
+    },
+    "user": {
+      "id": "U0D15K92L",
+      "name": "dr_maomao"
+    },
+    "message": {
+      "type": "message",
+      "user": "U0MJRG1AL",
+      "ts": "1516229207.000133",
+      "text": "World's smallest big cat! <https://youtube.com/watch?v=W86cTIoMv2U>"
+    }
   }
 ```
 

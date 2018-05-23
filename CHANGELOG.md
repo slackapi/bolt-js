@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.2.0 (2018-05-23)
+
+- Support for [Message Actions](https://api.slack.com/actions)
+
 ## v2.3 (2017-04-11)
 
 - Added support for dynamic [Message Menu](https://medium.com/slack-developer-blog/build-an-interactive-slack-app-with-message-menus-1fb2c6298308) options calls through `slapp.options(callback_id)`
