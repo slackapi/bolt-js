@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "ava": "^0.15.2",
-    "coveralls": "2.11.11",
+    "coveralls": "3.0.1",
     "dox": "^0.8.1",
     "nyc": "^7.0.0",
     "sinon": "^1.17.4",
