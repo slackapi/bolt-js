@@ -730,7 +730,7 @@ test.cb('Slapp.messageAction() w/ no match on callback_id', t => {
 })
 
 test.cb('Slapp.messageAction() w/ match', t => {
-  t.plan(4)
+  t.plan(3)
 
   let app = new Slapp({ context })
   let message = new Message('action', {
@@ -740,11 +740,9 @@ test.cb('Slapp.messageAction() w/ match', t => {
       ts: 'ts'
     }
   }, meta)
-  let clearSpy = sinon.stub(message, 'clearResponse')
 
   app
     .messageAction(message.body.callback_id, (msg, messageParsed) => {
-      t.true(clearSpy.called)
       t.deepEqual(message.body.message, messageParsed)
     })
     ._handle(message, (err, handled) => {
