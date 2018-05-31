@@ -27,10 +27,14 @@ module.exports = () => {
           user_id: body.user.id,
           channel_id: body.channel.id,
           team_id: body.team.id
-        },
-        // Message actions may be responded to directly within 3000ms
-        response: res,
-        responseTimeout: 2500
+        }
+      }
+
+      // message_action's do not support returning a message in the HTTP response
+      if (body.type !== 'message_action') {
+        // May be responded to directly within 3000ms
+        req.slapp.response = res
+        req.slapp.responseTimeout = 2500
       }
 
       next()

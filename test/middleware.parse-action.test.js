@@ -54,6 +54,25 @@ test.cb('ParseAction() valid payload', t => {
   })
 })
 
+test.cb('ParseAction() message_action valid payload', t => {
+  t.plan(3)
+  let mw = ParseAction().pop()
+
+  let payload = mockPayload()
+  payload.type = 'message_action'
+
+  let req = { body: { payload: JSON.stringify(payload) } }
+  let res = fixtures.getMockRes()
+
+  mw(req, res, () => {
+    let slapp = req.slapp
+    t.is(slapp.body.type, 'message_action')
+    t.deepEqual(slapp.body, payload)
+    t.falsy(slapp.response, 'response should be undefined if message_action')
+    t.end()
+  })
+})
+
 function mockPayload () {
   return {
     token: 'token',
