@@ -608,7 +608,7 @@ test.cb('Slapp.action() w/ selected_options', t => {
     .action(message.body.callback_id, /^beep.*/, /B[o]{2}p/, (msg, val) => {
       t.deepEqual(msg, message)
       t.true(Array.isArray(val))
-      t.same(val, ['no match', 'Boop'])
+      t.deepEqual(val, ['no match', 'Boop'])
     })
     ._handle(message, (err, handled) => {
       t.is(err, null)
@@ -719,7 +719,9 @@ test.cb('Slapp.messageAction() w/ no match on callback_id', t => {
   }, meta)
 
   app
-    .messageAction('no_match', (msg, messageParsed) => { })
+    .messageAction('no_match', (msg, messageParsed) => {
+      t.fail('messageAction should not be called when no match')
+    })
     ._handle(message, (err, handled) => {
       t.is(err, null)
       t.false(handled)
@@ -728,7 +730,7 @@ test.cb('Slapp.messageAction() w/ no match on callback_id', t => {
 })
 
 test.cb('Slapp.messageAction() w/ match', t => {
-  t.plan(3)
+  t.plan(4)
 
   let app = new Slapp({ context })
   let message = new Message('action', {
@@ -738,9 +740,11 @@ test.cb('Slapp.messageAction() w/ match', t => {
       ts: 'ts'
     }
   }, meta)
+  let clearSpy = sinon.stub(message, 'clearResponse')
 
   app
     .messageAction(message.body.callback_id, (msg, messageParsed) => {
+      t.true(clearSpy.called)
       t.deepEqual(message.body.message, messageParsed)
     })
     ._handle(message, (err, handled) => {

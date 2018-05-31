@@ -793,7 +793,7 @@ class Slapp extends EventEmitter {
       // Instead you use the response_url to respond to the action. Explicitly call respond to close the http
       // request before calling the users callback. If the user calls msg.respond() it will use the response_url
       // from the body of the request.
-      msg.respond({})
+      msg.clearResponse({ close: true })
       callback(msg, msg.body.message)
       return true
     }
