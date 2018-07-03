@@ -21,6 +21,7 @@ class Slapp extends EventEmitter {
    *
    * ##### Parameters
    * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
+   * - `opts.signing_secret` Slack signing secret to check/verify the signature of requests coming from Slack
    * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
    * - `opts.context` `Function (req, res, next)` Required HTTP Middleware function to enrich incoming request with context
    * - `opts.log` defaults to `true`, `false` to disable logging
@@ -40,6 +41,7 @@ class Slapp extends EventEmitter {
     super()
     opts = deap.update({
       verify_token: process.env.SLACK_VERIFY_TOKEN,
+      signing_secret: null,
       convo_store: null,
       context: null,
       log: true,

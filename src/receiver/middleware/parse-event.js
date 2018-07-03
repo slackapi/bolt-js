@@ -1,10 +1,11 @@
 'use strict'
 
 const bodyParser = require('body-parser')
+const verify = require('./body-parser-verify')
 
 module.exports = () => {
   return [
-    bodyParser.json(),
+    bodyParser.json({ verify: verify }),
     function handleChallenge (req, res, next) {
       let body = req.body || {}
 
@@ -27,12 +28,13 @@ module.exports = () => {
       } else if (!!event.user && typeof event.user === 'object') {
         userId = event.user.id
       }
-
       req.slapp = {
         type: 'event',
         body: body,
         meta: {
           verify_token: body.token,
+          signature: (req.headers || {})['x-slack-signature'],
+          timestamp: (req.headers || {})['x-slack-request-timestamp'],
           user_id: userId,
           bot_id: event.bot_id,
           channel_id: channelId,

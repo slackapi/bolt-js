@@ -3,6 +3,7 @@
 exports.getMockReq = function (req) {
   return Object.assign({
     body: {},
+    headers: {},
     slapp: {
       meta: {}
     }
@@ -28,4 +29,11 @@ exports.getMockHeaders = function (headers) {
     'bb-slackteamname': 'slackteamname',
     'bb-slackteamdomain': 'slackteamdomain'
   }, headers || {})
+}
+
+exports.getMockSlackHeaders = function (signature, timestamp) {
+  return {
+    'x-slack-signature': signature,
+    'x-slack-request-timestamp': timestamp
+  }
 }

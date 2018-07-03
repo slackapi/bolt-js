@@ -4,6 +4,9 @@ const test = require('ava').test
 const ParseCommand = require('../src/receiver/middleware/parse-command')
 const fixtures = require('./fixtures/')
 
+const SIGNATURE = 'mysignature'
+const TIMESTAMP = Date.now()
+
 test('ParseCommand()', t => {
   let mw = ParseCommand()
   t.is(mw.length, 2)
@@ -29,7 +32,10 @@ test.cb('ParseCommand() no payload', t => {
 test.cb('ParseCommand() with payload', t => {
   let mw = ParseCommand().pop()
   let payload = mockPayload()
-  let req = { body: payload }
+  let req = {
+    body: payload,
+    headers: fixtures.getMockSlackHeaders(SIGNATURE, TIMESTAMP)
+  }
   let res = fixtures.getMockRes()
 
   mw(req, res, () => {
@@ -41,6 +47,8 @@ test.cb('ParseCommand() with payload', t => {
     t.is(slapp.meta.user_id, payload.user_id)
     t.is(slapp.meta.channel_id, payload.channel_id)
     t.is(slapp.meta.team_id, payload.team_id)
+    t.is(slapp.meta.signature, SIGNATURE)
+    t.is(slapp.meta.timestamp, TIMESTAMP)
     t.is(slapp.response, res)
     t.is(slapp.responseTimeout, 2500)
     t.end()

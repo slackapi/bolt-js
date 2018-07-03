@@ -5,6 +5,9 @@ const sinon = require('sinon')
 const fixtures = require('./fixtures/')
 const ParseAction = require('../src/receiver/middleware/parse-action')
 
+const SIGNATURE = 'mysignature'
+const TIMESTAMP = Date.now()
+
 test('ParseAction()', t => {
   let mw = ParseAction()
   t.is(mw.length, 3)
@@ -31,11 +34,14 @@ test('ParseAction() invalid json payload', t => {
 })
 
 test.cb('ParseAction() valid payload', t => {
-  t.plan(8)
+  t.plan(10)
   let mw = ParseAction().pop()
 
   let payload = mockPayload()
-  let req = { body: { payload: JSON.stringify(payload) } }
+  let req = {
+    body: { payload: JSON.stringify(payload) },
+    headers: fixtures.getMockSlackHeaders(SIGNATURE, TIMESTAMP)
+  }
   let res = fixtures.getMockRes()
 
   mw(req, res, () => {
@@ -47,6 +53,8 @@ test.cb('ParseAction() valid payload', t => {
     t.is(slapp.meta.user_id, payload.user.id)
     t.is(slapp.meta.channel_id, payload.channel.id)
     t.is(slapp.meta.team_id, payload.team.id)
+    t.is(slapp.meta.signature, SIGNATURE)
+    t.is(slapp.meta.timestamp, TIMESTAMP)
     t.is(slapp.response, res)
     t.is(slapp.responseTimeout, 2500)
 

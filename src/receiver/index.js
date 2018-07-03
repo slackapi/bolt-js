@@ -8,6 +8,7 @@ const ParseCommand = require('./middleware/parse-command')
 const ParseAction = require('./middleware/parse-action')
 const ParseOptions = require('./middleware/parse-options')
 const VerifyToken = require('./middleware/verify-token')
+const CheckSignature = require('./middleware/check-signature')
 const SSLCheck = require('./middleware/ssl-check')
 
 /**
@@ -20,6 +21,7 @@ module.exports = class Receiver extends EventEmitter {
     opts = opts || {}
 
     this.verify_token = opts.verify_token
+    this.signing_secret = opts.signing_secret
     this.context = opts.context
 
     // record all events to a JSON line delimited file if record is set
@@ -51,6 +53,7 @@ module.exports = class Receiver extends EventEmitter {
 
     let emitHandler = this.emitHandler.bind(this)
     let verifyToken = VerifyToken(this.verify_token, this.emit.bind(this, 'error'))
+    let checkSignature = CheckSignature(this.signing_secret, this.emit.bind(this, 'error'))
     let sslCheck = SSLCheck()
 
     if (options.event) {
@@ -58,6 +61,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseEvent(),
         sslCheck,
         verifyToken,
+        checkSignature,
         this.context,
         emitHandler
       )
@@ -68,6 +72,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseCommand(),
         sslCheck,
         verifyToken,
+        checkSignature,
         this.context,
         emitHandler
       )
@@ -78,6 +83,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseAction(),
         sslCheck,
         verifyToken,
+        checkSignature,
         this.context,
         emitHandler
       )
@@ -88,6 +94,7 @@ module.exports = class Receiver extends EventEmitter {
         ParseOptions(),
         sslCheck,
         verifyToken,
+        checkSignature,
         this.context,
         emitHandler
       )

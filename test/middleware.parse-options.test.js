@@ -4,6 +4,9 @@ const test = require('ava').test
 const ParseOptions = require('../src/receiver/middleware/parse-options')
 const fixtures = require('./fixtures/')
 
+const SIGNATURE = 'mysignature'
+const TIMESTAMP = Date.now()
+
 test('ParseOptions()', t => {
   let mw = ParseOptions()
   t.is(mw.length, 2)
@@ -34,7 +37,10 @@ test.cb('ParseOptions() unparsable payload', t => {
 test.cb('ParseOptions() with payload', t => {
   let mw = ParseOptions().pop()
   let payload = mockPayload()
-  let req = { body: { payload: JSON.stringify(payload) } }
+  let req = {
+    body: { payload: JSON.stringify(payload) },
+    headers: fixtures.getMockSlackHeaders(SIGNATURE, TIMESTAMP)
+  }
   let res = fixtures.getMockRes()
 
   mw(req, res, (err) => {
@@ -47,6 +53,8 @@ test.cb('ParseOptions() with payload', t => {
     t.is(slapp.meta.user_id, payload.user.id)
     t.is(slapp.meta.channel_id, payload.channel.id)
     t.is(slapp.meta.team_id, payload.team.id)
+    t.is(slapp.meta.signature, SIGNATURE)
+    t.is(slapp.meta.timestamp, TIMESTAMP)
     t.is(slapp.response, res)
     t.is(slapp.responseTimeout, 3000)
     t.end()

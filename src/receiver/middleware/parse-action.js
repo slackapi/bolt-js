@@ -1,10 +1,11 @@
 'use strict'
 
 const bodyParser = require('body-parser')
+const verify = require('./body-parser-verify')
 
 module.exports = () => {
   return [
-    bodyParser.urlencoded({extended: true}),
+    bodyParser.urlencoded({ extended: true, verify: verify }),
     bodyParser.text({type: '*/*'}),
     function parseAction (req, res, next) {
       let body = req.body
@@ -24,6 +25,8 @@ module.exports = () => {
         body: body,
         meta: {
           verify_token: body.token,
+          signature: (req.headers || {})['x-slack-signature'],
+          timestamp: (req.headers || {})['x-slack-request-timestamp'],
           user_id: body.user.id,
           channel_id: body.channel.id,
           team_id: body.team.id
