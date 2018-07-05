@@ -379,6 +379,8 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   
   Parameters
   - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
+  - `opts.signing_secret` Slack signing secret to check/verify the signature of requests coming from Slack
+  - `opts.signing_version` Slack signing version string, defaults to 'v0'
   - `opts.convo_store` Implementation of ConversationStore, defaults to memory
   - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
   - `opts.log` defaults to `true`, `false` to disable logging
