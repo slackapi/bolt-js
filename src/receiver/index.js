@@ -52,52 +52,39 @@ module.exports = class Receiver extends EventEmitter {
       options[type] = options[type] === true ? defaults[type] : options[type]
     })
 
-    let emitHandler = this.emitHandler.bind(this)
-    let verifyToken = VerifyToken(this.verify_token, this.emit.bind(this, 'error'))
-    let checkSignature = CheckSignature(this.signing_secret, this.signing_version, this.emit.bind(this, 'error'))
-    let sslCheck = SSLCheck()
+    let defaultMiddlware = [
+      SSLCheck(),
+      VerifyToken(this.verify_token, this.emit.bind(this, 'error')),
+      CheckSignature(this.signing_secret, this.signing_version, this.emit.bind(this, 'error')),
+      this.context,
+      this.emitHandler.bind(this)
+    ]
 
     if (options.event) {
       app.post(options.event,
         ParseEvent(),
-        sslCheck,
-        verifyToken,
-        checkSignature,
-        this.context,
-        emitHandler
+        ...defaultMiddlware
       )
     }
 
     if (options.command) {
       app.post(options.command,
         ParseCommand(),
-        sslCheck,
-        verifyToken,
-        checkSignature,
-        this.context,
-        emitHandler
+        ...defaultMiddlware
       )
     }
 
     if (options.action) {
       app.post(options.action,
         ParseAction(),
-        sslCheck,
-        verifyToken,
-        checkSignature,
-        this.context,
-        emitHandler
+        ...defaultMiddlware
       )
     }
 
     if (options.options) {
       app.post(options.options,
         ParseOptions(),
-        sslCheck,
-        verifyToken,
-        checkSignature,
-        this.context,
-        emitHandler
+        ...defaultMiddlware
       )
     }
 
