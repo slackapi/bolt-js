@@ -22,6 +22,7 @@ module.exports = class Receiver extends EventEmitter {
 
     this.verify_token = opts.verify_token
     this.signing_secret = opts.signing_secret
+    this.signing_version = opts.signing_version
     this.context = opts.context
 
     // record all events to a JSON line delimited file if record is set
@@ -53,7 +54,7 @@ module.exports = class Receiver extends EventEmitter {
 
     let emitHandler = this.emitHandler.bind(this)
     let verifyToken = VerifyToken(this.verify_token, this.emit.bind(this, 'error'))
-    let checkSignature = CheckSignature(this.signing_secret, this.emit.bind(this, 'error'))
+    let checkSignature = CheckSignature(this.signing_secret, this.signing_version, this.emit.bind(this, 'error'))
     let sslCheck = SSLCheck()
 
     if (options.event) {

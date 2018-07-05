@@ -1,9 +1,7 @@
 'use strict'
 const crypto = require('crypto')
 
-const VERSION = 'v0'
-
-module.exports = (secret, onError) => {
+module.exports = (secret, version = 'v0', onError) => {
   function invalidSignature (res) {
     if (onError) {
       onError('Invalid signature')
@@ -42,11 +40,11 @@ module.exports = (secret, onError) => {
       return null
     }
 
-    let basestring = `${VERSION}:${timestamp}:${rawBody}`
+    let basestring = `${version}:${timestamp}:${rawBody}`
     let digest = crypto.createHmac('sha256', secret)
       .update(basestring)
       .digest('hex')
-    return `${VERSION}=${digest}`
+    return `${version}=${digest}`
   }
 
   return checkSignatureMiddleware

@@ -5,6 +5,7 @@ const sinon = require('sinon')
 const fixtures = require('./fixtures/')
 const CheckSignature = require('../src/receiver/middleware/check-signature')
 const SECRET = 'shhhhsecret'
+const VERSION = 'v0'
 
 test.cb('CheckSignature() no signing_secret option', t => {
   let mw = CheckSignature()
@@ -28,7 +29,7 @@ test('CheckSignature() signing_secret option no signature or timestamp header', 
 })
 
 test.cb('CheckSignature() signing_secret option no signature or timestamp header w/ error callback', t => {
-  let mw = CheckSignature(SECRET, (err) => {
+  let mw = CheckSignature(SECRET, VERSION, (err) => {
     t.is(err, 'Invalid signature')
     t.pass()
     t.end()
@@ -68,7 +69,7 @@ test('CheckSignature() signing_secret option no signature w/ timestamp header', 
 })
 
 test.cb('CheckSignature() signing_secret option w/ valid signature', t => {
-  let mw = CheckSignature(SECRET, (err) => {
+  let mw = CheckSignature(SECRET, VERSION, (err) => {
     t.fail(err)
     t.end()
   })
