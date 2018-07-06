@@ -1,7 +1,12 @@
 'use strict'
 const crypto = require('crypto')
 
-module.exports = (secret, version = 'v0', onError) => {
+module.exports = (secret, version, onError) => {
+  // If secret is set, but no version is set, this is an error, version must be provided
+  if (secret && (!version || typeof version !== 'string')) {
+    throw new Error('Slack signing secret provided, but no version is provided')
+  }
+
   function invalidSignature (res) {
     if (onError) {
       onError('Invalid signature')

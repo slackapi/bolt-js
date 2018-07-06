@@ -17,7 +17,7 @@ test.cb('CheckSignature() no signing_secret option', t => {
 })
 
 test('CheckSignature() signing_secret option no signature or timestamp header', t => {
-  let mw = CheckSignature(SECRET)
+  let mw = CheckSignature(SECRET, VERSION)
   let res = fixtures.getMockRes()
 
   let statusStub = sinon.stub(res, 'status', () => { return res })
@@ -45,7 +45,7 @@ test.cb('CheckSignature() signing_secret option no signature or timestamp header
 })
 
 test('CheckSignature() signing_secret option w/ signature no timestamp header', t => {
-  let mw = CheckSignature(SECRET)
+  let mw = CheckSignature(SECRET, VERSION)
   let res = fixtures.getMockRes()
 
   let statusStub = sinon.stub(res, 'status', () => { return res })
@@ -57,7 +57,7 @@ test('CheckSignature() signing_secret option w/ signature no timestamp header', 
 })
 
 test('CheckSignature() signing_secret option no signature w/ timestamp header', t => {
-  let mw = CheckSignature(SECRET)
+  let mw = CheckSignature(SECRET, VERSION)
   let res = fixtures.getMockRes()
 
   let statusStub = sinon.stub(res, 'status', () => { return res })
@@ -82,7 +82,7 @@ test.cb('CheckSignature() signing_secret option w/ valid signature', t => {
 })
 
 test('CheckSignature() signing_secret option w/ invalid signature', t => {
-  let mw = CheckSignature(SECRET)
+  let mw = CheckSignature(SECRET, VERSION)
   let res = fixtures.getMockRes()
 
   let statusStub = sinon.stub(res, 'status', () => { return res })
@@ -91,6 +91,34 @@ test('CheckSignature() signing_secret option w/ invalid signature', t => {
   mw(getSignedRequest(mw, {}, false), res, () => { })
   t.true(statusStub.calledWith(403))
   t.true(sendStub.calledWith('Invalid signature'))
+})
+
+test.cb('CheckSignature() signing_secret option w/o version should throw', t => {
+  try {
+    CheckSignature(SECRET)
+  } catch (e) {
+    t.truthy(e)
+    t.is(e.message, 'Slack signing secret provided, but no version is provided')
+    t.pass()
+    t.end()
+    return
+  }
+
+  t.fail('Should not be able to create middleware function without a version when secret is provided')
+})
+
+test.cb('CheckSignature() signing_secret option w/ onError cb as version should throw', t => {
+  try {
+    CheckSignature(SECRET, () => {})
+  } catch (e) {
+    t.truthy(e)
+    t.is(e.message, 'Slack signing secret provided, but no version is provided')
+    t.pass()
+    t.end()
+    return
+  }
+
+  t.fail('Should not be able to create middleware function without a version string when secret is provided')
 })
 
 function getSignedRequest (mw, { signature = true, timestamp = true } = {}, validSignature = true) {
