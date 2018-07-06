@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.3.0 (2018-07-6)
+- Support for [verifying Slack requests with signing secret](https://api.slack.com/docs/verifying-requests-from-slack).
+
 ## v3.2.0 (2018-05-23)
 
 - Support for [Message Actions](https://api.slack.com/actions)

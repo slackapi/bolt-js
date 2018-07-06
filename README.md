@@ -1,6 +1,6 @@
-[![Sponsored by Beep Boop](https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F_sponsored_by-%E2%9C%A8_Robots%20%26%20Pencils_%E2%9C%A8-FB6CBE.svg)](https://beepboophq.com)
-[![Build Status](https://travis-ci.org/BeepBoopHQ/slapp.svg)](https://travis-ci.org/BeepBoopHQ/slapp)
-[![Coverage Status](https://coveralls.io/repos/github/BeepBoopHQ/slapp/badge.svg)](https://coveralls.io/github/BeepBoopHQ/slapp)
+[![Sponsored by Robots and Pencils](https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F_sponsored_by-%E2%9C%A8_Robots%20%26%20Pencils_%E2%9C%A8-FB6CBE.svg)](https://missions.ai)
+[![Build Status](https://travis-ci.org/MissionsAI/slapp.svg)](https://travis-ci.org/MissionsAI/slapp)
+[![Coverage Status](https://coveralls.io/repos/github/MissionsAI/slapp/badge.svg)](https://coveralls.io/github/MissionsAI/slapp)
 
 # Slapp
 Slapp is a node.js module for creating Slack integrations from simple slash commands to complex bots. It is specifically for Slack --not a generic bot framework-- because we believe the best restaurants in the world are not buffets. 🍴😉
@@ -12,10 +12,10 @@ Slapp is built on a strong foundation with a test suite with 100% test coverage 
 Here is a basic example:
 ```js
 const Slapp = require('slapp')
-const BeepBoopContext = require('slapp-context-beepboop')
+const ContextLookup = require('./context-lookup')
 if (!process.env.PORT) throw Error('PORT missing but required')
 
-var slapp = Slapp({ context: BeepBoopContext() })
+var slapp = Slapp({ context: ContextLookup() })
 
 slapp.message('^(hi|hello|hey).*', ['direct_mention', 'direct_message'], (msg, text, greeting) => {
   msg
@@ -39,33 +39,25 @@ slapp.attachToExpress(require('express')()).listen(process.env.PORT)
 npm install --save slapp
 ```
 
-## Getting Started
-We recommend you watch this [quick tutorial](https://www.youtube.com/watch?v=q9iMeRbrgpw) on how to get started with Slapp on BeepBoop! It'll talk you through some of these key points:
-
-* Creating your first Slapp application
-* Adding your application to [Beep Boop](https://beepboophq.com)
-* Setting up a Slack App ready to work with Slapp / Beep Boop
-
-Even if you're not using Beep Boop the video should help you understand how to get your Slack App setup properly so you can make the most of Slapp.
-
 ## Setup
 You can call the Slapp function with the following options:
 ```js
 const Slapp = require('slapp')
-const ConvoStore = require('slapp-convo-beepboop')
-const BeepBoopContext = require('slapp-context-beepboop')
+// you can provide implementations for storing conversation state and context lookup
+const ConvoStore = require('./conversation-store')
+const ContextLookup = require('./context-lookup')
 
 var slapp = Slapp({
   verify_token: process.env.SLACK_VERIFY_TOKEN,
   convo_store: ConvoStore(),
-  context: BeepBoopContext(),
+  context: ContextLookup(),
   log: true,
   colors: true
 })
 ```
 
 ### Context Lookup
-One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. If you're running on [Beep Boop][beepboop], this data is saved for you automatically. Slapp has a required `context` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, there are a few required properties that need to be set on `req.slapp.meta` for Slapp to process requests:
+One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. Slapp has a required `context` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, there are a few required properties that need to be set on `req.slapp.meta` for Slapp to process requests:
 
 + `app_token` - **required** OAuth `access_token` property
 + `bot_token` - **required if you have a bot user** OAuth `bot.bot_access_token` property
@@ -87,7 +79,7 @@ The incoming request from Slack has been parsed and normalized by the time the `
 }
 ```
 
-If you're running on [Beep Boop][beepboop], these values are stored and added automatically for you, otherwise you'll need to set these properties on `req.slapp.meta` with data retreived from wherever you're storing your OAuth data. That might look something like this:
+You'll need to set required properties listed above on `req.slapp.meta` with data retreived from wherever you're storing your OAuth data. That might look something like this:
 ```js
 // your database module...
 var myDB = require('./my-db')
@@ -227,12 +219,12 @@ slapp.command('/inorout', 'create (.*)', (msg, text, question) => {
 
 ## Conversations and Bots
 With Slapp you can use the Slack Events API to create bots much like you would with a
-a Realtime Messaging API socket. Events over HTTP may be not necessarily be received by
+a Realtime Messaging API socket. Events over HTTP may not necessarily be received by
 the same process if you are running multiple instances of your app behind a load balancer;
 therefore your Slapp process should be stateless. And thus conversation state should be
 stored out of process.
 
-You can pass a conversation store implementation into the Slapp factory with the `convo_store` option. If you are using [Beep Boop](https://beepboophq.com), you should use `require('slapp-convo-beepboop')()` and it will be handled for you. Otherwise, a conversation store needs to implement these three functions:
+You can pass a conversation store implementation into the Slapp factory with the `convo_store` option. A conversation store needs to implement these three functions:
 
 ```js
   set (id, params, callback) {} // callback(err)
@@ -240,7 +232,7 @@ You can pass a conversation store implementation into the Slapp factory with the
   del (id, callback) {}         // callback(err)
 ```
 
-The [in memory implementation](https://github.com/BeepBoopHQ/slapp/blob/master/src/conversation_store/memory.js) can be used for testing and as an example when creating your own implementation.
+The [in memory implementation](https://github.com/MissionsAI/slapp/blob/master/src/conversation_store/memory.js) can be used for testing and as an example when creating your own implementation.
 
 ### What is a conversation?
 A conversation is scoped by the combination of Slack Team, Channel, and User. When
@@ -394,12 +386,12 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   
 ```js
   var Slapp = require('slapp')
-  var BeepBoopConvoStore = require('slapp-convo-beepboop')
-  var BeepBoopContext = require('slapp-context-beepboop')
+  var ConvoStore = require('./convo-store')
+  var ContextLookup = require('./context-lookup')
   var slapp = Slapp({
     record: 'out.jsonl',
-    context: BeepBoopContext(),
-    convo_store: BeepBoopConvoStore({ debug: true })
+    context: ContextLookup(),
+    convo_store: ConvoStore()
   })
 ```
 
@@ -1383,6 +1375,5 @@ We adore contributions. Please include the details of the proposed changes in a 
 - `npm run docs` - regenerates API docs in this README.md
 
 # License
-MIT Copyright (c) 2016 Beep Boop, Robots & Pencils
+MIT Copyright (c) 2018 Missions, Robots & Pencils
 
-[beepboop]: https://beepboophq.com
