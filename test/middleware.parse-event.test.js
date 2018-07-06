@@ -5,6 +5,9 @@ const sinon = require('sinon')
 const fixtures = require('./fixtures/')
 const ParseEvent = require('../src/receiver/middleware/parse-event')
 
+const SIGNATURE = 'mysignature'
+const TIMESTAMP = Date.now()
+
 test('ParseEvent()', t => {
   let mw = ParseEvent()
   t.is(mw.length, 3)
@@ -31,7 +34,10 @@ test.cb('ParseEvent() no payload', t => {
 test.cb('ParseEvent() with payload', t => {
   let mw = ParseEvent().pop()
   let payload = mockPayload()
-  let req = { body: payload }
+  let req = {
+    body: payload,
+    headers: fixtures.getMockSlackHeaders(SIGNATURE, TIMESTAMP)
+  }
 
   mw(req, {}, () => {
     let slapp = req.slapp
@@ -43,6 +49,8 @@ test.cb('ParseEvent() with payload', t => {
     t.is(slapp.meta.bot_id, payload.event.bot_id)
     t.is(slapp.meta.channel_id, payload.event.channel)
     t.is(slapp.meta.team_id, payload.team_id)
+    t.is(slapp.meta.signature, SIGNATURE)
+    t.is(slapp.meta.timestamp, TIMESTAMP)
     t.end()
   })
 })
