@@ -37,13 +37,13 @@
     "js-queue": "^1.0.0",
     "path-to-regexp": "^2.0.0",
     "request": "^2.73.0",
-    "slack": "^9.0.3"
+    "slack": "^11.0"
   },
   "devDependencies": {
     "ava": "^0.15.2",
-    "coveralls": "2.11.11",
-    "dox": "^0.8.1",
-    "nyc": "^7.0.0",
+    "coveralls": "^3.0.2",
+    "dox": "^0.9.0",
+    "nyc": "^13.0.1",
     "sinon": "^1.17.4",
     "standard": "^7.1.2"
   }
