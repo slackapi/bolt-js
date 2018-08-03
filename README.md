@@ -386,12 +386,12 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   
 ```js
   var Slapp = require('slapp')
-  var ConvoStore = require('./convo-store')
-  var ContextLookup = require('./context-lookup')
+  var BeepBoopConvoStore = require('slapp-convo-beepboop')
+  var BeepBoopContext = require('slapp-context-beepboop')
   var slapp = Slapp({
     record: 'out.jsonl',
-    context: ContextLookup(),
-    convo_store: ConvoStore()
+    context: BeepBoopContext(),
+    convo_store: BeepBoopConvoStore({ debug: true })
   })
 ```
 
@@ -411,6 +411,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - [Slapp.options()](#slappoptionscallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
   - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
   - [Slapp.dialog()](#slappdialogcallbackidstringcallbackfunction)
+  - [Slapp.dialogSuggestion()](#slappdialogsuggestioncallbackidstringcomponentnamecriteriastringregexpcallbackfunction)
 
 ## Slapp.use(fn:function)
 
@@ -994,8 +995,7 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   Example;
   
 ```js
-  // "/acommand"
-  slapp.command('my_callback_id', (msg, submission) => {
+  slapp.dialog('my_callback_id', (msg, submission) => {
     submission.prop_name_1
   }
 ```
@@ -1028,6 +1028,58 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
        },
        "action_ts": "1503445940.478855"
      },
+  }
+```
+
+## Slapp.dialogSuggestion(callbackId:string, componentNameCriteria:string|RegExp, callback:function)
+
+  Register a dialog suggestion 'load' handler for the given callback_id optionally matching the component name.
+  
+#### Parameters
+  - `callbackId` string - the callback_id of the dialog who's component is being dynamically loaded
+  - `componentNameCriteria` string - string or RegExp - the name of the component being loaded [optional]
+  - `callback` function - `(msg, value) => {}` [note: 'value' is the content the user has entered into the text field]
+  
+  
+#### Returns
+  - `this` (chainable)
+  
+  Example;
+  
+```js
+  // match all components
+  slapp.dialogSuggestion('dinner_callback', (msg, val) => { msg.respond({options: [{label: 'a', value: 'a'}]}); }
+  // match a single component
+  slapp.dialogSuggestion('dinner_callback', 'beer', (msg, val) => { msg.respond({options: [{label: 'a', value: 'a'}]}); }
+  // matching components
+  slapp.dialogSuggestion('dinner_callback', '(beer|wine)', (msg, val) => { msg.respond({options: [{label: 'a', value: 'a'}]}); }
+```
+
+  
+  Example `msg` object:
+  
+```js
+  {
+     "type":"action",
+     "body":{
+       "type": "dialog_suggestion",
+       "callback_id": "dinner_callback",
+       "team": {
+         "id": "T1PR9DEFS",
+         "domain": "aslackdomain"
+       },
+       "user": {
+         "id": "U1ABCDEF",
+         "name": "mikebrevoort"
+       },
+       "channel": {
+         "id": "C1PR520RRR",
+         "name": "random"
+       },
+       "action_ts": "1503445940.478855",
+       "name": "beer",
+       "value": "budwei"
+     }
   }
 ```
 
