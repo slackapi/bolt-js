@@ -34,11 +34,12 @@ test('Receiver.attachToExpress() defaults', t => {
 
   receiver.attachToExpress(app)
 
-  t.is(appStub.callCount, 4)
+  t.is(appStub.callCount, 5)
   t.true(appStub.calledWith('/slack/event'))
   t.true(appStub.calledWith('/slack/command'))
   t.true(appStub.calledWith('/slack/action'))
   t.true(appStub.calledWith('/slack/options'))
+  t.true(appStub.calledWith('/slack/load'))
 })
 
 test('Receiver.attachToExpress() true, false, string', t => {

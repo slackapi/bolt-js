@@ -432,12 +432,14 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   - POST `/slack/event`
   - POST `/slack/command`
   - POST `/slack/action`
+  - POST `/slack/load`
   
 #### Parameters
   - `app` instance of Express app or Express.Router
   - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
   - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
   - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
+  - `opts.load` `boolean|string` - action route (defaults to `/slack/load`) [optional]
   
   
 #### Returns

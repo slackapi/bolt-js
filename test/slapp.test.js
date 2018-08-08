@@ -1288,7 +1288,7 @@ test.cb('Slapp.dialogSuggestion()', t => {
   t.plan(4)
 
   let app = new Slapp({ context })
-  let message = new Message('action', {
+  let message = new Message('load', {
     type: 'dialog_suggestion',
     name: 'pets',
     value: 'cat',
@@ -1311,7 +1311,7 @@ test.cb('Slapp.dialogSuggestion() with componentName', t => {
   t.plan(4)
 
   let app = new Slapp({ context })
-  let message = new Message('action', {
+  let message = new Message('load', {
     type: 'dialog_suggestion',
     name: 'pets',
     value: 'cat',
@@ -1334,7 +1334,7 @@ test.cb('Slapp.dialogSuggestion() no callbackId match', t => {
   t.plan(2)
 
   let app = new Slapp({ context })
-  let message = new Message('action', {
+  let message = new Message('load', {
     type: 'dialog_suggestion',
     name: 'pets',
     value: 'cat',
@@ -1353,7 +1353,7 @@ test.cb('Slapp.dialogSuggestion() no componentName match', t => {
   t.plan(2)
 
   let app = new Slapp({ context })
-  let message = new Message('action', {
+  let message = new Message('load', {
     type: 'dialog_suggestion',
     name: 'pets',
     value: 'cat',

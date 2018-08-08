@@ -269,12 +269,14 @@ class Slapp extends EventEmitter {
    * - POST `/slack/event`
    * - POST `/slack/command`
    * - POST `/slack/action`
+   * - POST `/slack/load`
    *
    * ##### Parameters
    * - `app` instance of Express app or Express.Router
    * - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
    * - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
    * - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
+   * - `opts.load` `boolean|string` - action route (defaults to `/slack/load`) [optional]
    *
    *
    * ##### Returns
@@ -1114,7 +1116,7 @@ class Slapp extends EventEmitter {
     }
 
     let fn = (msg) => {
-      if (msg.type !== 'action' || msg.body.type !== 'dialog_suggestion') return
+      if (msg.type !== 'load' || msg.body.type !== 'dialog_suggestion') return
       let componentNameMatch = componentNameCriteria.exec(msg.body.name)
       if (!(callbackId === msg.body.callback_id && componentNameMatch)) return
       callback(msg, msg.body.value)
