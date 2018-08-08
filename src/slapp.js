@@ -269,12 +269,14 @@ class Slapp extends EventEmitter {
    * - POST `/slack/event`
    * - POST `/slack/command`
    * - POST `/slack/action`
+   * - POST `/slack/load`
    *
    * ##### Parameters
    * - `app` instance of Express app or Express.Router
    * - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
    * - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
    * - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
+   * - `opts.load` `boolean|string` - action route (defaults to `/slack/load`) [optional]
    *
    *
    * ##### Returns
@@ -985,7 +987,7 @@ class Slapp extends EventEmitter {
     return this.match(fn)
   }
 
-    /**
+  /**
    * Register a dialog submission handler for the given callback_id
    *
    * ##### Parameters
@@ -998,8 +1000,7 @@ class Slapp extends EventEmitter {
    *
    * Example;
    *
-   *     // "/acommand"
-   *     slapp.command('my_callback_id', (msg, submission) => {
+   *     slapp.dialog('my_callback_id', (msg, submission) => {
    *       submission.prop_name_1
    *     }
    *
@@ -1050,6 +1051,75 @@ class Slapp extends EventEmitter {
       msg.meta.params = params
 
       callback(msg, msg.body.submission)
+      return true
+    }
+
+    return this.match(fn)
+  }
+
+  /**
+   * Register a dialog suggestion 'load' handler for the given callback_id optionally matching the component name.
+   *
+   * ##### Parameters
+   * - `callbackId` string - the callback_id of the dialog who's component is being dynamically loaded
+   * - `componentNameCriteria` string - string or RegExp - the name of the component being loaded [optional]
+   * - `callback` function - `(msg, value) => {}` [note: 'value' is the content the user has entered into the text field]
+   *
+   *
+   * ##### Returns
+   * - `this` (chainable)
+   *
+   * Example;
+   *
+   *     // match all components
+   *     slapp.dialogSuggestion('dinner_callback', (msg, val) => { msg.respond({options: [{label: 'a', value: 'a'}]}); }
+   *     // match a single component
+   *     slapp.dialogSuggestion('dinner_callback', 'beer', (msg, val) => { msg.respond({options: [{label: 'a', value: 'a'}]}); }
+   *     // matching components
+   *     slapp.dialogSuggestion('dinner_callback', '(beer|wine)', (msg, val) => { msg.respond({options: [{label: 'a', value: 'a'}]}); }
+   *
+   * Example `msg` object:
+   *
+   *     {
+   *        "type":"action",
+   *        "body":{
+   *          "type": "dialog_suggestion",
+   *          "callback_id": "dinner_callback",
+   *          "team": {
+   *            "id": "T1PR9DEFS",
+   *            "domain": "aslackdomain"
+   *          },
+   *          "user": {
+   *            "id": "U1ABCDEF",
+   *            "name": "mikebrevoort"
+   *          },
+   *          "channel": {
+   *            "id": "C1PR520RRR",
+   *            "name": "random"
+   *          },
+   *          "action_ts": "1503445940.478855",
+   *          "name": "beer",
+   *          "value": "budwei"
+   *        }
+   *     }
+   * @param {string} callbackId
+   * @param {(string|RegExp)} componentNameCriteria
+   * @param {function} callback
+   */
+
+  dialogSuggestion (callbackId, componentNameCriteria, callback) {
+    if (typeof componentNameCriteria === 'function') {
+      callback = componentNameCriteria
+      componentNameCriteria = /.*/
+    } else if (typeof componentNameCriteria === 'string') {
+      componentNameCriteria = new RegExp(`^${componentNameCriteria}$`, 'i')
+    }
+
+    let fn = (msg) => {
+      if (msg.type !== 'load' || msg.body.type !== 'dialog_suggestion') return
+      let componentNameMatch = componentNameCriteria.exec(msg.body.name)
+      if (!(callbackId === msg.body.callback_id && componentNameMatch)) return
+      callback(msg, msg.body.value)
       return true
     }
 

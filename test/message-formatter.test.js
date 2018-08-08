@@ -7,6 +7,7 @@ const Formatter = require('../src/message-formatter')
 
 const eventMsg = require('./fixtures/messages/event.message')
 const eventMsgBotMsg = require('./fixtures/messages/event.message.bot_message')
+const eventReactionAddedMsg = require('./fixtures/messages/event.reaction_added')
 const actionMsg = require('./fixtures/messages/action')
 const commandMsg = require('./fixtures/messages/command')
 
@@ -39,6 +40,12 @@ test('Formatter() event message', t => {
   let format = Formatter()
   let output = format(eventMsg)
 
+  t.true(output.indexOf('[evt]') >= 0)
+})
+
+test('Formatter() reaction message', t => {
+  let format = Formatter()
+  let output = format(eventReactionAddedMsg)
   t.true(output.indexOf('[evt]') >= 0)
 })
 

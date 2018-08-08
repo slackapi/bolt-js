@@ -1284,6 +1284,130 @@ test.cb('Slapp.dialog() not action, not dialog_submission', t => {
     })
 })
 
+test.cb('Slapp.dialogSuggestion()', t => {
+  t.plan(4)
+
+  let app = new Slapp({ context })
+  let message = new Message('load', {
+    type: 'dialog_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+
+  app
+    .dialogSuggestion('/dialog/suggestion', (msg, name) => {
+      t.deepEqual(msg, message)
+      t.is('cat', name)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialogSuggestion() with componentName', t => {
+  t.plan(4)
+
+  let app = new Slapp({ context })
+  let message = new Message('load', {
+    type: 'dialog_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+
+  app
+    .dialogSuggestion('/dialog/suggestion', 'pets', (msg, name) => {
+      t.deepEqual(msg, message)
+      t.is('cat', name)
+    })
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.true(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialogSuggestion() message type mismatch', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    type: 'dialog_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+
+  app
+    .dialogSuggestion('/dialog/suggestion', (msg, name) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialogSuggestion() body type mismatch', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('load', {
+    type: 'another_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+
+  app
+    .dialogSuggestion('/dialog/suggestion', (msg, name) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialogSuggestion() no callbackId match', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('load', {
+    type: 'dialog_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/xxxx/xxxx'
+  }, meta)
+  app
+    .dialogSuggestion('/dialog/suggestion', (msg, name) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialogSuggestion() no componentName match', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('load', {
+    type: 'dialog_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+  app
+    .dialogSuggestion('/dialog/suggestion', 'dog', (msg, name) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
 test('Slapp default logger', t => {
   let app = new Slapp({ context })
 
