@@ -1330,6 +1330,46 @@ test.cb('Slapp.dialogSuggestion() with componentName', t => {
     })
 })
 
+test.cb('Slapp.dialogSuggestion() message type mismatch', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('action', {
+    type: 'dialog_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+
+  app
+    .dialogSuggestion('/dialog/suggestion', (msg, name) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
+test.cb('Slapp.dialogSuggestion() body type mismatch', t => {
+  t.plan(2)
+
+  let app = new Slapp({ context })
+  let message = new Message('load', {
+    type: 'another_suggestion',
+    name: 'pets',
+    value: 'cat',
+    callback_id: '/dialog/suggestion'
+  }, meta)
+
+  app
+    .dialogSuggestion('/dialog/suggestion', (msg, name) => {})
+    ._handle(message, (err, handled) => {
+      t.is(err, null)
+      t.false(handled)
+      t.end()
+    })
+})
+
 test.cb('Slapp.dialogSuggestion() no callbackId match', t => {
   t.plan(2)
 
