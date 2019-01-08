@@ -1,6 +1,6 @@
 'use strict'
 const request = require('request')
-const slack = require('slack')
+const { WebClient } = require('@slack/client')
 const Queue = require('js-queue')
 const RATE_LIMIT = 'You are sending too many requests. Please relax.'
 
@@ -241,6 +241,8 @@ class Message {
 
     input = self._processInput(input)
 
+    //this.attachToken(self.meta.bot_token || self.meta.app_token);
+
     let payload = Object.assign({
       token: self.meta.bot_token || self.meta.app_token,
       channel: self.meta.channel_id
@@ -254,7 +256,7 @@ class Message {
     }
 
     self._queueRequest(() => {
-      slack.chat.postMessage(payload, (err, data) => {
+      this._slapp.client.chat.postMessage(payload, (err, data) => {
         if (err) {
           self._slapp.emit('error', err)
         }
