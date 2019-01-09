@@ -1,6 +1,5 @@
 'use strict'
 const request = require('request')
-const { WebClient } = require('@slack/client')
 const RATE_LIMIT = 'You are sending too many requests. Please relax.'
 
 /**
@@ -238,8 +237,6 @@ class Message {
     if (!callback) callback = () => {}
 
     input = self._processInput(input)
-
-    //this.attachToken(self.meta.bot_token || self.meta.app_token);
 
     let payload = Object.assign({
       token: self.meta.bot_token || self.meta.app_token,
