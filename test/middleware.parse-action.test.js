@@ -3,7 +3,7 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const fixtures = require('./fixtures/')
-const ParseAction = require('../src/receiver/middleware/parse-action')
+const ParseAction = require('../build/receiver/middleware/parse-action')
 
 const SIGNATURE = 'mysignature'
 const TIMESTAMP = Date.now()

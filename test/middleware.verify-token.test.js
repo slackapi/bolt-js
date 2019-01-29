@@ -3,7 +3,7 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const fixtures = require('./fixtures/')
-const VerifyToken = require('../src/receiver/middleware/verify-token')
+const VerifyToken = require('../build/receiver/middleware/verify-token')
 
 test.cb('VerifyToken() no token option', t => {
   let mw = VerifyToken()

@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('ava').test
-const ParseCommand = require('../src/receiver/middleware/parse-command')
+const ParseCommand = require('../build/receiver/middleware/parse-command')
 const fixtures = require('./fixtures/')
 
 const SIGNATURE = 'mysignature'

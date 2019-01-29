@@ -3,7 +3,7 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const fixtures = require('./fixtures/')
-const CheckSignature = require('../src/receiver/middleware/check-signature')
+const CheckSignature = require('../build/receiver/middleware/check-signature')
 const SECRET = 'shhhhsecret'
 const VERSION = 'v0'
 

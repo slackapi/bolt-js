@@ -2,8 +2,8 @@
 
 const test = require('ava').test
 const sinon = require('sinon')
-const Slapp = require('../src/slapp')
-const Message = require('../src/message')
+const Slapp = require('../build/slapp')
+const Message = require('../build/message')
 const fixtures = require('./fixtures/')
 
 const meta = {

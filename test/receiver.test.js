@@ -4,8 +4,8 @@ const test = require('ava').test
 const sinon = require('sinon')
 const fs = require('fs')
 const fixtures = require('./fixtures/')
-const Receiver = require('../src/receiver/')
-const Message = require('../src/message')
+const Receiver = require('../build/receiver/')
+const Message = require('../build/message')
 
 test('Receiver() w/ record', t => {
   let writeStub = sinon.stub(fs, 'writeFileSync', () => {})

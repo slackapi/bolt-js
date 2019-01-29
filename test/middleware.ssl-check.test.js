@@ -3,7 +3,7 @@
 const test = require('ava').test
 const sinon = require('sinon')
 const fixtures = require('./fixtures/')
-const SSLCheck = require('../src/receiver/middleware/ssl-check')
+const SSLCheck = require('../build/receiver/middleware/ssl-check')
 
 test.cb('SSLCheck() no ssl_check', t => {
   let mw = SSLCheck()
