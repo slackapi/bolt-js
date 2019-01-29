@@ -1,5 +1,3 @@
-'use strict'
-
 const EventEmitter = require('events')
 const { WebClient } = require('@slack/client')
 const deap = require('deap/shallow')
@@ -8,6 +6,8 @@ const Receiver = require('./receiver/')
 const logger = require('./logger')
 const pathToRegexp = require('path-to-regexp')
 const HOUR = 60 * 60
+
+export interface SlappOptions {}
 
 /**
  * A Slack App
@@ -1057,4 +1057,4 @@ class Slapp extends EventEmitter {
   }
 }
 
-module.exports = Slapp
+export default Slapp;
