@@ -2,12 +2,12 @@
 
 const EventEmitter = require('events')
 const { WebClient } = require('@slack/client')
-const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
-const Receiver = require('./receiver/')
 const logger = require('./logger')
 const pathToRegexp = require('path-to-regexp')
 const HOUR = 60 * 60
+import ExpressReceiver, { Receiver } from './receiver';
+import defaultLogger, { Logger } from './logger';
 
 /**
  * A Slack App
@@ -16,73 +16,66 @@ const HOUR = 60 * 60
  */
 class Slapp extends EventEmitter {
 
-  /**
-   * Construct a Slapp, accepts an options object
-   *
-   * ##### Parameters
-   * - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
-   * - `opts.signing_secret` Slack signing secret to check/verify the signature of requests coming from Slack
-   * - `opts.signing_version` Slack signing version string, defaults to 'v0'
-   * - `opts.convo_store` Implementation of ConversationStore, defaults to memory
-   * - `opts.context` `Function (req, res, next)` Required HTTP Middleware function to enrich incoming request with context
-   * - `opts.log` defaults to `true`, `false` to disable logging
-   * - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
-   * - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
-   * - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's bot id.
-   * - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
-   * - `opts.defaultExpiration` (seconds) defaults to `60 * 60` (1 hour), 0 to never expire
-   *
-   * @api private
-   * @constructor
-   * @param {Object} opts
-   * @returns {Object} Slapp
-   */
+  /* Receiver */
+  private receiver: Receiver;
 
-  constructor (opts) {
-    super()
-    opts = deap.update({
-      verify_token: process.env.SLACK_VERIFY_TOKEN,
-      signing_secret: null,
-      signing_version: 'v0',
-      convo_store: null,
-      context: null,
-      log: true,
-      logger,
-      colors: !!process.stdout.isTTY,
-      ignoreSelf: true,
-      ignoreBots: false,
-      defaultExpiration: HOUR
-    }, opts || {})
+  /* Should enable logging */
+  private log: boolean;
 
-    if (!opts.context) {
+  /* Logger instance */
+  private logger: Logger;
+
+  /* Ignore any messages from your app */
+  private ignoreSelf: boolean;
+
+  /* Ignore any messages from a bot user */
+  private ignoreBots: boolean;
+
+  /* Enable colors for logging */
+  private colors: boolean;
+
+  constructor({
+    signingSecret = undefined,
+    receiver = undefined,
+    convoStore = undefined,
+    context = undefined,
+    logger = defaultLogger,
+    log = false,
+    colors = false,
+    ignoreSelf = false,
+    ignoreBots = false
+  }: SlappOptions = {}) {
+    super();
+
+    //if (!opts.context) {
       // TODO: Add a link to the github readme section talking about the context function
-      throw new Error('No context function provided. Please provide a context function to enrich Slack requests with necessary data.')
-    }
+      //throw new Error('No context function provided. Please provide a context function to enrich Slack requests with necessary data.')
+    //}
 
-    this._middleware = []
-    this._matchers = []
-    this._registry = {}
+    this._middleware = [];
+    this._matchers = [];
+    this._registry = {};
 
-    this.verify_token = opts.verify_token
-    this.log = opts.log
-    this.colors = opts.colors
-    this.logger = opts.logger
+    this.signingSecret = signingSecret;
 
-    this.ignoreSelf = opts.ignoreSelf
-    this.ignoreBots = opts.ignoreBots
-    this.defaultExpiration = opts.defaultExpiration
+    this.log = log;
+    this.colors = colors;
+    this.logger = logger;
+
+    this.ignoreSelf = ignoreSelf;
+    this.ignoreBots = ignoreBots;
 
     // If convo_store is a string, initialize that type of conversation store
     // If it's not a sting and it is defined, assume it is an implementation of
     // a conversation store
-    if (!opts.convo_store || typeof opts.convo_store === 'string') {
-      this.convoStore = conversationStore({ type: opts.convo_store })
+    if (!convoStore || typeof convoStore === 'string') {
+      this.convoStore = conversationStore({ type: convoStore });
     } else {
-      this.convoStore = opts.convo_store
+      this.convoStore = convoStore;
     }
 
-    this.client = new WebClient()
-    this.receiver = new Receiver(opts)
+    this.client = new WebClient();
+    this.receiver = new ExpressReceiver(signingSecret);
   }
 
   /**
@@ -96,11 +89,12 @@ class Slapp extends EventEmitter {
    */
   init () {
     // attach default logging if enabled
-    if (this.log) {
-      this.logger(this, {
-        colors: this.colors
-      })
-    }
+    // TODO: fix logger 
+    // if (this.log) {
+    //   this.logger(this, {
+    //     colors: this.colors
+    //   })
+    // }
     // call `handle` for each new request
     this.receiver
       .on('message', this._handle.bind(this))
@@ -302,9 +296,6 @@ class Slapp extends EventEmitter {
    * @param {Object} opts - options for attaching routes
    */
 
-  attachToExpress (app, opts) {
-    return this.receiver.attachToExpress(app, opts)
-  }
 
   /**
    * Register a new function route
@@ -1058,3 +1049,18 @@ class Slapp extends EventEmitter {
 }
 
 module.exports = Slapp
+
+/*
+ * Exported types
+ */
+export interface SlappOptions {
+  signingSecret?: string;
+  convoStore?: any;
+  context?: any;
+  receiver?: Receiver;
+  logger?: Logger;
+  log?: boolean;
+  colors?: boolean;
+  ignoreSelf?: boolean;
+  ignoreBots?: boolean;
+}
