@@ -1,7 +1,7 @@
 'use strict'
 
 const EventEmitter = require('events')
-const Slack = require('slack')
+const { WebClient } = require('@slack/client')
 const deap = require('deap/shallow')
 const conversationStore = require('./conversation_store')
 const Receiver = require('./receiver/')
@@ -81,7 +81,7 @@ class Slapp extends EventEmitter {
       this.convoStore = opts.convo_store
     }
 
-    this.client = new Slack()
+    this.client = new WebClient()
     this.receiver = new Receiver(opts)
   }
 

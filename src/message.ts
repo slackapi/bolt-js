@@ -1,7 +1,5 @@
 'use strict'
 const request = require('request')
-const slack = require('slack')
-const Queue = require('js-queue')
 const RATE_LIMIT = 'You are sending too many requests. Please relax.'
 
 /**
@@ -34,7 +32,6 @@ class Message {
     ].join('::')
 
     this._slapp = null
-    this._queue = null
 
     // allow clearTimeout to be stubbed
     this.clearTimeout = clearTimeout
@@ -253,14 +250,11 @@ class Message {
       payload.thread_ts = this.body.event.ts
     }
 
-    self._queueRequest(() => {
-      slack.chat.postMessage(payload, (err, data) => {
-        if (err) {
-          self._slapp.emit('error', err)
-        }
-        callback(err, data)
-        self._queue.next()
-      })
+    this._slapp.client.chat.postMessage(payload, (err, data) => {
+      if (err) {
+        self._slapp.emit('error', err)
+      }
+      callback(err, data)
     })
     return self
   }
@@ -337,27 +331,24 @@ class Message {
       return self
     }
 
-    self._queueRequest(() => {
-      self._request(responseUrl, self._processInput(input), (err, res, body) => {
-        // Normalize error for different error cases
-        if (!err && body.error) {
-          err = new Error(body.error)
-        }
-        if (!err && typeof body === 'string' && body.includes(RATE_LIMIT)) {
-          err = new Error('rate_limit')
-        }
+    self._request(responseUrl, self._processInput(input), (err, res, body) => {
+      // Normalize error for different error cases
+      if (!err && body.error) {
+        err = new Error(body.error)
+      }
+      if (!err && typeof body === 'string' && body.includes(RATE_LIMIT)) {
+        err = new Error('rate_limit')
+      }
 
-        if (err) {
-          self._slapp.emit('error', err)
-          callback(err)
-          return self._queue.next()
-        }
+      if (err) {
+        self._slapp.emit('error', err)
+        callback(err)
+        return
+      }
 
-        // success! clean up the response
-        delete body.ok
-        callback(null, body)
-        self._queue.next()
-      })
+      // success! clean up the response
+      delete body.ok
+      callback(null, body)
     })
 
     return self
@@ -700,13 +691,6 @@ class Message {
     }
 
     return input
-  }
-
-  _queueRequest (fn) {
-    if (!this._queue) {
-      this._queue = new Queue()
-    }
-    this._queue.add(fn)
   }
 
   verifyProps () {
