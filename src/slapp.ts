@@ -3,11 +3,10 @@
 const EventEmitter = require('events')
 const { WebClient } = require('@slack/client')
 const conversationStore = require('./conversation_store')
-const logger = require('./logger')
-const pathToRegexp = require('path-to-regexp')
-const HOUR = 60 * 60
 import ExpressReceiver, { Receiver } from './receiver';
 import defaultLogger, { Logger } from './logger';
+const pathToRegexp = require('path-to-regexp')
+const HOUR = 60 * 60
 
 /**
  * A Slack App
@@ -95,6 +94,7 @@ class Slapp extends EventEmitter {
     //     colors: this.colors
     //   })
     // }
+
     // call `handle` for each new request
     this.receiver
       .on('message', this._handle.bind(this))
@@ -1048,8 +1048,6 @@ class Slapp extends EventEmitter {
   }
 }
 
-module.exports = Slapp
-
 /*
  * Exported types
  */
@@ -1064,3 +1062,6 @@ export interface SlappOptions {
   ignoreSelf?: boolean;
   ignoreBots?: boolean;
 }
+
+export default Slapp;
+

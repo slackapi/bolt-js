@@ -3,7 +3,7 @@
 const test = require('ava').test
 const chalk = require('chalk')
 // const sinon = require('sinon')
-const Formatter = require('../src/message-formatter')
+const Formatter = require('../build/message-formatter')
 
 const eventMsg = require('./fixtures/messages/event.message')
 const eventMsgBotMsg = require('./fixtures/messages/event.message.bot_message')

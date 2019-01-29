@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('ava').test
-const Verify = require('../src/receiver/middleware/body-parser-verify')
+const Verify = require('../build/receiver/middleware/body-parser-verify')
 
 test('CheckSignature() signing_secret option no signature or timestamp header', t => {
   let rawBody = 'thisisjustarequestbody'

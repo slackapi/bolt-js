@@ -6,7 +6,7 @@ const { WebClient } = require('@slack/client')
 const fixtures = require('./fixtures/')
 
 const EventEmitter = require('events')
-const Message = require('../src/message')
+const Message = require('../build/message')
 
 test('Message() w/ user_id', t => {
   let type = 'event'
