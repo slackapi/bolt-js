@@ -45,6 +45,9 @@
     "dox": "^0.8.1",
     "nyc": "^7.0.0",
     "sinon": "^1.17.4",
-    "standard": "^7.1.2"
+    "standard": "^7.1.2",
+    "tslint": "^5.12.1",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.2.4"
   }
 }
