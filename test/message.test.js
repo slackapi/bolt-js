@@ -2,7 +2,7 @@
 
 const test = require('ava').test
 const sinon = require('sinon')
-const slack = require('slack')
+const { WebClient } = require('@slack/client')
 const fixtures = require('./fixtures/')
 
 const EventEmitter = require('events')
@@ -234,8 +234,11 @@ test('Message.say() w/ string using bot_token', t => {
     channel_id: 'channel_id'
   }
   let msg = new Message('event', {}, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.bot_token)
     t.is(payload.channel, meta.channel_id)
@@ -244,7 +247,7 @@ test('Message.say() w/ string using bot_token', t => {
   msg.say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.say() w/ callback', t => {
@@ -256,9 +259,12 @@ test('Message.say() w/ callback', t => {
     channel_id: 'channel_id'
   }
   let msg = new Message('event', {}, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
   let result = { data: 'data' }
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload, callback) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload, callback) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.bot_token)
     t.is(payload.channel, meta.channel_id)
@@ -271,7 +277,7 @@ test('Message.say() w/ callback', t => {
   })
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.say() w/ string using app_token', t => {
@@ -282,8 +288,11 @@ test('Message.say() w/ string using app_token', t => {
     channel_id: 'channel_id'
   }
   let msg = new Message('event', {}, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.app_token)
     t.is(payload.channel, meta.channel_id)
@@ -292,7 +301,7 @@ test('Message.say() w/ string using app_token', t => {
   msg.say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.say() w/ object override token & channel', t => {
@@ -303,12 +312,15 @@ test('Message.say() w/ object override token & channel', t => {
     channel_id: 'channel_id'
   }
   let msg = new Message('event', {}, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = {
     text: 'beepboop',
     channel: 'override_channel',
     token: 'override_token'
   }
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input.text)
     t.is(payload.token, input.token)
     t.is(payload.channel, input.channel)
@@ -317,36 +329,7 @@ test('Message.say() w/ object override token & channel', t => {
   msg.say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
-})
-
-test.cb('Message.say() multiple in series', t => {
-  t.plan(2)
-
-  let meta = {
-    bot_token: 'bot_token',
-    app_token: 'app_token',
-    channel_id: 'channel_id'
-  }
-  let msg = new Message('event', {}, meta)
-  let expected = '012345678910111213141516171819'
-  let accumulated = ''
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload, callback) => {
-    setTimeout(() => {
-      callback()
-      accumulated += payload.text
-      if (accumulated.length === 30) {
-        t.is(expected, accumulated)
-        t.is(postStub.callCount, 20)
-        slack.chat.postMessage.restore()
-        t.end()
-      }
-    }, Math.floor(Math.random() * 5))
-  })
-
-  for (let i = 0; i < 20; i++) {
-    msg.say(String(i))
-  }
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.say() api error', t => {
@@ -359,8 +342,9 @@ test('Message.say() api error', t => {
   let msg = new Message('event', {}, meta)
   let slapp = new EventEmitter()
   msg.attachSlapp(slapp)
+  msg._slapp.client = new WebClient()
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload, done) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload, done) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.app_token)
     t.is(payload.channel, meta.channel_id)
@@ -375,7 +359,7 @@ test('Message.say() api error', t => {
   t.true(postStub.calledOnce)
   t.true(emitStub.calledWith('error', 'kaboom'))
 
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.say() from threaded message', t => {
@@ -392,8 +376,11 @@ test('Message.say() from threaded message', t => {
     }
   }
   let msg = new Message('event', body, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.bot_token)
     t.is(payload.channel, meta.channel_id)
@@ -403,7 +390,7 @@ test('Message.say() from threaded message', t => {
   msg.say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.say() from non-threaded message', t => {
@@ -415,8 +402,11 @@ test('Message.say() from non-threaded message', t => {
     channel_id: 'channel_id'
   }
   let msg = new Message('event', {}, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.bot_token)
     t.is(payload.channel, meta.channel_id)
@@ -426,7 +416,7 @@ test('Message.say() from non-threaded message', t => {
   msg.say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.thread().say() from non-threaded message', t => {
@@ -443,8 +433,11 @@ test('Message.thread().say() from non-threaded message', t => {
     }
   }
   let msg = new Message('event', body, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.bot_token)
     t.is(payload.channel, meta.channel_id)
@@ -454,7 +447,7 @@ test('Message.thread().say() from non-threaded message', t => {
   msg.thread().say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test('Message.unthread().say() from threaded message', t => {
@@ -471,8 +464,11 @@ test('Message.unthread().say() from threaded message', t => {
     }
   }
   let msg = new Message('event', body, meta)
+  msg._slapp = {
+    client: new WebClient()
+  }
   let input = 'beepboop'
-  let postStub = sinon.stub(slack.chat, 'postMessage', (payload) => {
+  let postStub = sinon.stub(msg._slapp.client.chat, 'postMessage', (payload) => {
     t.is(payload.text, input)
     t.is(payload.token, meta.bot_token)
     t.is(payload.channel, meta.channel_id)
@@ -482,7 +478,7 @@ test('Message.unthread().say() from threaded message', t => {
   msg.unthread().say(input)
 
   t.true(postStub.calledOnce)
-  slack.chat.postMessage.restore()
+  msg._slapp.client.chat.postMessage.restore()
 })
 
 test.cb('Message.respond()', t => {
@@ -629,34 +625,6 @@ test('Message.respond() w/o responseUrl and response_url missing from body', t =
     t.is(err.message, 'no attached request and responseUrl not provided or not included as response_url with this type of Slack request')
   })
   t.deepEqual(msg, chainable)
-})
-
-test.cb('Message.respond() multiple in series', t => {
-  t.plan(22)
-  let msg = new Message()
-  let url = 'https://slack'
-
-  msg.body.response_url = url
-
-  let expected = '012345678910111213141516171819'
-  let accumulated = ''
-  let reqStub = sinon.stub(msg, '_request', (responseUrl, input, cb) => {
-    setTimeout(() => {
-      cb(null, {}, { ok: true })
-      accumulated += input.text
-      if (accumulated.length === 30) {
-        t.is(expected, accumulated)
-        t.is(reqStub.callCount, 20)
-        msg._request.restore()
-        t.end()
-      }
-    }, Math.floor(Math.random() * 5))
-  })
-
-  for (let i = 0; i < 20; i++) {
-    let chainable = msg.respond(String(i))
-    t.deepEqual(msg, chainable)
-  }
 })
 
 test.cb('Message.respond() w/response', t => {
