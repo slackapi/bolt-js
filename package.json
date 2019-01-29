@@ -2,10 +2,12 @@
   "name": "slapp",
   "version": "3.3.0",
   "description": "A module for Slack App integrations",
-  "main": "src/index.js",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "test": "npm run lint && npm run coverage",
-    "lint": "standard",
+    "lint": "tslint --project .",
     "unit": "ava --verbose --serial",
     "coverage": "nyc --check-coverage --statements 100 ava --verbose --serial",
     "lcov": "nyc --reporter lcov ava --serial",
@@ -28,9 +30,10 @@
   },
   "homepage": "https://github.com/missionsai/slapp#readme",
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.9.0"
   },
   "dependencies": {
+    "@types/node": ">=8",
     "@slack/client": "^4.8.0",
     "body-parser": "^1.15.2",
     "chalk": "^1.1.3",
@@ -45,6 +48,9 @@
     "dox": "^0.8.1",
     "nyc": "^7.0.0",
     "sinon": "^1.17.4",
-    "standard": "^7.1.2"
+    "standard": "^7.1.2",
+    "tslint": "^5.12.1",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.2.4"
   }
 }

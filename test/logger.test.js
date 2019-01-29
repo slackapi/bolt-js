@@ -2,7 +2,7 @@
 
 const test = require('ava').test
 const sinon = require('sinon')
-const Logger = require('../src/logger')
+const Logger = require('../build/logger')
 const EventEmitter = require('events')
 
 test('Logger()', t => {

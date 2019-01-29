@@ -1,8 +1,8 @@
 'use strict'
 
 const test = require('ava').test
-const Store = require('../src/conversation_store/')
-const Memory = require('../src/conversation_store/memory')
+const Store = require('../build/conversation_store/')
+const Memory = require('../build/conversation_store/memory')
 
 test('Store() w/ no type', t => {
   let store = Store()
