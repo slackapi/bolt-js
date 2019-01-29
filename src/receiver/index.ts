@@ -11,11 +11,17 @@ const VerifyToken = require('./middleware/verify-token')
 const CheckSignature = require('./middleware/check-signature')
 const SSLCheck = require('./middleware/ssl-check')
 
+//TODO: define interface
+export interface Receiver {
+  on(event: 'message', listener: () => void): this;
+  on(event: 'error', listener: (error: Error) => void): this;
+}
+
 /**
  * Receives HTTP requests with Events, Slash Commands, and Actions
  * @private
  */
-module.exports = class Receiver extends EventEmitter {
+export default class ExpressReceiver extends EventEmitter implements Receiver {
   constructor (opts) {
     super()
     opts = opts || {}
@@ -115,4 +121,3 @@ module.exports = class Receiver extends EventEmitter {
   }
 
 }
-

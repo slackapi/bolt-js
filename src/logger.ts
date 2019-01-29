@@ -3,7 +3,7 @@
 const chalk = require('chalk')
 const Formatter = require('./message-formatter')
 
-module.exports = (app, opts) => {
+export default (app, opts) => {
   opts = opts || {}
   let colors = opts.colors
   const formatter = Formatter({
@@ -21,4 +21,7 @@ module.exports = (app, opts) => {
     .on('error', err => {
       console.log([c('slapp:error', 'red'), (err && err.message) || err].join(' '))
     })
+};
+
+export interface Logger {
 }
