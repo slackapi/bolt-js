@@ -1,19 +1,18 @@
-'use strict'
-
-const EventEmitter = require('events')
-const { WebClient } = require('@slack/client')
-const conversationStore = require('./conversation_store')
-import ExpressReceiver, { Receiver } from './receiver';
-import defaultLogger, { Logger } from './logger';
-const pathToRegexp = require('path-to-regexp')
-const HOUR = 60 * 60
+// import EventEmitter from 'events';
+import { WebClient } from '@slack/client';
+// import conversationStore from './conversation_store';
+import ExpressReceiver, { Receiver } from './receiver'; // tslint:disable-line:import-name
+import defaultLogger, { Logger } from './logger'; // tslint:disable-line:import-name
+import pathToRegexp from 'path-to-regexp';
+import { Middleware, ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware';
 
 /**
  * A Slack App
- * @class Slapp
  * @api private
  */
-class Slapp extends EventEmitter {
+class Slapp /* extends EventEmitter */ {
+
+  public client: WebClient;
 
   /* Receiver */
   private receiver: Receiver;
@@ -33,6 +32,13 @@ class Slapp extends EventEmitter {
   /* Enable colors for logging */
   private colors: boolean;
 
+  /** Global middleware */
+  private middleware: Middleware[];
+
+  // TODO: change to listener type
+  /** Listeners (and their middleware) */
+  private listeners: any[];
+
   constructor({
     signingSecret = undefined,
     receiver = undefined,
@@ -42,20 +48,18 @@ class Slapp extends EventEmitter {
     log = false,
     colors = false,
     ignoreSelf = false,
-    ignoreBots = false
+    ignoreBots = false,
   }: SlappOptions = {}) {
-    super();
+    // super();
 
-    //if (!opts.context) {
+    // if (!opts.context) {
       // TODO: Add a link to the github readme section talking about the context function
-      //throw new Error('No context function provided. Please provide a context function to enrich Slack requests with necessary data.')
-    //}
+      // throw new Error('No context function provided. Please provide a context function to enrich Slack requests ' +
+      // 'with necessary data.')
+    // }
 
-    this._middleware = [];
-    this._matchers = [];
-    this._registry = {};
-
-    this.signingSecret = signingSecret;
+    this.middleware = [];
+    this.listeners = [];
 
     this.log = log;
     this.colors = colors;
@@ -64,31 +68,13 @@ class Slapp extends EventEmitter {
     this.ignoreSelf = ignoreSelf;
     this.ignoreBots = ignoreBots;
 
-    // If convo_store is a string, initialize that type of conversation store
-    // If it's not a sting and it is defined, assume it is an implementation of
-    // a conversation store
-    if (!convoStore || typeof convoStore === 'string') {
-      this.convoStore = conversationStore({ type: convoStore });
-    } else {
-      this.convoStore = convoStore;
-    }
+    // TODO: provide a global middleware for conversation store
 
     this.client = new WebClient();
     this.receiver = new ExpressReceiver(signingSecret);
-  }
 
-  /**
-   * Initialize app w/ logger, default middleware and receiver listener
-   *
-   *
-   * ##### Returns
-   * - `this` (chainable)
-   *
-   * @api private
-   */
-  init () {
     // attach default logging if enabled
-    // TODO: fix logger 
+    // TODO: fix logger
     // if (this.log) {
     //   this.logger(this, {
     //     colors: this.colors
@@ -97,96 +83,26 @@ class Slapp extends EventEmitter {
 
     // call `handle` for each new request
     this.receiver
-      .on('message', this._handle.bind(this))
-      .on('error', this.emit.bind(this, 'error'))
+      // TODO: push messages into processing pipeline
+      .on('message', () => undefined)
+      .on('error', e => this.receiverError(e));
 
     if (this.ignoreBots) {
-      this.use(this.ignoreBotsMiddleware())
+      this.use(ignoreBotsMiddleware());
     }
     if (this.ignoreSelf) {
-      this.use(this.ignoreSelfMiddleware())
-    }
-    this.use(this.preprocessConversationMiddleware())
-
-    return this
-  }
-
-  /**
-   * Middleware that gets an existing conversation from the conversation store
-   * or initialize a new one.
-   *
-   * @api private
-   */
-
-  preprocessConversationMiddleware () {
-    return (msg, next) => {
-      this.convoStore.get(msg.conversation_id, (err, val) => {
-        if (err) {
-          return this.emit('error', err)
-        }
-
-        if (val) {
-          msg.attachOverrideRoute(val.fnKey, val.state)
-        }
-
-        next()
-      })
-    }
-  }
-
-  /**
-   * Middleware that ignores messages from this bot user (self) when we can tell. Requires the
-   * meta context to be populated with `app_bot_id`.
-   *
-   * @api private
-   */
-
-  ignoreSelfMiddleware () {
-    return (msg, next) => {
-      if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-        let bothFalsy = !msg.meta.app_bot_id && !msg.meta.bot_id
-        let bothEqual = msg.meta.app_bot_id === msg.meta.bot_id
-        if (!bothFalsy && bothEqual) {
-          return
-        }
-      }
-      next()
-    }
-  }
-
-  /**
-   * Middleware that ignores messages from any bot user
-   *
-   * @api private
-   */
-
-  ignoreBotsMiddleware () {
-    return (msg, next) => {
-      if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-        return
-      }
-      next()
+      this.use(ignoreSelfMiddleware());
     }
   }
 
   /**
    * Register a new middleware, processed in the order registered.
    *
-   * ##### Parameters
-   * - `fn`: middleware function `(msg, next) => { }`
-   *
-   *
-   * ##### Returns
-   * - `this` (chainable)
-   *
-   * @param {function} fn
-   * @api public
+   * @param m global middleware function
    */
-
-  use (fn) {
-    this._middleware.push(fn)
-
-    return this
+  public use(m: Middleware): this {
+    this.middleware.push(m);
+    return this;
   }
 
   /**
@@ -194,67 +110,68 @@ class Slapp extends EventEmitter {
    *
    * ##### Parameters
    * - `msg` `Message`
-   * - `done` `function(err, bool)` Callback called once complete, called with error and boolean indicating message was handled [optional]
+   * - `done` `function(err, bool)` Callback called once complete, called with error and boolean indicating message was
+   *   handled [optional]
    *
    * @param {Message} msg
    * @param {function} done
    * @api private
    */
 
-  _handle (msg, done) {
-    done = done || (() => {})
-    let self = this
+  // _handle (/*msg, done*/) {
+  //   done = done || (() => {})
+  //   let self = this
 
-    let err = msg.verifyProps()
-    if (err) {
-      self.emit('error', err)
-    }
+  //   let err = msg.verifyProps()
+  //   if (err) {
+  //     self.emit('error', err)
+  //   }
 
-    this.emit('info', msg)
-    msg.attachSlapp(self)
-    let idx = 0
+  //   this.emit('info', msg)
+  //   msg.attachSlapp(self)
+  //   let idx = 0
 
-    let next = () => {
-      let current = idx++
-      if (self._middleware[current]) {
-        self._middleware[current](msg, next)
-        return
-      }
+  //   let next = () => {
+  //     let current = idx++
+  //     if (self._middleware[current]) {
+  //       self._middleware[current](msg, next)
+  //       return
+  //     }
 
-      // is there a conversation override?
-      if (msg.override) {
-        self.convoStore.del(msg.conversation_id, (err) => {
-          if (err) {
-            self.emit('error', err)
-          }
-          // invoking override w/o context explicitly
-          // don't want to confuse consumers w/ a msg as `this` scope
-          msg.override.call(null, msg)
+  //     // is there a conversation override?
+  //     if (msg.override) {
+  //       self.convoStore.del(msg.conversation_id, (err) => {
+  //         if (err) {
+  //           self.emit('error', err)
+  //         }
+  //         // invoking override w/o context explicitly
+  //         // don't want to confuse consumers w/ a msg as `this` scope
+  //         msg.override.call(null, msg)
 
-          done(err || null, true)
-        })
-        return
-      }
+  //         done(err || null, true)
+  //       })
+  //       return
+  //     }
 
-      // consider the matchers
-      for (let i = 0; i < self._matchers.length; i++) {
-        // if match is a regex, text the regex against the text of a message (if it is a message)
-        let matcher = self._matchers[i]
-        if (matcher(msg)) {
-          return done(null, true)
-        }
-      }
+  //     // consider the matchers
+  //     for (let i = 0; i < self._matchers.length; i++) {
+  //       // if match is a regex, text the regex against the text of a message (if it is a message)
+  //       let matcher = self._matchers[i]
+  //       if (matcher(msg)) {
+  //         return done(null, true)
+  //       }
+  //     }
 
-      // no matchers
-      msg.clearResponse({ close: true })
+  //     // no matchers
+  //     msg.clearResponse({ close: true })
 
-      done(null, false)
-    }
+  //     done(null, false)
+  //   }
 
-    next()
+  //   next()
 
-    return this
-  }
+  //   return this
+  // }
 
   /**
    * Attach HTTP routes to an Express app
@@ -296,45 +213,6 @@ class Slapp extends EventEmitter {
    * @param {Object} opts - options for attaching routes
    */
 
-
-  /**
-   * Register a new function route
-   *
-   * ##### Parameters
-   * - `fnKey` unique key to refer to function
-   * - `fn` `(msg, state) => {}`
-   *
-   *
-   * ##### Returns
-   * - `this` (chainable)
-   *
-   * @param {string} fnKey
-   * @param {function} fn
-   */
-
-  route (fnKey, fn) {
-    this._registry[fnKey] = fn
-
-    return this
-  }
-
-  /**
-   * Return a registered route
-   *
-   * ##### Parameters
-   * - `fnKey` string - unique key to refer to function
-   *
-   *
-   * ##### Returns
-   * - `(msg, state) => {}`
-   *
-   * @param {string} fnKey
-   */
-
-  getRoute (fnKey) {
-    return this._registry[fnKey]
-  }
-
   /**
    * Register a custom Match function (fn)
    *
@@ -359,11 +237,11 @@ class Slapp extends EventEmitter {
    * @param {function} fn
    */
 
-  match (fn) {
-    this._matchers.push(fn)
+  // match (fn) {
+  //   this._matchers.push(fn)
 
-    return this
-  }
+  //   return this
+  // }
 
   /**
    * Register a new message handler function for the criteria
@@ -415,31 +293,31 @@ class Slapp extends EventEmitter {
    * @param {(string|Array)} typeFilter
    */
 
-  message (criteria, typeFilter, callback) {
-    if (typeof criteria === 'string') {
-      criteria = new RegExp(criteria, 'i')
-    }
-    if (typeof typeFilter === 'function') {
-      callback = typeFilter
-      typeFilter = []
-    }
-    if (typeof typeFilter === 'string') {
-      typeFilter = [typeFilter]
-    }
+  // message (criteria, typeFilter, callback) {
+  //   if (typeof criteria === 'string') {
+  //     criteria = new RegExp(criteria, 'i')
+  //   }
+  //   if (typeof typeFilter === 'function') {
+  //     callback = typeFilter
+  //     typeFilter = []
+  //   }
+  //   if (typeof typeFilter === 'string') {
+  //     typeFilter = [typeFilter]
+  //   }
 
-    let fn = (msg) => {
-      if (msg.isBaseMessage()) {
-        let text = msg.stripDirectMention()
-        let match = text.match(criteria)
-        if (match && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
-          callback.apply(null, [msg].concat(match))
-          return true
-        }
-      }
-    }
-    this.match(fn)
-    return this
-  }
+  //   let fn = (msg) => {
+  //     if (msg.isBaseMessage()) {
+  //       let text = msg.stripDirectMention()
+  //       let match = text.match(criteria)
+  //       if (match && (typeFilter.length === 0 || msg.isAnyOf(typeFilter))) {
+  //         callback.apply(null, [msg].concat(match))
+  //         return true
+  //       }
+  //     }
+  //   }
+  //   this.match(fn)
+  //   return this
+  // }
 
   /**
    * Register a new event handler for an actionName
@@ -480,19 +358,19 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  event (criteria, callback) {
-    if (typeof criteria === 'string') {
-      criteria = new RegExp(`^${criteria}$`, 'i')
-    }
-    let fn = (msg) => {
-      if (msg.type === 'event' && msg.body.event && criteria.test(msg.body.event.type)) {
-        callback(msg)
-        return true
-      }
-    }
+  // event (criteria, callback) {
+  //   if (typeof criteria === 'string') {
+  //     criteria = new RegExp(`^${criteria}$`, 'i')
+  //   }
+  //   let fn = (msg) => {
+  //     if (msg.type === 'event' && msg.body.event && criteria.test(msg.body.event.type)) {
+  //       callback(msg)
+  //       return true
+  //     }
+  //   }
 
-    return this.match(fn)
-  }
+  //   return this.match(fn)
+  // }
 
   /**
    * Register a new handler for button or menu actions. The actionValueCriteria
@@ -668,64 +546,64 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  action (callbackIdPath, actionNameCriteria, actionValueCriteria, callback) {
-    if (typeof actionValueCriteria === 'function') {
-      callback = actionValueCriteria
-      actionValueCriteria = /.*/
-    }
+  // action (callbackIdPath, actionNameCriteria, actionValueCriteria, callback) {
+  //   if (typeof actionValueCriteria === 'function') {
+  //     callback = actionValueCriteria
+  //     actionValueCriteria = /.*/
+  //   }
 
-    if (typeof actionNameCriteria === 'function') {
-      callback = actionNameCriteria
-      actionNameCriteria = /.*/
-      actionValueCriteria = /.*/
-    }
+  //   if (typeof actionNameCriteria === 'function') {
+  //     callback = actionNameCriteria
+  //     actionNameCriteria = /.*/
+  //     actionValueCriteria = /.*/
+  //   }
 
-    if (typeof actionNameCriteria === 'string') {
-      actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
-    }
+  //   if (typeof actionNameCriteria === 'string') {
+  //     actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
+  //   }
 
-    if (typeof actionValueCriteria === 'string') {
-      actionValueCriteria = new RegExp(`^${actionValueCriteria}$`, 'i')
-    }
+  //   if (typeof actionValueCriteria === 'string') {
+  //     actionValueCriteria = new RegExp(`^${actionValueCriteria}$`, 'i')
+  //   }
 
-    var keys = []
-    var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
+  //   var keys = []
+  //   var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
 
-    let fn = (msg) => {
-      if (msg.type !== 'action' || !msg.body.actions) return
-      let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
-      if (!callbackIdMatch) return
+  //   let fn = (msg) => {
+  //     if (msg.type !== 'action' || !msg.body.actions) return
+  //     let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+  //     if (!callbackIdMatch) return
 
-      let params = {}
-      keys.forEach((key, i) => {
-        params[key.name] = callbackIdMatch[i + 1]
-      })
-      msg.meta.params = params
+  //     let params = {}
+  //     keys.forEach((key, i) => {
+  //       params[key.name] = callbackIdMatch[i + 1]
+  //     })
+  //     msg.meta.params = params
 
-      // Don't know how to handle multiple actions in the area. As far as this writing, this isn't ever
-      // expected to happen. Best way to handle this uncertainty is to loop until we find a match and then stop
-      for (let i = 0; i < msg.body.actions.length; i++) {
-        let action = msg.body.actions[i]
-        if (actionNameCriteria.test(action.name)) {
-          // test for menu options. There could be multiple options returned so attempt to match
-          // on any of them and if any one matches, we'll consider this a match.
-          if (Array.isArray(action.selected_options)) {
-            if (action.selected_options.find(option => actionValueCriteria.test(option.value))) {
-              callback(msg, action.selected_options.map(it => it.value))
-              return true
-            }
-          }
-          // test for message actions
-          if (actionValueCriteria.test(action.value)) {
-            callback(msg, action.value)
-            return true
-          }
-        }
-      }
-    }
+  //     // Don't know how to handle multiple actions in the area. As far as this writing, this isn't ever
+  //     // expected to happen. Best way to handle this uncertainty is to loop until we find a match and then stop
+  //     for (let i = 0; i < msg.body.actions.length; i++) {
+  //       let action = msg.body.actions[i]
+  //       if (actionNameCriteria.test(action.name)) {
+  //         // test for menu options. There could be multiple options returned so attempt to match
+  //         // on any of them and if any one matches, we'll consider this a match.
+  //         if (Array.isArray(action.selected_options)) {
+  //           if (action.selected_options.find(option => actionValueCriteria.test(option.value))) {
+  //             callback(msg, action.selected_options.map(it => it.value))
+  //             return true
+  //           }
+  //         }
+  //         // test for message actions
+  //         if (actionValueCriteria.test(action.value)) {
+  //           callback(msg, action.value)
+  //           return true
+  //         }
+  //       }
+  //     }
+  //   }
 
-    return this.match(fn)
-  }
+  //   return this.match(fn)
+  // }
 
   /**
    * Register a new handler for a [message action](https://api.slack.com/actions).
@@ -780,16 +658,16 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  messageAction (callbackId, callback) {
-    let fn = (msg) => {
-      if (msg.type !== 'action' || msg.body.type !== 'message_action') return
-      if (msg.body.callback_id !== callbackId) return
-      callback(msg, msg.body.message)
-      return true
-    }
+  // messageAction (callbackId, callback) {
+  //   let fn = (msg) => {
+  //     if (msg.type !== 'action' || msg.body.type !== 'message_action') return
+  //     if (msg.body.callback_id !== callbackId) return
+  //     callback(msg, msg.body.message)
+  //     return true
+  //   }
 
-    return this.match(fn)
-  }
+  //   return this.match(fn)
+  // }
 
   /**
    * Register a new interactive message options handler
@@ -856,38 +734,38 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  options (callbackIdPath, actionNameCriteria, callback) {
-    if (typeof actionNameCriteria === 'function') {
-      callback = actionNameCriteria
-      actionNameCriteria = /.*/
-    }
+  // options (callbackIdPath, actionNameCriteria, callback) {
+  //   if (typeof actionNameCriteria === 'function') {
+  //     callback = actionNameCriteria
+  //     actionNameCriteria = /.*/
+  //   }
 
-    if (typeof actionNameCriteria === 'string') {
-      actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
-    }
+  //   if (typeof actionNameCriteria === 'string') {
+  //     actionNameCriteria = new RegExp(`^${actionNameCriteria}$`, 'i')
+  //   }
 
-    var keys = []
-    var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
+  //   var keys = []
+  //   var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
 
-    let fn = (msg) => {
-      if (msg.type !== 'options') return false
-      let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
-      if (!callbackIdMatch) return
+  //   let fn = (msg) => {
+  //     if (msg.type !== 'options') return false
+  //     let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+  //     if (!callbackIdMatch) return
 
-      let params = {}
-      keys.forEach((key, i) => {
-        params[key.name] = callbackIdMatch[i + 1]
-      })
-      msg.meta.params = params
+  //     let params = {}
+  //     keys.forEach((key, i) => {
+  //       params[key.name] = callbackIdMatch[i + 1]
+  //     })
+  //     msg.meta.params = params
 
-      if (actionNameCriteria.test(msg.body.name)) {
-        callback(msg, msg.body.value)
-        return true
-      }
-    }
+  //     if (actionNameCriteria.test(msg.body.name)) {
+  //       callback(msg, msg.body.value)
+  //       return true
+  //     }
+  //   }
 
-    return this.match(fn)
-  }
+  //   return this.match(fn)
+  // }
 
   /**
    * Register a new slash command handler
@@ -950,33 +828,33 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  command (command, criteria, callback) {
-    if (typeof criteria === 'function') {
-      callback = criteria
-      criteria = /.*/
-    }
-    if (typeof criteria === 'string') {
-      criteria = new RegExp(criteria, 'i')
-    }
-    if (typeof command === 'string') {
-      command = new RegExp(`^${command}$`, 'i')
-    }
+  // command (command, criteria, callback) {
+  //   if (typeof criteria === 'function') {
+  //     callback = criteria
+  //     criteria = /.*/
+  //   }
+  //   if (typeof criteria === 'string') {
+  //     criteria = new RegExp(criteria, 'i')
+  //   }
+  //   if (typeof command === 'string') {
+  //     command = new RegExp(`^${command}$`, 'i')
+  //   }
 
-    let fn = (msg) => {
-      if (msg.type === 'command' && msg.body.command && msg.body.command.match(command)) {
-        let text = msg.body.text || ''
-        let match = text.match(criteria)
-        if (match) {
-          callback.apply(null, [msg].concat(match))
-          return true
-        }
-      }
-    }
+  //   let fn = (msg) => {
+  //     if (msg.type === 'command' && msg.body.command && msg.body.command.match(command)) {
+  //       let text = msg.body.text || ''
+  //       let match = text.match(criteria)
+  //       if (match) {
+  //         callback.apply(null, [msg].concat(match))
+  //         return true
+  //       }
+  //     }
+  //   }
 
-    return this.match(fn)
-  }
+  //   return this.match(fn)
+  // }
 
-    /**
+  /**
    * Register a dialog submission handler for the given callback_id
    *
    * ##### Parameters
@@ -1025,26 +903,32 @@ class Slapp extends EventEmitter {
    * @param {function} callback
    */
 
-  dialog (callbackIdPath, callback) {
-    var keys = []
-    var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
+  // dialog (callbackIdPath, callback) {
+  //   var keys = []
+  //   var callbackIdCriteria = pathToRegexp(callbackIdPath, keys)
 
-    let fn = (msg) => {
-      if (msg.type !== 'action' || msg.body.type !== 'dialog_submission') return
-      let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
-      if (!callbackIdMatch) return
+  //   let fn = (msg) => {
+  //     if (msg.type !== 'action' || msg.body.type !== 'dialog_submission') return
+  //     let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+  //     if (!callbackIdMatch) return
 
-      let params = {}
-      keys.forEach((key, i) => {
-        params[key.name] = callbackIdMatch[i + 1]
-      })
-      msg.meta.params = params
+  //     let params = {}
+  //     keys.forEach((key, i) => {
+  //       params[key.name] = callbackIdMatch[i + 1]
+  //     })
+  //     msg.meta.params = params
 
-      callback(msg, msg.body.submission)
-      return true
-    }
+  //     callback(msg, msg.body.submission)
+  //     return true
+  //   }
 
-    return this.match(fn)
+  //   return this.match(fn)
+  // }
+
+  /**
+   */
+  private receiverError(_error: Error): void {
+    // TODO
   }
 }
 
@@ -1064,4 +948,3 @@ export interface SlappOptions {
 }
 
 export default Slapp;
-
