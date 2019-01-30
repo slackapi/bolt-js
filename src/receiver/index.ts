@@ -1,6 +1,6 @@
 'use strict'
 
-const EventEmitter = require('events')
+import EventEmitter from 'events';
 const fs = require('fs')
 const Message = require('../message')
 const ParseEvent = require('./middleware/parse-event')
