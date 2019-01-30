@@ -6,7 +6,7 @@ export interface MiddlewareArguments {
 }
 
 export interface Middleware {
-  (args: MiddlewareArguments) : void;
+  (args: MiddlewareArguments): void;
 }
 
 /**
