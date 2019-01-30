@@ -1,5 +1,3 @@
-'use strict'
-
 import EventEmitter from 'events';
 const fs = require('fs')
 const Message = require('../message')
@@ -11,9 +9,30 @@ const VerifyToken = require('./middleware/verify-token')
 const CheckSignature = require('./middleware/check-signature')
 const SSLCheck = require('./middleware/ssl-check')
 
-//TODO: define interface
+/*
+
+interface EventsAPIBody {
+
+}
+
+type EventBody = EventsAPIBody;
+
+export interface Event<B extends EventBody> {
+  body: B;
+}
+
+*/
+
+// TODO: make this generic on the body
+export interface Event {
+  body: object;
+  ack: (message?: string | object) => void;
+  // TODO: maybe respond shouldn't be handled by the receiver at all
+  respond?: (message: string | object) => void;
+}
+
 export interface Receiver {
-  on(event: 'message', listener: () => void): this;
+  on(event: 'message', listener: (event: Event) => void): this;
   on(event: 'error', listener: (error: Error) => void): this;
 }
 

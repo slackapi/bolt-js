@@ -1,12 +1,35 @@
+export interface NextMiddleware {
+  (error: Error): void;
+  (postProcess: (error: Error | undefined, done: (error?: Error) => void) => any): void;
+  (): void;
+}
 
+// TODO: should this become a generic, so that specific handlers can bind to handling a specific type, and become
+// aware of which aliases are available?
 export interface MiddlewareArguments {
-  payload: any;
-  context: any;
-  next: any;
+  // Payload and its aliases
+  payload: object;
+  message?: object;
+  event?: object;
+
+  // Body (superset of payload)
+  body: object;
+
+  context: object;
+
+  say?: (message: string | object) => void;
+
+  ack?: (message?: string | object) => void;
+
+  respond?: (message: string | object) => void;
 }
 
 export interface Middleware {
-  (args: MiddlewareArguments) : void;
+  (args: MiddlewareArguments): void;
+}
+
+export function process(initialArguments: MiddlewareArguments, middleware: Middleware[]): void {
+  // TODO
 }
 
 /**
