@@ -1,6 +1,8 @@
 import rawBody from 'raw-body';
 import crypto from 'crypto';
+import { timingSafeCompare } from 'tsscmp';
 import querystring from 'querystring';
+import { Request, Response } from 'express';
 
 export const errorCodes = {
   SIGNATURE_VERIFICATION_FAILURE: 'SLACKHTTPHANDLER_REQUEST_SIGNATURE_VERIFICATION_FAILURE',
@@ -21,12 +23,12 @@ function parseBody(contentType: string, body: any): object {
 }
 
 export default function (signingSecret: string): any {
-  return (req, res, next) => {
+  return (req: Request, res: Response, next: (e?: Error) => void) => {
     rawBody(req)
       .then((r) => {
         const body = r.toString();
-        const signature = req.headers['x-slack-signature'];
-        const ts = req.headers['x-slack-request-timestamp'];
+        const signature = <string> req.headers['x-slack-signature'];
+        const ts = Number(req.headers['x-slack-request-timestamp']);
 
         // Divide current date to match Slack ts format
         // Subtract 5 minutes from current time
@@ -34,8 +36,7 @@ export default function (signingSecret: string): any {
 
         if (ts < fiveMinutesAgo) {
           const error = new Error('Slack request signing verification failed');
-          error.code = errorCodes.REQUEST_TIME_FAILURE;
-          throw error;
+          next(error);
         }
 
         const hmac = crypto.createHmac('sha256', signingSecret);
@@ -44,11 +45,10 @@ export default function (signingSecret: string): any {
 
         if (!timingSafeCompare(hash, hmac.digest('hex'))) {
           const error = new Error('Slack request signing verification failed');
-          error.code = errorCodes.SIGNATURE_VERIFICATION_FAILURE;
-          throw error;
+          next(error);
         }
 
-        req.body = parseBody(req.headers['Content-Type'], body);
+        req.body = parseBody(<string> req.headers['Content-Type'], body);
 
         next();
       });

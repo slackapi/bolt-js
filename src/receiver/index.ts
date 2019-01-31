@@ -1,13 +1,11 @@
-import EventEmitter from 'events';
-import express from 'express';
+import { EventEmitter } from 'events';
+import express, { Request, Response, Application } from 'express';
 import parseRequest from './middleware/parseRequest';
 import SSLCheck from './middleware/SSLCheck';
 import axios from 'axios';
 import { MiddlewareArguments } from '../middleware';
 
-// TODO: define interface
 export interface Receiver {
-  (args: ReceiverArguments): void;
   on(event: 'message', listener: () => void): this;
   on(event: 'error', listener: (error: Error) => void): this;
 }
@@ -25,14 +23,10 @@ export interface ReceiverArguments {
 export default class ExpressReceiver extends EventEmitter implements Receiver {
 
   /* Signing secret to verify requests from Slack */
-  private signingSecret: string;
-
-  /* Signing secret to verify requests from Slack */
-  private endpoints: object;
+  private endpoints: object | string;
 
   /* Express app */
-  // TODO: type
-  private app: any;
+  private app: Application;
 
   constructor ({
     signingSecret = '',
@@ -40,24 +34,28 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }: ReceiverArguments) {
     super();
 
-    this.signingSecret = signingSecret;
     this.endpoints = endpoints;
+
+    if (typeof this.endpoints === 'string') {
+      this.endpoints = { events: this.endpoints };
+    }
 
     this.app = express();
 
-    const e = Object.values(this.endpoints);
     const defaultMiddleware = [
       SSLCheck(),
-      parseRequest(this.signingSecret),
+      parseRequest(signingSecret),
       this.emitHandler.bind(this),
     ];
+
+    const e = Object.values(this.endpoints);
 
     for (const endpoint in e) {
       this.app.post(endpoint, ...defaultMiddleware);
     }
   }
 
-  private emitHandler(req, res): void {
+  private emitHandler(req: Request, res: Response): void {
     const msg: MiddlewareArguments = {
       payload: {},
       context: {},
@@ -66,7 +64,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
 
     // Attach respond function to request
     if (req.body && req.body.response_url) {
-      msg.respond = function (response: string | object): any {
+      msg.respond = (response: string | object): any => {
         axios.post(req.body.response_url, response)
           .catch((e) => {
             this.emit('error', e);
@@ -87,4 +85,3 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     this.emit('message', msg);
   }
 }
-const r = new ExpressReceiver({ signingSecret: '' });
