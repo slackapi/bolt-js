@@ -1,8 +1,20 @@
 
 export interface MiddlewareArguments {
-  payload: any;
-  context: any;
-  next: any;
+  // Payload and its aliases
+  payload: object;
+  message?: object;
+  event?: object;
+
+  // Body (superset of payload)
+  body: object;
+
+  context: object;
+
+  say?: (message: string | object) => void;
+
+  ack?: (message?: string | object) => void;
+
+  respond?: (message: string | object) => void;
 }
 
 export interface Middleware {
