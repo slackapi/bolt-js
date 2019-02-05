@@ -1,8 +1,10 @@
+import { RequestHandler } from 'express';
 
-export default function (): any {
+export default function (): RequestHandler {
   return (req, res, next) => {
     if (req.body && req.body.ssl_check) {
-      return res.send();
+      res.send();
+      return;
     }
 
     next();
