@@ -64,7 +64,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
 
     // Attach respond function to request
     if (req.body && req.body.response_url) {
-      msg.respond = (response: string | object): any => {
+      msg.respond = (response: string | object): void => {
         axios.post(req.body.response_url, response)
           .catch((e) => {
             this.emit('error', e);

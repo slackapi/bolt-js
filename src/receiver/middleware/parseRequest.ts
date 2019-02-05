@@ -2,7 +2,7 @@ import rawBody from 'raw-body';
 import crypto from 'crypto';
 import { timingSafeCompare } from 'tsscmp';
 import querystring from 'querystring';
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 
 export const errorCodes = {
   SIGNATURE_VERIFICATION_FAILURE: 'SLACKHTTPHANDLER_REQUEST_SIGNATURE_VERIFICATION_FAILURE',
@@ -13,7 +13,7 @@ function parseBody(contentType: string, body: any): object {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(body);
 
-    if (parsedBody.payload) {
+    if (typeof parsedBody.payload === 'string') {
       return JSON.parse(parsedBody.payload);
     }
     return parsedBody;
@@ -22,12 +22,12 @@ function parseBody(contentType: string, body: any): object {
   return JSON.parse(body);
 }
 
-export default function (signingSecret: string): any {
+export default function (signingSecret: string): RequestHandler {
   return (req: Request, res: Response, next: (e?: Error) => void) => {
     rawBody(req)
       .then((r) => {
         const body = r.toString();
-        const signature = <string> req.headers['x-slack-signature'];
+        const signature = req.headers['x-slack-signature'] as string;
         const ts = Number(req.headers['x-slack-request-timestamp']);
 
         // Divide current date to match Slack ts format
@@ -48,7 +48,7 @@ export default function (signingSecret: string): any {
           next(error);
         }
 
-        req.body = parseBody(<string> req.headers['Content-Type'], body);
+        req.body = parseBody(req.headers['Content-Type'] as string, body);
 
         next();
       });
