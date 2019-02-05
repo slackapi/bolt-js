@@ -1,123 +1,87 @@
-'use strict'
+import { EventEmitter } from 'events';
+import express, { Request, Response, Application } from 'express';
+import parseRequest from './middleware/parseRequest';
+import SSLCheck from './middleware/SSLCheck';
+import axios from 'axios';
+import { MiddlewareArguments } from '../middleware';
 
-import EventEmitter from 'events';
-const fs = require('fs')
-const Message = require('../message')
-const ParseEvent = require('./middleware/parse-event')
-const ParseCommand = require('./middleware/parse-command')
-const ParseAction = require('./middleware/parse-action')
-const ParseOptions = require('./middleware/parse-options')
-const VerifyToken = require('./middleware/verify-token')
-const CheckSignature = require('./middleware/check-signature')
-const SSLCheck = require('./middleware/ssl-check')
-
-//TODO: define interface
 export interface Receiver {
   on(event: 'message', listener: () => void): this;
   on(event: 'error', listener: (error: Error) => void): this;
 }
 
+export interface ReceiverArguments {
+  signingSecret: string;
+  endpoints?: string | {
+    [endpointType: string]: string;
+  };
+}
+
 /**
  * Receives HTTP requests with Events, Slash Commands, and Actions
- * @private
  */
 export default class ExpressReceiver extends EventEmitter implements Receiver {
-  constructor (opts) {
-    super()
-    opts = opts || {}
 
-    this.verify_token = opts.verify_token
-    this.signing_secret = opts.signing_secret
-    this.signing_version = opts.signing_version
-    this.context = opts.context
+  /* Signing secret to verify requests from Slack */
+  private endpoints: object | string;
 
-    // record all events to a JSON line delimited file if record is set
-    if (opts.record) {
-      this.started = Date.now()
-      fs.writeFileSync(opts.record, '')
-      this.on('message', (obj) => {
-        fs.appendFile(opts.record, JSON.stringify(Object.assign({}, obj, { delay: Date.now() - this.started })) + '\n')
-      })
+  /* Express app */
+  private app: Application;
+
+  constructor ({
+    signingSecret = '',
+    endpoints = { events: '/slack/events' },
+  }: ReceiverArguments) {
+    super();
+
+    this.endpoints = endpoints;
+
+    if (typeof this.endpoints === 'string') {
+      this.endpoints = { events: this.endpoints };
     }
-  }
 
-  /**
-   * Attach receiver HTTP route to an express app
-   */
-  attachToExpress (app, opts) {
-    let defaults = {
-      event: '/slack/event',
-      command: '/slack/command',
-      action: '/slack/action',
-      options: '/slack/options'
-    }
-    let options = opts || defaults
+    this.app = express();
 
-    // replace any `true` values w/ default paths
-    Object.keys(options).forEach((type) => {
-      options[type] = options[type] === true ? defaults[type] : options[type]
-    })
-
-    let defaultMiddlware = [
+    const defaultMiddleware = [
       SSLCheck(),
-      VerifyToken(this.verify_token, this.emit.bind(this, 'error')),
-      CheckSignature(this.signing_secret, this.signing_version, this.emit.bind(this, 'error')),
-      this.context,
-      this.emitHandler.bind(this)
-    ]
+      parseRequest(signingSecret),
+      this.emitHandler.bind(this),
+    ];
 
-    if (options.event) {
-      app.post(options.event,
-        ParseEvent(),
-        ...defaultMiddlware
-      )
+    const e = Object.values(this.endpoints);
+
+    for (const endpoint in e) {
+      this.app.post(endpoint, ...defaultMiddleware);
     }
-
-    if (options.command) {
-      app.post(options.command,
-        ParseCommand(),
-        ...defaultMiddlware
-      )
-    }
-
-    if (options.action) {
-      app.post(options.action,
-        ParseAction(),
-        ...defaultMiddlware
-      )
-    }
-
-    if (options.options) {
-      app.post(options.options,
-        ParseOptions(),
-        ...defaultMiddlware
-      )
-    }
-
-    return app
   }
 
-  emitHandler (req, res) {
-    let message = req.slapp
+  private emitHandler(req: Request, res: Response): void {
+    const msg: MiddlewareArguments = {
+      payload: {},
+      context: {},
+      body: req.body,
+    };
 
-    if (!message) {
-      return res.send('Missing req.slapp')
+    // Attach respond function to request
+    if (req.body && req.body.response_url) {
+      msg.respond = (response: string | object): void => {
+        axios.post(req.body.response_url, response)
+          .catch((e) => {
+            this.emit('error', e);
+          });
+      };
     }
 
-    let msg = new Message(message.type, message.body, message.meta)
+    // TODO: when is ack() not included on the response?
+    msg.ack = function (response: string | Object | undefined): void {
+      if (!response) res.send('');
+      if (typeof response === 'string') {
+        res.send(response);
+      } else {
+        res.json(response);
+      }
+    };
 
-    if (message.response && message.responseTimeout) {
-      // Attaching the response will delegate responsibility of closing it
-      this.attachResponse(msg, message.response, message.responseTimeout)
-    } else {
-      res.send()
-    }
-
-    this.emit('message', msg)
+    this.emit('message', msg);
   }
-
-  attachResponse (msg, response, timeout) {
-    msg.attachResponse(response, timeout)
-  }
-
 }
