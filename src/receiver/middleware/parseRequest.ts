@@ -23,7 +23,7 @@ function parseBody(contentType: string, body: any): object {
 }
 
 export default function (signingSecret: string): RequestHandler {
-  return (req: Request, res: Response, next: (e?: Error) => void) => {
+  return (req: Request, _res: Response, next: (e?: Error) => void) => {
     rawBody(req)
       .then((r) => {
         const body = r.toString();

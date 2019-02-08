@@ -19,11 +19,12 @@ export interface Event<B extends EventBody> {
 
 */
 
-// TODO: make this generic on the body
+// TODO: make this generic on the body?
 export interface Event {
-  body: object;
+  body: {
+    [key: string]: any;
+  };
   ack: (message?: string | object) => void;
-  // TODO: maybe respond shouldn't be handled by the receiver at all
   respond?: (message: string | object) => void;
 }
 
@@ -78,15 +79,22 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }
 
   private emitHandler(req: Request, res: Response): void {
-    const msg: MiddlewareArguments = {
-      payload: {},
-      context: {},
-      body: req.body,
+    const event: Event = {
+      body: req.body as { [key: string]: any },
+      ack: (response: any): void => {
+        if (!response) res.send('');
+        if (typeof response === 'string') {
+          res.send(response);
+        } else {
+          res.json(response);
+        }
+      },
+      respond: undefined,
     };
 
-    // Attach respond function to request
+    // TODO: should this be in Slapp? Attach respond function to request
     if (req.body && req.body.response_url) {
-      msg.respond = (response: string | object): void => {
+      event.respond = (response: string | object): void => {
         axios.post(req.body.response_url, response)
           .catch((e) => {
             this.emit('error', e);
@@ -94,16 +102,6 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
       };
     }
 
-    // TODO: when is ack() not included on the response?
-    msg.ack = function (response: string | Object | undefined): void {
-      if (!response) res.send('');
-      if (typeof response === 'string') {
-        res.send(response);
-      } else {
-        res.json(response);
-      }
-    };
-
-    this.emit('message', msg);
+    this.emit('message', event);
   }
 }

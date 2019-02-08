@@ -1,7 +1,8 @@
 // import EventEmitter from 'events';
 import { WebClient } from '@slack/client';
 // import conversationStore from './conversation_store';
-import ExpressReceiver, { Receiver, Event as ReceiverEvent } from './receiver'; // tslint:disable-line:import-name
+// tslint:disable-next-line:import-name
+import ExpressReceiver, { Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import defaultLogger, { Logger } from './logger'; // tslint:disable-line:import-name
 // import pathToRegexp from 'path-to-regexp';
 import { Middleware, ignoreSelfMiddleware, ignoreBotsMiddleware, process } from './middleware';
@@ -38,6 +39,7 @@ class Slapp /* extends EventEmitter */ {
 
   constructor({
     signingSecret = undefined,
+    endpoints = undefined,
     receiver = undefined,
     convoStore = undefined,
     teamContext = undefined,
@@ -64,8 +66,15 @@ class Slapp /* extends EventEmitter */ {
 
     this.client = new WebClient();
 
-    // TODO: only conditionally initialize the default receiver, throw an error when configuration is ambiguous
-    this.receiver = new ExpressReceiver(signingSecret);
+    // Check for required arguments of ExpressReceiver
+    if (signingSecret !== undefined) {
+      this.receiver = new ExpressReceiver({ signingSecret, endpoints });
+    } else if (receiver === undefined) {
+      // Check for custom receiver
+      throw new Error('Set a signing secret for the default receiver or a custom receiver');
+    } else {
+      this.receiver = receiver;
+    }
 
     // attach default logging if enabled
     // TODO: fix logger
@@ -159,12 +168,21 @@ class Slapp /* extends EventEmitter */ {
     // TODO: Dispatch event through global middleware
 
     // TODO: Dispatch event through all listeners
+    // this.listeners.forEach(l => l(listenerArguments));
   }
 
   /**
    */
   private onGlobalError(_error: Error): void {
     // TODO
+  }
+
+  public message(listener: (args: SlackMessageEvent) => void) {
+    this.listeners.push(listener);
+  }
+
+  public event(listener: (args: SlackEvent) => void) {
+    this.listeners.push(listener);
   }
 }
 
@@ -179,7 +197,8 @@ enum ReceiverMessageType {
  * Exported types
  */
 export interface SlappOptions {
-  signingSecret?: string;
+  signingSecret?: ReceiverArguments['signingSecret'];
+  endpoints?: ReceiverArguments['endpoints'];
   convoStore?: any;
   teamContext?: any;
   receiver?: Receiver;

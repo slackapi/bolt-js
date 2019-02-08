@@ -30,9 +30,7 @@ import Slapp, { SlappOptions } from './Slapp';
  */
 
 function factory(opts: SlappOptions): Slapp {
-  const app = new Slapp(opts);
-
-  return app.init();
+  return new Slapp(opts);
 }
 
 module.exports = factory;
