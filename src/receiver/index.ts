@@ -3,7 +3,7 @@ import express, { Request, Response, Application } from 'express';
 import parseRequest from './middleware/parseRequest';
 import SSLCheck from './middleware/SSLCheck';
 import axios from 'axios';
-import { MiddlewareArguments } from '../middleware';
+import { MiddlewareArguments } from '../middleware/builtin';
 
 /*
 

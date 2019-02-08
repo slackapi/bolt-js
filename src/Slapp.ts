@@ -5,7 +5,16 @@ import { WebClient } from '@slack/client';
 import ExpressReceiver, { Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import defaultLogger, { Logger } from './logger'; // tslint:disable-line:import-name
 // import pathToRegexp from 'path-to-regexp';
-import { Middleware, ignoreSelfMiddleware, ignoreBotsMiddleware, process } from './middleware';
+import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
+import {
+  Middleware,
+  AnyMiddlewareArgs,
+  SlackActionMiddlewareArgs,
+  SlackCommandMiddlewareArgs,
+  SlackEventMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
+  SlackAction,
+} from './middleware/types';
 
 /**
  * A Slack App
@@ -31,7 +40,7 @@ class Slapp /* extends EventEmitter */ {
   private colors: boolean;
 
   /** Global middleware */
-  private middleware: Middleware[];
+  private middleware: Middleware<AnyMiddlewareArgs>[];
 
   // TODO: change to listener type
   /** Listeners (and their middleware) */
@@ -107,7 +116,7 @@ class Slapp /* extends EventEmitter */ {
    *
    * @param m global middleware function
    */
-  public use(m: Middleware): this {
+  public use(m: any): this {
     this.middleware.push(m);
     return this;
   }
@@ -177,20 +186,45 @@ class Slapp /* extends EventEmitter */ {
     // TODO
   }
 
-  public message(listener: (args: SlackMessageEvent) => void) {
-    this.listeners.push(listener);
+  public event<EventType extends string = string>(
+    eventName: EventType,
+    listener: Middleware<SlackEventMiddlewareArgs<EventType>>,
+  ): void {
+    // TODO:
   }
 
-  public event(listener: (args: SlackEvent) => void) {
-    this.listeners.push(listener);
+  // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
+  public message(listener: Middleware<SlackEventMiddlewareArgs<'message'>>): void;
+  public message(pattern: string | RegExp, listener: Middleware<SlackEventMiddlewareArgs<'message'>>): void;
+  public message(
+    patternOrMiddleware: string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>,
+    listener?: Middleware<SlackEventMiddlewareArgs<'message'>>,
+  ): void {
+    // TODO
   }
-}
 
-enum ReceiverMessageType {
-  Event = 'Event',
-  Command = 'Command',
-  Options = 'Options',
-  Action = 'Action',
+  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
+  // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
+  public action<ActionType extends SlackAction = SlackAction>(
+    callbackId: string | RegExp,
+    listener: Middleware<SlackActionMiddlewareArgs<ActionType>>,
+  ): void {
+    // TODO:
+  }
+
+  // TODO: should command names also be regex?
+  public command(commandName: string, listener: Middleware<SlackCommandMiddlewareArgs>): void {
+    // TODO:
+  }
+
+  // TODO: is the generic constraint a good one?
+  // TODO: the name Within is not super good
+  public options<Within extends 'interactive_message' | 'dialog_suggestion' = 'interactive_message'>(
+    callbackId: string,
+    listener: Middleware<SlackOptionsMiddlewareArgs<Within>>,
+  ): void {
+    // TODO:
+  }
 }
 
 /*
