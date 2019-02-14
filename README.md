@@ -994,8 +994,8 @@ The `msg` is the same as the Message type. `opts` includes the `opts.colors` pas
   Example;
   
 ```js
-  // "/acommand"
-  slapp.command('my_callback_id', (msg, submission) => {
+  // "register dialog submission handler"
+  slapp.dialog('my_callback_id', (msg, submission) => {
     submission.prop_name_1
   }
 ```
