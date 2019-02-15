@@ -998,8 +998,7 @@ class Slapp extends EventEmitter {
    *
    * Example;
    *
-   *     // "/acommand"
-   *     slapp.command('my_callback_id', (msg, submission) => {
+   *     slapp.dialog('my_callback_id', (msg, submission) => {
    *       submission.prop_name_1
    *     }
    *
