@@ -703,6 +703,9 @@ class Slapp extends EventEmitter {
     let fn = (msg) => {
       if (msg.type !== 'action' || !msg.body.actions) return
       let callbackIdMatch = callbackIdCriteria.exec(msg.body.callback_id)
+      if (!callbackIdMatch) {
+        callbackIdMatch = callbackIdCriteria.exec(msg.body.actions[0].action_id)
+      }
       if (!callbackIdMatch) return
 
       let params = {}
