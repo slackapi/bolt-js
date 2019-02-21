@@ -81,6 +81,31 @@ test.cb('ParseAction() message_action valid payload', t => {
   })
 })
 
+test.cb('ParseAction() block_actions valid payload', t => {
+  t.plan(2)
+  let mw = ParseAction().pop()
+
+  let payload = mockPayload()
+  payload.type = 'block_actions'
+  payload.actions = [{
+    action_id: 'button_action_id'
+  }]
+
+  let req = {
+    body: { payload: JSON.stringify(payload) },
+    headers: fixtures.getMockSlackHeaders(SIGNATURE, TIMESTAMP)
+  }
+  let res = fixtures.getMockRes()
+
+  mw(req, res, () => {
+    let slapp = req.slapp
+
+    t.is(slapp.body.type, 'block_actions')
+    t.is(slapp.body.callback_id, 'button_action_id')
+    t.end()
+  })
+})
+
 function mockPayload () {
   return {
     token: 'token',
