@@ -2,7 +2,7 @@
  * Future generated types from Async API Spec
  */
 // NOTE: this is not a great example because it actually should get its shape from a message event
-interface AppMentionEvent {
+export interface AppMentionEvent {
   type: 'app_mention';
   user: string;
   text: string;
@@ -11,14 +11,14 @@ interface AppMentionEvent {
   event_ts: string;
 }
 
-interface GroupOpenEvent {
+export interface GroupOpenEvent {
   type: 'group_open';
   user: string;
   channel: string;
 }
 
 // NOTE: this should probably be broken into its two subtypes
-interface EmojiChangedEvent {
+export interface EmojiChangedEvent {
   type: 'emoji_changed';
   subtype: 'add' | 'remove';
   names?: string[];
@@ -27,7 +27,7 @@ interface EmojiChangedEvent {
   event_ts: string;
 }
 
-type SlackEvent =
+export type SlackEvent =
   | AppMentionEvent
   | GroupOpenEvent
   | EmojiChangedEvent;
@@ -36,7 +36,7 @@ type SlackEvent =
  * Slack Events API Types
  */
 
-interface UnknownSlackEvent {
+export interface UnknownSlackEvent {
   type: string;
 }
 
@@ -55,13 +55,13 @@ export interface SlackEventMiddlewareArgs<EventType extends string> {
  * Slack Action Types
  */
 
-interface ButtonClick {
+export interface ButtonClick {
   type: 'button';
   name: string;
   value: string;
 }
 
-interface MenuSelect {
+export interface MenuSelect {
   // TODO: figure out if type is really there
   // type: 'select';
   name: string;
@@ -70,11 +70,11 @@ interface MenuSelect {
   }[];
 }
 
-type InteractiveActions = ButtonClick | MenuSelect;
+export type InteractiveActions = ButtonClick | MenuSelect;
 
 // TODO: should we just leave the two InteractiveActions as separate interfaces?
 // TODO: how much of this can be a part of ActionFromType?
-interface InteractiveMessage<Action extends InteractiveActions> {
+export interface InteractiveMessage<Action extends InteractiveActions> {
   type: 'interactive_message';
   callback_id: string;
   actions: [Action];
@@ -103,7 +103,7 @@ interface InteractiveMessage<Action extends InteractiveActions> {
   original_message?: { [key: string]: string; };
 }
 
-interface DialogSubmitAction {
+export interface DialogSubmitAction {
   type: 'dialog_submission';
   callback_id: string;
   submission: { [name: string]: string };
@@ -129,7 +129,7 @@ interface DialogSubmitAction {
 // TODO: is there an actions property in this type? docs don't suggest so, but @slack/interactive-messages comments
 // would have me believe so (but would still function properly without it)
 // TODO: is this the only one that doesn't have an action_ts?
-interface MessageAction {
+export interface MessageAction {
   type: 'message_action';
   callback_id: string;
   trigger_id: string;
@@ -240,12 +240,12 @@ export type AnyMiddlewareArgs =
   | SlackCommandMiddlewareArgs
   | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>;
 
-export interface Middleware<Args> {
+export interface Middleware<Args extends AnyMiddlewareArgs> {
   // TODO: is there something nice we can do to get context's property types to flow from one middleware to the next?
   (args: Args & { next: NextMiddleware, context: { [key: string]: any } }): void;
 }
 
-interface NextMiddleware {
+export interface NextMiddleware {
   (error: Error): void;
   (postProcess: (error: Error | undefined, done: (error?: Error) => void) => any): void;
   (): void;
