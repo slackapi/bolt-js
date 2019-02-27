@@ -247,6 +247,11 @@ export interface Middleware<Args extends AnyMiddlewareArgs> {
 
 export interface NextMiddleware {
   (error: Error): void;
-  (postProcess: (error: Error | undefined, done: (error?: Error) => void) => any): void;
+  (postProcess: PostProcessFn): void;
   (): void;
+}
+
+// TODO: should this any be unknown type?
+export interface PostProcessFn {
+  (error: Error | undefined, done: (error?: Error) => void): any;
 }
