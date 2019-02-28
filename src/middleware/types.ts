@@ -240,9 +240,13 @@ export type AnyMiddlewareArgs =
   | SlackCommandMiddlewareArgs
   | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>;
 
+export interface Context {
+  [key: string]: any;
+}
+
 export interface Middleware<Args extends AnyMiddlewareArgs> {
   // TODO: is there something nice we can do to get context's property types to flow from one middleware to the next?
-  (args: Args & { next: NextMiddleware, context: { [key: string]: any } }): void;
+  (args: Args & { next: NextMiddleware, context: Context }): void;
 }
 
 export interface NextMiddleware {
