@@ -22,6 +22,7 @@ function parseBody(contentType: string, body: any): object {
   return JSON.parse(body);
 }
 
+// TODO: support req.rawBody for serverless platforms like Firebase
 export default function (signingSecret: string): RequestHandler {
   return (req: Request, _res: Response, next: (e?: Error) => void) => {
     rawBody(req)

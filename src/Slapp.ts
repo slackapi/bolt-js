@@ -1,10 +1,7 @@
-// import EventEmitter from 'events';
 import { WebClient } from '@slack/client';
 // import conversationStore from './conversation_store';
-// tslint:disable-next-line:import-name
-import ExpressReceiver, { Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
+import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import defaultLogger, { Logger } from './logger'; // tslint:disable-line:import-name
-// import pathToRegexp from 'path-to-regexp';
 import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
 import {
   Middleware,
@@ -16,11 +13,46 @@ import {
   SlackAction,
 } from './middleware/types';
 
+export interface SlappOptions {
+  signingSecret?: ReceiverArguments['signingSecret'];
+  endpoints?: ReceiverArguments['endpoints'];
+  convoStore?: any;
+  token?: string; // either token or teamContext
+  teamContext?: Authorize; // either token or teamContext
+  receiver?: Receiver;
+  logger?: Logger;
+  log?: boolean;
+  colors?: boolean;
+  ignoreSelf?: boolean;
+  ignoreBots?: boolean;
+}
+
+export interface Authorize {
+  (
+    source: AuthorizeSourceData,
+    body: ReceiverEvent['body'],
+  ): Promise<AuthorizeResult>;
+}
+
+export interface AuthorizeSourceData {
+  teamId: string;
+  enterpriseId?: string;
+  userId?: string;
+  conversationId?: string;
+}
+
+export interface AuthorizeResult {
+  botToken?: string; // used by `say` (preferred over appToken, one is required)
+  appToken?: string; // used by `say` (overridden by botToken, one is required)
+  botId?: string; // required for `ignoreSelf` global middleware
+  botUserId?: string; // optional
+  [ key: string ]: any;
+}
+
 /**
  * A Slack App
- * @api private
  */
-class Slapp /* extends EventEmitter */ {
+export default class Slapp {
 
   /** Slack Web API client */
   public client: WebClient;
@@ -28,29 +60,32 @@ class Slapp /* extends EventEmitter */ {
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
 
-  /* Should enable logging */
   // DEPRECATE: substitute this with a log level
+  /** Should enable logging */
   private log: boolean;
 
   /** Logger */
   private logger: Logger;
 
-  /* Enable colors for logging */
   // DEPRECATE: this can become a default property of the default logger
+  /** Enable colors for logging */
   private colors: boolean;
+
+  /**  */
+  private authorize: Authorize;
 
   /** Global middleware */
   private middleware: Middleware<AnyMiddlewareArgs>[];
 
-  // TODO: change to listener type
   /** Listeners (and their middleware) */
-  private listeners: any[];
+  private listeners: Middleware<AnyMiddlewareArgs>[][];
 
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
     receiver = undefined,
     convoStore = undefined,
+    token = undefined,
     teamContext = undefined,
     logger = defaultLogger,
     log = false,
@@ -58,13 +93,17 @@ class Slapp /* extends EventEmitter */ {
     ignoreSelf = false,
     ignoreBots = false,
   }: SlappOptions = {}) {
-    // super();
 
-    // if (!opts.context) {
-      // TODO: Add a link to the github readme section talking about the context function
-      // throw new Error('No context function provided. Please provide a context function to enrich Slack requests ' +
-      // 'with necessary data.')
-    // }
+    if (token !== undefined) {
+      if (teamContext !== undefined) {
+        throw new Error(`Both token and teamContext options provided. ${tokenUsage}`);
+      }
+      this.authorize = async () => ({ botToken: token });
+    } else if (teamContext === undefined) {
+      throw new Error(`No token and no teamContext options provided. ${tokenUsage}`);
+    } else {
+      this.authorize = teamContext;
+    }
 
     this.middleware = [];
     this.listeners = [];
@@ -80,7 +119,8 @@ class Slapp /* extends EventEmitter */ {
       this.receiver = new ExpressReceiver({ signingSecret, endpoints });
     } else if (receiver === undefined) {
       // Check for custom receiver
-      throw new Error('Set a signing secret for the default receiver or a custom receiver');
+      throw new Error('Signing secret not found, so could not initialize the default receiver. Set a signing secret ' +
+        'or use a custom receiver.');
     } else {
       this.receiver = receiver;
     }
@@ -95,7 +135,6 @@ class Slapp /* extends EventEmitter */ {
 
     // Subscribe to messages and errors from the receiver
     this.receiver
-      // TODO: push messages into processing pipeline
       .on('message', message => this.onIncomingEvent(message))
       .on('error', error => this.onGlobalError(error));
 
@@ -103,7 +142,6 @@ class Slapp /* extends EventEmitter */ {
       this.use(ignoreBotsMiddleware());
     }
     if (ignoreSelf) {
-      // TODO: this cannot work unless the teamContext provides the bot ID
       this.use(ignoreSelfMiddleware());
     }
 
@@ -124,54 +162,82 @@ class Slapp /* extends EventEmitter */ {
   /**
    * Handles events from the receiver
    */
-  private onIncomingEvent({ body, ack, respond }: ReceiverEvent): void {
+  private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
 
-    // Base values for all kinds of messages
-    const listenerArguments = {
-      body,
-      respond,
-      context: {},
-    };
-
-    // There are four kinds of messages:
-    // 1. event (Events API): each body has an `event` property
-    // 2. action (Button, Menu, Dialog Submission, Message Action): each
-    // 3. command (Slash Command)
-    // 4. options (Menu with external data source, in a Message or in a Dialog)
-    //
-    // Inspect the body to pick the appropriate logic to fill out the rest of the listenerArguments
-    if (body.event !== undefined) {
-      // EVENT
-
-      listenerArguments.payload = listenerArguments.event = body.event;
-
-      // If its a message event, create another alias
-      if (body.event.type === 'message') {
-        listenerArguments.message = body.event;
+    // Introspect the body to determine what type of incoming event is being handled
+    const type: IncomingEventType | undefined = (() => {
+      if (body.event !== undefined) {
+        return IncomingEventType.Event;
       }
+      if (body.command !== undefined) {
+        return IncomingEventType.Command;
+      }
+      if (body.name !== undefined) {
+        return IncomingEventType.Options;
+      }
+      if (body.actions !== undefined || body.type === 'dialog_submission') {
+        return IncomingEventType.Action;
+      }
+      return undefined;
+    })();
 
-      // Events are acknowledged right away, since there's no data expected in the acknowledgement
-      ack();
-    } else if (body.command !== undefined) {
-      // COMMAND
-      listenerArguments.payload = body;
-      listenerArguments.ack = ack;
-    } else if (body.name !== undefined) {
-      // OPTIONS
-      listenerArguments.payload = body;
-      listenerArguments.ack = ack;
-    } else if (body.actions !== undefined || body.type === 'dialog_submission') {
-      // ACTION
-      listenerArguments.ack = ack;
-    } else {
-      // TODO: warn and return
+    // If the type could not be determined, warn and exit
+    if (type === undefined) {
+      this.logger.warn('Could not determine the type of an incoming event. No listeners will be called.');
+      return;
     }
 
-    // TODO: add say method when there's a channel
+    // Initialize context (shallow copy to enforce object identity separation)
+    const context = { ...(await this.authorize(buildSource(type, body), body)) };
 
-    // TODO: if the receiver doesn't look for the response_url, and Slapp does instead, then respond can be defined here
+    // Factory for say() argument
+    const createSay = (channelId: string) => {
+      const token = context.botToken !== undefined ? context.botToken : context.appToken;
+      return (message: any) => {
+        const postMessageArguments = (typeof message === 'string') ?
+          { token, channel: channelId, text: message } : { token, channel: channelId, ...message };
+        this.client.chat.postMessage(postMessageArguments)
+          // TODO: create a specific error code
+          .catch(this.onGlobalError);
+      };
+    };
+
+    // Set body and payload
+    const listenerArgs: AnyMiddlewareArgs = {
+      body,
+      payload: (type === IncomingEventType.Event) ? body.event : body,
+    };
+
+    // Set aliases
+    if (type === IncomingEventType.Event) {
+      listenerArgs.event = listenerArgs.payload;
+      if (listenerArgs.event.type === 'message') {
+        listenerArgs.message = listenerArgs.payload;
+      }
+    } else if (type === IncomingEventType.Action) {
+      listenerArgs.action = listenerArgs.payload;
+    } else if (type === IncomingEventType.Command) {
+      listenerArgs.command = listenerArgs.payload;
+    }
+    // NOTE: there is no alias for options
+
+    // Set say() utility
+    const channelId = getChannelContext(type, body);
+    if (channelId !== undefined) {
+      listenerArgs.say = createSay(channelId);
+    }
+
+    // Set respond() utility
     if (respond !== undefined) {
-      listenerArguments.respond = respond;
+      listenerArgs.respond = respond;
+    }
+
+    // Set ack() utility
+    if (type !== IncomingEventType.Event) {
+      listenerArgs.ack = ack;
+    } else {
+      // Events API requests are acknowledged right away, since there's no data expected
+      ack();
     }
 
     // TODO: Dispatch event through global middleware
@@ -227,23 +293,74 @@ class Slapp /* extends EventEmitter */ {
   }
 }
 
-/*
- * Exported types
+const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
+  'should be initialized with a teamContext.';
+
+/**
+ * Internal data type for capturing the class of event processed in Slapp#onIncomingEvent()
  */
-export interface SlappOptions {
-  signingSecret?: ReceiverArguments['signingSecret'];
-  endpoints?: ReceiverArguments['endpoints'];
-  convoStore?: any;
-  teamContext?: any;
-  receiver?: Receiver;
-  logger?: Logger;
-  log?: boolean;
-  colors?: boolean;
-  ignoreSelf?: boolean;
-  ignoreBots?: boolean;
+enum IncomingEventType {
+  Event,
+  Action,
+  Command,
+  Options,
 }
 
-export default Slapp;
+/**
+ * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
+ */
+function buildSource(type: IncomingEventType, body: AnyMiddlewareArgs['body']): AuthorizeSourceData {
+  // tslint:disable:max-line-length
+  const source: AuthorizeSourceData = {
+    teamId:
+      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? body.team_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.team.id as string :
+       assertNever(type)),
+    enterpriseId:
+      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? body.enterprise_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.team.enterprise_id as string :
+       undefined),
+    userId:
+      ((type === IncomingEventType.Event) ?
+        ((typeof body.event.user === 'string') ? body.event.user as string :
+         (typeof body.event.user === 'object') ? body.event.user.id as string :
+         (body.event.channel !== undefined && body.event.channel.creator !== undefined) ? body.event.channel.creator as string :
+         (body.event.subteam !== undefined && body.event.subteam.created_by !== undefined) ? body.event.subteam.created_by as string :
+         undefined) :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.user.id as string :
+       (type === IncomingEventType.Command) ? body.user_id as string :
+       undefined),
+    // TODO: fill in conversationId, possibly reuse part of getChannelContext()
+    conversationId: undefined,
+  };
+  // tslint:enable:max-line-length
+
+  return source;
+}
+
+function getChannelContext(type: IncomingEventType, body: AnyMiddlewareArgs['body']): string | undefined {
+  if (type === IncomingEventType.Action) {
+    return body.channel.id;
+  }
+  if (type === IncomingEventType.Command) {
+    return body.channel_id;
+  }
+  // TODO: verify this covers all the events
+  if (type === IncomingEventType.Event) {
+    if (body.event.channel !== undefined) {
+      return body.event.channel;
+    }
+    if (body.event.item !== undefined) {
+      return body.event.item.channel;
+    }
+  }
+  // NOTE: Intentionally leaving all options requests with undefined
+  return undefined;
+}
+
+function assertNever(x: never): never {
+  throw new Error(`Unexpected object: ${x}`);
+}
 
   /**
    * Handle new events (slack events, commands, actions, webhooks, etc.)
