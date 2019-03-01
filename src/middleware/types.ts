@@ -2,7 +2,7 @@
  * Future generated types from Async API Spec
  */
 // NOTE: this is not a great example because it actually should get its shape from a message event
-export interface AppMentionEvent {
+export interface AppMentionEvent extends KeyValueMapping {
   type: 'app_mention';
   user: string;
   text: string;
@@ -11,14 +11,14 @@ export interface AppMentionEvent {
   event_ts: string;
 }
 
-export interface GroupOpenEvent {
+export interface GroupOpenEvent extends KeyValueMapping {
   type: 'group_open';
   user: string;
   channel: string;
 }
 
 // NOTE: this should probably be broken into its two subtypes
-export interface EmojiChangedEvent {
+export interface EmojiChangedEvent extends KeyValueMapping {
   type: 'emoji_changed';
   subtype: 'add' | 'remove';
   names?: string[];
@@ -28,7 +28,7 @@ export interface EmojiChangedEvent {
 }
 
 // TODO: this is just a draft of the actual message event
-export interface MessageEvent {
+export interface MessageEvent extends KeyValueMapping {
   type: 'message';
   channel: string;
   user: string;
@@ -48,14 +48,19 @@ export type SlackEvent =
  * Slack Events API Types
  */
 
-export interface UnknownSlackEvent {
-  type: string;
+interface KeyValueMapping {
+  [key: string]: any;
+}
+
+export interface UnknownSlackEvent<Type> extends KeyValueMapping {
+  type: Type;
 }
 
 type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
-type EventFromType<T extends string> = KnownEventFromType<T> extends never ? UnknownSlackEvent : KnownEventFromType<T>;
+type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
+  UnknownSlackEvent<T> : KnownEventFromType<T>;
 
-interface WrappedSlackEvent<EventBody> {
+interface WrappedSlackEvent<EventBody> extends KeyValueMapping {
   token: string;
   team_id: string;
   enterprise_id?: string;
@@ -98,7 +103,7 @@ export interface MenuSelect {
 
 export type InteractiveAction = ButtonClick | MenuSelect;
 
-export interface InteractiveMessage<Action extends InteractiveAction> {
+export interface InteractiveMessage<Action extends InteractiveAction> extends KeyValueMapping {
   type: 'interactive_message';
   callback_id: string;
   actions: [Action];
@@ -132,7 +137,7 @@ export interface InteractiveMessage<Action extends InteractiveAction> {
   original_message?: { [key: string]: string; };
 }
 
-export interface DialogSubmitAction {
+export interface DialogSubmitAction extends KeyValueMapping {
   type: 'dialog_submission';
   callback_id: string;
   submission: { [name: string]: string };
@@ -157,7 +162,7 @@ export interface DialogSubmitAction {
   response_url: string;
 }
 
-export interface MessageAction {
+export interface MessageAction extends KeyValueMapping {
   type: 'message_action';
   callback_id: string;
   trigger_id: string;
@@ -209,22 +214,24 @@ export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
  * Slack Command Types
  */
 
+export interface SlashCommand extends KeyValueMapping {
+  token: string;
+  command: string;
+  text: string;
+  response_url: string;
+  trigger_id: string;
+  user_id: string;
+  user_name: string;
+  team_id: string;
+  team_domain: string;
+  channel_id: string;
+  channel_name: string;
+  enterprise_id?: string;
+  enterprise_name?: string;
+}
+
 export interface SlackCommandMiddlewareArgs {
-  payload: {
-    token: string;
-    command: string;
-    text: string;
-    response_url: string;
-    trigger_id: string;
-    user_id: string;
-    user_name: string;
-    team_id: string;
-    team_domain: string;
-    channel_id: string;
-    channel_name: string;
-    enterprise_id?: string;
-    enterprise_name?: string;
-  };
+  payload: SlashCommand;
   command: this['payload'];
   body: this['payload'];
   // say: Say;
@@ -236,32 +243,34 @@ export interface SlackCommandMiddlewareArgs {
  * Slack Options Types
  */
 
-export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
-  payload: {
-    name: string;
-    value: string;
-    callback_id: string;
-    type: Within,
-    team: {
-      id: string;
-      domain: string;
-      enterprise_id?: string; // undocumented
-      enterprise_name?: string; // undocumented
-    };
-    channel: {
-      id: string;
-      name: string;
-    };
-    user: {
-      id: string;
-      name: string;
-      team_id?: string; // undocumented
-    },
-    action_ts: string;
-    message_ts?: string; // not when within a dialog
-    attachment_id?: string; // not when within a dialog
-    token: string;
+export interface ExternalOptionsRequest<Type> {
+  name: string;
+  value: string;
+  callback_id: string;
+  type: Type;
+  team: {
+    id: string;
+    domain: string;
+    enterprise_id?: string; // undocumented
+    enterprise_name?: string; // undocumented
   };
+  channel: {
+    id: string;
+    name: string;
+  };
+  user: {
+    id: string;
+    name: string;
+    team_id?: string; // undocumented
+  };
+  action_ts: string;
+  message_ts?: string; // not when within a dialog
+  attachment_id?: string; // not when within a dialog
+  token: string;
+}
+
+export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
+  payload: ExternalOptionsRequest<Within>;
   body: this['payload'];
   // ack: Ack<Within>;
 }
@@ -276,8 +285,7 @@ export type AnyMiddlewareArgs =
   | SlackCommandMiddlewareArgs
   | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>;
 
-export interface Context {
-  [key: string]: any;
+export interface Context extends KeyValueMapping {
 }
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a

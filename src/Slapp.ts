@@ -3,6 +3,7 @@ import { WebClient } from '@slack/client';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
 import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
+import { processMiddleware } from './middleware/process';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -225,10 +226,33 @@ export default class Slapp {
       ack();
     }
 
-    // TODO: Dispatch event through global middleware
-
-    // TODO: Dispatch event through all listeners
-    // this.listeners.forEach(l => l(listenerArguments));
+    // Dispatch event through global middleware
+    processMiddleware(
+      listenerArgs,
+      this.middleware,
+      (globalProcessedContext, globalProcessedArgs, startGlobalBubble) => {
+        this.listeners.forEach((listenerMiddleware) => {
+          // Dispatch event through all listeners
+          processMiddleware(
+            globalProcessedArgs,
+            listenerMiddleware,
+            (_listenerProcessedContext, _listenerProcessedArgs, startListenerBubble) => {
+              startListenerBubble();
+            },
+            (error) => {
+              startGlobalBubble(error);
+            },
+            globalProcessedContext,
+          );
+        });
+      },
+      (globalError) => {
+        if (globalError !== undefined) {
+          this.onGlobalError(globalError);
+        }
+      },
+      context,
+    );
   }
 
   /**
