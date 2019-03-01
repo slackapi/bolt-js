@@ -30,5 +30,5 @@ export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
     //   return
     // }
     next();
-  }
+  };
 }

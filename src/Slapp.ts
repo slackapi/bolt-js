@@ -61,7 +61,7 @@ export default class Slapp {
   private receiver: Receiver;
 
   /** Logger */
-  private log: Logger;
+  private logger: Logger;
 
   /**  */
   private authorize: Authorize;
@@ -86,8 +86,8 @@ export default class Slapp {
     ignoreBots = false,
   }: SlappOptions = {}) {
 
-    this.log = logger;
-    this.log.setLevel(logLevel);
+    this.logger = logger;
+    this.logger.setLevel(logLevel);
     // TODO: set colors
 
     if (token !== undefined) {
@@ -104,7 +104,7 @@ export default class Slapp {
     this.middleware = [];
     this.listeners = [];
 
-    // TODO: should we pass the logLevel through?
+    // TODO: should we pass the logLevel through? probably not
     this.client = new WebClient();
 
     // Check for required arguments of ExpressReceiver

@@ -27,12 +27,22 @@ export interface EmojiChangedEvent {
   event_ts: string;
 }
 
+// TODO: this is just a draft of the actual message event
+export interface MessageEvent {
+  type: 'message';
+  channel: string;
+  user: string;
+  text: string;
+  ts: string;
+}
+
 // TODO: script to generate these types
 
 export type SlackEvent =
   | AppMentionEvent
   | GroupOpenEvent
-  | EmojiChangedEvent;
+  | EmojiChangedEvent
+  | MessageEvent;
 
 /*
  * Slack Events API Types
@@ -63,7 +73,9 @@ export interface SlackEventMiddlewareArgs<EventType extends string> {
   event: this['payload'];
   message: EventType extends 'message' ? this['payload'] : never;
   body: WrappedSlackEvent<this['payload']>;
+  // TODO: faking it, but do this for real later
   // say: HasChannelContext<E>;
+  say: (message: string | { text: string; [key: string]: any }) => void;
 }
 
 /*
