@@ -89,10 +89,12 @@ export class ConsoleLogger implements Logger {
 
   constructor() {
     this.level = LogLevel.INFO;
+    // TODO: do we need a name?
     this.name = '';
     chalk.enabled = true;
 
     // In node < 8.0.0, console.debug does not exist
+    // TODO: remove this
     if (console.debug !== undefined) {
       this.debugFn = console.debug;
     } else {
@@ -126,7 +128,7 @@ export class ConsoleLogger implements Logger {
    */
   public debug(...msg: any[]): void {
     if (ConsoleLogger.isMoreOrEqualSevere(LogLevel.DEBUG, this.level)) {
-      this.debugFn(chalk.cyan((ConsoleLogger.labels.get(LogLevel.DEBUG) as string), this.name, ...msg);
+      this.debugFn(chalk.cyan((ConsoleLogger.labels.get(LogLevel.DEBUG) as string), this.name, ...msg));
     }
   }
   /**
@@ -160,27 +162,4 @@ export class ConsoleLogger implements Logger {
   private static isMoreOrEqualSevere(a: LogLevel, b: LogLevel): boolean {
     return ConsoleLogger.severity[a] >= ConsoleLogger.severity[b];
   }
-}
-
-let instanceCount = 0;
-
-/**
- * INTERNAL interface for getting or creating a named Logger.
- */
-export function getLogger(name: string, level: LogLevel, existingLogger?: Logger): Logger {
-  // Get a unique ID for the logger.
-  const instanceId = instanceCount;
-  instanceCount += 1;
-
-  // Set up the logger.
-  const logger: Logger = (() => {
-    if (existingLogger !== undefined) { return existingLogger; }
-    return new ConsoleLogger();
-  })();
-  logger.setName(`${name}:${instanceId}`);
-  if (level !== undefined) {
-    logger.setLevel(level);
-  }
-
-  return logger;
 }

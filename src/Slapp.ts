@@ -1,7 +1,7 @@
 import { WebClient } from '@slack/client';
 // import conversationStore from './conversation_store';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
-import defaultLogger, { Logger } from './logger'; // tslint:disable-line:import-name
+import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
 import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
 import {
   Middleware,
@@ -21,7 +21,7 @@ export interface SlappOptions {
   teamContext?: Authorize; // either token or teamContext
   receiver?: Receiver;
   logger?: Logger;
-  log?: boolean;
+  logLevel?: LogLevel;
   colors?: boolean;
   ignoreSelf?: boolean;
   ignoreBots?: boolean;
@@ -60,16 +60,8 @@ export default class Slapp {
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
 
-  // DEPRECATE: substitute this with a log level
-  /** Should enable logging */
-  private log: boolean;
-
   /** Logger */
-  private logger: Logger;
-
-  // DEPRECATE: this can become a default property of the default logger
-  /** Enable colors for logging */
-  private colors: boolean;
+  private log: Logger;
 
   /**  */
   private authorize: Authorize;
@@ -87,12 +79,16 @@ export default class Slapp {
     convoStore = undefined,
     token = undefined,
     teamContext = undefined,
-    logger = defaultLogger,
-    log = false,
+    logger = new ConsoleLogger(),
+    logLevel = LogLevel.INFO,
     colors = false,
     ignoreSelf = false,
     ignoreBots = false,
   }: SlappOptions = {}) {
+
+    this.log = logger;
+    this.log.setLevel(logLevel);
+    // TODO: set colors
 
     if (token !== undefined) {
       if (teamContext !== undefined) {
@@ -108,10 +104,7 @@ export default class Slapp {
     this.middleware = [];
     this.listeners = [];
 
-    this.log = log;
-    this.colors = colors;
-    this.logger = logger;
-
+    // TODO: should we pass the logLevel through?
     this.client = new WebClient();
 
     // Check for required arguments of ExpressReceiver
@@ -124,14 +117,6 @@ export default class Slapp {
     } else {
       this.receiver = receiver;
     }
-
-    // attach default logging if enabled
-    // TODO: fix logger
-    // if (this.log) {
-    //   this.logger(this, {
-    //     colors: this.colors
-    //   })
-    // }
 
     // Subscribe to messages and errors from the receiver
     this.receiver
