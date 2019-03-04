@@ -1,10 +1,20 @@
 // import EventEmitter from 'events';
 import { WebClient } from '@slack/client';
 // import conversationStore from './conversation_store';
-import ExpressReceiver, { Receiver } from './receiver'; // tslint:disable-line:import-name
+// tslint:disable-next-line:import-name
+import ExpressReceiver, { Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import defaultLogger, { Logger } from './logger'; // tslint:disable-line:import-name
-import pathToRegexp from 'path-to-regexp';
-import { Middleware, ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware';
+// import pathToRegexp from 'path-to-regexp';
+import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
+import {
+  Middleware,
+  AnyMiddlewareArgs,
+  SlackActionMiddlewareArgs,
+  SlackCommandMiddlewareArgs,
+  SlackEventMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
+  SlackAction,
+} from './middleware/types';
 
 /**
  * A Slack App
@@ -12,28 +22,25 @@ import { Middleware, ignoreSelfMiddleware, ignoreBotsMiddleware } from './middle
  */
 class Slapp /* extends EventEmitter */ {
 
+  /** Slack Web API client */
   public client: WebClient;
 
-  /* Receiver */
+  /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
 
   /* Should enable logging */
+  // DEPRECATE: substitute this with a log level
   private log: boolean;
 
-  /* Logger instance */
+  /** Logger */
   private logger: Logger;
 
-  /* Ignore any messages from your app */
-  private ignoreSelf: boolean;
-
-  /* Ignore any messages from a bot user */
-  private ignoreBots: boolean;
-
   /* Enable colors for logging */
+  // DEPRECATE: this can become a default property of the default logger
   private colors: boolean;
 
   /** Global middleware */
-  private middleware: Middleware[];
+  private middleware: Middleware<AnyMiddlewareArgs>[];
 
   // TODO: change to listener type
   /** Listeners (and their middleware) */
@@ -41,9 +48,10 @@ class Slapp /* extends EventEmitter */ {
 
   constructor({
     signingSecret = undefined,
+    endpoints = undefined,
     receiver = undefined,
     convoStore = undefined,
-    context = undefined,
+    teamContext = undefined,
     logger = defaultLogger,
     log = false,
     colors = false,
@@ -65,13 +73,17 @@ class Slapp /* extends EventEmitter */ {
     this.colors = colors;
     this.logger = logger;
 
-    this.ignoreSelf = ignoreSelf;
-    this.ignoreBots = ignoreBots;
-
-    // TODO: provide a global middleware for conversation store
-
     this.client = new WebClient();
-    this.receiver = new ExpressReceiver(signingSecret);
+
+    // Check for required arguments of ExpressReceiver
+    if (signingSecret !== undefined) {
+      this.receiver = new ExpressReceiver({ signingSecret, endpoints });
+    } else if (receiver === undefined) {
+      // Check for custom receiver
+      throw new Error('Set a signing secret for the default receiver or a custom receiver');
+    } else {
+      this.receiver = receiver;
+    }
 
     // attach default logging if enabled
     // TODO: fix logger
@@ -81,18 +93,22 @@ class Slapp /* extends EventEmitter */ {
     //   })
     // }
 
-    // call `handle` for each new request
+    // Subscribe to messages and errors from the receiver
     this.receiver
       // TODO: push messages into processing pipeline
-      .on('message', () => undefined)
-      .on('error', e => this.receiverError(e));
+      .on('message', message => this.onIncomingEvent(message))
+      .on('error', error => this.onGlobalError(error));
 
-    if (this.ignoreBots) {
+    if (ignoreBots) {
       this.use(ignoreBotsMiddleware());
     }
-    if (this.ignoreSelf) {
+    if (ignoreSelf) {
+      // TODO: this cannot work unless the teamContext provides the bot ID
       this.use(ignoreSelfMiddleware());
     }
+
+    // TODO: provide a global middleware for conversation store. this should be de-emphasized because workflows will
+    // supercede this solution for the same use cases
   }
 
   /**
@@ -100,10 +116,134 @@ class Slapp /* extends EventEmitter */ {
    *
    * @param m global middleware function
    */
-  public use(m: Middleware): this {
+  public use(m: any): this {
     this.middleware.push(m);
     return this;
   }
+
+  /**
+   * Handles events from the receiver
+   */
+  private onIncomingEvent({ body, ack, respond }: ReceiverEvent): void {
+
+    // Base values for all kinds of messages
+    const listenerArguments = {
+      body,
+      respond,
+      context: {},
+    };
+
+    // There are four kinds of messages:
+    // 1. event (Events API): each body has an `event` property
+    // 2. action (Button, Menu, Dialog Submission, Message Action): each
+    // 3. command (Slash Command)
+    // 4. options (Menu with external data source, in a Message or in a Dialog)
+    //
+    // Inspect the body to pick the appropriate logic to fill out the rest of the listenerArguments
+    if (body.event !== undefined) {
+      // EVENT
+
+      listenerArguments.payload = listenerArguments.event = body.event;
+
+      // If its a message event, create another alias
+      if (body.event.type === 'message') {
+        listenerArguments.message = body.event;
+      }
+
+      // Events are acknowledged right away, since there's no data expected in the acknowledgement
+      ack();
+    } else if (body.command !== undefined) {
+      // COMMAND
+      listenerArguments.payload = body;
+      listenerArguments.ack = ack;
+    } else if (body.name !== undefined) {
+      // OPTIONS
+      listenerArguments.payload = body;
+      listenerArguments.ack = ack;
+    } else if (body.actions !== undefined || body.type === 'dialog_submission') {
+      // ACTION
+      listenerArguments.ack = ack;
+    } else {
+      // TODO: warn and return
+    }
+
+    // TODO: add say method when there's a channel
+
+    // TODO: if the receiver doesn't look for the response_url, and Slapp does instead, then respond can be defined here
+    if (respond !== undefined) {
+      listenerArguments.respond = respond;
+    }
+
+    // TODO: Dispatch event through global middleware
+
+    // TODO: Dispatch event through all listeners
+    // this.listeners.forEach(l => l(listenerArguments));
+  }
+
+  /**
+   */
+  private onGlobalError(_error: Error): void {
+    // TODO
+  }
+
+  public event<EventType extends string = string>(
+    eventName: EventType,
+    listener: Middleware<SlackEventMiddlewareArgs<EventType>>,
+  ): void {
+    // TODO:
+  }
+
+  // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
+  public message(listener: Middleware<SlackEventMiddlewareArgs<'message'>>): void;
+  public message(pattern: string | RegExp, listener: Middleware<SlackEventMiddlewareArgs<'message'>>): void;
+  public message(
+    patternOrMiddleware: string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>,
+    listener?: Middleware<SlackEventMiddlewareArgs<'message'>>,
+  ): void {
+    // TODO
+  }
+
+  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
+  // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
+  public action<ActionType extends SlackAction = SlackAction>(
+    callbackId: string | RegExp,
+    listener: Middleware<SlackActionMiddlewareArgs<ActionType>>,
+  ): void {
+    // TODO:
+  }
+
+  // TODO: should command names also be regex?
+  public command(commandName: string, listener: Middleware<SlackCommandMiddlewareArgs>): void {
+    // TODO:
+  }
+
+  // TODO: is the generic constraint a good one?
+  // TODO: the name Within is not super good
+  public options<Within extends 'interactive_message' | 'dialog_suggestion' = 'interactive_message'>(
+    callbackId: string,
+    listener: Middleware<SlackOptionsMiddlewareArgs<Within>>,
+  ): void {
+    // TODO:
+  }
+}
+
+/*
+ * Exported types
+ */
+export interface SlappOptions {
+  signingSecret?: ReceiverArguments['signingSecret'];
+  endpoints?: ReceiverArguments['endpoints'];
+  convoStore?: any;
+  teamContext?: any;
+  receiver?: Receiver;
+  logger?: Logger;
+  log?: boolean;
+  colors?: boolean;
+  ignoreSelf?: boolean;
+  ignoreBots?: boolean;
+}
+
+export default Slapp;
 
   /**
    * Handle new events (slack events, commands, actions, webhooks, etc.)
@@ -248,7 +388,8 @@ class Slapp /* extends EventEmitter */ {
    *
    * ##### Parameters
    * - `criteria` text that message contains or regex (e.g. "^hi")
-   * - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`, `direct_mention`, `mention`, `ambient`
+   * - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`,
+   * `direct_mention`, `mention`, `ambient`
    * - `callback` function - `(msg, text, [match1], [match2]...) => {}`
    *
    *
@@ -384,7 +525,8 @@ class Slapp /* extends EventEmitter */ {
    * `msg.meta.params.type` ==> `a-great-action` and `msg.meta.params.id` ==> `abcd1234`. This allows
    * you to match on dynamic callbackIds while passing data.
    *
-   * Note, `callback_id` values must be properly encoded. We suggest you use `encodeURIComponent` and `decodeURIComponent`.
+   * Note, `callback_id` values must be properly encoded. We suggest you use `encodeURIComponent` and
+   * `decodeURIComponent`.
    *
    * The underlying module used for matching
    * is [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) where there are a lot of examples.
@@ -727,7 +869,7 @@ class Slapp /* extends EventEmitter */ {
    *         "attachment_id": "1",
    *         "token": "verification_token_string"
    *     }
-   **
+   *
    * @param {string} callbackId
    * @param {(string|RegExp)} actionNameCriteria
    * @param {(string|RegExp)} actionValueCriteria
@@ -924,27 +1066,3 @@ class Slapp /* extends EventEmitter */ {
 
   //   return this.match(fn)
   // }
-
-  /**
-   */
-  private receiverError(_error: Error): void {
-    // TODO
-  }
-}
-
-/*
- * Exported types
- */
-export interface SlappOptions {
-  signingSecret?: string;
-  convoStore?: any;
-  context?: any;
-  receiver?: Receiver;
-  logger?: Logger;
-  log?: boolean;
-  colors?: boolean;
-  ignoreSelf?: boolean;
-  ignoreBots?: boolean;
-}
-
-export default Slapp;
