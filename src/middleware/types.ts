@@ -1,3 +1,6 @@
+import bodyParser = require("body-parser");
+import { ChatPostMessageArguments } from '@slack/client';
+
 /*
  * Future generated types from Async API Spec
  */
@@ -56,6 +59,16 @@ export interface UnknownSlackEvent<Type> extends KeyValueMapping {
   type: Type;
 }
 
+type ActionAckFromType<T extends SlackAction> =
+  T extends InteractiveMessage<ButtonClick | MenuSelect> ?
+    (message: string | KeyValueMapping | undefined) => void :
+  T extends DialogSubmitAction ?
+    (payload: { errors: { name: string; error: string; }[] }) => void :
+    () => void;
+
+type HasChannelContext<E> = E extends { channel: string; } |
+  { item: KeyValueMapping; } ? SayFn : never;
+
 type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
 type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
   UnknownSlackEvent<T> : KnownEventFromType<T>;
@@ -78,9 +91,7 @@ export interface SlackEventMiddlewareArgs<EventType extends string> {
   event: this['payload'];
   message: EventType extends 'message' ? this['payload'] : never;
   body: WrappedSlackEvent<this['payload']>;
-  // TODO: faking it, but do this for real later
-  // say: HasChannelContext<E>;
-  say: (message: string | { text: string; [key: string]: any }) => void;
+  say: HasChannelContext<EventType>;
 }
 
 /*
@@ -205,9 +216,9 @@ export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
   payload: ActionType;
   action: this['payload'];
   body: this['payload'];
-  // say: HasChannelContext<ActionType>;
-  // ack: Ack<ActionType>;
-  // respond: HasResponseUrl<ActionType>;
+  say: SayFn;
+  ack: ActionAckFromType<ActionType>;
+  respond: ResponseFn;
 }
 
 /*
@@ -234,9 +245,9 @@ export interface SlackCommandMiddlewareArgs {
   payload: SlashCommand;
   command: this['payload'];
   body: this['payload'];
-  // say: Say;
-  // ack: Ack<Message>;
-  // respond: Respond;
+  say: SayFn;
+  ack: (message: string | { [key: string]: any } | undefined) => void;
+  respond: ResponseFn;
 }
 
 /*
@@ -269,10 +280,17 @@ export interface ExternalOptionsRequest<Type> {
   token: string;
 }
 
+export interface Option {
+  label: string;
+  value: string;
+}
+
 export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
   payload: ExternalOptionsRequest<Within>;
   body: this['payload'];
-  // ack: Ack<Within>;
+  ack: (options:
+    { options: Option[] } |
+    { option_groups: { label: string; options: Option[] }[] }) => void;
 }
 
 /*
@@ -301,7 +319,22 @@ export interface NextMiddleware {
   (): void;
 }
 
+// TODO: Before release, we need to modify ChatPostMessageArguments to make channel optional
+export interface ResponseArguments extends ChatPostMessageArguments {
+  response_type?: 'ephemeral' | 'in_channel';
+  replace_original?: boolean;
+  delete_original?: boolean;
+}
+
 // TODO: should this any be unknown type?
 export interface PostProcessFn {
   (error: Error | undefined, done: (error?: Error) => void): any;
+}
+
+export interface SayFn {
+  (message: string | { text: string; [key: string]: any }): void;
+}
+
+export interface ResponseFn {
+  (payload: ResponseArguments): void;
 }
