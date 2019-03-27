@@ -1,4 +1,4 @@
-import { PlainTextElement, MrkdwnElement, Option, Confirmation } from '@slack/client';
+import { PlainTextElement, Option, Confirmation } from '@slack/client';
 
 /*
  * Future generated types from Async API Spec
@@ -157,7 +157,7 @@ export interface MessageAttachmentContainer extends Container {
   app_unfurl_url?: string;
 }
 
-export type KnownActionResponses = UsersSelectResponse | StaticSelectResponse | ConversationsSelectResponse |
+export type KnownActions = UsersSelectResponse | StaticSelectResponse | ConversationsSelectResponse |
 ChannelsSelectResponse | ExternalSelectResponse | ButtonResponse | OverflowResponse | DatepickerResponse;
 
 export interface ActionResponse {
@@ -227,7 +227,7 @@ export interface DatepickerResponse extends ActionResponse {
   placeholder?: PlainTextElement;
 }
 
-export interface Actions<Action extends KnownActionResponses> extends KeyValueMapping {
+export interface Actions<Action extends KnownActions> extends KeyValueMapping {
   type: 'block_actions';
   actions: [Action];
   team: {
@@ -322,7 +322,8 @@ export type SlackAction =
   | InteractiveMessage<ButtonClick>
   | InteractiveMessage<MenuSelect>
   | DialogSubmitAction
-  | MessageAction;
+  | MessageAction
+  | KnownActions;
 
 export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
   payload: ActionType;
