@@ -28,7 +28,7 @@
     // not used in base config
     "await-promise": true,
     "ban-comma-operator": true,
-    "completed-docs": false,
+    "completed-docs": true,
     "interface-over-type-literal": true,
     "jsdoc-format": [true, "check-multiline-start"],
     "member-access": [true],
