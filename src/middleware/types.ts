@@ -321,7 +321,7 @@ export interface MessageAction extends KeyValueMapping {
     enterprise_name?: string; // undocumented
   };
   token: string;
-
+  action_ts: string; // undocumented
 }
 
 export type SlackAction =
