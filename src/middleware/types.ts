@@ -1,3 +1,8 @@
+import { ChatPostMessageArguments } from '@slack/web-api';
+
+// TODO: remove the following pragma after TSLint to ESLint transformation is complete
+/* tslint:disable:completed-docs */
+
 /*
  * Future generated types from Async API Spec
  */
@@ -78,9 +83,8 @@ export interface SlackEventMiddlewareArgs<EventType extends string> {
   event: this['payload'];
   message: EventType extends 'message' ? this['payload'] : never;
   body: WrappedSlackEvent<this['payload']>;
-  // TODO: faking it, but do this for real later
-  // say: HasChannelContext<E>;
-  say: (message: string | { text: string; [key: string]: any }) => void;
+  // TODO: make this a conditional on whether the event has channel context
+  say: SayFn;
 }
 
 /*
@@ -205,9 +209,11 @@ export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
   payload: ActionType;
   action: this['payload'];
   body: this['payload'];
-  // say: HasChannelContext<ActionType>;
-  // ack: Ack<ActionType>;
-  // respond: HasResponseUrl<ActionType>;
+  ack: ActionAckFn<ActionType>;
+  // TODO: make this conditional on whether the action has a response_url
+  respond: RespondFn;
+  // TODO: make this a conditional on whether the action has channel context (all but dialogs, i think)
+  say: SayFn;
 }
 
 /*
@@ -234,9 +240,9 @@ export interface SlackCommandMiddlewareArgs {
   payload: SlashCommand;
   command: this['payload'];
   body: this['payload'];
-  // say: Say;
   // ack: Ack<Message>;
-  // respond: Respond;
+  respond: RespondFn;
+  say: SayFn;
 }
 
 /*
@@ -272,7 +278,7 @@ export interface ExternalOptionsRequest<Type> {
 export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
   payload: ExternalOptionsRequest<Within>;
   body: this['payload'];
-  // ack: Ack<Within>;
+  ack: OptionsAckFn<Within>;
 }
 
 /*
@@ -301,7 +307,33 @@ export interface NextMiddleware {
   (): void;
 }
 
-// TODO: should this any be unknown type?
 export interface PostProcessFn {
+  // TODO: should the return value any be unknown type?
   (error: Error | undefined, done: (error?: Error) => void): any;
+}
+
+// The say() utility function binds the message to the same channel as the incoming message that triggered the
+// listener. Therefore, specifying the `channel` argument is not required.
+type SayArguments = {
+  [Arg in keyof ChatPostMessageArguments]: Arg extends 'channel' ?
+    (ChatPostMessageArguments[Arg] | undefined) : ChatPostMessageArguments[Arg];
+};
+
+export interface SayFn {
+  (message: string | SayArguments): void;
+}
+
+// TODO: figure out if this is a precise enough definition
+type RespondArguments = ChatPostMessageArguments & {
+  /** Response URLs can be used to send ephemeral messages or in-channel messages using this argument */
+  response_type?: 'in_channel' | 'ephemeral';
+};
+
+export interface RespondFn {
+  (message: string | RespondArguments): void;
+}
+
+// TODO: this probably also needs to be a generic with a type parameter describing the shape of the response expected.
+export interface AckFn<Response> {
+  (response?: Response): void;
 }

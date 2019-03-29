@@ -2,7 +2,7 @@
 
 const test = require('ava').test
 const sinon = require('sinon')
-const { WebClient } = require('@slack/client')
+const { WebClient } = require('@slack/web-api')
 const fixtures = require('./fixtures/')
 
 const EventEmitter = require('events')
