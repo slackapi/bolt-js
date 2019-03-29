@@ -49,7 +49,6 @@ export type SlackEvent =
 /*
  * Slack Events API Types
  */
-
 interface KeyValueMapping {
   [key: string]: any;
 }
@@ -131,9 +130,7 @@ export interface InteractiveMessage<Action extends InteractiveAction> extends Ke
   token: string;
   response_url: string;
   trigger_id: string;
-
   is_app_unfurl?: boolean; // undocumented
-
   // NOTE: the original_message is not available from ephemeral messages
   // TODO: confirm optionality of message_ts, if these are always either both available or neither, how can the type
   // system express that?
