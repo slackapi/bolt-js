@@ -3,29 +3,18 @@ import express, { Request, Response, Application } from 'express';
 import parseRequest from './middleware/parseRequest';
 import SSLCheck from './middleware/SSLCheck';
 import axios from 'axios';
-import { MiddlewareArguments } from '../middleware/builtin';
+import { RespondFn, AckFn } from '../middleware/types';
 
-/*
-
-interface EventsAPIBody {
-
-}
-
-type EventBody = EventsAPIBody;
-
-export interface Event<B extends EventBody> {
-  body: B;
-}
-
-*/
+// TODO: remove the following pragma after TSLint to ESLint transformation is complete
+/* tslint:disable:completed-docs */
 
 // TODO: make this generic on the body?
 export interface Event {
   body: {
     [key: string]: any;
   };
-  ack: (message?: string | object) => void;
-  respond?: (message: string | object) => void;
+  ack: AckFn;
+  respond?: RespondFn;
 }
 
 export interface Receiver {
@@ -43,7 +32,7 @@ export interface ReceiverArguments {
 /**
  * Receives HTTP requests with Events, Slash Commands, and Actions
  */
-export default class ExpressReceiver extends EventEmitter implements Receiver {
+export class ExpressReceiver extends EventEmitter implements Receiver {
 
   /* Signing secret to verify requests from Slack */
   private endpoints: object | string;

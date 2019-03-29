@@ -5,29 +5,29 @@ import { Middleware, AnyMiddlewareArgs } from './types';
  * meta context to be populated with `app_bot_id`.
  */
 export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
-  return ({ payload, next }) => {
+  return ({ next }) => {
     // TODO
-    if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-      let bothFalsy = !msg.meta.app_bot_id && !msg.meta.bot_id
-      let bothEqual = msg.meta.app_bot_id === msg.meta.bot_id
-      if (!bothFalsy && bothEqual) {
-        return
-      }
-    }
-    next()
-  }
+    // emit error if the botId is not defined
+    // if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
+    //   let bothFalsy = !msg.meta.app_bot_id && !msg.meta.bot_id
+    //   let bothEqual = msg.meta.app_bot_id === msg.meta.bot_id
+    //   if (!bothFalsy && bothEqual) {
+    //     return
+    //   }
+    // }
+    next();
+  };
 }
 
 /**
  * Middleware that ignores messages from any bot user
  */
-
-export function ignoreBotsMiddleware(): Middleware {
-  return ({ payload, next }) => {
+export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
+  return ({ next }) => {
     // TODO
-    if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-      return
-    }
-    next()
-  }
+    // if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
+    //   return
+    // }
+    next();
+  };
 }

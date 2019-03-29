@@ -2,5 +2,6 @@
   "editor.rulers": [120],
   "cSpell.words": [
     "Slapp"
-  ]
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
