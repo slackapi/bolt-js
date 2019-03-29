@@ -1,4 +1,4 @@
-import { WebClient } from '@slack/client';
+import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 // import conversationStore from './conversation_store';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
@@ -12,8 +12,16 @@ import {
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackAction,
+  Context,
+  SayFn,
+  AckFn,
+  RespondFn,
 } from './middleware/types';
 
+// TODO: remove the following pragma after TSLint to ESLint transformation is complete
+/* tslint:disable:completed-docs */
+
+/** App initialization options */
 export interface SlappOptions {
   signingSecret?: ReceiverArguments['signingSecret'];
   endpoints?: ReceiverArguments['endpoints'];
@@ -28,6 +36,7 @@ export interface SlappOptions {
   ignoreBots?: boolean;
 }
 
+/** Authorization function - seeds the middleware processing and listeners with an authorization context */
 export interface Authorize {
   (
     source: AuthorizeSourceData,
@@ -35,6 +44,7 @@ export interface Authorize {
   ): Promise<AuthorizeResult>;
 }
 
+/** Authorization function inputs - authenticated data about an event for the authorization function */
 export interface AuthorizeSourceData {
   teamId: string;
   enterpriseId?: string;
@@ -42,6 +52,7 @@ export interface AuthorizeSourceData {
   conversationId?: string;
 }
 
+/** Authorization function outputs - data that will be available as part of event processing */
 export interface AuthorizeResult {
   botToken?: string; // used by `say` (preferred over appToken, one is required)
   appToken?: string; // used by `say` (overridden by botToken, one is required)
@@ -173,42 +184,61 @@ export default class Slapp {
       return;
     }
 
+    // From this point on, we assume that body is not just a key-value map, but one of the types of bodies we expect
+    const bodyArg = body as AnyMiddlewareArgs['body'];
+
     // Initialize context (shallow copy to enforce object identity separation)
-    const context = { ...(await this.authorize(buildSource(type, body), body)) };
+    const context: Context = { ...(await this.authorize(buildSource(type, bodyArg), bodyArg)) };
 
     // Factory for say() argument
-    const createSay = (channelId: string) => {
+    const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.appToken;
-      return (message: any) => {
-        const postMessageArguments = (typeof message === 'string') ?
-          { token, channel: channelId, text: message } : { token, channel: channelId, ...message };
+      return (message: Parameters<SayFn>[0]) => {
+        const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
+          { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
         this.client.chat.postMessage(postMessageArguments)
           // TODO: create a specific error code
           .catch(this.onGlobalError);
       };
     };
 
-    // Set body and payload
-    const listenerArgs: AnyMiddlewareArgs = {
-      body,
-      payload: (type === IncomingEventType.Event) ? body.event : body,
-    };
+    // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
+    // NOTE: the following doesn't work because... distributive?
+    // const listenerArgs: Partial<AnyMiddlewareArgs> = {
+    const listenerArgs:
+      Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+        /** Say function might be set below */
+        say?: SayFn
+        /** Respond function might be set below */
+        respond?: RespondFn,
+        /** Ack function might be set below */
+        ack?: AckFn,
+      } = {
+        body: bodyArg,
+        payload: (type === IncomingEventType.Event) ?
+          (bodyArg as SlackEventMiddlewareArgs<string>['body']).event :
+          (bodyArg as Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs<string>>['body']),
+      };
 
     // Set aliases
     if (type === IncomingEventType.Event) {
-      listenerArgs.event = listenerArgs.payload;
-      if (listenerArgs.event.type === 'message') {
-        listenerArgs.message = listenerArgs.payload;
+      const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs<string>;
+      eventListenerArgs.event = eventListenerArgs.payload;
+      if (eventListenerArgs.event.type === 'message') {
+        const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
+        messageEventListenerArgs.message = messageEventListenerArgs.payload;
       }
     } else if (type === IncomingEventType.Action) {
-      listenerArgs.action = listenerArgs.payload;
+      const actionListenerArgs = listenerArgs as SlackActionMiddlewareArgs<SlackAction>;
+      actionListenerArgs.action = actionListenerArgs.payload;
     } else if (type === IncomingEventType.Command) {
-      listenerArgs.command = listenerArgs.payload;
+      const commandListenerArgs = listenerArgs as SlackCommandMiddlewareArgs;
+      commandListenerArgs.command = commandListenerArgs.payload;
     }
     // NOTE: there is no alias for options
 
     // Set say() utility
-    const channelId = getChannelContext(type, body);
+    const channelId = getChannelContext(type, bodyArg);
     if (channelId !== undefined) {
       listenerArgs.say = createSay(channelId);
     }
@@ -228,9 +258,9 @@ export default class Slapp {
 
     // Dispatch event through global middleware
     processMiddleware(
-      listenerArgs,
+      listenerArgs as AnyMiddlewareArgs,
       this.middleware,
-      (globalProcessedContext, globalProcessedArgs, startGlobalBubble) => {
+      (globalProcessedContext: Context, globalProcessedArgs: AnyMiddlewareArgs, startGlobalBubble) => {
         this.listeners.forEach((listenerMiddleware) => {
           // Dispatch event through all listeners
           processMiddleware(
@@ -246,7 +276,7 @@ export default class Slapp {
           );
         });
       },
-      (globalError) => {
+      (globalError?: Error) => {
         if (globalError !== undefined) {
           this.onGlobalError(globalError);
         }
@@ -320,25 +350,28 @@ enum IncomingEventType {
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
  */
 function buildSource(type: IncomingEventType, body: AnyMiddlewareArgs['body']): AuthorizeSourceData {
+  // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
+  // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
+
   // tslint:disable:max-line-length
   const source: AuthorizeSourceData = {
     teamId:
-      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? body.team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.team.id as string :
+      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).team_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'dialog_suggestion' | 'interactive_message'>)['body']).team.id as string :
        assertNever(type)),
     enterpriseId:
-      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? body.enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.team.enterprise_id as string :
+      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'dialog_suggestion' | 'interactive_message'>)['body']).team.enterprise_id as string :
        undefined),
     userId:
       ((type === IncomingEventType.Event) ?
-        ((typeof body.event.user === 'string') ? body.event.user as string :
-         (typeof body.event.user === 'object') ? body.event.user.id as string :
-         (body.event.channel !== undefined && body.event.channel.creator !== undefined) ? body.event.channel.creator as string :
-         (body.event.subteam !== undefined && body.event.subteam.created_by !== undefined) ? body.event.subteam.created_by as string :
+        ((typeof (body as SlackEventMiddlewareArgs<string>['body']).event.user === 'string') ? (body as SlackEventMiddlewareArgs<string>['body']).event.user as string :
+         (typeof (body as SlackEventMiddlewareArgs<string>['body']).event.user === 'object') ? (body as SlackEventMiddlewareArgs<string>['body']).event.user.id as string :
+         ((body as SlackEventMiddlewareArgs<string>['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs<string>['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs<string>['body']).event.channel.creator as string :
+         ((body as SlackEventMiddlewareArgs<string>['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs<string>['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs<string>['body']).event.subteam.created_by as string :
          undefined) :
        (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.user.id as string :
-       (type === IncomingEventType.Command) ? body.user_id as string :
+       (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
        undefined),
     // TODO: fill in conversationId, possibly reuse part of getChannelContext()
     conversationId: undefined,
@@ -348,26 +381,31 @@ function buildSource(type: IncomingEventType, body: AnyMiddlewareArgs['body']): 
   return source;
 }
 
+/**
+ * Helper which finds the channel that any specific incoming event is related to (if any). This is analagous to the type
+ * helper used to define the SlackEventMiddlewareArgs and SlackActionMiddlewareArgs types.
+ */
 function getChannelContext(type: IncomingEventType, body: AnyMiddlewareArgs['body']): string | undefined {
   if (type === IncomingEventType.Action) {
-    return body.channel.id;
+    return (body as SlackActionMiddlewareArgs<SlackAction>['body']).channel.id;
   }
   if (type === IncomingEventType.Command) {
-    return body.channel_id;
+    return (body as SlackCommandMiddlewareArgs['body']).channel_id;
   }
   // TODO: verify this covers all the events
   if (type === IncomingEventType.Event) {
-    if (body.event.channel !== undefined) {
-      return body.event.channel;
+    if ((body as SlackEventMiddlewareArgs<string>['body']).event.channel !== undefined) {
+      return (body as SlackEventMiddlewareArgs<string>['body']).event.channel;
     }
-    if (body.event.item !== undefined) {
-      return body.event.item.channel;
+    if ((body as SlackEventMiddlewareArgs<string>['body']).event.item !== undefined) {
+      return (body as SlackEventMiddlewareArgs<string>['body']).event.item.channel;
     }
   }
   // NOTE: Intentionally leaving all options requests with undefined
   return undefined;
 }
 
+/** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
 function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${x}`);
 }

@@ -1,4 +1,4 @@
-import { PlainTextElement, Option, Confirmation } from '@slack/client';
+import { ChatPostMessageArguments, PlainTextElement, Option, Confirmation } from '@slack/web-api';
 
 /*
  * Future generated types from Async API Spec
@@ -49,7 +49,6 @@ export type SlackEvent =
 /*
  * Slack Events API Types
  */
-
 interface KeyValueMapping {
   [key: string]: any;
 }
@@ -57,6 +56,10 @@ interface KeyValueMapping {
 export interface UnknownSlackEvent<Type> extends KeyValueMapping {
   type: Type;
 }
+
+// TODO: test this
+type WhenEventHasChannelContext<Event, Type> =
+  Event extends ({ channel: string; } | { item: { channel: string; }; }) ? Type : never;
 
 type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
 type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
@@ -80,9 +83,7 @@ export interface SlackEventMiddlewareArgs<EventType extends string> {
   event: this['payload'];
   message: EventType extends 'message' ? this['payload'] : never;
   body: WrappedSlackEvent<this['payload']>;
-  // TODO: faking it, but do this for real later
-  // say: HasChannelContext<E>;
-  say: (message: string | { text: string; [key: string]: any }) => void;
+  say: WhenEventHasChannelContext<EventFromType<EventType>, SayFn>;
 }
 
 /*
@@ -129,9 +130,7 @@ export interface InteractiveMessage<Action extends InteractiveAction> extends Ke
   token: string;
   response_url: string;
   trigger_id: string;
-
   is_app_unfurl?: boolean; // undocumented
-
   // NOTE: the original_message is not available from ephemeral messages
   // TODO: confirm optionality of message_ts, if these are always either both available or neither, how can the type
   // system express that?
@@ -285,6 +284,13 @@ export interface DialogSubmitAction extends KeyValueMapping {
   response_url: string;
 }
 
+export interface DialogValidation {
+  errors: {
+    name: string;
+    error: string;
+  }[];
+}
+
 export interface MessageAction extends KeyValueMapping {
   type: 'message_action';
   callback_id: string;
@@ -325,13 +331,21 @@ export type SlackAction =
   | MessageAction
   | KnownActions;
 
+type ActionAckFn<T extends SlackAction> =
+  T extends InteractiveMessage<ButtonClick | MenuSelect> ?
+    AckFn<string | SayArguments> :
+  T extends DialogSubmitAction ?
+    AckFn<DialogValidation> :
+  AckFn<void>;
+
 export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
   payload: ActionType;
   action: this['payload'];
   body: this['payload'];
-  // say: HasChannelContext<ActionType>;
-  // ack: Ack<ActionType>;
-  // respond: HasResponseUrl<ActionType>;
+  // all action types except dialog submission have a channel context
+  say: ActionType extends Exclude<SlackAction, DialogSubmitAction> ? SayFn : never;
+  respond: RespondFn;
+  ack: ActionAckFn<ActionType>;
 }
 
 /*
@@ -358,9 +372,9 @@ export interface SlackCommandMiddlewareArgs {
   payload: SlashCommand;
   command: this['payload'];
   body: this['payload'];
-  // say: Say;
-  // ack: Ack<Message>;
-  // respond: Respond;
+  say: SayFn;
+  respond: RespondFn;
+  ack: AckFn<string | RespondArguments>;
 }
 
 /*
@@ -393,10 +407,23 @@ export interface ExternalOptionsRequest<Type> {
   token: string;
 }
 
+export interface Option {
+  label: string;
+  value: string;
+}
+
+// TODO: there's a lot of repetition in the following type. factor out some common parts.
+// tslint:disable:max-line-length
+type OptionsAckFn<Within extends 'interactive_message' | 'dialog_suggestion'> =
+  Within extends 'interactive_message' ?
+    AckFn<{ options: { text: string; value: string; }[]; option_groups: { label: string; options: { text: string; value: string; }[]; }[]; }> :
+  AckFn<{ options: { label: string; value: string; }[]; option_groups: { label: string; options: { label: string; value: string; }[]; }[]; }>;
+// tslint:enable:max-line-length
+
 export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
   payload: ExternalOptionsRequest<Within>;
   body: this['payload'];
-  // ack: Ack<Within>;
+  ack: OptionsAckFn<Within>;
 }
 
 /*
@@ -425,7 +452,33 @@ export interface NextMiddleware {
   (): void;
 }
 
-// TODO: should this any be unknown type?
 export interface PostProcessFn {
+  // TODO: should the return value any be unknown type?
   (error: Error | undefined, done: (error?: Error) => void): any;
+}
+
+// The say() utility function binds the message to the same channel as the incoming message that triggered the
+// listener. Therefore, specifying the `channel` argument is not required.
+type SayArguments = {
+  [Arg in keyof ChatPostMessageArguments]: Arg extends 'channel' ?
+    (ChatPostMessageArguments[Arg] | undefined) : ChatPostMessageArguments[Arg];
+};
+
+export interface SayFn {
+  (message: string | SayArguments): void;
+}
+
+type RespondArguments = SayArguments & {
+  /** Response URLs can be used to send ephemeral messages or in-channel messages using this argument */
+  response_type?: 'in_channel' | 'ephemeral';
+  replace_original?: boolean;
+  delete_original?: boolean;
+};
+
+export interface RespondFn {
+  (message: string | RespondArguments): void;
+}
+
+export interface AckFn<Response> {
+  (response?: Response): void;
 }

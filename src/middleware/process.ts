@@ -6,6 +6,8 @@ import {
   PostProcessFn,
 } from './types';
 
+// TODO: remove the following pragma after TSLint to ESLint transformation is complete
+/* tslint:disable:completed-docs */
 export function processMiddleware(
   initialArguments: AnyMiddlewareArgs,
   middleware: Middleware<AnyMiddlewareArgs>[],

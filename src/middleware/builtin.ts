@@ -22,7 +22,6 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
 /**
  * Middleware that ignores messages from any bot user
  */
-
 export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
   return ({ next }) => {
     // TODO
