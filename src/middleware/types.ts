@@ -482,3 +482,9 @@ export interface RespondFn {
 export interface AckFn<Response> {
   (response?: Response): void;
 }
+
+export interface ConstraintObject {
+  block_id?: string | RegExp;
+  action_id?: string | RegExp;
+  callback_id?: string | RegExp;
+}

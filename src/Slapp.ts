@@ -22,6 +22,7 @@ import {
   KnownActions,
   Actions,
   InteractiveMessage,
+  ConstraintObject
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -322,25 +323,20 @@ export default class Slapp {
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
   public action<ActionType extends SlackAction = SlackAction>(
-    constraints: KeyValueMapping,
+    constraints: ConstraintObject,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
   public action<ActionType extends SlackAction = SlackAction>(
-    actionIdOrContraints: string | RegExp | KeyValueMapping,
+    actionIdOrContraints: string | RegExp | ConstraintObject,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void {
-    let constraints: KeyValueMapping = {};
+    let constraints: ConstraintObject = {};
 
-    if (typeof actionIdOrContraints !== 'object') {
+    if (!(typeof actionIdOrContraints === 'object')) {
       constraints.action_id = actionIdOrContraints;
     } else {
-      constraints = Object.assign({}, actionIdOrContraints);
+      constraints = Object.assign({}, actionIdOrContraints) as ConstraintObject;
     }
-
-    // Validate constraints object
-    const error = validateConstraints(constraints);
-
-    if (error) throw error;
 
     const actionMiddleware: Middleware<SlackActionMiddlewareArgs<ActionType>> = ({ action, next, context }) => {
       // Filter out any non-actions
@@ -400,28 +396,6 @@ enum IncomingEventType {
   Action,
   Command,
   Options,
-}
-
-/**
- * Validate constraints
- */
-function validateConstraints(constraints: KeyValueMapping): Error | boolean {
-  if (constraints.callback_id &&
-      !(typeof constraints.callback_id === 'string' || constraints.callback_id instanceof RegExp)) {
-    return new TypeError('Callback ID must be a string or RegExp');
-  }
-
-  if (constraints.block_id &&
-    !(typeof constraints.block_id === 'string' || constraints.block_id instanceof RegExp)) {
-    return new TypeError('Block ID must be a string or RegExp');
-  }
-
-  if (constraints.action_id &&
-    !(typeof constraints.action_id === 'string' || constraints.action_id instanceof RegExp)) {
-    return new TypeError('Action ID must be a string or RegExp');
-  }
-
-  return false;
 }
 
 /**
