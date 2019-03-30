@@ -12,6 +12,7 @@ import {
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackAction,
+  SlashCommand,
   Context,
   SayFn,
   AckFn,
@@ -361,7 +362,21 @@ export default class Slapp {
 
   // TODO: should command names also be regex?
   public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
-    // TODO:
+
+    const commandMiddleware: Middleware<SlackCommandMiddlewareArgs> = ({ command, next }) => {
+      // Filter out any non-commands
+      if ((command as SlashCommand).command === undefined) {
+        return;
+      }
+
+      // Filter out any commands without commandName
+      if (commandName !== command.text) return;
+
+      // It matches so we should continue down this middleware listener chain
+      next();
+    };
+
+    this.listeners.push([commandMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // TODO: is the generic constraint a good one?
@@ -412,6 +427,8 @@ function validateConstraints(constraints: KeyValueMapping): Error | boolean {
 /**
  * Match constraints given a message payload and adds all matches to context
  */
+
+ // TODO: Just change the type on the actions method
 function matchesConstraints(payload: KeyValueMapping, constraints: KeyValueMapping, context: Context): boolean {
   const action = payload.actions ? payload.actions[0] : {};
   let tempMatches: KeyValueMapping[] = [];
