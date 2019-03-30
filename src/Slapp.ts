@@ -13,6 +13,8 @@ import {
   SlackOptionsMiddlewareArgs,
   SlackAction,
   SlashCommand,
+  ExternalSelectResponse,
+  ExternalOptionsRequest,
   Context,
   SayFn,
   AckFn,
@@ -22,7 +24,8 @@ import {
   KnownActions,
   Actions,
   InteractiveMessage,
-  ConstraintObject
+  ConstraintObject,
+  ObjectConstraintObject,
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -376,12 +379,43 @@ export default class Slapp {
   }
 
   // TODO: is the generic constraint a good one?
-  // TODO: the name Within is not super good
-  public options<Within extends 'interactive_message' | 'dialog_suggestion' = 'interactive_message'>(
-    callbackId: string,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Within>>[]
+  public options<Container extends ExternalSelectResponse | 'interactive_message' |
+  'dialog_suggestion' = ExternalSelectResponse>(
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
+  ): void;
+  public options<Container extends ExternalSelectResponse | 'interactive_message' |
+  'dialog_suggestion' = ExternalSelectResponse>(
+    constraints: ObjectConstraintObject,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
+  ): void;
+  public options<Container extends ExternalSelectResponse | 'interactive_message' |
+  'dialog_suggestion' = ExternalSelectResponse>(
+    actionIdOrContraints: string | RegExp | ObjectConstraintObject,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void {
-    // TODO:
+    let constraints: ObjectConstraintObject = {};
+
+    if (!(typeof actionIdOrContraints === 'object')) {
+      constraints.action_id = actionIdOrContraints;
+    } else {
+      constraints = Object.assign({}, actionIdOrContraints) as ObjectConstraintObject;
+    }
+
+    const optionsMiddleware: Middleware<SlackOptionsMiddlewareArgs<Container>> = ({ payload, next, context }) => {
+      if (payload.type !== 'dialog_suggestion' && !isInteractiveMessageOptions(payload) && !isExternalSelect(payload)) {
+        return;
+      }
+
+      // Filter out any options without matching constriants
+      const match = matchesConstraints(payload, constraints, context);
+      if (!match) return;
+
+      // It matches so we should continue down this middleware listener chain
+      next();
+    };
+
+    this.listeners.push([optionsMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 }
 
@@ -401,19 +435,18 @@ enum IncomingEventType {
 /**
  * Match constraints given a message payload and adds all matches to context
  */
-
- // TODO: Just change the type on the actions method
-function matchesConstraints(payload: KeyValueMapping, constraints: KeyValueMapping, context: Context): boolean {
+function matchesConstraints(payload: KeyValueMapping, constraints: ConstraintObject | ObjectConstraintObject,
+                            context: Context): boolean {
   const action = payload.actions ? payload.actions[0] : {};
-  let tempMatches: KeyValueMapping[] = [];
-  const matches: KeyValueMapping[] = [];
+  let tempMatches: RegExpExecArray | null;
+  const matches: any[] = [];
 
   if (constraints.block_id) {
     if (typeof constraints.block_id === 'string' && action.block_id !== constraints.block_id) {
       return false;
     }
 
-    if ((tempMatches = constraints.block_id.exec(action.block_id)) != null) {
+    if ((tempMatches = (constraints.block_id as RegExp).exec(action.block_id)) != null) {
       matches.concat(tempMatches);
     } else return false;
   }
@@ -423,7 +456,7 @@ function matchesConstraints(payload: KeyValueMapping, constraints: KeyValueMappi
       return false;
     }
 
-    if ((tempMatches = constraints.action_id.exec(action.action_id)) != null) {
+    if ((tempMatches = (constraints.action_id as RegExp).exec(action.action_id)) != null) {
       matches.concat(tempMatches);
     } else return false;
   }
@@ -433,15 +466,64 @@ function matchesConstraints(payload: KeyValueMapping, constraints: KeyValueMappi
       return false;
     }
 
-    if ((tempMatches = constraints.callback_id.exec(payload.callback_id)) != null) {
+    if ((tempMatches = (constraints.callback_id as RegExp).exec(payload.callback_id)) != null) {
       matches.concat(tempMatches);
     } else return false;
+  }
+
+  if (isOptionConstraintObject(constraints) && constraints.container) {
+    if (constraints.container === 'dialog' && payload.type !== 'dialog_suggestion') {
+      return false;
+    }
+
+    if (constraints.container === 'interactive_message' && payload.type !== 'interactive_message') {
+      return false;
+    }
+
+    if (constraints.container === 'block_actions' && payload.type !== 'block_actions') {
+      return false;
+    }
   }
 
   // Add matches to context
   context['matches'] = matches;
 
   return true;
+}
+
+/**
+ * Helper that decides whether a constraint object is an options constraint object
+ */
+function isOptionConstraintObject(optionOrConstraintObject: ConstraintObject |
+  ObjectConstraintObject): optionOrConstraintObject is ObjectConstraintObject {
+  if ((optionOrConstraintObject as ObjectConstraintObject).container) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Helper that decides if a payload is an interactive message options request
+ */
+function isInteractiveMessageOptions(payload: KeyValueMapping):
+payload is ExternalOptionsRequest<'interactive_message'> {
+  if ((payload as InteractiveMessage<InteractiveAction>).actions) {
+    return false;
+  }
+  if (payload.type !== 'interactive_message') return false;
+  return false;
+}
+
+/**
+ * Helper that decides if a payload is an interactive message options request
+ */
+function isExternalSelect(payload: KeyValueMapping):
+payload is Actions<ExternalSelectResponse> {
+  if ((payload as Actions<ExternalSelectResponse>).actions &&
+    (payload as Actions<ExternalSelectResponse>).actions[0].type === 'external_select') {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -455,11 +537,11 @@ function buildSource(type: IncomingEventType, body: AnyMiddlewareArgs['body']): 
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'dialog_suggestion' | 'interactive_message'>)['body']).team.id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<ExternalSelectResponse | 'interactive_message' | 'dialog_suggestion'>)['body']).team.id as string :
        assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'dialog_suggestion' | 'interactive_message'>)['body']).team.enterprise_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<ExternalSelectResponse | 'interactive_message' | 'dialog_suggestion'>)['body']).team.enterprise_id as string :
        undefined),
     userId:
       ((type === IncomingEventType.Event) ?

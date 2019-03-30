@@ -378,7 +378,7 @@ export interface SlackCommandMiddlewareArgs {
 }
 
 /*
- * Slack Options Types
+ * Slack Dialog and Interactive Messages Options Types
  */
 
 export interface ExternalOptionsRequest<Type> {
@@ -413,17 +413,19 @@ export interface Option {
 }
 
 // TODO: there's a lot of repetition in the following type. factor out some common parts.
+// TODO: Should ack be different for Block actions?
 // tslint:disable:max-line-length
-type OptionsAckFn<Within extends 'interactive_message' | 'dialog_suggestion'> =
-  Within extends 'interactive_message' ?
+type OptionsAckFn<Container extends 'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse> =
+  Container extends ('interactive_message' | ExternalSelectResponse) ?
     AckFn<{ options: { text: string; value: string; }[]; option_groups: { label: string; options: { text: string; value: string; }[]; }[]; }> :
   AckFn<{ options: { label: string; value: string; }[]; option_groups: { label: string; options: { label: string; value: string; }[]; }[]; }>;
 // tslint:enable:max-line-length
 
-export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
-  payload: ExternalOptionsRequest<Within>;
+export interface SlackOptionsMiddlewareArgs<Container extends 'interactive_message' |
+  'dialog_suggestion' | ExternalSelectResponse> {
+  payload: ExternalOptionsRequest<Container> | Actions<ExternalSelectResponse>;
   body: this['payload'];
-  ack: OptionsAckFn<Within>;
+  ack: OptionsAckFn<Container>;
 }
 
 /*
@@ -434,7 +436,7 @@ export type AnyMiddlewareArgs =
   | SlackEventMiddlewareArgs<string>
   | SlackActionMiddlewareArgs<SlackAction>
   | SlackCommandMiddlewareArgs
-  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>;
+  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse>;
 
 export interface Context extends KeyValueMapping {
 }
@@ -487,4 +489,8 @@ export interface ConstraintObject {
   block_id?: string | RegExp;
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
+}
+
+export interface ObjectConstraintObject extends ConstraintObject {
+  container?: 'block_actions' | 'interactive_message' | 'dialog';
 }
