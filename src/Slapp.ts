@@ -16,6 +16,7 @@ import {
   SayFn,
   AckFn,
   RespondFn,
+  KeyValueMapping,
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -312,10 +313,44 @@ export default class Slapp {
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
   public action<ActionType extends SlackAction = SlackAction>(
-    callbackId: string | RegExp,
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void;
+  public action<ActionType extends SlackAction = SlackAction>(
+    constraints: KeyValueMapping,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void;
+  public action<ActionType extends SlackAction = SlackAction>(
+    actionIdOrContraints: string | RegExp | KeyValueMapping,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void {
-    // TODO:
+    let constraints: KeyValueMapping = {};
+
+    if (typeof actionIdOrContraints !== 'object') {
+      constraints.action_id = actionIdOrContraints;
+    } else {
+      constraints = Object.assign({}, actionIdOrContraints);
+    }
+
+    // TODO: validate constraints
+
+    const actionMiddleware: Middleware<SlackActionMiddlewareArgs<ActionType>> = ({ action, next }) => {
+      // Filter out any non-actions
+      if (isInteractiveAction(action) || isActions(action)) {
+
+      } else {
+        return next();
+      }
+      if ((action as InteractiveAction | Actions).actions === undefined && body.type !== 'dialog_submission') {
+        return next();
+      }
+
+      // Filter out any actions without actionId
+      const match = matchesConstraints(body, constraints);
+      if (!match) return next();
+    };
+
+    this.listeners.push([actionMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // TODO: should command names also be regex?

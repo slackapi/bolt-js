@@ -49,7 +49,7 @@ export type SlackEvent =
 /*
  * Slack Events API Types
  */
-interface KeyValueMapping {
+export interface KeyValueMapping {
   [key: string]: any;
 }
 
