@@ -17,6 +17,10 @@ import {
   AckFn,
   RespondFn,
   KeyValueMapping,
+  InteractiveAction,
+  KnownActions,
+  Actions,
+  InteractiveMessage,
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -332,22 +336,24 @@ export default class Slapp {
       constraints = Object.assign({}, actionIdOrContraints);
     }
 
-    // TODO: validate constraints
+    // Validate constraints object
+    const error = validateConstraints(constraints);
 
-    const actionMiddleware: Middleware<SlackActionMiddlewareArgs<ActionType>> = ({ action, next }) => {
+    if (error) throw error;
+
+    const actionMiddleware: Middleware<SlackActionMiddlewareArgs<ActionType>> = ({ action, next, context }) => {
       // Filter out any non-actions
-      if (isInteractiveAction(action) || isActions(action)) {
-
-      } else {
-        return next();
-      }
-      if ((action as InteractiveAction | Actions).actions === undefined && body.type !== 'dialog_submission') {
-        return next();
+      if ((action as Actions<KnownActions> | InteractiveMessage<InteractiveAction>).actions === undefined
+        && action.type !== 'dialog_submission') {
+        return;
       }
 
       // Filter out any actions without actionId
-      const match = matchesConstraints(body, constraints);
-      if (!match) return next();
+      const match = matchesConstraints(action, constraints, context);
+      if (!match) return;
+
+      // It matches so we should continue down this middleware listener chain
+      next();
     };
 
     this.listeners.push([actionMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
@@ -379,6 +385,72 @@ enum IncomingEventType {
   Action,
   Command,
   Options,
+}
+
+/**
+ * Validate constraints
+ */
+function validateConstraints(constraints: KeyValueMapping): Error | boolean {
+  if (constraints.callback_id &&
+      !(typeof constraints.callback_id === 'string' || constraints.callback_id instanceof RegExp)) {
+    return new TypeError('Callback ID must be a string or RegExp');
+  }
+
+  if (constraints.block_id &&
+    !(typeof constraints.block_id === 'string' || constraints.block_id instanceof RegExp)) {
+    return new TypeError('Block ID must be a string or RegExp');
+  }
+
+  if (constraints.action_id &&
+    !(typeof constraints.action_id === 'string' || constraints.action_id instanceof RegExp)) {
+    return new TypeError('Action ID must be a string or RegExp');
+  }
+
+  return false;
+}
+
+/**
+ * Match constraints given a message payload and adds all matches to context
+ */
+function matchesConstraints(payload: KeyValueMapping, constraints: KeyValueMapping, context: Context): boolean {
+  const action = payload.actions ? payload.actions[0] : {};
+  let tempMatches: KeyValueMapping[] = [];
+  const matches: KeyValueMapping[] = [];
+
+  if (constraints.block_id) {
+    if (typeof constraints.block_id === 'string' && action.block_id !== constraints.block_id) {
+      return false;
+    }
+
+    if ((tempMatches = constraints.block_id.exec(action.block_id)) != null) {
+      matches.concat(tempMatches);
+    } else return false;
+  }
+
+  if (constraints.action_id) {
+    if (typeof constraints.action_id === 'string' && action.action_id !== constraints.action_id) {
+      return false;
+    }
+
+    if ((tempMatches = constraints.action_id.exec(action.action_id)) != null) {
+      matches.concat(tempMatches);
+    } else return false;
+  }
+
+  if (constraints.callback_id) {
+    if (payload.callback_id !== constraints.callback_id) {
+      return false;
+    }
+
+    if ((tempMatches = constraints.callback_id.exec(payload.callback_id)) != null) {
+      matches.concat(tempMatches);
+    } else return false;
+  }
+
+  // Add matches to context
+  context['matches'] = matches;
+
+  return true;
 }
 
 /**
