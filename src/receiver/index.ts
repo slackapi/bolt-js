@@ -10,7 +10,7 @@ export interface Event {
   body: {
     [key: string]: any;
   };
-  ack: AckFn;
+  ack: AckFn<any>;
   respond?: RespondFn;
 }
 

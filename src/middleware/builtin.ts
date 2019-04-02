@@ -1,8 +1,6 @@
 import {
   Middleware,
   KeyValueMapping,
-  Actions,
-  ExternalSelectResponse,
   SlashCommand,
   SlackEvent,
   AnyMiddlewareArgs,
@@ -11,12 +9,13 @@ import {
   InteractiveAction,
   DialogSubmitAction,
   MessageAction,
-  ExternalOptionsRequest,
-  Container,
   ActionConstraints,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  UnknownElementAction,
+  MenuSelect,
+  ButtonClick,
 } from './types';
 
 /**
@@ -53,9 +52,9 @@ export function onlyCommands(): Middleware<AnyMiddlewareArgs & { command?: Slash
  * Middleware that filters out any event that isn't an options
  */
 export function onlyOptions(): Middleware<AnyMiddlewareArgs> {
-  return ({ payload, next }) => {
+  return ({ body, next }) => {
     // Filter out any non-actions
-    if (!isOptionsPayload(payload)) {
+    if (!isOptionsBody(body)) {
       return;
     }
 
@@ -80,99 +79,72 @@ export function onlyEvents(): Middleware<AnyMiddlewareArgs & { event?: SlackEven
 }
 
 /**
- * Helper function that determines if a payload is an options payload
- */
-function isOptionsPayload(payload: KeyValueMapping): boolean {
-  if (payload.type !== 'dialog_suggestion' && !isInteractiveMessageOptions(payload) && !isExternalSelect(payload)) {
-    return false;
-  }
-  return true;
-}
-
-/**
- * Typeguard that decides if a payload is an interactive message options request
- */
-function isInteractiveMessageOptions(payload: KeyValueMapping):
-payload is ExternalOptionsRequest<'interactive_message'> {
-  if ((payload as InteractiveMessage<InteractiveAction>).actions) {
-    return false;
-  }
-  if (payload.type !== 'interactive_message') {
-    return false;
-  }
-  return true;
-}
-
-/**
- * Typeguard that decides if a payload is an interactive message options request
- */
-function isExternalSelect(payload: KeyValueMapping):
-payload is Actions<ExternalSelectResponse> {
-  if ((payload as Actions<ExternalSelectResponse>).actions &&
-    (payload as Actions<ExternalSelectResponse>).actions[0].type === 'external_select') {
-    return true;
-  }
-  return false;
-}
-
-/**
- * Typeguard that decides whether a constraint object is an options constraint object
- */
-function hasCallbackId(payload: { [key: string]: any; }): payload is (
-    InteractiveMessage<InteractiveAction> | DialogSubmitAction | MessageAction | ExternalOptionsRequest<Container>
-  ) {
-  if ((payload as (InteractiveMessage<InteractiveAction> | DialogSubmitAction |
-    MessageAction | ExternalOptionsRequest<Container>)).callback_id) {
-    return true;
-  }
-  return false;
-}
-
-/**
  * Middleware that checks for matches given constraints
  */
 export function matchActionConstraints(
     constraints: ActionConstraints,
+    // TODO: this function signature could be wrong. this gets used in options() so the action property can be undefined
   ): Middleware<SlackActionMiddlewareArgs<SlackAction>> {
   return ({ action, next, context }) => {
+    // NOTE: DialogSubmitAction and MessageAction do not have an actions array
+    const innerAction: InteractiveAction | UnknownElementAction<string> | undefined =
+      action.actions !== undefined ? action.actions[0] : undefined;
+
+    // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
+    // which matches (and in which order)
     let tempMatches: RegExpExecArray | null;
     const matches: any[] = [];
 
-    if (constraints.block_id) {
-      if (typeof constraints.block_id === 'string' && action.block_id !== constraints.block_id) {
+    if (constraints.block_id !== undefined) {
+      if (innerAction === undefined || !isElementAction(innerAction)) {
         return;
       }
 
-      if ((tempMatches = (constraints.block_id as RegExp).exec(action.block_id)) != null) {
-        matches.concat(tempMatches);
-      } else return;
-    }
-
-    if (constraints.action_id) {
-      if (typeof constraints.action_id === 'string' && action.action_id !== constraints.action_id) {
-        return;
-      }
-
-      if ((tempMatches = (constraints.action_id as RegExp).exec(action.action_id)) != null) {
-        matches.concat(tempMatches);
-      } else {
-        return;
-      }
-    }
-
-    if (constraints.callback_id) {
-      if (hasCallbackId(action)) {
-        if (typeof constraints.callback_id === 'string' && action.callback_id !== constraints.callback_id) {
+      if (typeof constraints.block_id === 'string') {
+        if (innerAction.block_id !== constraints.block_id) {
           return;
         }
-
-        if ((tempMatches = (constraints.callback_id as RegExp).exec(action.callback_id)) != null) {
+      } else {
+        if ((tempMatches = constraints.block_id.exec(innerAction.block_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
         }
-      } else {
+      }
+    }
+
+    if (constraints.action_id !== undefined) {
+      if (innerAction === undefined || !isElementAction(innerAction)) {
         return;
+      }
+
+      if (typeof constraints.action_id === 'string') {
+        if (innerAction.action_id !== constraints.action_id) {
+          return;
+        }
+      } else {
+        if ((tempMatches = constraints.action_id.exec(innerAction.action_id)) !== null) {
+          matches.concat(tempMatches);
+        } else {
+          return;
+        }
+      }
+    }
+
+    if (constraints.callback_id !== undefined) {
+      if (!isCallbackIdentifiedAction(action)) {
+        return;
+      }
+      if (typeof constraints.callback_id === 'string') {
+        if (action.callback_id !== constraints.callback_id) {
+          return;
+        }
+      } else {
+        if ((tempMatches = constraints.callback_id.exec(action.callback_id)) !== null) {
+          matches.concat(tempMatches);
+        } else {
+          return;
+        }
       }
     }
 
@@ -191,14 +163,16 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
     let tempMatches: RegExpExecArray | null;
 
     // Filter out messages that don't contain the pattern
-    if (typeof pattern === 'string' && !message.text.includes(pattern)) {
-      return;
-    }
-
-    if ((tempMatches = (pattern as RegExp).exec(message.text)) != null) {
-      context['matches'] = tempMatches;
+    if (typeof pattern === 'string') {
+      if (!message.text.includes(pattern)) {
+        return;
+      }
     } else {
-      return;
+      if ((tempMatches = pattern.exec(message.text)) !== null) {
+        context['matches'] = tempMatches;
+      } else {
+        return;
+      }
     }
 
     next();
@@ -210,8 +184,8 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
  */
 export function matchCommandName(name: string): Middleware<SlackCommandMiddlewareArgs> {
   return ({ command, next }) => {
-    // Filter out any commands without commandName
-    if (name !== command.text) {
+    // Filter out any commands that are not the correct command name
+    if (name !== command.command) {
       return;
     }
 
@@ -224,7 +198,7 @@ export function matchCommandName(name: string): Middleware<SlackCommandMiddlewar
  */
 export function matchEventType(type: string): Middleware<SlackEventMiddlewareArgs<string>> {
   return ({ event, next }) => {
-    // Filter out any commands without commandName
+    // Filter out any events that are not the correct type
     if (type !== event.type) {
       return;
     }
@@ -263,4 +237,35 @@ export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
     // }
     next();
   };
+}
+
+function isElementAction(
+  action: InteractiveAction | UnknownElementAction<string>,
+): action is UnknownElementAction<string> {
+  return (action as UnknownElementAction<string>).action_id !== undefined;
+}
+
+type CallbackIdentifiedAction =
+  | InteractiveMessage<ButtonClick>
+  | InteractiveMessage<MenuSelect>
+  | DialogSubmitAction
+  | MessageAction;
+
+function isCallbackIdentifiedAction(action: SlackAction<string>): action is CallbackIdentifiedAction {
+  return (action as CallbackIdentifiedAction).callback_id !== undefined;
+}
+
+/**
+ * Helper function that determines if a payload is an options payload
+ * TODO: Get rid of use of KeyValueMapping
+ */
+function isOptionsBody(body: KeyValueMapping): boolean {
+  if (body.type === 'dialog_suggestion') {
+    return true;
+  }
+  if (body.type === 'interactive_message' && body.name !== undefined) {
+    return true;
+  }
+  // TODO: fill in a test for what an external_select options looks like once we sort out the payload
+  return false;
 }

@@ -1,3 +1,4 @@
+// TODO: import element interfaces from @slack/types
 import { ChatPostMessageArguments, PlainTextElement, Option, Confirmation } from '@slack/web-api';
 
 /*
@@ -138,42 +139,23 @@ export interface InteractiveMessage<Action extends InteractiveAction> extends Ke
   original_message?: { [key: string]: string; };
 }
 
-export interface Container {
-  message_ts: string;
-  channel_id: string;
-  is_ephemeral: boolean;
-  thread_ts?: string;
-}
-
-export interface MessageContainer extends Container {
-  type: 'message';
-}
-
-export interface MessageAttachmentContainer extends Container {
-  type: 'message_attachment';
-  attachment_id: number;
-  is_app_unfurl: boolean;
-  app_unfurl_url?: string;
-}
-
-export type KnownActions = UsersSelectResponse | StaticSelectResponse | ConversationsSelectResponse |
-ChannelsSelectResponse | ExternalSelectResponse | ButtonResponse | OverflowResponse | DatepickerResponse;
-
-export interface ActionResponse {
+// this interface is "abstract", and not meant to be used on its own. it just helps DRY up the following interfaces
+interface BaseElementAction {
   block_id: string;
   action_id: string;
   action_ts: string;
+  // TODO: figure out when this is actually available
   confirm?: Confirmation;
 }
 
-export interface ButtonResponse extends ActionResponse {
+export interface ButtonAction extends BaseElementAction {
   type: 'button';
   value: string;
   text: PlainTextElement;
   url?: string;
 }
 
-export interface StaticSelectResponse extends ActionResponse {
+export interface StaticSelectAction extends BaseElementAction {
   type: 'static_select';
   selected_option: {
     text: PlainTextElement,
@@ -183,35 +165,35 @@ export interface StaticSelectResponse extends ActionResponse {
   placeholder?: PlainTextElement;
 }
 
-export interface UsersSelectResponse extends ActionResponse {
+export interface UsersSelectAction extends BaseElementAction {
   type: 'users_select';
   selected_user: string;
   initial_user?: string;
   placeholder?: PlainTextElement;
 }
 
-export interface ConversationsSelectResponse extends ActionResponse {
+export interface ConversationsSelectAction extends BaseElementAction {
   type: 'conversations_select';
   selected_conversation: string;
   initial_conversation?: string;
   placeholder?: PlainTextElement;
 }
 
-export interface ChannelsSelectResponse extends ActionResponse {
+export interface ChannelsSelectAction extends BaseElementAction {
   type: 'channels_select';
   selected_channel: string;
   initial_channel?: string;
   placeholder?: PlainTextElement;
 }
 
-export interface ExternalSelectResponse extends ActionResponse {
+export interface ExternalSelectAction extends BaseElementAction {
   type: 'external_select';
   initial_option?: Option;
   placeholder?: PlainTextElement;
   min_query_length?: number;
 }
 
-export interface OverflowResponse extends ActionResponse {
+export interface OverflowAction extends BaseElementAction {
   type: 'overflow';
   selected_option: {
     text: PlainTextElement,
@@ -219,16 +201,35 @@ export interface OverflowResponse extends ActionResponse {
   };
 }
 
-export interface DatepickerResponse extends ActionResponse {
+export interface DatepickerAction extends BaseElementAction {
   type: 'datepicker';
   selected_date: string;
   initial_date?: string;
   placeholder?: PlainTextElement;
 }
 
-export interface Actions<Action extends KnownActions> extends KeyValueMapping {
+export type ElementAction =
+  | ButtonAction
+  | UsersSelectAction
+  | StaticSelectAction
+  | ConversationsSelectAction
+  | ChannelsSelectAction
+  | ExternalSelectAction
+  | OverflowAction
+  | DatepickerAction;
+
+export interface UnknownElementAction<Type> extends BaseElementAction, KeyValueMapping {
+  type: Type;
+}
+
+type KnownActionFromElementType<T extends string> = Extract<ElementAction, { type: T }>;
+type ActionFromElementType<T extends string> = KnownActionFromElementType<T> extends never ?
+  UnknownElementAction<T> : KnownActionFromElementType<T>;
+
+// TODO: add generic parameter for container (is the presence of message related to the container?)
+export interface BlockAction<ElementType extends string> extends KeyValueMapping {
   type: 'block_actions';
-  actions: [Action];
+  actions: [ActionFromElementType<ElementType>];
   team: {
     id: string;
     domain: string;
@@ -252,7 +253,7 @@ export interface Actions<Action extends KnownActions> extends KeyValueMapping {
     [key: string]: any;
   };
   app_unfurl?: KeyValueMapping;
-  container: MessageContainer | MessageAttachmentContainer;
+  container: KeyValueMapping;
   token: string;
   response_url: string;
   trigger_id: string;
@@ -324,22 +325,25 @@ export interface MessageAction extends KeyValueMapping {
   action_ts: string; // undocumented
 }
 
-export type SlackAction =
+export type SlackAction<ElementType extends string = string> =
+  | BlockAction<ElementType>
   | InteractiveMessage<ButtonClick>
   | InteractiveMessage<MenuSelect>
   | DialogSubmitAction
-  | MessageAction
-  | Actions<KnownActions>;
+  | MessageAction;
 
 type ActionAckFn<T extends SlackAction> =
   T extends InteractiveMessage<ButtonClick | MenuSelect> ?
     AckFn<string | SayArguments> :
   T extends DialogSubmitAction ?
     AckFn<DialogValidation> :
+  // message action and block actions don't accept any value in the ack response
   AckFn<void>;
 
 export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
   payload: ActionType;
+  // TODO: should the following value actually contain the unwrapped action payload?
+  // DialogSubmitAction and MessageAction don't have an actions property, so what would they contain?
   action: this['payload'];
   body: this['payload'];
   // all action types except dialog submission have a channel context
@@ -381,7 +385,7 @@ export interface SlackCommandMiddlewareArgs {
  * Slack Dialog and Interactive Messages Options Types
  */
 
-export interface ExternalOptionsRequest<Type> {
+export interface OptionsRequest<Type> {
   name: string;
   value: string;
   callback_id: string;
@@ -409,19 +413,24 @@ export interface ExternalOptionsRequest<Type> {
 
 // TODO: there's a lot of repetition in the following type. factor out some common parts.
 // tslint:disable:max-line-length
-type OptionsAckFn<Container extends 'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse> =
-  Container extends ExternalSelectResponse ?
+type OptionsAckFn<Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select'> =
+  Source extends 'external_select' ?
     AckFn<{ options: Option[]; option_groups: { label: string; options: Option[]; }[]; }> :
-  Container extends 'interactive_message' ?
+  Source extends 'interactive_message' ?
     AckFn<{ options: { text: string; value: string; }[]; option_groups: { label: string; options: { text: string; value: string; }[]; }[]; }> :
   AckFn<{ options: { label: string; value: string; }[]; option_groups: { label: string; options: { label: string; value: string; }[]; }[]; }>;
 // tslint:enable:max-line-length
 
-export interface SlackOptionsMiddlewareArgs<Container extends 'interactive_message' |
-  'dialog_suggestion' | ExternalSelectResponse> {
-  payload: ExternalOptionsRequest<Container> | Actions<ExternalSelectResponse>;
+export interface SlackOptionsMiddlewareArgs<
+  Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select'
+> {
+  // TODO: confirm that the payload is the entire block action when using an external select
+  // (where is the user's partial input?)
+  payload: Source extends 'external_select' ? BlockAction<Source> : OptionsRequest<Source>;
   body: this['payload'];
-  ack: OptionsAckFn<Container>;
+  // TODO: consider putting an options property in here, just so that middleware don't have to parse the body to decide
+  // what kind of event this is
+  ack: OptionsAckFn<Source>;
 }
 
 /*
@@ -432,7 +441,7 @@ export type AnyMiddlewareArgs =
   | SlackEventMiddlewareArgs<string>
   | SlackActionMiddlewareArgs<SlackAction>
   | SlackCommandMiddlewareArgs
-  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse>;
+  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | 'external_select'>;
 
 export interface Context extends KeyValueMapping {
 }
