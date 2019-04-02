@@ -1,5 +1,4 @@
 import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
-// import conversationStore from './conversation_store';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
 import {
@@ -16,6 +15,7 @@ import {
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
 import util from 'util';
+import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -31,15 +31,13 @@ import {
   RespondFn,
   ActionConstraints,
 } from './middleware/types';
-
-// TODO: remove the following pragma after TSLint to ESLint transformation is complete
-/* tslint:disable:completed-docs */
+import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 
 /** App initialization options */
 export interface SlappOptions {
   signingSecret?: ReceiverArguments['signingSecret'];
   endpoints?: ReceiverArguments['endpoints'];
-  convoStore?: any;
+  convoStore?: ConversationStore | false;
   token?: string; // either token or teamContext
   teamContext?: Authorize; // either token or teamContext
   receiver?: Receiver;
@@ -149,6 +147,7 @@ export default class Slapp {
       .on('message', message => this.onIncomingEvent(message))
       .on('error', error => this.onGlobalError(error));
 
+    // Use middleware which filter events from other apps or this app itself
     if (ignoreBots) {
       this.use(ignoreBotsMiddleware());
     }
@@ -156,8 +155,12 @@ export default class Slapp {
       this.use(ignoreSelfMiddleware());
     }
 
-    // TODO: provide a global middleware for conversation store. this should be de-emphasized because workflows will
-    // supercede this solution for the same use cases
+    // Use conversation state global middleware
+    if (convoStore !== false) {
+      // Use the memory store by default, or another store if provided
+      const store: ConversationStore = convoStore === undefined ? new MemoryStore() : convoStore;
+      this.use(conversationContext(store, this.logger));
+    }
   }
 
   /**
@@ -175,22 +178,8 @@ export default class Slapp {
    */
   private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
 
-    // Introspect the body to determine what type of incoming event is being handled
-    const type: IncomingEventType | undefined = (() => {
-      if (body.event !== undefined) {
-        return IncomingEventType.Event;
-      }
-      if (body.command !== undefined) {
-        return IncomingEventType.Command;
-      }
-      if (body.name !== undefined) {
-        return IncomingEventType.Options;
-      }
-      if (body.actions !== undefined || body.type === 'dialog_submission') {
-        return IncomingEventType.Action;
-      }
-      return undefined;
-    })();
+    // Introspect the body to determine what type of incoming event is being handled, and any channel context
+    const { type, conversationId } = getTypeAndConversation(body);
 
     // If the type could not be determined, warn and exit
     if (type === undefined) {
@@ -202,7 +191,7 @@ export default class Slapp {
     const bodyArg = body as AnyMiddlewareArgs['body'];
 
     // Initialize context (shallow copy to enforce object identity separation)
-    const context: Context = { ...(await this.authorize(buildSource(type, bodyArg), bodyArg)) };
+    const context: Context = { ...(await this.authorize(buildSource(type, conversationId, bodyArg), bodyArg)) };
 
     // Factory for say() argument
     const createSay = (channelId: string): SayFn => {
@@ -252,9 +241,8 @@ export default class Slapp {
     // NOTE: there is no alias for options
 
     // Set say() utility
-    const channelId = getChannelContext(type, bodyArg);
-    if (channelId !== undefined) {
-      listenerArgs.say = createSay(channelId);
+    if (conversationId !== undefined && type !== IncomingEventType.Options) {
+      listenerArgs.say = createSay(conversationId);
     }
 
     // Set respond() utility
@@ -390,19 +378,13 @@ const tokenUsage = 'Apps used in one workspace should be initialized with a toke
   'should be initialized with a teamContext.';
 
 /**
- * Internal data type for capturing the class of event processed in Slapp#onIncomingEvent()
- */
-enum IncomingEventType {
-  Event,
-  Action,
-  Command,
-  Options,
-}
-
-/**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
  */
-function buildSource(type: IncomingEventType, body: AnyMiddlewareArgs['body']): AuthorizeSourceData {
+function buildSource(
+  type: IncomingEventType,
+  channelId: string | undefined,
+  body: AnyMiddlewareArgs['body'],
+): AuthorizeSourceData {
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
 
@@ -426,39 +408,9 @@ function buildSource(type: IncomingEventType, body: AnyMiddlewareArgs['body']): 
        (type === IncomingEventType.Action || type === IncomingEventType.Options) ? body.user.id as string :
        (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
        undefined),
-    // TODO: fill in conversationId, possibly reuse part of getChannelContext()
-    conversationId: undefined,
+    conversationId: channelId,
   };
   // tslint:enable:max-line-length
 
   return source;
-}
-
-/**
- * Helper which finds the channel that any specific incoming event is related to (if any). This is analagous to the type
- * helper used to define the SlackEventMiddlewareArgs and SlackActionMiddlewareArgs types.
- */
-function getChannelContext(type: IncomingEventType, body: AnyMiddlewareArgs['body']): string | undefined {
-  if (type === IncomingEventType.Action) {
-    return (body as SlackActionMiddlewareArgs<SlackAction>['body']).channel.id;
-  }
-  if (type === IncomingEventType.Command) {
-    return (body as SlackCommandMiddlewareArgs['body']).channel_id;
-  }
-  // TODO: verify this covers all the events
-  if (type === IncomingEventType.Event) {
-    if ((body as SlackEventMiddlewareArgs<string>['body']).event.channel !== undefined) {
-      return (body as SlackEventMiddlewareArgs<string>['body']).event.channel;
-    }
-    if ((body as SlackEventMiddlewareArgs<string>['body']).event.item !== undefined) {
-      return (body as SlackEventMiddlewareArgs<string>['body']).event.item.channel;
-    }
-  }
-  // NOTE: Intentionally leaving all options requests with undefined
-  return undefined;
-}
-
-/** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
-function assertNever(x: never): never {
-  throw new Error(`Unexpected object: ${x}`);
 }
