@@ -10,6 +10,9 @@ import {
   matchCommands,
   matchCommandName,
   matchOptions,
+  matchEvents,
+  matchEventType,
+  matchMessage,
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
 import util from 'util';
@@ -306,9 +309,11 @@ export default class Slapp {
 
   public event<EventType extends string = string>(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
-    // TODO:
+    this.listeners.push(
+      [matchEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
@@ -318,8 +323,12 @@ export default class Slapp {
     patternOrMiddleware: string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>,
     ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]
   ): void {
-    // TODO
+    const messageMiddleware = (typeof patternOrMiddleware === 'string' || patternOrMiddleware instanceof RegExp) ?
+      matchMessage(patternOrMiddleware) : patternOrMiddleware;
 
+    this.listeners.push(
+      [matchEvents, matchEventType('message'), messageMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.

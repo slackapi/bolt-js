@@ -4,6 +4,7 @@ import {
   Actions,
   ExternalSelectResponse,
   SlashCommand,
+  SlackEvent,
   AnyMiddlewareArgs,
   SlackAction,
   InteractiveMessage,
@@ -16,6 +17,7 @@ import {
   ObjectConstraint,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
+  SlackEventMiddlewareArgs,
 } from './types';
 
 /**
@@ -64,6 +66,21 @@ export function matchOptions(): Middleware<AnyMiddlewareArgs> {
 }
 
 /**
+ * Middleware that filters out any event that isn't an event
+ */
+export function matchEvents(): Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> {
+  return ({ event, next }) => {
+    // Filter out any non-actions
+    if (event === undefined) {
+      return;
+    }
+
+    // It matches so we should continue down this middleware listener chain
+    next();
+  };
+}
+
+/**
  * Helper function that determines if a payload is an options payload
  */
 function isOptionsPayload(payload: KeyValueMapping): boolean {
@@ -82,7 +99,7 @@ payload is ExternalOptionsRequest<'interactive_message'> {
     return false;
   }
   if (payload.type !== 'interactive_message') return false;
-  return false;
+  return true;
 }
 
 /**
@@ -184,13 +201,47 @@ export function matchActionConstraints(
   };
 }
 
+/*
+ * Middleware that filters out messages that don't match pattern
+ */
+export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
+  return ({ message, context, next }) => {
+    let tempMatches: RegExpExecArray | null;
+
+    // Filter out messages that don't contain the pattern
+    if (typeof pattern === 'string' && !message.text.includes(pattern)) {
+      return;
+    }
+
+    if ((tempMatches = (pattern as RegExp).exec(message.text)) != null) {
+      context['matches'] = tempMatches;
+    } else return;
+
+    next();
+  };
+}
+
 /**
- * Middleware that filters out any event that isn't a command
+ * Middleware that filters out any command that doesn't match name
  */
 export function matchCommandName(name: string): Middleware<SlackCommandMiddlewareArgs> {
   return ({ command, next }) => {
     // Filter out any commands without commandName
     if (name !== command.text) {
+      return;
+    }
+
+    next();
+  };
+}
+
+/**
+ * Middleware that filters out any event that isn't of given type
+ */
+export function matchEventType(type: string): Middleware<SlackEventMiddlewareArgs<string>> {
+  return ({ event, next }) => {
+    // Filter out any commands without commandName
+    if (type !== event.type) {
       return;
     }
 
