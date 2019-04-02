@@ -98,7 +98,9 @@ payload is ExternalOptionsRequest<'interactive_message'> {
   if ((payload as InteractiveMessage<InteractiveAction>).actions) {
     return false;
   }
-  if (payload.type !== 'interactive_message') return false;
+  if (payload.type !== 'interactive_message') {
+    return false;
+  }
   return true;
 }
 
@@ -165,7 +167,9 @@ export function matchActionConstraints(
 
       if ((tempMatches = (constraints.action_id as RegExp).exec(action.action_id)) != null) {
         matches.concat(tempMatches);
-      } else return;
+      } else {
+        return;
+      }
     }
 
     if (constraints.callback_id) {
@@ -176,8 +180,12 @@ export function matchActionConstraints(
 
         if ((tempMatches = (constraints.callback_id as RegExp).exec(action.callback_id)) != null) {
           matches.concat(tempMatches);
-        } else return;
-      } else return;
+        } else {
+          return;
+        }
+      } else {
+        return;
+      }
     }
 
     if (isOptionConstraint(constraints)) {
@@ -212,7 +220,9 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
 
     if ((tempMatches = (pattern as RegExp).exec(message.text)) != null) {
       context['matches'] = tempMatches;
-    } else return;
+    } else {
+      return;
+    }
 
     next();
   };
