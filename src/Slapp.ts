@@ -323,7 +323,7 @@ export default class Slapp {
     patternOrMiddleware: string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>,
     ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]
   ): void {
-    const messageMiddleware = (typeof patternOrMiddleware === 'string' || patternOrMiddleware instanceof RegExp) ?
+    const messageMiddleware = (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) ?
       matchMessage(patternOrMiddleware) : patternOrMiddleware;
 
     this.listeners.push(
