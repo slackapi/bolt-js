@@ -1,5 +1,9 @@
 import {
-  SlackEventMiddlewareArgs, SlackCommandMiddlewareArgs, SlackActionMiddlewareArgs, SlackAction,
+  SlackEventMiddlewareArgs,
+  SlackCommandMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
+  SlackActionMiddlewareArgs,
+  SlackAction,
 } from './middleware/types';
 
 /**
@@ -37,7 +41,8 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
   if (body.name !== undefined) {
     return {
       type: IncomingEventType.Options,
-      // TODO: don't options have a channel context when they are within interactive messages?
+      conversationId:
+        (body as SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>['body']).channel.id;
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission') {

@@ -227,7 +227,7 @@ export default class Slapp {
     // NOTE: there is no alias for options
 
     // Set say() utility
-    if (conversationId !== undefined) {
+    if (conversationId !== undefined && type !== IncomingEventType.Options) {
       listenerArgs.say = createSay(conversationId);
     }
 
