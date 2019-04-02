@@ -49,7 +49,7 @@ export type SlackEvent =
 /*
  * Slack Events API Types
  */
-interface KeyValueMapping {
+export interface KeyValueMapping {
   [key: string]: any;
 }
 
@@ -329,7 +329,7 @@ export type SlackAction =
   | InteractiveMessage<MenuSelect>
   | DialogSubmitAction
   | MessageAction
-  | KnownActions;
+  | Actions<KnownActions>;
 
 type ActionAckFn<T extends SlackAction> =
   T extends InteractiveMessage<ButtonClick | MenuSelect> ?
@@ -378,7 +378,7 @@ export interface SlackCommandMiddlewareArgs {
 }
 
 /*
- * Slack Options Types
+ * Slack Dialog and Interactive Messages Options Types
  */
 
 export interface ExternalOptionsRequest<Type> {
@@ -407,23 +407,21 @@ export interface ExternalOptionsRequest<Type> {
   token: string;
 }
 
-export interface Option {
-  label: string;
-  value: string;
-}
-
 // TODO: there's a lot of repetition in the following type. factor out some common parts.
 // tslint:disable:max-line-length
-type OptionsAckFn<Within extends 'interactive_message' | 'dialog_suggestion'> =
-  Within extends 'interactive_message' ?
+type OptionsAckFn<Container extends 'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse> =
+  Container extends ExternalSelectResponse ?
+    AckFn<{ options: Option[]; option_groups: { label: string; options: Option[]; }[]; }> :
+  Container extends 'interactive_message' ?
     AckFn<{ options: { text: string; value: string; }[]; option_groups: { label: string; options: { text: string; value: string; }[]; }[]; }> :
   AckFn<{ options: { label: string; value: string; }[]; option_groups: { label: string; options: { label: string; value: string; }[]; }[]; }>;
 // tslint:enable:max-line-length
 
-export interface SlackOptionsMiddlewareArgs<Within extends 'interactive_message' | 'dialog_suggestion'> {
-  payload: ExternalOptionsRequest<Within>;
+export interface SlackOptionsMiddlewareArgs<Container extends 'interactive_message' |
+  'dialog_suggestion' | ExternalSelectResponse> {
+  payload: ExternalOptionsRequest<Container> | Actions<ExternalSelectResponse>;
   body: this['payload'];
-  ack: OptionsAckFn<Within>;
+  ack: OptionsAckFn<Container>;
 }
 
 /*
@@ -434,7 +432,7 @@ export type AnyMiddlewareArgs =
   | SlackEventMiddlewareArgs<string>
   | SlackActionMiddlewareArgs<SlackAction>
   | SlackCommandMiddlewareArgs
-  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>;
+  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse>;
 
 export interface Context extends KeyValueMapping {
 }
@@ -481,4 +479,10 @@ export interface RespondFn {
 
 export interface AckFn<Response> {
   (response?: Response): void;
+}
+
+export interface ActionConstraints {
+  block_id?: string | RegExp;
+  action_id?: string | RegExp;
+  callback_id?: string | RegExp;
 }

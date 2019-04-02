@@ -1,8 +1,20 @@
 import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
-import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
+import {
+  ignoreSelfMiddleware,
+  ignoreBotsMiddleware,
+  onlyActions,
+  matchActionConstraints,
+  onlyCommands,
+  matchCommandName,
+  onlyOptions,
+  onlyEvents,
+  matchEventType,
+  matchMessage,
+} from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
+import util from 'util';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   Middleware,
@@ -12,10 +24,12 @@ import {
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackAction,
+  ExternalSelectResponse,
   Context,
   SayFn,
   AckFn,
   RespondFn,
+  ActionConstraints,
 } from './middleware/types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 
@@ -282,9 +296,11 @@ export default class Slapp {
 
   public event<EventType extends string = string>(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
-    // TODO:
+    this.listeners.push(
+      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
@@ -294,30 +310,67 @@ export default class Slapp {
     patternOrMiddleware: string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>,
     ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]
   ): void {
-    // TODO
+    const messageMiddleware = (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) ?
+      matchMessage(patternOrMiddleware) : patternOrMiddleware;
+
+    this.listeners.push(
+      [onlyEvents, matchEventType('message'), messageMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
   public action<ActionType extends SlackAction = SlackAction>(
-    callbackId: string | RegExp,
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void;
+  public action<ActionType extends SlackAction = SlackAction>(
+    constraints: ActionConstraints,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void;
+  public action<ActionType extends SlackAction = SlackAction>(
+    actionIdOrContraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void {
-    // TODO:
+    const constraints: ActionConstraints =
+      (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
+      { action_id: actionIdOrContraints } : actionIdOrContraints;
+
+    this.listeners.push(
+      [onlyActions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // TODO: should command names also be regex?
   public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
-    // TODO:
+    this.listeners.push(
+      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // TODO: is the generic constraint a good one?
-  // TODO: the name Within is not super good
-  public options<Within extends 'interactive_message' | 'dialog_suggestion' = 'interactive_message'>(
-    callbackId: string,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Within>>[]
+  public options<Container extends ExternalSelectResponse | 'interactive_message' |
+  'dialog_suggestion' = ExternalSelectResponse>(
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
+  ): void;
+  public options<Container extends ExternalSelectResponse | 'interactive_message' |
+  'dialog_suggestion' = ExternalSelectResponse>(
+    constraints: ActionConstraints,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
+  ): void;
+  public options<Container extends ExternalSelectResponse | 'interactive_message' |
+  'dialog_suggestion' = ExternalSelectResponse>(
+    actionIdOrContraints: string | RegExp | ActionConstraints,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void {
-    // TODO:
+    const constraints: ActionConstraints =
+      (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
+      { action_id: actionIdOrContraints } : actionIdOrContraints;
+
+    this.listeners.push(
+      [onlyOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 }
 
@@ -339,11 +392,11 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'dialog_suggestion' | 'interactive_message'>)['body']).team.id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<ExternalSelectResponse | 'interactive_message' | 'dialog_suggestion'>)['body']).team.id as string :
        assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'dialog_suggestion' | 'interactive_message'>)['body']).team.enterprise_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<ExternalSelectResponse | 'interactive_message' | 'dialog_suggestion'>)['body']).team.enterprise_id as string :
        undefined),
     userId:
       ((type === IncomingEventType.Event) ?
