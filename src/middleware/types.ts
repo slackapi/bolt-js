@@ -486,8 +486,3 @@ export interface ActionConstraints {
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
 }
-
-// Container constraint is only accepted for options
-export interface OptionConstraints extends ActionConstraints {
-  container?: 'message' | 'dialog';
-}

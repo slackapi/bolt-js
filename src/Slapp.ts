@@ -30,7 +30,6 @@ import {
   AckFn,
   RespondFn,
   ActionConstraints,
-  OptionConstraints,
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -369,15 +368,15 @@ export default class Slapp {
   ): void;
   public options<Container extends ExternalSelectResponse | 'interactive_message' |
   'dialog_suggestion' = ExternalSelectResponse>(
-    constraints: OptionConstraints,
+    constraints: ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void;
   public options<Container extends ExternalSelectResponse | 'interactive_message' |
   'dialog_suggestion' = ExternalSelectResponse>(
-    actionIdOrContraints: string | RegExp | OptionConstraints,
+    actionIdOrContraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void {
-    const constraints: OptionConstraints =
+    const constraints: ActionConstraints =
       (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
       { action_id: actionIdOrContraints } : actionIdOrContraints;
 

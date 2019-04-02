@@ -14,7 +14,6 @@ import {
   ExternalOptionsRequest,
   Container,
   ActionConstraints,
-  OptionConstraints,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
@@ -119,17 +118,6 @@ payload is Actions<ExternalSelectResponse> {
 /**
  * Typeguard that decides whether a constraint object is an options constraint object
  */
-function isOptionConstraint(actionOrOptionConstraint: ActionConstraints |
-  OptionConstraints): actionOrOptionConstraint is OptionConstraints {
-  if ((actionOrOptionConstraint as OptionConstraints).container) {
-    return true;
-  }
-  return false;
-}
-
-/**
- * Typeguard that decides whether a constraint object is an options constraint object
- */
 function hasCallbackId(payload: { [key: string]: any; }): payload is (
     InteractiveMessage<InteractiveAction> | DialogSubmitAction | MessageAction | ExternalOptionsRequest<Container>
   ) {
@@ -144,7 +132,7 @@ function hasCallbackId(payload: { [key: string]: any; }): payload is (
  * Middleware that checks for matches given constraints
  */
 export function matchActionConstraints(
-    constraints: ActionConstraint | isOptionConstraint,
+    constraints: ActionConstraints,
   ): Middleware<SlackActionMiddlewareArgs<SlackAction>> {
   return ({ action, next, context }) => {
     let tempMatches: RegExpExecArray | null;
@@ -184,17 +172,6 @@ export function matchActionConstraints(
           return;
         }
       } else {
-        return;
-      }
-    }
-
-    if (isOptionConstraint(constraints)) {
-      if (constraints.container === 'dialog' && action.type !== 'dialog_suggestion') {
-        return;
-      }
-
-      if (constraints.container === 'message' &&
-        (action.type !== 'block_actions' && action.type !== 'interactive_message')) {
         return;
       }
     }
