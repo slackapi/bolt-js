@@ -42,7 +42,6 @@ export interface SlappOptions {
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
-  colors?: boolean;
   ignoreSelf?: boolean;
   ignoreBots?: boolean;
 }
@@ -104,14 +103,12 @@ export default class Slapp {
     teamContext = undefined,
     logger = new ConsoleLogger(),
     logLevel = LogLevel.INFO,
-    colors = false,
     ignoreSelf = false,
     ignoreBots = false,
   }: SlappOptions = {}) {
 
     this.logger = logger;
     this.logger.setLevel(logLevel);
-    // TODO: set colors
 
     if (token !== undefined) {
       if (teamContext !== undefined) {
