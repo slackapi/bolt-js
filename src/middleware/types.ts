@@ -343,6 +343,7 @@ type ActionAckFn<T extends SlackAction> =
 export interface SlackActionMiddlewareArgs<ActionType extends SlackAction> {
   payload: ActionType;
   // TODO: should the following value actually contain the unwrapped action payload?
+  // DialogSubmitAction and MessageAction don't have an actions property, so what would they contain?
   action: this['payload'];
   body: this['payload'];
   // all action types except dialog submission have a channel context
@@ -427,6 +428,8 @@ export interface SlackOptionsMiddlewareArgs<
   // (where is the user's partial input?)
   payload: Source extends 'external_select' ? BlockAction<Source> : OptionsRequest<Source>;
   body: this['payload'];
+  // TODO: consider putting an options property in here, just so that middleware don't have to parse the body to decide
+  // what kind of event this is
   ack: OptionsAckFn<Source>;
 }
 
