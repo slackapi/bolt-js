@@ -329,7 +329,7 @@ export type SlackAction =
   | InteractiveMessage<MenuSelect>
   | DialogSubmitAction
   | MessageAction
-  | KnownActions;
+  | Actions<KnownActions>;
 
 type ActionAckFn<T extends SlackAction> =
   T extends InteractiveMessage<ButtonClick | MenuSelect> ?
@@ -407,16 +407,12 @@ export interface ExternalOptionsRequest<Type> {
   token: string;
 }
 
-export interface Option {
-  label: string;
-  value: string;
-}
-
 // TODO: there's a lot of repetition in the following type. factor out some common parts.
-// TODO: Should ack be different for Block actions?
 // tslint:disable:max-line-length
 type OptionsAckFn<Container extends 'interactive_message' | 'dialog_suggestion' | ExternalSelectResponse> =
-  Container extends ('interactive_message' | ExternalSelectResponse) ?
+  Container extends ExternalSelectResponse ?
+    AckFn<{ options: Option[]; option_groups: { label: string; options: Option[]; }[]; }> :
+  Container extends 'interactive_message' ?
     AckFn<{ options: { text: string; value: string; }[]; option_groups: { label: string; options: { text: string; value: string; }[]; }[]; }> :
   AckFn<{ options: { label: string; value: string; }[]; option_groups: { label: string; options: { label: string; value: string; }[]; }[]; }>;
 // tslint:enable:max-line-length
@@ -485,12 +481,12 @@ export interface AckFn<Response> {
   (response?: Response): void;
 }
 
-export interface ConstraintObject {
+export interface ActionConstraint {
   block_id?: string | RegExp;
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
 }
 
-export interface ObjectConstraintObject extends ConstraintObject {
+export interface ObjectConstraint extends ActionConstraint {
   container?: 'block_actions' | 'interactive_message' | 'dialog';
 }

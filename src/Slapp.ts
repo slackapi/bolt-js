@@ -2,8 +2,17 @@ import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 // import conversationStore from './conversation_store';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
 import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
-import { ignoreSelfMiddleware, ignoreBotsMiddleware } from './middleware/builtin';
+import {
+  ignoreSelfMiddleware,
+  ignoreBotsMiddleware,
+  matchActions,
+  matchActionConstraints,
+  matchCommands,
+  matchCommandName,
+  matchOptions,
+} from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
+import util from 'util';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -12,20 +21,13 @@ import {
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackAction,
-  SlashCommand,
   ExternalSelectResponse,
-  ExternalOptionsRequest,
   Context,
   SayFn,
   AckFn,
   RespondFn,
-  KeyValueMapping,
-  InteractiveAction,
-  KnownActions,
-  Actions,
-  InteractiveMessage,
-  ConstraintObject,
-  ObjectConstraintObject,
+  ActionConstraint,
+  ObjectConstraint,
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -327,56 +329,27 @@ export default class Slapp {
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
   public action<ActionType extends SlackAction = SlackAction>(
-    constraints: ConstraintObject,
+    constraints: ActionConstraint,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
   public action<ActionType extends SlackAction = SlackAction>(
-    actionIdOrContraints: string | RegExp | ConstraintObject,
+    actionIdOrContraints: string | RegExp | ActionConstraint,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void {
-    let constraints: ConstraintObject = {};
+    const constraints: ActionConstraint =
+      (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
+      { action_id: actionIdOrContraints } : actionIdOrContraints;
 
-    if (!(typeof actionIdOrContraints === 'object')) {
-      constraints.action_id = actionIdOrContraints;
-    } else {
-      constraints = Object.assign({}, actionIdOrContraints) as ConstraintObject;
-    }
-
-    const actionMiddleware: Middleware<SlackActionMiddlewareArgs<ActionType>> = ({ action, next, context }) => {
-      // Filter out any non-actions
-      if ((action as Actions<KnownActions> | InteractiveMessage<InteractiveAction>).actions === undefined
-        && action.type !== 'dialog_submission') {
-        return;
-      }
-
-      // Filter out any actions without actionId
-      const match = matchesConstraints(action, constraints, context);
-      if (!match) return;
-
-      // It matches so we should continue down this middleware listener chain
-      next();
-    };
-
-    this.listeners.push([actionMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    this.listeners.push(
+      [matchActions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // TODO: should command names also be regex?
   public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
-
-    const commandMiddleware: Middleware<SlackCommandMiddlewareArgs> = ({ command, next }) => {
-      // Filter out any non-commands
-      if ((command as SlashCommand).command === undefined) {
-        return;
-      }
-
-      // Filter out any commands without commandName
-      if (commandName !== command.text) return;
-
-      // It matches so we should continue down this middleware listener chain
-      next();
-    };
-
-    this.listeners.push([commandMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    this.listeners.push(
+      [matchCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 
   // TODO: is the generic constraint a good one?
@@ -387,36 +360,21 @@ export default class Slapp {
   ): void;
   public options<Container extends ExternalSelectResponse | 'interactive_message' |
   'dialog_suggestion' = ExternalSelectResponse>(
-    constraints: ObjectConstraintObject,
+    constraints: ObjectConstraint,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void;
   public options<Container extends ExternalSelectResponse | 'interactive_message' |
   'dialog_suggestion' = ExternalSelectResponse>(
-    actionIdOrContraints: string | RegExp | ObjectConstraintObject,
+    actionIdOrContraints: string | RegExp | ObjectConstraint,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void {
-    let constraints: ObjectConstraintObject = {};
+    const constraints: ActionConstraint =
+      (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
+      { action_id: actionIdOrContraints } : actionIdOrContraints;
 
-    if (!(typeof actionIdOrContraints === 'object')) {
-      constraints.action_id = actionIdOrContraints;
-    } else {
-      constraints = Object.assign({}, actionIdOrContraints) as ObjectConstraintObject;
-    }
-
-    const optionsMiddleware: Middleware<SlackOptionsMiddlewareArgs<Container>> = ({ payload, next, context }) => {
-      if (payload.type !== 'dialog_suggestion' && !isInteractiveMessageOptions(payload) && !isExternalSelect(payload)) {
-        return;
-      }
-
-      // Filter out any options without matching constriants
-      const match = matchesConstraints(payload, constraints, context);
-      if (!match) return;
-
-      // It matches so we should continue down this middleware listener chain
-      next();
-    };
-
-    this.listeners.push([optionsMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    this.listeners.push(
+      [matchOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
   }
 }
 
@@ -431,100 +389,6 @@ enum IncomingEventType {
   Action,
   Command,
   Options,
-}
-
-/**
- * Match constraints given a message payload and adds all matches to context
- */
-function matchesConstraints(payload: KeyValueMapping, constraints: ConstraintObject | ObjectConstraintObject,
-                            context: Context): boolean {
-  const action = payload.actions ? payload.actions[0] : {};
-  let tempMatches: RegExpExecArray | null;
-  const matches: any[] = [];
-
-  if (constraints.block_id) {
-    if (typeof constraints.block_id === 'string' && action.block_id !== constraints.block_id) {
-      return false;
-    }
-
-    if ((tempMatches = (constraints.block_id as RegExp).exec(action.block_id)) != null) {
-      matches.concat(tempMatches);
-    } else return false;
-  }
-
-  if (constraints.action_id) {
-    if (typeof constraints.action_id === 'string' && action.action_id !== constraints.action_id) {
-      return false;
-    }
-
-    if ((tempMatches = (constraints.action_id as RegExp).exec(action.action_id)) != null) {
-      matches.concat(tempMatches);
-    } else return false;
-  }
-
-  if (constraints.callback_id) {
-    if (payload.callback_id !== constraints.callback_id) {
-      return false;
-    }
-
-    if ((tempMatches = (constraints.callback_id as RegExp).exec(payload.callback_id)) != null) {
-      matches.concat(tempMatches);
-    } else return false;
-  }
-
-  if (isOptionConstraintObject(constraints) && constraints.container) {
-    if (constraints.container === 'dialog' && payload.type !== 'dialog_suggestion') {
-      return false;
-    }
-
-    if (constraints.container === 'interactive_message' && payload.type !== 'interactive_message') {
-      return false;
-    }
-
-    if (constraints.container === 'block_actions' && payload.type !== 'block_actions') {
-      return false;
-    }
-  }
-
-  // Add matches to context
-  context['matches'] = matches;
-
-  return true;
-}
-
-/**
- * Helper that decides whether a constraint object is an options constraint object
- */
-function isOptionConstraintObject(optionOrConstraintObject: ConstraintObject |
-  ObjectConstraintObject): optionOrConstraintObject is ObjectConstraintObject {
-  if ((optionOrConstraintObject as ObjectConstraintObject).container) {
-    return true;
-  }
-  return false;
-}
-
-/**
- * Helper that decides if a payload is an interactive message options request
- */
-function isInteractiveMessageOptions(payload: KeyValueMapping):
-payload is ExternalOptionsRequest<'interactive_message'> {
-  if ((payload as InteractiveMessage<InteractiveAction>).actions) {
-    return false;
-  }
-  if (payload.type !== 'interactive_message') return false;
-  return false;
-}
-
-/**
- * Helper that decides if a payload is an interactive message options request
- */
-function isExternalSelect(payload: KeyValueMapping):
-payload is Actions<ExternalSelectResponse> {
-  if ((payload as Actions<ExternalSelectResponse>).actions &&
-    (payload as Actions<ExternalSelectResponse>).actions[0].type === 'external_select') {
-    return true;
-  }
-  return false;
 }
 
 /**
