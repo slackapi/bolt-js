@@ -28,6 +28,7 @@
     // not used in base config
     "await-promise": true,
     "ban-comma-operator": true,
+    // TODO: enable completed-docs after transition from TSLint to ESLint is complete
     "completed-docs": false,
     "interface-over-type-literal": true,
     "jsdoc-format": [true, "check-multiline-start"],

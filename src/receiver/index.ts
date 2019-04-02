@@ -5,9 +5,6 @@ import SSLCheck from './middleware/SSLCheck';
 import axios from 'axios';
 import { RespondFn, AckFn } from '../middleware/types';
 
-// TODO: remove the following pragma after TSLint to ESLint transformation is complete
-/* tslint:disable:completed-docs */
-
 // TODO: make this generic on the body?
 export interface Event {
   body: {
