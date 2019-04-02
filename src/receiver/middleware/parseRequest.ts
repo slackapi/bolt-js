@@ -1,6 +1,6 @@
 import rawBody from 'raw-body';
 import crypto from 'crypto';
-import { timingSafeCompare } from 'tsscmp';
+import tsscmp from 'tsscmp';
 import querystring from 'querystring';
 import { Request, Response, RequestHandler } from 'express';
 
@@ -44,7 +44,7 @@ export default function (signingSecret: string): RequestHandler {
         const [version, hash] = signature.split('=');
         hmac.update(`${version}:${ts}:${body}`);
 
-        if (!timingSafeCompare(hash, hmac.digest('hex'))) {
+        if (!tsscmp(hash, hmac.digest('hex'))) {
           const error = new Error('Slack request signing verification failed');
           next(error);
         }

@@ -58,10 +58,10 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
       this.emitHandler.bind(this),
     ];
 
-    const e = Object.values(this.endpoints);
+    const endpointPaths = Object.values(this.endpoints);
 
-    for (const endpoint in e) {
-      this.app.post(endpoint, ...defaultMiddleware);
+    for (const endpoint in endpointPaths) {
+      this.app.post(endpointPaths[endpoint], ...defaultMiddleware);
     }
   }
 

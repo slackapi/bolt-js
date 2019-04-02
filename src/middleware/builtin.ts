@@ -21,62 +21,54 @@ import {
 /**
  * Middleware that filters out any event that isn't an action
  */
-export function onlyActions(): Middleware<AnyMiddlewareArgs & { action?: SlackAction }> {
-  return ({ action, next }) => {
-    // Filter out any non-actions
-    if (action === undefined) {
-      return;
-    }
+export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = ({ action, next }) => {
+  // Filter out any non-actions
+  if (action === undefined) {
+    return;
+  }
 
-    // It matches so we should continue down this middleware listener chain
-    next();
-  };
-}
+  // It matches so we should continue down this middleware listener chain
+  next();
+};
 
 /**
  * Middleware that filters out any event that isn't a command
  */
-export function onlyCommands(): Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> {
-  return ({ command, next }) => {
-    // Filter out any non-commands
-    if (command === undefined) {
-      return;
-    }
+export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> = ({ command, next }) => {
+  // Filter out any non-commands
+  if (command === undefined) {
+    return;
+  }
 
-    // It matches so we should continue down this middleware listener chain
-    next();
-  };
-}
+  // It matches so we should continue down this middleware listener chain
+  next();
+};
 
 /**
  * Middleware that filters out any event that isn't an options
  */
-export function onlyOptions(): Middleware<AnyMiddlewareArgs> {
-  return ({ body, next }) => {
-    // Filter out any non-actions
-    if (!isOptionsBody(body)) {
-      return;
-    }
+export const onlyOptions: Middleware<AnyMiddlewareArgs> = ({ body, next }) => {
+  // Filter out any non-actions
+  if (!isOptionsBody(body)) {
+    return;
+  }
 
-    // It matches so we should continue down this middleware listener chain
-    next();
-  };
-}
+  // It matches so we should continue down this middleware listener chain
+  next();
+};
 
 /**
  * Middleware that filters out any event that isn't an event
  */
-export function onlyEvents(): Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> {
-  return ({ event, next }) => {
-    // Filter out any non-actions
-    if (event === undefined) {
-      return;
-    }
+export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = ({ event, next }) => {
+  // Filter out any non-actions
+  if (event === undefined) {
+    return;
+  }
 
-    // It matches so we should continue down this middleware listener chain
-    next();
-  };
-}
+  // It matches so we should continue down this middleware listener chain
+  next();
+};
 
 /**
  * Middleware that checks for matches given constraints
