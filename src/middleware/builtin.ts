@@ -13,8 +13,8 @@ import {
   MessageAction,
   ExternalOptionsRequest,
   Container,
-  ActionConstraint,
-  ObjectConstraint,
+  ActionConstraints,
+  OptionConstraints,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
@@ -23,7 +23,7 @@ import {
 /**
  * Middleware that filters out any event that isn't an action
  */
-export function matchActions(): Middleware<AnyMiddlewareArgs & { action?: SlackAction }> {
+export function onlyActions(): Middleware<AnyMiddlewareArgs & { action?: SlackAction }> {
   return ({ action, next }) => {
     // Filter out any non-actions
     if (action === undefined) {
@@ -38,7 +38,7 @@ export function matchActions(): Middleware<AnyMiddlewareArgs & { action?: SlackA
 /**
  * Middleware that filters out any event that isn't a command
  */
-export function matchCommands(): Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> {
+export function onlyCommands(): Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> {
   return ({ command, next }) => {
     // Filter out any non-commands
     if (command === undefined) {
@@ -53,7 +53,7 @@ export function matchCommands(): Middleware<AnyMiddlewareArgs & { command?: Slas
 /**
  * Middleware that filters out any event that isn't an options
  */
-export function matchOptions(): Middleware<AnyMiddlewareArgs> {
+export function onlyOptions(): Middleware<AnyMiddlewareArgs> {
   return ({ payload, next }) => {
     // Filter out any non-actions
     if (!isOptionsPayload(payload)) {
@@ -68,7 +68,7 @@ export function matchOptions(): Middleware<AnyMiddlewareArgs> {
 /**
  * Middleware that filters out any event that isn't an event
  */
-export function matchEvents(): Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> {
+export function onlyEvents(): Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> {
   return ({ event, next }) => {
     // Filter out any non-actions
     if (event === undefined) {
@@ -117,9 +117,9 @@ payload is Actions<ExternalSelectResponse> {
 /**
  * Typeguard that decides whether a constraint object is an options constraint object
  */
-function isOptionConstraint(actionOrOptionConstraint: ActionConstraint |
-  ObjectConstraint): actionOrOptionConstraint is ObjectConstraint {
-  if ((actionOrOptionConstraint as ObjectConstraint).container) {
+function isOptionConstraint(actionOrOptionConstraint: ActionConstraints |
+  OptionConstraints): actionOrOptionConstraint is OptionConstraints {
+  if ((actionOrOptionConstraint as OptionConstraints).container) {
     return true;
   }
   return false;
@@ -142,7 +142,7 @@ function hasCallbackId(payload: { [key: string]: any; }): payload is (
  * Middleware that checks for matches given constraints
  */
 export function matchActionConstraints(
-    constraints: ActionConstraint | ObjectConstraint,
+    constraints: ActionConstraint | isOptionConstraint,
   ): Middleware<SlackActionMiddlewareArgs<SlackAction>> {
   return ({ action, next, context }) => {
     let tempMatches: RegExpExecArray | null;
@@ -185,11 +185,8 @@ export function matchActionConstraints(
         return;
       }
 
-      if (constraints.container === 'interactive_message' && action.type !== 'interactive_message') {
-        return;
-      }
-
-      if (constraints.container === 'block_actions' && action.type !== 'block_actions') {
+      if (constraints.container === 'message' &&
+        (action.type !== 'block_actions' && action.type !== 'interactive_message')) {
         return;
       }
     }

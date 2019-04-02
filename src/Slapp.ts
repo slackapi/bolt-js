@@ -5,12 +5,12 @@ import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-li
 import {
   ignoreSelfMiddleware,
   ignoreBotsMiddleware,
-  matchActions,
+  onlyActions,
   matchActionConstraints,
-  matchCommands,
+  onlyCommands,
   matchCommandName,
-  matchOptions,
-  matchEvents,
+  onlyOptions,
+  onlyEvents,
   matchEventType,
   matchMessage,
 } from './middleware/builtin';
@@ -29,8 +29,8 @@ import {
   SayFn,
   AckFn,
   RespondFn,
-  ActionConstraint,
-  ObjectConstraint,
+  ActionConstraints,
+  OptionConstraints,
 } from './middleware/types';
 
 // TODO: remove the following pragma after TSLint to ESLint transformation is complete
@@ -312,7 +312,7 @@ export default class Slapp {
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
     this.listeners.push(
-      [matchEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
@@ -327,7 +327,7 @@ export default class Slapp {
       matchMessage(patternOrMiddleware) : patternOrMiddleware;
 
     this.listeners.push(
-      [matchEvents, matchEventType('message'), messageMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyEvents, matchEventType('message'), messageMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
@@ -338,26 +338,26 @@ export default class Slapp {
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
   public action<ActionType extends SlackAction = SlackAction>(
-    constraints: ActionConstraint,
+    constraints: ActionConstraints,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
   public action<ActionType extends SlackAction = SlackAction>(
-    actionIdOrContraints: string | RegExp | ActionConstraint,
+    actionIdOrContraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void {
-    const constraints: ActionConstraint =
+    const constraints: ActionConstraints =
       (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
       { action_id: actionIdOrContraints } : actionIdOrContraints;
 
     this.listeners.push(
-      [matchActions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyActions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
   // TODO: should command names also be regex?
   public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
     this.listeners.push(
-      [matchCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
@@ -369,20 +369,20 @@ export default class Slapp {
   ): void;
   public options<Container extends ExternalSelectResponse | 'interactive_message' |
   'dialog_suggestion' = ExternalSelectResponse>(
-    constraints: ObjectConstraint,
+    constraints: OptionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void;
   public options<Container extends ExternalSelectResponse | 'interactive_message' |
   'dialog_suggestion' = ExternalSelectResponse>(
-    actionIdOrContraints: string | RegExp | ObjectConstraint,
+    actionIdOrContraints: string | RegExp | OptionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Container>>[]
   ): void {
-    const constraints: ActionConstraint =
+    const constraints: OptionConstraints =
       (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
       { action_id: actionIdOrContraints } : actionIdOrContraints;
 
     this.listeners.push(
-      [matchOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 }

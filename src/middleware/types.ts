@@ -481,12 +481,13 @@ export interface AckFn<Response> {
   (response?: Response): void;
 }
 
-export interface ActionConstraint {
+export interface ActionConstraints {
   block_id?: string | RegExp;
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
 }
 
-export interface ObjectConstraint extends ActionConstraint {
-  container?: 'block_actions' | 'interactive_message' | 'dialog';
+// Container constraint is only accepted for options
+export interface OptionConstraints extends ActionConstraints {
+  container?: 'message' | 'dialog';
 }
