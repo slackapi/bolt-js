@@ -49,7 +49,7 @@ export default function (signingSecret: string): RequestHandler {
           next(error);
         }
 
-        req.body = parseBody(req.headers['Content-Type'] as string, body);
+        req.body = parseBody(req.headers['content-type'] as string, body);
 
         next();
       });

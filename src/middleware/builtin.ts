@@ -23,6 +23,7 @@ import {
  */
 export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = ({ action, next }) => {
   // Filter out any non-actions
+  console.log(action);
   if (action === undefined) {
     return;
   }
