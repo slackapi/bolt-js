@@ -17,6 +17,7 @@ export interface Event {
 export interface Receiver {
   on(event: 'message', listener: (event: Event) => void): this;
   on(event: 'error', listener: (error: Error) => void): this;
+  start(...args: any[]): Promise<unknown>;
 }
 
 export interface ReceiverArguments {
@@ -57,9 +58,7 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
       this.emitHandler.bind(this),
     ];
 
-    const e = Object.values(this.endpoints);
-
-    for (const endpoint in e) {
+    for (const endpoint of Object.values(this.endpoints)) {
       this.app.post(endpoint, ...defaultMiddleware);
     }
   }
@@ -89,5 +88,17 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
     }
 
     this.emit('message', event);
+  }
+
+  public start(port: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.app.listen(port, () => {
+          resolve();
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }
