@@ -466,9 +466,8 @@ export interface PostProcessFn {
 
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
 // listener. Therefore, specifying the `channel` argument is not required.
-type SayArguments = {
-  [Arg in keyof ChatPostMessageArguments]: Arg extends 'channel' ?
-    (ChatPostMessageArguments[Arg] | undefined) : ChatPostMessageArguments[Arg];
+type SayArguments = Pick<ChatPostMessageArguments, Exclude<KnownKeys<ChatPostMessageArguments>, 'channel'>> & {
+  channel?: string;
 };
 
 export interface SayFn {
@@ -495,3 +494,10 @@ export interface ActionConstraints {
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
 }
+
+/**
+ * Type helpers
+ */
+type KnownKeys<T> = {
+  [K in keyof T]: string extends K ? never : number extends K ? never : K
+} extends { [_ in keyof T]: infer U } ? U : never;

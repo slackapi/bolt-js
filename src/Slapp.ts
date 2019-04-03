@@ -37,12 +37,11 @@ export interface SlappOptions {
   signingSecret?: ReceiverArguments['signingSecret'];
   endpoints?: ReceiverArguments['endpoints'];
   convoStore?: ConversationStore | false;
-  token?: string; // either token or teamContext
-  teamContext?: Authorize; // either token or teamContext
+  token?: string; // either token or authorize
+  authorize?: Authorize; // either token or authorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
-  colors?: boolean;
   ignoreSelf?: boolean;
   ignoreBots?: boolean;
 }
@@ -65,8 +64,9 @@ export interface AuthorizeSourceData {
 
 /** Authorization function outputs - data that will be available as part of event processing */
 export interface AuthorizeResult {
-  botToken?: string; // used by `say` (preferred over appToken, one is required)
-  appToken?: string; // used by `say` (overridden by botToken, one is required)
+  // one of either botToken or userToken are required
+  botToken?: string; // used by `say` (preferred over userToken)
+  userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional
   [ key: string ]: any;
@@ -101,27 +101,25 @@ export default class Slapp {
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
-    teamContext = undefined,
+    authorize = undefined,
     logger = new ConsoleLogger(),
     logLevel = LogLevel.INFO,
-    colors = false,
     ignoreSelf = false,
     ignoreBots = false,
   }: SlappOptions = {}) {
 
     this.logger = logger;
     this.logger.setLevel(logLevel);
-    // TODO: set colors
 
     if (token !== undefined) {
-      if (teamContext !== undefined) {
-        throw new Error(`Both token and teamContext options provided. ${tokenUsage}`);
+      if (authorize !== undefined) {
+        throw new Error(`Both token and authorize options provided. ${tokenUsage}`);
       }
       this.authorize = async () => ({ botToken: token });
-    } else if (teamContext === undefined) {
-      throw new Error(`No token and no teamContext options provided. ${tokenUsage}`);
+    } else if (authorize === undefined) {
+      throw new Error(`No token and no authorize options provided. ${tokenUsage}`);
     } else {
-      this.authorize = teamContext;
+      this.authorize = authorize;
     }
 
     this.middleware = [];
@@ -194,7 +192,7 @@ export default class Slapp {
 
     // Factory for say() argument
     const createSay = (channelId: string): SayFn => {
-      const token = context.botToken !== undefined ? context.botToken : context.appToken;
+      const token = context.botToken !== undefined ? context.botToken : context.userToken;
       return (message: Parameters<SayFn>[0]) => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
@@ -359,12 +357,12 @@ export default class Slapp {
   Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select' =
     'interactive_message' | 'dialog_suggestion' | 'external_select'
   >(
-    actionIdOrContraints: string | RegExp | ActionConstraints,
+    actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void {
     const constraints: ActionConstraints =
-      (typeof actionIdOrContraints === 'string' || util.types.isRegExp(actionIdOrContraints)) ?
-      { action_id: actionIdOrContraints } : actionIdOrContraints;
+      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
+      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
       [onlyOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
@@ -373,7 +371,7 @@ export default class Slapp {
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
-  'should be initialized with a teamContext.';
+  'should be initialized with a authorize.';
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
