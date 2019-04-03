@@ -23,7 +23,6 @@ import {
  */
 export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = ({ action, next }) => {
   // Filter out any non-actions
-  console.log(action);
   if (action === undefined) {
     return;
   }
@@ -157,7 +156,7 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
 
     // Filter out messages that don't contain the pattern
     if (typeof pattern === 'string') {
-      if (!message.text.includes(pattern)) {
+      if (message.text !== undefined && !message.text.includes(pattern)) {
         return;
       }
     } else {
