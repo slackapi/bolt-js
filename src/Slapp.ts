@@ -170,6 +170,15 @@ export default class Slapp {
   }
 
   /**
+   * Convenience method to call start on the receiver
+   *
+   * @param args receiver-specific start arguments
+   */
+  public start(...args: any[]): Promise<unknown> {
+    return this.receiver.start(...args);
+  }
+
+  /**
    * Handles events from the receiver
    */
   private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {

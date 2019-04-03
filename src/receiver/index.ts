@@ -94,11 +94,13 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
 
   public start(port: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.app.listen(port, () => {
-        resolve();
-      }).on('error', (err: Error) => {
-        reject(err);
-      });
+      try {
+        this.app.listen(port, () => {
+          resolve();
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }
