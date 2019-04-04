@@ -248,7 +248,7 @@ export default class Slapp {
       const optionListenerArgs = listenerArgs as SlackOptionsMiddlewareArgs<OptionsSource>;
       optionListenerArgs.option = optionListenerArgs.payload;
     }
-    // undefined type
+    // Note: At this point, the type must be undefined
 
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
