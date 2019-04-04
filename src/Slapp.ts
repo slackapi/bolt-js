@@ -244,8 +244,11 @@ export default class Slapp {
     } else if (type === IncomingEventType.Command) {
       const commandListenerArgs = listenerArgs as SlackCommandMiddlewareArgs;
       commandListenerArgs.command = commandListenerArgs.payload;
+    } else if (type === IncomingEventType.Options) {
+      const optionListenerArgs = listenerArgs as SlackOptionsMiddlewareArgs<OptionsSource>;
+      optionListenerArgs.option = optionListenerArgs.payload;
     }
-    // NOTE: there is no alias for options
+    // undefined type
 
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {

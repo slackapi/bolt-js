@@ -391,7 +391,7 @@ export interface SlackCommandMiddlewareArgs {
 
 export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block_suggestion';
 
-export interface OptionsRequest<Type extends OptionsSource> {
+export interface OptionsRequest<Type extends OptionsSource> extends KeyValueMapping {
   value: string;
   type: Type;
   team: {
@@ -440,6 +440,7 @@ type OptionsAckFn<Source extends OptionsSource> =
 export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource> {
   payload: OptionsRequest<Source>;
   body: this['payload'];
+  option: this['payload'];
   // TODO: consider putting an options property in here, just so that middleware don't have to parse the body to decide
   // what kind of event this is
   ack: OptionsAckFn<Source>;
