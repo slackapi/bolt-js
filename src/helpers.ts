@@ -39,7 +39,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
       conversationId: (body as SlackCommandMiddlewareArgs['body']).channel_id,
     };
   }
-  if (body.name !== undefined) {
+  if (body.name !== undefined || body.type === 'block_suggestion') {
     return {
       type: IncomingEventType.Options,
       conversationId:
