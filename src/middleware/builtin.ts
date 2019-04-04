@@ -258,6 +258,8 @@ function isOptionsBody(body: KeyValueMapping): boolean {
   if (body.type === 'interactive_message' && body.name !== undefined) {
     return true;
   }
-  // TODO: fill in a test for what an external_select options looks like once we sort out the payload
+  if (body.type === 'block_suggestion') {
+    return true;
+  }
   return false;
 }

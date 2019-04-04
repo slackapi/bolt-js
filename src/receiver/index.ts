@@ -79,7 +79,7 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
 
     // TODO: should this be in Slapp? Attach respond function to request
     if (req.body && req.body.response_url) {
-      event.respond = (response: string | object): void => {
+      event.respond = (response): void => {
         axios.post(req.body.response_url, response)
           .catch((e) => {
             this.emit('error', e);

@@ -140,6 +140,7 @@ export interface InteractiveMessage<Action extends InteractiveAction> extends Ke
 }
 
 // this interface is "abstract", and not meant to be used on its own. it just helps DRY up the following interfaces
+// TODO: consider distributing this back into all the individual element actions
 interface BaseElementAction {
   block_id: string;
   action_id: string;
@@ -226,7 +227,6 @@ type KnownActionFromElementType<T extends string> = Extract<ElementAction, { typ
 type ActionFromElementType<T extends string> = KnownActionFromElementType<T> extends never ?
   UnknownElementAction<T> : KnownActionFromElementType<T>;
 
-// TODO: add generic parameter for container (is the presence of message related to the container?)
 export interface BlockAction<ElementType extends string> extends KeyValueMapping {
   type: 'block_actions';
   actions: [ActionFromElementType<ElementType>];
@@ -252,12 +252,16 @@ export interface BlockAction<ElementType extends string> extends KeyValueMapping
     text?: string; // undocumented that this is optional, but how could it exist on block kit based messages?
     [key: string]: any;
   };
-  app_unfurl?: KeyValueMapping;
-  container: KeyValueMapping;
   token: string;
   response_url: string;
   trigger_id: string;
   api_app_id: string;
+
+  // TODO: we'll need to fill this out a little more carefully in the future, possibly using a generic parameter
+  container: KeyValueMapping;
+
+  // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
+  app_unfurl?: any;
 }
 
 export interface DialogSubmitAction extends KeyValueMapping {
@@ -385,10 +389,10 @@ export interface SlackCommandMiddlewareArgs {
  * Slack Dialog and Interactive Messages Options Types
  */
 
-export interface OptionsRequest<Type> {
-  name: string;
+export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block_suggestion';
+
+export interface OptionsRequest<Type extends OptionsSource> {
   value: string;
-  callback_id: string;
   type: Type;
   team: {
     id: string;
@@ -405,28 +409,36 @@ export interface OptionsRequest<Type> {
     name: string;
     team_id?: string; // undocumented
   };
-  action_ts: string;
-  message_ts?: string; // not when within a dialog
-  attachment_id?: string; // not when within a dialog
   token: string;
+
+  name: Type extends 'interactive_message' | 'dialog_suggestion' ? string : never;
+  callback_id: Type extends 'interactive_message' | 'dialog_suggestion' ? string : never;
+  action_ts:  Type extends 'interactive_message' | 'dialog_suggestion' ? string : never;
+
+  message_ts: Type extends 'interactive_message' ? string : never;
+  attachment_id: Type extends 'interactive_message' ? string : never;
+
+  api_app_id: Type extends 'block_suggestion' ? string : never;
+  action_id: Type extends 'block_suggestion' ? string : never;
+  block_id: Type extends 'block_suggestion' ? string : never;
+  container: Type extends 'block_suggestion' ?  KeyValueMapping : never;
+
+  // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
+  app_unfurl?: any;
 }
 
 // TODO: there's a lot of repetition in the following type. factor out some common parts.
 // tslint:disable:max-line-length
-type OptionsAckFn<Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select'> =
-  Source extends 'external_select' ?
+type OptionsAckFn<Source extends OptionsSource> =
+  Source extends 'block_suggestion' ?
     AckFn<{ options: Option[]; option_groups: { label: string; options: Option[]; }[]; }> :
   Source extends 'interactive_message' ?
     AckFn<{ options: { text: string; value: string; }[]; option_groups: { label: string; options: { text: string; value: string; }[]; }[]; }> :
   AckFn<{ options: { label: string; value: string; }[]; option_groups: { label: string; options: { label: string; value: string; }[]; }[]; }>;
 // tslint:enable:max-line-length
 
-export interface SlackOptionsMiddlewareArgs<
-  Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select'
-> {
-  // TODO: confirm that the payload is the entire block action when using an external select
-  // (where is the user's partial input?)
-  payload: Source extends 'external_select' ? BlockAction<Source> : OptionsRequest<Source>;
+export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource> {
+  payload: OptionsRequest<Source>;
   body: this['payload'];
   // TODO: consider putting an options property in here, just so that middleware don't have to parse the body to decide
   // what kind of event this is
@@ -441,7 +453,7 @@ export type AnyMiddlewareArgs =
   | SlackEventMiddlewareArgs<string>
   | SlackActionMiddlewareArgs<SlackAction>
   | SlackCommandMiddlewareArgs
-  | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | 'external_select'>;
+  | SlackOptionsMiddlewareArgs<OptionsSource>;
 
 export interface Context extends KeyValueMapping {
 }
