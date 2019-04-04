@@ -76,7 +76,7 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that checks for matches given constraints
  */
-export function matchActionConstraints(
+export function matchConstraints(
     constraints: ActionConstraints,
     // TODO: this function signature could be wrong. this gets used in options() so the action property can be undefined
 ): Middleware<AnyMiddlewareArgs> {

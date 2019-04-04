@@ -5,7 +5,7 @@ import {
   ignoreSelfMiddleware,
   ignoreBotsMiddleware,
   onlyActions,
-  matchActionConstraints,
+  matchConstraints,
   onlyCommands,
   matchCommandName,
   onlyOptions,
@@ -347,7 +347,7 @@ export default class Slapp {
       { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
-      [onlyActions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
@@ -375,7 +375,7 @@ export default class Slapp {
       { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
-      [onlyOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 }
