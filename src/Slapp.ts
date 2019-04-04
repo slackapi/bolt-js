@@ -29,6 +29,7 @@ import {
   AckFn,
   RespondFn,
   ActionConstraints,
+  OptionsSource,
 } from './middleware/types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 
@@ -302,7 +303,7 @@ export default class Slapp {
 
   public event<EventType extends string = string>(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
   ): void {
     this.listeners.push(
       [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
@@ -354,18 +355,15 @@ export default class Slapp {
     );
   }
 
-  public options<
-    Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select' =
-      'interactive_message' | 'dialog_suggestion' | 'external_select'
-  >(actionId: string | RegExp, ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]): void;
-  public options<
-    Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select' =
-      'interactive_message' | 'dialog_suggestion' | 'external_select'
-  >(constraints: ActionConstraints, ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]): void;
-  public options<
-  Source extends 'interactive_message' | 'dialog_suggestion' | 'external_select' =
-    'interactive_message' | 'dialog_suggestion' | 'external_select'
-  >(
+  public options<Source extends OptionsSource = OptionsSource>(
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+  ): void;
+  public options<Source extends OptionsSource = OptionsSource>(
+    constraints: ActionConstraints,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+  ): void;
+  public options<Source extends OptionsSource = OptionsSource>(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void {
@@ -397,11 +395,11 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | 'external_select'>)['body']).team.id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<OptionsSource>)['body']).team.id as string :
        assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs<string> | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion' | 'external_select'>)['body']).team.enterprise_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs<SlackAction> | SlackOptionsMiddlewareArgs<OptionsSource>)['body']).team.enterprise_id as string :
        undefined),
     userId:
       ((type === IncomingEventType.Event) ?

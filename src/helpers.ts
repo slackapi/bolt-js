@@ -4,6 +4,7 @@ import {
   SlackOptionsMiddlewareArgs,
   SlackActionMiddlewareArgs,
   SlackAction,
+  OptionsSource,
 } from './middleware/types';
 
 /**
@@ -38,13 +39,11 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
       conversationId: (body as SlackCommandMiddlewareArgs['body']).channel_id,
     };
   }
-  // TODO: this doesn't correctly capture options requests from external_select. revist after the payload type has been
-  // sorted out
   if (body.name !== undefined) {
     return {
       type: IncomingEventType.Options,
       conversationId:
-        (body as SlackOptionsMiddlewareArgs<'interactive_message' | 'dialog_suggestion'>['body']).channel.id,
+        (body as SlackOptionsMiddlewareArgs<OptionsSource>['body']).channel.id,
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission') {
