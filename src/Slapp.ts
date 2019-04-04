@@ -68,7 +68,7 @@ export interface AuthorizeResult {
   botToken?: string; // used by `say` (preferred over userToken)
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
-  botUserId?: string; // optional
+  botUserId?: string; // optional but helps `ignoreSelf` global middleware be more complete
   [ key: string ]: any;
 }
 

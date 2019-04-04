@@ -199,22 +199,47 @@ export function matchEventType(type: string): Middleware<SlackEventMiddlewareArg
   };
 }
 
-/**
- * Middleware that ignores messages from this bot user (self) when we can tell. Requires the
- * meta context to be populated with `app_bot_id`.
- */
 export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
-  return ({ next }) => {
-    // TODO
-    // emit error if the botId is not defined
-    // if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-    //   let bothFalsy = !msg.meta.app_bot_id && !msg.meta.bot_id
-    //   let bothEqual = msg.meta.app_bot_id === msg.meta.bot_id
-    //   if (!bothFalsy && bothEqual) {
-    //     return
-    //   }
-    // }
-    next();
+  return (args) => {
+    // TODO: we might be able to query for the botId and/or botUserId and cache it to avoid errors/warnings.
+    // if so, the botId check would emit a warning instead of an error.
+
+    // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
+    if (args.context.botId === undefined) {
+      // TODO: coded error
+      args.next(new Error('Cannot ignore events from the app\'s own bot user without a bot ID. ' +
+        'Use authorize option to return a botId.'));
+      return;
+    }
+
+    const botId = args.context.botId as string;
+    const botUserId = args.context.botUserId !== undefined ? args.context.botUserId as string : undefined;
+
+    if (isEventArgs(args)) {
+      // Once we've narrowed the type down to SlackEventMiddlewareArgs<string>, there's no way to further narrow it
+      // down to SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
+      if (args.message !== undefined) {
+        const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
+
+        // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
+        // type narrowing
+        // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
+        if (message.subtype === 'bot_message' && message.bot_id === botId) {
+          return;
+        }
+
+      }
+    }
+
+    // Look for any events (not just Events API) that are from the same userId as this app, and return to skip
+    // NOTE: this goes further than Slapp's previous ignoreSelf middleware. That middleware only applied this filter
+    // when the event was of type message. Is this okay?
+    if (botUserId !== undefined && args.payload.user === botUserId) {
+      return;
+    }
+
+    // If all the previous checks didn't skip this message, then its okay to resume to next
+    args.next();
   };
 }
 
@@ -222,12 +247,24 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
  * Middleware that ignores messages from any bot user
  */
 export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
-  return ({ next }) => {
-    // TODO
-    // if (msg.isBot() && msg.isMessage() && msg.body.event.subtype === 'bot_message') {
-    //   return
-    // }
-    next();
+  return (args) => {
+    if (isEventArgs(args)) {
+      // Once we've narrowed the type down to SlackEventMiddlewareArgs<string>, there's no way to further narrow it
+      // down to SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
+      if (args.message !== undefined) {
+        const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
+
+        // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
+        // type narrowing
+        // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
+        if (message.subtype === 'bot_message') {
+          return;
+        }
+      }
+    }
+
+    // If all the previous checks didn't skip this message, then its okay to resume to next
+    args.next();
   };
 }
 
@@ -245,6 +282,12 @@ type CallbackIdentifiedAction =
 
 function isCallbackIdentifiedAction(action: SlackAction<string>): action is CallbackIdentifiedAction {
   return (action as CallbackIdentifiedAction).callback_id !== undefined;
+}
+
+function isEventArgs(
+  args: AnyMiddlewareArgs,
+): args is SlackEventMiddlewareArgs<string> {
+  return (args as SlackEventMiddlewareArgs<string>).event !== undefined;
 }
 
 /**
