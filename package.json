@@ -33,6 +33,7 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
+    "@slack/types": "^1.0.0",
     "@slack/web-api": "^5.0.0",
     "@types/chalk": "^2.2.0",
     "@types/express": "^4.16.1",

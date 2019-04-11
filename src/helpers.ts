@@ -5,7 +5,7 @@ import {
   SlackActionMiddlewareArgs,
   SlackAction,
   OptionsSource,
-} from './middleware/types';
+} from './types';
 
 /**
  * Internal data type for capturing the class of event processed in Slapp#onIncomingEvent()

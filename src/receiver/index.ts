@@ -3,7 +3,7 @@ import express, { Request, Response, Application } from 'express';
 import parseRequest from './middleware/parseRequest';
 import SSLCheck from './middleware/SSLCheck';
 import axios from 'axios';
-import { RespondFn, AckFn } from '../middleware/types';
+import { RespondFn, AckFn } from '../types';
 
 // TODO: make this generic on the body?
 export interface Event {
