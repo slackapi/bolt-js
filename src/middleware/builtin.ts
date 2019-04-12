@@ -16,6 +16,9 @@ import {
   UnknownElementAction,
   MenuSelect,
   ButtonClick,
+  SlackOptionsMiddlewareArgs,
+  OptionsRequest,
+  OptionsSource,
 } from './types';
 
 /**
@@ -73,14 +76,13 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that checks for matches given constraints
  */
-export function matchActionConstraints(
+export function matchConstraints(
     constraints: ActionConstraints,
     // TODO: this function signature could be wrong. this gets used in options() so the action property can be undefined
-  ): Middleware<SlackActionMiddlewareArgs<SlackAction>> {
-  return ({ action, next, context }) => {
-    // NOTE: DialogSubmitAction and MessageAction do not have an actions array
-    const innerAction: InteractiveAction | UnknownElementAction<string> | undefined =
-      action.actions !== undefined ? action.actions[0] : undefined;
+): Middleware<AnyMiddlewareArgs> {
+  return (args) => {
+    // NOTE: DialogSubmitAction and MessageAction do not have an innerPayload
+    const innerPayload = isActionsArgs(args) ? args.action.actions[0] : isOptionsArgs(args) ? args.options : undefined;
 
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
@@ -88,16 +90,22 @@ export function matchActionConstraints(
     const matches: any[] = [];
 
     if (constraints.block_id !== undefined) {
-      if (innerAction === undefined || !isElementAction(innerAction)) {
+      if (innerPayload === undefined) {
         return;
       }
 
+      if (isActionsArgs(args)) {
+        if (!isElementAction(innerPayload)) {
+          return;
+        }
+      }
+
       if (typeof constraints.block_id === 'string') {
-        if (innerAction.block_id !== constraints.block_id) {
+        if (innerPayload.block_id !== constraints.block_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.block_id.exec(innerAction.block_id)) !== null) {
+        if ((tempMatches = constraints.block_id.exec(innerPayload.block_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -106,16 +114,22 @@ export function matchActionConstraints(
     }
 
     if (constraints.action_id !== undefined) {
-      if (innerAction === undefined || !isElementAction(innerAction)) {
+      if (innerPayload === undefined) {
         return;
       }
 
+      if (isActionsArgs(args)) {
+        if (!isElementAction(innerPayload)) {
+          return;
+        }
+      }
+
       if (typeof constraints.action_id === 'string') {
-        if (innerAction.action_id !== constraints.action_id) {
+        if (innerPayload.action_id !== constraints.action_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.action_id.exec(innerAction.action_id)) !== null) {
+        if ((tempMatches = constraints.action_id.exec(innerPayload.action_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -124,15 +138,18 @@ export function matchActionConstraints(
     }
 
     if (constraints.callback_id !== undefined) {
-      if (!isCallbackIdentifiedAction(action)) {
+      if (isActionsArgs(args) && !isCallbackIdentifiedAction(args.action)) {
+        return;
+      }
+      if (isOptionsArgs(args) && !isCallbackIdentifiedOption(args.options)) {
         return;
       }
       if (typeof constraints.callback_id === 'string') {
-        if (action.callback_id !== constraints.callback_id) {
+        if (args.payload.callback_id !== constraints.callback_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.callback_id.exec(action.callback_id)) !== null) {
+        if ((tempMatches = constraints.callback_id.exec(args.payload.callback_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -141,9 +158,9 @@ export function matchActionConstraints(
     }
 
     // Add matches to context
-    context['matches'] = matches;
+    args.context['matches'] = matches;
 
-    next();
+    args.next();
   };
 }
 
@@ -284,10 +301,30 @@ function isCallbackIdentifiedAction(action: SlackAction<string>): action is Call
   return (action as CallbackIdentifiedAction).callback_id !== undefined;
 }
 
+type CallbackIdentifiedOptions =
+  | OptionsRequest<'interactive_message'>
+  | OptionsRequest<'dialog_suggestion'>;
+
+function isCallbackIdentifiedOption(options: OptionsRequest<OptionsSource>): options is CallbackIdentifiedOptions {
+  return (options as CallbackIdentifiedOptions).callback_id !== undefined;
+}
+
 function isEventArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackEventMiddlewareArgs<string> {
   return (args as SlackEventMiddlewareArgs<string>).event !== undefined;
+}
+
+function isActionsArgs(
+  args: AnyMiddlewareArgs,
+): args is SlackActionMiddlewareArgs<SlackAction> {
+  return (args as SlackActionMiddlewareArgs<SlackAction>).action !== undefined;
+}
+
+function isOptionsArgs(
+  args: AnyMiddlewareArgs,
+): args is SlackOptionsMiddlewareArgs<OptionsSource> {
+  return (args as SlackOptionsMiddlewareArgs<OptionsSource>).options !== undefined;
 }
 
 /**

@@ -5,7 +5,7 @@ import {
   ignoreSelfMiddleware,
   ignoreBotsMiddleware,
   onlyActions,
-  matchActionConstraints,
+  matchConstraints,
   onlyCommands,
   matchCommandName,
   onlyOptions,
@@ -244,8 +244,10 @@ export default class Slapp {
     } else if (type === IncomingEventType.Command) {
       const commandListenerArgs = listenerArgs as SlackCommandMiddlewareArgs;
       commandListenerArgs.command = commandListenerArgs.payload;
+    } else if (type === IncomingEventType.Options) {
+      const optionListenerArgs = listenerArgs as SlackOptionsMiddlewareArgs<OptionsSource>;
+      optionListenerArgs.options = optionListenerArgs.payload;
     }
-    // NOTE: there is no alias for options
 
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
@@ -344,7 +346,7 @@ export default class Slapp {
       { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
-      [onlyActions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
@@ -372,7 +374,7 @@ export default class Slapp {
       { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
-      [onlyOptions, matchActionConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 }
