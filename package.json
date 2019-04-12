@@ -11,7 +11,6 @@
     "unit": "ava --verbose --serial",
     "coverage": "nyc --check-coverage --statements 100 ava --verbose --serial",
     "lcov": "nyc --reporter lcov ava --serial",
-    "docs": "node scripts/docs.js",
     "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
@@ -46,7 +45,6 @@
   "devDependencies": {
     "ava": "^1.4.1",
     "coveralls": "^3.0.3",
-    "dox": "^0.9.0",
     "nyc": "^13.3.0",
     "sinon": "^7.3.1",
     "tslint": "^5.15.0",
