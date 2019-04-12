@@ -440,9 +440,7 @@ type OptionsAckFn<Source extends OptionsSource> =
 export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource> {
   payload: OptionsRequest<Source>;
   body: this['payload'];
-  option: this['payload'];
-  // TODO: consider putting an options property in here, just so that middleware don't have to parse the body to decide
-  // what kind of event this is
+  options: this['payload'];
   ack: OptionsAckFn<Source>;
 }
 

@@ -83,7 +83,7 @@ export function matchConstraints(
   return (args) => {
     // NOTE: DialogSubmitAction, MessageAction, and Options requests do not have an actions array
 
-    const innerPayload = isActionsArgs(args) ? args.action.actions[0] : isOptionsArgs(args) ? args.option : undefined;
+    const innerPayload = isActionsArgs(args) ? args.action.actions[0] : isOptionsArgs(args) ? args.options : undefined;
 
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
@@ -142,7 +142,7 @@ export function matchConstraints(
       if (isActionsArgs(args) && !isCallbackIdentifiedAction(args.action)) {
         return;
       }
-      if (isOptionsArgs(args) && !isCallbackIdentifiedOption(args.option)) {
+      if (isOptionsArgs(args) && !isCallbackIdentifiedOption(args.options)) {
         return;
       }
       if (typeof constraints.callback_id === 'string') {
@@ -302,12 +302,12 @@ function isCallbackIdentifiedAction(action: SlackAction<string>): action is Call
   return (action as CallbackIdentifiedAction).callback_id !== undefined;
 }
 
-type CallbackIdentifiedOption =
+type CallbackIdentifiedOptions =
   | OptionsRequest<'interactive_message'>
   | OptionsRequest<'dialog_suggestion'>;
 
-function isCallbackIdentifiedOption(option: OptionsRequest<OptionsSource>): option is CallbackIdentifiedOption {
-  return (option as CallbackIdentifiedOption).callback_id !== undefined;
+function isCallbackIdentifiedOption(options: OptionsRequest<OptionsSource>): options is CallbackIdentifiedOptions {
+  return (options as CallbackIdentifiedOptions).callback_id !== undefined;
 }
 
 function isEventArgs(
@@ -325,7 +325,7 @@ function isActionsArgs(
 function isOptionsArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackOptionsMiddlewareArgs<OptionsSource> {
-  return (args as SlackOptionsMiddlewareArgs<OptionsSource>).option !== undefined;
+  return (args as SlackOptionsMiddlewareArgs<OptionsSource>).options !== undefined;
 }
 
 /**
