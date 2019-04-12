@@ -81,8 +81,7 @@ export function matchConstraints(
     // TODO: this function signature could be wrong. this gets used in options() so the action property can be undefined
 ): Middleware<AnyMiddlewareArgs> {
   return (args) => {
-    // NOTE: DialogSubmitAction, MessageAction, and Options requests do not have an actions array
-
+    // NOTE: DialogSubmitAction and MessageAction do not have an innerPayload
     const innerPayload = isActionsArgs(args) ? args.action.actions[0] : isOptionsArgs(args) ? args.options : undefined;
 
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
