@@ -1,7 +1,7 @@
 import util from 'util';
 import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
-import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
+import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
   ignoreSelfMiddleware,
   ignoreBotsMiddleware,
@@ -31,13 +31,15 @@ import {
   OptionsSource,
   BlockAction,
   InteractiveMessage,
+  Receiver,
+  ReceiverEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 
 /** App initialization options */
 export interface SlappOptions {
-  signingSecret?: ReceiverArguments['signingSecret'];
-  endpoints?: ReceiverArguments['endpoints'];
+  signingSecret?: ExpressReceiverOptions['signingSecret'];
+  endpoints?: ExpressReceiverOptions['endpoints'];
   convoStore?: ConversationStore | false;
   token?: string; // either token or authorize
   authorize?: Authorize; // either token or authorize
