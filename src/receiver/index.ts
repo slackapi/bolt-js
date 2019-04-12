@@ -6,7 +6,7 @@ import axios from 'axios';
 import { RespondFn, AckFn } from '../types';
 
 // TODO: make this generic on the body?
-export interface Event {
+export interface ReceiverEvent {
   body: {
     [key: string]: any;
   };
@@ -15,12 +15,12 @@ export interface Event {
 }
 
 export interface Receiver {
-  on(event: 'message', listener: (event: Event) => void): this;
+  on(event: 'message', listener: (event: ReceiverEvent) => void): this;
   on(event: 'error', listener: (error: Error) => void): this;
   start(...args: any[]): Promise<unknown>;
 }
 
-export interface ReceiverArguments {
+export interface ExpressReceiverOptions {
   signingSecret: string;
   endpoints?: string | {
     [endpointType: string]: string;
@@ -41,7 +41,7 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
   constructor ({
     signingSecret = '',
     endpoints = { events: '/slack/events' },
-  }: ReceiverArguments) {
+  }: ExpressReceiverOptions) {
     super();
 
     this.endpoints = endpoints;
@@ -64,7 +64,7 @@ export class ExpressReceiver extends EventEmitter implements Receiver {
   }
 
   private emitHandler(req: Request, res: Response): void {
-    const event: Event = {
+    const event: ReceiverEvent = {
       body: req.body as { [key: string]: any },
       ack: (response: any): void => {
         if (!response) res.send('');

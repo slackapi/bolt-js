@@ -16,9 +16,9 @@ export * from './middleware/builtin';
 
 export {
   Receiver,
-  Event,
+  ReceiverEvent,
   ExpressReceiver,
-  ReceiverArguments,
+  ExpressReceiverOptions,
 } from './receiver';
 
 export * from './types';
