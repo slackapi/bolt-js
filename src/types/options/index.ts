@@ -8,8 +8,7 @@ import { AckFn } from '../utilities';
 export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = OptionsSource> {
   payload: OptionsRequest<Source>;
   body: this['payload'];
-  // TODO: consider putting an options property in here, just so that middleware don't have to parse the body to decide
-  // what kind of event this is
+  options: this['payload'];
   ack: OptionsAckFn<Source>;
 }
 
@@ -19,7 +18,7 @@ export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = Optio
  *
  * This describes the entire JSON-encoded body of a request.
  */
-export interface OptionsRequest<Source extends OptionsSource = OptionsSource> {
+export interface OptionsRequest<Source extends OptionsSource = OptionsSource> extends StringIndexed {
   value: string;
   type: Source;
   team: {
@@ -49,7 +48,7 @@ export interface OptionsRequest<Source extends OptionsSource = OptionsSource> {
   api_app_id: Source extends 'block_suggestion' ? string : never;
   action_id: Source extends 'block_suggestion' ? string : never;
   block_id: Source extends 'block_suggestion' ? string : never;
-  container: Source extends 'block_suggestion' ?  StringIndexed : never;
+  container: Source extends 'block_suggestion' ? StringIndexed : never;
 
   // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
   app_unfurl?: any;

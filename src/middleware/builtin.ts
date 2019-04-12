@@ -1,16 +1,17 @@
 import {
   Middleware,
-  SlashCommand,
-  SlackEvent,
   AnyMiddlewareArgs,
-  SlackAction,
-  InteractiveMessage,
-  InteractiveAction,
-  DialogSubmitAction,
-  MessageAction,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
+  SlackEvent,
+  SlackAction,
+  SlashCommand,
+  OptionsRequest,
+  InteractiveMessage,
+  DialogSubmitAction,
+  MessageAction,
   BlockElementAction,
 } from '../types';
 import { ActionConstraints } from '../Slapp';
@@ -44,9 +45,9 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs> = ({ body, next }) => {
-  // Filter out any non-actions
-  if (!isOptionsBody(body)) {
+export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequest }> = ({ options, next }) => {
+  // Filter out any non-options requests
+  if (options === undefined) {
     return;
   }
 
@@ -58,7 +59,7 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs> = ({ body, next }) => {
  * Middleware that filters out any event that isn't an event
  */
 export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = ({ event, next }) => {
-  // Filter out any non-actions
+  // Filter out any non-events
   if (event === undefined) {
     return;
   }
@@ -70,27 +71,26 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that checks for matches given constraints
  */
-export function matchActionConstraints(
+export function matchConstraints(
     constraints: ActionConstraints,
-    // TODO: this function signature could be wrong. this gets used in options() so the action property can be undefined
-  ): Middleware<SlackActionMiddlewareArgs<SlackAction>> {
-  return ({ action, body, next, context }) => {
+  ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
+  return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
     let tempMatches: RegExpExecArray | null;
     const matches: any[] = [];
 
     if (constraints.block_id !== undefined) {
-      if (!isBlockAction(action)) {
+      if (!isBlockPayload(payload)) {
         return;
       }
 
       if (typeof constraints.block_id === 'string') {
-        if (action.block_id !== constraints.block_id) {
+        if (payload.block_id !== constraints.block_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.block_id.exec(action.block_id)) !== null) {
+        if ((tempMatches = constraints.block_id.exec(payload.block_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -99,16 +99,16 @@ export function matchActionConstraints(
     }
 
     if (constraints.action_id !== undefined) {
-      if (!isBlockAction(action)) {
+      if (!isBlockPayload(payload)) {
         return;
       }
 
       if (typeof constraints.action_id === 'string') {
-        if (action.action_id !== constraints.action_id) {
+        if (payload.action_id !== constraints.action_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.action_id.exec(action.action_id)) !== null) {
+        if ((tempMatches = constraints.action_id.exec(payload.action_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -261,39 +261,26 @@ export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
   };
 }
 
-function isBlockAction(
-  action: BlockElementAction | InteractiveAction | DialogSubmitAction | MessageAction,
-): action is BlockElementAction {
-  return (action as BlockElementAction).action_id !== undefined;
+function isBlockPayload(
+  payload: SlackActionMiddlewareArgs['payload'] | SlackOptionsMiddlewareArgs['payload'],
+): payload is BlockElementAction | OptionsRequest<'block_suggestion'> {
+  return (payload as BlockElementAction | OptionsRequest<'block_suggestion'>).action_id !== undefined;
 }
 
-type CallbackIdentifiedAction = InteractiveMessage | DialogSubmitAction | MessageAction;
+type CallbackIdentifiedBody =
+  | InteractiveMessage
+  | DialogSubmitAction
+  | MessageAction
+  | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
 function isCallbackIdentifiedBody(
-  action: SlackAction,
-): action is CallbackIdentifiedAction {
-  return (action as DialogSubmitAction | MessageAction | InteractiveMessage).callback_id !== undefined;
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'],
+): body is CallbackIdentifiedBody {
+  return (body as CallbackIdentifiedBody).callback_id !== undefined;
 }
 
 function isEventArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackEventMiddlewareArgs {
   return (args as SlackEventMiddlewareArgs).event !== undefined;
-}
-
-/**
- * Helper function that determines if a payload is an options payload
- * TODO: This checks against a whole bunch of any type properties, use something more statically typed
- */
-function isOptionsBody(body: AnyMiddlewareArgs['body']): boolean {
-  if (body.type === 'dialog_suggestion') {
-    return true;
-  }
-  if (body.type === 'interactive_message' && body.name !== undefined) {
-    return true;
-  }
-  if (body.type === 'block_suggestion') {
-    return true;
-  }
-  return false;
 }
