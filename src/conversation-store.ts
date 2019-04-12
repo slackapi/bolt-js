@@ -1,5 +1,5 @@
 import { Middleware, AnyMiddlewareArgs } from './types';
-import { Logger } from './logger';
+import { Logger } from '@slack/logger';
 import { getTypeAndConversation } from './helpers';
 
 /**
