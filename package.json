@@ -11,7 +11,6 @@
     "unit": "ava --verbose --serial",
     "coverage": "nyc --check-coverage --statements 100 ava --verbose --serial",
     "lcov": "nyc --reporter lcov ava --serial",
-    "docs": "node scripts/docs.js",
     "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
@@ -38,26 +37,18 @@
     "@slack/web-api": "^5.0.0",
     "@types/express": "^4.16.1",
     "@types/node": ">=8",
-    "@types/request": "^2.48.1",
     "axios": "^0.18.0",
-    "deap": "^1.0.0",
     "express": "^4.16.4",
-    "js-queue": "^1.0.0",
-    "path-to-regexp": "^2.0.0",
-    "querystring": "^0.2.0",
     "raw-body": "^2.3.3",
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {
-    "ava": "^0.15.2",
-    "coveralls": "3.0.1",
-    "dox": "^0.8.1",
-    "nyc": "^7.0.0",
-    "sinon": "^1.17.4",
-    "standard": "^7.1.2",
-    "ts-node": "^8.0.2",
-    "tslint": "^5.12.1",
+    "ava": "^1.4.1",
+    "coveralls": "^3.0.3",
+    "nyc": "^13.3.0",
+    "sinon": "^7.3.1",
+    "tslint": "^5.15.0",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.4.3"
   }
 }
