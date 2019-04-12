@@ -1,25 +1,20 @@
 import {
   Middleware,
-  KeyValueMapping,
-  SlashCommand,
-  SlackEvent,
   AnyMiddlewareArgs,
-  SlackAction,
-  InteractiveMessage,
-  InteractiveAction,
-  DialogSubmitAction,
-  MessageAction,
-  ActionConstraints,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
-  UnknownElementAction,
-  MenuSelect,
-  ButtonClick,
   SlackOptionsMiddlewareArgs,
+  SlackEvent,
+  SlackAction,
+  SlashCommand,
   OptionsRequest,
-  OptionsSource,
-} from './types';
+  InteractiveMessage,
+  DialogSubmitAction,
+  MessageAction,
+  BlockElementAction,
+} from '../types';
+import { ActionConstraints } from '../Slapp';
 
 /**
  * Middleware that filters out any event that isn't an action
@@ -50,9 +45,9 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs> = ({ body, next }) => {
-  // Filter out any non-actions
-  if (!isOptionsBody(body)) {
+export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequest }> = ({ options, next }) => {
+  // Filter out any non-options requests
+  if (options === undefined) {
     return;
   }
 
@@ -64,7 +59,7 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs> = ({ body, next }) => {
  * Middleware that filters out any event that isn't an event
  */
 export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = ({ event, next }) => {
-  // Filter out any non-actions
+  // Filter out any non-events
   if (event === undefined) {
     return;
   }
@@ -78,34 +73,24 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
  */
 export function matchConstraints(
     constraints: ActionConstraints,
-    // TODO: this function signature could be wrong. this gets used in options() so the action property can be undefined
-): Middleware<AnyMiddlewareArgs> {
-  return (args) => {
-    // NOTE: DialogSubmitAction and MessageAction do not have an innerPayload
-    const innerPayload = isActionsArgs(args) ? args.action.actions[0] : isOptionsArgs(args) ? args.options : undefined;
-
+  ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
+  return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
     let tempMatches: RegExpExecArray | null;
     const matches: any[] = [];
 
     if (constraints.block_id !== undefined) {
-      if (innerPayload === undefined) {
+      if (!isBlockPayload(payload)) {
         return;
       }
 
-      if (isActionsArgs(args)) {
-        if (!isElementAction(innerPayload)) {
-          return;
-        }
-      }
-
       if (typeof constraints.block_id === 'string') {
-        if (innerPayload.block_id !== constraints.block_id) {
+        if (payload.block_id !== constraints.block_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.block_id.exec(innerPayload.block_id)) !== null) {
+        if ((tempMatches = constraints.block_id.exec(payload.block_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -114,22 +99,16 @@ export function matchConstraints(
     }
 
     if (constraints.action_id !== undefined) {
-      if (innerPayload === undefined) {
+      if (!isBlockPayload(payload)) {
         return;
       }
 
-      if (isActionsArgs(args)) {
-        if (!isElementAction(innerPayload)) {
-          return;
-        }
-      }
-
       if (typeof constraints.action_id === 'string') {
-        if (innerPayload.action_id !== constraints.action_id) {
+        if (payload.action_id !== constraints.action_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.action_id.exec(innerPayload.action_id)) !== null) {
+        if ((tempMatches = constraints.action_id.exec(payload.action_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -138,18 +117,15 @@ export function matchConstraints(
     }
 
     if (constraints.callback_id !== undefined) {
-      if (isActionsArgs(args) && !isCallbackIdentifiedAction(args.action)) {
-        return;
-      }
-      if (isOptionsArgs(args) && !isCallbackIdentifiedOption(args.options)) {
+      if (!isCallbackIdentifiedBody(body)) {
         return;
       }
       if (typeof constraints.callback_id === 'string') {
-        if (args.payload.callback_id !== constraints.callback_id) {
+        if (body.callback_id !== constraints.callback_id) {
           return;
         }
       } else {
-        if ((tempMatches = constraints.callback_id.exec(args.payload.callback_id)) !== null) {
+        if ((tempMatches = constraints.callback_id.exec(body.callback_id)) !== null) {
           matches.concat(tempMatches);
         } else {
           return;
@@ -158,9 +134,9 @@ export function matchConstraints(
     }
 
     // Add matches to context
-    args.context['matches'] = matches;
+    context['matches'] = matches;
 
-    args.next();
+    next();
   };
 }
 
@@ -205,7 +181,7 @@ export function matchCommandName(name: string): Middleware<SlackCommandMiddlewar
 /**
  * Middleware that filters out any event that isn't of given type
  */
-export function matchEventType(type: string): Middleware<SlackEventMiddlewareArgs<string>> {
+export function matchEventType(type: string): Middleware<SlackEventMiddlewareArgs> {
   return ({ event, next }) => {
     // Filter out any events that are not the correct type
     if (type !== event.type) {
@@ -233,8 +209,8 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
     const botUserId = args.context.botUserId !== undefined ? args.context.botUserId as string : undefined;
 
     if (isEventArgs(args)) {
-      // Once we've narrowed the type down to SlackEventMiddlewareArgs<string>, there's no way to further narrow it
-      // down to SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
+      // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
+      // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
       if (args.message !== undefined) {
         const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
 
@@ -251,7 +227,7 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
     // Look for any events (not just Events API) that are from the same userId as this app, and return to skip
     // NOTE: this goes further than Slapp's previous ignoreSelf middleware. That middleware only applied this filter
     // when the event was of type message. Is this okay?
-    if (botUserId !== undefined && args.payload.user === botUserId) {
+    if (botUserId !== undefined && args.body.user === botUserId) {
       return;
     }
 
@@ -266,8 +242,8 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
 export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
   return (args) => {
     if (isEventArgs(args)) {
-      // Once we've narrowed the type down to SlackEventMiddlewareArgs<string>, there's no way to further narrow it
-      // down to SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
+      // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
+      // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
       if (args.message !== undefined) {
         const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
 
@@ -285,61 +261,26 @@ export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
   };
 }
 
-function isElementAction(
-  action: InteractiveAction | UnknownElementAction<string>,
-): action is UnknownElementAction<string> {
-  return (action as UnknownElementAction<string>).action_id !== undefined;
+function isBlockPayload(
+  payload: SlackActionMiddlewareArgs['payload'] | SlackOptionsMiddlewareArgs['payload'],
+): payload is BlockElementAction | OptionsRequest<'block_suggestion'> {
+  return (payload as BlockElementAction | OptionsRequest<'block_suggestion'>).action_id !== undefined;
 }
 
-type CallbackIdentifiedAction =
-  | InteractiveMessage<ButtonClick>
-  | InteractiveMessage<MenuSelect>
+type CallbackIdentifiedBody =
+  | InteractiveMessage
   | DialogSubmitAction
-  | MessageAction;
+  | MessageAction
+  | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
-function isCallbackIdentifiedAction(action: SlackAction<string>): action is CallbackIdentifiedAction {
-  return (action as CallbackIdentifiedAction).callback_id !== undefined;
-}
-
-type CallbackIdentifiedOptions =
-  | OptionsRequest<'interactive_message'>
-  | OptionsRequest<'dialog_suggestion'>;
-
-function isCallbackIdentifiedOption(options: OptionsRequest<OptionsSource>): options is CallbackIdentifiedOptions {
-  return (options as CallbackIdentifiedOptions).callback_id !== undefined;
+function isCallbackIdentifiedBody(
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'],
+): body is CallbackIdentifiedBody {
+  return (body as CallbackIdentifiedBody).callback_id !== undefined;
 }
 
 function isEventArgs(
   args: AnyMiddlewareArgs,
-): args is SlackEventMiddlewareArgs<string> {
-  return (args as SlackEventMiddlewareArgs<string>).event !== undefined;
-}
-
-function isActionsArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackActionMiddlewareArgs<SlackAction> {
-  return (args as SlackActionMiddlewareArgs<SlackAction>).action !== undefined;
-}
-
-function isOptionsArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackOptionsMiddlewareArgs<OptionsSource> {
-  return (args as SlackOptionsMiddlewareArgs<OptionsSource>).options !== undefined;
-}
-
-/**
- * Helper function that determines if a payload is an options payload
- * TODO: Get rid of use of KeyValueMapping
- */
-function isOptionsBody(body: KeyValueMapping): boolean {
-  if (body.type === 'dialog_suggestion') {
-    return true;
-  }
-  if (body.type === 'interactive_message' && body.name !== undefined) {
-    return true;
-  }
-  if (body.type === 'block_suggestion') {
-    return true;
-  }
-  return false;
+): args is SlackEventMiddlewareArgs {
+  return (args as SlackEventMiddlewareArgs).event !== undefined;
 }

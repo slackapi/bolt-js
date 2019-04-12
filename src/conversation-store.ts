@@ -1,4 +1,4 @@
-import { Middleware, AnyMiddlewareArgs } from './middleware/types';
+import { Middleware, AnyMiddlewareArgs } from './types';
 import { Logger } from './logger';
 import { getTypeAndConversation } from './helpers';
 

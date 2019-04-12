@@ -4,7 +4,7 @@ import {
   AnyMiddlewareArgs,
   NextMiddleware,
   PostProcessFn,
-} from './types';
+} from '../types';
 
 export function processMiddleware(
   initialArguments: AnyMiddlewareArgs,
