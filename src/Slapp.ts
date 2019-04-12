@@ -1,6 +1,7 @@
+import util from 'util';
 import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
+import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import { ExpressReceiver, Receiver, Event as ReceiverEvent, ReceiverArguments } from './receiver';
-import { Logger, LogLevel, ConsoleLogger } from './logger'; // tslint:disable-line:import-name
 import {
   ignoreSelfMiddleware,
   ignoreBotsMiddleware,
@@ -14,7 +15,6 @@ import {
   matchMessage,
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
-import util from 'util';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   Middleware,
@@ -133,8 +133,7 @@ export default class Slapp {
     this.middleware = [];
     this.listeners = [];
 
-    // TODO: should we pass the logLevel through? probably not
-    this.client = new WebClient();
+    this.client = new WebClient(undefined, { logLevel });
 
     // Check for required arguments of ExpressReceiver
     if (signingSecret !== undefined) {
