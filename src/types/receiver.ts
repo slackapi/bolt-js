@@ -3,6 +3,8 @@ import { StringIndexed } from './helpers';
 
 export interface ReceiverEvent {
   body: StringIndexed;
+  // TODO: there should maybe be some more help for implementors or Receiver to know what kind of argument the AckFn
+  // is expected to deal with.
   ack: AckFn<any>;
   respond?: RespondFn;
 }
