@@ -1,7 +1,7 @@
 import util from 'util';
 import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
-import { Receiver, ReceiverEvent, ExpressReceiver, ExpressReceiverOptions } from './receiver';
+import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
   ignoreSelfMiddleware,
   ignoreBotsMiddleware,
@@ -31,6 +31,8 @@ import {
   OptionsSource,
   BlockAction,
   InteractiveMessage,
+  Receiver,
+  ReceiverEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 

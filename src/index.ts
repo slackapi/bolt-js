@@ -8,17 +8,14 @@ export {
 } from './Slapp';
 
 export {
+  default as ExpressReceiver,
+  ExpressReceiverOptions,
+} from './ExpressReceiver';
+
+export * from './middleware/builtin';
+export * from './types';
+
+export {
   ConversationStore,
   MemoryStore,
 } from './conversation-store';
-
-export * from './middleware/builtin';
-
-export {
-  Receiver,
-  ReceiverEvent,
-  ExpressReceiver,
-  ExpressReceiverOptions,
-} from './receiver';
-
-export * from './types';
