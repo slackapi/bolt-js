@@ -6,6 +6,8 @@ import {
   PostProcessFn,
 } from '../types';
 
+// TODO: what happens if an error is thrown inside a middleware/listener function? it should propagate up and eventually
+// be dealt with by the global error handler
 export function processMiddleware(
   initialArguments: AnyMiddlewareArgs,
   middleware: Middleware<AnyMiddlewareArgs>[],

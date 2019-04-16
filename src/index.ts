@@ -1,11 +1,12 @@
 export {
-  default as Slapp,
-  SlappOptions,
+  default as App,
+  AppOptions,
   Authorize,
   AuthorizeSourceData,
   AuthorizeResult,
   ActionConstraints,
-} from './Slapp';
+  LogLevel,
+} from './App';
 
 export {
   default as ExpressReceiver,

@@ -1,7 +1,10 @@
+# node / npm stuff
 /node_modules
-/build
+/package-lock.json
 
-# Testing output
-lib-cov
-coverage
-.nyc_output
+# build products
+/dist
+
+# coverage
+/.nyc_output
+/coverage

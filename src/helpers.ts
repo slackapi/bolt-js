@@ -8,7 +8,7 @@ import {
 } from './types';
 
 /**
- * Internal data type for capturing the class of event processed in Slapp#onIncomingEvent()
+ * Internal data type for capturing the class of event processed in App#onIncomingEvent()
  */
 export enum IncomingEventType {
   Event,

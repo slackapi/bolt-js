@@ -61,17 +61,18 @@ export function conversationContext<ConversationState = any>(
     const { body, context, next } = args;
     const { conversationId } = getTypeAndConversation(body as any);
     if (conversationId !== undefined) {
+      context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
       store.get(conversationId)
         .then((conversationState) => {
           context.conversation = conversationState;
-          context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
           logger.debug(`Conversation context loaded for ID ${conversationId}`);
         })
         .catch((error) => {
           logger.debug(`Conversation context not loaded: ${error.message}`);
         })
         .then(next);
+    } else {
+      logger.debug('No conversation ID for incoming event');
     }
-    logger.debug('No conversation ID for incoming event');
   };
 }

@@ -3,8 +3,7 @@ import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
-  ignoreSelfMiddleware,
-  ignoreBotsMiddleware,
+  ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
   matchConstraints,
   onlyCommands,
@@ -37,18 +36,21 @@ import {
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 
 /** App initialization options */
-export interface SlappOptions {
+export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
   convoStore?: ConversationStore | false;
-  token?: string; // either token or authorize
+  token?: AuthorizeResult['botToken']; // either token or authorize
+  botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
+  botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
   authorize?: Authorize; // either token or authorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
-  ignoreBots?: boolean;
 }
+
+export { LogLevel } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
 export interface Authorize {
@@ -72,7 +74,7 @@ export interface AuthorizeResult {
   botToken?: string; // used by `say` (preferred over userToken)
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
-  botUserId?: string; // optional but helps `ignoreSelf` global middleware be more complete
+  botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
   [ key: string ]: any;
 }
 
@@ -82,10 +84,14 @@ export interface ActionConstraints {
   callback_id?: string | RegExp;
 }
 
+export interface ErrorHandler {
+  (error: Error): void;
+}
+
 /**
  * A Slack App
  */
-export default class Slapp {
+export default class App {
 
   /** Slack Web API client */
   public client: WebClient;
@@ -105,27 +111,34 @@ export default class Slapp {
   /** Listeners (and their middleware) */
   private listeners: Middleware<AnyMiddlewareArgs>[][];
 
+  private errorHandler: ErrorHandler;
+
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
+    botId = undefined,
+    botUserId = undefined,
     authorize = undefined,
     logger = new ConsoleLogger(),
     logLevel = LogLevel.INFO,
-    ignoreSelf = false,
-    ignoreBots = false,
-  }: SlappOptions = {}) {
+    ignoreSelf = true,
+  }: AppOptions = {}) {
 
     this.logger = logger;
     this.logger.setLevel(logLevel);
+    this.errorHandler = defaultErrorHandler(this.logger);
+
+    // TODO: other webclient options (such as proxy)
+    this.client = new WebClient(undefined, { logLevel });
 
     if (token !== undefined) {
       if (authorize !== undefined) {
         throw new Error(`Both token and authorize options provided. ${tokenUsage}`);
       }
-      this.authorize = async () => ({ botToken: token });
+      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
     } else if (authorize === undefined) {
       throw new Error(`No token and no authorize options provided. ${tokenUsage}`);
     } else {
@@ -134,8 +147,6 @@ export default class Slapp {
 
     this.middleware = [];
     this.listeners = [];
-
-    this.client = new WebClient(undefined, { logLevel });
 
     // Check for required arguments of ExpressReceiver
     if (signingSecret !== undefined) {
@@ -153,10 +164,7 @@ export default class Slapp {
       .on('message', message => this.onIncomingEvent(message))
       .on('error', error => this.onGlobalError(error));
 
-    // Use middleware which filter events from other apps or this app itself
-    if (ignoreBots) {
-      this.use(ignoreBotsMiddleware());
-    }
+    // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
       this.use(ignoreSelfMiddleware());
     }
@@ -188,6 +196,93 @@ export default class Slapp {
    */
   public start(...args: any[]): Promise<unknown> {
     return this.receiver.start(...args);
+  }
+
+  public stop(...args: any[]): Promise<unknown> {
+    return this.receiver.stop(...args);
+  }
+
+  public event<EventType extends string = string>(
+    eventName: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+  ): void {
+    this.listeners.push(
+      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
+  // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
+  // TODO: maybe remove the first two overloads
+  public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
+  public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
+  public message(
+    ...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]
+  ): void {
+    const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
+      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
+        return matchMessage(patternOrMiddleware);
+      }
+      return patternOrMiddleware;
+    });
+
+    this.listeners.push(
+      [onlyEvents, matchEventType('message'), ...messageMiddleware] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
+  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
+  // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
+  public action<ActionType extends SlackAction = SlackAction>(
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void;
+  public action<ActionType extends SlackAction = SlackAction>(
+    constraints: ActionConstraints,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void;
+  public action<ActionType extends SlackAction = SlackAction>(
+    actionIdOrConstraints: string | RegExp | ActionConstraints,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+  ): void {
+    const constraints: ActionConstraints =
+      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
+      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+
+    this.listeners.push(
+      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
+  // TODO: should command names also be regex?
+  public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
+    this.listeners.push(
+      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
+  public options<Source extends OptionsSource = OptionsSource>(
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+  ): void;
+  public options<Source extends OptionsSource = OptionsSource>(
+    constraints: ActionConstraints,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+  ): void;
+  public options<Source extends OptionsSource = OptionsSource>(
+    actionIdOrConstraints: string | RegExp | ActionConstraints,
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+  ): void {
+    const constraints: ActionConstraints =
+      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
+      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+
+    this.listeners.push(
+      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
+  public error(errorHandler: ErrorHandler): void {
+    this.errorHandler = errorHandler;
   }
 
   /**
@@ -317,83 +412,9 @@ export default class Slapp {
    * Global error handler. The final destination for all errors (hopefully).
    */
   private onGlobalError(error: Error): void {
-    this.logger.error(error);
+    this.errorHandler(error);
   }
 
-  public event<EventType extends string = string>(
-    eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
-  ): void {
-    this.listeners.push(
-      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
-  }
-
-  // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
-  public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(
-    patternOrMiddleware: string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]
-  ): void {
-    const messageMiddleware = (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) ?
-      matchMessage(patternOrMiddleware) : patternOrMiddleware;
-
-    this.listeners.push(
-      [onlyEvents, matchEventType('message'), messageMiddleware, ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
-  }
-
-  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
-  // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
-  public action<ActionType extends SlackAction = SlackAction>(
-    actionId: string | RegExp,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
-  ): void;
-  public action<ActionType extends SlackAction = SlackAction>(
-    constraints: ActionConstraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
-  ): void;
-  public action<ActionType extends SlackAction = SlackAction>(
-    actionIdOrConstraints: string | RegExp | ActionConstraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
-  ): void {
-    const constraints: ActionConstraints =
-      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
-
-    this.listeners.push(
-      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
-  }
-
-  // TODO: should command names also be regex?
-  public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
-    this.listeners.push(
-      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
-  }
-
-  public options<Source extends OptionsSource = OptionsSource>(
-    actionId: string | RegExp,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
-  ): void;
-  public options<Source extends OptionsSource = OptionsSource>(
-    constraints: ActionConstraints,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
-  ): void;
-  public options<Source extends OptionsSource = OptionsSource>(
-    actionIdOrConstraints: string | RegExp | ActionConstraints,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
-  ): void {
-    const constraints: ActionConstraints =
-      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
-
-    this.listeners.push(
-      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
-  }
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
@@ -441,4 +462,30 @@ function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).action !== undefined;
+}
+
+function defaultErrorHandler(logger: Logger): ErrorHandler {
+  return (error) => {
+    logger.error(error);
+  };
+}
+
+function singleTeamAuthorization(
+  client: WebClient,
+  authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
+): Authorize {
+  // TODO: warn when something needed isn't found
+  const botUserId: Promise<string> = authorization.botUserId !== undefined ?
+    Promise.resolve(authorization.botUserId) :
+    client.auth.test({ token: authorization.botToken })
+      .then(result => result.user_id as string);
+  const botId: Promise<string> = authorization.botId !== undefined ?
+    Promise.resolve(authorization.botId) :
+    botUserId.then(id => client.users.info({ token: authorization.botToken, user: id }))
+      .then(result => ((result.user as any).profile.bot_id as string));
+  return async () => ({
+    botToken: authorization.botToken,
+    botId: await botId,
+    botUserId: await botUserId,
+  });
 }
