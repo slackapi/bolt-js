@@ -14,7 +14,7 @@ import {
   MessageAction,
   BlockElementAction,
 } from '../types';
-import { ActionConstraints } from '../Slapp';
+import { ActionConstraints } from '../App';
 
 /**
  * Middleware that filters out any event that isn't an action
@@ -192,16 +192,13 @@ export function matchEventType(type: string): Middleware<SlackEventMiddlewareArg
   };
 }
 
-export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
+export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return (args) => {
-    // TODO: we might be able to query for the botId and/or botUserId and cache it to avoid errors/warnings.
-    // if so, the botId check would emit a warning instead of an error.
-
     // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
     if (args.context.botId === undefined) {
       // TODO: coded error
-      args.next(new Error('Cannot ignore events from the app\'s own bot user without a bot ID. ' +
-        'Use authorize option to return a botId.'));
+      args.next(new Error('Cannot ignore events from the app without a bot ID. ' +
+        'Ensure authorize callback returns a botId.'));
       return;
     }
 
@@ -220,15 +217,12 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
         if (message.subtype === 'bot_message' && message.bot_id === botId) {
           return;
         }
-
       }
-    }
 
-    // Look for any events (not just Events API) that are from the same userId as this app, and return to skip
-    // NOTE: this goes further than Slapp's previous ignoreSelf middleware. That middleware only applied this filter
-    // when the event was of type message. Is this okay?
-    if (botUserId !== undefined && args.body.user === botUserId) {
-      return;
+      // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
+      if (botUserId !== undefined && args.event.user === botUserId) {
+        return;
+      }
     }
 
     // If all the previous checks didn't skip this message, then its okay to resume to next
@@ -236,28 +230,40 @@ export function ignoreSelfMiddleware(): Middleware<AnyMiddlewareArgs> {
   };
 }
 
-/**
- * Middleware that ignores messages from any bot user
- */
-export function ignoreBotsMiddleware(): Middleware<AnyMiddlewareArgs> {
-  return (args) => {
-    if (isEventArgs(args)) {
-      // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
-      // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
-      if (args.message !== undefined) {
-        const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
+export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
+  return ({ message, next }) => {
+    if (message.subtype !== subtype) {
+      next();
+    }
+  };
+}
 
-        // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
-        // type narrowing
-        // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
-        if (message.subtype === 'bot_message') {
-          return;
-        }
-      }
+const slackLink = /<(?<type>[@#!])?(?<link>[^>|]+)(?:\|(?<label>[^>]+))?>/;
+
+export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>> {
+  return ({ message, context, next }) => {
+    // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
+    if (context.botUserId === undefined) {
+      // TODO: coded error
+      next(new Error('Cannot match direct mentions of the app without a bot user ID. ' +
+        'Ensure authorize callback returns a botUserId.'));
+      return;
     }
 
-    // If all the previous checks didn't skip this message, then its okay to resume to next
-    args.next();
+    // Match the message text with a user mention format
+    const text = message.text.trim();
+
+    const matches = slackLink.exec(text);
+    if (
+      matches === null || // stop when no matches are found
+      matches.index !== 0 || // stop if match isn't at the beginning
+      // stop if match isn't a user mention with the right user ID
+      matches.groups === undefined || matches.groups.type !== '@' || matches.groups.link !== context.botUserId
+    ) {
+      return;
+    }
+
+    next();
   };
 }
 

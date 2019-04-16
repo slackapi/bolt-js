@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { Receiver, ReceiverEvent } from './types';
+import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler } from 'express';
 import axios from 'axios';
 import rawBody from 'raw-body';
@@ -22,6 +23,8 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   /* Express app */
   public app: Application;
 
+  private server: Server;
+
   constructor ({
     signingSecret = '',
     endpoints = { events: '/slack/events' },
@@ -29,6 +32,8 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     super();
 
     this.app = express();
+    // TODO: what about starting an https server instead of http? what about other options to create the server?
+    this.server = createServer(this.app);
 
     const expressMiddleware: RequestHandler[] = [
       verifySlackRequest(signingSecret),
@@ -44,6 +49,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }
 
   private requestHandler(req: Request, res: Response): void {
+    // TODO: start a timer, generate an error if the app fails to call ack() before the timer expires
     const event: ReceiverEvent = {
       body: req.body as { [key: string]: any },
       ack: (response: any): void => {
@@ -69,15 +75,36 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     this.emit('message', event);
   }
 
-  public start(port: number): Promise<void> {
+  // TODO: the arguments should be defined as the arguments of Server#listen()
+  // TODO: the return value should be defined as a type that both http and https servers inherit from, or a union
+  public start(port: number): Promise<Server> {
     return new Promise((resolve, reject) => {
       try {
-        this.app.listen(port, () => {
-          resolve();
+        // TODO: what about other listener options?
+        // TODO: what about asynchronous errors? should we attach a handler for this.server.on('error', ...)?
+        // if so, how can we check for only errors related to listening, as opposed to later errors?
+        this.server.listen(port, () => {
+          resolve(this.server);
         });
       } catch (error) {
         reject(error);
       }
+    });
+  }
+
+  // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
+  // generic types
+  public stop(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // TODO: what about synchronous errors?
+      this.server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve();
+      });
     });
   }
 }

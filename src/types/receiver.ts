@@ -13,4 +13,5 @@ export interface Receiver {
   on(event: 'message', listener: (event: ReceiverEvent) => void): this;
   on(event: 'error', listener: (error: Error) => void): this;
   start(...args: any[]): Promise<unknown>;
+  stop(...args: any[]): Promise<unknown>;
 }

@@ -16,7 +16,7 @@ export interface Context extends StringIndexed {
 }
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
-// constraint would mess up the interface of Slapp#event(), Slapp#message(), etc.
+// constraint would mess up the interface of App#event(), App#message(), etc.
 export interface Middleware<Args> {
   // TODO: is there something nice we can do to get context's property types to flow from one middleware to the next?
   (args: Args & { next: NextMiddleware, context: Context }): void;

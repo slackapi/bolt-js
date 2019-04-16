@@ -1,1379 +1,410 @@
-[![Sponsored by Robots and Pencils](https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F_sponsored_by-%E2%9C%A8_Robots%20%26%20Pencils_%E2%9C%A8-FB6CBE.svg)](https://missions.ai)
-[![Build Status](https://travis-ci.org/MissionsAI/slapp.svg)](https://travis-ci.org/MissionsAI/slapp)
-[![Coverage Status](https://coveralls.io/repos/github/MissionsAI/slapp/badge.svg)](https://coveralls.io/github/MissionsAI/slapp)
+# Slack ⚡️ Bolt
 
-# Slapp
-Slapp is a node.js module for creating Slack integrations from simple slash commands to complex bots. It is specifically for Slack --not a generic bot framework-- because we believe the best restaurants in the world are not buffets. 🍴😉
+> ⚠️ This project is **alpha quality** and is not meant to be used for any production scenarios. Slack offers no
+> commitment to launch any of the functionality in this project.
 
-Slapp heavily favors the new HTTP based [Slack Events API](https://api.slack.com/events-api) over [Realtime Messaging API](https://api.slack.com/rtm) websockets for creating more scalable and manageable bots. It supports simple conversation flows with state managed out of process to survive restarts and horizontal scaling. Conversation flows aren't just message based but may include any Slack event, [interactive buttons](https://api.slack.com/docs/message-buttons), [slash commands](https://api.slack.com/slash-commands), etc.
+A framework to build Slack apps, _fast_.
 
-Slapp is built on a strong foundation with a test suite with 100% test coverage and depends on the [smallwins/slack](https://github.com/smallwins/slack) client.
+The team behind Bolt is [currently gathering feedback](#feedback-wanted) regarding the ideas and solutions presented in
+this project. If you are interested in learning more, and delivering your feedback, please reach out to
+<ankur@slack-corp.com>.
 
-Here is a basic example:
+-----
+
+## Initialization
+
+Create an app by calling a constructor, which is a top-level export.
+
 ```js
-const Slapp = require('slapp')
-const ContextLookup = require('./context-lookup')
-if (!process.env.PORT) throw Error('PORT missing but required')
+const { App } = require('@slack/bolt');
 
-var slapp = Slapp({ context: ContextLookup() })
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN,
+});
 
-slapp.message('^(hi|hello|hey).*', ['direct_mention', 'direct_message'], (msg, text, greeting) => {
-  msg
-    .say(`${greeting}, how are you?`)
-    .route('handleHowAreYou')  // where to route the next msg in the conversation
-})
+/* Add functionality here */
 
-// register a route handler
-slapp.route('handleHowAreYou', (msg) => {
-  // respond with a random entry from array
-  msg.say(['Me too', 'Noted', 'That is interesting'])
-})
+(async () => {
+  // Start the app
+  await app.start(process.env.PORT || 3000);
 
-// attach handlers to an Express app
-slapp.attachToExpress(require('express')()).listen(process.env.PORT)
+  console.log('⚡️ Bolt app is running!');
+})();
 ```
 
-## Install
+## Listening for events
 
-```
-npm install --save slapp
-```
+Apps typically react to incoming events, which can be events, actions, commands, or options requests. For each type of
+event, there's a method to attach a listener function.
 
-## Setup
-You can call the Slapp function with the following options:
 ```js
-const Slapp = require('slapp')
-// you can provide implementations for storing conversation state and context lookup
-const ConvoStore = require('./conversation-store')
-const ContextLookup = require('./context-lookup')
+// Listen for an event from the Events API
+app.event(eventType, fn);
 
-var slapp = Slapp({
-  verify_token: process.env.SLACK_VERIFY_TOKEN,
-  convo_store: ConvoStore(),
-  context: ContextLookup(),
-  log: true,
-  colors: true
-})
+// Listen for an action from a block element (buttons, menus, etc), dialog submission, message action, or legacy action
+app.action(actionId, fn);
+
+// Listen for a slash command
+app.command(commandName, fn);
+
+// Listen for options requests (from menus with an external data source)
+app.options(actionId, fn);
 ```
 
-### Context Lookup
-One of the challenges with writing a multi-team Slack app is that you need to make sure you have the appropriate tokens and meta-data for a team when you get a message from them. This lets you make api calls on behalf of that team in response to incoming messages from Slack. You typically collect and store this meta-data during the **Add to Slack** OAuth flow. Slapp has a required `context` option that gives you a convenient hook to load that team-specific meta-data and enrich the message with it.  While you can add whatever meta-data you have about a team in this function, there are a few required properties that need to be set on `req.slapp.meta` for Slapp to process requests:
+There's a special method that's provided as a convenience to handle Events API events with the type `message`. Also, you
+can include a string or RegExp `pattern` before the listener function to only call that listener function when the
+message text matches that pattern.
 
-+ `app_token` - **required** OAuth `access_token` property
-+ `bot_token` - **required if you have a bot user** OAuth `bot.bot_access_token` property
-+ `bot_user_id` - **required if you have a bot user** OAuth `bot.bot_user_id` property
-+ `app_bot_id` - **required if you have a bot user and use ignoreSelf option** Profile call with bot token, `users.profile.bot_id` property
-
-The incoming request from Slack has been parsed and normalized by the time the `context` function runs, and is available via `req.slapp`.  You can rely on this data in your `context` function to assist you in looking up the necessary tokens and meta-data.
-
-`req.slapp` has the following structure:
 ```js
-{
-  type: 'event|command|action',
-  body: {}, // original payload from Slack
-  meta: {
-    user_id: '<USER_ID>',
-    channel_id: '<CHANNEL_ID>',
-    team_id: '<TEAM_ID>'
+app.message([pattern ,] fn);
+```
+
+## Making things happen
+
+Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are
+called with arguments that make it easy to build a rich app.
+
+*  `payload` (aliases: `message`, `event`, `action`, `command`, `options`) - The contents of the event. The
+   exact structure will depend on which kind of event this listener is attached to. For example, for an event from the
+   Events API, it will the [event type structure](https://api.slack.com/events-api#event_type_structure) (the portion
+   inside the event envelope). For a block action or legacy action, it will be the action inside the `actions` array.
+   The same object will also be available with the specific name for the kind of payload it is. For example, for an
+   event from a block action, you can use the `payload` and `action` arguments interchangeably. **The easiest way to
+   understand what's in a payload is to simply log it**, or otherwise [use TypeScript](#using-typescript).
+
+*  `say` - A function to respond to an incoming event. This argument is only available when the listener is triggered
+   for event that contains a `channel_id` (including `message` events). Call this function to send a message back to the
+   same channel as the incoming event. It accepts both simple strings (for plain messages) and objects (for complex
+   messages, including blocks or attachments).
+
+*  `ack` - A function to acknowledge that an incoming event was received by the app. Incoming events from actions,
+   commands, and options requests **must** be acknowledged by calling this function. See [acknowledging
+   events](#acknowledging-events) for details.
+
+*  `respond` - A function to respond to an incoming event. This argument is only available when the listener is
+   triggered for an event that contains a `response_url` (actions and commands). Call this function to send a message
+   back to the same channel as the incoming event, but using the semantics of the `response_url`.
+
+*  `context` - The event context. This object contains data about the message and the app, such as the `botId`.
+   See [advanced usage](#advanced-usage) for more details.
+
+*  `body` - An object that contains the whole body of the event, which is a superset of the data in `payload`. Some
+   types of data are only available outside the event payload itself, such as `api_app_id`, `authed_users`, etc. This
+   argument should rarely be needed, but for completeness it is provided here.
+
+The arguments are grouped into properties of one object, so that its easier to pick just the ones your listener needs
+(using
+[object destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter)).
+Here is an example where the app sends a simple response, so there's no need for most of these arguments:
+
+```js
+// Reverse all messages the app can hear
+app.message(({ message, say }) => {
+  const reversedText = message.text.split('').reverse().join('');
+  say(reversedText);
+});
+```
+
+### Calling the Web API
+
+Listeners can use the full power of all the methods in the Web API (given that your app is installed with the
+appropriate scopes). Each app has a `client` property that can be used to call methods. Your listener may read the app's
+token from the `context` argument, and use it as the `token` argument for a method call. See the [`WebClient`
+documentation](https://slack.dev/node-slack-sdk/web-api) for a more complete description of how it can be used.
+
+```js
+// React to any message that contains "happy" with a 😀
+app.message('happy', async ({ message, context }) => {
+  try {
+    // Call the "reactions.add" Web API method
+    const result = await app.client.reactions.add({
+      // Use token from context
+      token: context.botToken,
+      name: ':grinning:',
+      channel: message.channel_id
+    });
+    console.log(result);
+  } catch (error) {
+    console.error(error);
   }
-}
+});
 ```
 
-You'll need to set required properties listed above on `req.slapp.meta` with data retreived from wherever you're storing your OAuth data. That might look something like this:
+### Acknowledging events
+
+Some types of events need to be acknowledged in order to ensure a consistent user experience inside the Slack client
+(web, mobile, and desktop apps). This includes all actions, commands, and options requests. Listeners for these events
+need to call the `ack()` function, which is passed in as an argument.
+
+In general, the Slack platform expects an acknowledgement within 3 seconds, so listeners should call this function as
+soon as possible.
+
+Depending on the type of incoming event a listener is meant for, `ack()` should be called with a parameter:
+
+*  Block actions and message actions: Call `ack()` with no parameters.
+
+*  Dialog submissions: Call `ack()` with no parameters when the inputs are all valid, or an object describing the
+   validation errors if any inputs are not valid.
+
+*  Options requests: Call `ack()` with an object containing the options for the user to see.
+
+*  Legacy message button clicks, menu selections, and slash commands: Either call `ack()` with no parameters, a `string`
+   to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the
+   message to remove the interactive elements is a best practice for any action that should only be performed once.
+
+If an app does not call `ack()` within the time limit, Bolt will generate an error. See [handling
+errors](#handling-errors) for more details.
+
+The following is an example of acknowledging a dialog submission:
+
 ```js
-// your database module...
-var myDB = require('./my-db')
+app.action({ callbackId: 'my_dialog_callback' }, async ({ action, ack }) => {
+  // Expect the ticketId value to begin with "CODE"
+  if (action.submission.ticketId.indexOf('CODE') !== 0) {
+    ack({
+      errors: [{
+        name: 'ticketId',
+        error: 'This value must begin with CODE',
+      }],
+    });
+    return;
+  }
+  ack();
 
-var slapp = Slapp({
-  context (req, res, next) {
-    var meta = req.slapp.meta
+  // Do some work
+});
+```
 
-    myDB.getTeamData(meta.team_id, (err, data) => {
-      if (err) {
-        console.error('Error loading team data: ', err)
-        return res.send(err)
+## Handling errors
+
+If an error occurs in a listener function, its strongly recommended to handle it directly. There are a few cases where
+those errors may occur after your listener function has returned (such as when calling `say()` or `respond()`, or
+forgetting to call `ack()`). In these cases, your app will be notified about the error in an error handler function.
+Your app should register an error handler using the `App#error(fn)` method.
+
+```js
+app.error((error) => {
+  // Check the details of the error to handle special cases (such as stopping the app or retrying the sending of a message)
+  console.error(error);
+});
+```
+
+If you do not attach an error handler, the app will log these errors to the console by default.
+
+The `app.error()` method should be used as a last resort to catch errors. It is always better to deal with errors in the
+listeners where they occur because you can use all the context available in that listener. If the app expects that using
+`say()` or `respond()` can fail, it's always possible to use `app.client.chat.postMessage()` instead, which returns a
+`Promise` that can be caught to deal with the error.
+
+## Advanced usage
+
+Apps are designed to be extensible using a concept called **middleware**. Middleware allow you to define how to process
+a whole set of events before (and after) the listener function is called. This makes it easier to deal with common
+concerns in one place (e.g. authentication, logging, etc) instead of spreading them out in every listener.
+
+In fact, middleware can be _chained_ so that any number of middleware functions get a chance to run before the listener,
+and they each run in the order they were added to the chain.
+
+Middleware are just functions - nearly identical to listener functions. They can choose to respond right away, to extend
+the `context` argument and continue, or trigger an error. The only difference is that middleware use a special `next()`
+argument, a function that's called to let the app know it can continue to the next middleware (or listener) in the
+chain.
+
+There are two types of middleware: global and listener. Each are explained below.
+
+### Global middleware
+
+Global middleware are used to deal with app-wide concerns, where every incoming event should be processed. They are
+added to the chain using `app.use(middleware)`. You can add multiple middleware, and each of them will run in order
+before any of the listener middleware, or the listener functions run.
+
+As an example, let's say your app can only work if the user who sends any incoming message is identified using an
+internal authentication service (e.g. an SSO provider, LDAP, etc). Here is how you might define a global middleware to
+make that data available to each listener.
+
+```js
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN,
+});
+
+// Add the authentication global middleware
+app.use(authWithAcme);
+
+// The listener now has access to the user details
+app.message('whoami', ({ say, context }) => { say(`User Details: ${JSON.stringify(context.user)}`) });
+
+(async () => {
+  // Start the app
+  await app.start(process.env.PORT || 3000);
+  console.log('⚡️ Bolt app is running!');
+})();
+
+// Authentication middleware - Calls Acme identity provider to associate the incoming event with the user who sent it
+// Its a function just like listeners, but it also uses the next argument
+function authWithAcme({ payload, context, say, next }) {
+  const slackUserId = payload.user;
+
+  // Assume we have a function that can take a Slack user ID as input to find user details from the provider
+  acme.lookupBySlackId(slackUserId)
+    .then((user) => {
+      // When the user lookup is successful, add the user details to the context
+      context.user = user;
+
+      // Pass control to the next middleware (if there are any) and the listener functions
+      next();
+    })
+    .catch((error) => {
+      // Uh oh, this user hasn't registered with Acme. Send them a registration link, and don't let the
+      // middleware/listeners continue
+      if (error.message === 'Not Found') {
+        // In the real world, you would need to check if the say function was defined, falling back to the respond
+        // function if not, and then falling back to only logging the error as a last resort.
+        say(`I'm sorry <@${slackUserId}, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
+         return;
       }
 
-      // mixin necessary team meta-data
-      req.slapp.meta = Object.assign(req.slapp.meta, {
-        app_token: data.app_token,
-        bot_token: data.bot_token,
-        bot_user_id: data.bot_user_id,
-        // you can add your own team meta-data as well
-        other_value: data.other_value
-      })
-    })
-  }
-})
-```
-
-### Message Middleware
-Slapp supports middleware for incoming events, allowing you to stop the propagation
-of the event by not calling `next()`, passively observing, or appending metadata
-to the message by adding properties to `msg.meta`. Middleware is processed in the
-order it is added.
-
-Register new middleware with `use`:
-
-```
-slapp.use(fn(msg, next))
-```
-
-For example, simple middleware that logs all incoming messages:
-
-```
-slapp.use((msg, next) => {
-  console.log(msg)
-  next()
-})
-```
-
-Or that does some validation:
-
-```
-slapp.use((msg, next) => {
-  if (valid) {
-    next()
-  } else {
-    console.error('uh oh')
-  }
-})
-```
-
-## Slack Events
-Listen for any Slack event with `slapp.event(event_name, (msg) => {})`.
-
-```js
-// add a smile reaction by the bot for any message reacted to
-slapp.event('reaction_added', (msg) => {
-  let token = msg.meta.bot_token
-  let timestamp = msg.body.event.item.ts
-  let channel = msg.body.event.item.channel
-  slapp.client.reactions.add({token, name: 'smile', channel, timestamp}, (err) => {
-    if (err) console.log('Error adding reaction', err)
-  })
-})
-```
-
-![Slack Events Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-event.gif)
-
-## Slack Event Messages
-A message is just a subtype of Slack event but has a special convenience method `slapp.message(regex, [types], (msg) => {})`:
-
-```js
-slapp.message('goodnight', 'mention', (msg) => {
-  msg.say('sweet dreams :crescent_moon: ')
-})
-```
-![Slack Message Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-message.gif)
-
-
-## Interactive Messages
-`msg.say()` may be passed text, an array of text values (one is chosen randomly), or an object to be sent to [`chat.postMessage`](https://api.slack.com/methods/chat.postMessage). It defaults to the current channel and the bot user token (or app token if there is not bot user). Here's an example of using `msg.say()` to send an interactive message and registering a handler to receive the button action:
-
-```js
-slapp.message('yesno', (msg) => {
-  msg.say({
-      text: '',
-      attachments: [
-        {
-          text: '',
-          fallback: 'Yes or No?',
-          callback_id: 'yesno_callback',
-          actions: [
-            { name: 'answer', text: 'Yes', type: 'button', value: 'yes' },
-            { name: 'answer', text: 'No',  type: 'button',  value: 'no' }
-          ]
-        }]
-      })
-})
-
-slapp.action('yesno_callback', 'answer', (msg, value) => {
-  msg.respond(msg.body.response_url, `${value} is a good choice!`)
-})
-```
-
-![Interactive Message Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-interactive.gif)
-
-## Slash Commands
-
-```js
-slapp.command('/inorout', /^in/, (msg) => {
-  // `respond` is used for actions or commands and uses the `response_url` provided by the
-  // incoming request from Slack
-  msg.respond(`Glad you are in ${match}!`)
-})
-```
-
-![Slash Command Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-slash.gif)
-
-
-You can also match on text after the command similar to messages like this:
-```js
-slapp.command('/inorout', 'create (.*)', (msg, text, question) => {
-  // if "/inorout create Who is in?" is received:
-  // text = create Who is in?
-  // question = Who is in?
-})
-```
-
-## Conversations and Bots
-With Slapp you can use the Slack Events API to create bots much like you would with a
-a Realtime Messaging API socket. Events over HTTP may not necessarily be received by
-the same process if you are running multiple instances of your app behind a load balancer;
-therefore your Slapp process should be stateless. And thus conversation state should be
-stored out of process.
-
-You can pass a conversation store implementation into the Slapp factory with the `convo_store` option. A conversation store needs to implement these three functions:
-
-```js
-  set (id, params, callback) {} // callback(err)
-  get (id, callback)            // callback(err, val)
-  del (id, callback) {}         // callback(err)
-```
-
-The [in memory implementation](https://github.com/MissionsAI/slapp/blob/master/src/conversation_store/memory.js) can be used for testing and as an example when creating your own implementation.
-
-### What is a conversation?
-A conversation is scoped by the combination of Slack Team, Channel, and User. When
-you register a new route handler (see below), it will only be invoked when receiving
-a message from the same team in the same channel by the same user.
-
-### Conversation Routing
-Conversations use a very simple routing mechanism. Within any msg handler you may
-call `msg.route` to designate a handler for the next msg received in a conversation.
-The handler must be preregistered with the same key through `slapp.route`.
-
-For example, if we register a route handler under the key `handleGoodDay`:
-
-```js
-slapp.route('handleGoodDay', (msg) => {
-  msg.say(':expressionless:')
-})
-```
-
-We can route to that in a `msg` handler like this:
-
-```js
-slapp.message('^hi', 'direct_message', (msg) => {
-  msg.say('Are you having a good day?').route('handleGoodDay')
-})
-```
-
-The route handler will get called for this conversation no matter what type of event
-it is. This means you can use any slack events, slash commands interactive message actions,
-and the like in your conversation flows. If a route handler is registered, it will
-supercede any other matcher.
-
-### Conversation State and Expiration
-When specifying a route handler with `msg.route` you can optionally pass an arbitrary
-object and expiration time in seconds.
-
-Consider the example below. If a user says "do it" in a direct message then ask
-for confirmation using an interactive message. If they do something other than
-answer by pressing a button, redirect them to choose one of the options, yes or no.
-When they choose, handle the response accordingly.
-
-Notice the `state` object that is passed to `msg.route` and into `slapp.route`. Each time `msg.route` is called an expiration time of 60 seconds is set. If
-there is not activity by the user for 60 seconds, we expire the conversation flow.
-
-
-```js
-// if a user says "do it" in a DM
-slapp.message('do it', 'direct_message', (msg) => {
-  var state = { requested: Date.now() }
-  // respond with an interactive message with buttons Yes and No
-  msg
-  .say({
-    text: '',
-    attachments: [
-      {
-        text: 'Are you sure?',
-        fallback: 'Are you sure?',
-        callback_id: 'doit_confirm_callback',
-        actions: [
-          { name: 'answer', text: 'Yes', type: 'button', value: 'yes' },
-          { name: 'answer', text: 'No', type: 'button', value: 'no' }
-        ]
-      }]
-    })
-  // handle the response with this route passing state
-  // and expiring the conversation after 60 seconds
-  .route('handleDoitConfirmation', state, 60)
-})
-
-slapp.route('handleDoitConfirmation', (msg, state) => {
-  // if they respond with anything other than a button selection,
-  // get them back on track
-  if (msg.type !== 'action') {
-    msg
-      .say('Please choose a Yes or No button :wink:')
-      // notice we have to declare the next route to handle the response
-      // every time. Pass along the state and expire the conversation
-      // 60 seconds from now.
-      .route('handleDoitConfirmation', state, 60)
-    return
-  }
-
-  let answer = msg.body.actions[0].value
-  if (answer !== 'yes') {
-    // the answer was not affirmative
-    msg.respond(msg.body.response_url, {
-      text: `OK, not doing it. Whew that was close :cold_sweat:`,
-      delete_original: true
-    })
-    // notice we did NOT specify a route because the conversation is over
-    return
-  }
-
-  // use the state that's been passed through the flow to figure out the
-  // elapsed time
-  var elapsed = (Date.now() - state.requested)/1000
-  msg.respond(msg.body.response_url, {
-    text: `You requested me to do it ${elapsed} seconds ago`,
-    delete_original: true
-  })
-
-  // simulate doing some work and send a confirmation.
-  setTimeout(() => {
-    msg.say('I "did it"')
-  }, 3000)
-})
-```
-
-![Conversation Demo](https://storage.googleapis.com/beepboophq/_assets/slackapp/demo-doit.gif)
-
-## Custom Logging
-You can pass in your own custom logger instead of using the built-in logger. A custom logger would implement:
-
-```js
-(app, opts) => {
-  app
-    .on('info', (msg) => {
-      ...
-    })
-    .on('error', (err) => {
-      ...
-    })
+      // This middleware doesn't know how to handle any other errors. Pass control to the previous middleware (if there
+      // are any) or the global error handler.
+      next(error);
+    });
 }
-```
-The `msg` is the same as the Message type. `opts` includes the `opts.colors` passed into Slapp initially.
 
-# API
-
-# slapp
-
-  - [slapp()](#slappoptsobject)
-
-## slapp(opts:Object)
-
-  Create a new Slapp, accepts an options object
-  
-  Parameters
-  - `opts.verify_token` Slack Veryify token to validate authenticity of requests coming from Slack
-  - `opts.signing_secret` Slack signing secret to check/verify the signature of requests coming from Slack
-  - `opts.signing_version` Slack signing version string, defaults to 'v0'
-  - `opts.convo_store` Implementation of ConversationStore, defaults to memory
-  - `opts.context` `Function (req, res, next)` HTTP Middleware function to enrich incoming request with context
-  - `opts.log` defaults to `true`, `false` to disable logging
-  - `opts.logger` Implementation of a logger, defaults to built-in Slapp command line logger.
-  - `opts.colors` defaults to `process.stdout.isTTY`, `true` to enable colors in logging
-  - `opts.ignoreSelf` defaults to `true`, `true` to automatically ignore any messages from yourself. This flag requires the context to set `meta.app_bot_id` with the Slack App's users.profile.bot_id.
-  - `opts.ignoreBots` defaults to `false`, `true` to ignore any messages from bot users automatically
-  
-  Example
-  
-  
-```js
-  var Slapp = require('slapp')
-  var ConvoStore = require('./convo-store')
-  var ContextLookup = require('./context-lookup')
-  var slapp = Slapp({
-    record: 'out.jsonl',
-    context: ContextLookup(),
-    convo_store: ConvoStore()
-  })
 ```
 
+### Listener middleware
 
+Listener middleware are used to deal with shared concerns amongst many listeners, but not necessarily for all of them.
+They are added as arguments that precede the listener function in the call that attaches the listener function. This
+means the methods described in [Listening for events](#listening-for-events) are actually all variadic (they take any
+number of parameters). You can add as many listener middleware as you like.
 
-# Slapp
+As an example, let's say your listener only needs to deal with messages from humans. Messages from apps will always have
+a subtype of `bot_message`. We can write a middleware that excludes bot messages, and use it as a listener middleware
+before the listener attached to `message` events:
 
-  - [Slapp.use()](#slappusefnfunction)
-  - [Slapp.attachToExpress()](#slappattachtoexpressappobjectoptsobject)
-  - [Slapp.route()](#slapproutefnkeystringfnfunction)
-  - [Slapp.getRoute()](#slappgetroutefnkeystring)
-  - [Slapp.match()](#slappmatchfnfunction)
-  - [Slapp.message()](#slappmessagecriteriastringtypefilterstringarray)
-  - [Slapp.event()](#slappeventcriteriastringregexpcallbackfunction)
-  - [Slapp.action()](#slappactioncallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
-  - [Slapp.messageAction()](#slappmessageactioncallbackidstringcallbackfunction)
-  - [Slapp.options()](#slappoptionscallbackidstringactionnamecriteriastringregexpactionvaluecriteriastringregexpcallbackfunction)
-  - [Slapp.command()](#slappcommandcommandstringcriteriastringregexpcallbackfunction)
-  - [Slapp.dialog()](#slappdialogcallbackidstringcallbackfunction)
-
-## Slapp.use(fn:function)
-
-  Register a new middleware, processed in the order registered.
-  
-#### Parameters
-  - `fn`: middleware function `(msg, next) => { }`
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Slapp.attachToExpress(app:Object, opts:Object)
-
-  Attach HTTP routes to an Express app
-  
-  Routes are:
-  - POST `/slack/event`
-  - POST `/slack/command`
-  - POST `/slack/action`
-  
-#### Parameters
-  - `app` instance of Express app or Express.Router
-  - `opts.event` `boolean|string` - event route (defaults to `/slack/event`) [optional]
-  - `opts.command` `boolean|string` - command route (defaults to `/slack/command`) [optional]
-  - `opts.action` `boolean|string` - action route (defaults to `/slack/action`) [optional]
-  
-  
-#### Returns
-  - `app` reference to Express app or Express.Router passed in
-  
-  
-  Examples:
-  
 ```js
-  // would attach all routes w/ default paths
-  slapp.attachToExpress(app)
-```
-
-  
-```js
-  // with options
-  slapp.attachToExpress(app, {
-    event: true, // would register event route with default of /slack/event
-    command: false, // would not register a route for commands
-    action: '/slack-action' // custom route for actions
-  })
-```
-
-  
-```js
-  // would only attach a route for events w/ default path
-  slapp.attachToExpress(app, {
-    event: true
-  })
-```
-
-## Slapp.route(fnKey:string, fn:function)
-
-  Register a new function route
-  
-#### Parameters
-  - `fnKey` unique key to refer to function
-  - `fn` `(msg, state) => {}`
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Slapp.getRoute(fnKey:string)
-
-  Return a registered route
-  
-#### Parameters
-  - `fnKey` string - unique key to refer to function
-  
-  
-#### Returns
-  - `(msg, state) => {}`
-
-## Slapp.match(fn:function)
-
-  Register a custom Match function (fn)
-  
-#### Returns `true` if there is a match AND you handled the msg.
-  Return `false` if there is not a match and you pass on the message.
-  
-  All of the higher level matching convenience functions
-  generate a match function and call `match` to register it.
-  
-  Only one matcher can return true, and they are executed in the order they are
-  defined. Match functions should return as fast as possible because it's important
-  that they are efficient. However you may do asyncronous tasks within to
-  your hearts content.
-  
-#### Parameters
-  - `fn` function - match function `(msg) => { return bool }`
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Slapp.message(criteria:string, typeFilter:string|Array)
-
-  Register a new message handler function for the criteria
-  
-#### Parameters
-  - `criteria` text that message contains or regex (e.g. "^hi")
-  - `typeFilter` [optional] Array for multiple values or string for one value. Valid values are `direct_message`, `direct_mention`, `mention`, `ambient`
-  - `callback` function - `(msg, text, [match1], [match2]...) => {}`
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  Example with regex matchers:
-  
-```js
-  slapp.message('^play (song|artist) <([^>]+)>', (msg, text, type, toplay) => {
-    // text = 'play artist spotify:track:1yJiE307EBIzOB9kqH1deb'
-    // type = 'artist'
-    // toplay = 'spotify:track:1yJiE307EBIzOB9kqH1deb'
+// Listener middleware - filters out messages that have subtype 'bot_message'
+function noBotMessages({ message, next }) {
+  if (!message.subtype || message.subtype !== 'bot_message') {
+     next();
   }
+}
+
+// The listener only sees messages from human users
+app.message(noBotMessages, ({ message }) => console.log(
+`(MSG) User: ${message.user}
+       Message: ${message.text}`
+));
 ```
 
-  
-  Example without matchers:
-  
+Message subtype matching is common, so Bolt ships with a builtin listener middleware that filters all messages that
+match a given subtype. The following is an example of the opposite of the one above - the listener only sees messages
+that _are_ `bot_message`s.
+
 ```js
-  slapp.message('play', (msg, text) => {
-    // text = 'play'
-  }
+const { App, subtype } = require('@slack/bolt');
+
+// Not shown: app initialization and start
+
+// The listener only sees messages from bot users (apps)
+app.message(subtype('bot_message'), ({ message }) => console.log(
+`(MSG) Bot: ${message.bot_id}
+       Message: ${message.text}`
+));
 ```
 
-  
-  Example `msg.body`:
-  
+### Even more advanced usage
+
+The examples above all illustrate how middleware can be used to process an event _before_ the listener (and other
+middleware in the chain) run. However, middleware can be designed to process the event _after_ the listener finishes.
+In general, a middleware can run both before and after the remaining middleware chain.
+
+In order to process the event after the listener, the middleware passes a function to `next()`. The function receives
+two arguments:
+
+* `error` - The value is falsy when the middleware chain finished handling the event normally. When a later
+  middleware calls `next(error)` (where `error` is an `Error`), then this value is set to the `error`.
+
+* `done` - A callback that **must** be called when processing is complete. When there is no error, or the incoming
+  error has been handled, `done()` should be called with no parameters. If instead the middleware is propagating an
+  error up the middleware chain, `done(error)` should be called with the error as its only parameter.
+
+The following example shows a global middleware that calculates the total processing time for the middleware chain by
+calculating the time difference from before the listener and after the listener:
+
 ```js
- {
-    "token":"dxxxxxxxxxxxxxxxxxxxx",
-    "team_id":"TXXXXXXXX",
-    "api_app_id":"AXXXXXXXX",
-    "event":{
-       "type":"message",
-       "user":"UXXXXXXXX",
-       "text":"hello!",
-       "ts":"1469130107.000088",
-       "channel":"DXXXXXXXX"
-    },
-    "event_ts":"1469130107.000088",
-    "type":"event_callback",
-    "authed_users":[
-       "UXXXXXXXX"
-    ]
- }
-```
-
-## Slapp.event(criteria:string|RegExp, callback:function)
-
-  Register a new event handler for an actionName
-  
-#### Parameters
-  - `criteria` the type of event
-  - `callback` `(msg) => {}`
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  
-  Example `msg` object:
-  
-```js
-  {
-     "token":"dxxxxxxxxxxxxxxxxxxxx",
-     "team_id":"TXXXXXXXX",
-     "api_app_id":"AXXXXXXXX",
-     "event":{
-        "type":"reaction_added",
-        "user":"UXXXXXXXX",
-        "item":{
-           "type":"message",
-           "channel":"DXXXXXXXX",
-           "ts":"1469130181.000096"
-        },
-        "reaction":"grinning"
-     },
-     "event_ts":"1469131201.822817",
-     "type":"event_callback",
-     "authed_users":[
-        "UXXXXXXXX"
-     ]
-  }
-```
-
-## Slapp.action(callbackId:string, actionNameCriteria:string|RegExp, actionValueCriteria:string|RegExp, callback:function)
-
-  Register a new handler for button or menu actions. The actionValueCriteria
-  (optional) for menu options will successfully match if any one of the values
-  match the criteria.
-  
-  The `callbackId` can optionally accept a URL path like pattern matcher that can be
-  used to match as well as extract values. For example if `callbackId` is `/myaction/:type/:id`,
-  it _will_ match on `/myaction/a-great-action/abcd1234`. And the resulting `Message` object will
-  include a `meta.params` object that contains the extracted variables. For example,
-  `msg.meta.params.type` ==> `a-great-action` and `msg.meta.params.id` ==> `abcd1234`. This allows
-  you to match on dynamic callbackIds while passing data.
-  
-  Note, `callback_id` values must be properly encoded. We suggest you use `encodeURIComponent` and `decodeURIComponent`.
-  
-  The underlying module used for matching
-  is [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) where there are a lot of examples.
-  
-  
-#### Parameters
-  - `callbackIdPath` string - may be a simple string or a URL path matcher
-  - `actionNameCriteria` string or RegExp - the name of the action [optional]
-  - `actionValueCriteria` string or RegExp - the value of the action [optional]
-  - `callback` function - `(msg, value) => {}` - value may be a string or array of strings
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  Example:
-  
-```js
-  // match name and value
-  slapp.action('dinner_callback', 'drink', 'beer', (msg, val) => {}
-  // match name and value either beer or wine
-  slapp.action('dinner_callback', 'drink', '(beer|wine)', (msg, val) => {}
-  // match name drink, any value
-  slapp.action('dinner_callback', 'drink', (msg, val) => {}
-  // match dinner_callback, any name or value
-  slapp.action('dinner_callback', 'drink', (msg, val) => {}
-  // match with regex
-  slapp.action('dinner_callback', /^drink$/, /^b[e]{2}r$/, (msg, val) => {}
-  // callback_id matcher
-  slapp.action('/dinner_callback/:drink', (msg, val) => {}
-```
-
-  
-  Example button action `msg.body` object:
-  
-```js
-  {
-     "actions":[
-        {
-           "name":"answer",
-           "value":":wine_glass:"
-        }
-     ],
-     "callback_id":"in_or_out_callback",
-     "team":{
-        "id":"TXXXXXXXX",
-        "domain":"companydomain"
-     },
-     "channel":{
-        "id":"DXXXXXXXX",
-        "name":"directmessage"
-     },
-     "user":{
-        "id":"UXXXXXXXX",
-        "name":"mike.brevoort"
-     },
-     "action_ts":"1469129995.067370",
-     "message_ts":"1469129988.000084",
-     "attachment_id":"1",
-     "token":"dxxxxxxxxxxxxxxxxxxxx",
-     "original_message":{
-        "text":"What?",
-        "username":"In or Out",
-        "bot_id":"BXXXXXXXX",
-        "attachments":[
-           {
-              "callback_id":"in_or_out_callback",
-              "fallback":"Pick one",
-              "id":1,
-              "actions":[
-                 {
-                    "id":"1",
-                    "name":"answer",
-                    "text":":beer:",
-                    "type":"button",
-                    "value":":beer:",
-                    "style":""
-                 },
-                 {
-                    "id":"2",
-                    "name":"answer",
-                    "text":":beers:",
-                    "type":"button",
-                    "value":":wine:",
-                    "style":""
-                 },
-              ]
-           },
-           {
-              "text":":beers: • mike.brevoort",
-              "id":2,
-              "fallback":"who picked beers"
-           }
-        ],
-        "type":"message",
-        "subtype":"bot_message",
-        "ts":"1469129988.000084"
-     },
-     "response_url":"https://hooks.slack.com/actions/TXXXXXXXX/111111111111/txxxxxxxxxxxxxxxxxxxx"
-  }
-```
-
-  
-  
-  Example menu action `msg.body` object:
-  
-```js
-  {
-    "actions": [
-      {
-        "name": "winners_list",
-        "selected_options": [
-          {
-            "value": "U061F1ZUR"
-          }
-        ]
-      }
-    ],
-      "callback_id": "select_simple_1234",
-        "team": {
-      "id": "T012AB0A1",
-        "domain": "pocket-calculator"
-    },
-    "channel": {
-      "id": "C012AB3CD",
-        "name": "general"
-    },
-    "user": {
-      "id": "U012A1BCD",
-        "name": "musik"
-    },
-    "action_ts": "1481579588.685999",
-      "message_ts": "1481579582.000003",
-        "attachment_id": "1",
-          "token": "verification_token_string",
-            "original_message": {
-      "text": "It's time to nominate the channel of the week",
-        "bot_id": "B08BCU62D",
-          "attachments": [
-            {
-              "callback_id": "select_simple_1234",
-              "fallback": "Upgrade your Slack client to use messages like these.",
-              "id": 1,
-              "color": "3AA3E3",
-              "actions": [
-                {
-                  "id": "1",
-                  "name": "channels_list",
-                  "text": "Which channel changed your life this week?",
-                  "type": "select",
-                  "data_source": "channels"
-                }
-              ]
-            }
-          ],
-            "type": "message",
-              "subtype": "bot_message",
-                "ts": "1481579582.000003"
-    },
-    "response_url": "https://hooks.slack.com/actions/T012AB0A1/1234567890/JpmK0yzoZ5eRiqfeduTBYXWQ"
-  }
-```
-
-## Slapp.messageAction(callbackId:string, callback:function)
-
-  Register a new handler for a [message action](https://api.slack.com/actions).
-  
-  The `callbackId` should match the "Callback ID" registered in the message action.
-  
-  
-#### Parameters
-  - `callbackId` string
-  - `callback` function - `(msg, message) => {}` - message
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  Example:
-  
-```js
-  // match on callback_id
-  slapp.messageAction('launch_message_action', (msg, message) => {}
-```
-
-  
-  
-  Example message action `msg.body` object:
-  
-```js
-  {
-    "token": "Nj2rfC2hU8mAfgaJLemZgO7H",
-    "callback_id": "chirp_message",
-    "type": "message_action",
-    "trigger_id": "13345224609.8534564800.6f8ab1f53e13d0cd15f96106292d5536",
-    "response_url": "https://hooks.slack.com/app-actions/T0MJR11A4/21974584944/yk1S9ndf35Q1flupVG5JbpM6",
-    "team": {
-      "id": "T0MJRM1A7",
-      "domain": "pandamonium",
-    },
-    "channel": {
-      "id": "D0LFFBKLZ",
-      "name": "cats"
-    },
-    "user": {
-      "id": "U0D15K92L",
-      "name": "dr_maomao"
-    },
-    "message": {
-      "type": "message",
-      "user": "U0MJRG1AL",
-      "ts": "1516229207.000133",
-      "text": "World's smallest big cat! <https://youtube.com/watch?v=W86cTIoMv2U>"
+function logProcessingTime({ next }) {
+  const startTimeMs = Date.now();
+  next((error, done) => {
+    // This middleware doesn't deal with any errors, so it propagates any truthy value to the previous middleware
+    if (error) {
+      done(error);
+      return;
     }
-  }
+
+    const endTimeMs = Date.now();
+    console.log(`Total processing time: ${endTimeMs - startTimeMs}`);
+
+    // Continue normally
+    done();
+  });
+}
+
+app.use(logProcessingTime)
 ```
 
-## Slapp.options(callbackId:string, actionNameCriteria:string|RegExp, actionValueCriteria:string|RegExp, callback:function)
-
-  Register a new interactive message options handler
-  
-  `options` accepts a `callbackIdPath` like `action`. See `action` for details.
-  
-#### Parameters
-  - `callbackIdPath` string - may be a simple string or a URL path matcher
-  - `actionNameCriteria` string or RegExp - the name of the action [optional]
-  - `actionValueCriteria` string or RegExp - the value of the action [optional]
-  - `callback` function - `(msg, value) => {}` - value is the current value of the option (e.g. partially typed)
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  Example matching callback only
-  
-```js
-  slapp.options('my_callback', (msg, value) => {}
-```
-
-  
-  
-  Example with name matcher
-  
-```js
-  slapp.options('my_callback', 'my_name', (msg, value) => {}
-```
-
-  
-  
-  Example with RegExp matcher criteria:
-  
-```js
-  slapp.options('my_callback', /my_n.+/, (msg, value) => {}
-```
-
-  
-  Example with callback_id path criteria:
-  
-```js
-  slapp.options('/my_callback/:id', (msg, value) => {}
-```
-
-  
-  
-  
-  Example `msg.body` object:
-  
-```js
-  {
-      "name": "musik",
-      "value": "",
-      "callback_id": "select_remote_1234",
-      "team": {
-          "id": "T012AB0A1",
-          "domain": "pocket-calculator"
-      },
-      "channel": {
-          "id": "C012AB3CD",
-          "name": "general"
-      },
-      "user": {
-          "id": "U012A1BCD",
-          "name": "musik"
-      },
-      "action_ts": "1481670445.010908",
-      "message_ts": "1481670439.000007",
-      "attachment_id": "1",
-      "token": "verification_token_string"
-  }
-```
-
-  *
-
-## Slapp.command(command:string, criteria:string|RegExp, callback:function)
-
-  Register a new slash command handler
-  
-#### Parameters
-  - `command` string - the slash command (e.g. "/doit")
-  - `criteria` string or RegExp (e.g "/^create.+$/") [optional]
-  - `callback` function - `(msg) => {}`
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  Example without parameters:
-  
-```js
-  // "/acommand"
-  slapp.command('acommand', (msg) => {
-  }
-```
-
-  
-  
-  Example with RegExp matcher criteria:
-  
-```js
-  // "/acommand create flipper"
-  slapp.command('acommand', 'create (.*)'(msg, text, name) => {
-    // text = 'create flipper'
-    // name = 'flipper'
-  }
-```
-
-  
-  
-  Example `msg` object:
-  
-```js
-  {
-     "type":"command",
-     "body":{
-        "token":"xxxxxxxxxxxxxxxxxxx",
-        "team_id":"TXXXXXXXX",
-        "team_domain":"teamxxxxxxx",
-        "channel_id":"Dxxxxxxxx",
-        "channel_name":"directmessage",
-        "user_id":"Uxxxxxxxx",
-        "user_name":"xxxx.xxxxxxxx",
-        "command":"/doit",
-        "text":"whatever was typed after command",
-        "response_url":"https://hooks.slack.com/commands/TXXXXXXXX/111111111111111111111111111"
-     },
-     "resource":{
-        "app_token":"xoxp-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX",
-        "app_user_id":"UXXXXXXXX",
-        "bot_token":"xoxb-XXXXXXXXXX-XXXXXXXXXXXXXXXXXXXX",
-        "bot_user_id":"UXXXXXXXX"
-     },
-     "meta":{
-        "user_id":"UXXXXXXXX",
-        "channel_id":"DXXXXXXXX",
-        "team_id":"TXXXXXXXX"
-     },
-  }
-```
-
-## Slapp.dialog(callbackId:string, callback:function)
-
-  Register a dialog submission handler for the given callback_id
-  
-#### Parameters
-  - `callbackId` string - the callback_id of the form
-  - `callback` function - `(msg, submission) => {}`
-  
-  
-#### Returns
-  - `this` (chainable)
-  
-  Example;
-  
-```js
-  // "/acommand"
-  slapp.command('my_callback_id', (msg, submission) => {
-    submission.prop_name_1
-  }
-```
-
-  
-  
-  Example `msg` object:
-  
-```js
-  {
-     "type":"action",
-     "body":{
-       "type": "dialog_submission",
-       "submission": {
-         "answer": "two",
-         "feedback": "test"
-       },
-       "callback_id": "xyz",
-       "team": {
-         "id": "T1PR9DEFS",
-         "domain": "aslackdomain"
-       },
-       "user": {
-         "id": "U1ABCDEF",
-         "name": "mikebrevoort"
-       },
-       "channel": {
-         "id": "C1PR520RRR",
-         "name": "random"
-       },
-       "action_ts": "1503445940.478855"
-     },
-  }
-```
-
-
-
-# Message
-
-
-A Message object is created for every incoming Slack event, slash command, and interactive message action.
-It is generally always passed as `msg`.
-
-`msg` has three main top level properties
-- `type` - one of `event`, `command`, `action`
-- `body` - the unmodified payload of the original event
-- `meta` - derived or normalized properties and anything appended by middleware.
-
-`meta` should at least have these properties
-- `app_token` - token for the user for the app
-- `app_user_id` - userID for the user who install ed the app
-- `bot_token` - token for a bot user of the app
-- `bot_user_id` -  userID of the bot user of the app
-    
-
-  - [Message.constructor()](#messageconstructortypestringbodyobjectmetaobject)
-  - [Message.hasResponse()](#messagehasresponse)
-  - [Message.route()](#messageroutefnkeystringstateobjectsecondstoexpirenumber)
-  - [Message.cancel()](#messagecancel)
-  - [Message.say()](#messagesayinputstringobjectarraycallbackfunction)
-  - [Message.respond()](#messagerespondresponseurlstringinputstringobjectarraycallbackfunction)
-  - [Message.thread()](#messagethread)
-  - [Message.unthread()](#messageunthread)
-  - [Message._request()](#message_request)
-  - [Message.isBot()](#messageisbot)
-  - [Message.isBaseMessage()](#messageisbasemessage)
-  - [Message.isThreaded()](#messageisthreaded)
-  - [Message.isDirectMention()](#messageisdirectmention)
-  - [Message.isDirectMessage()](#messageisdirectmessage)
-  - [Message.isMention()](#messageismention)
-  - [Message.isAmbient()](#messageisambient)
-  - [Message.isAnyOf()](#messageisanyofofarray)
-  - [Message.isAuthedTeam()](#messageisauthedteam)
-  - [Message.usersMentioned()](#messageusersmentioned)
-  - [Message.channelsMentioned()](#messagechannelsmentioned)
-  - [Message.subteamGroupsMentioned()](#messagesubteamgroupsmentioned)
-  - [Message.everyoneMentioned()](#messageeveryonementioned)
-  - [Message.channelMentioned()](#messagechannelmentioned)
-  - [Message.hereMentioned()](#messageherementioned)
-  - [Message.linksMentioned()](#messagelinksmentioned)
-  - [Message.stripDirectMention()](#messagestripdirectmention)
-
-## Message.constructor(type:string, body:Object, meta:Object)
-
-  Construct a new Message
-  
-#### Parameters
-  - `type` the type of message (event, command, action, etc.)
-
-## Message.hasResponse()
-
-  May this message be responded to with `msg.respond` because the originating
-  event included a `response_url`. If `hasResponse` returns false, you may
-  still call `msg.respond` while explicitly passing a `response_url`.
-  
-#### Returns `true` if `msg.respond` may be called on this message, implicitly.
-
-## Message.route(fnKey:string, state:Object, secondsToExpire:number)
-
-  Register the next function to route to in a conversation.
-  
-  The route should be registered already through `slapp.route`
-  
-#### Parameters
-  - `fnKey` `string`
-  - `state` `object` arbitrary data to be passed back to your function [optional]
-  - `secondsToExpire` `number` - number of seconds to wait for the next message in the conversation before giving up. Default 60 minutes [optional]
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Message.cancel()
-
-  Explicity cancel pending `route` registration.
-
-## Message.say(input:string|Object|Array, callback:function)
-
-  Send a message through [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage).
-  
-  The current channel and inferred tokens are used as defaults. `input` maybe a
-  `string`, `Object` or mixed `Array` of `strings` and `Objects`. If a string,
-  the value will be set to `text` of the `chat.postmessage` object. Otherwise pass
-  a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage) `Object`.
-  If the current message is part of a thread, the new message will remain
-  in the thread. To control if a message is threaded or not you can use the
-  `msg.thread()` and `msg.unthread()` functions.
-  
-  If `input` is an `Array`, a random value in the array will be selected.
-  
-#### Parameters
-  - `input` the payload to send, maybe a string, Object or Array.
-  - `callback` (err, data) => {}
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Message.respond([responseUrl]:string, input:string|Object|Array, callback:function)
-
-  Respond to a Slash command, interactive message action, or interactive message options request.
-  
-  Slash commands and message actions responses should be passed a [`chat.postmessage`](https://api.slack.com/methods/chat.postMessage)
-  payload. If `respond` is called within 3000ms (2500ms actually with a 500ms buffer) of the original request,
-  the original request will be responded to instead or using the `response_url`. This will keep the
-  action button spinner in sync with an awaiting update and is about 25% more responsive when tested.
-  
-  `input` options are the same as [`say`](#messagesay)
-  
-  
-  If a response to an interactive message options request then an array of options should be passed
-  like:
-  
-```js
-   {
-     "options": [
-       { "text": "value" },
-       { "text": "value" }
-     ]
-   }
-```
-
-  
-  
-#### Parameters
-  - `responseUrl` string - URL provided by a Slack interactive message action or slash command [optional]
-  - `input` the payload to send, maybe a string, Object or Array.
-  - `callback` (err, data) => {}
-  
-  Example:
-  
-```js
-  // responseUrl implied from body.response_url if this is an action or command
-  msg.respond('thanks!', (err) => {})
-```
-
-  
-```js
-  // responseUrl explicitly provided
-  msg.respond(responseUrl, 'thanks!', (err) => {})
-```
-
-  
-```js
-  // input provided as object
-  msg.respond({ text: 'thanks!' }, (err) => {})
-```
-
-  
-```js
-  // input provided as Array
-  msg.respond(['thanks!', 'I :heart: u'], (err) => {})
-```
-
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Message.thread()
-
-  Ensures all subsequent messages created are under a thread of the current message
-  
-  Example:
-  
-```js
-  // current msg is not part of a thread (i.e. does not have thread_ts set)
-  msg.
-   .say('This message will not be part of the thread and will be in the channel')
-   .thread()
-   .say('This message will remain in the thread')
-   .say('This will also be in the thread')
-```
-
-  
-#### Returns
-  - `this` (chainable)
-
-## Message.unthread()
-
-  Ensures all subsequent messages created are not part of a thread
-  
-  Example:
-  
-```js
-  // current msg is part of a thread (i.e. has thread_ts set)
-  msg.
-   .say('This message will remain in the thread')
-   .unthread()
-   .say('This message will not be part of the thread and will be in the channel')
-   .say('This will also not be part of the thread')
-```
-
-  
-  
-#### Returns
-  - `this` (chainable)
-
-## Message._request()
-
-  istanbul ignore next
-
-## Message.isBot()
-
-  Is this from a bot user?
-  
-#### Returns `bool` true if `this` is a message from a bot user
-
-## Message.isBaseMessage()
-
-  Is this an `event` of type `message` without any [subtype](https://api.slack.com/events/message)?
-  
-  
-#### Returns `bool` true if `this` is a message event type with no subtype
-
-## Message.isThreaded()
-
-  Is this an `event` of type `message` without any [subtype](https://api.slack.com/events/message)?
-  
-  
-#### Returns `bool` true if `this` is an event that is part of a thread
-
-## Message.isDirectMention()
-
-  Is this a message that is a direct mention ("@botusername: hi there", "@botusername goodbye!")
-  
-  
-#### Returns `bool` true if `this` is a direct mention
-
-## Message.isDirectMessage()
-
-  Is this a message in a direct message channel (one on one)
-  
-  
-#### Returns `bool` true if `this` is a direct message
-
-## Message.isMention()
-
-  Is this a message where the bot user mentioned anywhere in the message.
-  Only checks for mentions of the bot user and does not consider any other users.
-  
-  
-#### Returns `bool` true if `this` mentions the bot user
-
-## Message.isAmbient()
-
-  Is this a message that's not a direct message or that mentions that bot at
-  all (other users could be mentioned)
-  
-  
-#### Returns `bool` true if `this` is an ambient message
-
-## Message.isAnyOf(of:Array)
-
-  Is this a message that matches any one of the filters
-  
-#### Parameters
-  - `messageFilters` Array - any of `direct_message`, `direct_mention`, `mention` and `ambient`
-  
-  
-#### Returns `bool` true if `this` is a message that matches any of the filters
-
-## Message.isAuthedTeam()
-
-  Return true if the event "team_id" is included in the "authed_teams" array.
-  In other words, this event originated from a team who has installed your app
-  versus a team who is sharing a channel with a team who has installed the app
-  but in fact hasn't installed the app into that team explicitly.
-  There are some events that do not include an "authed_teams" property. In these
-  cases, error on the side of claiming this IS from an authed team.
-  
-#### Returns an Array of user IDs
-
-## Message.usersMentioned()
-
-  Return the user IDs of any users mentioned in the message
-  
-#### Returns an Array of user IDs
-
-## Message.channelsMentioned()
-
-  Return the channel IDs of any channels mentioned in the message
-  
-#### Returns an Array of channel IDs
-
-## Message.subteamGroupsMentioned()
-
-  Return the IDs of any subteams (groups) mentioned in the message
-  
-#### Returns an Array of subteam IDs
-
-## Message.everyoneMentioned()
-
-  Was "@everyone" mentioned in the message
-  
-#### Returns `bool` true if `@everyone` was mentioned
-
-## Message.channelMentioned()
-
-  Was the current "@channel" mentioned in the message
-  
-#### Returns `bool` true if `@channel` was mentioned
-
-## Message.hereMentioned()
-
-  Was the "@here" mentioned in the message
-  
-#### Returns `bool` true if `@here` was mentioned
-
-## Message.linksMentioned()
-
-  Return the URLs of any links mentioned in the message
-  
-#### Returns `Array:string` of URLs of links mentioned in the message
-
-## Message.stripDirectMention()
-
-  Strip the direct mention prefix from the message text and return it. The
-  original text is not modified
-  
-  
-#### Returns `string` original `text` of message with a direct mention of the bot
-  user removed. For example, `@botuser hi` or `@botuser: hi` would produce `hi`.
-  `@notbotuser hi` would produce `@notbotuser hi`
-
-
-# Contributing
-
-We adore contributions. Please include the details of the proposed changes in a Pull Request and ensure `npm test` passes. 👻
-
-### Scripts
-- `npm test` - runs linter and tests with coverage
-- `npm run unit` - runs unit tests without coverage
-- `npm run lint` - just runs JS standard linter
-- `npm run coverage` - runs tests with coverage
-- `npm run lcov` - runs tests with coverage and output lcov report
-- `npm run docs` - regenerates API docs in this README.md
-
-# License
-MIT Copyright (c) 2018 Missions, Robots & Pencils
-
+## Using TypeScript
+
+Bolt offers rich type information that helps you build apps with speed and confidence. For example, when attaching
+listeners for specific Events API event types, you will get rich type hints about the shape of the `event` argument
+including which properties it has.
+
+**TODO**: Document a summary of the various ways to use types.
+
+--------
+
+## Known issues
+
+*  Error handling
+  -  Errors are only understandable to humans by reading their `message`. In order to programmatically handle errors,
+     they will each have a unique `code` assigned to them.
+  -  `App#error()` is not yet implemented. This method will allow apps to register a global error handler, as described
+     in [error handling](#handling-errors).
+
+*  Message text and action constraint pattern matching
+  -  The order of pattern matches in `context.matches` is not completely clear.
+
+*  Missing type information
+  -  Very few Events API
+
+*  Undocumented features
+  -  Each of the `App` initialization options should be documented. There is information about how they can be used
+     in the source code.
+  -  Using `callbackId` for legacy actions and options requests should be documented. There is an example in
+     [acknowledging events](#acknowledging-events), but the action constraints are not explicitly documented.
+  -  Multi-team usage relies on using the `authorize` `App` initialization option and this should be documented. There
+     is information about how this option can be used in the source code.
+  -  Middleware have four distinct options regarding how they might handle an incoming event which should be explicitly
+     documented.
+  -  `context.matches` can be used to find the pattern matches from message text and action constraints RegExp matches.
+
+## Feedback wanted
+
+*  If you are building a new app, the team would like to know what kinds of questions you had along the way. Even if
+   you were able to find the answer yourself (such as by reading the source code), the team would like to help make the
+   answers more obvious. The team also wants to know whether you've been able to write your own middleware, and what
+   kinds of operations you wrote them to do.
+
+*  If you have an existing app built with Hubot or Slapp, the team is hoping you'll attempt migrating the app to use
+   Bolt. We'd appreciate any and all feedback you have about the migration experience. Specifically, we'd like to know
+   where you ran into pain points, like where it was easier to do something in the original code and more difficult with
+   Bolt. If there are external scripts you use with Hubot (installed from npm) that you cannot easily port, the team can
+   help you find a way to migrate that functionality. Also, if there are any capabilities you find missing from Bolt,
+   let us know.
+
+*  What kind of information would be helpful for debugging? Is this information already available by setting the
+   `logLevel` to `LogLevel.DEBUG`?
