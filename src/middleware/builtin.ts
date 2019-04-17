@@ -75,8 +75,6 @@ export function matchConstraints(
     constraints: ActionConstraints,
   ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
   return ({ payload, body, next, context }) => {
-    // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
-    // which matches (and in which order)
     let tempMatches: RegExpExecArray | null;
     const matches: any[] = [];
 
@@ -91,7 +89,7 @@ export function matchConstraints(
         }
       } else {
         if ((tempMatches = constraints.block_id.exec(payload.block_id)) !== null) {
-          matches.concat(tempMatches);
+          matches.push(tempMatches);
         } else {
           return;
         }
@@ -109,7 +107,7 @@ export function matchConstraints(
         }
       } else {
         if ((tempMatches = constraints.action_id.exec(payload.action_id)) !== null) {
-          matches.concat(tempMatches);
+          matches.push(tempMatches);
         } else {
           return;
         }
@@ -126,7 +124,7 @@ export function matchConstraints(
         }
       } else {
         if ((tempMatches = constraints.callback_id.exec(body.callback_id)) !== null) {
-          matches.concat(tempMatches);
+          matches.push(tempMatches);
         } else {
           return;
         }
@@ -146,6 +144,7 @@ export function matchConstraints(
 export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, context, next }) => {
     let tempMatches: RegExpExecArray | null;
+    const matches: string[] = [];
 
     // Filter out messages that don't contain the pattern
     if (typeof pattern === 'string') {
@@ -153,8 +152,15 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
         return;
       }
     } else {
-      if ((tempMatches = pattern.exec(message.text)) !== null) {
-        context['matches'] = tempMatches;
+      while ((tempMatches = pattern.exec(message.text)) !== null) {
+        matches.push(tempMatches[1]);
+        // Avoids an infinite loop if /g isn't at the end of the RegExp
+        if (!pattern.global) {
+          break;
+        }
+      }
+      if (matches.length !== 0) {
+        context['matches'] = matches;
       } else {
         return;
       }
