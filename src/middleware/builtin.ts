@@ -75,6 +75,8 @@ export function matchConstraints(
     constraints: ActionConstraints,
   ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
   return ({ payload, body, next, context }) => {
+    // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
+    // which matches (and in which order)
     let tempMatches: RegExpExecArray | null;
     const matches: any[] = [];
 
