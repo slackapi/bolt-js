@@ -1,4 +1,5 @@
 import { StringIndexed } from '../helpers';
+import { MessageAttachment } from '@slack/types';
 
 /**
  * All known event types in Slack's Events API
@@ -387,6 +388,111 @@ export interface MessageEvent extends StringIndexed {
   user: string;
   text: string;
   ts: string;
+  attachments?: MessageAttachment;
+  edited?: {
+    user: string;
+    ts: string;
+  };
+
+  // TODO: optional types that maybe should flow into other subtypes?
+  is_starred?: boolean;
+  pinned_to?: string[];
+  reactions?: {
+    name: string;
+    count: number;
+    users: string[];
+  }[];
+}
+
+// TODO: are blocks meant to be at the top level here?
+export interface BotMessageEvent extends StringIndexed {
+  type: 'message';
+  subtype: 'bot_message';
+  ts: string;
+  text: string;
+  bot_id: string;
+  username?: string;
+  icons?: {
+    [size: string]: string;
+  };
+
+  // copied from MessageEvent
+  // TODO: is a user really optional? likely for things like IncomingWebhook authored messages
+  user?: string;
+  attachments?: MessageAttachment;
+  edited?: {
+    user: string;
+    ts: string;
+  };
+}
+
+export interface EKMAccessDeniedMessageEvent extends StringIndexed {
+  type: 'message';
+  subtype: 'ekm_access_denied';
+  ts: string;
+  text: string; // This will not have any meaningful content within
+  user: 'UREVOKEDU';
+}
+
+export interface MeMessageEvent extends StringIndexed {
+  type: 'message';
+  subtype: 'me_message';
+  channel: string;
+  user: string;
+  text: string;
+  ts: string;
+}
+
+export interface MessageChangedEvent extends StringIndexed {
+  type: 'message';
+  subtype: 'message_changed';
+  hidden: true;
+  channel: string;
+  ts: string;
+  message: MessageEvent; // TODO: should this be the union of all message events with type 'message'?
+}
+
+export interface MessageDeletedEvent extends StringIndexed {
+  type: 'message';
+  subtype: 'message_deleted';
+  hidden: true;
+  channel: string;
+  ts: string;
+  deleted_ts: string;
+}
+
+export interface MessageRepliedEvent extends StringIndexed {
+  type: 'message';
+  subtype: 'message_replied';
+  hidden: true;
+  channel: string;
+  event_ts: string;
+  ts: string;
+  message: MessageEvent & { // TODO: should this be the union of all message events with type 'message'?
+    thread_ts: string;
+    reply_count: number;
+    replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?
+  };
+}
+
+// the `reply_broadcast` message subtype is omitted because it is discontinued
+
+export interface ThreadBroadcastMessageEvent extends StringIndexed {
+  type: 'message';
+  message: {
+    type: 'message';
+    subtype: 'thread_broadcast';
+    thread_ts: string;
+    user: string;
+    ts: string;
+    root:  MessageEvent & { // TODO: should this be the union of all message events with type 'message'?
+      thread_ts: string;
+      reply_count: number;
+      replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?
+      // TODO: unread_count doesn't appear in any other message event types, is this really the only place its included?
+      unread_count?: number;
+    };
+  };
 }
 
 export interface PinAddedEvent extends StringIndexed {
