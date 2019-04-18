@@ -109,6 +109,8 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }
 }
 
+// TODO: respond to url_verification, and also help a beginner set up Events API (maybe adopt the CLI verify tool)
+
 const respondToSslCheck: RequestHandler = (req, res, next) => {
   if (req.body && req.body.ssl_check) {
     res.send();
