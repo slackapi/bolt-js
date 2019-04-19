@@ -1,5 +1,5 @@
 import { StringIndexed } from '../helpers';
-import { MessageAttachment } from '@slack/types';
+import { MessageAttachment, KnownBlock, Block } from '@slack/types';
 
 /**
  * All known event types in Slack's Events API
@@ -159,12 +159,12 @@ export interface DNDUpdatedEvent extends StringIndexed {
   type: 'dnd_updated';
   user: string;
   dnd_status: {
-    // TODO: some or all of these have to be optional, right?
     dnd_enabled: boolean;
     next_dnd_start_ts: number;
     next_dnd_end_ts: number;
     snooze_enabled: boolean;
     snooze_endtime: number;
+    snooze_remaining: number;
   };
 }
 
@@ -172,7 +172,6 @@ export interface DNDUpdatedUserEvent extends StringIndexed {
   type: 'dnd_updated_user';
   user: string;
   dnd_status: {
-    // TODO: some or all of these have to be optional, right?
     dnd_enabled: boolean;
     next_dnd_start_ts: number;
     next_dnd_end_ts: number;
@@ -388,7 +387,8 @@ export interface MessageEvent extends StringIndexed {
   user: string;
   text: string;
   ts: string;
-  attachments?: MessageAttachment;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
   edited?: {
     user: string;
     ts: string;
@@ -404,7 +404,6 @@ export interface MessageEvent extends StringIndexed {
   }[];
 }
 
-// TODO: are blocks meant to be at the top level here?
 export interface BotMessageEvent extends StringIndexed {
   type: 'message';
   subtype: 'bot_message';
@@ -419,7 +418,8 @@ export interface BotMessageEvent extends StringIndexed {
   // copied from MessageEvent
   // TODO: is a user really optional? likely for things like IncomingWebhook authored messages
   user?: string;
-  attachments?: MessageAttachment;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
   edited?: {
     user: string;
     ts: string;
@@ -499,7 +499,7 @@ export interface PinAddedEvent extends StringIndexed {
   type: 'pin_added';
   user: string;
   channel_id: string;
-  // TODO: incomplete, what are all the types of items? probably message | file | file comment (deprecated)
+  // TODO: incomplete, should be message | file | file comment (deprecated)
   item: {
   };
 }
@@ -508,7 +508,7 @@ export interface PinRemovedEvent extends StringIndexed {
   type: 'pin_removed';
   user: string;
   channel_id: string;
-  // TODO: incomplete, what are all the types of items? probably message | file | file comment (deprecated)
+  // TODO: incomplete, should be message | file | file comment (deprecated)
   item: {
   };
   has_pins: boolean;
@@ -520,7 +520,7 @@ export interface ReactionAddedEvent extends StringIndexed {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, what are all the types of items? probably message | file | file comment (deprecated)
+  // TODO: incomplete, should be message | file | file comment (deprecated)
   // https://api.slack.com/events/reaction_added
   item: {
   };
@@ -532,7 +532,7 @@ export interface ReactionRemovedEvent extends StringIndexed {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, what are all the types of items? probably message | file | file comment (deprecated)
+  // TODO: incomplete, should be message | file | file comment (deprecated)
   // https://api.slack.com/events/reaction_removed
   item: {
   };
@@ -578,9 +578,9 @@ export interface SubteamMembersChanged extends StringIndexed {
   date_previous_update: number;
   date_update: number;
   added_users: string[];
-  added_users_count: string; // are we sure this isn't a number?
+  added_users_count: number;
   removed_users: string[];
-  removed_users_count: string;
+  removed_users_count: number;
 }
 
 export interface SubteamSelfAddedEvent extends StringIndexed {
