@@ -1,5 +1,5 @@
 import util from 'util';
-import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
+import { WebClient, ChatPostMessageArguments, addAppMetadata } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
@@ -34,6 +34,7 @@ import {
   ReceiverEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
+const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
 /** App initialization options */
 export interface AppOptions {
@@ -489,3 +490,6 @@ function singleTeamAuthorization(
     botUserId: await botUserId,
   });
 }
+
+/* Instrumentation */
+addAppMetadata({ name: packageJson.name, version: packageJson.version });
