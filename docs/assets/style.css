@@ -88,7 +88,18 @@ isn't exactly how I'm anticipating. Look into a way to inject classes */
     "head"
     "body"
     "code"
+    "secondary"
     "divider"
+}
+
+.secondary-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 25px;
+  grid-template-areas:
+    "body"
+    "code"
 }
 
 .content .section-wrapper .language-javascript {
@@ -108,11 +119,31 @@ isn't exactly how I'm anticipating. Look into a way to inject classes */
   line-height: 1.75em;
 }
 
+.content .section-wrapper .secondary-content {
+  grid-area: body;
+}
+
+.content .section-wrapper details {
+  grid-area: secondary;
+  font-size: 1em;
+  line-height: 1.75em;
+}
+
 .content .section-wrapper h3 {
   grid-area: head;
   font-size: 1.4em;
   font-weight: 600;
 }
+
+.content .section-wrapper summary {
+  grid-area: head;
+}
+
+/* .content .section-wrapper summary.section-head {
+  grid-area: secondaryhead;
+  font-size: 1em;
+  font-weight: 600;
+} */
 
 .content .section-wrapper hr {
   grid-area: divider;
@@ -151,7 +182,15 @@ isn't exactly how I'm anticipating. Look into a way to inject classes */
     grid-template-areas:
       "head head"
       "body code"
+      "secondary secondary"
       "divider divider"
+  }
+
+  .secondary-wrapper {
+    grid-template-columns: 50% 50%;
+    grid-template-areas:
+      "head head"
+      "body code"
   }
 }
 

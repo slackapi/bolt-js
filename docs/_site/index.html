@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
   
-    <title>Bolt | Bolt</title>
+    <title>Bolt</title>
     <meta name="author" content="Slack">
     <meta name="description" content="A framework that makes Slack app development fast and straight-forward.  With a single interface for Slack’s Web API, Events API, and interactive features,  Bolt gives you the full power of the Slack platform out of the box.">
     <link rel="canonical" href="http://localhost:4000/bolt/">
@@ -128,6 +128,30 @@
 </code></pre>
   </div>
 </div>
+
+<details>
+  <summary>
+    <h4 class="section-head">Initializing without a token</h4>
+  </summary>
+
+  <div class="secondary-wrapper">
+
+    <div class="secondary_content">
+      <p>If you’re using a built-in method (<code class="highlighter-rouge">message()</code>, <code class="highlighter-rouge">event()</code>, <code class="highlighter-rouge">action()</code>, <code class="highlighter-rouge">command()</code>, or <code class="highlighter-rouge">options()</code>), <code class="highlighter-rouge">say()</code> is available to your listener middleware whenever there is an associated channel (the conversation a message was posted in, for example). <code class="highlighter-rouge">say()</code> accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated channel.</p>
+
+      <p>In the case that you aren’t in listener middleware for one of the built-in methods or you want to do something more advanced (like handle specific errors), you can call <code class="highlighter-rouge">chat.postMessage</code> using the client attached to your Slapp instance.</p>
+    </div>
+
+    <div class="secondary-code">
+      <div class="language-javascript highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'bold'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`*</span><span class="p">${</span><span class="nx">command</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">*`</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</details>
+
 
 
             <hr>
