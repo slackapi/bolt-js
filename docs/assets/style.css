@@ -43,7 +43,7 @@ body {
   font-size: 1.5em;
 }
 
-.panel .sidebar_content .logo .version {
+.panel .sidebar_content .logo .version a {
   color: #868686;
   font-size: 0.75em;
 }
