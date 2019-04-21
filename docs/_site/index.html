@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Bolt | Bolt</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward.  With a single interface for Slack’s Web API, Events API, and interactive features,  Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt/">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    <link href="http://localhost:4000/bolt/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="https://a.slack-edge.com/4f28/img/icons/favicon-32.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+    <link rel="icon" href="https://a.slack-edge.com/4f28/img/icons/app-256.png" sizes="256x256" type="image/png" />
+  
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://a.slack-edge.com/4f28/img/icons/ios-152.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://a.slack-edge.com/4f28/img/icons/ios-144.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://a.slack-edge.com/4f28/img/icons/ios-120.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://a.slack-edge.com/4f28/img/icons/ios-114.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://a.slack-edge.com/4f28/img/icons/ios-72.png" />
+    <link rel="apple-touch-icon-precomposed" href="https://a.slack-edge.com/4f28/img/icons/ios-57.png" />
+  
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+    <meta name="msapplication-TileImage" content="https://a.slack-edge.com/4f28/img/icons/app-144.png" />
+  
+  </head>
+
+<body>
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar_content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt/assets/bolt-logo.png">
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <span class="version">
+      v1.0.0
+    </span>
+  </div>
+
+  <ul class="sidebar_section">
+    <a href="#basic"><li class="title">Main concepts</li></a>
+    
+      <a href="http://localhost:4000/bolt/#listening-messages"><li>Listening to messages</li></a>
+    
+      <a href="http://localhost:4000/bolt/#sending-messages"><li>Sending messages</li></a>
+    
+      <a href="http://localhost:4000/bolt/#web-api"><li>Using the Web API</li></a>
+    
+  </ul>
+
+  <ul class="sidebar_section">
+    <a href="#advanced"><li class="title">Advanced concepts</li></a>
+    
+      <a href="http://localhost:4000/bolt/#error-handling"><li>Handling errors</li></a>
+    
+  </ul>
+</div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+  </div>
+</div>
+        </div>
+
+        <div id="basic">
+        
+          <div class="section-wrapper">
+            <h3 id="listening-messages">Listening to messages</h3>
+
+            <div class="section_content">
+  <p>To listen to messages that your app has access to receive, you can use the <code class="highlighter-rouge">message()</code> method. This method adds listener middleware that filters out any events that aren’t of type <code class="highlighter-rouge">message</code>.</p>
+
+  <p>It accepts an optional <code class="highlighter-rouge">pattern</code> parameter of type <code class="highlighter-rouge">string</code> or <code class="highlighter-rouge">RegExp</code> object that will filter out any messages that don’t match.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// This will match any message that contains 👋</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="s1">':wave:'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">say</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`Hello, &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;`</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="sending-messages">Sending messages</h3>
+
+            <div class="section_content">
+  <p>If you’re using a built-in method (<code class="highlighter-rouge">message()</code>, <code class="highlighter-rouge">event()</code>, <code class="highlighter-rouge">action()</code>, <code class="highlighter-rouge">command()</code>, or <code class="highlighter-rouge">options()</code>), <code class="highlighter-rouge">say()</code> is available to your listener middleware whenever there is an associated channel (the conversation a message was posted in, for example). <code class="highlighter-rouge">say()</code> accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated channel.</p>
+
+  <p>In the case that you aren’t in listener middleware for one of the built-in methods or you want to do something more advanced (like handle specific errors), you can call <code class="highlighter-rouge">chat.postMessage</code> using the client attached to your Slapp instance.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'bold'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`*</span><span class="p">${</span><span class="nx">command</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">*`</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="web-api">Using the Web API</h3>
+
+            <div class="section_content">
+  <p>You can call any Web API method using the client attached to your Slapp instance under the <code class="highlighter-rouge">client</code> key (given that your app has the appropriate scopes). This is an instance of theour @slack/web-api client, so you can call a method the same way you would with that package.</p>
+
+  <p>The token used to initialize Bolt can be found in the <code class="highlighter-rouge">context</code> object, which can be helpful when you’re making calls and need to pass the token yourself.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// Epoch for September 30, 2019 11:59:59 PM</span>
+<span class="kd">const</span> <span class="nx">whenSeptemberEnds</span> <span class="o">=</span> <span class="mi">1569887999</span><span class="p">;</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="s1">'wake me up'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">context</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="c1">// Call the chat.scheduleMessage method</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">scheduleMessage</span><span class="p">({</span>
+      <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+      <span class="na">channel</span><span class="p">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">channel</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+      <span class="na">post_at</span><span class="p">:</span> <span class="nx">whenSeptemberEnds</span><span class="p">,</span>
+      <span class="na">text</span><span class="p">:</span> <span class="s1">'Summer has come and passed'</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+  <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+        </div>
+
+        <div id="advanced">
+        
+          <div class="section-wrapper">
+            <h3 id="error-handling">Handling errors</h3>
+
+            <div class="section_content">
+  <p>If an error occurs in a listener middleware, it’s recommended you handle it directly. However, there are cases where errors may occur after your listener middleware has returned (like <code class="highlighter-rouge">say()</code> and <code class="highlighter-rouge">respond()</code>, or not calling <code class="highlighter-rouge">ack()</code>). By default, these errors will be logged to the console. To handle them yourself, you can attach a global error handler to your app using the <code class="highlighter-rouge">App.prototype.error(fn)</code> method.</p>
+
+  <p>If you want more control over errors, it’s advised to use the <code class="highlighter-rouge">chat.postMessage</code> method attached to your app under the <code class="highlighter-rouge">client</code> key. This returns a <code class="highlighter-rouge">Promise</code> that can be caught to handle the error.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="nx">app</span><span class="p">.</span><span class="nx">error</span><span class="p">((</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="c1">// Check the details of the error to handle cases where you should retry sending a message or stop the app</span>
+	<span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+        </div>
+    </div>
+
+  </div>
+</body>
+</html>

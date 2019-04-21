@@ -1,0 +1,48 @@
+---
+sidebar_style: main
+---
+<!DOCTYPE html>
+<html>
+
+{% include head.html %}
+
+<body>
+  <div class="wrapper">
+    <div class="panel">
+      {% include en/sidebar.html %}
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          {% include en/header.html %}
+        </div>
+
+        <div id="basic">
+        {% for section in site.basic %}
+          <div class="section-wrapper">
+            <h3 id="{{section.slug}}">{{ section.title }}</h3>
+
+            {{ section.content | markdownify }}
+
+            <hr>
+          </div>
+        {% endfor %}
+        </div>
+
+        <div id="advanced">
+        {% for section in site.advanced %}
+          <div class="section-wrapper">
+            <h3 id="{{section.slug}}">{{ section.title }}</h3>
+
+            {{ section.content | markdownify }}
+
+            <hr>
+          </div>
+        {% endfor %}
+        </div>
+    </div>
+
+  </div>
+</body>
+</html>
