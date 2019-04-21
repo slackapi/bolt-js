@@ -1,17 +1,21 @@
+/* Color variables */
 :root {
   --light-grey: #F8F8F8;
   --blue: #1264A3;
   --light-blue: #B8D1E3;
+  --white: #FFFFFF;
+  --black: #000000;
 }
 
 body {
-  background-color: #FFFFFF;
+  background-color: var(--white);
 }
 
 .content {
   grid-area: content;
 }
 
+/* Sidebar */
 .panel {
   position: fixed;
   width: 20%;
@@ -21,137 +25,63 @@ body {
   height: 100%;
 }
 
-.panel .sidebar_content {
+.panel .sidebar-content {
   width: 70%;
   margin: 30px auto 20px auto;
   left: 1em;
 }
 
-.panel .sidebar_content .logo {
+.panel .sidebar-content .logo {
   padding-top: 1em;
 }
 
-.panel .sidebar_content .logo .icon img {
+.panel .sidebar-content .logo .icon img {
   width: 16px;
   margin-right: 4px;
   margin-top: -8px;
   margin-left: -15px;
 }
 
-.panel .sidebar_content .logo .name {
+.panel .sidebar-content .logo .name {
   font-weight: 800;
   font-size: 1.5em;
 }
 
-.panel .sidebar_content .logo .version a {
+.panel .sidebar-content .logo .version a {
   color: #868686;
   font-size: 0.75em;
 }
 
-.panel .sidebar_content ul.sidebar_section {
+.panel .sidebar-content ul.sidebar-section {
   list-style: none;
   padding-top: 2.5em;
   margin: 0;
   font-size: 0.80em;
 }
 
-.panel .sidebar_content ul.sidebar_section li {
+.panel .sidebar-content ul.sidebar-section li {
   border-radius: 6px;
   padding-left: 10px;
   padding-top: 2px;
   padding-bottom: 2px;
   margin: 3px 0;
-  color: #000000;
+  color: var(--black);
 }
 
-.panel .sidebar_content ul.sidebar_section li:hover {
+.panel .sidebar-content ul.sidebar-section li:hover {
   background-color: #D7D7D7;
 }
 
-.panel .sidebar_content ul.sidebar_section li.active {
+.panel .sidebar-content ul.sidebar-section li.active {
   background-color: var(--blue);
-  color: #FFF;
+  color: var(--white);
 }
 
-.panel .sidebar_content ul.sidebar_section li.title {
+.panel .sidebar-content ul.sidebar-section li.title {
   font-weight: 600;
 }
 
-/* TODO: This method is very flaky if the markdown 
-isn't exactly how I'm anticipating. Look into a way to inject classes */
-.section-wrapper {
-  width: 90%;
-  margin: 0 auto 30px auto;
-  display: grid;
-  grid-gap: 25px;
-  grid-template-areas: 
-    "head"
-    "body"
-    "code"
-    "secondary"
-    "divider"
-}
-
-.secondary-wrapper {
-  width: 100%;
-  margin: 0 auto;
-  display: grid;
-  grid-gap: 25px;
-  grid-template-areas:
-    "body"
-    "code"
-}
-
-.content .section-wrapper .language-javascript {
-  grid-area: code;
-}
-
-.content .section-wrapper .language-javascript pre {
-  background-color: var(--light-grey) !important;
-  background-image: none;
-  padding: 2em;
-  border: 1px solid #DDDDDD;
-}
-
-.content .section-wrapper .section_content {
-  grid-area: body;
-  font-size: 1em;
-  line-height: 1.75em;
-}
-
-.content .section-wrapper .secondary-content {
-  grid-area: body;
-}
-
-.content .section-wrapper details {
-  grid-area: secondary;
-  font-size: 1em;
-  line-height: 1.75em;
-}
-
-.content .section-wrapper h3 {
-  grid-area: head;
-  font-size: 1.4em;
-  font-weight: 600;
-}
-
-.content .section-wrapper summary {
-  grid-area: head;
-}
-
-/* .content .section-wrapper summary.section-head {
-  grid-area: secondaryhead;
-  font-size: 1em;
-  font-weight: 600;
-} */
-
-.content .section-wrapper hr {
-  grid-area: divider;
-  height: 1px;
-  border-top: 1px solid #DDD;
-  width: 100%;
-}
-
+/* Main page */
 .header {
   width: 95%;
   margin: 0 auto;
@@ -170,6 +100,76 @@ isn't exactly how I'm anticipating. Look into a way to inject classes */
     "divider"
 }
 
+/* Main page content */
+.section-wrapper {
+  width: 90%;
+  margin: 0 auto 30px auto;
+  display: grid;
+  grid-gap: 25px;
+  grid-template-areas: 
+    "head"
+    "body"
+    "code"
+    "secondary"
+    "divider"
+}
+
+.content .section-wrapper .language-javascript {
+  grid-area: code;
+}
+
+.content .section-wrapper .language-javascript pre {
+  background-color: var(--light-grey) !important;
+  background-image: none;
+  padding: 2em;
+  border: 1px solid #DDDDDD;
+}
+
+.content .section-wrapper .section-content {
+  grid-area: body;
+  font-size: 1em;
+  line-height: 1.75em;
+}
+
+.content .section-wrapper h3 {
+  grid-area: head;
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.content .section-wrapper hr {
+  grid-area: divider;
+  height: 1px;
+  border-top: 1px solid #DDD;
+  width: 100%;
+}
+
+/* Secondary content */
+.secondary-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 25px;
+  grid-template-areas:
+    "body"
+    "code"
+}
+
+.content .section-wrapper .secondary-content {
+  grid-area: body;
+}
+
+.content .section-wrapper details {
+  grid-area: secondary;
+  font-size: 1em;
+  line-height: 1.75em;
+}
+
+.content .section-wrapper summary {
+  grid-area: head;
+}
+
+/* Responsive */
 @media (min-width: 550px) {
   .wrapper {
     grid-template-columns: 20% auto;
@@ -199,6 +199,7 @@ isn't exactly how I'm anticipating. Look into a way to inject classes */
     display: none;
   }
 }
+
 
 /*
  * Github theme stylesheet from: http://jwarby.github.io/jekyll-pygments-themes/languages/javascript.html

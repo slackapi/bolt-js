@@ -1,4 +1,4 @@
-<div class="sidebar_content">
+<div class="sidebar-content">
   <div class="logo">
     <span class="icon">
       <img src="{{ site.url | append: site.baseurl }}/assets/bolt-logo.png"/>
@@ -13,14 +13,14 @@
     </span>
   </div>
 
-  <ul class="sidebar_section">
+  <ul class="sidebar-section">
     <a href="#basic"><li class="title">Main concepts</li></a>
     {% for section in site.basic %}
       <a href="{{ site.url | append: site.baseurl }}/#{{ section.slug }}"><li>{{section.title}}</li></a>
     {% endfor %}
   </ul>
 
-  <ul class="sidebar_section">
+  <ul class="sidebar-section">
     <a href="#advanced"><li class="title">Advanced concepts</li></a>
     {% for section in site.advanced %}
       <a href="{{ site.url | append: site.baseurl }}/#{{ section.slug }}"><li>{{section.title}}</li></a>

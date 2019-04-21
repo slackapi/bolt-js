@@ -39,7 +39,7 @@
 <body>
   <div class="wrapper">
     <div class="panel">
-      <div class="sidebar_content">
+      <div class="sidebar-content">
   <div class="logo">
     <span class="icon">
       <img src="http://localhost:4000/bolt/assets/bolt-logo.png">
@@ -54,7 +54,7 @@
     </span>
   </div>
 
-  <ul class="sidebar_section">
+  <ul class="sidebar-section">
     <a href="#basic"><li class="title">Main concepts</li></a>
     
       <a href="http://localhost:4000/bolt/#listening-messages"><li>Listening to messages</li></a>
@@ -65,7 +65,7 @@
     
   </ul>
 
-  <ul class="sidebar_section">
+  <ul class="sidebar-section">
     <a href="#advanced"><li class="title">Advanced concepts</li></a>
     
       <a href="http://localhost:4000/bolt/#error-handling"><li>Handling errors</li></a>
@@ -91,7 +91,7 @@
           <div class="section-wrapper">
             <h3 id="listening-messages">Listening to messages</h3>
 
-            <div class="section_content">
+            <div class="section-content">
   <p>To listen to messages that your app has access to receive, you can use the <code class="highlighter-rouge">message()</code> method. This method adds listener middleware that filters out any events that aren’t of type <code class="highlighter-rouge">message</code>.</p>
 
   <p>It accepts an optional <code class="highlighter-rouge">pattern</code> parameter of type <code class="highlighter-rouge">string</code> or <code class="highlighter-rouge">RegExp</code> object that will filter out any messages that don’t match.</p>
@@ -114,7 +114,7 @@
           <div class="section-wrapper">
             <h3 id="sending-messages">Sending messages</h3>
 
-            <div class="section_content">
+            <div class="section-content">
   <p>If you’re using a built-in method (<code class="highlighter-rouge">message()</code>, <code class="highlighter-rouge">event()</code>, <code class="highlighter-rouge">action()</code>, <code class="highlighter-rouge">command()</code>, or <code class="highlighter-rouge">options()</code>), <code class="highlighter-rouge">say()</code> is available to your listener middleware whenever there is an associated channel (the conversation a message was posted in, for example). <code class="highlighter-rouge">say()</code> accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated channel.</p>
 
   <p>In the case that you aren’t in listener middleware for one of the built-in methods or you want to do something more advanced (like handle specific errors), you can call <code class="highlighter-rouge">chat.postMessage</code> using the client attached to your Slapp instance.</p>
@@ -136,19 +136,18 @@
 
   <div class="secondary-wrapper">
 
-    <div class="secondary_content">
+    <div class="secondary-content">
       <p>If you’re using a built-in method (<code class="highlighter-rouge">message()</code>, <code class="highlighter-rouge">event()</code>, <code class="highlighter-rouge">action()</code>, <code class="highlighter-rouge">command()</code>, or <code class="highlighter-rouge">options()</code>), <code class="highlighter-rouge">say()</code> is available to your listener middleware whenever there is an associated channel (the conversation a message was posted in, for example). <code class="highlighter-rouge">say()</code> accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated channel.</p>
 
       <p>In the case that you aren’t in listener middleware for one of the built-in methods or you want to do something more advanced (like handle specific errors), you can call <code class="highlighter-rouge">chat.postMessage</code> using the client attached to your Slapp instance.</p>
     </div>
 
-    <div class="secondary-code">
-      <div class="language-javascript highlighter-rouge">
+    <div class="language-javascript highlighter-rouge">
 <div class="highlight"><pre class="highlight"><code><span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'bold'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
   <span class="nx">say</span><span class="p">(</span><span class="s2">`*</span><span class="p">${</span><span class="nx">command</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">*`</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div>      </div>
-    </div>
+</code></pre></div>    </div>
+
   </div>
 </details>
 
@@ -160,7 +159,7 @@
           <div class="section-wrapper">
             <h3 id="web-api">Using the Web API</h3>
 
-            <div class="section_content">
+            <div class="section-content">
   <p>You can call any Web API method using the client attached to your Slapp instance under the <code class="highlighter-rouge">client</code> key (given that your app has the appropriate scopes). This is an instance of theour @slack/web-api client, so you can call a method the same way you would with that package.</p>
 
   <p>The token used to initialize Bolt can be found in the <code class="highlighter-rouge">context</code> object, which can be helpful when you’re making calls and need to pass the token yourself.</p>
@@ -200,7 +199,7 @@
           <div class="section-wrapper">
             <h3 id="error-handling">Handling errors</h3>
 
-            <div class="section_content">
+            <div class="section-content">
   <p>If an error occurs in a listener middleware, it’s recommended you handle it directly. However, there are cases where errors may occur after your listener middleware has returned (like <code class="highlighter-rouge">say()</code> and <code class="highlighter-rouge">respond()</code>, or not calling <code class="highlighter-rouge">ack()</code>). By default, these errors will be logged to the console. To handle them yourself, you can attach a global error handler to your app using the <code class="highlighter-rouge">App.prototype.error(fn)</code> method.</p>
 
   <p>If you want more control over errors, it’s advised to use the <code class="highlighter-rouge">chat.postMessage</code> method attached to your app under the <code class="highlighter-rouge">client</code> key. This returns a <code class="highlighter-rouge">Promise</code> that can be caught to handle the error.</p>
