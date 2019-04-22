@@ -19,10 +19,11 @@ body {
 .panel {
   position: fixed;
   width: 20%;
+  height: 100%;
+  overflow: auto;
   top: 0;
   left: 0;
   background-color: var(--light-grey);
-  height: 100%;
 }
 
 .panel .sidebar-content {
@@ -200,6 +201,9 @@ body {
 
 @media (max-width: 550px) {
   .header {
+    display: none;
+  }
+  .panel {
     display: none;
   }
 }
