@@ -34,6 +34,7 @@ import {
   ReceiverEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
+import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
 const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
 /** App initialization options */
@@ -86,7 +87,7 @@ export interface ActionConstraints {
 }
 
 export interface ErrorHandler {
-  (error: Error): void;
+  (error: CodedError): void;
 }
 
 /**
@@ -137,11 +138,17 @@ export default class App {
 
     if (token !== undefined) {
       if (authorize !== undefined) {
-        throw new Error(`Both token and authorize options provided. ${tokenUsage}`);
+        throw errorWithCode(
+          `Both token and authorize options provided. ${tokenUsage}`,
+          ErrorCode.AppInitializationError,
+        );
       }
       this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
     } else if (authorize === undefined) {
-      throw new Error(`No token and no authorize options provided. ${tokenUsage}`);
+      throw errorWithCode(
+        `No token and no authorize options provided. ${tokenUsage}`,
+        ErrorCode.AppInitializationError,
+      );
     } else {
       this.authorize = authorize;
     }
@@ -154,8 +161,11 @@ export default class App {
       this.receiver = new ExpressReceiver({ signingSecret, endpoints });
     } else if (receiver === undefined) {
       // Check for custom receiver
-      throw new Error('Signing secret not found, so could not initialize the default receiver. Set a signing secret ' +
-        'or use a custom receiver.');
+      throw errorWithCode(
+        'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+        'custom receiver.',
+        ErrorCode.AppInitializationError,
+      );
     } else {
       this.receiver = receiver;
     }
@@ -290,6 +300,9 @@ export default class App {
    * Handles events from the receiver
    */
   private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
+    // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
+    // or even all of the args, as properties of the error. This would give error handling code some ability to deal
+    // with "finally" type error situations.
 
     // Introspect the body to determine what type of incoming event is being handled, and any channel context
     const { type, conversationId } = getTypeAndConversation(body);
@@ -304,16 +317,23 @@ export default class App {
     const bodyArg = body as AnyMiddlewareArgs['body'];
 
     // Initialize context (shallow copy to enforce object identity separation)
-    const context: Context = { ...(await this.authorize(buildSource(type, conversationId, bodyArg), bodyArg)) };
+    const source = buildSource(type, conversationId, bodyArg);
+    const authorizeResult = await (this.authorize(source, bodyArg).catch((error) => {
+      this.onGlobalError(authorizationErrorFromOriginal(error));
+    }));
+    if (authorizeResult === undefined) {
+      this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+      return;
+    }
+    const context: Context = { ...authorizeResult };
 
-    // Factory for say() argument
+    // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.userToken;
       return (message: Parameters<SayFn>[0]) => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
         this.client.chat.postMessage(postMessageArguments)
-          // TODO: create a specific error code
           .catch(this.onGlobalError);
       };
     };
@@ -400,7 +420,7 @@ export default class App {
           );
         });
       },
-      (globalError?: Error) => {
+      (globalError?: CodedError | Error) => {
         if (globalError !== undefined) {
           this.onGlobalError(globalError);
         }
@@ -413,7 +433,7 @@ export default class App {
    * Global error handler. The final destination for all errors (hopefully).
    */
   private onGlobalError(error: Error): void {
-    this.errorHandler(error);
+    this.errorHandler(asCodedError(error));
   }
 
 }
@@ -493,3 +513,15 @@ function singleTeamAuthorization(
 
 /* Instrumentation */
 addAppMetadata({ name: packageJson.name, version: packageJson.version });
+
+/* Error handling helpers */
+function authorizationErrorFromOriginal(original: Error): AuthorizationError {
+  const error = errorWithCode('Authorization of incoming event did not succeed.', ErrorCode.AuthorizationError);
+  (error as AuthorizationError).original = original;
+  return error as AuthorizationError;
+}
+
+export interface AuthorizationError extends CodedError {
+  code: ErrorCode.AuthorizationError;
+  original: Error;
+}

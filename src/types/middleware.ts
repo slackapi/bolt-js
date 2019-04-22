@@ -3,6 +3,7 @@ import { SlackEventMiddlewareArgs } from './events';
 import { SlackActionMiddlewareArgs } from './actions';
 import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
+import { CodedError, ErrorCode } from '../errors';
 
 export type AnyMiddlewareArgs =
   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs | SlackOptionsMiddlewareArgs;
@@ -26,4 +27,9 @@ export interface NextMiddleware {
   (error: Error): void;
   (postProcess: PostProcessFn): void;
   (): void;
+}
+
+export interface ContextMissingPropertyError extends CodedError {
+  code: ErrorCode.ContextMissingPropertyError;
+  missingProperty: string;
 }
