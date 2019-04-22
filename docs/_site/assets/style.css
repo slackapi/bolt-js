@@ -169,6 +169,10 @@ body {
   grid-area: head;
 }
 
+.content .section-wrapper summary h4 {
+  display: inline;
+}
+
 /* Responsive */
 @media (min-width: 550px) {
   .wrapper {

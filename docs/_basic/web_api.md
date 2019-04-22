@@ -1,17 +1,17 @@
 ---
 title: Using the Web API
-tags: web-api client
 slug: web-api
+order: 3
 ---
 
 <div class="section-content">
-You can call any Web API method using the client attached to your Slapp instance under the `client` key (given that your app has the appropriate scopes). This is an instance of theour @slack/web-api client, so you can call a method the same way you would with that package.
+You can call [any Web API method](https://api.slack.com/methods) using the client attached to your Bolt instance under the `client` key (given that your app has the appropriate scopes). When you call one of the methods on the `client`, it will return a promise containing the response from Slack.
 
 The token used to initialize Bolt can be found in the `context` object, which can be helpful when you’re making calls and need to pass the token yourself.
 </div>
 
 ```javascript
-// Epoch for September 30, 2019 11:59:59 PM
+// Unix Epoch time for September 30, 2019 11:59:59 PM
 const whenSeptemberEnds = 1569887999;
 
 app.message('wake me up', async ({ message, context }) => {
