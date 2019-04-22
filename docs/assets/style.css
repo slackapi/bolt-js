@@ -209,14 +209,14 @@ body {
  * Github theme stylesheet from: http://jwarby.github.io/jekyll-pygments-themes/languages/javascript.html
  */
  .highlight .hll { background-color: #ffffcc }
- .highlight .c { color: #999988; font-style: italic } /* Comment */
+ .highlight .c { color: #999988; } /* Comment */
  .highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
  .highlight .k { color: #000000; font-weight: bold } /* Keyword */
  .highlight .o { color: #000000; font-weight: bold } /* Operator */
- .highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
- .highlight .cp { color: #999999; font-weight: bold; font-style: italic } /* Comment.Preproc */
- .highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
- .highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
+ .highlight .cm { color: #999988; } /* Comment.Multiline */
+ .highlight .cp { color: #999999; font-weight: bold; } /* Comment.Preproc */
+ .highlight .c1 { color: #999988; } /* Comment.Single */
+ .highlight .cs { color: #999999; font-weight: bold; } /* Comment.Special */
  .highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
  .highlight .ge { color: #000000; font-style: italic } /* Generic.Emph */
  .highlight .gr { color: #aa0000 } /* Generic.Error */
