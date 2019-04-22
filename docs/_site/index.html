@@ -81,7 +81,22 @@
   <ul class="sidebar-section">
     <a href="#advanced"><li class="title">Advanced concepts</li></a>
     
+    
       <a href="http://localhost:4000/bolt/#error-handling"><li>Handling errors</li></a>
+    
+      <a href="http://localhost:4000/bolt/#authorization"><li>Authorization</li></a>
+    
+      <a href="http://localhost:4000/bolt/#conversation-store"><li>Conversation stores</li></a>
+    
+      <a href="http://localhost:4000/bolt/#global-middleware"><li>Global middleware</li></a>
+    
+      <a href="http://localhost:4000/bolt/#listener-middleware"><li>Listener middleware</li></a>
+    
+      <a href="http://localhost:4000/bolt/#context"><li>Adding context</li></a>
+    
+      <a href="http://localhost:4000/bolt/#logging"><li>Logging</li></a>
+    
+      <a href="http://localhost:4000/bolt/#receiver"><li>Customizing a receiver</li></a>
     
   </ul>
 </div>
@@ -493,14 +508,15 @@
         </div>
 
         <div id="advanced">
-        
+          
+          
           <div class="section-wrapper">
             <h3 id="error-handling">Handling errors</h3>
 
             <div class="section-content">
   <p>If an error occurs in a listener middleware, it’s recommended you handle it directly. However, there are cases where errors may occur after your listener middleware has returned (like <code class="highlighter-rouge">say()</code> and <code class="highlighter-rouge">respond()</code>, or not calling <code class="highlighter-rouge">ack()</code>). By default, these errors will be logged to the console. To handle them yourself, you can attach a global error handler to your app using the <code class="highlighter-rouge">App.prototype.error(fn)</code> method.</p>
 
-  <p>If you want more control over errors, it’s advised to use the <code class="highlighter-rouge">chat.postMessage</code> method attached to your app under the <code class="highlighter-rouge">client</code> key. This returns a <code class="highlighter-rouge">Promise</code> that can be caught to handle the error.</p>
+  <p>If you want more control over errors, it’s advised to use the <a href="https://api.slack.com/methods/chat.postMessage"><code class="highlighter-rouge">chat.postMessage</code></a> method attached to your app under the <code class="highlighter-rouge">client</code> key. This returns a <code class="highlighter-rouge">Promise</code> that can be caught to handle the error.</p>
 </div>
 
 <div class="language-javascript highlighter-rouge">
@@ -509,6 +525,328 @@
 	<span class="c1">// Check the details of the error to handle cases where you should retry sending a message or stop the app</span>
 	<span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
 <span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="authorization">Authorization</h3>
+
+            <div class="section-content">
+  <p>Custom apps installed on just one team can define <code class="highlighter-rouge">token</code> (and optionally <code class="highlighter-rouge">botId</code> and <code class="highlighter-rouge">botUserId</code>) at the time of app initialization. But in the case you want to handle multiple tokens, authorization functions can be passed in rather than a <code class="highlighter-rouge">token</code>. Authorization functions must have <code class="highlighter-rouge">source</code> and <code class="highlighter-rouge">body</code> as parameters and are expected to return a Promise that resolves to an <code class="highlighter-rouge">AuthorizeResult</code>.</p>
+
+  <p><code class="highlighter-rouge">source</code> will be provided to an authorize function and will always contain a <code class="highlighter-rouge">teamId</code>, and will contain an <code class="highlighter-rouge">enterpriseId</code>, a <code class="highlighter-rouge">userId</code>, and a <code class="highlighter-rouge">conversationId</code> when they exist for the event.</p>
+
+  <p><code class="highlighter-rouge">body</code> will be provided as the request body of the event.</p>
+
+  <p>After you app is initialized, the authorization function will be run as an incoming event is passed from the Receiver. This will give opportunity to add the proper token and bot user and app IDs (which are used for the builtin <code class="highlighter-rouge">ignoreSelf</code> middleware).</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// NOTE: This is for demonstration purposes only.</span>
+<span class="c1">// All sensitive data should be stored in a secure database</span>
+<span class="kd">let</span> <span class="nx">teamInfo</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">'E1234A12AB'</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s1">'T12345'</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-123abc'</span><span class="p">,</span>
+      <span class="na">botId</span><span class="p">:</span> <span class="s1">'B1251'</span><span class="p">,</span>
+      <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U12385'</span> 
+    <span class="p">},</span>
+    <span class="s1">'T56789'</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-456def'</span><span class="p">,</span>
+      <span class="na">botId</span><span class="p">:</span> <span class="s1">'B3219'</span><span class="p">,</span>
+      <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U45819'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="s1">'E5678B23CD'</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s1">'T77712'</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-102anc'</span><span class="p">,</span>
+      <span class="na">botId</span><span class="p">:</span> <span class="s1">'B5910'</span><span class="p">,</span>
+      <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U1239'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">authorizeFn</span> <span class="o">=</span> <span class="k">async</span> <span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Fetch team info from database. You could also set userToken instead.</span>
+  <span class="kd">const</span> <span class="nx">fetchAuthorizedTeam</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">teamInfo</span><span class="p">[</span><span class="nx">source</span><span class="p">.</span><span class="nx">enterpriseId</span><span class="p">][</span><span class="nx">source</span><span class="p">.</span><span class="nx">teamId</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="p">?</span>
+      <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">teamInfo</span><span class="p">[</span><span class="nx">source</span><span class="p">.</span><span class="nx">enterpriseId</span><span class="p">][</span><span class="nx">source</span><span class="p">.</span><span class="nx">teamId</span><span class="p">])</span> <span class="p">:</span>
+      <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">();</span>
+  <span class="p">});</span>
+
+  <span class="kd">const</span> <span class="nx">authorizedTeam</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">fetchAuthorizedTeam</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">({</span>
+    <span class="na">botToken</span><span class="p">:</span> <span class="nx">authorizedTeam</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+    <span class="na">botId</span><span class="p">:</span> <span class="nx">authorizedTeam</span><span class="p">.</span><span class="nx">botId</span><span class="p">,</span>
+    <span class="na">botUserId</span><span class="p">:</span> <span class="nx">authorizedTeam</span><span class="p">.</span><span class="nx">botUserId</span><span class="p">,</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="conversation-store">Conversation stores</h3>
+
+            <div class="section-content">
+  <p>Bolt includes support for a store, which sets and retrieves state related to a conversation. Conversation stores have two methods:</p>
+  <ul>
+    <li>
+<code class="highlighter-rouge">set()</code> modifies conversation state. <code class="highlighter-rouge">set()</code> requires a <code class="highlighter-rouge">conversationId</code> of type string, <code class="highlighter-rouge">value</code> that can be any type, and an optional <code class="highlighter-rouge">expiresAt</code> of type number.  <code class="highlighter-rouge">set()</code> returns a <code class="highlighter-rouge">Promise</code>.</li>
+    <li>
+<code class="highlighter-rouge">get()</code> fetches conversation state from the store. Get requires a <code class="highlighter-rouge">conversationId</code> of type string and returns a Promise with the conversation’s state.</li>
+  </ul>
+
+  <p><code class="highlighter-rouge">conversationContext()</code> is a built-in <a href="#global-middleware">global middleware</a> that allows conversations to be updated by middleware. When receiving an event, middleware functions can use <code class="highlighter-rouge">context.updateConversation()</code> to set state and reading from <code class="highlighter-rouge">context.conversation</code> to retrieve it.</p>
+
+  <p>The default (built-in) conversation store simply stores conversation state in memory. While this is sufficient for some situations, if there is more than one instance of your app running the state will not be shared among your processes so you’ll want to implement a conversation store that fetches conversation state from a database.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="nx">TODO</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="global-middleware">Global middleware</h3>
+
+            <div class="section-content">
+  <p>Global middleware is run for all incoming events before any listener middleware. You can add any number of global middleware to your app by utilizing <code class="highlighter-rouge">app.use(fn(payload,...,next))</code>.</p>
+
+  <p>Both global and listener middleware must call <code class="highlighter-rouge">next()</code> to pass control of the execution chain to the next middleware, or call <code class="highlighter-rouge">next(error)</code> to pass an error back up the already-executed middleware chain.</p>
+
+  <p>As an example, let’s say your app should only respond to users identified with a corresponding internal authentication service (an SSO provider or LDAP, for example). You may define a global middleware that looks up a user record in the authentication service and errors if the user is not found.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// Authentication middleware that associates incoming event with user in Acme identity provider</span>
+<span class="kd">function</span> <span class="nx">authWithAcme</span><span class="p">({</span> <span class="nx">payload</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">say</span><span class="p">,</span> <span class="nx">next</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">slackUserId</span> <span class="o">=</span> <span class="nx">payload</span><span class="p">.</span><span class="nx">user</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">helpChannelId</span> <span class="o">=</span> <span class="s1">'C12345'</span><span class="p">;</span>
+
+  <span class="c1">// Assume we have a function that accepts a Slack user ID to find user details from Acme</span>
+  <span class="nx">acme</span><span class="p">.</span><span class="nx">lookupBySlackId</span><span class="p">(</span><span class="nx">slackUserId</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">user</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// When the lookup is successful, populate context with Acme user details</span>
+      <span class="nx">context</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">user</span><span class="p">;</span>
+
+      <span class="c1">// Pass control to the next middleware and any listener functions</span>
+      <span class="nx">next</span><span class="p">();</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// This user wasn't found in Acme. Send them an error and don't continue processing event</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="o">===</span> <span class="s1">'Not Found'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">postEphemeral</span><span class="p">({</span>
+          <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+          <span class="na">channel</span><span class="p">:</span> <span class="nx">payload</span><span class="p">.</span><span class="nx">channel</span><span class="p">,</span>
+          <span class="na">user</span><span class="p">:</span> <span class="nx">slackUserId</span><span class="p">,</span>
+          <span class="na">text</span><span class="p">:</span> <span class="s2">`Sorry &lt;@</span><span class="p">${</span><span class="nx">slackUserId</span><span class="p">}</span><span class="s2">, you aren't registered in Acme. Please post in &lt;#</span><span class="p">${</span><span class="nx">helpChannelId</span><span class="p">}</span><span class="s2"> for assistance.`</span>
+        <span class="p">});</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="c1">// Pass control to previous middleware (if any) or the global error handler</span>
+      <span class="nx">next</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="listener-middleware">Listener middleware</h3>
+
+            <div class="section-content">
+  <p>Listener middleware is used for logic across many listener functions (but usually not all of them). They are added as arguments before the listener function in one of the built-in methods. You can add any number of listener middleware before the listener function.</p>
+
+  <p>There’s a collection of built-in listener middleware that you can use like <code class="highlighter-rouge">subtype()</code> for filtering on a message subtype and <code class="highlighter-rouge">directionMention()</code> which filters out any message that doesn’t directly @-mention your bot.</p>
+
+  <p>But of course, you can write your own middleware for more custom functionality. While writing your own middleware, your function must call <code class="highlighter-rouge">next()</code> to pass control to the next middleware, or calling <code class="highlighter-rouge">next(error)</code> to pass an error back up the already-executed middleware chain.</p>
+
+  <p>As an example, let’s say your listener should only deal with messages from humans. You can write a listener middleware that excludes any bot messages.</p>
+
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// Listener middleware that filters out messages with 'bot_message' subtype</span>
+<span class="kd">function</span> <span class="nx">noBotMessages</span><span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">next</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">message</span><span class="p">.</span><span class="nx">subtype</span> <span class="o">||</span> <span class="nx">message</span><span class="p">.</span><span class="nx">subtype</span> <span class="o">!==</span> <span class="s1">'bot_message'</span><span class="p">)</span> <span class="p">{</span>
+     <span class="nx">next</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// The listener only receives messages from humans</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="nx">noBotMessages</span><span class="p">,</span> <span class="p">({</span> <span class="nx">message</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
+  <span class="s2">`(MSG) User: </span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">
+   Message: </span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">`</span>
+<span class="p">));</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="context">Adding context</h3>
+
+            <div class="section-content">
+  <p>All listeners have access to a <code class="highlighter-rouge">context</code> object, which can be used to enrich events with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.</p>
+
+  <p><code class="highlighter-rouge">context</code> is just an object, so you can add to it by setting it to a modified version of itself.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">addTimezoneContext</span> <span class="p">({</span> <span class="nx">payload</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">next</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">info</span><span class="p">({</span>
+    <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="nx">payload</span><span class="p">.</span><span class="nx">user_id</span><span class="p">,</span>
+    <span class="na">include_locale</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">});</span>
+
+  <span class="c1">// Add user's timezone context</span>
+  <span class="nx">context</span><span class="p">.</span><span class="nx">tz_offset</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">tz_offset</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'request'</span><span class="p">,</span> <span class="nx">addTimezoneContext</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">context</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Get local hour of request</span>
+  <span class="kd">const</span> <span class="nx">local_hour</span> <span class="o">=</span> <span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">UTC</span><span class="p">()</span> <span class="o">+</span> <span class="nx">context</span><span class="p">.</span><span class="nx">tz_offset</span><span class="p">).</span><span class="nx">getHours</span><span class="p">();</span>
+
+  <span class="c1">// Request channel ID</span>
+  <span class="kd">const</span> <span class="nx">requestChannel</span> <span class="o">=</span> <span class="s1">'C12345'</span><span class="p">;</span>
+
+  <span class="kd">const</span> <span class="nx">requestText</span> <span class="o">=</span> <span class="s2">`:large_blue_circle: *New request from &lt;@</span><span class="p">${</span><span class="nx">command</span><span class="p">.</span><span class="nx">user_id</span><span class="p">}</span><span class="s2">&gt;*: </span><span class="p">${</span><span class="nx">command</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+
+  <span class="c1">// If request not inbetween 9AM and 5PM, send request tomorrow</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">local_hour</span> <span class="o">&gt;</span> <span class="mi">17</span> <span class="o">||</span> <span class="nx">local_hour</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Assume function exists to get local tomorrow 9AM from offset</span>
+    <span class="kd">const</span> <span class="nx">local_tomorrow</span> <span class="o">=</span> <span class="nx">getLocalTomorrow</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">tz_offset</span><span class="p">);</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="c1">// Schedule message</span>
+      <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">scheduleMessage</span><span class="p">({</span>
+        <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+        <span class="na">channel</span><span class="p">:</span> <span class="nx">requestChannel</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="nx">requestText</span><span class="p">,</span>
+        <span class="na">post_at</span><span class="p">:</span> <span class="nx">local_tomorrow</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="c1">// Post now</span>
+      <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">({</span>
+        <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+        <span class="na">channel</span><span class="p">:</span> <span class="nx">requestChannel</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="nx">requestText</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="logging">Logging</h3>
+
+            <div class="section-content">
+  <p>By default, Bolt will log information from your app to the console. You can customize how much logging occurs by passing a <code class="highlighter-rouge">logLevel</code> in the constructor. The available log levels in order of most to least logs are <code class="highlighter-rouge">DEBUG</code>, <code class="highlighter-rouge">INFO</code>, <code class="highlighter-rouge">WARN</code>, and <code class="highlighter-rouge">ERROR</code>.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// Import LogLevel from the package</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span><span class="p">,</span> <span class="nx">LogLevel</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@slack/bolt'</span><span class="p">);</span>
+
+<span class="c1">// Log level is one of the options you can set in the constructor</span>
+<span class="kd">const</span> <span class="nx">web</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebClient</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">logLevel</span><span class="p">:</span> <span class="nx">LogLevel</span><span class="p">.</span><span class="nx">DEBUG</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+<details>
+  <summary class="section-head">
+    <h4 class="section-head">Sending log output somewhere besides the console</h4>
+  </summary>
+
+  <div class="secondary-wrapper">
+
+    <div class="secondary-content">
+      <p>If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a logger. A custom logger must implement specific methods (known as the <code class="highlighter-rouge">Logger</code> interface).</p>
+    </div>
+
+    <div class="language-javascript highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="nx">TODO</span>
+</code></pre></div>    </div>
+
+  </div>
+</details>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="receiver">Customizing a receiver</h3>
+
+            <div class="section-content">
+  <p>A receiver is responsible for handling and parsing any incoming requests from Slack, then emitting the request so the Bolt app can add context and pass the request to your app’s listeners. Receivers must conform to the Receiver interface:</p>
+  <ul>
+    <li>
+<code class="highlighter-rouge">Receiver.on('message',  listener)</code> should route all incoming requests that have been parsed to <code class="highlighter-rouge">onIncomingEvent()</code>. It’s called in the Bolt app as <code class="highlighter-rouge">this.receiver.on('message', message =&gt; this.onIncomingEvent(message))</code>.</li>
+    <li>
+<code class="highlighter-rouge">Receiver.on('error',  listener)</code> should route errors to the global error handler. It’s called in the Bolt app as <code class="highlighter-rouge">this.receiver.on('error', error =&gt; this.onGlobalError(error))</code>.</li>
+    <li>
+<code class="highlighter-rouge">start()</code> is intended to start a server and will be called by the end developer. It should return a <code class="highlighter-rouge">Promise</code>
+</li>
+    <li>
+<code class="highlighter-rouge">stop()</code> is intended to stop the server and will be called by the end developer. It should return a <code class="highlighter-rouge">Promise</code>
+</li>
+  </ul>
+
+  <p>To use a custom receiver, you’ll need to pass it into the constructor when initializing your Bolt app. Here is what a basic custom receiver might look like.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="nx">TODO</span>
 </code></pre>
   </div>
 </div>

@@ -1,0 +1,19 @@
+---
+title: Conversation stores
+slug: conversation-store
+order: 3
+---
+
+<div class="section-content">
+Bolt includes support for a store, which sets and retrieves state related to a conversation. Conversation stores have two methods:
+* `set()` modifies conversation state. `set()` requires a `conversationId` of type string, `value` that can be any type, and an optional `expiresAt` of type number.  `set()` returns a `Promise`.
+* `get()` fetches conversation state from the store. Get requires a `conversationId` of type string and returns a Promise with the conversation’s state.
+
+`conversationContext()` is a built-in [global middleware](#global-middleware) that allows conversations to be updated by middleware. When receiving an event, middleware functions can use `context.updateConversation()` to set state and reading from `context.conversation` to retrieve it.
+
+The default (built-in) conversation store simply stores conversation state in memory. While this is sufficient for some situations, if there is more than one instance of your app running the state will not be shared among your processes so you’ll want to implement a conversation store that fetches conversation state from a database.
+</div>
+
+```javascript
+TODO
+```
