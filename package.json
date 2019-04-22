@@ -29,7 +29,7 @@
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "tslint --project .",
-    "test": "npm run build && nyc mocha --config .mocharc.json src/*.spec.js",
+    "test": "nyc mocha --config .mocharc.json src/*.spec.ts",
     "coverage": "codecov"
   },
   "repository": "slackapi/bolt",
@@ -49,10 +49,14 @@
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {
+    "@types/mocha": "^5.2.6",
     "codecov": "^3.2.0",
+    "mocha": "^6.1.4",
     "nyc": "^14.0.0",
     "shx": "^0.3.2",
     "sinon": "^7.3.1",
+    "source-map-support": "^0.5.12",
+    "ts-node": "^8.1.0",
     "tslint": "^5.15.0",
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.4.3"
