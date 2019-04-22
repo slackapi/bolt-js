@@ -39,4 +39,4 @@ plugins:
   - jemoji
   - jekyll-redirect-from
 
-repository: slackapi/node-slack-sdk
+repository: slackapi/bolt
