@@ -93,12 +93,6 @@ body {
 .wrapper {
   width: 100%;
   margin: 0 auto;
-  display: grid;
-  grid-gap: 20px;
-  grid-template-areas: 
-    "head"
-    "content"
-    "divider"
 }
 
 /* Main page content */
@@ -175,9 +169,10 @@ body {
 }
 
 /* Responsive */
-@media (min-width: 550px) {
+@media (min-width: 768px) {
   .wrapper {
-    grid-template-columns: 20% auto;
+    display: grid;
+    grid-template-columns: 20% 75%;
     grid-template-areas:
       "sidebar content"
   }
@@ -199,7 +194,7 @@ body {
   }
 }
 
-@media (max-width: 550px) {
+@media (max-width: 768px) {
   .header {
     display: none;
   }
