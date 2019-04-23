@@ -52,7 +52,7 @@ export interface AppOptions {
   ignoreSelf?: boolean;
 }
 
-export { LogLevel } from '@slack/logger';
+export { LogLevel, Logger } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
 export interface Authorize {
@@ -171,9 +171,8 @@ export default class App {
     }
 
     // Subscribe to messages and errors from the receiver
-    this.receiver
-      .on('message', message => this.onIncomingEvent(message))
-      .on('error', error => this.onGlobalError(error));
+    this.receiver.on('message', message => this.onIncomingEvent(message));
+    this.receiver.on('error', error => this.onGlobalError(error));
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
