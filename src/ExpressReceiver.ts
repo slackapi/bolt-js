@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Receiver, ReceiverEvent /*, ReceiverAckTimeoutError */ } from './types';
+import { Receiver, ReceiverEvent ReceiverAckTimeoutError } from './types';
 import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
 import axios from 'axios';
@@ -54,15 +54,30 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }
 
   private requestHandler(req: Request, res: Response): void {
-    // TODO: start a timer, generate an error if the app fails to call ack() before the timer expires
+    let timer: NodeJS.Timer | undefined = setTimeout(
+      () => {
+        this.emit('error', receiverAckTimeoutError(
+          'An incoming event was not acknowledged before the timeout. ' +
+          'Ensure that the ack() argument is called in your listeners.',
+        ));
+        timer = undefined;
+      },
+      2800,
+    );
     const event: ReceiverEvent = {
       body: req.body as { [key: string]: any },
       ack: (response: any): void => {
-        if (!response) res.send('');
-        if (typeof response === 'string') {
-          res.send(response);
-        } else {
-          res.json(response);
+        // TODO: if app tries acknowledging more than once, emit a warning
+        if (timer !== undefined) {
+          clearTimeout(timer);
+          timer = undefined;
+
+          if (!response) res.send('');
+          if (typeof response === 'string') {
+            res.send(response);
+          } else {
+            res.json(response);
+          }
         }
       },
       respond: undefined,
@@ -189,3 +204,9 @@ const parseBody: RequestHandler = (req, _res, next) => {
   }
   next();
 };
+
+function receiverAckTimeoutError(message: string): ReceiverAckTimeoutError {
+  const error = new Error(message);
+  (error as ReceiverAckTimeoutError).code = ErrorCode.ReceiverAckTimeoutError;
+  return (error as ReceiverAckTimeoutError);
+}

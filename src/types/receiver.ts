@@ -4,15 +4,16 @@ import { CodedError, ErrorCode } from '../errors';
 
 export interface ReceiverEvent {
   body: StringIndexed;
-  // TODO: there should maybe be some more help for implementors or Receiver to know what kind of argument the AckFn
+  // TODO: there should maybe be some more help for implementors of Receiver to know what kind of argument the AckFn
   // is expected to deal with.
   ack: AckFn<any>;
   respond?: RespondFn;
 }
 
-// TODO: should it really be a requirement that on() returns this?
 export interface Receiver {
   on(event: 'message', listener: (event: ReceiverEvent) => void): this;
+  // strictly speaking, Error | ReceiverAckTimeoutError is just Error since the latter is a subtype of the former, but
+  // being explicit here is good for documentation purposes
   on(event: 'error', listener: (error: Error | ReceiverAckTimeoutError) => void): this;
   start(...args: any[]): Promise<unknown>;
   stop(...args: any[]): Promise<unknown>;
