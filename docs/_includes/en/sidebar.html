@@ -1,0 +1,39 @@
+<div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="{{ site.url | append: site.baseurl }}/assets/bolt-logo.png"/>
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <span class="version">
+      <a href="{{site.github.url}}">{{site.github.latest_release.tag_name}}</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl }}/tutorial/getting-started"><li class="title">Getting started</li></a>
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl }}/concepts#basic"><li class="title">Basic concepts</li></a>
+    {% assign basic_sections = site.basic | sort: "order" %}
+    {% for section in basic_sections %}
+      <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}"><li>{{section.title}}</li></a>
+    {% endfor %}
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="#advanced"><li class="title">Advanced concepts</li></a>
+    {% assign advanced_sections = site.advanced | sort: "order" %}
+    {% for section in advanced_sections %}
+      <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}"><li>{{section.title}}</li></a>
+    {% endfor %}
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="https://github.com/SlackAPI/bolt/blob/master/.github/contributing.md"><li class="title">Contributing</li></a>
+  </ul>
+</div>

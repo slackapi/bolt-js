@@ -1,57 +1,60 @@
 {
-  "name": "slapp",
-  "version": "3.3.0",
-  "description": "A module for Slack App integrations",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "test": "npm run lint && npm run coverage",
-    "lint": "tslint --project .",
-    "unit": "ava --verbose --serial",
-    "coverage": "nyc --check-coverage --statements 100 ava --verbose --serial",
-    "lcov": "nyc --reporter lcov ava --serial",
-    "docs": "node scripts/docs.js",
-    "coveralls": "npm run lcov && cat ./coverage/lcov.info | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/missionsai/slapp.git"
-  },
+  "name": "@slack/bolt",
+  "version": "1.0.0-alpha.0",
+  "description": "A framework for building Slack apps, fast.",
+  "author": "Slack Technologies, Inc.",
+  "license": "MIT",
   "keywords": [
     "slack",
     "bot",
-    "missions"
+    "events-api",
+    "slash-commands",
+    "interactive-components",
+    "api",
+    "chatops",
+    "integration",
+    "slack-app"
   ],
-  "author": "Mike Brevoort",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/missionsai/slapp/issues"
-  },
-  "homepage": "https://github.com/missionsai/slapp#readme",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">= 10.13.0",
+    "npm": ">= 6.4.1"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
+    "lint": "tslint --project .",
+    "test": "npm run build && nyc mocha --config .mocharc.json src/*.spec.js",
+    "coverage": "codecov"
+  },
+  "repository": "slackapi/bolt",
+  "homepage": "https://slack.dev/bolt",
+  "bugs": {
+    "url": "https://github.com/slackapi/bolt/issues"
   },
   "dependencies": {
-    "@slack/client": "^4.8.0",
-    "@types/node": ">=8",
-    "@types/request": "^2.48.1",
-    "body-parser": "^1.15.2",
-    "chalk": "^1.1.3",
-    "deap": "^1.0.0",
-    "js-queue": "^1.0.0",
-    "path-to-regexp": "^2.0.0",
-    "request": "^2.73.0"
+    "@slack/logger": "^1.0.0",
+    "@slack/types": "^1.0.0",
+    "@slack/web-api": "^5.0.0",
+    "@types/express": "^4.16.1",
+    "@types/node": ">=10",
+    "axios": "^0.18.0",
+    "express": "^4.16.4",
+    "raw-body": "^2.3.3",
+    "tsscmp": "^1.0.6"
   },
   "devDependencies": {
-    "ava": "^0.15.2",
-    "coveralls": "3.0.1",
-    "dox": "^0.8.1",
-    "nyc": "^7.0.0",
-    "sinon": "^1.17.4",
-    "standard": "^7.1.2",
-    "tslint": "^5.12.1",
+    "codecov": "^3.2.0",
+    "nyc": "^14.0.0",
+    "shx": "^0.3.2",
+    "sinon": "^7.3.1",
+    "tslint": "^5.15.0",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.2.4"
+    "typescript": "^3.4.3"
   }
 }
