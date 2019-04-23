@@ -1,0 +1,45 @@
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+title: Bolt
+description: >-
+  A framework that makes Slack app development fast and straight-forward. 
+  With a single interface for Slack’s Web API, Events API, and interactive features, 
+  Bolt gives you the full power of the Slack platform out of the box.
+baseurl: /bolt
+url: https://slack.dev
+
+collections:
+  basic:
+    output: false
+  advanced:
+    output: false
+  tutorials:
+    output: true
+    permalink: /tutorials/:slug
+
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      layout: "default"
+
+# Metadata
+repo_name: bolt
+github_username: SlackAPI
+
+code_of_conduct_url: https://slackhq.github.io/code-of-conduct
+cla_url: https://cla-assistant.io/slackapi/bolt
+
+google_analytics: UA-56978219-13
+google_tag_manager: GTM-KFZ5MK7
+
+# Build settings
+markdown: kramdown
+kramdown:
+  parse_block_html: true
+plugins:
+  - jemoji
+  - jekyll-redirect-from
+
+repository: slackapi/bolt
