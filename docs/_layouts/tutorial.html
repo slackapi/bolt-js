@@ -17,8 +17,10 @@ sidebar_style: main
         <div class="mainheader">
           {% include en/header.html %}
         </div>
-
-      {{ content }}
+        
+        <div class="tutorial">
+          {{ content | markdownify }}
+        </div>
     </div>
 
   </div>

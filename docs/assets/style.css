@@ -55,7 +55,7 @@ body {
 
 .panel .sidebar-content ul.sidebar-section {
   list-style: none;
-  padding-top: 2.5em;
+  padding-top: 1.5em;
   margin: 0;
   font-size: 0.80em;
 }
@@ -107,6 +107,13 @@ body {
     "code"
     "secondary"
     "divider"
+}
+
+.tutorial {
+  width: 90%;
+  margin: 1em auto 0 auto;
+  font-size: 1em;
+  line-height: 1.75em;
 }
 
 .content .section-wrapper .language-javascript {

@@ -2,10 +2,17 @@
 title: Getting started
 order: 1
 slug: getting-started
+layout: tutorial
+permalink: /tutorial/getting-started
+redirect_from:
+  - /getting-started
 ---
 
+<div class="section-content">
 This guide is meant to show you how to get up and running with your first Bolt app. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
+</div> 
 
+<div class="supporting-content">
 - [Create an app](#create-an-app)
 - [Tokens and installing apps](#tokens-and-installing-apps)
 - [Setting up your local project](#setting-up-your-local-project)
@@ -13,6 +20,9 @@ This guide is meant to show you how to get up and running with your first Bolt a
 - [Listening and responding to a message](#listening-and-responding-to-a-message)
 - [Sending and responding to actions](#sending-and-responding-to-actions)
 - [Next steps](#next-steps)
+</div>
+
+---
 
 ### Create an app
 First thing's first: before you start developing with Bolt, you'll need to [create an app](https://api.slack.com/apps/new). After you fill out an App Name (_you can change it later_) and picking a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
@@ -21,9 +31,11 @@ First thing's first: before you start developing with Bolt, you'll need to [crea
 
 This page contains links to add features and functionality to your app in addition to important credentials you'll need for development later, like the `Signing Secret` under **App Crendentials**.
 
-![Basic Information page](basic-information-page.png "Basic Information page")
+![Basic Information page](../assets/basic-information-page.png "Basic Information page")
 
 Look around, add an app icon and description, and then let's start configuring your app 🔩
+
+---
 
 ### Tokens and installing apps
 You have two major options for tokens: user (`xoxp`) tokens and bot (`xoxb`) tokens. User tokens allow you to call Web API methods on behalf of users based on OAuth scopes and bot tokens require a bot user, which has default permissions similar to a standard user.
@@ -36,7 +48,7 @@ Now that you have a bot user with permission to send messages to Slack, let's in
 
 Click **Install App** on the left sidebar and click the big **Install App to Workspace** button at the top of the page. Once you authorize the installation, you'll land on the **OAuth & Permissions** page.
 
-![OAuth Tokens](bot-token.png "OAuth Tokens")
+![OAuth Tokens](../assets/bot-token.png "OAuth Tokens")
 
 You'll see two tokens. To add scopes to the `xoxp` tokens, you can scroll down to the **Scopes** section. For now, we'll just use the `xoxb` bot token.
 
@@ -104,6 +116,8 @@ node app.js
 
 Your app should let you know that it's up and running.
 
+---
+
 ### Setting up events
 To listen to events happening in Slack (like when a reaction is added, or a message is posted) you'll need to enable events for your app.
 
@@ -122,7 +136,7 @@ Once you’ve installed a development proxy, run it to begin forwarding requests
 ngrok http 3000
 ```
 
-![Running ngrok](ngrok.gif "Running ngrok")
+![Running ngrok](../assets/ngrok.gif "Running ngrok")
 
 The output should show a generated URL that you can use (we recommend the one that starts with `https://`). This URL will be the base of your request URL, in this case `https://8e8ec2d7.ngrok.io`.
 
@@ -130,6 +144,7 @@ Okay, so at this point you should have some kind of public-facing URL. The reque
 
 Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your endpoint should become verified.
 
+---
 
 ### Listening and responding to a message
 Your app is now ready for some logic. Let's start by using the `message()` method that listens to messages in channels your bot user is a member of.
@@ -163,6 +178,8 @@ If you restart your app, you should be able to add your bot user to a channel, s
 
 This is a basic example, but it gives you a place to start customizing your app based on your end goal. Let's try something a little more interactive by sending an interactive button rather than plain text.
 
+---
+
 ### Sending and responding to actions
 
 To use features like buttons, select menus, datepickers, dialogs, or message actions, you’ll need to enable interactivity. This is similar to enabling interactivity for events above.
@@ -171,7 +188,7 @@ Back on your app configuration page, click on **Interactive Components** on the 
 
 Unless you specified your own endpoints, use *the same* request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Interactivity is enabled!
 
-![Configuring a Request URL](request-url-config.png "Configuring a Request URL")
+![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
 
 Now, let's go back to your app's code and add our own interactivity. I'll break this into two steps: first, I'll send a message that _contains a button_. Then we'll set up a listener that is called when the button is clicked.
 
@@ -274,6 +291,8 @@ const port = process.env.PORT || 3000;
 ```
 
 You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
+
+---
 
 ### Next steps
 You just built your first Bolt app! 🎉

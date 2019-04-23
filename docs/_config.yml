@@ -13,6 +13,9 @@ collections:
     output: false
   advanced:
     output: false
+  tutorials:
+    output: true
+    permalink: /tutorials/:slug
 
 defaults:
   -
