@@ -73,6 +73,10 @@ body {
   background-color: #D7D7D7;
 }
 
+.panel .sidebar-content ul.sidebar-section li.madeby:hover {
+  background-color: transparent;
+}
+
 .panel .sidebar-content a:hover {
   text-decoration: none;
 }
@@ -200,7 +204,7 @@ a:hover {
   margin-top: 1em;
 }
 
-.content .section-wrapper summary h4 {
+summary h4 {
   display: inline;
 }
 
