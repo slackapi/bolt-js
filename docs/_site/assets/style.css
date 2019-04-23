@@ -151,8 +151,7 @@ body {
 }
 
 .content .section-wrapper a:hover {
-  background-color: var(--light-blue);
-  border-radius: 4px;
+  text-decoration: underline;
 }
 
 /* Secondary content */
