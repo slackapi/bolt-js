@@ -298,9 +298,9 @@
             <h3 id="web-api">Using the Web API</h3>
 
             <div class="section-content">
-  <p>You can call <a href="https://api.slack.com/methods">any Web API method</a> using the client attached to your Bolt instance under the <code class="highlighter-rouge">client</code> key (given that your app has the appropriate scopes). When you call one of the methods on the <code class="highlighter-rouge">client</code>, it will return a promise containing the response from Slack.</p>
+  <p>You can call <a href="https://api.slack.com/methods">any Web API method</a> using the <a href="https://slack.dev/node-slack-sdk/web-api"><code class="highlighter-rouge">WebClient</code></a> provided to your Bolt app as <code class="highlighter-rouge">app.client</code> (given that your app has the appropriate scopes). When you call one the client’s methods, it returns a Promise containing the response from Slack.</p>
 
-  <p>The token used to initialize Bolt can be found in the <code class="highlighter-rouge">context</code> object, which can be helpful when you’re making calls and need to pass the token yourself.</p>
+  <p>The token used to initialize Bolt can be found in the <code class="highlighter-rouge">context</code> object, which is required for most Web API methods.</p>
 </div>
 
 <div class="language-javascript highlighter-rouge">
@@ -477,7 +477,7 @@
             <h3 id="commands">Listening and responding to commands</h3>
 
             <div class="section-content">
-  <p>Your app can use the <code class="highlighter-rouge">command()</code> method to listen to incoming slash command payloads. The method requires a <code class="highlighter-rouge">commandName</code> of type string that matches the incoming command name.</p>
+  <p>Your app can use the <code class="highlighter-rouge">command()</code> method to listen to incoming slash command payloads. The method requires a <code class="highlighter-rouge">commandName</code> of type string.</p>
 
   <p>Similar to actions, there are two ways to respond to slash command requests. The first way is to use <code class="highlighter-rouge">say()</code>, which accepts a string or JSON payload. The second is <code class="highlighter-rouge">respond()</code> which uses the <code class="highlighter-rouge">response_url</code>.</p>
 </div>
@@ -976,7 +976,7 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
         <td>
 <code class="highlighter-rouge">type: string</code>, <code class="highlighter-rouge">listener: fn()</code>
 </td>
-        <td><code class="highlighter-rouge">void</code></td>
+        <td><code class="highlighter-rouge">unknown</code></td>
       </tr>
       <tr>
         <td><code class="highlighter-rouge">start()</code></td>
