@@ -39,6 +39,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
       verifySlackRequest(signingSecret),
       parseBody,
       respondToSslCheck,
+      respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
 
@@ -114,6 +115,14 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
 const respondToSslCheck: RequestHandler = (req, res, next) => {
   if (req.body && req.body.ssl_check) {
     res.send();
+    return;
+  }
+  next();
+};
+
+const respondToUrlVerification: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.type && req.body.type === 'url_verification') {
+    res.json({ challenge: req.body.challenge });
     return;
   }
   next();
