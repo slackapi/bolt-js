@@ -76,6 +76,8 @@
     
       <a href="http://localhost:4000/bolt/#commands"><li>Listening and responding to commands</li></a>
     
+      <a href="http://localhost:4000/bolt/#options"><li>Listening and responding to options</li></a>
+    
   </ul>
 
   <ul class="sidebar-section">
@@ -121,7 +123,7 @@
             <h3 id="message-listening">Listening to messages</h3>
 
             <div class="section-content">
-  <p>To listen to messages that <a href="https://api.slack.com/messaging/retrieving#permissions">your app has access to receive</a>, you can use the <code class="highlighter-rouge">message()</code> method. This method adds listener middleware that filters out any events that aren’t of type <code class="highlighter-rouge">message</code>.</p>
+  <p>To listen to messages that <a href="https://api.slack.com/messaging/retrieving#permissions">your app has access to receive</a>, you can use the <code class="highlighter-rouge">message()</code> method. This method filters out any events that aren’t of type <code class="highlighter-rouge">message</code>.</p>
 
   <p>It accepts an optional <code class="highlighter-rouge">pattern</code> parameter of type <code class="highlighter-rouge">string</code> or <code class="highlighter-rouge">RegExp</code> object that will filter out any messages that don’t match.</p>
 </div>
@@ -458,7 +460,7 @@
 
 <details>
   <summary class="section-head">
-    <h4 class="section-head">Using respond</h4>
+    <h4 class="section-head">Using respond()</h4>
   </summary>
 
   <div class="secondary-wrapper">
@@ -505,6 +507,54 @@
             <hr>
           </div>
         
+          <div class="section-wrapper">
+            <h3 id="options">Listening and responding to options</h3>
+
+            <div class="section-content">
+  <p>The <code class="highlighter-rouge">option()</code> method listens for incoming option request payloads from Slack. <a href="#action-listening">Similar to <code class="highlighter-rouge">actions()</code></a>,
+an <code class="highlighter-rouge">action_id</code> or constraints object is required.</p>
+
+  <p>While it’s recommended to use <code class="highlighter-rouge">action_id</code> for <code class="highlighter-rouge">external_select</code> menus, dialogs do not yet support Block Kit so you’ll have to 
+use the constraints object to filter on a <code class="highlighter-rouge">callback_id</code>.</p>
+
+  <p>To respond to options requests, you’ll need to <code class="highlighter-rouge">ack()</code> with valid options. Both <a href="https://api.slack.com/reference/messaging/block-elements#external-select">external select response examples</a> and <a href="https://api.slack.com/dialogs#dynamic_select_elements_external">dialog response examples</a> can be found on our API site.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// Example of responding to an external_select options request</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">options</span><span class="p">(</span><span class="s1">'external_action'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">ack</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Get information specific to a team or channel</span>
+  <span class="kd">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">db</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">team</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="c1">// Collect information in options array to send in Slack ack response</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">result</span> <span class="k">in</span> <span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+        <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"plain_text"</span><span class="p">,</span>
+          <span class="s2">"text"</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">label</span>
+        <span class="p">},</span>
+        <span class="s2">"value"</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">value</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="nx">ack</span><span class="p">({</span>
+      <span class="s2">"options"</span><span class="p">:</span> <span class="nx">options</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">ack</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
+
+
+            <hr>
+          </div>
+        
         </div>
 
         <div id="advanced">
@@ -539,9 +589,14 @@
             <div class="section-content">
   <p>Custom apps installed on just one team can define <code class="highlighter-rouge">token</code> (and optionally <code class="highlighter-rouge">botId</code> and <code class="highlighter-rouge">botUserId</code>) at the time of app initialization. But in the case you want to handle multiple tokens, authorization functions can be passed in rather than a <code class="highlighter-rouge">token</code>. Authorization functions must have <code class="highlighter-rouge">source</code> and <code class="highlighter-rouge">body</code> as parameters and are expected to return a Promise that resolves to an <code class="highlighter-rouge">AuthorizeResult</code>.</p>
 
-  <p><code class="highlighter-rouge">source</code> will be provided to an authorize function and will always contain a <code class="highlighter-rouge">teamId</code>, and will contain an <code class="highlighter-rouge">enterpriseId</code>, a <code class="highlighter-rouge">userId</code>, and a <code class="highlighter-rouge">conversationId</code> when they exist for the event.</p>
-
-  <p><code class="highlighter-rouge">body</code> will be provided as the request body of the event.</p>
+  <ul>
+    <li>
+      <p><code class="highlighter-rouge">source</code> will be provided to an authorize function and will always contain a <code class="highlighter-rouge">teamId</code>, and will contain an <code class="highlighter-rouge">enterpriseId</code>, a <code class="highlighter-rouge">userId</code>, and a <code class="highlighter-rouge">conversationId</code> when they exist for the event.</p>
+    </li>
+    <li>
+      <p><code class="highlighter-rouge">body</code> will be provided as the request body of the event.</p>
+    </li>
+  </ul>
 
   <p>After you app is initialized, the authorization function will be run as an incoming event is passed from the Receiver. This will give opportunity to add the proper token and bot user and app IDs (which are used for the builtin <code class="highlighter-rouge">ignoreSelf</code> middleware).</p>
 </div>
@@ -556,11 +611,6 @@
       <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-123abc'</span><span class="p">,</span>
       <span class="na">botId</span><span class="p">:</span> <span class="s1">'B1251'</span><span class="p">,</span>
       <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U12385'</span> 
-    <span class="p">},</span>
-    <span class="s1">'T56789'</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-456def'</span><span class="p">,</span>
-      <span class="na">botId</span><span class="p">:</span> <span class="s1">'B3219'</span><span class="p">,</span>
-      <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U45819'</span>
     <span class="p">}</span>
   <span class="p">},</span>
   <span class="s1">'E5678B23CD'</span><span class="p">:</span> <span class="p">{</span>
@@ -615,7 +665,39 @@
 
 <div class="language-javascript highlighter-rouge">
   <div class="highlight">
-    <pre class="highlight"><code><span class="nx">TODO</span>
+    <pre class="highlight"><code><span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="nx">token</span><span class="p">,</span>
+  <span class="nx">signingSecret</span><span class="p">,</span>
+  <span class="c1">// It's more likely that you'd create a class for a convo store</span>
+  <span class="na">convoStore</span><span class="p">:</span> <span class="k">new</span> <span class="nx">simpleConvoStore</span><span class="p">()</span>
+<span class="p">});</span>
+
+<span class="c1">// A simple implementation of a conversation store with a Firebase-like database</span>
+<span class="kd">class</span> <span class="nx">simpleConvoStore</span> <span class="p">{</span>
+  <span class="kd">set</span><span class="p">(</span><span class="nx">conversationId</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">expiresAt</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Returns a Promise</span>
+    <span class="k">return</span> <span class="nx">db</span><span class="p">().</span><span class="nx">ref</span><span class="p">(</span><span class="s1">'conversations/'</span> <span class="o">+</span> <span class="nx">conversationId</span><span class="p">).</span><span class="kd">set</span><span class="p">({</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">expiresAt</span> <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="kd">get</span><span class="p">(</span><span class="nx">conversationId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Returns a Promise</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">db</span><span class="p">().</span><span class="nx">ref</span><span class="p">(</span><span class="s1">'conversations/'</span> <span class="o">+</span> <span class="nx">conversationId</span><span class="p">).</span><span class="nx">once</span><span class="p">(</span><span class="s1">'value'</span><span class="p">).</span><span class="nx">then</span><span class="p">((</span><span class="nx">result</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">result</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">expiresAt</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">&gt;</span> <span class="nx">result</span><span class="p">.</span><span class="nx">expiresAt</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">db</span><span class="p">().</span><span class="nx">ref</span><span class="p">(</span><span class="s1">'conversations/'</span> <span class="o">+</span> <span class="nx">conversationId</span><span class="p">).</span><span class="k">delete</span><span class="p">();</span>
+
+            <span class="nx">reject</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Conversation expired'</span><span class="p">));</span>
+          <span class="p">}</span>
+          <span class="nx">resolve</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="c1">// Conversation not found</span>
+          <span class="nx">reject</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Conversation not found'</span><span class="p">));</span>
+        <span class="p">}</span>
+      <span class="p">});</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre>
   </div>
 </div>
@@ -794,7 +876,9 @@
 <span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span><span class="p">,</span> <span class="nx">LogLevel</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@slack/bolt'</span><span class="p">);</span>
 
 <span class="c1">// Log level is one of the options you can set in the constructor</span>
-<span class="kd">const</span> <span class="nx">web</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebClient</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="p">{</span>
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="nx">token</span><span class="p">,</span>
+  <span class="nx">signingSecret</span><span class="p">,</span>
   <span class="na">logLevel</span><span class="p">:</span> <span class="nx">LogLevel</span><span class="p">.</span><span class="nx">DEBUG</span><span class="p">,</span>
 <span class="p">});</span>
 </code></pre>
@@ -809,11 +893,71 @@
   <div class="secondary-wrapper">
 
     <div class="secondary-content">
-      <p>If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a logger. A custom logger must implement specific methods (known as the <code class="highlighter-rouge">Logger</code> interface).</p>
+      <p>If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a logger. A custom logger must implement specific methods (known as the <code class="highlighter-rouge">Logger</code> interface):</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Parameters</th>
+            <th>Return type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="highlighter-rouge">setLevel()</code></td>
+            <td><code class="highlighter-rouge">level: LogLevel</code></td>
+            <td><code class="highlighter-rouge">void</code></td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">setName()</code></td>
+            <td><code class="highlighter-rouge">name: string</code></td>
+            <td><code class="highlighter-rouge">void</code></td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">debug()</code></td>
+            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+            <td><code class="highlighter-rouge">void</code></td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">info()</code></td>
+            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+            <td><code class="highlighter-rouge">void</code></td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">warn()</code></td>
+            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+            <td><code class="highlighter-rouge">void</code></td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">error()</code></td>
+            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+            <td><code class="highlighter-rouge">void</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>A very simple custom logger might ignore the name and level, and write all messages to a file.</p>
     </div>
 
     <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="nx">TODO</span>
+<div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@slack/bolt'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">createWriteStream</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">logWritable</span> <span class="o">=</span> <span class="nx">createWriteStream</span><span class="p">(</span><span class="s1">'/var/my_log_file'</span><span class="p">);</span> <span class="c1">// Not shown: close this stream</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="nx">token</span><span class="p">,</span>
+  <span class="nx">signingSecret</span><span class="p">,</span>
+  <span class="c1">// Creating a logger as a literal object. It's more likely that you'd create a class.</span>
+  <span class="na">logger</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nx">debug</span><span class="p">(...</span><span class="nx">msgs</span><span class="p">):</span> <span class="p">{</span> <span class="nx">logWritable</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'debug: '</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgs</span><span class="p">));</span> <span class="p">},</span>
+    <span class="nx">info</span><span class="p">(...</span><span class="nx">msgs</span><span class="p">):</span> <span class="p">{</span> <span class="nx">logWritable</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'info: '</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgs</span><span class="p">));</span> <span class="p">},</span>
+    <span class="nx">warn</span><span class="p">(...</span><span class="nx">msgs</span><span class="p">):</span> <span class="p">{</span> <span class="nx">logWritable</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'warn: '</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgs</span><span class="p">));</span> <span class="p">},</span>
+    <span class="nx">error</span><span class="p">(...</span><span class="nx">msgs</span><span class="p">):</span> <span class="p">{</span> <span class="nx">logWritable</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'error: '</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgs</span><span class="p">));</span> <span class="p">},</span>
+    <span class="nx">setLevel</span><span class="p">():</span> <span class="p">{</span> <span class="p">},</span>
+    <span class="nx">setName</span><span class="p">():</span> <span class="p">{</span> <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">});</span>
 </code></pre></div>    </div>
 
   </div>
@@ -828,25 +972,110 @@
 
             <div class="section-content">
   <p>A receiver is responsible for handling and parsing any incoming requests from Slack, then emitting the request so the Bolt app can add context and pass the request to your app’s listeners. Receivers must conform to the Receiver interface:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Parameters</th>
+        <th>Return type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code class="highlighter-rouge">on()</code></td>
+        <td>
+<code class="highlighter-rouge">type: string</code>, <code class="highlighter-rouge">listener: fn()</code>
+</td>
+        <td><code class="highlighter-rouge">void</code></td>
+      </tr>
+      <tr>
+        <td><code class="highlighter-rouge">start()</code></td>
+        <td>None</td>
+        <td><code class="highlighter-rouge">Promise</code></td>
+      </tr>
+      <tr>
+        <td><code class="highlighter-rouge">stop()</code></td>
+        <td>None</td>
+        <td><code class="highlighter-rouge">Promise</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><code class="highlighter-rouge">on()</code> is called two times in the Bolt app:</p>
   <ul>
     <li>
 <code class="highlighter-rouge">Receiver.on('message',  listener)</code> should route all incoming requests that have been parsed to <code class="highlighter-rouge">onIncomingEvent()</code>. It’s called in the Bolt app as <code class="highlighter-rouge">this.receiver.on('message', message =&gt; this.onIncomingEvent(message))</code>.</li>
     <li>
 <code class="highlighter-rouge">Receiver.on('error',  listener)</code> should route errors to the global error handler. It’s called in the Bolt app as <code class="highlighter-rouge">this.receiver.on('error', error =&gt; this.onGlobalError(error))</code>.</li>
-    <li>
-<code class="highlighter-rouge">start()</code> is intended to start a server and will be called by the end developer. It should return a <code class="highlighter-rouge">Promise</code>
-</li>
-    <li>
-<code class="highlighter-rouge">stop()</code> is intended to stop the server and will be called by the end developer. It should return a <code class="highlighter-rouge">Promise</code>
-</li>
   </ul>
 
   <p>To use a custom receiver, you’ll need to pass it into the constructor when initializing your Bolt app. Here is what a basic custom receiver might look like.</p>
+
+  <p>For a more in-depth look at a receiver, <a href="https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts">read the source code for the built-in Express receiver</a></p>
 </div>
 
 <div class="language-javascript highlighter-rouge">
   <div class="highlight">
-    <pre class="highlight"><code><span class="nx">TODO</span>
+    <pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">EventEmitter</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">'events'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createServer</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">'http'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">express</span> <span class="k">from</span> <span class="s1">'express'</span><span class="p">;</span>
+
+<span class="c1">// EventEmitter handles the on() function for us</span>
+<span class="c1">// https://nodejs.org/api/events.html#events_emitter_on_eventname_listener</span>
+<span class="kd">class</span> <span class="nx">simpleReceiver</span> <span class="kd">extends</span> <span class="nx">EventEmitter</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="nx">signingSecret</span><span class="p">,</span> <span class="nx">endpoints</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">server</span> <span class="o">=</span> <span class="nx">createServer</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">endpoint</span> <span class="k">of</span> <span class="nx">endpoints</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">requestHandler</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="nx">start</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="nx">resolve</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">server</span><span class="p">);</span>
+        <span class="p">});</span>
+      <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="nx">stop</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">close</span><span class="p">((</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+          <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nx">resolve</span><span class="p">();</span>
+      <span class="p">})</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+
+  <span class="c1">// This is a very simple implementation. Look at the ExpressReceiver source for more detail</span>
+  <span class="nx">requestHandler</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Assume parseBody function exists to parse incoming requests</span>
+    <span class="kd">const</span> <span class="nx">parsedReq</span> <span class="o">=</span> <span class="nx">parseBody</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">event</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">body</span><span class="p">:</span> <span class="nx">parsedReq</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span>
+      <span class="c1">// Receivers are responsible for handling acknowledgements</span>
+      <span class="na">ack</span><span class="p">:</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="nx">event</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre>
   </div>
 </div>

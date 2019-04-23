@@ -20,7 +20,7 @@ app.action('approve_button', async ({ ack, say }) => {
 
 <details markdown="0">
 <summary class="section-head">
-<h4 class="section-head">Using respond</h4>
+<h4 class="section-head">Using respond()</h4>
 </summary>
 
 <div class="secondary-wrapper">

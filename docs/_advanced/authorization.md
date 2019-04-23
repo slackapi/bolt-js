@@ -7,9 +7,9 @@ order: 2
 <div class="section-content">
 Custom apps installed on just one team can define `token` (and optionally `botId` and `botUserId`) at the time of app initialization. But in the case you want to handle multiple tokens, authorization functions can be passed in rather than a `token`. Authorization functions must have `source` and `body` as parameters and are expected to return a Promise that resolves to an `AuthorizeResult`.
 
-`source` will be provided to an authorize function and will always contain a `teamId`, and will contain an `enterpriseId`, a `userId`, and a `conversationId` when they exist for the event.
+* `source` will be provided to an authorize function and will always contain a `teamId`, and will contain an `enterpriseId`, a `userId`, and a `conversationId` when they exist for the event.
 
-`body` will be provided as the request body of the event.
+* `body` will be provided as the request body of the event.
 
 After you app is initialized, the authorization function will be run as an incoming event is passed from the Receiver. This will give opportunity to add the proper token and bot user and app IDs (which are used for the builtin `ignoreSelf` middleware).
 </div>
@@ -23,11 +23,6 @@ let teamInfo = {
       botToken: 'xoxb-123abc',
       botId: 'B1251',
       botUserId: 'U12385' 
-    },
-    'T56789': {
-      botToken: 'xoxb-456def',
-      botId: 'B3219',
-      botUserId: 'U45819'
     }
   },
   'E5678B23CD': {

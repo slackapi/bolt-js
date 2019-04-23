@@ -120,6 +120,10 @@ body {
   border: 1px solid #DDDDDD;
 }
 
+.content .section-wrapper .language-javascript pre code {
+  font-size: 0.85em !important;
+}
+
 .content .section-wrapper .section-content {
   grid-area: body;
   font-size: 1em;
@@ -137,6 +141,11 @@ body {
   height: 1px;
   border-top: 1px solid #DDD;
   width: 100%;
+}
+
+.content .section-wrapper a:hover {
+  background-color: var(--light-blue);
+  border-radius: 4px;
 }
 
 /* Secondary content */

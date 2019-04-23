@@ -15,5 +15,37 @@ The default (built-in) conversation store simply stores conversation state in me
 </div>
 
 ```javascript
-TODO
+const app = new App({
+  token,
+  signingSecret,
+  // It's more likely that you'd create a class for a convo store
+  convoStore: new simpleConvoStore()
+});
+
+// A simple implementation of a conversation store with a Firebase-like database
+class simpleConvoStore {
+  set(conversationId, value, expiresAt) {
+    // Returns a Promise
+    return db().ref('conversations/' + conversationId).set({ value, expiresAt });
+  }
+
+  get(conversationId) {
+    // Returns a Promise
+    return new Promise((resolve, reject) => {
+      db().ref('conversations/' + conversationId).once('value').then((result) => {
+        if (result !== undefined) {
+          if (result.expiresAt !== undefined && Date.now() > result.expiresAt) {
+            db().ref('conversations/' + conversationId).delete();
+
+            reject(new Error('Conversation expired'));
+          }
+          resolve(result.value)
+        } else {
+          // Conversation not found
+          reject(new Error('Conversation not found'));
+        }
+      });
+    });
+  }
+}
 ```
