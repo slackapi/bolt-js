@@ -159,28 +159,17 @@ body {
   width: 100%;
   grid-area: secondary;
   margin: 1em auto 0 auto;
-  display: grid;
   font-size: 1em;
   line-height: 1.75em;
-  grid-template-areas:
-    "secondhead"
-    "secondbody"
-    "secondcode"
-}
-
-.secondary-wrapper .secondary-header {
-  grid-area: secondhead;
 }
 
 .secondary-wrapper .language-javascript {
-  grid-area: secondcode;
   width: 50%;
   float: left;
   margin-top: 1em;
 }
 
 .content .section-wrapper .secondary-content {
-  grid-area: secondbody;
   width: 45%;
   float: left;
   margin-right: 5%;
@@ -207,12 +196,6 @@ body {
       "body code"
       "secondary secondary"
       "divider divider"
-  }
-
-  .secondary-wrapper {
-    grid-template-columns: 50% 50%;
-    grid-template-areas:
-      "secondbody secondcode"
   }
 }
 
