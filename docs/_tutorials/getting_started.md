@@ -112,7 +112,6 @@ const port = process.env.PORT || 3000;
 // Starts your app
 (async () => {
   await app.start(port);
-
   console.log('Your Bolt app is up and running');
 });
 ```
@@ -185,8 +184,7 @@ const port = process.env.PORT || 3000;
 
 (async () => {
   await app.start(port);
-
-  console.log('Your Bolt ⚡ app is up and running');
+  console.log('Your Bolt app is up and running');
 });
 ```
 
@@ -246,8 +244,7 @@ const port = process.env.PORT || 3000;
 
 (async () => {
   await app.start(port);
-
-  console.log('Your Bolt ⚡ app is up and running');
+  console.log('Your Bolt app is up and running');
 });
 ```
 
@@ -301,8 +298,7 @@ const port = process.env.PORT || 3000;
 
 (async () => {
   await app.start(port);
-
-  console.log('Your Bolt ⚡ app is up and running');
+  console.log('Your Bolt app is up and running');
 });
 ```
 
