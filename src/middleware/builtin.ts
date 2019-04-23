@@ -13,7 +13,6 @@ import {
   DialogSubmitAction,
   MessageAction,
   BlockElementAction,
-  Context,
 } from '../types';
 import { ActionConstraints } from '../App';
 
