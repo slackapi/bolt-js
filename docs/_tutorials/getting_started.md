@@ -107,8 +107,6 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-const port = process.env.PORT || 3000;
-
 (async () => {
   // Start your app
   await app.start(process.env.PORT || 3000);
@@ -181,8 +179,6 @@ app.message('hello', ({ message, say }) => {
   say(`Hey there <@{message.user}!`);
 });
 
-const port = process.env.PORT || 3000;
-
 (async () => {
   // Start your app
   await app.start(process.env.PORT || 3000);
@@ -243,8 +239,6 @@ app.message('hello', ({ message, say }) => {
   });
 });
 
-const port = process.env.PORT || 3000;
-
 (async () => {
   // Start your app
   await app.start(process.env.PORT || 3000);
@@ -298,8 +292,6 @@ app.message('hello', ({ message, say }) => {
 app.action('button_click', ({ action, say }) {
   say(`@{action.user} clicked the button`);
 });
-
-const port = process.env.PORT || 3000;
 
 (async () => {
   // Start your app
