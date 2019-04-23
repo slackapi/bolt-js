@@ -11,8 +11,9 @@ In the case that you aren’t in listener middleware for one of the built-in met
 </div>
 
 ```javascript
-app.command('bold', async ({ command, say }) => {
-  say(`*${command.text}*`);
+// Listens for messsages containing "knock knock" and responds with an italicized "who's there?"
+app.message('knock knock', ({ message, say }) => {
+  say(`_Who's there?_`);
 });
 ```
 
@@ -29,7 +30,7 @@ To explore adding rich message layouts to your app, read through [the guide on o
 
 ```javascript
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
-app.event('reaction_added', async ({ event, say }) => {
+app.event('reaction_added', ({ event, say }) => {
   if (event.reaction === 'calendar') {
     say({
       blocks: [{
