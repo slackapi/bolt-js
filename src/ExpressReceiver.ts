@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Receiver, ReceiverEvent ReceiverAckTimeoutError } from './types';
+import { Receiver, ReceiverEvent, ReceiverAckTimeoutError } from './types';
 import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
 import axios from 'axios';
