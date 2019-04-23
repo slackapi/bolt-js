@@ -73,6 +73,10 @@ body {
   background-color: #D7D7D7;
 }
 
+.panel .sidebar-content a:hover {
+  text-decoration: none;
+}
+
 .panel .sidebar-content ul.sidebar-section li.active {
   background-color: var(--blue);
   color: var(--white);
@@ -110,24 +114,44 @@ body {
 }
 
 .tutorial {
-  width: 90%;
+  width: 80%;
   margin: 1em auto 0 auto;
+  padding-bottom: 2em;
   font-size: 1em;
   line-height: 1.75em;
+}
+
+.tutorial img {
+  width: 60%;
+  margin: 0.2em auto;
+  display: block;
+  box-shadow: 0 0 15px #DDDDDD;
+}
+
+.tutorial blockquote {
+  margin: 0 0 0 1em;
+  padding: 0 6em 0 1.5em;
+  border-radius: 6px;
+  border-left: 6px solid #DDD;
+  font-size: 0.95em;
+}
+
+.tutorial h3 {
+  padding-bottom: 1em;
 }
 
 .content .section-wrapper .language-javascript {
   grid-area: code;
 }
 
-.content .section-wrapper .language-javascript pre {
+pre {
   background-color: var(--light-grey) !important;
   background-image: none;
   padding: 2em;
   border: 1px solid #DDDDDD;
 }
 
-.content .section-wrapper .language-javascript pre code {
+pre code {
   font-size: 0.85em !important;
 }
 
@@ -150,7 +174,7 @@ body {
   width: 100%;
 }
 
-.content .section-wrapper a:hover {
+a:hover {
   text-decoration: underline;
 }
 

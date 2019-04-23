@@ -9,6 +9,7 @@ redirect_from:
 ---
 
 <div class="section-content">
+# Getting started
 This guide is meant to show you how to get up and running with your first Bolt app. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 </div> 
 
