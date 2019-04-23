@@ -14,7 +14,7 @@
   </div>
 
   <ul class="sidebar-section">
-    <a href="#basic"><li class="title">Main concepts</li></a>
+    <a href="#basic"><li class="title">Basic concepts</li></a>
     {% assign basic_sections = site.basic | sort: "order" %}
     {% for section in basic_sections %}
       <a href="{{ site.url | append: site.baseurl }}/#{{ section.slug }}"><li>{{section.title}}</li></a>
