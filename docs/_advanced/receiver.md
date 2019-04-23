@@ -9,7 +9,7 @@ A receiver is responsible for handling and parsing any incoming requests from Sl
 
 | Method       | Parameters                       | Return type |
 |--------------|----------------------------------|-------------|
-| `on()`       | `type: string`, `listener: fn()` | `void`      |
+| `on()`       | `type: string`, `listener: fn()` | `unknown`   |
 | `start()`    | None                             | `Promise`   |
 | `stop()`     | None                             | `Promise`   |
 
