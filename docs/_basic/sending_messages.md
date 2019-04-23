@@ -22,8 +22,7 @@ app.command('bold', async ({ command, say }) => {
 </summary>
 
 <div class="secondary-wrapper">
-
-<div class="secondary-content">
+<div class="secondary-content" >
 `say()` accepts more complex message payloads to make it easy to add functionality and structure to your messages.
 
 To explore adding rich message layouts to your app, read through [the guide on our API site](https://api.slack.com/messaging/composing/layouts) and look through templates of common app flows [in the Block Kit Builder](https://api.slack.com/tools/block-kit-builder?template=1).

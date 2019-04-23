@@ -157,7 +157,7 @@ body {
 /* Secondary content */
 .secondary-wrapper {
   width: 100%;
-  margin: 0 auto;
+  margin: 1em auto 0 auto;
   display: grid;
   grid-gap: 25px;
   grid-template-areas:
@@ -175,12 +175,9 @@ body {
   line-height: 1.75em;
 }
 
-.content .section-wrapper summary {
-  grid-area: head;
-}
-
 .content .section-wrapper summary h4 {
   display: inline;
+  padding-bottom: 1em;
 }
 
 /* Responsive */
@@ -204,7 +201,6 @@ body {
   .secondary-wrapper {
     grid-template-columns: 50% 50%;
     grid-template-areas:
-      "head head"
       "body code"
   }
 }
