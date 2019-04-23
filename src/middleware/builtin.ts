@@ -79,8 +79,7 @@ export function matchConstraints(
   return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
-    let tempMatches: RegExpExecArray | null;
-    const matches: any[] = [];
+    let tempMatches: RegExpMatchArray | null;
 
     if (constraints.block_id !== undefined) {
       if (!isBlockPayload(payload)) {
@@ -92,8 +91,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        if ((tempMatches = constraints.block_id.exec(payload.block_id)) !== null) {
-          matches.concat(tempMatches);
+        tempMatches = payload.block_id.match(constraints.block_id);
+
+        if (tempMatches !== null) {
+          context['blockIdMatches'] = tempMatches;
         } else {
           return;
         }
@@ -110,8 +111,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        if ((tempMatches = constraints.action_id.exec(payload.action_id)) !== null) {
-          matches.concat(tempMatches);
+        tempMatches = payload.action_id.match(constraints.action_id);
+
+        if (tempMatches !== null) {
+          context['actionIdMatches'] = tempMatches;
         } else {
           return;
         }
@@ -127,16 +130,15 @@ export function matchConstraints(
           return;
         }
       } else {
-        if ((tempMatches = constraints.callback_id.exec(body.callback_id)) !== null) {
-          matches.concat(tempMatches);
+        tempMatches = body.callback_id.match(constraints.callback_id);
+
+        if (tempMatches !== null) {
+          context['callbackIdMatches'] = tempMatches;
         } else {
           return;
         }
       }
     }
-
-    // Add matches to context
-    context['matches'] = matches;
 
     next();
   };
@@ -147,7 +149,7 @@ export function matchConstraints(
  */
 export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, context, next }) => {
-    let tempMatches: RegExpExecArray | null;
+    let tempMatches: RegExpMatchArray | null;
 
     // Filter out messages that don't contain the pattern
     if (typeof pattern === 'string') {
@@ -155,7 +157,9 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
         return;
       }
     } else {
-      if ((tempMatches = pattern.exec(message.text)) !== null) {
+      tempMatches = message.text.match(pattern);
+
+      if (tempMatches !== null) {
         context['matches'] = tempMatches;
       } else {
         return;
