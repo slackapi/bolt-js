@@ -50,7 +50,9 @@
     </span>
 
     <span class="version">
-      <a href="https://github.com/pages/slackapi/bolt"></a>
+        <!-- | sort: "latest_release"  -->
+        
+        <a href="">v</a>
     </span>
   </div>
 
@@ -246,13 +248,12 @@ npm init
   <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span>
 <span class="p">});</span>
 
-<span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">;</span>
-
-<span class="c1">// Starts your app</span>
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">port</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Your Bolt app is up and running'</span><span class="p">);</span>
-<span class="p">});</span>
+  <span class="c1">// Start your app</span>
+  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'⚡️ Bolt app is running!'</span><span class="p">);</span>
+<span class="p">})();</span>
 </code></pre>
   </div>
 </div>
@@ -325,12 +326,12 @@ npm init
   <span class="nx">say</span><span class="p">(</span><span class="s2">`Hey there &lt;@{message.user}!`</span><span class="p">);</span>
 <span class="p">});</span>
 
-<span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">;</span>
-
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">port</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Your Bolt app is up and running'</span><span class="p">);</span>
-<span class="p">});</span>
+  <span class="c1">// Start your app</span>
+  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'⚡️ Bolt app is running!'</span><span class="p">);</span>
+<span class="p">})();</span>
 </code></pre>
   </div>
 </div>
@@ -388,12 +389,12 @@ npm init
   <span class="p">});</span>
 <span class="p">});</span>
 
-<span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">;</span>
-
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">port</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Your Bolt app is up and running'</span><span class="p">);</span>
-<span class="p">});</span>
+  <span class="c1">// Start your app</span>
+  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'⚡️ Bolt app is running!'</span><span class="p">);</span>
+<span class="p">})();</span>
 </code></pre>
   </div>
 </div>
@@ -447,12 +448,12 @@ npm init
   <span class="nx">say</span><span class="p">(</span><span class="s2">`@{action.user} clicked the button`</span><span class="p">);</span>
 <span class="p">});</span>
 
-<span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">;</span>
-
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">port</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Your Bolt app is up and running'</span><span class="p">);</span>
-<span class="p">});</span>
+  <span class="c1">// Start your app</span>
+  <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'⚡️ Bolt app is running!'</span><span class="p">);</span>
+<span class="p">})();</span>
 </code></pre>
   </div>
 </div>
