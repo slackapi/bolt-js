@@ -28,14 +28,12 @@ app.event('team_join', async ({ event, context }) => {
 });
 ```
 
-<details markdown="0">
-<summary class="section-head">
+<details class="secondary-wrapper" >
+<summary class="section-head" markdown="0">
 <h4 class="section-head">Filtering on event subtypes</h4>
 </summary>
 
-<div class="secondary-wrapper">
-
-<div class="secondary-content">
+<div class="secondary-content" markdown="0">
 You can filter on subtypes of events by using the built-in `matchEventSubtype()` middleware. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
 </div>
 
@@ -46,5 +44,4 @@ app.event('message', matchEventSubtype('bot_message'), async ({ event }) => {
 });
 ```
 
-</div>
 </details>

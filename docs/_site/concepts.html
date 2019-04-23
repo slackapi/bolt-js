@@ -146,29 +146,29 @@
   </div>
 </div>
 
-<details>
+<details class="secondary-wrapper">
   <summary class="section-head">
     <h4 class="section-head">Using a RegExp pattern</h4>
   </summary>
 
-  <div class="secondary-wrapper">
+  <div class="secondary-content">
+    <p>A RegExp pattern can be used instead of a string for more granular matching.</p>
 
-    <div class="secondary-content">
-      <p>A RegExp pattern can be used instead of a string for more granular matching.</p>
+    <p>All of the results of the RegExp match will be in <code class="highlighter-rouge">context.matches</code>.</p>
+  </div>
 
-      <p>All of the results of the RegExp match will be in <code class="highlighter-rouge">context.matches</code>.</p>
-    </div>
-
-    <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="sr">/^</span><span class="se">(</span><span class="sr">hi|hello|hey</span><span class="se">)</span><span class="sr">.*/</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
+  <div class="language-javascript highlighter-rouge">
+    <div class="highlight">
+      <pre class="highlight"><code><span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="sr">/^</span><span class="se">(</span><span class="sr">hi|hello|hey</span><span class="se">)</span><span class="sr">.*/</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">// RegExp matches are inside of context.matches</span>
   <span class="kd">const</span> <span class="nx">greeting</span> <span class="o">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
   
   <span class="nx">say</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">greeting</span><span class="p">}</span><span class="s2">, how are you?`</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div>    </div>
-
+</code></pre>
+    </div>
   </div>
+
 </details>
 
 
@@ -193,21 +193,21 @@
   </div>
 </div>
 
-<details>
+<details class="secondary-wrapper">
   <summary>
-    <h4 class="section-head">Sending a message with blocks</h4>
+    <h4 class="secondary-header">Sending a message with blocks</h4>
   </summary>
 
-  <div class="secondary-wrapper">
-    <div class="secondary-content">
-      <p><code class="highlighter-rouge">say()</code> accepts more complex message payloads to make it easy to add functionality and structure to your messages.</p>
+  <div class="secondary-content">
+    <p><code class="highlighter-rouge">say()</code> accepts more complex message payloads to make it easy to add functionality and structure to your messages.</p>
 
-      <p>To explore adding rich message layouts to your app, read through <a href="https://api.slack.com/messaging/composing/layouts">the guide on our API site</a> and look through templates of common app flows <a href="https://api.slack.com/tools/block-kit-builder?template=1">in the Block Kit Builder</a>.</p>
-    </div>
+    <p>To explore adding rich message layouts to your app, read through <a href="https://api.slack.com/messaging/composing/layouts">the guide on our API site</a> and look through templates of common app flows <a href="https://api.slack.com/tools/block-kit-builder?template=1">in the Block Kit Builder</a>.</p>
+  </div>
 
-    <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="c1">// Sends a section block with datepicker when someone reacts with a 📅 emoji</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">event</span><span class="p">(</span><span class="s1">'reaction_added'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
+  <div class="language-javascript highlighter-rouge">
+    <div class="highlight">
+      <pre class="highlight"><code><span class="c1">// Sends a section block with datepicker when someone reacts with a 📅 emoji</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">event</span><span class="p">(</span><span class="s1">'reaction_added'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">reaction</span> <span class="o">===</span> <span class="s1">'calendar'</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">say</span><span class="p">({</span>
       <span class="na">blocks</span><span class="p">:</span> <span class="p">[{</span>
@@ -228,8 +228,8 @@
         <span class="p">}]});</span>
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre></div>    </div>
-
+</code></pre>
+    </div>
   </div>
 </details>
 
@@ -303,25 +303,25 @@
   </div>
 </div>
 
-<details>
+<details class="secondary-wrapper">
   <summary class="section-head">
     <h4 class="section-head">Filtering on event subtypes</h4>
   </summary>
 
-  <div class="secondary-wrapper">
+  <div class="secondary-content">
+    <p>You can filter on subtypes of events by using the built-in <code class="highlighter-rouge">matchEventSubtype()</code> middleware. Common message subtypes like <code class="highlighter-rouge">bot_message</code> and <code class="highlighter-rouge">message_replied</code> can be found <a href="https://api.slack.com/events/message#message_subtypes">on the message event page</a>.</p>
+  </div>
 
-    <div class="secondary-content">
-      <p>You can filter on subtypes of events by using the built-in <code class="highlighter-rouge">matchEventSubtype()</code> middleware. Common message subtypes like <code class="highlighter-rouge">bot_message</code> and <code class="highlighter-rouge">message_replied</code> can be found <a href="https://api.slack.com/events/message#message_subtypes">on the message event page</a>.</p>
-    </div>
-
-    <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="c1">// event('message') is the same as message()</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">event</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="nx">matchEventSubtype</span><span class="p">(</span><span class="s1">'bot_message'</span><span class="p">),</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
+  <div class="language-javascript highlighter-rouge">
+    <div class="highlight">
+      <pre class="highlight"><code><span class="c1">// event('message') is the same as message()</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">event</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="nx">matchEventSubtype</span><span class="p">(</span><span class="s1">'bot_message'</span><span class="p">),</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`The bot user </span><span class="p">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2"> said </span><span class="p">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div>    </div>
-
+</code></pre>
+    </div>
   </div>
+
 </details>
 
 
@@ -372,21 +372,20 @@
   </div>
 </div>
 
-<details>
+<details class="secondary-wrapper">
   <summary class="section-head">
     <h4 class="section-head">Listening to actions using a constraint object</h4>
   </summary>
 
-  <div class="secondary-wrapper">
+  <div class="secondary-content">
+    <p>You can use a constraints object to listen to <code class="highlighter-rouge">callback_id</code>s, <code class="highlighter-rouge">block_id</code>s, and <code class="highlighter-rouge">action_id</code>s (or any combination of them). Constraints in the object can be of type string or RegExp.</p>
+  </div>
 
-    <div class="secondary-content">
-      <p>You can use a constraints object to listen to <code class="highlighter-rouge">callback_id</code>s, <code class="highlighter-rouge">block_id</code>s, and <code class="highlighter-rouge">action_id</code>s (or any combination of them). Constraints in the object can be of type string or RegExp.</p>
-    </div>
-
-    <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="c1">// Your middleware will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'</span>
+  <div class="language-javascript highlighter-rouge">
+    <div class="highlight">
+      <pre class="highlight"><code><span class="c1">// Your middleware will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'</span>
 <span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">({</span> <span class="na">action_id</span><span class="p">:</span> <span class="s1">'select_user'</span><span class="p">,</span> <span class="na">block_id</span><span class="p">:</span> <span class="s1">'assign_ticket'</span> <span class="p">},</span>
-  <span class="k">async</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">context</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
+  <span class="k">async</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">context</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">ack</span><span class="p">();</span>
     <span class="k">try</span> <span class="p">{</span>
       <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">reactions</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
@@ -400,9 +399,10 @@
       <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">});</span>
-</code></pre></div>    </div>
-
+</code></pre>
+    </div>
   </div>
+
 </details>
 
 
@@ -465,26 +465,26 @@
   </div>
 </div>
 
-<details>
+<details class="secondary-wrapper">
   <summary class="section-head">
     <h4 class="section-head">Using respond()</h4>
   </summary>
 
-  <div class="secondary-wrapper">
-
-    <div class="secondary-content">
-      <p>In addition to using <code class="highlighter-rouge">say()</code>, you can respond to them using <code class="highlighter-rouge">respond()</code>. <code class="highlighter-rouge">respond()</code> is a utility for calling the <code class="highlighter-rouge">response_url</code>, so it behaves in the same way. You can pass a JSON object with a new message payload that will be published back to the source of the original interaction. Response URLs are covered in more depth <a href="https://api.slack.com/messaging/interactivity">on our API site</a>.</p>
-    </div>
-
-    <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="c1">// Listens to actions triggered with action_id of “user_select”</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'user_select'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">respond</span> <span class="p">})</span> <span class="o">=&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="p">{</span>
-	<span class="nx">ack</span><span class="p">();</span>
-	<span class="nx">respond</span><span class="p">(</span><span class="s2">`You selected &amp;lt;@</span><span class="p">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">selected_user</span><span class="p">}</span><span class="s2">&amp;gt;`</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></div>    </div>
-
+  <div class="secondary-content">
+    <p>In addition to using <code class="highlighter-rouge">say()</code>, you can respond to them using <code class="highlighter-rouge">respond()</code>. <code class="highlighter-rouge">respond()</code> is a utility for calling the <code class="highlighter-rouge">response_url</code>, so it behaves in the same way. You can pass a JSON object with a new message payload that will be published back to the source of the original interaction. Response URLs are covered in more depth <a href="https://api.slack.com/messaging/interactivity">on our API site</a>.</p>
   </div>
+
+  <div class="language-javascript highlighter-rouge">
+    <div class="highlight">
+      <pre class="highlight"><code><span class="c1">// Listens to actions triggered with action_id of “user_select”</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'user_select'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">respond</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="nx">ack</span><span class="p">();</span>
+	<span class="nx">respond</span><span class="p">(</span><span class="s2">`You selected &lt;@</span><span class="p">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">selected_user</span><span class="p">}</span><span class="s2">&gt;`</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+    </div>
+  </div>
+
 </details>
 
 
@@ -892,63 +892,62 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
   </div>
 </div>
 
-<details>
+<details class="secondary-wrapper">
   <summary class="section-head">
     <h4 class="section-head">Sending log output somewhere besides the console</h4>
   </summary>
 
-  <div class="secondary-wrapper">
+  <div class="secondary-content">
+    <p>If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a logger. A custom logger must implement specific methods (known as the <code class="highlighter-rouge">Logger</code> interface):</p>
 
-    <div class="secondary-content">
-      <p>If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a logger. A custom logger must implement specific methods (known as the <code class="highlighter-rouge">Logger</code> interface):</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Parameters</th>
+          <th>Return type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="highlighter-rouge">setLevel()</code></td>
+          <td><code class="highlighter-rouge">level: LogLevel</code></td>
+          <td><code class="highlighter-rouge">void</code></td>
+        </tr>
+        <tr>
+          <td><code class="highlighter-rouge">setName()</code></td>
+          <td><code class="highlighter-rouge">name: string</code></td>
+          <td><code class="highlighter-rouge">void</code></td>
+        </tr>
+        <tr>
+          <td><code class="highlighter-rouge">debug()</code></td>
+          <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+          <td><code class="highlighter-rouge">void</code></td>
+        </tr>
+        <tr>
+          <td><code class="highlighter-rouge">info()</code></td>
+          <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+          <td><code class="highlighter-rouge">void</code></td>
+        </tr>
+        <tr>
+          <td><code class="highlighter-rouge">warn()</code></td>
+          <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+          <td><code class="highlighter-rouge">void</code></td>
+        </tr>
+        <tr>
+          <td><code class="highlighter-rouge">error()</code></td>
+          <td><code class="highlighter-rouge">...msgs: any[]</code></td>
+          <td><code class="highlighter-rouge">void</code></td>
+        </tr>
+      </tbody>
+    </table>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Method</th>
-            <th>Parameters</th>
-            <th>Return type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code class="highlighter-rouge">setLevel()</code></td>
-            <td><code class="highlighter-rouge">level: LogLevel</code></td>
-            <td><code class="highlighter-rouge">void</code></td>
-          </tr>
-          <tr>
-            <td><code class="highlighter-rouge">setName()</code></td>
-            <td><code class="highlighter-rouge">name: string</code></td>
-            <td><code class="highlighter-rouge">void</code></td>
-          </tr>
-          <tr>
-            <td><code class="highlighter-rouge">debug()</code></td>
-            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
-            <td><code class="highlighter-rouge">void</code></td>
-          </tr>
-          <tr>
-            <td><code class="highlighter-rouge">info()</code></td>
-            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
-            <td><code class="highlighter-rouge">void</code></td>
-          </tr>
-          <tr>
-            <td><code class="highlighter-rouge">warn()</code></td>
-            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
-            <td><code class="highlighter-rouge">void</code></td>
-          </tr>
-          <tr>
-            <td><code class="highlighter-rouge">error()</code></td>
-            <td><code class="highlighter-rouge">...msgs: any[]</code></td>
-            <td><code class="highlighter-rouge">void</code></td>
-          </tr>
-        </tbody>
-      </table>
+    <p>A very simple custom logger might ignore the name and level, and write all messages to a file.</p>
+  </div>
 
-      <p>A very simple custom logger might ignore the name and level, and write all messages to a file.</p>
-    </div>
-
-    <div class="language-javascript highlighter-rouge">
-<div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@slack/bolt'</span><span class="p">);</span>
+  <div class="language-javascript highlighter-rouge">
+    <div class="highlight">
+      <pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@slack/bolt'</span><span class="p">);</span>
 <span class="kd">const</span> <span class="p">{</span> <span class="nx">createWriteStream</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span>
 <span class="kd">const</span> <span class="nx">logWritable</span> <span class="o">=</span> <span class="nx">createWriteStream</span><span class="p">(</span><span class="s1">'/var/my_log_file'</span><span class="p">);</span> <span class="c1">// Not shown: close this stream</span>
 
@@ -965,9 +964,10 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
     <span class="nx">setName</span><span class="p">():</span> <span class="p">{</span> <span class="p">},</span>
   <span class="p">},</span>
 <span class="p">});</span>
-</code></pre></div>    </div>
-
+</code></pre>
+    </div>
   </div>
+
 </details>
 
 

@@ -16,13 +16,12 @@ app.command('bold', async ({ command, say }) => {
 });
 ```
 
-<details markdown="0">
-<summary>
-<h4 class="section-head">Sending a message with blocks</h4>
+<details class="secondary-wrapper">
+<summary markdown="0">
+<h4 class="secondary-header">Sending a message with blocks</h4>
 </summary>
 
-<div class="secondary-wrapper">
-<div class="secondary-content" >
+<div class="secondary-content" markdown="0">
 `say()` accepts more complex message payloads to make it easy to add functionality and structure to your messages.
 
 To explore adding rich message layouts to your app, read through [the guide on our API site](https://api.slack.com/messaging/composing/layouts) and look through templates of common app flows [in the Block Kit Builder](https://api.slack.com/tools/block-kit-builder?template=1).
@@ -52,6 +51,4 @@ app.event('reaction_added', async ({ event, say }) => {
   }
 });
 ```
-
-</div>
 </details>

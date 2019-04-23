@@ -21,14 +21,12 @@ app.action('approve_button', async ({ ack, say }) => {
 });
 ```
 
-<details markdown="0">
-<summary class="section-head">
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
 <h4 class="section-head">Listening to actions using a constraint object</h4>
 </summary>
 
-<div class="secondary-wrapper">
-
-<div class="secondary-content">
+<div class="secondary-content" markdown="0">
 You can use a constraints object to listen to `callback_id`s, `block_id`s, and `action_id`s (or any combination of them). Constraints in the object can be of type string or RegExp.
 </div>
 
@@ -51,5 +49,4 @@ app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
 });
 ```
 
-</div>
 </details>

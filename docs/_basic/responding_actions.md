@@ -18,14 +18,12 @@ app.action('approve_button', async ({ ack, say }) => {
 });
 ```
 
-<details markdown="0">
-<summary class="section-head">
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
 <h4 class="section-head">Using respond()</h4>
 </summary>
 
-<div class="secondary-wrapper">
-
-<div class="secondary-content">
+<div class="secondary-content" markdown="0">
 In addition to using `say()`, you can respond to them using `respond()`. `respond()` is a utility for calling the `response_url`, so it behaves in the same way. You can pass a JSON object with a new message payload that will be published back to the source of the original interaction. Response URLs are covered in more depth [on our API site](https://api.slack.com/messaging/interactivity).
 </div>
 
@@ -37,5 +35,4 @@ app.action('user_select', async ({ action, ack, respond }) => {
 });
 ```
 
-</div>
 </details>
