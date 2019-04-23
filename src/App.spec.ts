@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
+import { Receiver } from './types';
 
 describe('App', function () {
   describe('constructor', function () {
@@ -25,7 +26,7 @@ describe('App', function () {
       const { App } = await importApp();
       try {
         new App({ signingSecret: '' }); // tslint:disable-line:no-unused-expression
-        throw new Error('should not reach');
+        assert.fail();
       } catch (error) {
         assert.instanceOf(error, Error);
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
@@ -37,11 +38,28 @@ describe('App', function () {
       try {
          // tslint:disable-next-line:no-unused-expression
         new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
-        throw new Error('should not reach');
+        assert.fail();
       } catch (error) {
         assert.instanceOf(error, Error);
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
+      }
+    });
+    describe('with a custom receiver', function () {
+      it('should succeed with no signing secret for the default receiver', async function () {
+        const { App } = await importApp();
+        const mockReceiver = createMockReceiver();
+        new App({ authorize: sinon.spy(), receiver: mockReceiver }); // tslint:disable-line:no-unused-expression
+      });
+    });
+    it('should fail when no signing secret for the default receiver is specified', async function () {
+      const { App } = await importApp();
+      try {
+        new App({ authorize: sinon.spy() }); // tslint:disable-line:no-unused-expression
+        assert.fail();
+      } catch (error) {
+        assert.instanceOf(error, Error);
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
     });
   });
@@ -97,4 +115,14 @@ async function importApp() {
   return {
     App,
   };
+}
+
+function createMockReceiver(): Receiver {
+  const mock = {
+    on: sinon.fake(),
+    start: sinon.fake.resolves(undefined),
+    stop: sinon.fake.resolves(undefined),
+  };
+  mock.on = sinon.fake.returns(mock);
+  return mock;
 }
