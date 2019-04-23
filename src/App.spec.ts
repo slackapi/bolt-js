@@ -5,6 +5,7 @@ import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
 import { Receiver } from './types';
+import { ConversationStore } from './conversation-store';
 
 describe('App', function () {
   describe('constructor', function () {
@@ -22,7 +23,7 @@ describe('App', function () {
       new App({ authorize: authorizeCallback, signingSecret: '' }); // tslint:disable-line:no-unused-expression
       assert(authorizeCallback.notCalled);
     });
-    it('should fail without a token for single team authorization', async function () {
+    it('should fail without a token  for single team authorization or authorize callback', async function () {
       const { App } = await importApp();
       try {
         new App({ signingSecret: '' }); // tslint:disable-line:no-unused-expression
@@ -61,6 +62,27 @@ describe('App', function () {
         assert.instanceOf(error, Error);
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
+    });
+    it('should initialize MemoryStore conversation store by default', async function () {
+      const { App, memoryStoreStub, conversationContextStub } = await importApp();
+      new App({ authorize: sinon.spy(), signingSecret: '' }); // tslint:disable-line:no-unused-expression
+      assert(memoryStoreStub.calledWithNew);
+      assert(conversationContextStub.called);
+    });
+    it('should initialize without a conversation store when option is false', async function () {
+      const { App, conversationContextStub } = await importApp();
+      // tslint:disable-next-line:no-unused-expression
+      new App({ convoStore: false, authorize: sinon.spy(), signingSecret: '' });
+      assert(conversationContextStub.notCalled);
+    });
+    describe('with a custom conversation store', function () {
+      it('should initialize the conversation store', async function () {
+        const { App, conversationContextStub } = await importApp();
+        const mockConvoStore = createMockConvoStore();
+        // tslint:disable-next-line:no-unused-expression
+        new App({ convoStore: mockConvoStore, authorize: sinon.spy(), signingSecret: '' });
+        assert(conversationContextStub.firstCall.calledWith(mockConvoStore));
+      });
     });
   });
 });
@@ -101,6 +123,8 @@ async function importAppWhichFetchesOwnBotIds() {
 }
 
 async function importApp() {
+  const memoryStoreStub = sinon.stub();
+  const conversationContextStub = sinon.stub();
   const App = (await rewiremock.module(() => import('./App'), { // tslint:disable-line:variable-name
     '@slack/web-api': {
       WebClient: class {
@@ -110,10 +134,16 @@ async function importApp() {
       },
       addAppMetadata: sinon.fake(),
     },
+    './conversation-store': {
+      conversationContext: conversationContextStub,
+      MemoryStore: memoryStoreStub,
+    },
   })).default;
 
   return {
     App,
+    memoryStoreStub,
+    conversationContextStub,
   };
 }
 
@@ -125,4 +155,11 @@ function createMockReceiver(): Receiver {
   };
   mock.on = sinon.fake.returns(mock);
   return mock;
+}
+
+function createMockConvoStore(): ConversationStore {
+  return {
+    set: sinon.fake.resolves(undefined),
+    get: sinon.fake.resolves(undefined),
+  };
 }
