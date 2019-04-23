@@ -11,10 +11,10 @@ export interface ReceiverEvent {
 }
 
 export interface Receiver {
-  on(event: 'message', listener: (event: ReceiverEvent) => void): this;
+  on(event: 'message', listener: (event: ReceiverEvent) => void): unknown;
   // strictly speaking, Error | ReceiverAckTimeoutError is just Error since the latter is a subtype of the former, but
   // being explicit here is good for documentation purposes
-  on(event: 'error', listener: (error: Error | ReceiverAckTimeoutError) => void): this;
+  on(event: 'error', listener: (error: Error | ReceiverAckTimeoutError) => void): unknown;
   start(...args: any[]): Promise<unknown>;
   stop(...args: any[]): Promise<unknown>;
 }

@@ -7,6 +7,7 @@ export {
   AuthorizationError,
   ActionConstraints,
   LogLevel,
+  Logger,
 } from './App';
 
 export { ErrorCode } from './errors';
