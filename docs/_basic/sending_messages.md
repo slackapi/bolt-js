@@ -11,7 +11,7 @@ In the case that you aren’t in listener middleware for one of the built-in met
 </div>
 
 ```javascript
-app.command('bold', async ({ command, say }) => {
+app.command('/bold', ({ command, say }) => {
   say(`*${command.text}*`);
 });
 ```
