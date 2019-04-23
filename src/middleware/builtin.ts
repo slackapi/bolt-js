@@ -78,8 +78,7 @@ export function matchConstraints(
   return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
-    let tempMatches: RegExpExecArray | null;
-    let matches: RegExpExecArray[] = [];
+    let tempMatches: RegExpMatchArray | null;
 
     if (constraints.block_id !== undefined) {
       if (!isBlockPayload(payload)) {
@@ -91,16 +90,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        while ((tempMatches = constraints.block_id.exec(payload.block_id)) !== null) {
-          matches.push(tempMatches);
-          // Avoids an infinite loop if /g isn't at the end of the RegExp
-          if (!constraints.block_id.global) {
-            break;
-          }
-        }
+        tempMatches = payload.block_id.match(constraints.block_id);
 
-        if (matches.length !== 0) {
-          context['blockIdMatches'] = matches;
+        if (tempMatches !== null) {
+          context['blockIdMatches'] = tempMatches;
         } else {
           return;
         }
@@ -117,17 +110,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        matches = [];
-        while ((tempMatches = constraints.action_id.exec(payload.action_id)) !== null) {
-          matches.push(tempMatches);
-          // Avoids an infinite loop if /g isn't at the end of the RegExp
-          if (!constraints.action_id.global) {
-            break;
-          }
-        }
+        tempMatches = payload.action_id.match(constraints.action_id);
 
-        if (matches.length !== 0) {
-          context['actionId'] = matches;
+        if (tempMatches !== null) {
+          context['actionIdMatches'] = tempMatches;
         } else {
           return;
         }
@@ -143,17 +129,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        matches = [];
-        while ((tempMatches = constraints.callback_id.exec(body.callback_id)) !== null) {
-          matches.push(tempMatches);
-          // Avoids an infinite loop if /g isn't at the end of the RegExp
-          if (!constraints.callback_id.global) {
-            break;
-          }
-        }
+        tempMatches = body.callback_id.match(constraints.callback_id);
 
-        if (matches.length !== 0) {
-          context['callbackIdMatches'] = matches;
+        if (tempMatches !== null) {
+          context['callbackIdMatches'] = tempMatches;
         } else {
           return;
         }
