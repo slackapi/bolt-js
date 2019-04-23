@@ -1,13 +1,16 @@
 import { EventEmitter } from 'events';
-import { Receiver, ReceiverEvent } from './types';
+import { Receiver, ReceiverEvent /*, ReceiverAckTimeoutError */ } from './types';
 import { createServer, Server } from 'http';
-import express, { Request, Response, Application, RequestHandler } from 'express';
+import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
 import axios from 'axios';
 import rawBody from 'raw-body';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import querystring from 'querystring';
+import { ErrorCode, errorWithCode } from './errors';
 
+// TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
+// if that's the reason, let's document that with a comment.
 export interface ExpressReceiverOptions {
   signingSecret: string;
   endpoints?: string | {
@@ -32,6 +35,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     super();
 
     this.app = express();
+    this.app.use(this.errorHandler.bind(this));
     // TODO: what about starting an https server instead of http? what about other options to create the server?
     this.server = createServer(this.app);
 
@@ -39,6 +43,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
       verifySlackRequest(signingSecret),
       parseBody,
       respondToSslCheck,
+      respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
 
@@ -107,6 +112,12 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
       });
     });
   }
+
+  private errorHandler(err: any, _req: Request, _res: Response, next: NextFunction): void {
+    this.emit('error', err);
+    // Forward to express' default error handler (which knows how to print stack traces in development)
+    next(err);
+  }
 }
 
 // TODO: respond to url_verification, and also help a beginner set up Events API (maybe adopt the CLI verify tool)
@@ -114,6 +125,14 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
 const respondToSslCheck: RequestHandler = (req, res, next) => {
   if (req.body && req.body.ssl_check) {
     res.send();
+    return;
+  }
+  next();
+};
+
+const respondToUrlVerification: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.type && req.body.type === 'url_verification') {
+    res.json({ challenge: req.body.challenge });
     return;
   }
   next();
@@ -132,8 +151,10 @@ function verifySlackRequest(signingSecret: string): RequestHandler {
       const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
 
       if (ts < fiveMinutesAgo) {
-        // TODO: coded error
-        const error = new Error('Slack request signing verification failed');
+        const error = errorWithCode(
+          'Slack request signing verification failed. Timestamp is too old.',
+          ErrorCode.ExpressReceiverAuthenticityError,
+        );
         next(error);
       }
 
@@ -142,8 +163,10 @@ function verifySlackRequest(signingSecret: string): RequestHandler {
       hmac.update(`${version}:${ts}:${body}`);
 
       if (!tsscmp(hash, hmac.digest('hex'))) {
-        // TODO: coded error
-        const error = new Error('Slack request signing verification failed');
+        const error = errorWithCode(
+          'Slack request signing verification failed. Signature mismatch.',
+          ErrorCode.ExpressReceiverAuthenticityError,
+        );
         next(error);
       }
 
@@ -151,7 +174,6 @@ function verifySlackRequest(signingSecret: string): RequestHandler {
       req.body = body;
       next();
     } catch (error) {
-      // TODO: coded error
       next(error);
     }
   };

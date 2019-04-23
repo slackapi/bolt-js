@@ -4,9 +4,12 @@ export {
   Authorize,
   AuthorizeSourceData,
   AuthorizeResult,
+  AuthorizationError,
   ActionConstraints,
   LogLevel,
 } from './App';
+
+export { ErrorCode } from './errors';
 
 export {
   default as ExpressReceiver,
