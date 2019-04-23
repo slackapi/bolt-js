@@ -109,11 +109,12 @@ const app = new App({
 
 const port = process.env.PORT || 3000;
 
-// Starts your app
 (async () => {
-  await app.start(port);
-  console.log('Your Bolt app is up and running');
-});
+  // Start your app
+  await app.start(process.env.PORT || 3000);
+
+  console.log('⚡️ Bolt app is running!');
+})();
 ```
 
 Your token and signing secret are all that's required to create your first Bolt app. Save your `app.js` file then, back at the command line, run the following:
@@ -183,9 +184,11 @@ app.message('hello', ({ message, say }) => {
 const port = process.env.PORT || 3000;
 
 (async () => {
-  await app.start(port);
-  console.log('Your Bolt app is up and running');
-});
+  // Start your app
+  await app.start(process.env.PORT || 3000);
+
+  console.log('⚡️ Bolt app is running!');
+})();
 ```
 
 If you restart your app, you should be able to add your bot user to a channel, say "hello", and it will respond.
@@ -243,9 +246,11 @@ app.message('hello', ({ message, say }) => {
 const port = process.env.PORT || 3000;
 
 (async () => {
-  await app.start(port);
-  console.log('Your Bolt app is up and running');
-});
+  // Start your app
+  await app.start(process.env.PORT || 3000);
+
+  console.log('⚡️ Bolt app is running!');
+})();
 ```
 
 The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory.
@@ -297,9 +302,11 @@ app.action('button_click', ({ action, say }) {
 const port = process.env.PORT || 3000;
 
 (async () => {
-  await app.start(port);
-  console.log('Your Bolt app is up and running');
-});
+  // Start your app
+  await app.start(process.env.PORT || 3000);
+
+  console.log('⚡️ Bolt app is running!');
+})();
 ```
 
 You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
