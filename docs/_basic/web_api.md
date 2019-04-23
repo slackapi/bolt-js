@@ -7,7 +7,7 @@ order: 4
 <div class="section-content">
 You can call [any Web API method](https://api.slack.com/methods) using the [`WebClient`](https://slack.dev/node-slack-sdk/web-api) provided to your Bolt app as `app.client` (given that your app has the appropriate scopes). When you call one the client's methods, it returns a Promise containing the response from Slack.
 
-The token used to initialize Bolt can be found in the `context` object, which can be helpful when you’re making calls and need to pass the token yourself.
+The token used to initialize Bolt can be found in the `context` object, which is required for most Web API methods.
 </div>
 
 ```javascript
