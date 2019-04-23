@@ -1,7 +1,7 @@
 ---
 title: Using the Web API
 slug: web-api
-order: 3
+order: 4
 ---
 
 <div class="section-content">
@@ -16,8 +16,9 @@ const whenSeptemberEnds = 1569887999;
 
 app.message('wake me up', async ({ message, context }) => {
   try {
-    // Call the chat.scheduleMessage method
+    // Call the chat.scheduleMessage method with a token
     const result = await app.client.chat.scheduleMessage({
+      // The token you used to initalize your app is placed in `context`
       token: context.botToken,
       channel: message.channel.id,
       post_at: whenSeptemberEnds,

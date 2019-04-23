@@ -1,5 +1,5 @@
 ---
-title: Listening to messages
+title: Listening to message events
 slug: message-listening
 order: 1
 ---

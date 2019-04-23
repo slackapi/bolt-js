@@ -1,7 +1,7 @@
 ---
 title: Listening to actions
 slug: action-listening
-order: 6
+order: 5
 ---
 
 <div class="section-content">
@@ -39,7 +39,7 @@ app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
       const result = await app.client.reactions.add({
         token: context.botToken,
         name: 'white_check_mark',
-        timestamp: action.action_ts,
+        timestamp: action.ts,
         channel: action.channel.id
       });
     }
