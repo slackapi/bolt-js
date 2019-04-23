@@ -6,16 +6,13 @@ slug: getting-started
 
 This guide is meant to show you how to get up and running with your first Bolt app. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 
-<!-- - [Create an app](#create-an-app)
+- [Create an app](#create-an-app)
 - [Tokens and installing apps](#tokens-and-installing-apps)
-- [Setting up interactive components](#setting-up-interactive-components)
-  - [What is a Request URL?](#what-is-a-request-URL)
-  - [Using a local Request URL for development](#using-a-local-request-URL-for-development)
-  - [Add Request URL to your app configuration](#add-the-URL-to-your-app-configuration)
-- [Listening to workspace events](#listening-to-workspace-events)
-  - [Verifying your local endpoint](#verifying-your-local-endpoint)
-  - [Adding event subscriptions](#adding-event-subscriptions)
-- [Next steps](#next-steps) -->
+- [Setting up your local project](#setting-up-your-local-project)
+- [Setting up events](#setting-up-events)
+- [Listening and responding to a message](#listening-and-responding-to-a-message)
+- [Sending and responding to actions](#sending-and-responding-to-actions)
+- [Next steps](#next-steps)
 
 ### Create an app
 First thing's first: before you start developing with Bolt, you'll need to [create an app](https://api.slack.com/apps/new). After you fill out an App Name (_you can change it later_) and picking a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
@@ -162,12 +159,132 @@ const port = process.env.PORT || 3000;
 });
 ```
 
-If you restart your app, you should be able to add your bot user to a channel, say "hello", and then it will respond.
+If you restart your app, you should be able to add your bot user to a channel, say "hello", and it will respond.
 
 This is a basic example, but it gives you a place to start customizing your app based on your end goal. Let's try something a little more interactive by sending an interactive button rather than plain text.
 
 ### Sending and responding to actions
 
+To use features like buttons, select menus, datepickers, dialogs, or message actions, you’ll need to enable interactivity. This is similar to enabling interactivity for events above.
+
+Back on your app configuration page, click on **Interactive Components** on the left side. You'll see that there's another **Request URL** box.
+
+Unless you specified your own endpoints, use *the same* request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Interactivity is enabled!
+
+![Configuring a Request URL](request-url-config.png "Configuring a Request URL")
+
+Now, let's go back to your app's code and add our own interactivity. I'll break this into two steps: first, I'll send a message that _contains a button_. Then we'll set up a listener that is called when the button is clicked.
+
+Below, I've modified the app code we've been writing to send a message with a button instead of a just sending a string:
+
+```javascript
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET
+});
+
+// Listens to incoming messages that contain "hello"
+app.message('hello', ({ message, say }) => {
+  // say() sends a message to the channel where the event was triggered
+  say({
+    blocks: [
+	    {
+		    "type": "section",
+        "text": {
+          "type": "plain_text",
+          "text": `Hey there <@{message.user}!`
+        },
+        "accessory": {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Click Me"
+          },
+          "action_id": "button_click"
+		    }
+	    }
+    ]
+  });
+});
+
+const port = process.env.PORT || 3000;
+
+(async () => {
+  await app.start(port);
+
+  console.log('Your Bolt ⚡ app is up and running');
+});
+```
+
+The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. I've added a section block with a button as an accessory.
+
+You'll notice in the same `accessory` object as the button, there is an `action_id`. This will act as a unique identifier for the action so your app knows what action you want to respond to.
+
+> 💡 The [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) is an easy way to prototype your interactive messages. You can copy and paste the message payload directly into your Bolt app.
+
+Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens.
+
+Let's add a handler to send a followup message when someone clicks the button:
+
+```javascript
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET
+});
+
+// Listens to incoming messages that contain "hello"
+app.message('hello', ({ message, say }) => {
+  // say() sends a message to the channel where the event was triggered
+  say({
+    blocks: [
+	    {
+		    "type": "section",
+        "text": {
+          "type": "plain_text",
+          "text": `Hey there <@{message.user}!`
+        },
+        "accessory": {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Click Me"
+          },
+          "action_id": "button_click"
+		    }
+	    }
+    ]
+  });
+});
+
+app.action('button_click', ({ action, say }) {
+  say(`@{action.user} clicked the button`);
+});
+
+const port = process.env.PORT || 3000;
+
+(async () => {
+  await app.start(port);
+
+  console.log('Your Bolt ⚡ app is up and running');
+});
+```
+
+You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
+
+### Next steps
+You just built your first Bolt app! 🎉
+
+Now that you have a basic app up and running, you can start exploring the parts of Bolt that will make your app stand out. Here are some ideas about where to look next:
+
+* Read through the [Basic concepts](https://slack.dev/bolt#basic) to learn about the different methods and features your Bolt app has access to.
+
+* Explore the different events your bot can listen to with the [`events()` method](https://slack.dev/bolt#event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
+
+* Bolt allows you to [call Web API methods](https://slack.dev/bolt#web-api) with the client attached to your app. There are [over 130 methods](https://api.slack.com/methods) on our API site.
 
 
 
