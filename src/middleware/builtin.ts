@@ -148,8 +148,7 @@ export function matchConstraints(
  */
 export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, context, next }) => {
-    let tempMatches: RegExpExecArray | null;
-    const matches: RegExpExecArray[] = [];
+    let tempMatches: RegExpMatchArray | null;
 
     // Filter out messages that don't contain the pattern
     if (typeof pattern === 'string') {
@@ -157,15 +156,10 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
         return;
       }
     } else {
-      while ((tempMatches = pattern.exec(message.text)) !== null) {
-        matches.push(tempMatches);
-        // Avoids an infinite loop if /g isn't at the end of the RegExp
-        if (!pattern.global) {
-          break;
-        }
-      }
-      if (matches.length !== 0) {
-        context['matches'] = matches;
+      tempMatches = message.text.match(pattern);
+
+      if (tempMatches !== null) {
+        context['matches'] = tempMatches;
       } else {
         return;
       }
