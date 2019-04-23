@@ -7,7 +7,7 @@ order: 2
 <div class="section-content">
 Within your listener function, `say()` is available whenever there is an associated conversation (for example, the conversation where the event or action which triggered the listener occurred). `say()` accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated conversation.
 
-In the case that you aren’t in listener middleware for one of the built-in methods or you want to do something more advanced (like handle specific errors), you can call `chat.postMessage` [using the client attached to your Bolt instance](#web-api).
+In the case that you'd like to send a message outside of a listener or you want to do something more advanced (like handle specific errors), you can call `chat.postMessage` [using the client attached to your Bolt instance](#web-api).
 </div>
 
 ```javascript
