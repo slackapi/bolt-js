@@ -1,11 +1,9 @@
-import { StringIndexed } from '../helpers';
-
 /**
  * A Slack dialog submit action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack dialogs.
  */
-export interface DialogSubmitAction extends StringIndexed {
+export interface DialogSubmitAction {
   type: 'dialog_submission';
   callback_id: string;
   submission: { [name: string]: string };
