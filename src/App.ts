@@ -481,7 +481,7 @@ function buildSource(
 function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
-  return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).action !== undefined;
+  return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
 function defaultErrorHandler(logger: Logger): ErrorHandler {
