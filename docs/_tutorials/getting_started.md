@@ -176,7 +176,7 @@ const app = new App({
 // Listens to incoming messages that contain "hello"
 app.message('hello', ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say(`Hey there <@{message.user}>!`);
+  say(`Hey there <@${message.user}>!`);
 });
 
 (async () => {
@@ -224,7 +224,7 @@ app.message('hello', ({ message, say }) => {
 		    "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Hey there <@{message.user}>!`
+          "text": `Hey there <@${message.user}>!`
         },
         "accessory": {
           "type": "button",
@@ -289,7 +289,7 @@ app.message('hello', ({ message, say }) => {
   });
 });
 
-app.action('button_click', ({ action, ack, say }) {
+app.action('button_click', ({ action, ack, say }) => {
   // Acknowledge the action
   ack();
   say(`<@${action.user}> clicked the button`);
