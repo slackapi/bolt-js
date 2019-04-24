@@ -1,11 +1,9 @@
-import { StringIndexed } from '../helpers';
-
 /**
  * A Slack message action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack message actions.
  */
-export interface MessageAction extends StringIndexed {
+export interface MessageAction {
   type: 'message_action';
   callback_id: string;
   trigger_id: string;
