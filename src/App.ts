@@ -258,6 +258,16 @@ export default class App {
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
       { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
+    // Fail early if the constraints contain invalid keys
+    const unknownConstraintKeys = Object.keys(constraints)
+      .filter(k => (k !== 'action_id' && k !== 'block_id' && k !== 'callback_id'));
+    if (unknownConstraintKeys.length > 0) {
+      this.logger.error(
+        `Action listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
+      );
+      return;
+    }
+
     this.listeners.push(
       [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
