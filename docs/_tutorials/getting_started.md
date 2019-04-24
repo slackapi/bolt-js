@@ -289,10 +289,10 @@ app.message('hello', ({ message, say }) => {
   });
 });
 
-app.action('button_click', ({ action, ack, say }) => {
+app.action('button_click', ({ body, ack, say }) => {
   // Acknowledge the action
   ack();
-  say(`<@${action.user}> clicked the button`);
+  say(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {
