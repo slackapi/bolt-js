@@ -12,7 +12,10 @@ Similar to actions, there are two ways to respond to slash command requests. The
 
 ```javascript
 // The echo command simply echoes on command
-app.command('/echo', async ({ command, say }) => {
+app.command('/echo', async ({ command, ack, say }) => {
+  // Acknowledge command request
+  ack();
+  
   say(`${command.text}`);
 });
 ```
