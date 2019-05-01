@@ -12,7 +12,8 @@ The second way to respond to actions is using `respond()`, which is a simple uti
 
 ```javascript
 // Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered
-app.action('approve_button', async ({ ack, say }) => {
+app.action('approve_button', ({ ack, say }) => {
+  // Acknowledge action request
   ack();
   say('Request approved 👍');
 });
@@ -29,7 +30,7 @@ Since `respond()` is a utility for calling the `response_url`, it behaves in the
 
 ```javascript
 // Listens to actions triggered with action_id of “user_select”
-app.action('user_choice', async ({ action, ack, respond }) => {
+app.action('user_choice', ({ action, ack, respond }) => {
 	ack();
 	respond(`You selected <@${action.selected_user}>`);
 });

@@ -50,9 +50,8 @@
     </span>
 
     <span class="version">
-        <!-- | sort: "latest_release"  -->
         
-        <a href="">v</a>
+        <a href="https://github.com/slackapi/bolt/releases/tag/%40slack/bolt%401.0.1">v1.0.1</a>
     </span>
   </div>
 
@@ -74,7 +73,7 @@
     
       <a href="http://localhost:4000/bolt/concepts#action-listening"><li>Listening to actions</li></a>
     
-      <a href="http://localhost:4000/bolt/concepts#action-acknowledge"><li>Acknowleding actions</li></a>
+      <a href="http://localhost:4000/bolt/concepts#acknowledge"><li>Acknowledging requests</li></a>
     
       <a href="http://localhost:4000/bolt/concepts#action-respond"><li>Responding to actions</li></a>
     
@@ -323,7 +322,7 @@ npm init
 <span class="c1">// Listens to incoming messages that contain "hello"</span>
 <span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">// say() sends a message to the channel where the event was triggered</span>
-  <span class="nx">say</span><span class="p">(</span><span class="s2">`Hey there &lt;@{message.user}!`</span><span class="p">);</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span><span class="p">);</span>
 <span class="p">});</span>
 
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -373,8 +372,8 @@ npm init
 	    <span class="p">{</span>
 		    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"section"</span><span class="p">,</span>
         <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"plain_text"</span><span class="p">,</span>
-          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@{message.user}!`</span>
+          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"mrkdwn"</span><span class="p">,</span>
+          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span>
         <span class="p">},</span>
         <span class="s2">"accessory"</span><span class="p">:</span> <span class="p">{</span>
           <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"button"</span><span class="p">,</span>
@@ -428,8 +427,8 @@ npm init
 	    <span class="p">{</span>
 		    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"section"</span><span class="p">,</span>
         <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"plain_text"</span><span class="p">,</span>
-          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@{message.user}!`</span>
+          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"mrkdwn"</span><span class="p">,</span>
+          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@{message.user}&gt;!`</span>
         <span class="p">},</span>
         <span class="s2">"accessory"</span><span class="p">:</span> <span class="p">{</span>
           <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"button"</span><span class="p">,</span>
@@ -444,8 +443,10 @@ npm init
   <span class="p">});</span>
 <span class="p">});</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'button_click'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="p">{</span>
-  <span class="nx">say</span><span class="p">(</span><span class="s2">`@{action.user} clicked the button`</span><span class="p">);</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'button_click'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Acknowledge the action</span>
+  <span class="nx">ack</span><span class="p">();</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`&lt;@</span><span class="p">${</span><span class="nx">body</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="s2">&gt; clicked the button`</span><span class="p">);</span>
 <span class="p">});</span>
 
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>

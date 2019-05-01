@@ -50,9 +50,8 @@
     </span>
 
     <span class="version">
-        <!-- | sort: "latest_release"  -->
         
-        <a href="">v</a>
+        <a href="https://github.com/slackapi/bolt/releases/tag/%40slack/bolt%401.0.1">v1.0.1</a>
     </span>
   </div>
 
@@ -74,7 +73,7 @@
     
       <a href="http://localhost:4000/bolt/concepts#action-listening"><li>Listening to actions</li></a>
     
-      <a href="http://localhost:4000/bolt/concepts#action-acknowledge"><li>Acknowleding actions</li></a>
+      <a href="http://localhost:4000/bolt/concepts#acknowledge"><li>Acknowledging requests</li></a>
     
       <a href="http://localhost:4000/bolt/concepts#action-respond"><li>Responding to actions</li></a>
     
@@ -282,9 +281,9 @@
 
   <div class="language-javascript highlighter-rouge">
     <div class="highlight">
-      <pre class="highlight"><code><span class="c1">// event('message') is the same as message()</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="nx">matchEventSubtype</span><span class="p">(</span><span class="s1">'bot_message'</span><span class="p">),</span> <span class="p">({</span> <span class="nx">event</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`The bot user </span><span class="p">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2"> said </span><span class="p">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
+      <pre class="highlight"><code><span class="c1">// Matches all messages from bot users</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="nx">subtype</span><span class="p">(</span><span class="s1">'bot_message'</span><span class="p">),</span> <span class="p">({</span> <span class="nx">message</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`The bot user </span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2"> said </span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
     </div>
@@ -314,7 +313,7 @@
   <span class="k">try</span> <span class="p">{</span>
     <span class="c1">// Call the chat.scheduleMessage method with a token</span>
     <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">scheduleMessage</span><span class="p">({</span>
-      <span class="c1">// The token you used to initalize your app is placed in `context`</span>
+      <span class="c1">// The token you used to initalize your app is stored in the `context` object</span>
       <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
       <span class="na">channel</span><span class="p">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">channel</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
       <span class="na">post_at</span><span class="p">:</span> <span class="nx">whenSeptemberEnds</span><span class="p">,</span>
@@ -394,10 +393,10 @@
           </div>
         
           <div class="section-wrapper">
-            <h3 id="action-acknowledge">Acknowleding actions</h3>
+            <h3 id="acknowledge">Acknowledging requests</h3>
 
             <div class="section-content">
-  <p>Actions must <strong>always</strong> be acknowledged using the <code class="highlighter-rouge">ack()</code> function. This lets Slack know that the action was received and updates the Slack user interface accordingly. Depending on the type of action, your acknowledgement may be different. For example, when responding to a dialog submission you will call <code class="highlighter-rouge">ack()</code> with validation errors if the submission contains errors, or with no parameters if the submission is valid.</p>
+  <p>Actions, commands, and options requests must <strong>always</strong> be acknowledged using the <code class="highlighter-rouge">ack()</code> function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of reuqest, your acknowledgement may be different. For example, when responding to a dialog submission you will call <code class="highlighter-rouge">ack()</code> with validation errors if the submission contains errors, or with no parameters if the submission is valid.</p>
 
   <p>We recommend calling <code class="highlighter-rouge">ack()</code> right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.</p>
 </div>
@@ -441,7 +440,8 @@
 <div class="language-javascript highlighter-rouge">
   <div class="highlight">
     <pre class="highlight"><code><span class="c1">// Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'approve_button'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'approve_button'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Acknowledge action request</span>
   <span class="nx">ack</span><span class="p">();</span>
   <span class="nx">say</span><span class="p">(</span><span class="s1">'Request approved 👍'</span><span class="p">);</span>
 <span class="p">});</span>
@@ -461,7 +461,7 @@
   <div class="language-javascript highlighter-rouge">
     <div class="highlight">
       <pre class="highlight"><code><span class="c1">// Listens to actions triggered with action_id of “user_select”</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'user_choice'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">respond</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'user_choice'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">respond</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
 	<span class="nx">ack</span><span class="p">();</span>
 	<span class="nx">respond</span><span class="p">(</span><span class="s2">`You selected &lt;@</span><span class="p">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">selected_user</span><span class="p">}</span><span class="s2">&gt;`</span><span class="p">);</span>
 <span class="p">});</span>
@@ -481,13 +481,18 @@
             <div class="section-content">
   <p>Your app can use the <code class="highlighter-rouge">command()</code> method to listen to incoming slash command payloads. The method requires a <code class="highlighter-rouge">commandName</code> of type string.</p>
 
-  <p>Similar to actions, there are two ways to respond to slash command requests. The first way is to use <code class="highlighter-rouge">say()</code>, which accepts a string or JSON payload. The second is <code class="highlighter-rouge">respond()</code> which uses the <code class="highlighter-rouge">response_url</code>.</p>
+  <p>Commands must be acknowledged with <code class="highlighter-rouge">ack()</code> to inform Slack your app has received the request.</p>
+
+  <p>There are two ways to respond to slash command requests. The first way is to use <code class="highlighter-rouge">say()</code>, which accepts a string or JSON payload. The second is <code class="highlighter-rouge">respond()</code> which is a utility for the <code class="highlighter-rouge">response_url</code>. These are explained in more depth in the <a href="#action-respond">responding to actions</a> section.</p>
 </div>
 
 <div class="language-javascript highlighter-rouge">
   <div class="highlight">
     <pre class="highlight"><code><span class="c1">// The echo command simply echoes on command</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'/echo'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'/echo'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Acknowledge command request</span>
+  <span class="nx">ack</span><span class="p">();</span>
+  
   <span class="nx">say</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">command</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
@@ -555,9 +560,9 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
             <h3 id="error-handling">Handling errors</h3>
 
             <div class="section-content">
-  <p>If an error occurs in a listener middleware, it’s recommended you handle it directly. However, there are cases where errors may occur after your listener middleware has returned (like <code class="highlighter-rouge">say()</code> and <code class="highlighter-rouge">respond()</code>, or not calling <code class="highlighter-rouge">ack()</code>). By default, these errors will be logged to the console. To handle them yourself, you can attach a global error handler to your app using the <code class="highlighter-rouge">App.prototype.error(fn)</code> method.</p>
+  <p>If an error occurs in a listener, it’s recommended you handle it directly. However, there are cases where errors may occur after your listener middleware has returned (such as <code class="highlighter-rouge">say()</code>, <code class="highlighter-rouge">respond()</code>, or not calling <code class="highlighter-rouge">ack()</code>). By default, these errors will be logged to the console. To handle them yourself, you can attach a global error handler to your app using the <code class="highlighter-rouge">error(fn)</code> method.</p>
 
-  <p>If you want more control over errors, it’s advised to use the <a href="https://api.slack.com/methods/chat.postMessage"><code class="highlighter-rouge">chat.postMessage</code></a> method attached to your app under the <code class="highlighter-rouge">client</code> key. This returns a <code class="highlighter-rouge">Promise</code> that can be caught to handle the error.</p>
+  <p>If you want more control over errors, it’s advised to use the <a href="https://api.slack.com/methods/chat.postMessage"><code class="highlighter-rouge">chat.postMessage</code></a> method attached to your app under the <code class="highlighter-rouge">client</code> key (instead of <code class="highlighter-rouge">say()</code> or <code class="highlighter-rouge">respond()</code>). This returns a <code class="highlighter-rouge">Promise</code> that can be caught to handle the error.</p>
 </div>
 
 <div class="language-javascript highlighter-rouge">
@@ -578,42 +583,40 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
             <h3 id="authorization">Authorization</h3>
 
             <div class="section-content">
-  <p>Custom apps installed on just one team can define <code class="highlighter-rouge">token</code> (and optionally <code class="highlighter-rouge">botId</code> and <code class="highlighter-rouge">botUserId</code>) at the time of app initialization. But in the case you want to handle multiple tokens, authorization functions can be passed in rather than a <code class="highlighter-rouge">token</code>. Authorization functions must have <code class="highlighter-rouge">source</code> and <code class="highlighter-rouge">body</code> as parameters and are expected to return a Promise that resolves to an <code class="highlighter-rouge">AuthorizeResult</code>.</p>
+  <p>Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming event.</p>
 
-  <ul>
-    <li>
-      <p><code class="highlighter-rouge">source</code> will be provided to an authorize function and will always contain a <code class="highlighter-rouge">teamId</code>, and will contain an <code class="highlighter-rouge">enterpriseId</code>, a <code class="highlighter-rouge">userId</code>, and a <code class="highlighter-rouge">conversationId</code> when they exist for the event.</p>
-    </li>
-    <li>
-      <p><code class="highlighter-rouge">body</code> will be provided as the request body of the event.</p>
-    </li>
-  </ul>
+  <p>Custom apps installed on just one workspace can simply use the <code class="highlighter-rouge">token</code> option (and optionally <code class="highlighter-rouge">botId</code> and <code class="highlighter-rouge">botUserId</code> options) at the time of <code class="highlighter-rouge">App</code> initialization. However, when your app needs to handle multiple tokens, the <code class="highlighter-rouge">authorize</code> option needs to be used instead. You might need to use this option if you’re building an app that is in just one workspace but needs to access several different user tokens, or if you’re building an app that is installed across multiple workspaces.</p>
 
-  <p>After you app is initialized, the authorization function will be run as an incoming event is passed from the Receiver. This will give opportunity to add the proper token and bot user and app IDs (which are used for the builtin <code class="highlighter-rouge">ignoreSelf</code> middleware).</p>
+  <p>The <code class="highlighter-rouge">authorize</code> option should be set to a function. The function takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who (and where) the event is coming from, which are properties such as <code class="highlighter-rouge">teamId</code> (always available), <code class="highlighter-rouge">userId</code>, <code class="highlighter-rouge">conversationId</code>, and <code class="highlighter-rouge">enterpriseId</code>. The authorized credentials should also have a few specific properties: <code class="highlighter-rouge">botToken</code>, <code class="highlighter-rouge">userToken</code>, <code class="highlighter-rouge">botId</code>, and <code class="highlighter-rouge">botUserId</code> (and any other properties you’d like to make available on the <a href="#context"><code class="highlighter-rouge">context</code></a>).</p>
+
+  <p>You should always provide either one or both of the <code class="highlighter-rouge">botToken</code> and <code class="highlighter-rouge">userToken</code> properties. One of them is necessary to make helpers like <code class="highlighter-rouge">say()</code> work. If they are both given, then <code class="highlighter-rouge">botToken</code> will take precedence. The <code class="highlighter-rouge">botId</code> property is required in order for the app to ignore messages from itself (see <code class="highlighter-rouge">ignoreSelf</code> option and built-in middleware). The <code class="highlighter-rouge">botUserId</code> property is optional, but helps the app ignore events from itself besides message events.</p>
 </div>
 
 <div class="language-javascript highlighter-rouge">
   <div class="highlight">
-    <pre class="highlight"><code><span class="c1">// NOTE: This is for demonstration purposes only.</span>
-<span class="c1">// All sensitive data should be stored in a secure database</span>
-<span class="kd">let</span> <span class="nx">teamInfo</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="s1">'E1234A12AB'</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s1">'T12345'</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-123abc'</span><span class="p">,</span>
-      <span class="na">botId</span><span class="p">:</span> <span class="s1">'B1251'</span><span class="p">,</span>
-      <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U12385'</span> 
-    <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="s1">'E5678B23CD'</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s1">'T77712'</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-102anc'</span><span class="p">,</span>
-      <span class="na">botId</span><span class="p">:</span> <span class="s1">'B5910'</span><span class="p">,</span>
-      <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U1239'</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+    <pre class="highlight"><code><span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span> <span class="na">authorize</span><span class="p">:</span> <span class="nx">authorizeFn</span><span class="p">,</span> <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span> <span class="p">});</span>
 
-<span class="kd">const</span> <span class="nx">authorizeFn</span> <span class="o">=</span> <span class="k">async</span> <span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="c1">// NOTE: This is for demonstration purposes only.</span>
+<span class="c1">// All sensitive data should be stored in a secure database</span>
+<span class="c1">// Assuming this app only uses bot tokens, the following object represents a model for storing the credentials as the app is installed into multiple workspaces.</span>
+
+<span class="kd">const</span> <span class="nx">installations</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="na">enterpriseId</span><span class="p">:</span> <span class="s1">'E1234A12AB'</span><span class="p">,</span>
+    <span class="na">teamId</span><span class="p">:</span> <span class="s1">'T12345'</span><span class="p">,</span>
+    <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-123abc'</span><span class="p">,</span>
+    <span class="na">botId</span><span class="p">:</span> <span class="s1">'B1251'</span><span class="p">,</span>
+    <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U12385'</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="na">teamId</span><span class="p">:</span> <span class="s1">'T77712'</span><span class="p">,</span>
+    <span class="na">botToken</span><span class="p">:</span> <span class="s1">'xoxb-102anc'</span><span class="p">,</span>
+    <span class="na">botId</span><span class="p">:</span> <span class="s1">'B5910'</span><span class="p">,</span>
+    <span class="na">botUserId</span><span class="p">:</span> <span class="s1">'U1239'</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">authorizeFn</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">teamId</span><span class="p">,</span> <span class="nx">enterpriseId</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">// Fetch team info from database. You could also set userToken instead.</span>
   <span class="kd">const</span> <span class="nx">fetchAuthorizedTeam</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">teamInfo</span><span class="p">[</span><span class="nx">source</span><span class="p">.</span><span class="nx">enterpriseId</span><span class="p">][</span><span class="nx">source</span><span class="p">.</span><span class="nx">teamId</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="p">?</span>
@@ -806,7 +809,9 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
   <span class="nx">context</span><span class="p">.</span><span class="nx">tz_offset</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">tz_offset</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'request'</span><span class="p">,</span> <span class="nx">addTimezoneContext</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">context</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">'request'</span><span class="p">,</span> <span class="nx">addTimezoneContext</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">context</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Acknowledge command request</span>
+  <span class="nx">ack</span><span class="p">();</span>
   <span class="c1">// Get local hour of request</span>
   <span class="kd">const</span> <span class="nx">local_hour</span> <span class="o">=</span> <span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">UTC</span><span class="p">()</span> <span class="o">+</span> <span class="nx">context</span><span class="p">.</span><span class="nx">tz_offset</span><span class="p">).</span><span class="nx">getHours</span><span class="p">();</span>
 
