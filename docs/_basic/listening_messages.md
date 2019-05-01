@@ -17,14 +17,12 @@ app.message(':wave:', async ({ message, say}) => {
 });
 ```
 
-<details markdown="0">
-<summary class="section-head">
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
 <h4 class="section-head">Using a RegExp pattern</h4>
 </summary>
 
-<div class="secondary-wrapper">
-
-<div class="secondary-content">
+<div class="secondary-content" markdown="0">
 A RegExp pattern can be used instead of a string for more granular matching.
 
 All of the results of the RegExp match will be in `context.matches`.
@@ -39,5 +37,4 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
 });
 ```
 
-</div>
 </details>

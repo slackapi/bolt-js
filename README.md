@@ -1,15 +1,6 @@
 # Slack ⚡️ Bolt
 
-> ⚠️ This project is **alpha quality** and is not meant to be used for any production scenarios. Slack offers no
-> commitment to launch any of the functionality in this project.
-
 A framework to build Slack apps, _fast_.
-
-The team behind Bolt is [currently gathering feedback](#feedback-wanted) regarding the ideas and solutions presented in
-this project. If you are interested in learning more, and delivering your feedback, please reach out to
-<ankur@slack-corp.com>.
-
------
 
 ## Initialization
 
@@ -356,55 +347,3 @@ function logProcessingTime({ next }) {
 
 app.use(logProcessingTime)
 ```
-
-## Using TypeScript
-
-Bolt offers rich type information that helps you build apps with speed and confidence. For example, when attaching
-listeners for specific Events API event types, you will get rich type hints about the shape of the `event` argument
-including which properties it has.
-
-**TODO**: Document a summary of the various ways to use types.
-
---------
-
-## Known issues
-
-*  Error handling
-  -  Errors are only understandable to humans by reading their `message`. In order to programmatically handle errors,
-     they will each have a unique `code` assigned to them.
-  -  `App#error()` is not yet implemented. This method will allow apps to register a global error handler, as described
-     in [error handling](#handling-errors).
-
-*  Message text and action constraint pattern matching
-  -  The order of pattern matches in `context.matches` is not completely clear.
-
-*  Missing type information
-  -  Very few Events API
-
-*  Undocumented features
-  -  Each of the `App` initialization options should be documented. There is information about how they can be used
-     in the source code.
-  -  Using `callbackId` for legacy actions and options requests should be documented. There is an example in
-     [acknowledging events](#acknowledging-events), but the action constraints are not explicitly documented.
-  -  Multi-team usage relies on using the `authorize` `App` initialization option and this should be documented. There
-     is information about how this option can be used in the source code.
-  -  Middleware have four distinct options regarding how they might handle an incoming event which should be explicitly
-     documented.
-  -  `context.matches` can be used to find the pattern matches from message text and action constraints RegExp matches.
-
-## Feedback wanted
-
-*  If you are building a new app, the team would like to know what kinds of questions you had along the way. Even if
-   you were able to find the answer yourself (such as by reading the source code), the team would like to help make the
-   answers more obvious. The team also wants to know whether you've been able to write your own middleware, and what
-   kinds of operations you wrote them to do.
-
-*  If you have an existing app built with Hubot or Slapp, the team is hoping you'll attempt migrating the app to use
-   Bolt. We'd appreciate any and all feedback you have about the migration experience. Specifically, we'd like to know
-   where you ran into pain points, like where it was easier to do something in the original code and more difficult with
-   Bolt. If there are external scripts you use with Hubot (installed from npm) that you cannot easily port, the team can
-   help you find a way to migrate that functionality. Also, if there are any capabilities you find missing from Bolt,
-   let us know.
-
-*  What kind of information would be helpful for debugging? Is this information already available by setting the
-   `logLevel` to `LogLevel.DEBUG`?

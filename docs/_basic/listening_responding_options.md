@@ -1,7 +1,7 @@
 ---
 title: Listening and responding to options
 slug: options
-order: 10
+order: 9
 ---
 
 <div class="section-content">

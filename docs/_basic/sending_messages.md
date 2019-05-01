@@ -5,25 +5,24 @@ order: 2
 ---
 
 <div class="section-content">
-If you’re using a built-in method (`message()`, `event()`, `action()`, `command()`, or `options()`), `say()` is available to your listener middleware whenever there is an associated channel (the conversation a message was posted in, for example). `say()` accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated channel.
+Within your listener function, `say()` is available whenever there is an associated conversation (for example, the conversation where the event or action which triggered the listener occurred). `say()` accepts a string to post simple text-based messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated conversation.
 
-In the case that you aren’t in listener middleware for one of the built-in methods or you want to do something more advanced (like handle specific errors), you can call `chat.postMessage` [using the client attached to your Bolt instance](#web-api).
+In the case that you'd like to send a message outside of a listener or you want to do something more advanced (like handle specific errors), you can call `chat.postMessage` [using the client attached to your Bolt instance](#web-api).
 </div>
 
 ```javascript
-app.command('bold', async ({ command, say }) => {
-  say(`*${command.text}*`);
+// Listens for messsages containing "knock knock" and responds with an italicized "who's there?"
+app.message('knock knock', ({ message, say }) => {
+  say(`_Who's there?_`);
 });
 ```
 
-<details markdown="0">
-<summary>
-<h4 class="section-head">Sending a message with blocks</h4>
+<details class="secondary-wrapper">
+<summary markdown="0">
+<h4 class="secondary-header">Sending a message with blocks</h4>
 </summary>
 
-<div class="secondary-wrapper">
-
-<div class="secondary-content">
+<div class="secondary-content" markdown="0">
 `say()` accepts more complex message payloads to make it easy to add functionality and structure to your messages.
 
 To explore adding rich message layouts to your app, read through [the guide on our API site](https://api.slack.com/messaging/composing/layouts) and look through templates of common app flows [in the Block Kit Builder](https://api.slack.com/tools/block-kit-builder?template=1).
@@ -31,7 +30,7 @@ To explore adding rich message layouts to your app, read through [the guide on o
 
 ```javascript
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
-app.event('reaction_added', async ({ event, say }) => {
+app.event('reaction_added', ({ event, say }) => {
   if (event.reaction === 'calendar') {
     say({
       blocks: [{
@@ -53,6 +52,4 @@ app.event('reaction_added', async ({ event, say }) => {
   }
 });
 ```
-
-</div>
 </details>

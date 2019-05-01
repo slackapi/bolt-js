@@ -32,12 +32,10 @@ export class MemoryStore<ConversationState = any> implements ConversationStore<C
         if (entry.expiresAt !== undefined && Date.now() > entry.expiresAt) {
           // release the memory
           this.state.delete(conversationId);
-          // TODO: coded error?
           reject(new Error('Conversation expired'));
         }
         resolve(entry.value);
       }
-      // TODO: coded error?
       reject(new Error('Conversation not found'));
     });
   }

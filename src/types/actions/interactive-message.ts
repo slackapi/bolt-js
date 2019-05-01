@@ -1,5 +1,3 @@
-import { StringIndexed } from '../helpers';
-
 /**
  * All actions which Slack delivers from legacy interactive messages. The full body of these actions are represented
  * as [[InteractiveMessage]].
@@ -31,7 +29,7 @@ export interface MenuSelect {
  *
  * This describes the entire JSON-encoded body of a request from Slack's legacy interactive messages.
  */
-export interface InteractiveMessage<Action extends InteractiveAction = InteractiveAction> extends StringIndexed {
+export interface InteractiveMessage<Action extends InteractiveAction = InteractiveAction> {
   type: 'interactive_message';
   callback_id: string;
   actions: [Action];

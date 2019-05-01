@@ -22,7 +22,9 @@ async function addTimezoneContext ({ payload, context, next }) {
   context.tz_offset = user.tz_offset;
 }
 
-app.command('request', addTimezoneContext, async ({ command, context }) => {
+app.command('request', addTimezoneContext, async ({ command, ack, context }) => {
+  // Acknowledge command request
+  ack();
   // Get local hour of request
   const local_hour = (Date.UTC() + context.tz_offset).getHours();
 

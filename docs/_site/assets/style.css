@@ -55,7 +55,7 @@ body {
 
 .panel .sidebar-content ul.sidebar-section {
   list-style: none;
-  padding-top: 1.5em;
+  padding-top: 0.9em;
   margin: 0;
   font-size: 0.80em;
 }
@@ -71,6 +71,14 @@ body {
 
 .panel .sidebar-content ul.sidebar-section li:hover {
   background-color: #D7D7D7;
+}
+
+.panel .sidebar-content ul.sidebar-section li.madeby:hover {
+  background-color: transparent;
+}
+
+.panel .sidebar-content a:hover {
+  text-decoration: none;
 }
 
 .panel .sidebar-content ul.sidebar-section li.active {
@@ -110,24 +118,44 @@ body {
 }
 
 .tutorial {
-  width: 90%;
+  width: 80%;
   margin: 1em auto 0 auto;
+  padding-bottom: 2em;
   font-size: 1em;
   line-height: 1.75em;
+}
+
+.tutorial img {
+  width: 60%;
+  margin: 0.2em auto;
+  display: block;
+  box-shadow: 0 0 15px #DDDDDD;
+}
+
+.tutorial blockquote {
+  margin: 0 0 0 1em;
+  padding: 0 6em 0 1.5em;
+  border-radius: 6px;
+  border-left: 6px solid #DDD;
+  font-size: 0.95em;
+}
+
+.tutorial h3 {
+  padding-bottom: 1em;
 }
 
 .content .section-wrapper .language-javascript {
   grid-area: code;
 }
 
-.content .section-wrapper .language-javascript pre {
+pre {
   background-color: var(--light-grey) !important;
   background-image: none;
   padding: 2em;
   border: 1px solid #DDDDDD;
 }
 
-.content .section-wrapper .language-javascript pre code {
+pre code {
   font-size: 0.85em !important;
 }
 
@@ -150,37 +178,33 @@ body {
   width: 100%;
 }
 
-.content .section-wrapper a:hover {
-  background-color: var(--light-blue);
-  border-radius: 4px;
+a:hover {
+  text-decoration: underline;
 }
 
 /* Secondary content */
 .secondary-wrapper {
   width: 100%;
-  margin: 0 auto;
-  display: grid;
-  grid-gap: 25px;
-  grid-template-areas:
-    "body"
-    "code"
-}
-
-.content .section-wrapper .secondary-content {
-  grid-area: body;
-}
-
-.content .section-wrapper details {
   grid-area: secondary;
+  margin: 1em auto 0 auto;
   font-size: 1em;
   line-height: 1.75em;
 }
 
-.content .section-wrapper summary {
-  grid-area: head;
+.secondary-wrapper .language-javascript {
+  width: 50%;
+  float: left;
+  margin-top: 1em;
 }
 
-.content .section-wrapper summary h4 {
+.content .section-wrapper .secondary-content {
+  width: 45%;
+  float: left;
+  margin-right: 5%;
+  margin-top: 1em;
+}
+
+summary h4 {
   display: inline;
 }
 
@@ -200,13 +224,6 @@ body {
       "body code"
       "secondary secondary"
       "divider divider"
-  }
-
-  .secondary-wrapper {
-    grid-template-columns: 50% 50%;
-    grid-template-areas:
-      "head head"
-      "body code"
   }
 }
 

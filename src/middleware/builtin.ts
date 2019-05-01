@@ -13,8 +13,10 @@ import {
   DialogSubmitAction,
   MessageAction,
   BlockElementAction,
+  ContextMissingPropertyError,
 } from '../types';
 import { ActionConstraints } from '../App';
+import { ErrorCode, errorWithCode } from '../errors';
 
 /**
  * Middleware that filters out any event that isn't an action
@@ -77,8 +79,7 @@ export function matchConstraints(
   return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
-    let tempMatches: RegExpExecArray | null;
-    const matches: any[] = [];
+    let tempMatches: RegExpMatchArray | null;
 
     if (constraints.block_id !== undefined) {
       if (!isBlockPayload(payload)) {
@@ -90,8 +91,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        if ((tempMatches = constraints.block_id.exec(payload.block_id)) !== null) {
-          matches.concat(tempMatches);
+        tempMatches = payload.block_id.match(constraints.block_id);
+
+        if (tempMatches !== null) {
+          context['blockIdMatches'] = tempMatches;
         } else {
           return;
         }
@@ -108,8 +111,10 @@ export function matchConstraints(
           return;
         }
       } else {
-        if ((tempMatches = constraints.action_id.exec(payload.action_id)) !== null) {
-          matches.concat(tempMatches);
+        tempMatches = payload.action_id.match(constraints.action_id);
+
+        if (tempMatches !== null) {
+          context['actionIdMatches'] = tempMatches;
         } else {
           return;
         }
@@ -125,16 +130,15 @@ export function matchConstraints(
           return;
         }
       } else {
-        if ((tempMatches = constraints.callback_id.exec(body.callback_id)) !== null) {
-          matches.concat(tempMatches);
+        tempMatches = body.callback_id.match(constraints.callback_id);
+
+        if (tempMatches !== null) {
+          context['callbackIdMatches'] = tempMatches;
         } else {
           return;
         }
       }
     }
-
-    // Add matches to context
-    context['matches'] = matches;
 
     next();
   };
@@ -145,7 +149,7 @@ export function matchConstraints(
  */
 export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, context, next }) => {
-    let tempMatches: RegExpExecArray | null;
+    let tempMatches: RegExpMatchArray | null;
 
     // Filter out messages that don't contain the pattern
     if (typeof pattern === 'string') {
@@ -153,7 +157,9 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
         return;
       }
     } else {
-      if ((tempMatches = pattern.exec(message.text)) !== null) {
+      tempMatches = message.text.match(pattern);
+
+      if (tempMatches !== null) {
         context['matches'] = tempMatches;
       } else {
         return;
@@ -196,9 +202,10 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return (args) => {
     // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
     if (args.context.botId === undefined) {
-      // TODO: coded error
-      args.next(new Error('Cannot ignore events from the app without a bot ID. ' +
-        'Ensure authorize callback returns a botId.'));
+      args.next(contextMissingPropertyError(
+        'botId',
+        'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
+      ));
       return;
     }
 
@@ -244,9 +251,10 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
   return ({ message, context, next }) => {
     // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
     if (context.botUserId === undefined) {
-      // TODO: coded error
-      next(new Error('Cannot match direct mentions of the app without a bot user ID. ' +
-        'Ensure authorize callback returns a botUserId.'));
+      next(contextMissingPropertyError(
+        'botUserId',
+        'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
+      ));
       return;
     }
 
@@ -289,4 +297,11 @@ function isEventArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackEventMiddlewareArgs {
   return (args as SlackEventMiddlewareArgs).event !== undefined;
+}
+
+export function contextMissingPropertyError(propertyName: string, message?: string): ContextMissingPropertyError {
+  const m = message === undefined ? `Context missing property: ${propertyName}` : message;
+  const error = errorWithCode(m, ErrorCode.ContextMissingPropertyError);
+  (error as ContextMissingPropertyError).missingProperty = propertyName;
+  return error as ContextMissingPropertyError;
 }

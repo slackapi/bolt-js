@@ -1,7 +1,7 @@
 ---
 title: Acknowleding actions
 slug: action-acknowledge
-order: 7
+order: 6
 ---
 
 <div class="section-content">
@@ -12,14 +12,14 @@ We recommend calling `ack()` right away before sending a new message or fetching
 
 ```javascript
 // Regex to determine if this is a valid email
-let isEmail = ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$
+let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 // This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit 
 app.action({ callback_id: 'ticket_submit' }, ({ action, ack }) => {
 	// it’s a valid email, accept the submission
   if (isEmail.test(action.submission.email)) {
 	  ack();
   } else {
-		// if it isn’t a valid email, respond with an error
+		// if it isn’t a valid email, acknowledge with an error
 	  ack({
 		  errors: [{
 			  "name": "email_address",

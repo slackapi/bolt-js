@@ -118,7 +118,7 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
  *
  * This describes the entire JSON-encoded body of a request from Slack's Block Kit interactive components.
  */
-export interface BlockAction<ElementAction extends BasicElementAction = BlockElementAction> extends StringIndexed {
+export interface BlockAction<ElementAction extends BasicElementAction = BlockElementAction> {
   type: 'block_actions';
   actions: [ElementAction];
   team: {
@@ -166,9 +166,3 @@ export type BlockChannelsSelectAction = BlockAction<ChannelsSelectAction>;
 export type BlockExternalSelectAction = BlockAction<ExternalSelectAction>;
 export type BlockOverflowAction = BlockAction<OverflowAction>;
 export type BlockDatepickerAction = BlockAction<DatepickerAction>;
-
-// Relics of the past
-
-// type KnownActionFromElementType<T extends string> = Extract<ElementAction, { type: T }>;
-// type ActionFromElementType<T extends string> = KnownActionFromElementType<T> extends never ?
-//   BasicElementAction<T> : KnownActionFromElementType<T>;
