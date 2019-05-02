@@ -1,7 +1,7 @@
 ---
 title: Responding to actions
 slug: action-respond
-order: 7
+order: 6
 ---
 
 <div class="section-content">

@@ -1,7 +1,7 @@
 ---
 title: Acknowledging requests
 slug: acknowledge
-order: 6
+order: 7
 ---
 
 <div class="section-content">
