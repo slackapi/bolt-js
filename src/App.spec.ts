@@ -489,4 +489,3 @@ function delay(ms: number = 0) {
 }
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
-// TODO: add coverage and build badges to README
