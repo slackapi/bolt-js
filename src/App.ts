@@ -343,7 +343,7 @@ export default class App {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
         this.client.chat.postMessage(postMessageArguments)
-          .catch(this.onGlobalError);
+          .catch((err) => this.onGlobalError(err));
       };
     };
 
