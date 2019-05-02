@@ -73,9 +73,9 @@
     
       <a href="http://localhost:4000/bolt/concepts#action-listening"><li>Listening to actions</li></a>
     
-      <a href="http://localhost:4000/bolt/concepts#acknowledge"><li>Acknowledging requests</li></a>
-    
       <a href="http://localhost:4000/bolt/concepts#action-respond"><li>Responding to actions</li></a>
+    
+      <a href="http://localhost:4000/bolt/concepts#acknowledge"><li>Acknowledging requests</li></a>
     
       <a href="http://localhost:4000/bolt/concepts#commands"><li>Listening and responding to commands</li></a>
     
@@ -340,7 +340,7 @@
 
   <p>Actions can be filtered on  an <code class="highlighter-rouge">action_id</code> of type string or RegExp. <code class="highlighter-rouge">action_id</code>s act as unique identifiers for interactive components on the Slack platform.</p>
 
-  <p>You’ll notice in all <code class="highlighter-rouge">action()</code> examples, <code class="highlighter-rouge">ack()</code> is used. It is required to call the <code class="highlighter-rouge">ack()</code> function within an action listener to acknowledge the event was received from Slack. This is discussed in the <a href="#action-acknowledging">acknowledging actions section</a>.</p>
+  <p>You’ll notice in all <code class="highlighter-rouge">action()</code> examples, <code class="highlighter-rouge">ack()</code> is used. It is required to call the <code class="highlighter-rouge">ack()</code> function within an action listener to acknowledge the event was received from Slack. This is discussed in the <a href="#acknowledge">acknowledging requests section</a>.</p>
 
 </div>
 
@@ -393,42 +393,6 @@
           </div>
         
           <div class="section-wrapper">
-            <h3 id="acknowledge">Acknowledging requests</h3>
-
-            <div class="section-content">
-  <p>Actions, commands, and options requests must <strong>always</strong> be acknowledged using the <code class="highlighter-rouge">ack()</code> function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of reuqest, your acknowledgement may be different. For example, when responding to a dialog submission you will call <code class="highlighter-rouge">ack()</code> with validation errors if the submission contains errors, or with no parameters if the submission is valid.</p>
-
-  <p>We recommend calling <code class="highlighter-rouge">ack()</code> right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.</p>
-</div>
-
-<div class="language-javascript highlighter-rouge">
-  <div class="highlight">
-    <pre class="highlight"><code><span class="c1">// Regex to determine if this is a valid email</span>
-<span class="kd">let</span> <span class="nx">isEmail</span> <span class="o">=</span> <span class="sr">/^</span><span class="se">[\w</span><span class="sr">-</span><span class="se">\.]</span><span class="sr">+@</span><span class="se">([\w</span><span class="sr">-</span><span class="se">]</span><span class="sr">+</span><span class="se">\.)</span><span class="sr">+</span><span class="se">[\w</span><span class="sr">-</span><span class="se">]{2,4}</span><span class="sr">$/</span>
-<span class="c1">// This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit </span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">({</span> <span class="na">callback_id</span><span class="p">:</span> <span class="s1">'ticket_submit'</span> <span class="p">},</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-	<span class="c1">// it’s a valid email, accept the submission</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">isEmail</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">submission</span><span class="p">.</span><span class="nx">email</span><span class="p">))</span> <span class="p">{</span>
-	  <span class="nx">ack</span><span class="p">();</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-		<span class="c1">// if it isn’t a valid email, acknowledge with an error</span>
-	  <span class="nx">ack</span><span class="p">({</span>
-		  <span class="na">errors</span><span class="p">:</span> <span class="p">[{</span>
-			  <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"email_address"</span><span class="p">,</span>
-			  <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Sorry, this isn’t a valid email"</span>
-      <span class="p">}]</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-</code></pre>
-  </div>
-</div>
-
-
-            <hr>
-          </div>
-        
-          <div class="section-wrapper">
             <h3 id="action-respond">Responding to actions</h3>
 
             <div class="section-content">
@@ -470,6 +434,42 @@
   </div>
 
 </details>
+
+
+            <hr>
+          </div>
+        
+          <div class="section-wrapper">
+            <h3 id="acknowledge">Acknowledging requests</h3>
+
+            <div class="section-content">
+  <p>Actions, commands, and options requests must <strong>always</strong> be acknowledged using the <code class="highlighter-rouge">ack()</code> function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of reuqest, your acknowledgement may be different. For example, when responding to a dialog submission you will call <code class="highlighter-rouge">ack()</code> with validation errors if the submission contains errors, or with no parameters if the submission is valid.</p>
+
+  <p>We recommend calling <code class="highlighter-rouge">ack()</code> right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.</p>
+</div>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><span class="c1">// Regex to determine if this is a valid email</span>
+<span class="kd">let</span> <span class="nx">isEmail</span> <span class="o">=</span> <span class="sr">/^</span><span class="se">[\w</span><span class="sr">-</span><span class="se">\.]</span><span class="sr">+@</span><span class="se">([\w</span><span class="sr">-</span><span class="se">]</span><span class="sr">+</span><span class="se">\.)</span><span class="sr">+</span><span class="se">[\w</span><span class="sr">-</span><span class="se">]{2,4}</span><span class="sr">$/</span>
+<span class="c1">// This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit </span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">({</span> <span class="na">callback_id</span><span class="p">:</span> <span class="s1">'ticket_submit'</span> <span class="p">},</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="c1">// it’s a valid email, accept the submission</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">isEmail</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">submission</span><span class="p">.</span><span class="nx">email</span><span class="p">))</span> <span class="p">{</span>
+	  <span class="nx">ack</span><span class="p">();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="c1">// if it isn’t a valid email, acknowledge with an error</span>
+	  <span class="nx">ack</span><span class="p">({</span>
+		  <span class="na">errors</span><span class="p">:</span> <span class="p">[{</span>
+			  <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"email_address"</span><span class="p">,</span>
+			  <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Sorry, this isn’t a valid email"</span>
+      <span class="p">}]</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+  </div>
+</div>
 
 
             <hr>
@@ -585,11 +585,13 @@ use the constraints object to filter on a <code class="highlighter-rouge">callba
             <div class="section-content">
   <p>Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming event.</p>
 
-  <p>Custom apps installed on just one workspace can simply use the <code class="highlighter-rouge">token</code> option (and optionally <code class="highlighter-rouge">botId</code> and <code class="highlighter-rouge">botUserId</code> options) at the time of <code class="highlighter-rouge">App</code> initialization. However, when your app needs to handle multiple tokens, the <code class="highlighter-rouge">authorize</code> option needs to be used instead. You might need to use this option if you’re building an app that is in just one workspace but needs to access several different user tokens, or if you’re building an app that is installed across multiple workspaces.</p>
+  <p>Custom apps installed on a single workspace can simply use the <code class="highlighter-rouge">token</code> option at the time of <code class="highlighter-rouge">App</code> initialization. However, when your app needs to handle multiple tokens, such as cases where it will be installed on multiple workspaces or needs access to more than one user token, the <code class="highlighter-rouge">authorize</code> option should be used instead.</p>
 
-  <p>The <code class="highlighter-rouge">authorize</code> option should be set to a function. The function takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who (and where) the event is coming from, which are properties such as <code class="highlighter-rouge">teamId</code> (always available), <code class="highlighter-rouge">userId</code>, <code class="highlighter-rouge">conversationId</code>, and <code class="highlighter-rouge">enterpriseId</code>. The authorized credentials should also have a few specific properties: <code class="highlighter-rouge">botToken</code>, <code class="highlighter-rouge">userToken</code>, <code class="highlighter-rouge">botId</code>, and <code class="highlighter-rouge">botUserId</code> (and any other properties you’d like to make available on the <a href="#context"><code class="highlighter-rouge">context</code></a>).</p>
+  <p>The <code class="highlighter-rouge">authorize</code> option should be set to a function that takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who and where the event is coming from using properties like <code class="highlighter-rouge">teamId</code> (always available), <code class="highlighter-rouge">userId</code>, <code class="highlighter-rouge">conversationId</code>, and <code class="highlighter-rouge">enterpriseId</code>.</p>
 
-  <p>You should always provide either one or both of the <code class="highlighter-rouge">botToken</code> and <code class="highlighter-rouge">userToken</code> properties. One of them is necessary to make helpers like <code class="highlighter-rouge">say()</code> work. If they are both given, then <code class="highlighter-rouge">botToken</code> will take precedence. The <code class="highlighter-rouge">botId</code> property is required in order for the app to ignore messages from itself (see <code class="highlighter-rouge">ignoreSelf</code> option and built-in middleware). The <code class="highlighter-rouge">botUserId</code> property is optional, but helps the app ignore events from itself besides message events.</p>
+  <p>The authorized credentials should also have a few specific properties: <code class="highlighter-rouge">botToken</code>, <code class="highlighter-rouge">userToken</code>, <code class="highlighter-rouge">botId</code> (required for app to ignore messages from itself), and <code class="highlighter-rouge">botUserId</code>. You can also include any other properties you’d like to make available on the <a href="#context"><code class="highlighter-rouge">context</code></a>.</p>
+
+  <p>You should always provide either one or both of the <code class="highlighter-rouge">botToken</code> and <code class="highlighter-rouge">userToken</code> properties. One of them is necessary to make helpers like <code class="highlighter-rouge">say()</code> work. If they are both given, then <code class="highlighter-rouge">botToken</code> will take precedence.</p>
 </div>
 
 <div class="language-javascript highlighter-rouge">

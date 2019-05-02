@@ -7,11 +7,13 @@ order: 2
 <div class="section-content">
 Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming event.
 
-Custom apps installed on just one workspace can simply use the `token` option (and optionally `botId` and `botUserId` options) at the time of `App` initialization. However, when your app needs to handle multiple tokens, the `authorize` option needs to be used instead. You might need to use this option if you're building an app that is in just one workspace but needs to access several different user tokens, or if you're building an app that is installed across multiple workspaces.
+Custom apps installed on a single workspace can simply use the `token` option at the time of `App` initialization. However, when your app needs to handle multiple tokens, such as cases where it will be installed on multiple workspaces or needs access to more than one user token, the `authorize` option should be used instead.
 
-The `authorize` option should be set to a function. The function takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who (and where) the event is coming from, which are properties such as `teamId` (always available), `userId`, `conversationId`, and `enterpriseId`. The authorized credentials should also have a few specific properties: `botToken`, `userToken`, `botId`, and `botUserId` (and any other properties you'd like to make available on the [`context`](#context)).
+The `authorize` option should be set to a function that takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who and where the event is coming from using properties like `teamId` (always available), `userId`, `conversationId`, and `enterpriseId`.
 
-You should always provide either one or both of the `botToken` and `userToken` properties. One of them is necessary to make helpers like `say()` work. If they are both given, then `botToken` will take precedence. The `botId` property is required in order for the app to ignore messages from itself (see `ignoreSelf` option and built-in middleware). The `botUserId` property is optional, but helps the app ignore events from itself besides message events.
+The authorized credentials should also have a few specific properties: `botToken`, `userToken`, `botId` (required for app to ignore messages from itself), and `botUserId`. You can also include any other properties you'd like to make available on the [`context`](#context).
+
+You should always provide either one or both of the `botToken` and `userToken` properties. One of them is necessary to make helpers like `say()` work. If they are both given, then `botToken` will take precedence.
 </div>
 
 ```javascript
