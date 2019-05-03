@@ -1,5 +1,8 @@
 # Slack ⚡️ Bolt
 
+[![Build Status](https://travis-ci.org/slackapi/bolt.svg?branch=master)](https://travis-ci.org/slackapi/bolt)
+[![codecov](https://codecov.io/gh/slackapi/bolt/branch/master/graph/badge.svg)](https://codecov.io/gh/slackapi/bolt)
+
 A framework to build Slack apps, _fast_.
 
 ## Initialization
