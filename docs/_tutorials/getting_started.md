@@ -126,7 +126,7 @@ Your app should let you know that it's up and running.
 ---
 
 ### Setting up events
-Your app behaves similarly to people on your team — it can respond to  that happen, post messages, and more. To listen to events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you'll use the [Events API to listen for specific events](https://api.slack.com/events-api).
+Your app behaves similarly to people on your team — it can respond to  that happen, post messages, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
 
 To enable events for your app, start by going back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**. 
 
