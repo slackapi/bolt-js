@@ -40,25 +40,20 @@ const installations = [
 ];
 
 const authorizeFn = async ({ teamId, enterpriseId }) => {
-  // Fetch team info from database. You could also set userToken instead.
-  const fetchAuthorizedTeam = new Promise((resolve, reject) => {
-    for (const team in installations) {
-      // Check for matching teamId and enterpriseId in the installations array
-      if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
-        // This is a match. Use these installaton credentials.
-        Promise.resolve(team);
-      }
+  // Fetch team info from database
+  for (const team in installations) {
+    // Check for matching teamId and enterpriseId in the installations array
+    if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
+      // This is a match. Use these installaton credentials.
+      return {
+        // You could also set userToken instead
+        botToken: team.botToken,
+        botId: team.botId,
+        botUserId: team.botUserId
+      };
     }
-
-    Promise.reject();
-  });
-
-  const authorizedTeam = await fetchAuthorizedTeam;
-
-  return () => ({
-    botToken: authorizedTeam.botToken,
-    botId: authorizedTeam.botId,
-    botUserId: authorizedTeam.botUserId,
-  });
+  }
+  
+  throw new Error('No matching authorizations');
 }
 ```
