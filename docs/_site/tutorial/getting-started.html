@@ -50,9 +50,8 @@
     </span>
 
     <span class="version">
-        <!-- | sort: "latest_release"  -->
         
-        <a href="">v</a>
+        <a href="https://github.com/slackapi/bolt/releases/tag/%40slack/bolt%401.0.1">v1.0.1</a>
     </span>
   </div>
 
@@ -74,9 +73,9 @@
     
       <a href="http://localhost:4000/bolt/concepts#action-listening"><li>Listening to actions</li></a>
     
-      <a href="http://localhost:4000/bolt/concepts#action-acknowledge"><li>Acknowleding actions</li></a>
-    
       <a href="http://localhost:4000/bolt/concepts#action-respond"><li>Responding to actions</li></a>
+    
+      <a href="http://localhost:4000/bolt/concepts#acknowledge"><li>Acknowledging requests</li></a>
     
       <a href="http://localhost:4000/bolt/concepts#commands"><li>Listening and responding to commands</li></a>
     
@@ -128,7 +127,7 @@
           <h1 id="getting-started">Getting started</h1>
 
 <div class="section-content">
-  <p>This guide is meant to show you how to get up and running with your first Bolt app. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.</p>
+  <p>This guide is meant to walk you through getting up and running with a Slack app using Bolt. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.</p>
 </div>
 
 <div class="supporting-content">
@@ -152,9 +151,9 @@
   <p>💡 We recommend using a workspace where you won’t disrupt real work getting done — <a href="https://slack.com/get-started#create">you can create a new one for free</a>.</p>
 </blockquote>
 
-<p>After you fill out an App Name (<em>you can change it later</em>) and picking a workspace to install it to, hit the <code class="highlighter-rouge">Create App</code> button and you’ll land on your app’s <strong>Basic Information</strong> page.</p>
+<p>After you fill out an app name (<em>you can change it later</em>) and picking a workspace to install it to, hit the <code class="highlighter-rouge">Create App</code> button and you’ll land on your app’s <strong>Basic Information</strong> page.</p>
 
-<p>This page contains all of the information about your app in addition to important credentials you’ll need for development later, like the <code class="highlighter-rouge">Signing Secret</code> under the <strong>App Crendentials</strong> header.</p>
+<p>This page contains an overview of your app in addition to important credentials you’ll need later, like the <code class="highlighter-rouge">Signing Secret</code> under the <strong>App Crendentials</strong> header.</p>
 
 <p><img src="../assets/basic-information-page.png" alt="Basic Information page" title="Basic Information page" /></p>
 
@@ -163,32 +162,32 @@
 <hr />
 
 <h3 id="tokens-and-installing-apps">Tokens and installing apps</h3>
-<p>First things first: Slack apps use the industry standard <a href="https://api.slack.com/docs/oauth">OAuth to manage access to Slack’s APIs</a>. When an app is installed, you receive a token that your app uses to call various API methods.</p>
+<p>Slack apps use the industry standard <a href="https://api.slack.com/docs/oauth">OAuth to manage access to Slack’s APIs</a>. When an app is installed, you’ll receive a token that your app can use to call various API methods.</p>
 
-<p>There are two token types your app can use: user (<code class="highlighter-rouge">xoxp</code>) tokens and bot (<code class="highlighter-rouge">xoxb</code>) tokens. User tokens allow you to call API methods on behalf of the people who are part of your workspace, and by default, your app receive an <code class="highlighter-rouge">xoxp</code> token associated with the person who installs the app. Bot tokens require adding a bot user to your app, which is granted a default set of permissions.</p>
+<p>There are two token types availalbe to a Slack app: user (<code class="highlighter-rouge">xoxp</code>) tokens and bot (<code class="highlighter-rouge">xoxb</code>) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. By default, your app receive an <code class="highlighter-rouge">xoxp</code> token associated with the person who installs the app. Bot tokens require adding a bot user to your app, which is granted a default set of permissions.</p>
 
-<p><a href="https://api.slack.com/docs/oauth-scopes">Tokens also require one or more scopes</a>, which define the actions the token can perform. Every API method has a corresponding scope and in order to be able to call that method, the token must have been granted that scope when the app is installed.</p>
+<p><a href="https://api.slack.com/docs/oauth-scopes">Tokens require one or more scopes</a>, which define the actions the token can perform. Every API method has a corresponding scope that’s required for an app to call the method.</p>
 
 <p>You can learn more about the different token types <a href="https://api.slack.com/docs/token-types">on our API site</a>. The type of token your app needs depends on the actions you want it to perform. For brevity, we’re going to use bot tokens for this guide.</p>
 
-<p>To add a bot user, click <strong>Bot Users</strong> on the left sidebar and then <strong>Add A Bot User</strong>. Give it a display name and username and then click <strong>Add Bot User</strong>.</p>
+<p>To add a bot user, click <strong>Bot Users</strong> on the left sidebar and then <strong>Add A Bot User</strong>. Give it a display name and username, then click <strong>Add Bot User</strong>.</p>
 
 <p>Now that you have a bot user with permission to send messages to Slack, let’s install the app to your workspace.</p>
 
-<p>Click <strong>Install App</strong> on the left sidebar and click the big <strong>Install App to Workspace</strong> button at the top of the page. If you’ve never installed a Slack app before, you’ll see a screen that details what permissions this app is requesting. This is what determines the scopes that get applied to your app’s OAuth token(s).</p>
+<p>Click <strong>Install App</strong> on the left sidebar and click the big <strong>Install App to Workspace</strong> button at the top of the page. If you’ve never installed this Slack app before, you’ll see a screen that details what permissions this app is requesting. This is what determines the scopes that are applied to your app’s OAuth token(s).</p>
 
 <p>Once you authorize the installation, you’ll land on the <strong>OAuth &amp; Permissions</strong> page.</p>
 
 <p><img src="../assets/bot-token.png" alt="OAuth Tokens" title="OAuth Tokens" /></p>
 
-<p>You’ll see two tokens. For now, we’ll just use the <code class="highlighter-rouge">xoxb</code> bot token. (If you scrol down this page to the <strong>Scopes</strong> section, you’ll see the various scopes you can add to the <code class="highlighter-rouge">xoxp</code> token.)</p>
+<p>You’ll see two tokens. For now, we’ll just use the <code class="highlighter-rouge">xoxb</code> bot token. (If you scroll down this page to the <strong>Scopes</strong> section, you’ll see the various scopes you can add to the <code class="highlighter-rouge">xoxp</code> token.)</p>
 
 <blockquote>
-  <p>💡 Treat your token like a password and <a href="https://api.slack.com/docs/oauth-safety">keep it safe</a>. Your app uses it to post and retrieve information from your Slack.</p>
+  <p>💡 Treat your token like a password and <a href="https://api.slack.com/docs/oauth-safety">keep it safe</a>. Your app uses it to post and retrieve information from Slack workspaces.</p>
 </blockquote>
 
 <h3 id="setting-up-your-local-project">Setting up your local project</h3>
-<p>With the initial configuration handled, it’s time to set up a new Bolt project. This is where you’ll write the code that handles all of the logic for your app. One important thing to note is that Slack doesn’t host your code, you do.</p>
+<p>With the initial configuration handled, it’s time to set up a new Bolt project. This is where you’ll write the code that handles the logic for your app. One important thing to note is that Slack doesn’t host your code — you do.</p>
 
 <p>If you don’t already have a project, let’s create a new one. Create an empty directory and initalize a new project:</p>
 
@@ -201,9 +200,9 @@ npm init
   </div>
 </div>
 
-<p>You’ll be prompted with a series of questions to describe your project, and you can accept the defaults if you aren’t picky. After you’re done, you’ll have a new <code class="highlighter-rouge">package.json</code> file in your directory.</p>
+<p>You’ll be prompted with a series of questions to describe your new project (you can accept the defaults if you aren’t picky). After you’re done, you’ll have a new <code class="highlighter-rouge">package.json</code> file in your directory.</p>
 
-<p>Before we install the Bolt package to your new project, let’s save the bot token and signing secret you generated when you configured your app. These are stored as environment variables and should not be saved in version control – remember, your tokens have access to your Slack workspace, treat them just like you would a password.</p>
+<p>Before we install the Bolt package to your new project, let’s save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should <em>not</em> be saved in version control.</p>
 
 <ol>
   <li><strong>Copy your Signing Secret from the Basic Information page</strong> and then store it in a new environment variable. The following example works on Linux and MacOS; but <a href="https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153">similar commands are available on Windows</a>.</li>
@@ -258,7 +257,7 @@ npm init
   </div>
 </div>
 
-<p>Your token and signing secret are all that’s required to create your first Bolt app. Save your <code class="highlighter-rouge">app.js</code> file then, back at the command line, run the following:</p>
+<p>Your token and signing secret are all that is required to create your first Bolt app. Save your <code class="highlighter-rouge">app.js</code> file then, back at the command line, run the following:</p>
 
 <pre><code class="language-script">node app.js
 </code></pre>
@@ -268,20 +267,24 @@ npm init
 <hr />
 
 <h3 id="setting-up-events">Setting up events</h3>
-<p>Your app behaves similarly to people on your team – it can respond to things that happen, post messages, and more. To listen to events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you’ll use the <a href="https://api.slack.com/events-api">Events API to listen for specific events</a>.</p>
+<p>Your app behaves similarly to people on your team — it can respond to  that happen, post messages, and more. To listen to events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you’ll use the <a href="https://api.slack.com/events-api">Events API to listen for specific events</a>.</p>
 
-<p>To enable events for your app, start by going back to your app configuration page (click on your app <a href="https://api.slack.com/apps">from your app management page</a>). Click <strong>Event Subscriptions</strong> on the left sidebar. Toggle the switch labeled <strong>Enable Events</strong>.</p>
+<p>To enable events for your app, start by going back to your app configuration page (click on the app <a href="https://api.slack.com/apps">from your app management page</a>). Click <strong>Event Subscriptions</strong> on the left sidebar. Toggle the switch labeled <strong>Enable Events</strong>.</p>
 
-<p>You’ll see a text input labeled “Request URL”. This Request URL is a public endpoint where Slack will send HTTP POST requests about just the events you specify.</p>
+<p>You’ll see a text input labeled <strong>Request URL</strong>. The Request URL is a public endpoint where Slack will send HTTP POST requests about the events you specify.</p>
 
-<p>When one of these events occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occured in. Your app will process the JSON and can then respond accordingly.</p>
+<blockquote>
+  <p>⚙️We’ve collected some of the most common hosting providers Slack developers use to host their apps <a href="https://api.slack.com/docs/hosting">on our API site</a></p>
+</blockquote>
+
+<p>When one of the events occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occured in. Your app will process the JSON and can then respond accordingly.</p>
 
 <details>
   <summary>
     <h4>Using a local Request URL for development</h4>
   </summary>
 
-  <p>If you’re just getting started with your app development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set that up, but for now a development proxy like <a href="https://ngrok.com/">ngrok</a> will do the job. We’ve written a separate tutorial about <a href="https://api.slack.com/tutorials/tunneling-with-ngrok">using ngrok with Slack for local development</a> that should help you get everything set up.</p>
+  <p>If you’re just getting started with your app’s development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set that up, but for now a development proxy like <a href="https://ngrok.com/">ngrok</a> will do the job. We’ve written a separate tutorial about <a href="https://api.slack.com/tutorials/tunneling-with-ngrok">using ngrok with Slack for local development</a> that should help you get everything set up.</p>
 
   <p>Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port 3000 for this example, but if you customized the port used to intialize your app use that port instead):</p>
 
@@ -307,7 +310,7 @@ npm init
 <hr />
 
 <h3 id="listening-and-responding-to-a-message">Listening and responding to a message</h3>
-<p>Your app is now ready for some logic. Let’s start by using the <code class="highlighter-rouge">message()</code> method that listens to messages in channels your bot user is a member of.</p>
+<p>Your app is now ready for some logic. Let’s start by using the <code class="highlighter-rouge">message()</code> listener that listens for messages in channels your bot user is a member of.</p>
 
 <p>The following example listens to all messages that contain the word “hello” and responds with “Hey there @user!”</p>
 
@@ -323,7 +326,7 @@ npm init
 <span class="c1">// Listens to incoming messages that contain "hello"</span>
 <span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">// say() sends a message to the channel where the event was triggered</span>
-  <span class="nx">say</span><span class="p">(</span><span class="s2">`Hey there &lt;@{message.user}!`</span><span class="p">);</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span><span class="p">);</span>
 <span class="p">});</span>
 
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -336,25 +339,29 @@ npm init
   </div>
 </div>
 
-<p>If you restart your app, you should be able to add your bot user to a channel, say “hello”, and it will respond.</p>
+<p>If you restart your app, you should be able to add your bot user to a channel, send any message that contains “hello”, and it will respond.</p>
 
-<p>This is a basic example, but it gives you a place to start customizing your app based on your end goal. Let’s try something a little more interactive by sending an interactive button rather than plain text.</p>
+<p>This is a basic example, but it gives you a place to start customizing your app based on your end goals. Let’s try something a little more interactive by sending a button rather than plain text.</p>
 
 <hr />
 
 <h3 id="sending-and-responding-to-actions">Sending and responding to actions</h3>
 
-<p>To use features like buttons, select menus, datepickers, dialogs, or message actions, you’ll need to enable interactivity. Similar to how you set up your app to listen for events, you’ll need to specify a URL for Slack to send the action (such as, someone clicked a button) to.</p>
+<p>To use features like buttons, select menus, datepickers, dialogs, and message actions, you’ll need to enable interactivity. Similar to events, you’ll need to specify a URL for Slack to send the action (such as <em>user clicked a button</em>).</p>
 
 <p>Back on your app configuration page, click on <strong>Interactive Components</strong> on the left side. You’ll see that there’s another <strong>Request URL</strong> box.</p>
 
-<p>By default, Bolt is configured to use same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was <code class="highlighter-rouge">https://8e8ec2d7.ngrok.io/slack/events</code>). Press the <strong>Save Changes</strong> button in the lower right hand corner, and that’s it. Your app is now all set up for interactivity!</p>
+<p>By default, Bolt is configured to use same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was <code class="highlighter-rouge">https://8e8ec2d7.ngrok.io/slack/events</code>). Press the <strong>Save Changes</strong> button in the lower right hand corner, and that’s it. Your app is all set up for interactivity!</p>
 
 <p><img src="../assets/request-url-config.png" alt="Configuring a Request URL" title="Configuring a Request URL" /></p>
 
-<p>Now, let’s go back to your app’s code and add our own interactivity. This will consist of two steps: first, your app will send a message that contains a button. Then, your app will set up a listener for when that button is clicked and do something in response.</p>
+<p>Now, let’s go back to your app’s code and add our own interactivity. This will consist of two steps:</p>
+<ul>
+  <li>First, your app will send a message that contains a button.</li>
+  <li>Next, your app will set up a listener that responds to a user when they click your app’s button</li>
+</ul>
 
-<p>Below, I’ve modified the app code we’ve been writing to send a message with a button instead of a just sending a string:</p>
+<p>Below, I’ve modified the app code we wrote in the last section to send a message with a button rather than a string:</p>
 
 <div class="language-javascript highlighter-rouge">
   <div class="highlight">
@@ -373,8 +380,8 @@ npm init
 	    <span class="p">{</span>
 		    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"section"</span><span class="p">,</span>
         <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"plain_text"</span><span class="p">,</span>
-          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@{message.user}!`</span>
+          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"mrkdwn"</span><span class="p">,</span>
+          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span>
         <span class="p">},</span>
         <span class="s2">"accessory"</span><span class="p">:</span> <span class="p">{</span>
           <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"button"</span><span class="p">,</span>
@@ -401,13 +408,13 @@ npm init
 
 <p>The value inside of <code class="highlighter-rouge">say()</code> is now an object that contains an array of <code class="highlighter-rouge">blocks</code>. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory.</p>
 
-<p>You’ll notice in the same <code class="highlighter-rouge">accessory</code> object as the button, there is an <code class="highlighter-rouge">action_id</code>. This will act as a unique identifier for the action so your app knows what action you want to respond to.</p>
+<p>You’ll notice in the same <code class="highlighter-rouge">accessory</code> object as the button, there is an <code class="highlighter-rouge">action_id</code>. This will act as a unique identifier for the button so your app can specify what action it is responding to.</p>
 
 <blockquote>
-  <p>💡 The <a href="https://api.slack.com/tools/block-kit-builder">Block Kit Builder</a> is an easy way to prototype your interactive messages. The builder lets you, or anyone on your team, mockup what a message should look like and then generates the corresponding JSON. You can then copy and paste the message payload JSON directly into your Bolt app.</p>
+  <p>💡 The <a href="https://api.slack.com/tools/block-kit-builder">Block Kit Builder</a> is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.</p>
 </blockquote>
 
-<p>Now, if you restart your app and say “hello” in a channel your app is in, you’ll see a message with a button. But if you click the button, nothing happens.</p>
+<p>Now, if you restart your app and say “hello” in a channel your app is in, you’ll see a message with a button. But if you click the button, nothing happens (<em>yet!</em>).</p>
 
 <p>Let’s add a handler to send a followup message when someone clicks the button:</p>
 
@@ -428,8 +435,8 @@ npm init
 	    <span class="p">{</span>
 		    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"section"</span><span class="p">,</span>
         <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"plain_text"</span><span class="p">,</span>
-          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@{message.user}!`</span>
+          <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"mrkdwn"</span><span class="p">,</span>
+          <span class="s2">"text"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@{message.user}&gt;!`</span>
         <span class="p">},</span>
         <span class="s2">"accessory"</span><span class="p">:</span> <span class="p">{</span>
           <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"button"</span><span class="p">,</span>
@@ -444,8 +451,10 @@ npm init
   <span class="p">});</span>
 <span class="p">});</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'button_click'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="p">{</span>
-  <span class="nx">say</span><span class="p">(</span><span class="s2">`@{action.user} clicked the button`</span><span class="p">);</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="s1">'button_click'</span><span class="p">,</span> <span class="p">({</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Acknowledge the action</span>
+  <span class="nx">ack</span><span class="p">();</span>
+  <span class="nx">say</span><span class="p">(</span><span class="s2">`&lt;@</span><span class="p">${</span><span class="nx">body</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="s2">&gt; clicked the button`</span><span class="p">);</span>
 <span class="p">});</span>
 
 <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
