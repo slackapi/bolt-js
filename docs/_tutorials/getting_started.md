@@ -163,7 +163,7 @@ Under the **Enable Events** switch in the **Request URL** box, go ahead and past
 ---
 
 ### Listening and responding to a message
-Your app is now ready for some logic. Let's start by using the `message()` listener that listens for messages in channels your bot user is a member of.
+Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
 
 The following example listens to all messages that contain the word "hello" and responds with "Hey there @user!"
 
