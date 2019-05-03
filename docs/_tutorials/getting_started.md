@@ -74,7 +74,7 @@ cd first-bolt-app
 npm init
 ```
 
-You’ll be prompted with a series of questions to describe your new project (you can accept the defaults if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
+You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
 
 Before we install the Bolt package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
 
