@@ -191,7 +191,7 @@ app.message('hello', ({ message, say }) => {
 
 If you restart your app, you should be able to add your bot user to a channel, send any message that contains "hello", and it will respond.
 
-This is a basic example, but it gives you a place to start customizing your app based on your end goals. Let's try something a little more interactive by sending a button rather than plain text.
+This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
 
 ---
 
