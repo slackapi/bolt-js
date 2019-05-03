@@ -134,7 +134,7 @@ You'll see a text input labeled **Request URL**. The Request URL is a public end
 
 > ⚙️We've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting)
 
-When one of the events occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occured in. Your app will process the JSON and can then respond accordingly.
+When an event occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
 
 <details>
 <summary markdown="0">
