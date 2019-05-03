@@ -207,7 +207,7 @@ By default, Bolt is configured to use same endpoint for interactive components t
 
 Now, let's go back to your app's code and add interactivity. This will consist of two steps:
 - First, your app will send a message that contains a button.
-- Next, your app will set up a listener that responds to a user when they click your app's button
+- Next, your app will listen to the action of a user clicking the button and respond
 
 Below, I've modified the app code we wrote in the last section to send a message with a button rather than a string:
 
