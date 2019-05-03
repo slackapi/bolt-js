@@ -115,7 +115,7 @@ const app = new App({
 })();
 ```
 
-Your token and signing secret are all that is required to create your first Bolt app. Save your `app.js` file then, back at the command line, run the following:
+Your token and signing secret are enough to create your first Bolt app. Save your `app.js` file then, back at the command line, run the following:
 
 ```script
 node app.js
