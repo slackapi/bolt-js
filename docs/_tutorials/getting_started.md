@@ -41,7 +41,7 @@ Look around, add an app icon and description, and then let's start configuring y
 ---
 
 ### Tokens and installing apps
-Slack apps use the industry standard [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that your app can use to call various API methods. 
+Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that your app can use to call various API methods. 
 
 There are two token types availalbe to a Slack app: user (`xoxp`) tokens and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. By default, your app receive an `xoxp` token associated with the person who installs the app. Bot tokens require adding a bot user to your app, which is granted a default set of permissions.
 
