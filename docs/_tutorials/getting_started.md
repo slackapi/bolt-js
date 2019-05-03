@@ -205,7 +205,7 @@ By default, Bolt is configured to use same endpoint for interactive components t
 
 ![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
 
-Now, let's go back to your app's code and add our own interactivity. This will consist of two steps:
+Now, let's go back to your app's code and add interactivity. This will consist of two steps:
 - First, your app will send a message that contains a button.
 - Next, your app will set up a listener that responds to a user when they click your app's button
 
