@@ -30,7 +30,7 @@ First thing's first: before you start developing with Bolt, you'll want to [crea
 
 > 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
 
-After you fill out an app name (_you can change it later_) and picking a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
+After you fill out an app name (_you can change it later_) and pick a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
 
 This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Crendentials** header. 
 
@@ -41,9 +41,9 @@ Look around, add an app icon and description, and then let's start configuring y
 ---
 
 ### Tokens and installing apps
-Slack apps use the industry standard [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that your app can use to call various API methods. 
+Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that your app can use to call various API methods. 
 
-There are two token types availalbe to a Slack app: user (`xoxp`) tokens and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. By default, your app receives an `xoxp` token associated with the person who installs the app. Bot tokens require adding a bot user to your app, which is granted a default set of permissions.
+There are two token types available to a Slack app: user (`xoxp`) tokens and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. Your app receives an `xoxp` token associated with each user who installs the app. Bot tokens require adding a bot user to your app, which are granted once in each workspace that a user installs the app into, and will be the identical no matter which user performed the installation.
 
 For brevity, we're going to use bot tokens for this guide.
 
@@ -72,7 +72,7 @@ cd first-bolt-app
 npm init
 ```
 
-You’ll be prompted with a series of questions to describe your new project (you can accept the defaults if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
+You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
 
 Before we install the Bolt package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
 
@@ -113,7 +113,7 @@ const app = new App({
 })();
 ```
 
-Your token and signing secret are all that is required to create your first Bolt app. Save your `app.js` file then, back at the command line, run the following:
+Your token and signing secret are enough to create your first Bolt app. Save your `app.js` file then, back at the command line, run the following:
 
 ```script
 node app.js
@@ -124,7 +124,7 @@ Your app should let you know that it's up and running.
 ---
 
 ### Setting up events
-Your app behaves similarly to people on your team — it can respond to  that happen, post messages, and more. To listen to events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you'll use the [Events API to listen for specific events](https://api.slack.com/events-api).
+Your app behaves similarly to people on your team — it can respond to  that happen, post messages, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
 
 To enable events for your app, start by going back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**. 
 
@@ -132,7 +132,7 @@ You'll see a text input labeled **Request URL**. The Request URL is a public URL
 
 > ⚙️We've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting)
 
-When one of the events occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occured in. Your app will process the JSON and can then respond accordingly.
+When an event occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
 
 <details>
 <summary markdown="0">
@@ -161,7 +161,7 @@ Under the **Enable Events** switch in the **Request URL** box, go ahead and past
 ---
 
 ### Listening and responding to a message
-Your app is now ready for some logic. Let's start by using the `message()` listener that listens for messages in channels your bot user is a member of.
+Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
 
 The following example listens to all messages that contain the word "hello" and responds with "Hey there @user!"
 
@@ -189,7 +189,7 @@ app.message('hello', ({ message, say }) => {
 
 If you restart your app, you should be able to add your bot user to a channel, send any message that contains "hello", and it will respond.
 
-This is a basic example, but it gives you a place to start customizing your app based on your end goals. Let's try something a little more interactive by sending a button rather than plain text.
+This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
 
 ---
 
@@ -203,9 +203,9 @@ By default, Bolt is configured to use the same endpoint for interactive componen
 
 ![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
 
-Now, let's go back to your app's code and add our own interactivity. This will consist of two steps:
+Now, let's go back to your app's code and add interactivity. This will consist of two steps:
 - First, your app will send a message that contains a button.
-- Next, your app will set up a listener that responds to a user when they click your app's button
+- Next, your app will listen to the action of a user clicking the button and respond
 
 Below, I've modified the app code we wrote in the last section to send a message with a button rather than a string:
 

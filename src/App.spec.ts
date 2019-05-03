@@ -5,7 +5,7 @@ import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
-import { Receiver, ReceiverEvent, Middleware, AnyMiddlewareArgs } from './types';
+import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
 import { Logger } from '@slack/logger';
 
@@ -15,75 +15,144 @@ describe('App', () => {
     // that the `ignoreSelf` middleware will fail (or maybe just warn) a bunch.
     describe('with successful single team authorization results', () => {
       it('should succeed with a token for single team authorization', async () => {
-        const { App } = await importAppWhichFetchesOwnBotIds();
-        new App({ token: '', signingSecret: '' }); // tslint:disable-line:no-unused-expression
+        // Arrange
+        const fakeBotId = 'B_FAKE_BOT_ID';
+        const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+        );
+        const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+        // Act
+        const app = new App({ token: '', signingSecret: '' });
+
+        // Assert
+        // TODO: verify that the fake bot ID and fake bot user ID are retrieved
+        assert.instanceOf(app, App);
       });
     });
     it('should succeed with an authorize callback', async () => {
-      const { App } = await importApp();
-      const authorizeCallback = sinon.spy();
-      new App({ authorize: authorizeCallback, signingSecret: '' }); // tslint:disable-line:no-unused-expression
-      assert(authorizeCallback.notCalled);
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({ authorize: authorizeCallback, signingSecret: '' });
+
+      // Assert
+      assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
+      assert.instanceOf(app, App);
     });
-    it('should fail without a token  for single team authorization or authorize callback', async () => {
-      const { App } = await importApp();
+    it('should fail without a token for single team authorization or authorize callback', async () => {
+      // Arrange
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
       try {
         new App({ signingSecret: '' }); // tslint:disable-line:no-unused-expression
         assert.fail();
       } catch (error) {
-        assert.instanceOf(error, Error);
+        // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
     });
     it('should fail when both a token and authorize callback are specified', async () => {
-      const { App } = await importApp();
-      const authorizeCallback = sinon.spy();
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
       try {
-         // tslint:disable-next-line:no-unused-expression
+        // tslint:disable-next-line:no-unused-expression
         new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
         assert.fail();
       } catch (error) {
-        assert.instanceOf(error, Error);
+        // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
       }
     });
     describe('with a custom receiver', () => {
-      it('should succeed with no signing secret for the default receiver', async () => {
-        const { App } = await importApp();
-        const mockReceiver = createMockReceiver();
-        new App({ receiver: mockReceiver, authorize: sinon.spy() }); // tslint:disable-line:no-unused-expression
+      it('should succeed with no signing secret', async () => {
+        // Arrange
+        const App = await importApp(); // tslint:disable-line:variable-name
+
+        // Act
+        const app = new App({ receiver: createFakeReceiver(), authorize: noopAuthorize });
+
+        // Assert
+        assert.instanceOf(app, App);
       });
     });
     it('should fail when no signing secret for the default receiver is specified', async () => {
-      const { App } = await importApp();
+      // Arrange
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
       try {
-        new App({ authorize: sinon.spy() }); // tslint:disable-line:no-unused-expression
+        new App({ authorize: noopAuthorize }); // tslint:disable-line:no-unused-expression
         assert.fail();
       } catch (error) {
-        assert.instanceOf(error, Error);
+        // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
     });
     it('should initialize MemoryStore conversation store by default', async () => {
-      const { App, memoryStoreStub, conversationContextStub } = await importApp();
-      new App({ authorize: sinon.spy(), signingSecret: '' }); // tslint:disable-line:no-unused-expression
-      assert(memoryStoreStub.calledWithNew);
-      assert((conversationContextStub as SinonSpy).called);
+      // Arrange
+      const fakeMemoryStore = sinon.fake();
+      const fakeConversationContext = sinon.fake.returns(noopMiddleware);
+      const overrides = mergeOverrides(
+        withNoopAppMetadata(),
+        withNoopWebClient(),
+        withMemoryStore(fakeMemoryStore),
+        withConversationContext(fakeConversationContext),
+      );
+      const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({ authorize: noopAuthorize, signingSecret: '' });
+
+      // Assert
+      assert.instanceOf(app, App);
+      assert(fakeMemoryStore.calledWithNew);
+      assert(fakeConversationContext.called);
     });
     it('should initialize without a conversation store when option is false', async () => {
-      const { App, conversationContextStub } = await importApp();
-      // tslint:disable-next-line:no-unused-expression
-      new App({ convoStore: false, authorize: sinon.spy(), signingSecret: '' });
-      assert((conversationContextStub as SinonSpy).notCalled);
+      // Arrange
+      const fakeConversationContext = sinon.fake.returns(noopMiddleware);
+      const overrides = mergeOverrides(
+        withNoopAppMetadata(),
+        withNoopWebClient(),
+        withConversationContext(fakeConversationContext),
+      );
+      const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({ convoStore: false, authorize: noopAuthorize, signingSecret: '' });
+
+      // Assert
+      assert.instanceOf(app, App);
+      assert(fakeConversationContext.notCalled);
     });
     describe('with a custom conversation store', () => {
       it('should initialize the conversation store', async () => {
-        const { App, conversationContextStub } = await importApp();
-        const mockConvoStore = createMockConvoStore();
-        // tslint:disable-next-line:no-unused-expression
-        new App({ convoStore: mockConvoStore, authorize: sinon.spy(), signingSecret: '' });
-        assert((conversationContextStub as SinonSpy).firstCall.calledWith(mockConvoStore));
+        // Arrange
+        const fakeConversationContext = sinon.fake.returns(noopMiddleware);
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withNoopWebClient(),
+          withConversationContext(fakeConversationContext),
+        );
+        const dummyConvoStore = Symbol() as unknown as ConversationStore;
+        const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+        // Act
+        const app = new App({ convoStore: dummyConvoStore, authorize: noopAuthorize, signingSecret: '' });
+
+        // Assert
+        assert.instanceOf(app, App);
+        assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
     // TODO: tests for ignoreSelf option
@@ -94,169 +163,300 @@ describe('App', () => {
 
   describe('#start', () => {
     it('should pass calls through to receiver', async () => {
-      const { App } = await importApp();
-      const mockReceiver = createMockReceiver();
-      const mockReturns = Symbol();
-      const mockParameterList = [Symbol(), Symbol()];
-      mockReceiver.start = sinon.fake.resolves(mockReturns);
-      const app = new App({ receiver: mockReceiver, authorize: sinon.spy() });
-      const actualMockReturns = await app.start(...mockParameterList);
-      assert.equal(actualMockReturns, mockReturns);
-      assert.deepEqual(mockParameterList, (mockReceiver.start as SinonSpy).firstCall.args);
+      // Arrange
+      const dummyReturn = Symbol();
+      const dummyParams = [Symbol(), Symbol()];
+      const fakeReceiver = createFakeReceiver(sinon.fake.resolves(dummyReturn));
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+      const actualReturn = await app.start(...dummyParams);
+
+      // Assert
+      assert.equal(actualReturn, dummyReturn);
+      assert.deepEqual(dummyParams, fakeReceiver.start.firstCall.args);
     });
   });
 
   describe('#stop', () => {
     it('should pass calls through to receiver', async () => {
-      const { App } = await importApp();
-      const mockReceiver = createMockReceiver();
-      const mockReturns = Symbol();
-      const mockParameterList = [Symbol(), Symbol()];
-      mockReceiver.stop = sinon.fake.resolves(mockReturns);
-      const app = new App({ receiver: mockReceiver, authorize: sinon.spy() });
-      const actualMockReturns = await app.stop(...mockParameterList);
-      assert.equal(actualMockReturns, mockReturns);
-      assert.deepEqual(mockParameterList, (mockReceiver.stop as SinonSpy).firstCall.args);
+      // Arrange
+      const dummyReturn = Symbol();
+      const dummyParams = [Symbol(), Symbol()];
+      const fakeReceiver = createFakeReceiver(undefined, sinon.fake.resolves(dummyReturn));
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+      const actualReturn = await app.stop(...dummyParams);
+
+      // Assert
+      assert.equal(actualReturn, dummyReturn);
+      assert.deepEqual(dummyParams, fakeReceiver.stop.firstCall.args);
     });
   });
 
   describe('event processing', () => {
+    // TODO: verify that authorize callback is called with the correct properties and responds correctly to
+    // various return values
+
+    function createInvalidReceiverEvents(): ReceiverEvent[] {
+      // TODO: create many more invalid receiver events (fuzzing)
+      return [{
+        body: {},
+        respond: sinon.fake(),
+        ack: sinon.fake(),
+      }];
+    }
+
     it('should warn and skip when processing a receiver event with unknown type (never crash)', async () => {
-      const { App } = await importApp();
-      const mockReceiver = createMockReceiver();
+      // Arrange
+      const fakeReceiver = createFakeReceiver();
+      const fakeLogger = createFakeLogger();
+      const fakeMiddleware = sinon.fake(noopMiddleware);
       const invalidReceiverEvents = createInvalidReceiverEvents();
-      const spyLogger = createSpyLogger();
-      const spyMiddleware = createSpyMiddleware();
-      const app = new App({ receiver: mockReceiver, logger: spyLogger, authorize: sinon.spy() });
-      app.use(spyMiddleware);
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
+      app.use(fakeMiddleware);
       for (const event of invalidReceiverEvents) {
-        (mockReceiver as unknown as EventEmitter).emit('message', event);
+        fakeReceiver.emit('message', event);
       }
-      assert((spyMiddleware as SinonSpy).notCalled);
-      assert.isAtLeast((spyLogger.warn as SinonSpy).callCount, invalidReceiverEvents.length);
+
+      // Assert
+      assert(fakeMiddleware.notCalled);
+      assert.isAtLeast(fakeLogger.warn.callCount, invalidReceiverEvents.length);
     });
     it('should warn, send to global error handler, and skip when a receiver event fails authorization', async () => {
-      const { App } = await importApp();
-      const mockReceiver = createMockReceiver();
-      const mockReceiverEvent = createMockReceiverEvent();
-      const spyLogger = createSpyLogger();
-      const spyMiddleware = createSpyMiddleware();
-      const spyErrorHandler = sinon.spy();
-      const rejection = new Error();
-      const app = new App({ receiver: mockReceiver, logger: spyLogger, authorize: sinon.fake.rejects(rejection) });
-      app.use(spyMiddleware);
-      app.error(spyErrorHandler);
-      (mockReceiver as unknown as EventEmitter).emit('message', mockReceiverEvent);
+      // Arrange
+      const fakeReceiver = createFakeReceiver();
+      const fakeLogger = createFakeLogger();
+      const fakeMiddleware = sinon.fake(noopMiddleware);
+      const fakeErrorHandler = sinon.fake();
+      const dummyAuthorizationError = new Error();
+      const dummyReceiverEvent = createDummyReceiverEvent();
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      const app = new App({
+        receiver: fakeReceiver,
+        logger: fakeLogger,
+        authorize: sinon.fake.rejects(dummyAuthorizationError),
+      });
+      app.use(fakeMiddleware);
+      app.error(fakeErrorHandler);
+      fakeReceiver.emit('message', dummyReceiverEvent);
       await delay();
-      assert((spyMiddleware as SinonSpy).notCalled);
-      assert((spyLogger.warn as SinonSpy).called);
-      assert.instanceOf(spyErrorHandler.firstCall.args[0], Error);
-      assert.propertyVal(spyErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
-      assert.propertyVal(spyErrorHandler.firstCall.args[0], 'original', rejection);
+
+      // Assert
+      assert(fakeMiddleware.notCalled);
+      assert(fakeLogger.warn.called);
+      assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+      assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
+      assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'original', dummyAuthorizationError);
     });
     describe('global middleware', () => {
-      it('should process receiver events in order or #use', async () => {
-        const { App } = await importApp();
-        const mockReceiver = createMockReceiver();
-        const mockReceiverEvent = createMockReceiverEvent();
-        const spyFirstMiddleware = createSpyMiddleware();
-        const spySecondMiddleware = createSpyMiddleware();
-        const app = new App({ receiver: mockReceiver, authorize: sinon.fake.resolves({ botToken: '', botId: '' }) });
-        app.use(spyFirstMiddleware);
-        app.use(spySecondMiddleware);
-        (mockReceiver as unknown as EventEmitter).emit('message', mockReceiverEvent);
-        await delay();
-        assert((spyFirstMiddleware as SinonSpy).calledOnce);
-        assert((spyFirstMiddleware as SinonSpy).calledBefore(spySecondMiddleware as SinonSpy));
-        assert((spySecondMiddleware as SinonSpy).calledOnce);
+      it('should process receiver events in order of #use', async () => {
+        // Arrange
+        const fakeReceiver = createFakeReceiver();
+        const fakeFirstMiddleware = sinon.fake(noopMiddleware);
+        const fakeSecondMiddleware = sinon.fake(noopMiddleware);
+        const dummyReceiverEvent = createDummyReceiverEvent();
+        const dummyAuthorizationResult = { botToken: '', botId: '' };
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withNoopWebClient(),
+          withMemoryStore(sinon.fake()),
+          withConversationContext(sinon.fake.returns(noopMiddleware)),
+        );
+        const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+        // Act
+        const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+        app.use(fakeFirstMiddleware);
+        app.use(fakeSecondMiddleware);
+        fakeReceiver.emit('message', dummyReceiverEvent);
+        await delay(10);
+
+        // Assert
+        assert(fakeFirstMiddleware.calledOnce);
+        assert(fakeFirstMiddleware.calledBefore(fakeSecondMiddleware));
+        assert(fakeSecondMiddleware.calledOnce);
+      });
+    });
+    describe('middleware and listener arguments', () => {
+      describe('say()', () => {
+        it.skip('should send a message to a channel where the incoming event originates', async () => {
+          // Arrange
+          const fakeReceiver = createFakeReceiver();
+          const fakePostMessage = sinon.fake();
+          const dummyReceiverEvent = createDummyReceiverEvent();
+          const dummyMessage = 'test';
+          const overrides = mergeOverrides(
+            withNoopAppMetadata(),
+            withPostMessage(fakePostMessage),
+            withMemoryStore(sinon.fake()),
+            withConversationContext(sinon.fake.returns(noopMiddleware)),
+          );
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+          app.use((args) => {
+            // By definition, the mockEvents should all produce a say function, so we cast args.say into a SayFn
+            const say = (args as any).say as SayFn;
+            say(dummyMessage);
+          });
+          fakeReceiver.emit('message', dummyReceiverEvent);
+          await delay();
+
+          // Assert
+          // TODO
+        });
       });
     });
   });
 });
 
-/* Test Helpers */
+/* Testing Harness */
 
-async function importAppWhichFetchesOwnBotIds() {
-  const fakeBotUserId = 'fake_bot_user_id';
-  const fakeBotId = 'fake_bot_id';
-  const App = (await rewiremock.module(() => import('./App'), { // tslint:disable-line:variable-name
+// Loading the system under test using overrides
+async function importApp(
+  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
+): Promise<typeof import('./App').default> {
+  return (await rewiremock.module(() => import('./App'), overrides)).default;
+}
+
+// Composable overrides
+interface Override {
+  [packageName: string]: {
+    [exportName: string]: any;
+  };
+}
+
+function withNoopWebClient(): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {},
+    },
+  };
+}
+
+function withNoopAppMetadata(): Override {
+  return {
+    '@slack/web-api': {
+      addAppMetadata: sinon.fake(),
+    },
+  };
+}
+
+// TODO: see if we can use a partial type for the return value
+function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string): Override {
+  return {
     '@slack/web-api': {
       WebClient: class {
-        public readonly auth = {
-          test: sinon.fake.resolves({ user_id: fakeBotUserId }),
+        public auth = {
+          test: sinon.fake.resolves({ user_id: botUserId }),
         };
-        public readonly users = {
+        public users = {
           info: sinon.fake.resolves({
             user: {
               profile: {
-                bot_id: fakeBotId,
+                bot_id: botId,
               },
             },
           }),
         };
-        public readonly chat = {
-          postMessage: sinon.fake.resolves({}),
-        };
       },
-      addAppMetadata: sinon.fake(),
     },
-  })).default;
-
-  return {
-    fakeBotId,
-    fakeBotUserId,
-    App,
   };
 }
 
-async function importApp() {
-  const memoryStoreStub = sinon.stub();
-  const conversationContextStub: typeof import('./conversation-store').conversationContext =
-    sinon.spy(() => createSpyMiddleware());
-  const App = (await rewiremock.module(() => import('./App'), { // tslint:disable-line:variable-name
+function withPostMessage(spy: SinonSpy): Override {
+  return {
     '@slack/web-api': {
       WebClient: class {
-        public readonly chat = {
-          postMessage: sinon.fake.resolves({}),
+        public chat = {
+          postMessage: spy,
         };
       },
-      addAppMetadata: sinon.fake(),
     },
+  };
+}
+
+function withMemoryStore(spy: SinonSpy): Override {
+  return {
     './conversation-store': {
-      conversationContext: conversationContextStub,
-      MemoryStore: memoryStoreStub,
+      MemoryStore: spy,
     },
-  })).default;
-
-  return {
-    App,
-    memoryStoreStub,
-    conversationContextStub,
   };
 }
 
-function createSpyMiddleware(): Middleware<AnyMiddlewareArgs> {
-  return sinon.spy(({ next }) => { next(); });
+function withConversationContext(spy: SinonSpy): Override {
+  return {
+    './conversation-store': {
+      conversationContext: spy,
+    },
+  };
 }
 
-function createMockReceiver(): Receiver {
+function mergeOverrides(...overrides: Override[]): Override {
+  let currentOverrides: Override = {};
+  for (const override of overrides) {
+    currentOverrides = mergeObjProperties(currentOverrides, override);
+  }
+  return currentOverrides;
+}
+
+function mergeObjProperties(first: Override, second: Override): Override {
+  const merged: Override = {};
+  const props = Object.keys(first).concat(Object.keys(second));
+  for (const prop of props) {
+    if (second[prop] === undefined && first[prop] !== undefined) {
+      merged[prop] = first[prop];
+    } else if (first[prop] === undefined && second[prop] !== undefined) {
+      merged[prop] = second[prop];
+    } else {
+      // second always overwrites the first
+      merged[prop] = { ...first[prop], ...second[prop] };
+    }
+  }
+  return merged;
+}
+
+// Fakes
+type FakeReceiver = SinonSpy & EventEmitter & {
+  start: SinonSpy<Parameters<Receiver['start']>, ReturnType<Receiver['start']>>;
+  stop: SinonSpy<Parameters<Receiver['stop']>, ReturnType<Receiver['stop']>>;
+};
+
+function createFakeReceiver(
+  startSpy: SinonSpy = sinon.fake.resolves(undefined),
+  stopSpy: SinonSpy = sinon.fake.resolves(undefined),
+): FakeReceiver {
   const mock = new EventEmitter();
-  (mock as unknown as Receiver).start = sinon.fake.resolves(undefined);
-  (mock as unknown as Receiver).stop = sinon.fake.resolves(undefined);
-  return mock as unknown as Receiver;
+  (mock as FakeReceiver).start = startSpy;
+  (mock as FakeReceiver).stop = stopSpy;
+  return mock as FakeReceiver;
 }
 
-function createMockConvoStore(): ConversationStore {
-  return {
-    set: sinon.fake.resolves(undefined),
-    get: sinon.fake.resolves(undefined),
-  };
+interface FakeLogger extends Logger {
+  setLevel: SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>;
+  setName: SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>;
+  debug: SinonSpy<Parameters<Logger['debug']>, ReturnType<Logger['debug']>>;
+  info: SinonSpy<Parameters<Logger['info']>, ReturnType<Logger['info']>>;
+  warn: SinonSpy<Parameters<Logger['warn']>, ReturnType<Logger['warn']>>;
+  error: SinonSpy<Parameters<Logger['error']>, ReturnType<Logger['error']>>;
 }
 
-function createSpyLogger(): Logger {
+function createFakeLogger(): FakeLogger {
   return {
-    setLevel: sinon.fake(),
-    setName: sinon.fake(),
+    // NOTE: the two casts are because of a TypeScript inconsistency with tuple types and any[]. all tuple types
+    // should be assignable to any[], but TypeScript doesn't think so.
+    setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
+    setName: sinon.fake() as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
     debug: sinon.fake(),
     info: sinon.fake(),
     warn: sinon.fake(),
@@ -264,28 +464,28 @@ function createSpyLogger(): Logger {
   };
 }
 
-function createInvalidReceiverEvents(): ReceiverEvent[] {
-  // TODO: create many more invalid receiver events (fuzzing)
-  return [{
-    body: {},
-    respond: sinon.fake(),
-    ack: sinon.fake(),
-  }];
-}
-
-function createMockReceiverEvent(): ReceiverEvent {
+// Dummies (values that have no real behavior but pass through the system opaquely)
+function createDummyReceiverEvent(): ReceiverEvent {
+  // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
+  // IncomingEventType.Event
   return {
     body: {
       event: {
       },
     },
-    respond: sinon.fake(),
-    ack: sinon.fake(),
+    respond: noop,
+    ack: noop,
   };
 }
 
+// Utility functions
+const noop = () => { }; // tslint:disable-line:no-empty
+const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
+const noopAuthorize = (() => Promise.resolve({}));
 function delay(ms: number = 0) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
+
+// TODO: swap out rewiremock for proxyquire to see if it saves execution time

@@ -192,7 +192,7 @@ export default class App {
    *
    * @param m global middleware function
    */
-  public use(m: any): this {
+  public use(m: Middleware<AnyMiddlewareArgs>): this {
     this.middleware.push(m);
     return this;
   }
