@@ -239,7 +239,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
 
 export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, next }) => {
-    if (message.subtype !== subtype) {
+    if (message.subtype === subtype) {
       next();
     }
   };
