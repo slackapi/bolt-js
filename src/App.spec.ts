@@ -278,7 +278,7 @@ describe('App', () => {
         app.use(fakeFirstMiddleware);
         app.use(fakeSecondMiddleware);
         fakeReceiver.emit('message', dummyReceiverEvent);
-        await delay(10);
+        await delay();
 
         // Assert
         assert(fakeFirstMiddleware.calledOnce);
@@ -288,12 +288,90 @@ describe('App', () => {
     });
     describe('middleware and listener arguments', () => {
       describe('say()', () => {
-        it.skip('should send a message to a channel where the incoming event originates', async () => {
+
+        function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {
+          return [
+            // IncomingEventType.Event with channel in payload
+            {
+              body: {
+                event: {
+                  channel: channelId,
+                },
+                team_id: 'TEAM_ID',
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // IncomingEventType.Event with channel in item
+            {
+              body: {
+                event: {
+                  item: {
+                    channel: channelId,
+                  },
+                },
+                team_id: 'TEAM_ID',
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // IncomingEventType.Command
+            {
+              body: {
+                command: '/COMMAND_NAME',
+                channel_id: channelId,
+                team_id: 'TEAM_ID',
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // IncomingEventType.Action from block action, interactive message, or message action
+            {
+              body: {
+                actions: [{}],
+                channel: {
+                  id: channelId,
+                },
+                user: {
+                  id: 'USER_ID',
+                },
+                team: {
+                  id: 'TEAM_ID',
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // IncomingEventType.Action from dialog submission
+            {
+              body: {
+                type: 'dialog_submission',
+                channel: {
+                  id: channelId,
+                },
+                user: {
+                  id: 'USER_ID',
+                },
+                team: {
+                  id: 'TEAM_ID',
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+          ];
+        }
+
+        // TODO: add tests for using a complex message
+        it('should send a simple message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakeReceiver = createFakeReceiver();
-          const fakePostMessage = sinon.fake();
-          const dummyReceiverEvent = createDummyReceiverEvent();
+          const fakePostMessage = sinon.fake.resolves({});
+          const fakeErrorHandler = sinon.fake();
+          const dummyAuthorizationResult = { botToken: '', botId: '' };
           const dummyMessage = 'test';
+          const dummyChannelId = 'CHANNEL_ID';
+          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
           const overrides = mergeOverrides(
             withNoopAppMetadata(),
             withPostMessage(fakePostMessage),
@@ -303,17 +381,25 @@ describe('App', () => {
           const App = await importApp(overrides); // tslint:disable-line:variable-name
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use((args) => {
-            // By definition, the mockEvents should all produce a say function, so we cast args.say into a SayFn
+            // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
             say(dummyMessage);
           });
-          fakeReceiver.emit('message', dummyReceiverEvent);
+          app.error(fakeErrorHandler);
+          dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
           await delay();
 
           // Assert
-          // TODO
+          assert.equal(fakePostMessage.callCount, dummyReceiverEvents.length);
+          // Assert that each call to fakePostMessage had the right arguments
+          fakePostMessage.getCalls().forEach((call) => {
+            const firstArg = call.args[0];
+            assert.propertyVal(firstArg, 'text', dummyMessage);
+            assert.propertyVal(firstArg, 'channel', dummyChannelId);
+          });
+          assert(fakeErrorHandler.notCalled);
         });
       });
     });
@@ -489,3 +575,40 @@ function delay(ms: number = 0) {
 }
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
+
+// TODO: make sure these channel context carrying events do not get a say function
+// also add an events API event that does not have a channel context
+// // IncomingEventType.Options from block action
+// {
+//   body: {
+//     type: 'block_suggestion',
+//     channel: {
+//       id: 'CHANNEL_ID',
+//     },
+//     user: {
+//       id: 'USER_ID',
+//     },
+//     team: {
+//       id: 'TEAM_ID',
+//     },
+//   },
+//   respond: noop,
+//   ack: noop,
+// },
+// // IncomingEventType.Options from interactive message or dialog
+// {
+//   body: {
+//     name: 'select_field_name',
+//     channel: {
+//       id: 'CHANNEL_ID',
+//     },
+//     user: {
+//       id: 'USER_ID',
+//     },
+//     team: {
+//       id: 'TEAM_ID',
+//     },
+//   },
+//   respond: noop,
+//   ack: noop,
+// },
