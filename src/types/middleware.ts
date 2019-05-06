@@ -9,8 +9,7 @@ export type AnyMiddlewareArgs =
   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs | SlackOptionsMiddlewareArgs;
 
 export interface PostProcessFn {
-  // TODO: should the return value any be unknown type?
-  (error: Error | undefined, done: (error?: Error) => void): any;
+  (error: Error | undefined, done: (error?: Error) => void): unknown;
 }
 
 export interface Context extends StringIndexed {
@@ -20,7 +19,7 @@ export interface Context extends StringIndexed {
 // constraint would mess up the interface of App#event(), App#message(), etc.
 export interface Middleware<Args> {
   // TODO: is there something nice we can do to get context's property types to flow from one middleware to the next?
-  (args: Args & { next: NextMiddleware, context: Context }): void;
+  (args: Args & { next: NextMiddleware, context: Context }): unknown;
 }
 
 export interface NextMiddleware {
