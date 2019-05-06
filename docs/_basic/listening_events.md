@@ -41,9 +41,9 @@ You can filter on subtypes of events by using the built-in `matchEventSubtype()`
 </div>
 
 ```javascript
-// event('message') is the same as message()
-app.message(matchEventSubtype('bot_message'), ({ event }) => {
-  console.log(`The bot user ${event.user} said ${event.text}`);
+// Matches all messages from bot users
+app.message(subtype('bot_message'), ({ message }) => {
+  console.log(`The bot user ${message.user} said ${message.text}`);
 });
 ```
 
