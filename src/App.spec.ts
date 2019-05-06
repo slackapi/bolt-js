@@ -362,7 +362,6 @@ describe('App', () => {
           ];
         }
 
-        // TODO: add tests for using a complex message
         it('should send a simple message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakeReceiver = createFakeReceiver();
@@ -400,6 +399,158 @@ describe('App', () => {
             assert.propertyVal(firstArg, 'channel', dummyChannelId);
           });
           assert(fakeErrorHandler.notCalled);
+        });
+
+        // TODO: DRY up this case with the case above
+        it('should send a complex message to a channel where the incoming event originates', async () => {
+          // Arrange
+          const fakeReceiver = createFakeReceiver();
+          const fakePostMessage = sinon.fake.resolves({});
+          const fakeErrorHandler = sinon.fake();
+          const dummyAuthorizationResult = { botToken: '', botId: '' };
+          const dummyMessage = { text: 'test' };
+          const dummyChannelId = 'CHANNEL_ID';
+          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
+          const overrides = mergeOverrides(
+            withNoopAppMetadata(),
+            withPostMessage(fakePostMessage),
+            withMemoryStore(sinon.fake()),
+            withConversationContext(sinon.fake.returns(noopMiddleware)),
+          );
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.use((args) => {
+            // By definition, these events should all produce a say function, so we cast args.say into a SayFn
+            const say = (args as any).say as SayFn;
+            say(dummyMessage);
+          });
+          app.error(fakeErrorHandler);
+          dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
+          await delay();
+
+          // Assert
+          assert.equal(fakePostMessage.callCount, dummyReceiverEvents.length);
+          // Assert that each call to fakePostMessage had the right arguments
+          fakePostMessage.getCalls().forEach((call) => {
+            const firstArg = call.args[0];
+            assert.propertyVal(firstArg, 'channel', dummyChannelId);
+            for (const prop in dummyMessage) {
+              assert.propertyVal(firstArg, prop, (dummyMessage as any)[prop]);
+            }
+          });
+          assert(fakeErrorHandler.notCalled);
+        });
+
+        function createReceiverEventsWithoutSay(channelId: string): ReceiverEvent[] {
+          return [
+            // IncomingEventType.Options from block action
+            {
+              body: {
+                type: 'block_suggestion',
+                channel: {
+                  id: channelId,
+                },
+                user: {
+                  id: 'USER_ID',
+                },
+                team: {
+                  id: 'TEAM_ID',
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // IncomingEventType.Options from interactive message or dialog
+            {
+              body: {
+                name: 'select_field_name',
+                channel: {
+                  id: channelId,
+                },
+                user: {
+                  id: 'USER_ID',
+                },
+                team: {
+                  id: 'TEAM_ID',
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // IncomingEventType.Event without a channel context
+            {
+              body: {
+                event: {
+                },
+                team_id: 'TEAM_ID',
+              },
+              respond: noop,
+              ack: noop,
+            },
+          ];
+        }
+
+        it('should not exist in the arguments on incoming events that don\'t support say', async () => {
+          // Arrange
+          const fakeReceiver = createFakeReceiver();
+          const assertionAggregator = sinon.fake();
+          const dummyAuthorizationResult = { botToken: '', botId: '' };
+          const dummyReceiverEvents = createReceiverEventsWithoutSay('CHANNEL_ID');
+          const overrides = mergeOverrides(
+            withNoopAppMetadata(),
+            withNoopWebClient(),
+            withMemoryStore(sinon.fake()),
+            withConversationContext(sinon.fake.returns(noopMiddleware)),
+          );
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.use((args) => {
+            assert.isUndefined((args as any).say);
+            // If the above assertion fails, then it would throw an AssertionError and the following line will not be
+            // called
+            assertionAggregator();
+          });
+          dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
+          await delay();
+
+          // Assert
+          assert.equal(assertionAggregator.callCount, dummyReceiverEvents.length);
+        });
+
+        it('should handle failures through the App\'s global error handler', async () => {
+          // Arrange
+          const fakeReceiver = createFakeReceiver();
+          const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
+          const fakeErrorHandler = sinon.fake();
+          const dummyAuthorizationResult = { botToken: '', botId: '' };
+          const dummyMessage = { text: 'test' };
+          const dummyChannelId = 'CHANNEL_ID';
+          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
+          const overrides = mergeOverrides(
+            withNoopAppMetadata(),
+            withPostMessage(fakePostMessage),
+            withMemoryStore(sinon.fake()),
+            withConversationContext(sinon.fake.returns(noopMiddleware)),
+          );
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.use((args) => {
+            // By definition, these events should all produce a say function, so we cast args.say into a SayFn
+            const say = (args as any).say as SayFn;
+            say(dummyMessage);
+          });
+          app.error(fakeErrorHandler);
+          dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
+          await delay();
+
+          // Assert
+          assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
         });
       });
     });
@@ -575,40 +726,3 @@ function delay(ms: number = 0) {
 }
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
-
-// TODO: make sure these channel context carrying events do not get a say function
-// also add an events API event that does not have a channel context
-// // IncomingEventType.Options from block action
-// {
-//   body: {
-//     type: 'block_suggestion',
-//     channel: {
-//       id: 'CHANNEL_ID',
-//     },
-//     user: {
-//       id: 'USER_ID',
-//     },
-//     team: {
-//       id: 'TEAM_ID',
-//     },
-//   },
-//   respond: noop,
-//   ack: noop,
-// },
-// // IncomingEventType.Options from interactive message or dialog
-// {
-//   body: {
-//     name: 'select_field_name',
-//     channel: {
-//       id: 'CHANNEL_ID',
-//     },
-//     user: {
-//       id: 'USER_ID',
-//     },
-//     team: {
-//       id: 'TEAM_ID',
-//     },
-//   },
-//   respond: noop,
-//   ack: noop,
-// },
