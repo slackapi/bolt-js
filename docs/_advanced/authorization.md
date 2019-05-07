@@ -44,7 +44,7 @@ const authorizeFn = async ({ teamId, enterpriseId }) => {
   for (const team in installations) {
     // Check for matching teamId and enterpriseId in the installations array
     if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
-      // This is a match. Use these installaton credentials.
+      // This is a match. Use these installation credentials.
       return {
         // You could also set userToken instead
         botToken: team.botToken,
