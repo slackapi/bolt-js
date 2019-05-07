@@ -13,7 +13,7 @@ The `event()` method requires an `eventType` of type string.
 ```javascript
 const welcomeChannelId = 'C12345';
 
-// When a user joins the team, send a message in a predfined channel asking them to introduce themselves
+// When a user joins the team, send a message in a predefined channel asking them to introduce themselves
 app.event('team_join', async ({ event, context }) => {
   try {
     const result = await app.client.chat.postMessage({
