@@ -1,16 +1,11 @@
-// tslint:disable:no-implicit-dependencies no-object-literal-type-assertion
+// tslint:disable:no-implicit-dependencies
 import 'mocha';
 import { assert } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
+import { Override, createFakeLogger } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
 import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
-import { Logger } from '@slack/logger';
-
-interface DummyContext<ConversationState> {
-  conversation?: ConversationState;
-  updateConversation?: (c: ConversationState) => Promise<unknown>;
-}
 
 describe('conversationContext middleware', () => {
   it('should forward events that have no conversation ID', async () => {
@@ -121,6 +116,11 @@ describe('conversationContext middleware', () => {
 
 type MiddlewareArgs = AnyMiddlewareArgs & { next: NextMiddleware, context: Context };
 
+interface DummyContext<ConversationState> {
+  conversation?: ConversationState;
+  updateConversation?: (c: ConversationState) => Promise<unknown>;
+}
+
 // Loading the system under test using overrides
 async function importConversationStore(
   overrides: Override = {},
@@ -129,13 +129,6 @@ async function importConversationStore(
 }
 
 // Composable overrides
-// TODO: DRY this up with the duplicate definition in App.spec.ts
-interface Override {
-  [packageName: string]: {
-    [exportName: string]: any;
-  };
-}
-
 function withGetTypeAndConversation(spy: SinonSpy): Override {
   return {
     './helpers': {
@@ -144,30 +137,7 @@ function withGetTypeAndConversation(spy: SinonSpy): Override {
   };
 }
 
-// TODO: DRY up fake logger code
-
-interface FakeLogger extends Logger {
-  setLevel: SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>;
-  setName: SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>;
-  debug: SinonSpy<Parameters<Logger['debug']>, ReturnType<Logger['debug']>>;
-  info: SinonSpy<Parameters<Logger['info']>, ReturnType<Logger['info']>>;
-  warn: SinonSpy<Parameters<Logger['warn']>, ReturnType<Logger['warn']>>;
-  error: SinonSpy<Parameters<Logger['error']>, ReturnType<Logger['error']>>;
-}
-
-function createFakeLogger(): FakeLogger {
-  return {
-    // NOTE: the two casts are because of a TypeScript inconsistency with tuple types and any[]. all tuple types
-    // should be assignable to any[], but TypeScript doesn't think so.
-    setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
-    setName: sinon.fake() as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
-    debug: sinon.fake(),
-    info: sinon.fake(),
-    warn: sinon.fake(),
-    error: sinon.fake(),
-  };
-}
-
+// Fakes
 interface FakeStore extends ConversationStore {
   set: SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>;
   get: SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>;
@@ -183,6 +153,7 @@ function createFakeStore(
   };
 }
 
+// Utility functions
 function wrapToResolveOnFirstCall<T extends (...args: any[]) => void>(
   original: T,
   timeoutMs: number = 1000,
