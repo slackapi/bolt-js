@@ -59,6 +59,7 @@ export function conversationContext<ConversationState = any>(
     const { body, context, next } = args;
     const { conversationId } = getTypeAndConversation(body as any);
     if (conversationId !== undefined) {
+      // TODO: expiresAt is not passed through to store.set
       context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
       store.get(conversationId)
         .then((conversationState) => {
@@ -71,6 +72,7 @@ export function conversationContext<ConversationState = any>(
         .then(next);
     } else {
       logger.debug('No conversation ID for incoming event');
+      next();
     }
   };
 }
