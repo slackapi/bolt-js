@@ -1,4 +1,4 @@
-// tslint:disable:ter-prefer-arrow-callback typedef no-implicit-dependencies no-this-assignment
+// tslint:disable:no-implicit-dependencies
 import 'mocha';
 import { EventEmitter } from 'events';
 import sinon, { SinonSpy } from 'sinon';
@@ -719,7 +719,7 @@ function createDummyReceiverEvent(): ReceiverEvent {
 const noop = () => { }; // tslint:disable-line:no-empty
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
-function delay(ms: number = 0) {
+function delay(ms: number = 0): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
