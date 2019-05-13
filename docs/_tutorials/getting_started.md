@@ -32,7 +32,7 @@ First thing's first: before you start developing with Bolt, you'll want to [crea
 
 After you fill out an app name (_you can change it later_) and pick a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
 
-This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Crendentials** header. 
+This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header. 
 
 ![Basic Information page](../assets/basic-information-page.png "Basic Information page")
 
@@ -64,7 +64,7 @@ You'll see two tokens. For now, we'll just use the `xoxb` bot token. (If you scr
 ### Setting up your local project
 With the initial configuration handled, it's time to set up a new Bolt project. This is where you'll write the code that handles the logic for your app.
 
-If you don’t already have a project, let’s create a new one. Create an empty directory and initalize a new project:
+If you don’t already have a project, let’s create a new one. Create an empty directory and initialize a new project:
 
 ```shell
 mkdir first-bolt-app
@@ -82,7 +82,7 @@ Before we install the Bolt package to your new project, let's save the bot token
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
-2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another enviornment variable.
+2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another environment variable.
 
 ```shell
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
@@ -141,7 +141,7 @@ When an event occurs, Slack will send your app some information about the event,
 
 If you’re just getting started with your app's development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set that up, but for now a development proxy like [ngrok](https://ngrok.com/) will create a public URL and tunnel  requests to your own development environment. We've written a separate tutorial about [using ngrok with Slack for local development](https://api.slack.com/tutorials/tunneling-with-ngrok) that should help you get everything set up.
 
-Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port 3000 for this example, but if you customized the port used to intialize your app use that port instead):
+Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port 3000 for this example, but if you customized the port used to initialize your app use that port instead):
 
 ```shell
 ngrok http 3000
