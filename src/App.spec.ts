@@ -1,13 +1,13 @@
-// tslint:disable:ter-prefer-arrow-callback typedef no-implicit-dependencies no-this-assignment
+// tslint:disable:no-implicit-dependencies
 import 'mocha';
 import { EventEmitter } from 'events';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
+import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
-import { Logger } from '@slack/logger';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -567,12 +567,6 @@ async function importApp(
 }
 
 // Composable overrides
-interface Override {
-  [packageName: string]: {
-    [exportName: string]: any;
-  };
-}
-
 function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
@@ -589,7 +583,6 @@ function withNoopAppMetadata(): Override {
   };
 }
 
-// TODO: see if we can use a partial type for the return value
 function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string): Override {
   return {
     '@slack/web-api': {
@@ -639,30 +632,6 @@ function withConversationContext(spy: SinonSpy): Override {
   };
 }
 
-function mergeOverrides(...overrides: Override[]): Override {
-  let currentOverrides: Override = {};
-  for (const override of overrides) {
-    currentOverrides = mergeObjProperties(currentOverrides, override);
-  }
-  return currentOverrides;
-}
-
-function mergeObjProperties(first: Override, second: Override): Override {
-  const merged: Override = {};
-  const props = Object.keys(first).concat(Object.keys(second));
-  for (const prop of props) {
-    if (second[prop] === undefined && first[prop] !== undefined) {
-      merged[prop] = first[prop];
-    } else if (first[prop] === undefined && second[prop] !== undefined) {
-      merged[prop] = second[prop];
-    } else {
-      // second always overwrites the first
-      merged[prop] = { ...first[prop], ...second[prop] };
-    }
-  }
-  return merged;
-}
-
 // Fakes
 type FakeReceiver = SinonSpy & EventEmitter & {
   start: SinonSpy<Parameters<Receiver['start']>, ReturnType<Receiver['start']>>;
@@ -677,28 +646,6 @@ function createFakeReceiver(
   (mock as FakeReceiver).start = startSpy;
   (mock as FakeReceiver).stop = stopSpy;
   return mock as FakeReceiver;
-}
-
-interface FakeLogger extends Logger {
-  setLevel: SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>;
-  setName: SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>;
-  debug: SinonSpy<Parameters<Logger['debug']>, ReturnType<Logger['debug']>>;
-  info: SinonSpy<Parameters<Logger['info']>, ReturnType<Logger['info']>>;
-  warn: SinonSpy<Parameters<Logger['warn']>, ReturnType<Logger['warn']>>;
-  error: SinonSpy<Parameters<Logger['error']>, ReturnType<Logger['error']>>;
-}
-
-function createFakeLogger(): FakeLogger {
-  return {
-    // NOTE: the two casts are because of a TypeScript inconsistency with tuple types and any[]. all tuple types
-    // should be assignable to any[], but TypeScript doesn't think so.
-    setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
-    setName: sinon.fake() as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
-    debug: sinon.fake(),
-    info: sinon.fake(),
-    warn: sinon.fake(),
-    error: sinon.fake(),
-  };
 }
 
 // Dummies (values that have no real behavior but pass through the system opaquely)
@@ -719,10 +666,5 @@ function createDummyReceiverEvent(): ReceiverEvent {
 const noop = () => { }; // tslint:disable-line:no-empty
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
-function delay(ms: number = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
