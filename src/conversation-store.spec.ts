@@ -1,8 +1,8 @@
 // tslint:disable:no-implicit-dependencies
 import 'mocha';
-import { assert } from 'chai';
+import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
-import { Override, createFakeLogger } from './test-helpers';
+import { Override, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
 import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
@@ -109,6 +109,78 @@ describe('conversationContext middleware', () => {
       }
     }
     return onNextFirstCall;
+  });
+});
+
+describe('MemoryStore', () => {
+  describe('constructor', () => {
+    it('should initialize successfully', async () => {
+      // Arrange
+      const { MemoryStore } = await importConversationStore();
+
+      // Act
+      const store = new MemoryStore();
+
+      // Assert
+      assert.isOk(store);
+    });
+  });
+
+  // NOTE: there's no good way to fetch the contents of the map that backs the state with an override, so instead we use
+  // the public API once again. as a consequence, this is not a pure unit test of a single method, but it does verify
+  // the expected behavior when looking at set and get as one unit.
+  describe('#set and #get', () => {
+    it('should store conversation state', async () => {
+      // Arrange
+      const dummyConversationState = Symbol();
+      const dummyConversationId = 'CONVERSATION_ID';
+      const { MemoryStore } = await importConversationStore();
+
+      // Act
+      const store = new MemoryStore();
+      await store.set(dummyConversationId, dummyConversationState);
+      const actualConversationState = await store.get(dummyConversationId);
+
+      // Assert
+      assert.equal(actualConversationState, dummyConversationState);
+    });
+
+    it('should reject lookup of conversation state when the conversation is not stored', async () => {
+      // Arrange
+      const { MemoryStore } = await importConversationStore();
+
+      // Act
+      const store = new MemoryStore();
+      try {
+        await store.get('CONVERSATION_ID');
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.instanceOf(error, Error);
+        assert.notInstanceOf(error, AssertionError);
+      }
+    });
+
+    it('should reject lookup of conversation state when the conversation is expired', async () => {
+      // Arrange
+      const dummyConversationId = 'CONVERSATION_ID';
+      const dummyConversationState = Symbol();
+      const expiresInMs = 5;
+      const { MemoryStore } = await importConversationStore();
+
+      // Act
+      const store = new MemoryStore();
+      await store.set(dummyConversationId, dummyConversationState, Date.now() + expiresInMs);
+      await delay(expiresInMs * 2);
+      try {
+        await store.get(dummyConversationId);
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.instanceOf(error, Error);
+        assert.notInstanceOf(error, AssertionError);
+      }
+    });
   });
 });
 

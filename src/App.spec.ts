@@ -3,7 +3,7 @@ import 'mocha';
 import { EventEmitter } from 'events';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
-import { Override, mergeOverrides, createFakeLogger } from './test-helpers';
+import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
@@ -666,10 +666,5 @@ function createDummyReceiverEvent(): ReceiverEvent {
 const noop = () => { }; // tslint:disable-line:no-empty
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
-function delay(ms: number = 0): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
