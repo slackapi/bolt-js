@@ -443,7 +443,7 @@
             <h3 id="acknowledge">Acknowledging requests</h3>
 
             <div class="section-content">
-  <p>Actions, commands, and options requests must <strong>always</strong> be acknowledged using the <code class="highlighter-rouge">ack()</code> function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of reuqest, your acknowledgement may be different. For example, when responding to a dialog submission you will call <code class="highlighter-rouge">ack()</code> with validation errors if the submission contains errors, or with no parameters if the submission is valid.</p>
+  <p>Actions, commands, and options requests must <strong>always</strong> be acknowledged using the <code class="highlighter-rouge">ack()</code> function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of request, your acknowledgement may be different. For example, when responding to a dialog submission you will call <code class="highlighter-rouge">ack()</code> with validation errors if the submission contains errors, or with no parameters if the submission is valid.</p>
 
   <p>We recommend calling <code class="highlighter-rouge">ack()</code> right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.</p>
 </div>

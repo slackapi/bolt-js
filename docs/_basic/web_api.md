@@ -18,7 +18,7 @@ app.message('wake me up', async ({ message, context }) => {
   try {
     // Call the chat.scheduleMessage method with a token
     const result = await app.client.chat.scheduleMessage({
-      // The token you used to initalize your app is stored in the `context` object
+      // The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
       channel: message.channel.id,
       post_at: whenSeptemberEnds,

@@ -153,7 +153,7 @@
 
 <p>After you fill out an app name (<em>you can change it later</em>) and picking a workspace to install it to, hit the <code class="highlighter-rouge">Create App</code> button and you’ll land on your app’s <strong>Basic Information</strong> page.</p>
 
-<p>This page contains an overview of your app in addition to important credentials you’ll need later, like the <code class="highlighter-rouge">Signing Secret</code> under the <strong>App Crendentials</strong> header.</p>
+<p>This page contains an overview of your app in addition to important credentials you’ll need later, like the <code class="highlighter-rouge">Signing Secret</code> under the <strong>App Credentials</strong> header.</p>
 
 <p><img src="../assets/basic-information-page.png" alt="Basic Information page" title="Basic Information page" /></p>
 
@@ -164,7 +164,7 @@
 <h3 id="tokens-and-installing-apps">Tokens and installing apps</h3>
 <p>Slack apps use the industry standard <a href="https://api.slack.com/docs/oauth">OAuth to manage access to Slack’s APIs</a>. When an app is installed, you’ll receive a token that your app can use to call various API methods.</p>
 
-<p>There are two token types availalbe to a Slack app: user (<code class="highlighter-rouge">xoxp</code>) tokens and bot (<code class="highlighter-rouge">xoxb</code>) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. By default, your app receive an <code class="highlighter-rouge">xoxp</code> token associated with the person who installs the app. Bot tokens require adding a bot user to your app, which is granted a default set of permissions.</p>
+<p>There are two token types available to a Slack app: user (<code class="highlighter-rouge">xoxp</code>) tokens and bot (<code class="highlighter-rouge">xoxb</code>) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. By default, your app receive an <code class="highlighter-rouge">xoxp</code> token associated with the person who installs the app. Bot tokens require adding a bot user to your app, which is granted a default set of permissions.</p>
 
 <p><a href="https://api.slack.com/docs/oauth-scopes">Tokens require one or more scopes</a>, which define the actions the token can perform. Every API method has a corresponding scope that’s required for an app to call the method.</p>
 
@@ -189,7 +189,7 @@
 <h3 id="setting-up-your-local-project">Setting up your local project</h3>
 <p>With the initial configuration handled, it’s time to set up a new Bolt project. This is where you’ll write the code that handles the logic for your app. One important thing to note is that Slack doesn’t host your code — you do.</p>
 
-<p>If you don’t already have a project, let’s create a new one. Create an empty directory and initalize a new project:</p>
+<p>If you don’t already have a project, let’s create a new one. Create an empty directory and initialize a new project:</p>
 
 <div class="language-shell highlighter-rouge">
   <div class="highlight">
@@ -216,7 +216,7 @@ npm init
 </div>
 
 <ol>
-  <li><strong>Copy your bot (xoxb) token from the OAuth &amp; Permissions page</strong> and store it in another enviornment variable.</li>
+  <li><strong>Copy your bot (xoxb) token from the OAuth &amp; Permissions page</strong> and store it in another environment variable.</li>
 </ol>
 
 <div class="language-shell highlighter-rouge">
@@ -241,7 +241,7 @@ npm init
   <div class="highlight">
     <pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@slack/bolt'</span><span class="p">);</span>
 
-<span class="c1">// Initalizes your app with your bot token and signing secret</span>
+<span class="c1">// Initializes your app with your bot token and signing secret</span>
 <span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
   <span class="na">token</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_BOT_TOKEN</span><span class="p">,</span>
   <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span>
@@ -286,7 +286,7 @@ npm init
 
   <p>If you’re just getting started with your app’s development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set that up, but for now a development proxy like <a href="https://ngrok.com/">ngrok</a> will do the job. We’ve written a separate tutorial about <a href="https://api.slack.com/tutorials/tunneling-with-ngrok">using ngrok with Slack for local development</a> that should help you get everything set up.</p>
 
-  <p>Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port 3000 for this example, but if you customized the port used to intialize your app use that port instead):</p>
+  <p>Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port 3000 for this example, but if you customized the port used to initialize your app use that port instead):</p>
 
   <div class="language-shell highlighter-rouge">
     <div class="highlight">
