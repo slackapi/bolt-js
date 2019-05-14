@@ -21,8 +21,8 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">= 10.13.0",
-    "npm": ">= 6.4.1"
+    "node": ">=10.13.0",
+    "npm": ">=6.4.1"
   },
   "scripts": {
     "prepare": "npm run build",
@@ -45,6 +45,7 @@
     "@types/node": ">=10",
     "axios": "^0.18.0",
     "express": "^4.16.4",
+    "please-upgrade-node": "^3.1.1",
     "raw-body": "^2.3.3",
     "tsscmp": "^1.0.6"
   },
