@@ -5,7 +5,7 @@ order: 3
 ---
 
 <div class="section-content">
-You can listen to [any Events API event](https://api.slack.com/events) using the `event()` method by subscribing to it in your app configuration. on your This allows your app to take action when something happens in Slack, like a user reacting to a message or joining a channel.
+You can listen to [any Events API event](https://api.slack.com/events) using the `event()` method after subscribing to it in your app configuration. This allows your app to take action when something happens in Slack, like a user reacting to a message or joining a channel.
 
 The `event()` method requires an `eventType` of type string.
 </div>

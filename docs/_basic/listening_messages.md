@@ -5,9 +5,9 @@ order: 1
 ---
 
 <div class="section-content">
-To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method. This method filters out any events that aren’t of type `message`.
+To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message`.
 
-It accepts an optional `pattern` parameter of type `string` or `RegExp` object that will filter out any messages that don’t match.
+`message()` accepts an optional `pattern` parameter of type `string` or `RegExp` object which filters out any messages that don’t match the pattern.
 </div>
 
 ```javascript

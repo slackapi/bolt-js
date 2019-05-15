@@ -7,7 +7,7 @@ order: 4
 <div class="section-content">
 Global middleware is run for all incoming events before any listener middleware. You can add any number of global middleware to your app by utilizing `app.use(fn(payload,...,next))`. 
 
-Both global and listener middleware must call `next()` to pass control of the execution chain to the next middleware, or call `next(error)` to pass an error back up the already-executed middleware chain.
+Both global and listener middleware must call `next()` to pass control of the execution chain to the next middleware, or call `next(error)` to pass an error back up the previously-executed middleware chain.
 
 As an example, let's say your app should only respond to users identified with a corresponding internal authentication service (an SSO provider or LDAP, for example). You may define a global middleware that looks up a user record in the authentication service and errors if the user is not found.
 </div>
