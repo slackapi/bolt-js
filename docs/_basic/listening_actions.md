@@ -7,9 +7,9 @@ order: 5
 <div class="section-content">
 Your app can listen to user actions like button clicks, menu selects, and message actions using the `action` method.
 
-Actions can be filtered on  an `action_id` of type string or RegExp. `action_id`s act as unique identifiers for interactive components on the Slack platform. 
+Actions can be filtered on an `action_id` of type string or RegExp object. `action_id`s act as unique identifiers for interactive components on the Slack platform. 
 
-You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge the event was received from Slack. This is discussed in the [acknowledging requests section](#acknowledge).
+You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the event was received from Slack. This is discussed in the [acknowledging events section](#acknowledge).
 
 </div>
 
@@ -27,7 +27,7 @@ app.action('approve_button', async ({ ack, say }) => {
 </summary>
 
 <div class="secondary-content" markdown="0">
-You can use a constraints object to listen to `callback_id`s, `block_id`s, and `action_id`s (or any combination of them). Constraints in the object can be of type string or RegExp.
+You can use a constraints object to listen to `callback_id`s, `block_id`s, and `action_id`s (or any combination of them). Constraints in the object can be of type string or RegExp object.
 </div>
 
 ```javascript

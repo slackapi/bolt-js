@@ -41,9 +41,9 @@ Look around, add an app icon and description, and then let's start configuring y
 ---
 
 ### Tokens and installing apps
-Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that your app can use to call various API methods. 
+Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods. 
 
-There are two token types available to a Slack app: user (`xoxp`) tokens and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users who are a part of your workspace. Your app receives an `xoxp` token associated with each user who installs the app. Bot tokens require adding a bot user to your app, which are granted once in each workspace that a user installs the app into, and will be the identical no matter which user performed the installation.
+There are two token types available to a Slack app: user (`xoxp`) and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. Bot tokens are granted once in every workspace where someone installs the app, though they require adding a bot user to your app. The bot token your app uses will be the same no matter which user performed the installation.
 
 For brevity, we're going to use bot tokens for this guide.
 
@@ -51,7 +51,7 @@ To add a bot user, click **Bot Users** on the left sidebar and then **Add A Bot 
 
 Now that you have a bot user with permission to send messages to Slack, let's install the app to your workspace.
 
-Click **Install App** on the left sidebar and click the big **Install App to Workspace** button at the top of the page. You'll see a screen that details what permissions the app is requesting, which correlate to the scopes applied to your app's OAuth token(s).
+Click **Install App** on the left sidebar and click the **Install App to Workspace** button at the top of the page. You'll see a screen that details what permissions the app is requesting, which correlate to the scopes applied to your app's OAuth token(s).
 
 Once you authorize the installation, you'll land on the **OAuth & Permissions** page.
 
@@ -113,7 +113,7 @@ const app = new App({
 })();
 ```
 
-Your token and signing secret are enough to create your first Bolt app. Save your `app.js` file then, back at the command line, run the following:
+Your token and signing secret are enough to create your first Bolt app. Save your `app.js` file then on the command line run the following:
 
 ```script
 node app.js
@@ -124,11 +124,11 @@ Your app should let you know that it's up and running.
 ---
 
 ### Setting up events
-Your app behaves similarly to people on your team — it can respond to  that happen, post messages, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a emoji reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
+Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
 
 To enable events for your app, start by going back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**. 
 
-You'll see a text input labeled **Request URL**. The Request URL is a public URL where Slack will send HTTP POST requests about the events you specify.
+You'll see a text input labeled **Request URL**. The Request URL is a public URL where Slack will send HTTP POST requests corresponding to events you specify.
 
 > ⚙️We've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting)
 
@@ -139,9 +139,9 @@ When an event occurs, Slack will send your app some information about the event,
 <h4>Using a local Request URL for development</h4>
 </summary>
 
-If you’re just getting started with your app's development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set that up, but for now a development proxy like [ngrok](https://ngrok.com/) will create a public URL and tunnel  requests to your own development environment. We've written a separate tutorial about [using ngrok with Slack for local development](https://api.slack.com/tutorials/tunneling-with-ngrok) that should help you get everything set up.
+If you’re just getting started with your app's development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set one up, but for now a development proxy like [ngrok](https://ngrok.com/) will create a public URL and tunnel requests to your own development environment. We've written a separate tutorial about [using ngrok with Slack for local development](https://api.slack.com/tutorials/tunneling-with-ngrok) that should help you get everything set up.
 
-Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port 3000 for this example, but if you customized the port used to initialize your app use that port instead):
+Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port `3000` for this example, but if you customized the port used to initialize your app use that port instead):
 
 ```shell
 ngrok http 3000
@@ -199,7 +199,7 @@ To use features like buttons, select menus, datepickers, dialogs, and message ac
 
 Back on your app configuration page, click on **Interactive Components** on the left side. You'll see that there's another **Request URL** box.
 
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is all set up for interactivity!
+By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
 
 ![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
 
@@ -223,19 +223,19 @@ app.message('hello', ({ message, say }) => {
   say({
     blocks: [
     {
-	"type": "section",
+	    "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": `Hey there <@${message.user}>!`
+      },
+      "accessory": {
+        "type": "button",
         "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+          "type": "plain_text",
+          "text": "Click Me"
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
-          },
-          "action_id": "button_click"
-        }
+        "action_id": "button_click"
+      }
      }
     ]
   });
@@ -251,7 +251,7 @@ app.message('hello', ({ message, say }) => {
 
 The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory.
 
-You'll notice in the same `accessory` object as the button, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it is responding to.
+You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
 > 💡 The [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
 
@@ -272,7 +272,7 @@ app.message('hello', ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   say({
     blocks: [
-    {
+      {
         "type": "section",
         "text": {
           "type": "mrkdwn",
@@ -285,8 +285,8 @@ app.message('hello', ({ message, say }) => {
             "text": "Click Me"
           },
           "action_id": "button_click"
-	}
-     }
+        }
+      }
     ]
   });
 });

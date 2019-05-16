@@ -26,7 +26,7 @@ const app = new App({
 </summary>
 
 <div class="secondary-content" markdown="0">
-If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a logger. A custom logger must implement specific methods (known as the `Logger` interface):
+If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a custom logger. A custom logger must implement specific methods (known as the `Logger` interface):
 
 | Method       | Parameters        | Return type |
 |--------------|-------------------|-------------|
