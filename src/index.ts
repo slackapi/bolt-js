@@ -1,3 +1,8 @@
+const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
+import pleaseUpgradeNode from 'please-upgrade-node';
+
+pleaseUpgradeNode(packageJson);
+
 export {
   default as App,
   AppOptions,
