@@ -20,21 +20,14 @@ describe('matchMessage()', () => {
     };
   }
 
-  function matchesPatternTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+  function matchesPatternTestCase(pattern: string | RegExp, matchingText: string): Mocha.AsyncFunc {
     return async () => {
       // Arrange
-      const dummyMatchingMessageEvent: MessageEvent = {
-        text: 'foobar',
-        type: 'message',
-        channel: 'CHANNEL_ID',
-        user: 'USER_ID',
-        ts: 'MESSAGE_ID',
-      };
       const dummyContext: DummyContext = {};
       const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
       const fakeArgs = {
         next,
-        message: dummyMatchingMessageEvent,
+        message: createFakeMessageEvent(matchingText),
         context: dummyContext,
       } as unknown as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
@@ -61,20 +54,13 @@ describe('matchMessage()', () => {
     };
   }
 
-  function notMatchesPatternTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+  function notMatchesPatternTestCase(pattern: string | RegExp, nonMatchingText: string): Mocha.AsyncFunc {
     return async () => {
       // Arrange
-      const dummyMismatchingMessageEvent: MessageEvent = {
-        text: 'bar',
-        type: 'message',
-        channel: 'CHANNEL_ID',
-        user: 'USER_ID',
-        ts: 'MESSAGE_ID',
-      };
       const dummyContext = {};
       const fakeNext = sinon.fake();
       const fakeArgs = {
-        message: dummyMismatchingMessageEvent,
+        message: createFakeMessageEvent(nonMatchingText),
         context: dummyContext,
         next: fakeNext,
       } as unknown as MessageMiddlewareArgs;
@@ -94,17 +80,10 @@ describe('matchMessage()', () => {
   function noTextMessageTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
     return async () => {
       // Arrange
-      const dummyMismatchingMessageEvent: MessageEvent = {
-        type: 'message',
-        blocks: [{ type: 'divider' }],
-        channel: 'CHANNEL_ID',
-        user: 'USER_ID',
-        ts: 'MESSAGE_ID',
-      };
       const dummyContext = {};
       const fakeNext = sinon.fake();
       const fakeArgs = {
-        message: dummyMismatchingMessageEvent,
+        message: createFakeMessageEvent([{ type: 'divider' }]),
         context: dummyContext,
         next: fakeNext,
       } as unknown as MessageMiddlewareArgs;
@@ -123,17 +102,25 @@ describe('matchMessage()', () => {
 
   describe('using a string pattern', () => {
     const pattern = 'foo';
+    const matchingText = 'foobar';
+    const nonMatchingText = 'bar';
     it('should initialize', initializeTestCase(pattern));
-    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern));
-    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(pattern));
+    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern, matchingText));
+    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(
+      pattern, nonMatchingText,
+    ));
     it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
 
   describe('using a RegExp pattern', () => {
     const pattern = /foo/;
+    const matchingText = 'foobar';
+    const nonMatchingText = 'bar';
     it('should initialize', initializeTestCase(pattern));
-    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern));
-    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(pattern));
+    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern, matchingText));
+    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(
+      pattern, nonMatchingText,
+    ));
     it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
 });
@@ -150,4 +137,19 @@ async function importBuiltin(
   overrides: Override = {},
 ): Promise<typeof import('./builtin')> {
   return rewiremock.module(() => import('./builtin'), overrides);
+}
+
+function createFakeMessageEvent(content: string | MessageEvent['blocks'] = ''): MessageEvent {
+  const event: Partial<MessageEvent> = {
+    type: 'message',
+    channel: 'CHANNEL_ID',
+    user: 'USER_ID',
+    ts: 'MESSAGE_ID',
+  };
+  if (typeof content === 'string') {
+    event.text = content;
+  } else {
+    event.blocks = content;
+  }
+  return event as MessageEvent;
 }
