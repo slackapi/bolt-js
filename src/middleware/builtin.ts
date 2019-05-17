@@ -262,6 +262,10 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       return;
     }
 
+    if (message.text === undefined) {
+      return;
+    }
+
     // Match the message text with a user mention format
     const text = message.text.trim();
 

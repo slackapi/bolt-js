@@ -2,6 +2,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import { ErrorCode } from '../errors';
 import { Override, delay, wrapToResolveOnFirstCall } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import { SlackEventMiddlewareArgs, NextMiddleware, Context, MessageEvent } from '../types';
@@ -122,6 +123,141 @@ describe('matchMessage()', () => {
       pattern, nonMatchingText,
     ));
     it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
+  });
+});
+
+describe('directMention()', () => {
+  it('should bail when the context does not provide a bot user ID', async () => {
+    // Arrange
+    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+    const fakeArgs = {
+      next,
+      message: createFakeMessageEvent(),
+      context: {},
+    } as unknown as MessageMiddlewareArgs;
+    const { directMention } = await importBuiltin();
+
+    // Act
+    const middleware = directMention();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    async function assertions(...args: any[]): Promise<void> {
+      const firstArg = args[0];
+      assert.instanceOf(firstArg, Error);
+      assert.propertyVal(firstArg, 'code', ErrorCode.ContextMissingPropertyError);
+      assert.propertyVal(firstArg, 'missingProperty', 'botUserId');
+    }
+    return onNextFirstCall;
+  });
+
+  it('should match message events that mention the bot user ID at the beginning of message text', async () => {
+    // Arrange
+    const fakeBotUserId = 'B123456';
+    const messageText = `<@${fakeBotUserId}> hi`;
+    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+    const fakeArgs = {
+      next,
+      message: createFakeMessageEvent(messageText),
+      context: { botUserId: fakeBotUserId },
+    } as unknown as MessageMiddlewareArgs;
+    const { directMention } = await importBuiltin();
+
+    // Act
+    const middleware = directMention();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    async function assertions(...args: any[]): Promise<void> {
+      // Assert that there is no error
+      assert.notExists(args[0]);
+    }
+    return onNextFirstCall;
+  });
+
+  it('should not match message events that do not mention the bot user ID', async () => {
+    // Arrange
+    const fakeBotUserId = 'B123456';
+    const messageText = 'hi';
+    const fakeNext = sinon.fake();
+    const fakeArgs = {
+      next: fakeNext,
+      message: createFakeMessageEvent(messageText),
+      context: { botUserId: fakeBotUserId },
+    } as unknown as MessageMiddlewareArgs;
+    const { directMention } = await importBuiltin();
+
+    // Act
+    const middleware = directMention();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('should not match message events that mention the bot user ID NOT at the beginning of message text', async () => {
+    // Arrange
+    const fakeBotUserId = 'B123456';
+    const messageText = `hello <@${fakeBotUserId}>`;
+    const fakeNext = sinon.fake();
+    const fakeArgs = {
+      next: fakeNext,
+      message: createFakeMessageEvent(messageText),
+      context: { botUserId: fakeBotUserId },
+    } as unknown as MessageMiddlewareArgs;
+    const { directMention } = await importBuiltin();
+
+    // Act
+    const middleware = directMention();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('should not match message events which do not have text (block kit)', async () => {
+    // Arrange
+    const fakeBotUserId = 'B123456';
+    const fakeNext = sinon.fake();
+    const fakeArgs = {
+      next: fakeNext,
+      message: createFakeMessageEvent([{ type: 'divider' }]),
+      context: { botUserId: fakeBotUserId },
+    } as unknown as MessageMiddlewareArgs;
+    const { directMention } = await importBuiltin();
+
+    // Act
+    const middleware = directMention();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('should not match message events that contain a link to a conversation at the beginning', async () => {
+    // Arrange
+    const fakeBotUserId = 'B123456';
+    const messageText = '<#C12345> hi';
+    const fakeNext = sinon.fake();
+    const fakeArgs = {
+      next: fakeNext,
+      message: createFakeMessageEvent(messageText),
+      context: { botUserId: fakeBotUserId },
+    } as unknown as MessageMiddlewareArgs;
+    const { directMention } = await importBuiltin();
+
+    // Act
+    const middleware = directMention();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
   });
 });
 
