@@ -7,209 +7,134 @@ import rewiremock from 'rewiremock';
 import { SlackEventMiddlewareArgs, NextMiddleware, Context, MessageEvent } from '../types';
 
 describe('matchMessage()', () => {
-  it('should initialize with a string', async () => {
-    // Arrange
-    const { matchMessage } = await importBuiltin();
+  function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+    return async () => {
+      // Arrange
+      const { matchMessage } = await importBuiltin();
 
-    // Act
-    const middleware = matchMessage('string pattern');
+      // Act
+      const middleware = matchMessage(pattern);
 
-    // Assert
-    assert.isOk(middleware);
-  });
-
-  it('should initialize with a RegExp', async () => {
-    // Arrange
-    const { matchMessage } = await importBuiltin();
-
-    // Act
-    const middleware = matchMessage(/a RegExp pattern/);
-
-    // Assert
-    assert.isOk(middleware);
-  });
-
-  it('should match message events in which the text matches the string pattern', async () => {
-    // Arrange
-    const dummyPattern = 'foo';
-    const dummyMatchingMessageEvent: MessageEvent = {
-      text: 'foobar',
-      type: 'message',
-      channel: 'CHANNEL_ID',
-      user: 'USER_ID',
-      ts: 'MESSAGE_ID',
+      // Assert
+      assert.isOk(middleware);
     };
-    const dummyContext: DummyContext = {};
-    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
-    const fakeArgs = {
-      next,
-      message: dummyMatchingMessageEvent,
-      context: dummyContext,
-    } as unknown as MessageMiddlewareArgs;
-    const { matchMessage } = await importBuiltin();
+  }
 
-    // Act
-    const middleware = matchMessage(dummyPattern);
-    middleware(fakeArgs);
-    await delay();
+  function matchesPatternTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+    return async () => {
+      // Arrange
+      const dummyMatchingMessageEvent: MessageEvent = {
+        text: 'foobar',
+        type: 'message',
+        channel: 'CHANNEL_ID',
+        user: 'USER_ID',
+        ts: 'MESSAGE_ID',
+      };
+      const dummyContext: DummyContext = {};
+      const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+      const fakeArgs = {
+        next,
+        message: dummyMatchingMessageEvent,
+        context: dummyContext,
+      } as unknown as MessageMiddlewareArgs;
+      const { matchMessage } = await importBuiltin();
 
-    // Assert
-    async function assertions(...args: any[]): Promise<void> {
-      assert.notExists(args[0]);
-    }
-    return onNextFirstCall;
-  });
+      // Act
+      const middleware = matchMessage(pattern);
+      middleware(fakeArgs);
+      await delay();
 
-  it('should match message events in which the text matches the RegExp pattern', async () => {
-    // Arrange
-    const dummyPattern = /foo/;
-    const dummyMatchingMessageEvent: MessageEvent = {
-      text: 'foobar',
-      type: 'message',
-      channel: 'CHANNEL_ID',
-      user: 'USER_ID',
-      ts: 'MESSAGE_ID',
-    };
-    const dummyContext: DummyContext = {};
-    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
-    const fakeArgs = {
-      next,
-      message: dummyMatchingMessageEvent,
-      context: dummyContext,
-    } as unknown as MessageMiddlewareArgs;
-    const { matchMessage } = await importBuiltin();
-
-    // Act
-    const middleware = matchMessage(dummyPattern);
-    middleware(fakeArgs);
-    await delay();
-
-    // Assert
-    async function assertions(...args: any[]): Promise<void> {
-      assert.notExists(args[0]);
-      if (dummyContext.matches !== undefined) {
-        assert.lengthOf(dummyContext.matches, 1);
-      } else {
-        assert.fail();
+      // Assert
+      async function assertions(...args: any[]): Promise<void> {
+        // Assert that there is no error
+        assert.notExists(args[0]);
+        // The following assertion(s) check behavior that is only targeted at RegExp patterns
+        if (typeof pattern !== 'string') {
+          if (dummyContext.matches !== undefined) {
+            assert.lengthOf(dummyContext.matches, 1);
+          } else {
+            assert.fail();
+          }
+        }
       }
-    }
-    return onNextFirstCall;
+      return onNextFirstCall;
+    };
+  }
+
+  function notMatchesPatternTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+    return async () => {
+      // Arrange
+      const dummyMismatchingMessageEvent: MessageEvent = {
+        text: 'bar',
+        type: 'message',
+        channel: 'CHANNEL_ID',
+        user: 'USER_ID',
+        ts: 'MESSAGE_ID',
+      };
+      const dummyContext = {};
+      const fakeNext = sinon.fake();
+      const fakeArgs = {
+        message: dummyMismatchingMessageEvent,
+        context: dummyContext,
+        next: fakeNext,
+      } as unknown as MessageMiddlewareArgs;
+      const { matchMessage } = await importBuiltin();
+
+      // Act
+      const middleware = matchMessage(pattern);
+      middleware(fakeArgs);
+      await delay();
+
+      // Assert
+      assert(fakeNext.notCalled);
+      assert.notProperty(dummyContext, 'matches');
+    };
+  }
+
+  function noTextMessageTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+    return async () => {
+      // Arrange
+      const dummyMismatchingMessageEvent: MessageEvent = {
+        type: 'message',
+        blocks: [{ type: 'divider' }],
+        channel: 'CHANNEL_ID',
+        user: 'USER_ID',
+        ts: 'MESSAGE_ID',
+      };
+      const dummyContext = {};
+      const fakeNext = sinon.fake();
+      const fakeArgs = {
+        message: dummyMismatchingMessageEvent,
+        context: dummyContext,
+        next: fakeNext,
+      } as unknown as MessageMiddlewareArgs;
+      const { matchMessage } = await importBuiltin();
+
+      // Act
+      const middleware = matchMessage(pattern);
+      middleware(fakeArgs);
+      await delay();
+
+      // Assert
+      assert(fakeNext.notCalled);
+      assert.notProperty(dummyContext, 'matches');
+    };
+  }
+
+  describe('using a string pattern', () => {
+    const pattern = 'foo';
+    it('should initialize', initializeTestCase(pattern));
+    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern));
+    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(pattern));
+    it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
 
-  it('should filter out message events which do not match a string pattern', async () => {
-    // Arrange
-    const dummyPattern = 'foo';
-    const dummyMismatchingMessageEvent: MessageEvent = {
-      text: 'bar',
-      type: 'message',
-      channel: 'CHANNEL_ID',
-      user: 'USER_ID',
-      ts: 'MESSAGE_ID',
-    };
-    const dummyContext = {};
-    const fakeNext = sinon.fake();
-    const fakeArgs = {
-      message: dummyMismatchingMessageEvent,
-      context: dummyContext,
-      next: fakeNext,
-    } as unknown as MessageMiddlewareArgs;
-    const { matchMessage } = await importBuiltin();
-
-    // Act
-    const middleware = matchMessage(dummyPattern);
-    middleware(fakeArgs);
-    await delay();
-
-    // Assert
-    assert(fakeNext.notCalled);
-    assert.notProperty(dummyContext, 'matches');
-  });
-
-  it('should filter out message events which do not match a RegExp pattern', async () => {
-    // Arrange
-    const dummyPattern = /foo/;
-    const dummyMismatchingMessageEvent: MessageEvent = {
-      text: 'bar',
-      type: 'message',
-      channel: 'CHANNEL_ID',
-      user: 'USER_ID',
-      ts: 'MESSAGE_ID',
-    };
-    const dummyContext = {};
-    const fakeNext = sinon.fake();
-    const fakeArgs = {
-      message: dummyMismatchingMessageEvent,
-      context: dummyContext,
-      next: fakeNext,
-    } as unknown as MessageMiddlewareArgs;
-    const { matchMessage } = await importBuiltin();
-
-    // Act
-    const middleware = matchMessage(dummyPattern);
-    middleware(fakeArgs);
-    await delay();
-
-    // Assert
-    assert(fakeNext.notCalled);
-    assert.notProperty(dummyContext, 'matches');
-  });
-
-  it('should filter out message events which do not have text (block kit messages) with a string pattern', async () => {
-    // Arrange
-    const dummyPattern = 'foo';
-    const dummyMismatchingMessageEvent: MessageEvent = {
-      type: 'message',
-      blocks: [{ type: 'divider' }],
-      channel: 'CHANNEL_ID',
-      user: 'USER_ID',
-      ts: 'MESSAGE_ID',
-    };
-    const dummyContext = {};
-    const fakeNext = sinon.fake();
-    const fakeArgs = {
-      message: dummyMismatchingMessageEvent,
-      context: dummyContext,
-      next: fakeNext,
-    } as unknown as MessageMiddlewareArgs;
-    const { matchMessage } = await importBuiltin();
-
-    // Act
-    const middleware = matchMessage(dummyPattern);
-    middleware(fakeArgs);
-    await delay();
-
-    // Assert
-    assert(fakeNext.notCalled);
-    assert.notProperty(dummyContext, 'matches');
-  });
-
-  it('should filter out message events which do not have text (block kit messages) with a RegExp pattern', async () => {
-    // Arrange
-    const dummyPattern = /foo/;
-    const dummyMismatchingMessageEvent: MessageEvent = {
-      type: 'message',
-      blocks: [{ type: 'divider' }],
-      channel: 'CHANNEL_ID',
-      user: 'USER_ID',
-      ts: 'MESSAGE_ID',
-    };
-    const dummyContext = {};
-    const fakeNext = sinon.fake();
-    const fakeArgs = {
-      message: dummyMismatchingMessageEvent,
-      context: dummyContext,
-      next: fakeNext,
-    } as unknown as MessageMiddlewareArgs;
-    const { matchMessage } = await importBuiltin();
-
-    // Act
-    const middleware = matchMessage(dummyPattern);
-    middleware(fakeArgs);
-    await delay();
-
-    // Assert
-    assert(fakeNext.notCalled);
-    assert.notProperty(dummyContext, 'matches');
+  describe('using a RegExp pattern', () => {
+    const pattern = /foo/;
+    it('should initialize', initializeTestCase(pattern));
+    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern));
+    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(pattern));
+    it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
 });
 
