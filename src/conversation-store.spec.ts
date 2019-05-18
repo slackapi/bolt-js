@@ -2,7 +2,7 @@
 import 'mocha';
 import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
-import { Override, createFakeLogger, delay } from './test-helpers';
+import { Override, createFakeLogger, delay, wrapToResolveOnFirstCall } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
 import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
@@ -222,41 +222,5 @@ function createFakeStore(
   return {
     set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
     get: getSpy as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
-  };
-}
-
-// Utility functions
-function wrapToResolveOnFirstCall<T extends (...args: any[]) => void>(
-  original: T,
-  timeoutMs: number = 1000,
-): { fn: (...args: Parameters<T>) => Promise<void>; promise: Promise<void>; } {
-  // tslint:disable-next-line:no-empty
-  let firstCallResolve: (value?: void | PromiseLike<void>) => void = () => { };
-  let firstCallReject: (reason?: any) => void = () => { }; // tslint:disable-line:no-empty
-
-  const firstCallPromise: Promise<void> = new Promise((resolve, reject) => {
-    firstCallResolve = resolve;
-    firstCallReject = reject;
-  });
-
-  const wrapped = async function (this: ThisParameterType<T>, ...args: Parameters<T>): Promise<void> {
-    try {
-      await original.call(this, ...args);
-      firstCallResolve();
-    } catch (error) {
-      firstCallReject(error);
-    }
-  };
-
-  setTimeout(
-    () => {
-      firstCallReject(new Error('First call to function took longer than expected'));
-    },
-    timeoutMs,
-  );
-
-  return {
-    promise: firstCallPromise,
-    fn: wrapped,
   };
 }

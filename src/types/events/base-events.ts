@@ -385,7 +385,7 @@ export interface MessageEvent extends StringIndexed {
   type: 'message';
   channel: string;
   user: string;
-  text: string;
+  text?: string;
   ts: string;
   attachments?: MessageAttachment[];
   blocks?: (KnownBlock | Block)[];

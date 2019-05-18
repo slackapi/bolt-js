@@ -151,9 +151,13 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
   return ({ message, context, next }) => {
     let tempMatches: RegExpMatchArray | null;
 
+    if (message.text === undefined) {
+      return;
+    }
+
     // Filter out messages that don't contain the pattern
     if (typeof pattern === 'string') {
-      if (message.text !== undefined && !message.text.includes(pattern)) {
+      if (!message.text.includes(pattern)) {
         return;
       }
     } else {
@@ -255,6 +259,10 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
         'botUserId',
         'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
       ));
+      return;
+    }
+
+    if (message.text === undefined) {
       return;
     }
 
