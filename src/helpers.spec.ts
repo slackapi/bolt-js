@@ -1,62 +1,167 @@
 // tslint:disable:no-implicit-dependencies
+import 'mocha';
 import { assert } from 'chai';
 import { getTypeAndConversation, IncomingEventType } from './helpers';
-import { SlackAction } from './types';
-import { Func } from 'mocha';
 
 describe('getTypeAndConversation()', () => {
-  function matchesActionType(actionType: string): Func {
-    return () => {
-      // Arrange
-      const messageActionBody: SlackAction = createFakeMessageAction(actionType);
+  describe('event types', () => {
+    // Arrange
+    const conversationId = 'CONVERSATION_ID';
+    const dummyEventBody = {
+      event: {
+        type: 'app_home_opened',
+        channel: conversationId,
+        event_ts: 'EVENT_TS',
+      },
+    };
 
+    it('should find Event type for generic event', () => {
       // Act
-      const typeAndConversation = getTypeAndConversation(messageActionBody);
+      const typeAndConversation = getTypeAndConversation(dummyEventBody);
 
       // Assert
-      assert(typeAndConversation.type === IncomingEventType.Action);
+      assert(typeAndConversation.type === IncomingEventType.Event);
+      assert(typeAndConversation.conversationId === conversationId);
+    });
+  });
+
+  describe('command types', () => {
+    // Arrange
+    const conversationId = 'CONVERSATION_ID';
+    const dummyCommandBody = {
+      command: 'COMMAND_NAME',
+      channel_id: conversationId,
+      response_url: 'https://hooks.slack.com/commands/RESPONSE_URL',
     };
-  }
+
+    it('should find Command type for generic command', () => {
+      // Act
+      const typeAndConversation = getTypeAndConversation(dummyCommandBody);
+
+      // Assert
+      assert(typeAndConversation.type === IncomingEventType.Command);
+      assert(typeAndConversation.conversationId === conversationId);
+    });
+  });
+
+  describe('options types', () => {
+    // Arrange
+    const conversationId = 'CONVERSATION_ID';
+    const dummyActionBodies = createFakeOptions(conversationId);
+
+    dummyActionBodies.forEach((option) => {
+      it(`should find Option type for ${option.type}`, () => {
+        // Act
+        const typeAndConversation = getTypeAndConversation(option);
+
+        // Assert
+        assert(typeAndConversation.type === IncomingEventType.Options);
+        assert(typeAndConversation.conversationId === conversationId);
+      });
+    });
+  });
 
   describe('action types', () => {
-    it('should find Action type for message actions', matchesActionType('message_action'));
-    it('should find Action type for dialog submissions', matchesActionType('dialog_submission'));
-    it('should find Action type for block actions', matchesActionType('block_actions'));
-    it('should find Action type for interactive actions', matchesActionType('interactive_message'));
+    // Arrange
+    const conversationId = 'CONVERSATION_ID';
+    const dummyActionBodies = createFakeActions(conversationId);
+
+    dummyActionBodies.forEach((action) => {
+      it(`should find Action type for ${action.type}`, () => {
+        // Act
+        const typeAndConversation = getTypeAndConversation(action);
+
+        // Assert
+        assert(typeAndConversation.type === IncomingEventType.Action);
+        assert(typeAndConversation.conversationId === conversationId);
+      });
+    });
+  });
+
+  describe('invalid events', () => {
+    // Arrange
+    const fakeEventBody = {
+      fake: 'THIS_IS_FAKE',
+      channel: { id: 'FAKE_CONVERSATION_ID' },
+    };
+
+    it('should not find type for invalid event', () => {
+      // Act
+      const typeAndConversation = getTypeAndConversation(fakeEventBody);
+
+      // Assert
+      assert.isEmpty(typeAndConversation);
+    });
   });
 });
 
-function createFakeMessageAction(actionType: string): SlackAction {
-  const action: Partial<SlackAction> = {
-    type: actionType,
-    channel: { id: 'CHANNEL_ID', name: 'CHANNEL_NAME' },
-    user: { id: 'USER_ID', name: 'USER_NAME' },
-    team: { id: 'TEAM_ID', domain: 'TEAM_DOMAIN' },
-    response_url: 'https://hooks.slack.com/actions/RESPONSE_URL',
-    token: 'TOKEN',
-  };
+function createFakeActions(conversationId: string): any[] {
+  return [
+    // Body for a message action
+    {
+      type: 'message_action',
+      channel: { id: conversationId },
+      callback_id: 'CALLBACK_ID',
+    },
+    // Body for a dialog submission
+    {
+      type: 'dialog_submission',
+      channel: { id: conversationId },
+      callback_id: 'CALLBACK_ID',
+      submission: { KEY: 'VALUE' },
+    },
+    // Body for an action within an interactive message
+    {
+      type: 'interactive_message',
+      channel: { id: conversationId },
+      callback_id: 'CALLBACK_ID',
+      actions: [
+        {
+          type: 'button',
+          name: 'NAME',
+          value: 'VALUE',
+        },
+      ],
+    },
+    // Body for an action within a block
+    {
+      type: 'block_actions',
+      channel: { id: conversationId },
+      actions: [
+        {
+          type: 'static_select',
+          selected_option: {
+            text: {
+              type: 'plain_text',
+              text: 'ELEMENT_TEXT',
+            },
+            value: 'VALUE',
+          },
+        },
+      ],
+    },
+  ];
+}
 
-  if (actionType === 'interactive_message') {
-    action.actions = [{
-      type: 'button',
-      name: 'NAME',
-      value: 'VALUE',
-    }];
-  }
-
-  if (actionType === 'block_actions') {
-    action.actions = [{
-      type: 'button',
-      value: 'VALUE',
-      text: {
-        type: 'plain_text',
-        text: 'TEXT',
-      },
-      block_id: 'BLOCK_ID',
+function createFakeOptions(conversationId: string): any[] {
+  return [
+    // Body for an options request in an interactive message
+    {
+      type: 'interactive_message',
+      channel: { id: conversationId },
+      name: 'OPTIONS_NAME',
+    },
+    // Body for an options request in a dialog
+    {
+      type: 'dialog_suggestion',
+      channel: { id: conversationId },
+      name: 'OPTIONS_NAME',
+    },
+    // Body for an action within a block
+    {
+      type: 'block_suggestion',
+      channel: { id: conversationId },
       action_id: 'ACTION_ID',
-      action_ts: 'ACTION_TS',
-    }];
-  }
-
-  return action as SlackAction;
+    },
+  ];
 }
