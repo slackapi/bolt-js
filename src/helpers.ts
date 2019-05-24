@@ -46,7 +46,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
         (body as SlackOptionsMiddlewareArgs<OptionsSource>['body']).channel.id,
     };
   }
-  if (body.actions !== undefined || body.type === 'dialog_submission') {
+  if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'message_action') {
     return {
       type: IncomingEventType.Action,
       conversationId: (body as SlackActionMiddlewareArgs<SlackAction>['body']).channel.id,
