@@ -11,7 +11,6 @@ describe('getTypeAndConversation()', () => {
       event: {
         type: 'app_home_opened',
         channel: conversationId,
-        event_ts: 'EVENT_TS',
       },
     };
 
@@ -101,25 +100,19 @@ function createFakeActions(conversationId: string): any[] {
     {
       type: 'message_action',
       channel: { id: conversationId },
-      callback_id: 'CALLBACK_ID',
     },
     // Body for a dialog submission
     {
       type: 'dialog_submission',
       channel: { id: conversationId },
-      callback_id: 'CALLBACK_ID',
-      submission: { KEY: 'VALUE' },
     },
     // Body for an action within an interactive message
     {
       type: 'interactive_message',
       channel: { id: conversationId },
-      callback_id: 'CALLBACK_ID',
       actions: [
         {
           type: 'button',
-          name: 'NAME',
-          value: 'VALUE',
         },
       ],
     },
@@ -130,13 +123,6 @@ function createFakeActions(conversationId: string): any[] {
       actions: [
         {
           type: 'static_select',
-          selected_option: {
-            text: {
-              type: 'plain_text',
-              text: 'ELEMENT_TEXT',
-            },
-            value: 'VALUE',
-          },
         },
       ],
     },
@@ -161,7 +147,6 @@ function createFakeOptions(conversationId: string): any[] {
     {
       type: 'block_suggestion',
       channel: { id: conversationId },
-      action_id: 'ACTION_ID',
     },
   ];
 }
