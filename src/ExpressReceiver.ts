@@ -4,15 +4,17 @@ import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
 import axios from 'axios';
 import rawBody from 'raw-body';
+import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
-import querystring from 'querystring';
 import { ErrorCode, errorWithCode } from './errors';
+import { Logger, ConsoleLogger } from '@slack/logger';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
 export interface ExpressReceiverOptions {
   signingSecret: string;
+  logger?: Logger;
   endpoints?: string | {
     [endpointType: string]: string;
   };
@@ -28,9 +30,10 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
 
   private server: Server;
 
-  constructor ({
+  constructor({
     signingSecret = '',
-    endpoints = { events: '/slack/events' },
+    logger = new ConsoleLogger(),
+    endpoints = { events: '/slack/events' }
   }: ExpressReceiverOptions) {
     super();
 
@@ -40,8 +43,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     this.server = createServer(this.app);
 
     const expressMiddleware: RequestHandler[] = [
-      verifySlackRequest(signingSecret),
-      parseBody,
+      verifySignatureAndParseBody(logger, signingSecret),
       respondToSslCheck,
       respondToUrlVerification,
       this.requestHandler.bind(this),
@@ -151,40 +153,44 @@ const respondToUrlVerification: RequestHandler = (req, res, next) => {
   next();
 };
 
-// TODO: this should be imported from another package
-function verifySlackRequest(signingSecret: string): RequestHandler {
-  return async (req , _res, next) => {
+/**
+ * This request handler has two responsibilities:
+ * - Verify the request signature
+ * - Parse request.body and assign the successfully parsed object to it.
+ */
+export function verifySignatureAndParseBody(
+  logger: Logger,
+  signingSecret: string): RequestHandler {
+  return async (req, _res, next) => {
     try {
-      const body: string = (await rawBody(req)).toString();
+      // *** Request verification ***
+      let stringBody: string;
+      // On some environments like GCP (Google Cloud Platform),
+      // req.body can be pre-parsed and be passed as req.rawBody here
+      const preparsedRawBody: any = (req as any).rawBody;
+      if (preparsedRawBody !== undefined) {
+        stringBody = preparsedRawBody.toString();
+      } else {
+        stringBody = (await rawBody(req)).toString();
+      }
       const signature = req.headers['x-slack-signature'] as string;
       const ts = Number(req.headers['x-slack-request-timestamp']);
 
-      // Divide current date to match Slack ts format
-      // Subtract 5 minutes from current time
-      const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
-
-      if (ts < fiveMinutesAgo) {
-        const error = errorWithCode(
-          'Slack request signing verification failed. Timestamp is too old.',
-          ErrorCode.ExpressReceiverAuthenticityError,
-        );
-        next(error);
+      try {
+        await verifyRequestSignature(signingSecret, stringBody, signature, ts);
+      } catch (e) {
+        return next(e);
       }
 
-      const hmac = crypto.createHmac('sha256', signingSecret);
-      const [version, hash] = signature.split('=');
-      hmac.update(`${version}:${ts}:${body}`);
+      // *** Parsing body ***
+      // As the verification passed, parse the body as an object and assign it to req.body
+      // Following middlewares can expect `req.body` is already a parsed one.
 
-      if (!tsscmp(hash, hmac.digest('hex'))) {
-        const error = errorWithCode(
-          'Slack request signing verification failed. Signature mismatch.',
-          ErrorCode.ExpressReceiverAuthenticityError,
-        );
-        next(error);
-      }
+      // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
+      // and overwrites `req.body` with the parsed JS object.
+      const contentType = req.headers['content-type'];
+      req.body = parseRequestBody(logger, stringBody, contentType);
 
-      // Verification passed, assign string body back to request and resume
-      req.body = body;
       next();
     } catch (error) {
       next(error);
@@ -192,16 +198,69 @@ function verifySlackRequest(signingSecret: string): RequestHandler {
   };
 }
 
-const parseBody: RequestHandler = (req, _res, next) => {
-  if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
-    const parsedBody = querystring.parse(req.body);
-    req.body = (typeof parsedBody.payload === 'string') ? JSON.parse(parsedBody.payload) : parsedBody;
-  } else {
-    // TODO: should we check the content type header to make sure its JSON here?
-    req.body = JSON.parse(req.body);
+// TODO: this should be imported from another package
+async function verifyRequestSignature(
+  signingSecret: string,
+  body: string,
+  signature: string,
+  requestTimestamp: number): Promise<void> {
+  if (!signature || !requestTimestamp) {
+    const error = errorWithCode(
+      'Slack request signing verification failed. Some headers are missing.',
+      ErrorCode.ExpressReceiverAuthenticityError,
+    );
+    throw error;
   }
-  next();
-};
+
+  // Divide current date to match Slack ts format
+  // Subtract 5 minutes from current time
+  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
+
+  if (requestTimestamp < fiveMinutesAgo) {
+    const error = errorWithCode(
+      'Slack request signing verification failed. Timestamp is too old.',
+      ErrorCode.ExpressReceiverAuthenticityError,
+    );
+    throw error;
+  }
+
+  const hmac = crypto.createHmac('sha256', signingSecret);
+  const [version, hash] = signature.split('=');
+  hmac.update(`${version}:${requestTimestamp}:${body}`);
+
+  if (!tsscmp(hash, hmac.digest('hex'))) {
+    const error = errorWithCode(
+      'Slack request signing verification failed. Signature mismatch.',
+      ErrorCode.ExpressReceiverAuthenticityError,
+    );
+    throw error;
+  }
+}
+
+function parseRequestBody(
+  logger: Logger,
+  stringBody: string,
+  contentType: string | undefined) {
+  if (contentType === 'application/x-www-form-urlencoded') {
+    const parsedBody = querystring.parse(stringBody);
+    if (typeof parsedBody.payload === 'string') {
+      return JSON.parse(parsedBody.payload);
+    } else {
+      return parsedBody;
+    }
+  } else if (contentType === 'application/json') {
+    return JSON.parse(stringBody);
+  } else {
+    logger.warn(`Unexpected content-type detected: ${contentType}`);
+    try {
+      // Parse this body anyway
+      return JSON.parse(stringBody);
+    } catch (e) {
+      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`)
+      throw e;
+    }
+  }
+}
 
 function receiverAckTimeoutError(message: string): ReceiverAckTimeoutError {
   const error = new Error(message);
