@@ -286,7 +286,28 @@ describe('App', () => {
         assert(fakeSecondMiddleware.calledOnce);
       });
     });
+
     describe('middleware and listener arguments', () => {
+
+      let fakeReceiver: FakeReceiver;
+      let fakeErrorHandler: SinonSpy;
+      let dummyAuthorizationResult: { [key: string]: any };
+      const dummyChannelId = 'CHANNEL_ID';
+      let overrides: Override;
+
+      function buildOverrides(secondOverride: Override) {
+        fakeReceiver = createFakeReceiver();
+        fakeErrorHandler = sinon.fake();
+        dummyAuthorizationResult = { botToken: '', botId: '' };
+        overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          secondOverride,
+          withMemoryStore(sinon.fake()),
+          withConversationContext(sinon.fake.returns(noopMiddleware))
+        );
+        return overrides;
+      }
+
       describe('say()', () => {
 
         function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {
@@ -364,20 +385,12 @@ describe('App', () => {
 
         it('should send a simple message to a channel where the incoming event originates', async () => {
           // Arrange
-          const fakeReceiver = createFakeReceiver();
           const fakePostMessage = sinon.fake.resolves({});
-          const fakeErrorHandler = sinon.fake();
-          const dummyAuthorizationResult = { botToken: '', botId: '' };
-          const dummyMessage = 'test';
-          const dummyChannelId = 'CHANNEL_ID';
-          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
-          const overrides = mergeOverrides(
-            withNoopAppMetadata(),
-            withPostMessage(fakePostMessage),
-            withMemoryStore(sinon.fake()),
-            withConversationContext(sinon.fake.returns(noopMiddleware)),
-          );
+          const overrides = buildOverrides(withPostMessage(fakePostMessage));
           const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          const dummyMessage = 'test';
+          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -401,23 +414,14 @@ describe('App', () => {
           assert(fakeErrorHandler.notCalled);
         });
 
-        // TODO: DRY up this case with the case above
         it('should send a complex message to a channel where the incoming event originates', async () => {
           // Arrange
-          const fakeReceiver = createFakeReceiver();
           const fakePostMessage = sinon.fake.resolves({});
-          const fakeErrorHandler = sinon.fake();
-          const dummyAuthorizationResult = { botToken: '', botId: '' };
-          const dummyMessage = { text: 'test' };
-          const dummyChannelId = 'CHANNEL_ID';
-          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
-          const overrides = mergeOverrides(
-            withNoopAppMetadata(),
-            withPostMessage(fakePostMessage),
-            withMemoryStore(sinon.fake()),
-            withConversationContext(sinon.fake.returns(noopMiddleware)),
-          );
+          const overrides = buildOverrides(withPostMessage(fakePostMessage));
           const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          const dummyMessage = { text: 'test' };
+          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -494,17 +498,11 @@ describe('App', () => {
 
         it('should not exist in the arguments on incoming events that don\'t support say', async () => {
           // Arrange
-          const fakeReceiver = createFakeReceiver();
-          const assertionAggregator = sinon.fake();
-          const dummyAuthorizationResult = { botToken: '', botId: '' };
-          const dummyReceiverEvents = createReceiverEventsWithoutSay('CHANNEL_ID');
-          const overrides = mergeOverrides(
-            withNoopAppMetadata(),
-            withNoopWebClient(),
-            withMemoryStore(sinon.fake()),
-            withConversationContext(sinon.fake.returns(noopMiddleware)),
-          );
+          const overrides = buildOverrides(withNoopWebClient());
           const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          const assertionAggregator = sinon.fake();
+          const dummyReceiverEvents = createReceiverEventsWithoutSay(dummyChannelId);
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -523,20 +521,12 @@ describe('App', () => {
 
         it('should handle failures through the App\'s global error handler', async () => {
           // Arrange
-          const fakeReceiver = createFakeReceiver();
           const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
-          const fakeErrorHandler = sinon.fake();
-          const dummyAuthorizationResult = { botToken: '', botId: '' };
-          const dummyMessage = { text: 'test' };
-          const dummyChannelId = 'CHANNEL_ID';
-          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
-          const overrides = mergeOverrides(
-            withNoopAppMetadata(),
-            withPostMessage(fakePostMessage),
-            withMemoryStore(sinon.fake()),
-            withConversationContext(sinon.fake.returns(noopMiddleware)),
-          );
+          const overrides = buildOverrides(withPostMessage(fakePostMessage));
           const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          const dummyMessage = { text: 'test' };
+          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -570,7 +560,7 @@ async function importApp(
 function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
-      WebClient: class {},
+      WebClient: class { },
     },
   };
 }
