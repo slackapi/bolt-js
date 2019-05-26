@@ -143,7 +143,7 @@ export default class App {
           ErrorCode.AppInitializationError,
         );
       }
-      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.authorize = singleTeamAuthorization(this.client, this.logger, { botId, botUserId, botToken: token });
     } else if (authorize === undefined) {
       throw errorWithCode(
         `No token and no authorize options provided. ${tokenUsage}`,
@@ -502,17 +502,44 @@ function defaultErrorHandler(logger: Logger): ErrorHandler {
 
 function singleTeamAuthorization(
   client: WebClient,
+  logger: Logger,
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Authorize {
-  // TODO: warn when something needed isn't found
-  const botUserId: Promise<string> = authorization.botUserId !== undefined ?
+  const botUserId: Promise<string|undefined> = authorization.botUserId !== undefined ?
     Promise.resolve(authorization.botUserId) :
     client.auth.test({ token: authorization.botToken })
-      .then(result => result.user_id as string);
-  const botId: Promise<string> = authorization.botId !== undefined ?
+      .then(result => {
+        if (result.ok) return result.user_id as string;
+        else {
+          logger.warn(`Failed to get botUserId because ${result.error}`);
+          return undefined;
+        }
+      })
+      .catch(error => {
+        logger.warn(`Failed to call auth.test API because ${JSON.stringify(error)}`);
+        return undefined;
+      });
+  const botId: Promise<string|undefined> = authorization.botId !== undefined ?
     Promise.resolve(authorization.botId) :
-    botUserId.then(id => client.users.info({ token: authorization.botToken, user: id }))
-      .then(result => ((result.user as any).profile.bot_id as string));
+    botUserId
+      .then(userId => {
+        if (userId === undefined) return Promise.reject(undefined);
+        else return client.users.info({ token: authorization.botToken, user: userId });
+      })
+      .then(result => {
+        if (result.ok) return (result.user as any).profile.bot_id as string;
+        else {
+          logger.warn(`Failed to get botId because ${result.error}`);
+          return undefined;
+        }
+      })
+      .catch(error => {
+        // undefined may passed as result of the above rejection
+        if (error !== undefined) {
+          logger.warn(`Failed to call users.info API because ${JSON.stringify(error)}`);
+        }
+        return undefined;
+      })
   return async () => ({
     botToken: authorization.botToken,
     botId: await botId,

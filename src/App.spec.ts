@@ -10,9 +10,8 @@ import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
 
 describe('App', () => {
+
   describe('constructor', () => {
-    // TODO: test when the single team authorization results fail. that should still succeed but warn. it also means
-    // that the `ignoreSelf` middleware will fail (or maybe just warn) a bunch.
     describe('with successful single team authorization results', () => {
       it('should succeed with a token for single team authorization', async () => {
         // Arrange
@@ -23,15 +22,59 @@ describe('App', () => {
           withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
         );
         const App = await importApp(overrides); // tslint:disable-line:variable-name
+        const fakeLogger = createFakeLogger();
 
         // Act
-        const app = new App({ token: '', signingSecret: '' });
+        const app = new App({ token: '', signingSecret: '', logger: fakeLogger });
 
         // Assert
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
         assert.instanceOf(app, App);
+        await delay();
+        assert.equal(fakeLogger.warn.callCount, 0, JSON.stringify(fakeLogger.warn.args));
       });
     });
+    // test when the single team authorization results fail. that should still succeed but warn. it also means
+    // that the `ignoreSelf` middleware will fail (or maybe just warn) a bunch.
+    describe('with "ok:false" single team authorization results', () => {
+      it('should succeed with a token for single team authorization but should give warnings', async () => {
+        // Arrange
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withOkFalseBotUserFetchingWebClient(),
+        );
+        const App = await importApp(overrides); // tslint:disable-line:variable-name
+        const fakeLogger = createFakeLogger();
+
+        // Act
+        const app = new App({ token: '', signingSecret: '', logger: fakeLogger });
+
+        // Assert
+        assert.instanceOf(app, App);
+        await delay();
+        assert.equal(fakeLogger.warn.callCount, 1, JSON.stringify(fakeLogger.warn.args));
+      });
+    });
+    describe('with failed single team authorization results', () => {
+      it('should succeed with a token for single team authorization but should give warnings', async () => {
+        // Arrange
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withFailingBotUserFetchingWebClient(),
+        );
+        const App = await importApp(overrides); // tslint:disable-line:variable-name
+        const fakeLogger = createFakeLogger();
+
+        // Act
+        const app = new App({ token: '', signingSecret: '', logger: fakeLogger });
+
+        // Assert
+        assert.instanceOf(app, App);
+        await delay();
+        assert.equal(fakeLogger.warn.callCount, 1, JSON.stringify(fakeLogger.warn.args));
+      });
+    });
+
     it('should succeed with an authorize callback', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
@@ -578,10 +621,11 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
     '@slack/web-api': {
       WebClient: class {
         public auth = {
-          test: sinon.fake.resolves({ user_id: botUserId }),
+          test: sinon.fake.resolves({ ok: true, user_id: botUserId }),
         };
         public users = {
           info: sinon.fake.resolves({
+            ok: true,
             user: {
               profile: {
                 bot_id: botId,
@@ -593,6 +637,36 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
     },
   };
 }
+
+function withOkFalseBotUserFetchingWebClient(): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {
+        public auth = {
+          test: sinon.fake.resolves({ ok: false, error: 'not_found' })
+        };
+        public users = {
+          info: sinon.fake.resolves({ ok: false, error: 'not_found' })
+        };
+      },
+    },
+  };
+}
+function withFailingBotUserFetchingWebClient(): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {
+        public auth = {
+          test: sinon.fake.rejects({ ok: false, error: 'not_found' })
+        };
+        public users = {
+          info: sinon.fake.rejects({ ok: false, error: 'not_found' })
+        };
+      },
+    },
+  };
+}
+
 
 function withPostMessage(spy: SinonSpy): Override {
   return {
