@@ -280,7 +280,7 @@ app.message('hello', ({ message, say }) => {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Hey there <@{message.user}>!`
+          "text": `Hey there <@${message.user}>!`
         },
         "accessory": {
           "type": "button",
