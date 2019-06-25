@@ -1,5 +1,6 @@
 ---
 title: Listening to events
+lang: en
 slug: event-listening
 order: 3
 ---

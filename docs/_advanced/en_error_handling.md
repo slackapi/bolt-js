@@ -1,5 +1,6 @@
 ---
 title: Handling errors
+lang: en
 slug: error-handling
 order: 1
 ---

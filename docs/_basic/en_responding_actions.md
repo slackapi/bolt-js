@@ -1,5 +1,6 @@
 ---
 title: Responding to actions
+lang: en
 slug: action-respond
 order: 6
 ---

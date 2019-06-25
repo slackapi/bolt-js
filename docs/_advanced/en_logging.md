@@ -1,5 +1,6 @@
 ---
 title: Logging
+lang: en
 slug: logging
 order: 7
 ---
