@@ -1,5 +1,6 @@
 ---
 title: Listening and responding to commands
+lang: en
 slug: commands
 order: 8
 ---

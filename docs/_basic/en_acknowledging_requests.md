@@ -1,5 +1,6 @@
 ---
 title: Acknowledging events
+lang: en
 slug: acknowledge
 order: 7
 ---

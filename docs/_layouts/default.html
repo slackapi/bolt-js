@@ -33,7 +33,7 @@ sidebar_style: main
         </div>
 
         <div id="advanced">
-          {% assign advanced_sections = site.advanced | sort: "order" %}
+          {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", "jp" %}
           {% for section in advanced_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>

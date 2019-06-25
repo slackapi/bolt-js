@@ -13,16 +13,6 @@ redirect_from:
 This guide is meant to walk you through getting up and running with a Slack app using Bolt. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 </div> 
 
-<div class="supporting-content">
-- [Create an app](#create-an-app)
-- [Tokens and installing apps](#tokens-and-installing-apps)
-- [Setting up your local project](#setting-up-your-local-project)
-- [Setting up events](#setting-up-events)
-- [Listening and responding to a message](#listening-and-responding-to-a-message)
-- [Sending and responding to actions](#sending-and-responding-to-actions)
-- [Next steps](#next-steps)
-</div>
-
 ---
 
 ### Create an app

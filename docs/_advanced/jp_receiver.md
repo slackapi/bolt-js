@@ -1,25 +1,26 @@
 ---
-title: Customizing a receiver
+title: レシーバーのカスタマイズ
+lang: jp
 slug: receiver
 order: 8
 ---
 
 <div class="section-content">
-A receiver is responsible for handling and parsing any incoming events from Slack, then emitting the event so the Bolt app can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
+レシーバーは、Slack から送信されたイベントを処理およびパースして発行するので、Bolt アプリがそのイベントにコンテキストを追加し、アプリのリスナーに渡すことができます。レシーバーは、レシーバーのインターフェイスに準拠している必要があります。
 
-| Method       | Parameters                       | Return type |
+| メソッド      | パラメーター                       | 戻り値の型    |
 |--------------|----------------------------------|-------------|
 | `on()`       | `type: string`, `listener: fn()` | `unknown`   |
 | `start()`    | None                             | `Promise`   |
 | `stop()`     | None                             | `Promise`   |
 
-`on()` is called two times in the Bolt app:
-* `Receiver.on('message',  listener)` should route all incoming requests that have been parsed to `onIncomingEvent()`. It’s called in the Bolt app as `this.receiver.on('message', message => this.onIncomingEvent(message))`.
-* `Receiver.on('error',  listener)` should route errors to the global error handler. It’s called in the Bolt app as `this.receiver.on('error', error => this.onGlobalError(error))`.
+Bolt アプリでは `on()` が 2 回呼び出されます。
+* `Receiver.on('message', listener)` は、解析されたすべての着信リクエストを `onIncomingEvent()` にルーティングする必要があります。これは、Bolt アプリでは `this.receiver.on('message', message => this.onIncomingEvent(message))` として呼び出されます。
+* `Receiver.on('error', listener)` は、エラーをグローバルエラーハンドラーにルーティングする必要があります。これは、Bolt アプリでは `this.receiver.on('error', error => this.onGlobalError(error))` として呼び出されます。
 
-To use a custom receiver, you can pass it into the constructor when initializing your Bolt app. Here is what a basic custom receiver might look like.
+Bolt アプリを初期化するときにカスタムレシーバーをコンストラクタに渡すことで、そのカスタムレシーバーを使用できます。ここで紹介するのは、基本的なカスタムレシーバーです。
 
-For a more in-depth look at a receiver, [read the source code for the built-in Express receiver](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)
+レシーバーについて詳しくは、[組み込み Express レシーバーのソースコード](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)をお読みください。
 </div>
 
 ```javascript

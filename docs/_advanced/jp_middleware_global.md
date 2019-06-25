@@ -1,15 +1,16 @@
 ---
-title: Global middleware
+title: グローバルミドルウェア
+lang: jp
 slug: global-middleware
 order: 4
 ---
 
 <div class="section-content">
-Global middleware is run for all incoming events before any listener middleware. You can add any number of global middleware to your app by utilizing `app.use(fn(payload,...,next))`. 
+グローバルミドルウェアは、すべての着信イベントに対して、リスナーミドルウェアより前に実行されます。`app.use(fn(payload,...,next))` を使用すると、グローバルミドルウェアをいくつでもアプリに追加できます。
 
-Both global and listener middleware must call `next()` to pass control of the execution chain to the next middleware, or call `next(error)` to pass an error back up the previously-executed middleware chain.
+グローバルミドルウェアとリスナーミドルウェアは、いずれも、`next()` を呼び出して実行チェーンの制御を次のミドルウェアに渡すか、`next(error)` を呼び出して以前に実行したミドルウェアチェーンにエラーを渡す必要があります。
 
-As an example, let's say your app should only respond to users identified with a corresponding internal authentication service (an SSO provider or LDAP, for example). You may define a global middleware that looks up a user record in the authentication service and errors if the user is not found.
+たとえば、アプリが、対応する内部認証サービス (SSO プロバイダ、LDAP など) で識別されたユーザーにのみ応答する必要があるとします。この場合、グローバルミドルウェアを使用して認証サービス内のユーザーレコードを検索し、ユーザーが見つからない場合はエラーとなるように定義するのがよいでしょう。
 </div>
 
 ```javascript

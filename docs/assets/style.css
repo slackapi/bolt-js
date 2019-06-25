@@ -55,6 +55,7 @@ body {
 
 .panel .sidebar-content ul.sidebar-section {
   list-style: none;
+  list-style-position: inside;
   padding-top: 0.9em;
   margin: 0;
   font-size: 0.80em;
@@ -98,6 +99,10 @@ body {
   padding-top: 1.5em;
 }
 
+.header a:hover {
+  text-decoration: none;
+}
+
 .wrapper {
   width: 100%;
   margin: 0 auto;
@@ -117,16 +122,65 @@ body {
     "divider"
 }
 
+.tutorial-nav {
+  width: 15%;
+  position: fixed;
+}
+
+.tutorial-nav ul {
+  margin-left: 6em;
+  padding-left: 1em;
+  border-width: 4px;
+  border-left-style: solid;
+  border-color: #F2F2F2;
+  border-image: linear-gradient(
+    to bottom, 
+    #FFFFFF 0%, 
+    #F2F2F2 6% 92%,
+    #FFFFFF 100%
+  ) 1 100%;
+  list-style: none;
+  padding-top: 1.5em;
+}
+
+.circle {
+  background: #ddd;
+  border-radius: 50%;
+  height: 1em;
+  width: 1em;
+  float: left;
+  margin: 5px 0 0 -1.6em;
+}
+
+.completed {
+  background: #58AF7F;
+}
+
+.tutorial-nav ul li {
+  padding-bottom: 2.5em;
+}
+
+.tutorial-nav a {
+  font-weight: 700;
+  font-size: 0.8em;
+  color: #757575;
+}
+
+.tutorial-nav a:hover {
+  color: #000;
+  text-decoration: none;
+}
+
 .tutorial {
-  width: 80%;
-  margin: 1em auto 0 auto;
+  width: 55%;
+  margin: 1em 0 0 33%;
   padding-bottom: 2em;
   font-size: 1em;
   line-height: 1.75em;
 }
 
 .tutorial img {
-  width: 60%;
+  width: 85%;
   margin: 0.2em auto;
   display: block;
   box-shadow: 0 0 15px #DDDDDD;
@@ -162,7 +216,7 @@ pre code {
 .content .section-wrapper .section-content {
   grid-area: body;
   font-size: 1em;
-  line-height: 1.75em;
+  line-height: 2em;
 }
 
 .content .section-wrapper h3 {

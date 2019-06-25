@@ -18,6 +18,10 @@ sidebar_style: main
         <div class="mainheader">
           {% include en/header.html %}
         </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
+        </div>
         
         <div class="tutorial">
           {{ content | markdownify }}
@@ -25,6 +29,8 @@ sidebar_style: main
     </div>
 
   </div>
+  <script src="{{ site.url | append: site.baseurl }}/scripts/tutorial_nav.js"></script>
+
   {% include analytics.html %}
 </body>
 </html>

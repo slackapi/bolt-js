@@ -1,13 +1,14 @@
 ---
-title: Adding context
+title: context の追加
+lang: jp
 slug: context
 order: 6
 ---
 
 <div class="section-content">
-All listeners have access to a `context` object, which can be used to enrich events with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
+すべてのリスナーから、情報を追加してイベントを充実させるために使用できる `context` オブジェクトにアクセスすることができます。これはたとえば、サードパーティのシステムからユーザー情報を追加したり、チェーン内の次のミドルウェアの一時的な状態を追加したりする場合に使用します。
 
-`context` is just an object, so you can add to it by setting it to a modified version of itself.
+`context` は単なるオブジェクトであるため、必要な情報をいくらでも追加、編集できます。
 </div>
 
 ```javascript
