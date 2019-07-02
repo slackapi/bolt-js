@@ -24,6 +24,18 @@ defaults:
     values:
       layout: "default"
 
+t:
+  en:
+    basic: Basic concepts
+    advanced: Advanced concepts
+    start: Getting started
+    contribute: Contributing
+  jp:
+    basic: 基本的な概念
+    advanced: 応用コンセプト
+    start: Bolt 入門ガイド
+    contribute: 貢献
+
 # Metadata
 repo_name: bolt
 github_username: SlackAPI

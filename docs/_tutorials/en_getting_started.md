@@ -2,10 +2,12 @@
 title: Getting started
 order: 1
 slug: getting-started
+lang: en
 layout: tutorial
 permalink: /tutorial/getting-started
 redirect_from:
   - /getting-started
+  - /getting-started/en
 ---
 # Getting started
 

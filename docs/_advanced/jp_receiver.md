@@ -28,7 +28,7 @@ import { EventEmitter } from 'events';
 import { createServer } from 'http';
 import express from 'express';
 
-// EventEmitter handles the on() function for us
+// EventEmitter は on() 関数を操作
 // https://nodejs.org/api/events.html#events_emitter_on_eventname_listener
 class simpleReceiver extends EventEmitter {
   constructor(signingSecret, endpoints) {
@@ -65,13 +65,12 @@ class simpleReceiver extends EventEmitter {
     })
   }
 
-  // This is a very simple implementation. Look at the ExpressReceiver source for more detail
   requestHandler(req, res) {
-    // Assume parseBody function exists to parse incoming requests
+    // 着信リクエストをパースするparseBody 関数があると仮定
     const parsedReq = parseBody(req);
     const event = {
       body: parsedReq.body,
-      // Receivers are responsible for handling acknowledgements
+      // レシーバーが確認作業に重要
       ack: (response) => {
         if (!response) {
           res.send('')

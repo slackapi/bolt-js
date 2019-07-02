@@ -16,14 +16,14 @@ order: 5
 </div>
 
 ```javascript
-// Listener middleware that filters out messages with 'bot_message' subtype
+// 'bot_message' サブタイプを持つメッセージをフィルタリングするリスナーミドルウェア
 function noBotMessages({ message, next }) {
   if (!message.subtype || message.subtype !== 'bot_message') {
      next();
   }
 }
 
-// The listener only receives messages from humans
+// ボットではなく人間からのメッセージのみを受信するリスナー
 app.message(noBotMessages, ({ message }) => console.log(
   `(MSG) User: ${message.user}
    Message: ${message.text}`

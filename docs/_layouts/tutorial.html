@@ -10,13 +10,21 @@ sidebar_style: main
   {% include tag_manager.html %}
   <div class="wrapper">
     <div class="panel">
-      {% include en/sidebar.html %}
+      {% if page.lang == "jp" %}
+        {% include jp/sidebar.html %}
+      {% else %}
+        {% include sidebar.html %}
+      {% endif %}
     </div>
 
 
     <div class="content">
         <div class="mainheader">
-          {% include en/header.html %}
+          {% if page.lang == "jp" %}
+            {% include jp/header.html %}
+          {% else %}
+            {% include header.html %}
+          {% endif %}
         </div>
 
         <div class="tutorial-nav">

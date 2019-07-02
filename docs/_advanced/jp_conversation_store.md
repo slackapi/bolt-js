@@ -19,19 +19,19 @@ Bolt は、会話 (conversation) に関連する state を設定および取得�
 const app = new App({
   token,
   signingSecret,
-  // It's more likely that you'd create a class for a convo store
+  // クラスを作成する感じで
   convoStore: new simpleConvoStore()
 });
 
-// A simple implementation of a conversation store with a Firebase-like database
+// Firebaseのようなデータベースを使い conversation store を実装
 class simpleConvoStore {
   set(conversationId, value, expiresAt) {
-    // Returns a Promise
+    // Promise を返す
     return db().ref('conversations/' + conversationId).set({ value, expiresAt });
   }
 
   get(conversationId) {
-    // Returns a Promise
+    // Promise を返す
     return new Promise((resolve, reject) => {
       db().ref('conversations/' + conversationId).once('value').then((result) => {
         if (result !== undefined) {
@@ -42,7 +42,7 @@ class simpleConvoStore {
           }
           resolve(result.value)
         } else {
-          // Conversation not found
+          // Conversation が存在しないエラー
           reject(new Error('Conversation not found'));
         }
       });

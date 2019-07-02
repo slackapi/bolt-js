@@ -19,28 +19,28 @@ async function addTimezoneContext ({ payload, context, next }) {
     include_locale: true
   });
 
-  // Add user's timezone context
+  // ユーザのタイムゾーン情報を追加
   context.tz_offset = user.tz_offset;
 }
 
 app.command('request', addTimezoneContext, async ({ command, ack, context }) => {
-  // Acknowledge command request
+  // コマンドリクエストの確認
   ack();
-  // Get local hour of request
+  // リクエスト時のローカル時間を取得
   const local_hour = (Date.UTC() + context.tz_offset).getHours();
 
-  // Request channel ID
+  // チャンネル ID のリクエスト
   const requestChannel = 'C12345';
 
   const requestText = `:large_blue_circle: *New request from <@${command.user_id}>*: ${command.text}`;
 
-  // If request not inbetween 9AM and 5PM, send request tomorrow
+  // 午前9時〜午後5時以外のリクエストの場合は明日
   if (local_hour > 17 || local_hour < 9) {
-    // Assume function exists to get local tomorrow 9AM from offset
+    // ローカル時間の明日午前９時までの差分を取得する関数があると仮定
     const local_tomorrow = getLocalTomorrow(context.tz_offset);
 
     try {
-      // Schedule message
+      // メッセージ送信スケジュールを調整
       const result = await app.client.chat.scheduleMessage({
         token: context.botToken,
         channel: requestChannel,
@@ -53,7 +53,7 @@ app.command('request', addTimezoneContext, async ({ command, ack, context }) => 
     }
   } else {
     try {
-      // Post now
+      // 送信
       const result = app.client.chat.postMessage({
         token: context.botToken,
         channel: requestChannel,

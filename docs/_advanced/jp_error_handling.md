@@ -1,6 +1,6 @@
 ---
 title: エラーの処理
-lang: en
+lang: jp
 slug: error-handling
 order: 1
 ---
@@ -13,7 +13,7 @@ order: 1
 
 ```javascript
 app.error((error) => {
-	// Check the details of the error to handle cases where you should retry sending a message or stop the app
+	// メッセージ再送信もしくはアプリを停止するかの決定をくだすために、エラーの詳細をチェック 
 	console.error(error);
 });
 ```
