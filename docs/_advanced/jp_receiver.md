@@ -1,6 +1,6 @@
 ---
 title: レシーバーのカスタマイズ
-lang: jp
+lang: ja-jp
 slug: receiver
 order: 8
 ---

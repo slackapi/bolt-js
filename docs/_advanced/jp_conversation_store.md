@@ -1,6 +1,6 @@
 ---
 title: Conversation stores
-lang: jp
+lang: ja-jp
 slug: conversation-store
 order: 3
 ---

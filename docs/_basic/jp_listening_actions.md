@@ -1,6 +1,6 @@
 ---
 title: アクションのリスニング
-lang: jp
+lang: ja-jp
 slug: action-listening
 order: 5
 ---

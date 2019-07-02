@@ -1,6 +1,6 @@
 ---
 title: コマンドのリスニングと応答
-lang: jp
+lang: ja-jp
 slug: commands
 order: 8
 ---

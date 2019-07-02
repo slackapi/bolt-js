@@ -4,5 +4,5 @@ redirect_from:
   - /jp
   - /ja-jp
 layout: default
-lang: jp
+lang: ja-jp
 ---

@@ -1,6 +1,6 @@
 ---
 title: イベントの確認
-lang: jp
+lang: ja-jp
 slug: acknowledge
 order: 7
 ---
