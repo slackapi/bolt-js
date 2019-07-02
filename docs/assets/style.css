@@ -277,6 +277,19 @@ summary h4 {
 
 /* Responsive */
 @media (min-width: 768px) {
+  .tutorial-nav ul {
+    margin-left: 2em;
+  }
+
+  .tutorial-nav {
+    width: 20%;
+    position: fixed;
+  }
+
+  .tutorial {
+    width: 55%;
+  }
+
   .wrapper {
     display: grid;
     grid-template-columns: 20% 75%;
@@ -295,11 +308,38 @@ summary h4 {
 }
 
 @media (max-width: 768px) {
-  .header {
-    display: none;
-  }
   .panel {
     display: none;
+  }
+
+  .language-switcher {
+    display: none;
+  }
+
+  .tutorial-nav {
+    display: none;
+  }
+
+  .tutorial {
+    width: 85%;
+    margin: 1em auto;
+  }
+
+  .wrapper {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "content"
+  }
+
+  .section-wrapper {
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "head"
+      "body"
+      "code"
+      "secondary"
+      "divider"
   }
 }
 
