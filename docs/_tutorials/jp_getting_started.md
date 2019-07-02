@@ -4,9 +4,11 @@ order: 1
 slug: getting-started
 lang: jp
 layout: tutorial
-permalink: /tutorial/getting-started
+permalink: /ja-jp/tutorial/getting-started
 redirect_from:
-  - /getting-started
+  - /ja-jp/getting-started
+  - /jp/tutorial/getting-started
+  - /getting-started/ja-jp
   - /getting-started/jp
 ---
 # Bolt 入門ガイド
