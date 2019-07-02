@@ -1,5 +1,7 @@
 ---
 permalink: /concepts
-redirect_from: /
+redirect_from:
+  - /
 layout: default
+lang: en
 ---

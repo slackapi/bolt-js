@@ -14,22 +14,22 @@ order: 4
 </div>
 
 ```javascript
-// Authentication middleware that associates incoming event with user in Acme identity provider
+//  Acme ID情報管理プロバイダ上のユーザからの着信イベントと紐つけた認証ミドルウェア
 function authWithAcme({ payload, context, say, next }) {
   const slackUserId = payload.user;
   const helpChannelId = 'C12345';
 
-  // Assume we have a function that accepts a Slack user ID to find user details from Acme
+  // Slack ユーザ ID を使って Acmeシステム上にあるユーザ情報を検索できる関数があるとと仮定
   acme.lookupBySlackId(slackUserId)
     .then((user) => {
-      // When the lookup is successful, populate context with Acme user details
+      // 検索できたらそのユーザ情報でコンテクストを生成
       context.user = user;
 
-      // Pass control to the next middleware and any listener functions
+      // 制御とリスナー関数を次のミドルウェアに引き渡し
       next();
     })
     .catch((error) => {
-      // This user wasn't found in Acme. Send them an error and don't continue processing event
+      // Acme システム上にユーザが存在しないのでエラーをわたし、イベントプロセスを終了
       if (error.message === 'Not Found') {
         app.client.chat.postEphemeral({
           token: context.botToken,
@@ -40,7 +40,7 @@ function authWithAcme({ payload, context, say, next }) {
         return;
       }
 
-      // Pass control to previous middleware (if any) or the global error handler
+      // 制御とリスナー関数を（もしあれば）前のミドルウェア渡す、もしくはグローバルエラーハンドラに引き渡し
       next(error);
     });
 }

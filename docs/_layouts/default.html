@@ -10,17 +10,25 @@ sidebar_style: main
   {% include tag_manager.html %}
   <div class="wrapper">
     <div class="panel">
-      {% include en/sidebar.html %}
+      {% if page.lang == "jp" %}
+        {% include jp/sidebar.html %}
+      {% else %}
+        {% include sidebar.html %}
+      {% endif %}
     </div>
 
 
     <div class="content">
         <div class="mainheader">
-          {% include en/header.html %}
+          {% if page.lang == "jp" %}
+            {% include jp/header.html %}
+          {% else %}
+            {% include header.html %}
+          {% endif %}
         </div>
 
         <div id="basic">
-        {% assign basic_sections = site.basic | sort: "order" %}
+        {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
         {% for section in basic_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>
@@ -33,7 +41,7 @@ sidebar_style: main
         </div>
 
         <div id="advanced">
-          {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", "jp" %}
+          {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
           {% for section in advanced_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>

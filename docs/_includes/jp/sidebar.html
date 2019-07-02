@@ -1,0 +1,50 @@
+<div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="{{ site.url | append: site.baseurl }}/assets/bolt-logo.png"/>
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <span class="version">
+        {% assign release = site.github.releases | where_exp: "release", 
+          "release.tag_name contains '@slack/bolt'" | sort: "created_at" | reverse | pop %}
+        <a href="{{ release[0].html_url }}">v{{ release[0].tag_name | remove: "@slack/bolt@" }}</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl }}/tutorial/getting-started/{{page.lang}}"><li class="title">{{ site.t[page.lang].start }}</li></a>
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#basic"><li class="title">{{ site.t[page.lang].basic }}</li></a>
+    {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
+    
+    {% for section in basic_sections %}
+      <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#{{ section.slug }}">
+        <li>{{section.title}}</li>
+      </a>
+    {% endfor %}
+  </ul>
+
+  <ul class="sidebar-section">
+
+    <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#advanced">
+      <li class="title">{{ site.t[page.lang].advanced }}</li>
+    </a>
+    {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
+    {% for section in advanced_sections %}
+      <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#{{ section.slug }}">
+        <li>{{section.title}}</li>
+      </a>
+    {% endfor %}
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="https://github.com/SlackAPI/bolt/blob/master/.github/contributing.md"><li class="title">{{ site.t[page.lang].contribute }}</li></a>
+  </ul>
+</div>
+  

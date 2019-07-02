@@ -1,6 +1,7 @@
 /* Color variables */
 :root {
   --light-grey: #F8F8F8;
+  --grey: #868686;
   --blue: #1264A3;
   --light-blue: #B8D1E3;
   --white: #FFFFFF;
@@ -9,6 +10,7 @@
 
 body {
   background-color: var(--white);
+  font-family: 'Noto Sans JP', 'Slack-Lato', sans-serif;
 }
 
 .content {
@@ -49,7 +51,7 @@ body {
 }
 
 .panel .sidebar-content .logo .version a {
-  color: #868686;
+  color: var(--grey);
   font-size: 0.75em;
 }
 
@@ -101,6 +103,17 @@ body {
 
 .header a:hover {
   text-decoration: none;
+}
+
+.header a.language-switcher {
+  color: var(--grey);
+  font-weight: 700;
+  padding: 6px 14px 9px;
+  font-size: 15px;
+}
+
+.header a.language-switcher:hover {
+  color: var(--black);
 }
 
 .wrapper {

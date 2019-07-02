@@ -20,9 +20,9 @@ order: 2
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
 
-// NOTE: This is for demonstration purposes only.
-// All sensitive data should be stored in a secure database
-// Assuming this app only uses bot tokens, the following object represents a model for storing the credentials as the app is installed into multiple workspaces.
+// 注: これはデモの目的のみの例です
+// 実際は重要なデータはセキュリティの高いデータベースに保存してください
+// このアプリは bot トークンのみのしようと仮定、ここで使われるオブジェクトは、複数ワークスペースにアプリをインストールする際の認証情報を保管するモデルとします
 
 const installations = [
   {
@@ -41,13 +41,13 @@ const installations = [
 ];
 
 const authorizeFn = async ({ teamId, enterpriseId }) => {
-  // Fetch team info from database
+  // データベースから team 情報を取得
   for (const team in installations) {
-    // Check for matching teamId and enterpriseId in the installations array
+    // installations 配列から teamId と enterpriseId が一致するかチェック
     if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
-      // This is a match. Use these installation credentials.
+      // 一致したワークスペースの認証情報を使用
       return {
-        // You could also set userToken instead
+        // かわりに userToken を使用
         botToken: team.botToken,
         botId: team.botId,
         botUserId: team.botUserId
@@ -55,6 +55,6 @@ const authorizeFn = async ({ teamId, enterpriseId }) => {
     }
   }
   
-  throw new Error('No matching authorizations');
+  throw new Error('No matching authorizations'); // 認証エラー
 }
 ```
