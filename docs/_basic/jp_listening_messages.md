@@ -1,6 +1,6 @@
 ---
 title: メッセージ・イベントのリスニング
-lang: jp
+lang: ja-jp
 slug: message-listening
 order: 1
 ---

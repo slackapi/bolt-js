@@ -1,6 +1,6 @@
 ---
 title: アクションへの応答
-lang: jp
+lang: ja-jp
 slug: action-respond
 order: 6
 ---

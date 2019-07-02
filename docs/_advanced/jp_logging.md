@@ -1,6 +1,6 @@
 ---
 title: ログの表示
-lang: jp
+lang: ja-jp
 slug: logging
 order: 7
 ---

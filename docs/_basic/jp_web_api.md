@@ -1,6 +1,6 @@
 ---
 title: Web API の使用
-lang: jp
+lang: ja-jp
 slug: web-api
 order: 4
 ---

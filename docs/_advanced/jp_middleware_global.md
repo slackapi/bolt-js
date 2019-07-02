@@ -1,6 +1,6 @@
 ---
 title: グローバルミドルウェア
-lang: jp
+lang: ja-jp
 slug: global-middleware
 order: 4
 ---

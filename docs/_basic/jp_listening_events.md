@@ -1,6 +1,6 @@
 ---
 title: イベントのリスニング
-lang: jp
+lang: ja-jp
 slug: event-listening
 order: 3
 ---

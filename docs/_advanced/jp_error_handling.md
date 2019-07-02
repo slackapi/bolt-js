@@ -1,6 +1,6 @@
 ---
 title: エラーの処理
-lang: jp
+lang: ja-jp
 slug: error-handling
 order: 1
 ---

@@ -1,6 +1,6 @@
 ---
 title: メッセージの送信
-lang: jp
+lang: ja-jp
 slug: message-sending
 order: 2
 ---

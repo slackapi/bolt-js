@@ -1,6 +1,6 @@
 ---
 title: オプションのリスニングと応答
-lang: jp
+lang: ja-jp
 slug: options
 order: 9
 ---

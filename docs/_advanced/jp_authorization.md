@@ -1,6 +1,6 @@
 ---
 title: 承認
-lang: jp
+lang: ja-jp
 slug: authorization
 order: 2
 ---

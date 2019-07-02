@@ -24,34 +24,22 @@
     {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
     
     {% for section in basic_sections %}
-      {% if page.lang == "jp" %}
-        <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#{{ section.slug }}">
-          <li>{{section.title}}</li>
-        </a>
-      {% else %}
-        <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}">
-          <li>{{section.title}}</li>
-        </a>
-      {% endif %} 
+      <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}">
+        <li>{{section.title}}</li>
+      </a>
     {% endfor %}
   </ul>
 
   <ul class="sidebar-section">
 
-    <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#advanced">
+    <a href="{{ site.url | append: site.baseurl }}/concepts#advanced">
       <li class="title">{{ site.t[page.lang].advanced }}</li>
     </a>
     {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
     {% for section in advanced_sections %}
-      {% if page.lang == "jp" %}
-        <a href="{{ site.url | append: site.baseurl }}/{{page.lang}}/concepts#{{ section.slug }}">
-          <li>{{section.title}}</li>
-        </a>
-      {% else %}
-        <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}">
-          <li>{{section.title}}</li>
-        </a>
-      {% endif %}
+      <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}">
+        <li>{{section.title}}</li>
+      </a>
     {% endfor %}
   </ul>
 

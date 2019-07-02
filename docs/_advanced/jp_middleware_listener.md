@@ -1,6 +1,6 @@
 ---
 title: リスナーミドルウェア
-lang: jp
+lang: ja-jp
 slug: listener-middleware
 order: 5
 ---

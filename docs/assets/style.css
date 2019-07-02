@@ -96,7 +96,7 @@ body {
 /* Main page */
 .header {
   width: 95%;
-  margin: 0 auto;
+  margin: 0 auto 1em auto;
   height: 5rem;
   padding-top: 1.5em;
 }
@@ -136,12 +136,12 @@ body {
 }
 
 .tutorial-nav {
-  width: 15%;
+  width: 20%;
   position: fixed;
 }
 
 .tutorial-nav ul {
-  margin-left: 6em;
+  margin-left: 3em;
   padding-left: 1em;
   border-width: 4px;
   border-left-style: solid;
@@ -276,20 +276,13 @@ summary h4 {
 }
 
 /* Responsive */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .tutorial-nav ul {
-    margin-left: 2em;
+    margin-left: 5em;
   }
+}
 
-  .tutorial-nav {
-    width: 20%;
-    position: fixed;
-  }
-
-  .tutorial {
-    width: 55%;
-  }
-
+@media (min-width: 768px) {
   .wrapper {
     display: grid;
     grid-template-columns: 20% 75%;
