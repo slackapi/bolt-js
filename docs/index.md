@@ -1,6 +1,7 @@
 ---
-permalink: {{ site.url | append: site.baseurl }}/concepts
+permalink: /concepts
 redirect_from:
-  - /{{ site.url | append: site.baseurl }}
+  - /
 layout: default
+lang: en
 ---
