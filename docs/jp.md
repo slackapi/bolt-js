@@ -1,5 +1,5 @@
 ---
-permalink: /ja-jp/concepts
+permalink: ja-jp/concepts
 redirect_from:
   - /jp
   - /ja-jp

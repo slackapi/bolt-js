@@ -7,9 +7,7 @@ layout: tutorial
 permalink: /ja-jp/tutorial/getting-started
 redirect_from:
   - /ja-jp/getting-started
-  - /jp/tutorial/getting-started
   - /getting-started/ja-jp
-  - /getting-started/jp
 ---
 # Bolt 入門ガイド
 
