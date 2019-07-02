@@ -1,17 +1,18 @@
 ---
-title: Getting started
-order: 0
-slug: getting-started
-lang: en
+title: アプリを Hubot から Bolt に移行する
+order: 1
+slug: hubot-migration
+lang: ja-jp
 layout: tutorial
-permalink: /tutorial/getting-started
+permalink: /ja-jp/tutorial/hubot-migration
 redirect_from:
-  - /getting-started
+  - /ja-jp/hubot-migration
 ---
 # Getting started
 
 <div class="section-content">
-This guide is meant to walk you through getting up and running with a Slack app using Bolt. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
+Bolt は、Slack アプリを構築する時間と手間を減らすために作成され、Slack 開発者に最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot](https://hubot.github.com/docs/) から Bolt の使用にアプリを移行するプロセスを順を追って説明します。
+
 </div> 
 
 ---

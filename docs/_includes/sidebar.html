@@ -44,6 +44,12 @@
   </ul>
 
   <ul class="sidebar-section">
+    {% assign tutorials = site.tutorials | where: "lang", page.lang | where_exp: "tutorial", "tutorial.order > 0" %}
+    {% for tutorial in tutorials %}
+      <a href="{{ site.url | append: site.baseurl }}/tutorial/{{ tutorial.slug }}">
+        <li class="title">{{tutorial.title}}</li>
+      </a>
+    {% endfor %}
     <a href="https://github.com/SlackAPI/bolt/blob/master/.github/contributing.md"><li class="title">{{ site.t[page.lang].contribute }}</li></a>
   </ul>
 </div>
