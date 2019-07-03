@@ -8,312 +8,162 @@ permalink: /ja-jp/tutorial/hubot-migration
 redirect_from:
   - /ja-jp/hubot-migration
 ---
-# Getting started
+# アプリを Hubot から Bolt に移行する
 
 <div class="section-content">
 Bolt は、Slack アプリを構築する時間と手間を減らすために作成され、Slack 開発者に最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot](https://hubot.github.com/docs/) から Bolt の使用にアプリを移行するプロセスを順を追って説明します。
 
+すでに [ボットユーザーがいるアプリ](https://api.slack.com/bot-users#getting-started) を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに [Bolt リポジトリのサンプルスクリプト](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js) を読むとよいでしょう。
 </div> 
 
 ---
 
-### Create an app
-First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new). 
+### 準備段階
+Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握していると助けになります。Slack の Hubot アダプターは、[RTM API](https://api.slack.com/rtm) とインターフェイス接続するように構築されています。これは、Hubot アプリに一連のワークスペースイベントを送信する WebSocket ベースの接続を使用しています。RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでお勧めできません。
 
-> 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
+デフォルトの Bolt レシーバーは、[Events API](https://api.slack.com/events-api) をサポートするように構築されています。これは、HTTP ベースのイベントサブスクリプションを使用して Bolt アプリに JSON ペイロードを送信します。Events API には、RTM にはない新しいイベントが含まれており、より詳細でスケーラブルです。ほとんどのユースケースで推奨されています。しかし、RTM API を使用し続けなければならない理由の 1 つに、アプリをホストしているサーバーにファイアウォールがあり、送信リクエストのみを許可して、受信リクエストを許可しないことが挙げられます。
 
-After you fill out an app name (_you can change it later_) and pick a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
-
-This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header. 
-
-![Basic Information page](../../assets/basic-information-page.png "Basic Information page")
-
-Look around, add an app icon and description, and then let's start configuring your app 🔩
+Bolt アプリを作成する前に考慮に入れた方がよい違いがほかにもあります。
+- Bolt の最小 Node バージョンは `v10.0.0` です。アプリをホストしているサーバーが、`v10` をサポートできない場合は、現時点でアプリを Bolt に移行することはできません。
+- Bolt は、外部スクリプトをサポートしていません。Hubot アプリがアプリの機能または展開に必要な外部スクリプトを使用している場合、当面は Hubot のままでいいと思われるかもしれません。アプリに外部スクリプトがあるかどうかわからない場合は、`external-scripts.json` ファイルをチェックしてください。Slack は Bolt に引き続き投資しつつ、将来や、Slack アプリの開発と展開を簡単に行う方法について検討しています。アプリが使用する重要な外部スクリプトがある場合、[専用の Github の話題でどんなスクリプトなのか聞かせてください](https://github.com/slackapi/bolt/issues/119)。
+- Hubot アプリは、Coffeescript で書かれており、Javascript にトランスパイルされます。Slack は、Bolt を Typescript で書くことで豊富な型情報にアクセスできるようにしました。Bolt アプリは、Typescript または Javascript を使用して開発できます。こちらの [サンプルスクリプト](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js) は、Coffeescript がどのように Javascript に変換されるかを示しています。あなたのアプリが、比較的複雑なスクリプトである場合、[Decaffeinate](https://github.com/decaffeinate/decaffeinate) などのプロジェクトを調べて、CoffeeScript を Javascript に変換するとよいかもしれません。
 
 ---
 
-### Tokens and installing apps
-Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods. 
+### ボットの構成
+ボットユーザーがいる既存の Slack アプリへのアクセスしている方は、[次のセクションに進むことができます](#configure-what-your-bot-will-hear)。わからない場合は、[App Management ページ](https://api.slack.com/apps) に移動し、自分の Hubot アプリがあるかどうかを確認してください。ある場合は、そのアプリの認証情報を使用できます ([次のセクションに進んでください](#configure-what-your-bot-will-hear))。ない場合は、Slack アプリの作成について説明します。
 
-There are two token types available to a Slack app: user (`xoxp`) and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. Bot tokens are granted once in every workspace where someone installs the app, though they require adding a bot user to your app. The bot token your app uses will be the same no matter which user performed the installation.
+#### Slack アプリを作成する
+まず最初に、Slack アプリを作成します。
 
-For brevity, we're going to use bot tokens for this guide.
+> 💡実際の作業を中断しないように、ワークスペースを使用することをお勧めします — [新しいワークスペースを無料で作成できます](https://api.slack.com/apps/new)。
 
-To add a bot user, click **Bot Users** on the left sidebar and then **Add A Bot User**. Give it a display name and username, then click **Add Bot User**.
+アプリ名を入力し、インストール先のワークスペースを選択したら、`Create App` ボタンをクリックします。そうすると、アプリの **Basic Information** ページが表示されます。
+ 
+このページには、後で必要になる重要な認証情報 (**App Credentials** ヘッダーの下の `Signing Secret` など) に加えて、アプリケーションの概要が表示されます。
 
-Now that you have a bot user with permission to send messages to Slack, let's install the app to your workspace.
+ひと通り確認し、アプリのアイコンと説明を追加したら、アプリの構成 🔩 を始めましょう。
 
-Click **Install App** on the left sidebar and click the **Install App to Workspace** button at the top of the page. You'll see a screen that details what permissions the app is requesting, which correlate to the scopes applied to your app's OAuth token(s).
+#### ボットユーザーを追加する
+Slack では、Hubot アプリは会話によってユーザーと対話するようにSibelcoの設計されたボットユーザーを採用しています。
 
-Once you authorize the installation, you'll land on the **OAuth & Permissions** page.
+新しいアプリにボットユーザーを追加するには、左側のサイドバーの **Bot Users** をクリックしてから、**Add A Bot User** をクリックします。表示名とユーザー名を指定して、**Add Bot User** をクリックします。その他のフィールドの詳しい情報は、[API サイト](https://api.slack.com/bot-users#creating-bot-user) をご覧ください。
 
-![OAuth Tokens](../../assets/bot-token.png "OAuth Tokens")
+### ボットが理解できる内容の構成
+[Events API](https://api.slack.com/bot-users#app-mentions-response) は、ボットの目と耳に相当します。これによりボットは、投稿されたメッセージ、チャンネルの変更、Slack で発生するその他のアクティビティに応答することができます。
 
-You'll see two tokens. For now, we'll just use the `xoxb` bot token. (If you scroll down this page to the **Scopes** section, you'll see the various scopes you can add to the `xoxp` token.)
+> ⚠️ボットのイベントを構成する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-your-local-project) と [イベントの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events) を参考にしてください。
 
-> 💡 Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
+#### メッセージのリッスン
+すべての Hubot アプリは、デフォルトでメッセージをリッスンできるので、ボットユーザーがそうするように設定する必要があります。
 
-### Setting up your local project
-With the initial configuration handled, it's time to set up a new Bolt project. This is where you'll write the code that handles the logic for your app.
+[イベントの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events) を行ってから、リクエスト URL を確認してください。**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります: message channel (パブリックチャンネルのメッセージをリッスンします)、message group (プライベートチャンネルのメッセージをリッスンします)、message.im (アプリのホーム/DM スペースのメッセージをリッスンします)、message.mpim (マルチパーソン DM のメッセージをリッスンします）。
 
-If you don’t already have a project, let’s create a new one. Create an empty directory and initialize a new project:
+ボットがチャンネルのメッセージをリッスンするだけでよい場合は、message.channels とmessage.groups をリッスンできます。または、ボットがすべての場所のメッセージをリッスンするようにするには、4 つのメッセージイベントすべてを選択します。
 
-```shell
-mkdir first-bolt-app
-cd first-bolt-app
-npm init
-```
+ボットにリッスンさせるメッセージイベントの種類を追加して、**Save Changes** をクリックします。
 
-You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
+#### その他のイベントのリッスン
+使用していた機能に応じて、Hubot アプリはほかのイベントにも応答していたかもしれません。スクリプトを調べて、スクリプトで react、respond、presenceChange が使用されている箇所を特定してください。
+- アプリで respond が使用されている場合、app_mention イベントをサブスクライブします。これで、ボットユーザーがメンションされる時をリッスンします。
+- アプリで react が使用されている場合、reaction_added イベントをサブスクライブします。これにより、ボットユーザーがいるチャンネルのメッセージにリアクションが追加される時をリッスンします。
+- アプリで presenceChange が使用されている場合、対応するイベントはありません。このイベントがあなたのボットの機能上重要な場合は、Hubot の使用を継続するか、アプリのロジックを変更する必要があるかもしれません。
 
-Before we install the Bolt package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
+> 💡Bolt に追加された利点として、どの [Events API イベント](https://api.slack.com/events) でもリッスンできることが挙げられます。移行が完了すれば、[ユーザーがワークスペースに参加したとき](https://api.slack.com/events/team_join) や [ユーザーがアプリで DM を開いたとき](https://api.slack.com/events/app_home_opened) など、より多くのイベントをリッスンできます。
 
-1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and MacOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
+あなたのアプリの機能に対応するイベントを追加したら、**Save Changes** をクリックします。
 
-```shell
-export SLACK_SIGNING_SECRET=<your-signing-secret>
-```
+### スクリプトインターフェイスの変更
+Bolt のインターフェイスは、可能な限り Slack API 言語に適合するように設計されましたが、Hubot は複数のサービスを抽象化するために一般化された言語を使用して設計されました。インターフェイスは似ていますが、Hubot スクリプトを Bolt スクリプトに変換するには、いくらかコードを変更する必要があります。
 
-2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another environment variable.
+Bolt は、res を使用せず、Slack からの raw リクエストを公開しません。代わりに、payload のペイロード本文を使用したり、say() を使ってメッセージを送信するといった一般的な機能を使用したりできます。
 
-```shell
-export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
-```
+> ⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、[Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js)。
 
-Now, lets create your app. Install the `@slack/bolt` package and save it to your `package.json` dependencies using the following command:
+#### message() を使用したパターンのリッスン
+Hubot スクリプトは、hear() を使用して、一致するパターンを持つメッセージをリッスンします。代わりに、 Bolt は message() を使用して、そのパターンの string または RegExp を受け入れます。
 
-```shell
-npm install @slack/bolt
-```
+> 👨‍💻👩‍💻コードで hear() を使用している箇所はすべて、message() を使用するように変更してください。
 
-Create a new file called `app.js` in this directory and add the following code:
+[メッセージのリッスンについてもっと詳しく読む](https://slack.dev/bolt/ja-jp/concepts#message-listening).
+
+#### say() および respond() を使用したメッセージで応答する
+Hubot スクリプトは、send() を使用してメッセージを同じ会話に送信し、reply() を使用して、元のメッセージを送信したユーザー宛のメンションを付けて、メッセージを同じ会話に送信します。
+
+Bolt は、send() の代わりに say() を使用し、respond() を使用して response_url で返信を送信します。返信の冒頭にメンションを追加するには、context オブジェクトにあるユーザー ID を使用できます。たとえば、メッセージイベントの場合は次のようにできます: `say('<@${message.user}>Hello :wave:')`
+
+Hubot の send() と Bolt の say() はほとんど同じですが、say() を使用すると [ボタン、メニューの選択、デートピッカー](https://api.slack.com/messaging/interactivity#interaction) といったインタラクティブなコンポーネントを付けてメッセージを送信できます。
+
+> 👨‍💻👩‍💻コードで send() が使用されている箇所はすべて say() に変更してください
+
+[メッセージへの応答についてもっと詳しく読む](https://slack.dev/bolt/ja-jp/concepts#message-sending).
+
+#### respond と react
+
+前のセクションで、Hubot スクリプトで respond() が使用されている場合は app_mention イベントを、react() が使用されている場合は reaction_added をサブスクライブするようにアプリを設定しました。
+
+Bolt は、event() と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリッスンできます。コードを変更するには、respond() を app.event(‘app_mention’) に、react() を app.event(‘reaction_added’) に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
+
+> 👨‍💻👩‍💻コードで respond() が使用されている箇所はすべて、app.event ('app_mention') を使用するように変更してください。react が使用されている箇所はすべて app.event('reaction_added') に変更してください。
+
+[イベントのリッスンについてもっと詳しく読む](https://slack.dev/bolt/ja-jp/concepts#event-listening).
+
+### Bolt で Web API メソッドを使用する
+Hubot では、@slack/client から WebClient パッケージをインポートする必要がありました。Bolt では、app.client からアクセスできる WebClient インスタンスがデフォルトでインポートされます。
+
+組み込みの WebClient を使用するには、アプリをインスタンス化するために使用されるトークン、またはリクエストの送信元のチームに関連付けられているトークンを渡す必要があります。これは、リスナー関数に渡された context オブジェクトにあります。たとえば、メッセージにリアクションを追加するには、次を使用します:
 
 ```javascript
-const { App } = require('@slack/bolt');
-
-// Initializes your app with your bot token and signing secret
-const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+app.message('react', async ({ message, context }) => {
+  try {
+      const result = await app.client.reactions.add({
+      	token: context.botToken,
+        name: ‘star’,
+        channel: message.channel,
+        timestamp: message.ts
+    });
+  }
+  catch (error) {
+    console.error(error);
+  }
 });
-
-(async () => {
-  // Start your app
-  await app.start(process.env.PORT || 3000);
-
-  console.log('⚡️ Bolt app is running!');
-})();
 ```
 
-Your token and signing secret are enough to create your first Bolt app. Save your `app.js` file then on the command line run the following:
+> 👨‍💻👩‍💻app.client で組み込みのクライアントを使用するように、Web API 呼び出しを変更してください。
 
-```script
-node app.js
-```
+[Bolt での Web API の使用についてもっと詳しく読む。](https://slack.dev/bolt/ja-jp/concepts#web-api)
 
-Your app should let you know that it's up and running.
+### Bolt でのミドルウェアの使用
+Hubot には、受信 (リスナーが呼び出される前に実行される)、リスナー (一致するすべてのリスナーに対して実行される)、応答 (送信されるすべての応答に対して実行される) という 3 種類のミドルウェアがあります。
 
----
+Bolt には、グローバルとリスナーという 2 種類のミドルウェアしかありません。
+- グローバルミドルウェアは、リスナーミドルウェアが呼び出される前に実行されます。Bolt アプリ自体に付属しています。[Bolt のグローバルミドルウェアについてもっと詳しく読む。](https://slack.dev/bolt/ja-jp/concepts#global-middleware).
+- リスナーミドルウェアは、付属するリスナー関数に対してのみ実行されます。[Bolt のリスナーミドルウェアについてもっと詳しく読む。](https://slack.dev/bolt/ja-jp/concepts#listener-middleware)
 
-### Setting up events
-Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
+Bolt では、グローバルとリスナーというミドルウェアはいずれも、next() を呼び出して実行の制御を次のミドルウェアに渡す必要があります。ミドルウェアが実行中にエラーを検出した場合、Error を next() に渡すことができ、エラーはその前に実行されたミドルウェアチェーンにバブルアップされます。
 
-To enable events for your app, start by going back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**. 
+既存のミドルウェア関数を移行するには、Hubot の受信ミドルウェアは、Bolt のグローバルミドルウェアのユースケースと対応しています。Hubot と Bolt のリスナーミドルウェアは、ほぼ同じです。Hubot の応答ミドルウェアを移行するには、後処理関数と呼ばれる Bolt のコンセプトを使用します。
 
-You'll see a text input labeled **Request URL**. The Request URL is a public URL where Slack will send HTTP POST requests corresponding to events you specify.
+ミドルウェアがイベントの後処理を実行する必要がある場合、undefined で呼び出すのではなく、後処理関数を使用して next() を呼び出すことができます。後処理関数は、ミドルウェア関数が next() を呼び出すのと同じ方法で done() を呼び出す必要があります(Error で呼び出すことも可能) 。
 
-> ⚙️We've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting)
+### ブレインを会話ストアに移行する
+Hubot には、ブレインと呼ばれるインメモリストアがあります。これによって、Hubot スクリプトはデータの基本部分を get および set することができます。Bolt は、会話ストアと呼ばれる、get()`/`set() インターフェイスを含むグローバルミドルウェアを使用します。
 
-When an event occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
+デフォルトの組み込み会話ストアは Hubot に似たインメモリストアを使用し、ミリ秒単位で有効期限を設定できます。会話の状態を get および set する方法は 2 つあります。
 
-<details>
-<summary markdown="0">
-<h4>Using a local Request URL for development</h4>
-</summary>
+- 会話 ID を使用して app.convoStore.get() を呼び出して会話の状態を取得する方法と、会話 ID、会話の状態 (キーと値のペア) 、オプションで expriesAt 時間 (ミリ秒) を使用して app.convoStore.set() を呼び出す方法です。
+- リスナーミドルウェアでは、context.updateConversation() を呼び出して更新された会話の状態を得るか、context.conversation を使用して現在の会話の状態にアクセスします。
 
-If you’re just getting started with your app's development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set one up, but for now a development proxy like [ngrok](https://ngrok.com/) will create a public URL and tunnel requests to your own development environment. We've written a separate tutorial about [using ngrok with Slack for local development](https://api.slack.com/tutorials/tunneling-with-ngrok) that should help you get everything set up.
+アプリのインスタンスが複数実行されている場合、組み込みの会話ストアはプロセス間で共有されないため、データベースから会話の状態を取得する会話ストアを実装することをお勧めします。
 
-Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port `3000` for this example, but if you customized the port used to initialize your app use that port instead):
+[会話ストアについてもっと詳しく読む](https://slack.dev/bolt/ja-jp/concepts#conversation-store).
 
-```shell
-ngrok http 3000
-```
+### 次のステップ
+ここまでで、Hubot アプリを Bolt アプリに変換できたことでしょう！✨⚡
 
-![Running ngrok](../../assets/ngrok.gif "Running ngrok")
+人目を引く新しい Bolt アプリを手に入れた今、さらにパワーアップする方法を調べることができます。
+- [ボタンやメニュー選択](https://api.slack.com/messaging/interactivity#interaction) などの双方向性を追加することを検討してください。これらの機能は、Hubot ではサポートされていませんでしたが、アプリが Slack にメッセージを送信するときにコンテキストアクションを含めることができるようになります。
+- こちらの [ドキュメント](https://slack.dev/bolt/ja-jp/concepts) を読んで、Bolt でほかに何ができるかお確かめください。
+- イベントやインタラクティブコンポーネントの使用方法を示す [サンプルアプリ](https://glitch.com/~slack-bolt) をご覧ください。
 
-The output should show a generated URL that you can use (we recommend the one that starts with `https://`). This URL will be the base of your request URL, in this case `https://8e8ec2d7.ngrok.io`.
-
----
-</details>
-
-Now you have a public-facing URL for your app that tunnels to your local machine. The Request URL that you use in your app configuration is composed of your public-facing URL combined with the URL your app is listening on. By default, Bolt apps listen at `/slack/events` so our full request URL would be `https://8e8ec2d7.ngrok.io/slack/events`.
-
-Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your URL should become verified.
-
-After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
-
-If you want your bot to listen to messages from everywhere it is, choose all four message events. After you’ve added the events you want your bot to listen to, click the green **Save Changes** button.
-
----
-
-### Listening and responding to a message
-Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
-
-The following example listens to all messages that contain the word "hello" and responds with "Hey there @user!"
-
-```javascript
-const { App } = require('@slack/bolt');
-
-const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
-});
-
-// Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  say(`Hey there <@${message.user}>!`);
-});
-
-(async () => {
-  // Start your app
-  await app.start(process.env.PORT || 3000);
-
-  console.log('⚡️ Bolt app is running!');
-})();
-```
-
-If you restart your app, you should be able to add your bot user to a channel, send any message that contains "hello", and it will respond.
-
-This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
-
----
-
-### Sending and responding to actions
-
-To use features like buttons, select menus, datepickers, dialogs, and message actions, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
-
-Back on your app configuration page, click on **Interactive Components** on the left side. You'll see that there's another **Request URL** box.
-
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
-
-![Configuring a Request URL](../../assets/request-url-config.png "Configuring a Request URL")
-
-Now, let's go back to your app's code and add interactivity. This will consist of two steps:
-- First, your app will send a message that contains a button.
-- Next, your app will listen to the action of a user clicking the button and respond
-
-Below, I've modified the app code we wrote in the last section to send a message with a button rather than a string:
-
-```javascript
-const { App } = require('@slack/bolt');
-
-const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
-});
-
-// Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  say({
-    blocks: [
-    {
-	    "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": `Hey there <@${message.user}>!`
-      },
-      "accessory": {
-        "type": "button",
-        "text": {
-          "type": "plain_text",
-          "text": "Click Me"
-        },
-        "action_id": "button_click"
-      }
-     }
-    ]
-  });
-});
-
-(async () => {
-  // Start your app
-  await app.start(process.env.PORT || 3000);
-
-  console.log('⚡️ Bolt app is running!');
-})();
-```
-
-The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory.
-
-You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
-
-> 💡 The [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
-
-Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (*yet!*).
-
-Let's add a handler to send a followup message when someone clicks the button:
-
-```javascript
-const { App } = require('@slack/bolt');
-
-const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
-});
-
-// Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  say({
-    blocks: [
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
-        },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
-          },
-          "action_id": "button_click"
-        }
-      }
-    ]
-  });
-});
-
-app.action('button_click', ({ body, ack, say }) => {
-  // Acknowledge the action
-  ack();
-  say(`<@${body.user.id}> clicked the button`);
-});
-
-(async () => {
-  // Start your app
-  await app.start(process.env.PORT || 3000);
-
-  console.log('⚡️ Bolt app is running!');
-})();
-```
-
-You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
-
----
-
-### Next steps
-You just built your first Bolt app! 🎉
-
-Now that you have a basic app up and running, you can start exploring the parts of Bolt that will make your app stand out. Here are some ideas about where to look next:
-
-* Read through the [Basic concepts](https://slack.dev/bolt#basic) to learn about the different methods and features your Bolt app has access to.
-
-* Explore the different events your bot can listen to with the [`events()` method](https://slack.dev/bolt#event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
-
-* Bolt allows you to [call Web API methods](https://slack.dev/bolt#web-api) with the client attached to your app. There are [over 130 methods](https://api.slack.com/methods) on our API site.
-
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform.
+開発中に問題が発生した場合は、Slack の開発者サポートチーム[developers@slack.com](mailto:developers@slack.com)までお問合せください。フレームワークで問題が発生した場合は、[Githubでイシューを開いてください](https://github.com/slackapi/bolt/issues/new)。

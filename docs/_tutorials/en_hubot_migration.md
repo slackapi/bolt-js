@@ -167,8 +167,3 @@ Now that you have your flashy new Bolt app, you can explore how to power it up:
 - Check out our [sample app](https://glitch.com/~slack-bolt) that shows you how to use events and interactive components.
 
 And if you have difficulties while developing, reach out to our developer support team to at [developers@slack.com](mailto:developers@slack.com), and if you run into a problem with the framework [open an issue on Github](https://github.com/slackapi/bolt/issues/new).
-
-
-
-
-
