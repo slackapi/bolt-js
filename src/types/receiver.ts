@@ -1,4 +1,4 @@
-import { RespondFn, AckFn } from '../types';
+import { RespondFn, AckFn } from './index';
 import { StringIndexed } from './helpers';
 import { CodedError, ErrorCode } from '../errors';
 

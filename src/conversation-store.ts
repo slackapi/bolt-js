@@ -1,5 +1,5 @@
-import { Middleware, AnyMiddlewareArgs } from './types';
 import { Logger } from '@slack/logger';
+import { Middleware, AnyMiddlewareArgs } from './types';
 import { getTypeAndConversation } from './helpers';
 
 /**
@@ -19,12 +19,24 @@ export interface ConversationStore<ConversationState = any> {
  */
 export class MemoryStore<ConversationState = any> implements ConversationStore<ConversationState> {
   private state: Map<string, { value: ConversationState; expiresAt?: number }> = new Map();
+
+  /**
+   * Sets a conversation state in the cache
+   * @param conversationId conversation to store state for
+   * @param value state to store
+   * @param expiresAt time to expire the cached state
+   */
   public set(conversationId: string, value: ConversationState, expiresAt?: number): Promise<void> {
     return new Promise((resolve) => {
       this.state.set(conversationId, { value, expiresAt });
       resolve();
     });
   }
+
+  /**
+   * Retrieves a particular conversation state
+   * @param conversationId conversation to retrieve
+   */
   public get(conversationId: string): Promise<ConversationState> {
     return new Promise((resolve, reject) => {
       const entry = this.state.get(conversationId);
@@ -61,7 +73,9 @@ export function conversationContext<ConversationState = any>(
     if (conversationId !== undefined) {
       // TODO: expiresAt is not passed through to store.set
       context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
-      store.get(conversationId)
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      store
+        .get(conversationId)
         .then((conversationState) => {
           context.conversation = conversationState;
           logger.debug(`Conversation context loaded for ID ${conversationId}`);

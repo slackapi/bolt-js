@@ -1,19 +1,18 @@
-// tslint:disable:no-implicit-dependencies
 import { assert } from 'chai';
-import { processMiddleware } from './process';
 import { Context } from 'mocha';
+import { processMiddleware } from './process';
 import { AnyMiddlewareArgs, Middleware } from '../types';
 
 describe('processMiddleware()', () => {
   const middlewareOne: Middleware<AnyMiddlewareArgs> = ({ next, context }) => {
-    const fn = () => {
+    const fn = (): void => {
       context.one = true;
       next();
     };
     setTimeout(fn, 10);
   };
   const middlewareTwo: Middleware<AnyMiddlewareArgs> = ({ next, context }) => {
-    const fn = () => {
+    const fn = (): void => {
       context.two = true;
       next();
     };
@@ -32,6 +31,7 @@ describe('processMiddleware()', () => {
       },
       (error?: Error) => {
         if (error) {
+          // eslint-disable-next-line no-console
           console.error(`after post process: ${error && error.message}`);
         }
         assert(false);

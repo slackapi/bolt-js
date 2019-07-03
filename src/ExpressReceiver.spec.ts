@@ -1,11 +1,8 @@
-// tslint:disable:no-implicit-dependencies
-import 'mocha';
-
 import { Logger, LogLevel } from '@slack/logger';
 import { assert } from 'chai';
 import { Request, Response } from 'express';
 import { Agent } from 'http';
-import sinon, { SinonFakeTimers } from 'sinon';
+import * as sinon from 'sinon';
 import { Readable } from 'stream';
 
 import ExpressReceiver, {
@@ -17,7 +14,6 @@ import ExpressReceiver, {
 import { RespondArguments } from './types/utilities';
 
 describe('ExpressReceiver', () => {
-
   const noopLogger: Logger = {
     debug(..._msg: any[]): void { /* noop */ },
     info(..._msg: any[]): void { /* noop */ },
@@ -69,13 +65,13 @@ describe('ExpressReceiver', () => {
     describe('ssl_check requset handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
         const req = { body: { ssl_check: 1 } } as Request;
         let sent = false;
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { send: () => { sent = true; } } as Response;
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+        const resp = { send: (): void => { sent = true; } } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any): void => { errorResult = error; };
 
         // Act
         respondToSslCheck(req, resp, next);
@@ -87,13 +83,13 @@ describe('ExpressReceiver', () => {
 
       it('should work with other requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
         const req = { body: { type: 'block_actions' } } as Request;
         let sent = false;
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { send: () => { sent = true; } } as Response;
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+        const resp = { send: (): void => { sent = true; } } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any): void => { errorResult = error; };
 
         // Act
         respondToSslCheck(req, resp, next);
@@ -107,13 +103,13 @@ describe('ExpressReceiver', () => {
     describe('url_verification requset handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
         const req = { body: { type: 'url_verification', challenge: 'this is it' } } as Request;
         let sentBody = undefined;
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { json: (body) => { sentBody = body; } } as Response;
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+        const resp = { json: (body): void => { sentBody = body; } } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any): void => { errorResult = error; };
 
         // Act
         respondToUrlVerification(req, resp, next);
@@ -125,13 +121,13 @@ describe('ExpressReceiver', () => {
 
       it('should work with other requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
         const req = { body: { ssl_check: 1 } } as Request;
         let sentBody = undefined;
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { json: (body) => { sentBody = body; } } as Response;
+        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+        const resp = { json: (body): void => { sentBody = body; } } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any): void => { errorResult = error; };
 
         // Act
         respondToUrlVerification(req, resp, next);
@@ -144,8 +140,7 @@ describe('ExpressReceiver', () => {
   });
 
   describe('verifySignatureAndParseBody', () => {
-
-    let clock: SinonFakeTimers;
+    let clock: sinon.SinonFakeTimers;
 
     beforeEach(() => {
       // requestTimestamp = 1531420618 means this timestamp
@@ -161,6 +156,7 @@ describe('ExpressReceiver', () => {
     const signingSecret = '8f742231b10e8888abcd99yyyzzz85a5';
     const signature = 'v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503';
     const requestTimestamp = 1531420618;
+    // eslint-disable-next-line max-len
     const body = 'token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c';
 
     function buildExpressRequest(): Request {
@@ -195,7 +191,7 @@ describe('ExpressReceiver', () => {
     async function runWithValidRequest(req: Request, state: any): Promise<void> {
       // Arrange
       const resp = buildResponseToVerify(state);
-      const next = (error: any) => { state.error = error; };
+      const next = (error: any): void => { state.error = error; };
 
       // Act
       const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
@@ -247,8 +243,8 @@ describe('ExpressReceiver', () => {
       const result: any = {};
       const resp = buildResponseToVerify(result);
 
-      let error: string = '';
-      let warn: string = '';
+      let error = '';
+      let warn = '';
       const logger = {
         error: (msg: string) => { error = msg; },
         warn: (msg: string) => { warn = msg; },
@@ -329,7 +325,7 @@ describe('ExpressReceiver', () => {
       reqAsStream.push(null); // indicate EOF
       (reqAsStream as { [key: string]: any }).headers = {
         'x-slack-signature': signature,
-        /*'x-slack-request-timestamp': requestTimestamp, */
+        /* 'x-slack-request-timestamp': requestTimestamp, */
         'content-type': 'application/x-www-form-urlencoded',
       };
       await verifyMissingHeaderDetection(reqAsStream as Request);
@@ -340,7 +336,7 @@ describe('ExpressReceiver', () => {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
-          /*'x-slack-request-timestamp': requestTimestamp, */
+          /* 'x-slack-request-timestamp': requestTimestamp, */
           'content-type': 'application/x-www-form-urlencoded',
         },
       };
@@ -450,7 +446,6 @@ describe('ExpressReceiver', () => {
       const req = untypedReq as Request;
       await verifySignatureMismatch(req);
     });
-
   });
 
   // Just copied the implementation as the method is private and it's a bit hard to write a unit test
@@ -466,5 +461,4 @@ describe('ExpressReceiver', () => {
       respond({ text: 'hello', blocks: [] });
     });
   });
-
 });

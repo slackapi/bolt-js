@@ -1,5 +1,3 @@
-// tslint:disable:no-implicit-dependencies
-import 'mocha';
 import { assert } from 'chai';
 import { getTypeAndConversation, IncomingEventType } from './helpers';
 
@@ -29,7 +27,9 @@ describe('getTypeAndConversation()', () => {
     const conversationId = 'CONVERSATION_ID';
     const dummyCommandBody = {
       command: 'COMMAND_NAME',
+      // eslint-disable-next-line @typescript-eslint/camelcase
       channel_id: conversationId,
+      // eslint-disable-next-line @typescript-eslint/camelcase
       response_url: 'https://hooks.slack.com/commands/RESPONSE_URL',
     };
 

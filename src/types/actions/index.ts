@@ -1,13 +1,18 @@
-export * from './block-action';
-export * from './interactive-message';
-export * from './dialog-action';
-export * from './message-action';
-
 import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { MessageAction } from './message-action';
-import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
+import {
+  SayFn,
+  SayArguments,
+  RespondFn,
+  AckFn,
+} from '../utilities';
+
+export * from './block-action';
+export * from './interactive-message';
+export * from './dialog-action';
+export * from './message-action';
 
 /**
  * All known actions from Slack's Block Kit interactive components, message actions, dialogs, and legacy interactive
@@ -35,9 +40,11 @@ export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction 
  */
 export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> {
   payload: (
-    Action extends BlockAction<infer ElementAction> ? ElementAction :
-    Action extends InteractiveMessage<infer InteractiveAction> ? InteractiveAction :
-    Action
+    Action extends BlockAction<infer ElementAction>
+      ? ElementAction
+      : Action extends InteractiveMessage<infer InteractiveAction>
+        ? InteractiveAction
+        : Action
   );
   action: this['payload'];
   body: Action;
@@ -52,7 +59,9 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
  * to acknowledge the receipt (and possibly signal failure) of an action from a listener or middleware.
  */
 type ActionAckFn<A extends SlackAction> =
-  A extends InteractiveMessage ? AckFn<string | SayArguments> :
-  A extends DialogSubmitAction ? AckFn<DialogValidation> :
-  // message action and block actions don't accept any value in the ack response
-  AckFn<void>;
+  A extends InteractiveMessage
+    ? AckFn<string | SayArguments>
+    : A extends DialogSubmitAction
+      ? AckFn<DialogValidation>
+      // message action and block actions don't accept any value in the ack response
+      : AckFn<void>;

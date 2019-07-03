@@ -1,7 +1,8 @@
-export * from './base-events';
 import { SlackEvent, BasicSlackEvent } from './base-events';
 import { StringIndexed } from '../helpers';
 import { SayFn } from '../utilities';
+
+export * from './base-events';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
@@ -46,4 +47,4 @@ type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
  * occurred, and returns `Type` when the test passes. Otherwise this returns `never`.
  */
 type WhenEventHasChannelContext<Event, Type> =
-  Event extends ({ channel: string; } | { item: { channel: string; }; }) ? Type : never;
+  Event extends ({ channel: string } | { item: { channel: string } }) ? Type : never;

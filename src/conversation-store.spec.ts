@@ -1,13 +1,16 @@
-// tslint:disable:no-implicit-dependencies
-import 'mocha';
-import { assert, AssertionError } from 'chai';
-import sinon, { SinonSpy } from 'sinon';
-import { Override, createFakeLogger, delay, wrapToResolveOnFirstCall } from './test-helpers';
-import rewiremock from 'rewiremock';
-import { ConversationStore } from './conversation-store';
-import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
+import { assert, AssertionError } from 'chai';
+import * as sinon from 'sinon';
+import rewiremock from 'rewiremock';
+import {
+  Override,
+  createFakeLogger,
+  delay,
+  wrapToResolveOnFirstCall,
+} from './test-helpers';
+import { ConversationStore } from './conversation-store';
+import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
 
 describe('conversationContext middleware', () => {
   it('should forward events that have no conversation ID', async () => {
@@ -42,9 +45,9 @@ describe('conversationContext middleware', () => {
 
   it('should add to the context for events within a conversation that was not previously stored', async () => {
     // Arrange
-    const dummyConversationState = Symbol();
+    const dummyConversationState = Symbol('dummyState');
     const dummyConversationId = 'CONVERSATION_ID';
-    const dummyStoreSetResult = Symbol();
+    const dummyStoreSetResult = Symbol('dummyStoreResult');
     const fakeGetTypeAndConversation = sinon.fake.returns({ conversationId: dummyConversationId });
     const fakeStore = createFakeStore(
       sinon.fake.rejects(new Error('Test conversation missing')),
@@ -80,9 +83,9 @@ describe('conversationContext middleware', () => {
 
   it('should add to the context for events within a conversation that was previously stored', async () => {
     // Arrange
-    const dummyConversationState = Symbol();
+    const dummyConversationState = Symbol('dummyState');
     const dummyConversationId = 'CONVERSATION_ID';
-    const dummyStoreSetResult = Symbol();
+    const dummyStoreSetResult = Symbol('dummyStoreResult');
     const fakeGetTypeAndConversation = sinon.fake.returns({ conversationId: dummyConversationId });
     const fakeStore = createFakeStore(
       sinon.fake.resolves(dummyConversationState),
@@ -105,7 +108,7 @@ describe('conversationContext middleware', () => {
       assert.notExists(args[0]);
       assert.equal(dummyContext.conversation, dummyConversationState);
       if (dummyContext.updateConversation !== undefined) {
-        const newDummyConversationState = Symbol();
+        const newDummyConversationState = Symbol('dummyState');
         const result = await dummyContext.updateConversation(newDummyConversationState);
         assert.equal(result, dummyStoreSetResult);
         assert(fakeStore.set.calledOnce);
@@ -138,7 +141,7 @@ describe('MemoryStore', () => {
   describe('#set and #get', () => {
     it('should store conversation state', async () => {
       // Arrange
-      const dummyConversationState = Symbol();
+      const dummyConversationState = Symbol('dummyState');
       const dummyConversationId = 'CONVERSATION_ID';
       const { MemoryStore } = await importConversationStore();
 
@@ -170,7 +173,7 @@ describe('MemoryStore', () => {
     it('should reject lookup of conversation state when the conversation is expired', async () => {
       // Arrange
       const dummyConversationId = 'CONVERSATION_ID';
-      const dummyConversationState = Symbol();
+      const dummyConversationState = Symbol('dummyState');
       const expiresInMs = 5;
       const { MemoryStore } = await importConversationStore();
 
@@ -193,10 +196,10 @@ describe('MemoryStore', () => {
 /* Testing Harness */
 
 type MiddlewareArgs = AnyMiddlewareArgs & {
-  next: NextMiddleware,
-  context: Context,
-  logger: Logger,
-  client: WebClient,
+  next: NextMiddleware;
+  context: Context;
+  logger: Logger;
+  client: WebClient;
 };
 
 interface DummyContext<ConversationState> {
@@ -212,7 +215,7 @@ async function importConversationStore(
 }
 
 // Composable overrides
-function withGetTypeAndConversation(spy: SinonSpy): Override {
+function withGetTypeAndConversation(spy: sinon.SinonSpy): Override {
   return {
     './helpers': {
       getTypeAndConversation: spy,
@@ -222,13 +225,13 @@ function withGetTypeAndConversation(spy: SinonSpy): Override {
 
 // Fakes
 interface FakeStore extends ConversationStore {
-  set: SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>;
-  get: SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>;
+  set: sinon.SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>;
+  get: sinon.SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>;
 }
 
 function createFakeStore(
-  getSpy: SinonSpy = sinon.fake.resolves(undefined),
-  setSpy: SinonSpy = sinon.fake.resolves({}),
+  getSpy: sinon.SinonSpy = sinon.fake.resolves(undefined),
+  setSpy: sinon.SinonSpy = sinon.fake.resolves({}),
 ): FakeStore {
   return {
     // NOTE (Nov 2019): We had to convert to 'unknown' first due to the following error:
@@ -241,7 +244,11 @@ function createFakeStore(
     //       Type 'any[]' is not comparable to type '[string, any, (number | undefined)?]'.
     // 223     set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
     //              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    set: setSpy as unknown as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
-    get: getSpy as unknown as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
+    set: setSpy as unknown as sinon.SinonSpy<
+      Parameters<
+        ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
+    get: getSpy as unknown as sinon.SinonSpy<
+      Parameters<
+        ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
   };
 }

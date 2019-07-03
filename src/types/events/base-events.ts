@@ -1,5 +1,10 @@
+import {
+  MessageAttachment,
+  KnownBlock,
+  Block,
+  View,
+} from '@slack/types';
 import { StringIndexed } from '../helpers';
-import { MessageAttachment, KnownBlock, Block, View } from '@slack/types';
 
 /**
  * All known event types in Slack's Events API
@@ -434,7 +439,7 @@ export interface InviteRequestedEvent extends StringIndexed {
       id: string;
       name: string;
       domain: string;
-    }
+    };
   };
 }
 
@@ -572,7 +577,7 @@ export interface ThreadBroadcastMessageEvent extends StringIndexed {
     thread_ts: string;
     user: string;
     ts: string;
-    root:  MessageEvent & { // TODO: should this be the union of all message events with type 'message'?
+    root: MessageEvent & { // TODO: should this be the union of all message events with type 'message'?
       thread_ts: string;
       reply_count: number;
       replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?

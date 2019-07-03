@@ -19,12 +19,21 @@ export enum ErrorCode {
   UnknownError = 'slack_bolt_unknown_error',
 }
 
+/**
+ * Creates a coded error from an error
+ * @param message message to throw
+ * @param code error code to append
+ */
 export function errorWithCode(message: string, code: ErrorCode): CodedError {
   const error = new Error(message);
   (error as CodedError).code = code;
   return error as CodedError;
 }
 
+/**
+ * Converts an error into a coded error
+ * @param error error to convert
+ */
 export function asCodedError(error: CodedError | Error): CodedError {
   if ((error as CodedError).code !== undefined) {
     return error as CodedError;

@@ -24,6 +24,7 @@ import { ErrorCode, errorWithCode } from '../errors';
 
 /**
  * Middleware that filters out any event that isn't an action
+ * @param args middleware arguments
  */
 export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = ({ action, next }) => {
   // Filter out any non-actions
@@ -37,6 +38,7 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
 
 /**
  * Middleware that filters out any event that isn't a command
+ * @param args middleware arguments
  */
 export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> = ({ command, next }) => {
   // Filter out any non-commands
@@ -50,6 +52,7 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
 
 /**
  * Middleware that filters out any event that isn't an options
+ * @param args middleware arguments
  */
 export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequest }> = ({ options, next }) => {
   // Filter out any non-options requests
@@ -63,6 +66,7 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequ
 
 /**
  * Middleware that filters out any event that isn't an event
+ * @param args middleware arguments
  */
 export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = ({ event, next }) => {
   // Filter out any non-events
@@ -76,6 +80,9 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
+ * @param options options
+ * @param options.view view name
+ * @param options.next next middleware action
  */
 export const onlyViewActions: Middleware<AnyMiddlewareArgs &
   { view?: (ViewSubmitAction | ViewClosedAction) }> = ({ view, next }) => {
@@ -90,11 +97,17 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs &
 
 /**
  * Middleware that checks for matches given constraints
+ * @param constraints constraints to match
  */
 export function matchConstraints(
     constraints: ActionConstraints | ViewConstraints,
   ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
-  return ({ payload, body, next, context }) => {
+  return ({
+    payload,
+    body,
+    next,
+    context,
+  }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
     let tempMatches: RegExpMatchArray | null;
@@ -107,7 +120,6 @@ export function matchConstraints(
 
       // Check block_id
       if (constraints.block_id !== undefined) {
-
         if (typeof constraints.block_id === 'string') {
           if (payload.block_id !== constraints.block_id) {
             return;
@@ -116,7 +128,7 @@ export function matchConstraints(
           tempMatches = payload.block_id.match(constraints.block_id);
 
           if (tempMatches !== null) {
-            context['blockIdMatches'] = tempMatches;
+            context.blockIdMatches = tempMatches;
           } else {
             return;
           }
@@ -133,7 +145,7 @@ export function matchConstraints(
           tempMatches = payload.action_id.match(constraints.action_id);
 
           if (tempMatches !== null) {
-            context['actionIdMatches'] = tempMatches;
+            context.actionIdMatches = tempMatches;
           } else {
             return;
           }
@@ -143,16 +155,14 @@ export function matchConstraints(
 
     // Check callback_id
     if ('callback_id' in constraints && constraints.callback_id !== undefined) {
-      let callbackId: string = '';
+      let callbackId = '';
 
       if (isViewBody(body)) {
-        callbackId = body['view']['callback_id'];
+        callbackId = body.view.callback_id;
+      } else if (isCallbackIdentifiedBody(body)) {
+        callbackId = body.callback_id;
       } else {
-        if (isCallbackIdentifiedBody(body)) {
-          callbackId = body['callback_id'];
-        } else {
-          return;
-        }
+        return;
       }
 
       if (typeof constraints.callback_id === 'string') {
@@ -163,7 +173,7 @@ export function matchConstraints(
         tempMatches = callbackId.match(constraints.callback_id);
 
         if (tempMatches !== null) {
-          context['callbackIdMatches'] = tempMatches;
+          context.callbackIdMatches = tempMatches;
         } else {
           return;
         }
@@ -179,8 +189,9 @@ export function matchConstraints(
   };
 }
 
-/*
+/**
  * Middleware that filters out messages that don't match pattern
+ * @param pattern pattern the message should match
  */
 export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, context, next }) => {
@@ -199,7 +210,7 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
       tempMatches = message.text.match(pattern);
 
       if (tempMatches !== null) {
-        context['matches'] = tempMatches;
+        context.matches = tempMatches;
       } else {
         return;
       }
@@ -211,6 +222,7 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
 
 /**
  * Middleware that filters out any command that doesn't match name
+ * @param name command name to match
  */
 export function matchCommandName(name: string): Middleware<SlackCommandMiddlewareArgs> {
   return ({ command, next }) => {
@@ -225,6 +237,7 @@ export function matchCommandName(name: string): Middleware<SlackCommandMiddlewar
 
 /**
  * Middleware that filters out any event that isn't of given type
+ * @param type event type to match
  */
 export function matchEventType(type: string): Middleware<SlackEventMiddlewareArgs> {
   return ({ event, next }) => {
@@ -237,6 +250,9 @@ export function matchEventType(type: string): Middleware<SlackEventMiddlewareArg
   };
 }
 
+/**
+ * Ignores self (current user/bot)
+ */
 export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return (args) => {
     // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
@@ -283,9 +299,13 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   };
 }
 
-export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
+/**
+ * Creates a middleware function for processing a given subtype
+ * @param type subtype to match
+ */
+export function subtype(type: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, next }) => {
-    if (message.subtype === subtype) {
+    if (message.subtype === type) {
       next();
     }
   };
@@ -293,6 +313,9 @@ export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'m
 
 const slackLink = /<(?<type>[@#!])?(?<link>[^>|]+)(?:\|(?<label>[^>]+))?>/;
 
+/**
+ * Detects direct mentions
+ */
 export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return ({ message, context, next }) => {
     // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
@@ -325,6 +348,10 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
   };
 }
 
+/**
+ * Determines if a payload is a block payload
+ * @param payload payload being tested
+ */
 function isBlockPayload(
   payload:
     | SlackActionMiddlewareArgs['payload']
@@ -340,12 +367,20 @@ type CallbackIdentifiedBody =
   | MessageAction
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
+/**
+ * Determines if a body is an identified callback
+ * @param body body being tested
+ */
 function isCallbackIdentifiedBody(
   body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'],
 ): body is CallbackIdentifiedBody {
   return (body as CallbackIdentifiedBody).callback_id !== undefined;
 }
 
+/**
+ * Determines if middleware arguments are a view action
+ * @param body body to test
+ */
 function isViewBody(
   body:
     SlackActionMiddlewareArgs['body']
@@ -355,12 +390,21 @@ function isViewBody(
   return (body as SlackViewAction).view !== undefined;
 }
 
+/**
+ * Determines if middleware arguments are event arguments
+ * @param args middleware arguments to test
+ */
 function isEventArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackEventMiddlewareArgs {
   return (args as SlackEventMiddlewareArgs).event !== undefined;
 }
 
+/**
+ * Creates an error to represent a missing context property
+ * @param propertyName property missing
+ * @param message message to throw
+ */
 export function contextMissingPropertyError(propertyName: string, message?: string): ContextMissingPropertyError {
   const m = message === undefined ? `Context missing property: ${propertyName}` : message;
   const error = errorWithCode(m, ErrorCode.ContextMissingPropertyError);

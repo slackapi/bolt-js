@@ -1,16 +1,24 @@
-// tslint:disable:no-implicit-dependencies
-import 'mocha';
 import { EventEmitter } from 'events';
-import sinon, { SinonSpy } from 'sinon';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
-import { ErrorCode } from './errors';
-import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
-import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
-import { ViewConstraints } from './App';
 import { WebClientOptions, WebClient } from '@slack/web-api';
+import {
+  Override,
+  mergeOverrides,
+  createFakeLogger,
+  delay,
+} from './test-helpers';
+import { ErrorCode } from './errors';
+import {
+  Receiver,
+  ReceiverEvent,
+  SayFn,
+  NextMiddleware,
+} from './types';
+import { ConversationStore } from './conversation-store';
+import { ViewConstraints } from './App';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -25,7 +33,7 @@ describe('App', () => {
           withNoopAppMetadata(),
           withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
         );
-        const App = await importApp(overrides); // tslint:disable-line:variable-name
+        const App = await importApp(overrides);
 
         // Act
         const app = new App({ token: '', signingSecret: '' });
@@ -38,7 +46,7 @@ describe('App', () => {
     it('should succeed with an authorize callback', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       const app = new App({ authorize: authorizeCallback, signingSecret: '' });
@@ -49,11 +57,12 @@ describe('App', () => {
     });
     it('should fail without a token for single team authorization or authorize callback', async () => {
       // Arrange
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       try {
-        new App({ signingSecret: '' }); // tslint:disable-line:no-unused-expression
+        // eslint-disable-next-line no-new
+        new App({ signingSecret: '' });
         assert.fail();
       } catch (error) {
         // Assert
@@ -63,11 +72,11 @@ describe('App', () => {
     it('should fail when both a token and authorize callback are specified', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       try {
-        // tslint:disable-next-line:no-unused-expression
+        // eslint-disable-next-line no-new
         new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
         assert.fail();
       } catch (error) {
@@ -79,7 +88,7 @@ describe('App', () => {
     describe('with a custom receiver', () => {
       it('should succeed with no signing secret', async () => {
         // Arrange
-        const App = await importApp(); // tslint:disable-line:variable-name
+        const App = await importApp();
 
         // Act
         const app = new App({ receiver: createFakeReceiver(), authorize: noopAuthorize });
@@ -90,11 +99,12 @@ describe('App', () => {
     });
     it('should fail when no signing secret for the default receiver is specified', async () => {
       // Arrange
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       try {
-        new App({ authorize: noopAuthorize }); // tslint:disable-line:no-unused-expression
+        // eslint-disable-next-line no-new
+        new App({ authorize: noopAuthorize });
         assert.fail();
       } catch (error) {
         // Assert
@@ -111,7 +121,7 @@ describe('App', () => {
         withMemoryStore(fakeMemoryStore),
         withConversationContext(fakeConversationContext),
       );
-      const App = await importApp(overrides); // tslint:disable-line:variable-name
+      const App = await importApp(overrides);
 
       // Act
       const app = new App({ authorize: noopAuthorize, signingSecret: '' });
@@ -129,7 +139,7 @@ describe('App', () => {
         withNoopWebClient(),
         withConversationContext(fakeConversationContext),
       );
-      const App = await importApp(overrides); // tslint:disable-line:variable-name
+      const App = await importApp(overrides);
 
       // Act
       const app = new App({ convoStore: false, authorize: noopAuthorize, signingSecret: '' });
@@ -147,8 +157,8 @@ describe('App', () => {
           withNoopWebClient(),
           withConversationContext(fakeConversationContext),
         );
-        const dummyConvoStore = Symbol() as unknown as ConversationStore;
-        const App = await importApp(overrides); // tslint:disable-line:variable-name
+        const dummyConvoStore = Symbol('dummyStore') as unknown as ConversationStore;
+        const App = await importApp(overrides);
 
         // Act
         const app = new App({ convoStore: dummyConvoStore, authorize: noopAuthorize, signingSecret: '' });
@@ -165,19 +175,23 @@ describe('App', () => {
         {
           '@slack/web-api': {
             WebClient: class {
-              constructor() {
-                fakeConstructor(...arguments);
+              public constructor(...args: any[]) {
+                fakeConstructor(...args);
               }
             },
           },
         },
       );
-      // tslint:disable-next-line: variable-name
       const App = await importApp(overrides);
 
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
-      // tslint:disable-next-line: no-unused-expression
-      new App({ clientOptions, authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR });
+      // eslint-disable-next-line no-new
+      new App({
+        clientOptions,
+        authorize: noopAuthorize,
+        signingSecret: '',
+        logLevel: LogLevel.ERROR,
+      });
 
       assert.ok(fakeConstructor.called);
 
@@ -195,10 +209,10 @@ describe('App', () => {
   describe('#start', () => {
     it('should pass calls through to receiver', async () => {
       // Arrange
-      const dummyReturn = Symbol();
-      const dummyParams = [Symbol(), Symbol()];
+      const dummyReturn = Symbol('returnValue');
+      const dummyParams = [Symbol('param1'), Symbol('param2')];
       const fakeReceiver = createFakeReceiver(sinon.fake.resolves(dummyReturn));
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
@@ -213,10 +227,10 @@ describe('App', () => {
   describe('#stop', () => {
     it('should pass calls through to receiver', async () => {
       // Arrange
-      const dummyReturn = Symbol();
-      const dummyParams = [Symbol(), Symbol()];
+      const dummyReturn = Symbol('returnValue');
+      const dummyParams = [Symbol('param1'), Symbol('param2')];
       const fakeReceiver = createFakeReceiver(undefined, sinon.fake.resolves(dummyReturn));
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
@@ -247,7 +261,7 @@ describe('App', () => {
       const fakeLogger = createFakeLogger();
       const fakeMiddleware = sinon.fake(noopMiddleware);
       const invalidReceiverEvents = createInvalidReceiverEvents();
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       const app = new App({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
@@ -268,7 +282,7 @@ describe('App', () => {
       const fakeErrorHandler = sinon.fake();
       const dummyAuthorizationError = new Error();
       const dummyReceiverEvent = createDummyReceiverEvent();
-      const App = await importApp(); // tslint:disable-line:variable-name
+      const App = await importApp();
 
       // Act
       const app = new App({
@@ -302,7 +316,7 @@ describe('App', () => {
           withMemoryStore(sinon.fake()),
           withConversationContext(sinon.fake.returns(noopMiddleware)),
         );
-        const App = await importApp(overrides); // tslint:disable-line:variable-name
+        const App = await importApp(overrides);
 
         // Act
         const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -319,9 +333,8 @@ describe('App', () => {
     });
 
     describe('middleware and listener arguments', () => {
-
       let fakeReceiver: FakeReceiver;
-      let fakeErrorHandler: SinonSpy;
+      let fakeErrorHandler: sinon.SinonSpy;
       let dummyAuthorizationResult: { [key: string]: any };
       const dummyChannelId = 'CHANNEL_ID';
       let overrides: Override;
@@ -340,7 +353,6 @@ describe('App', () => {
       }
 
       describe('routing', () => {
-
         function createReceiverEvents(): ReceiverEvent[] {
           return [
             { // IncomingEventType.Event (app.event)
@@ -490,8 +502,7 @@ describe('App', () => {
           const actionFn = sinon.fake.resolves({});
           const viewFn = sinon.fake.resolves({});
           const optionsFn = sinon.fake.resolves({});
-          const overrides = buildOverrides(withNoopWebClient());
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const App = await importApp(buildOverrides(withNoopWebClient()));
           const dummyReceiverEvents = createReceiverEvents();
 
           // Act
@@ -506,22 +517,23 @@ describe('App', () => {
             ackFn();
             _args.next();
           });
-          app.action('block_action_id', ({ }) => { actionFn(); });
-          app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
+          app.action('block_action_id', () => { actionFn(); });
+          app.action({ callback_id: 'message_action_callback_id' }, () => { actionFn(); });
           app.action(
             { type: 'message_action', callback_id: 'another_message_action_callback_id' },
-            ({ }) => { actionFn(); });
-          app.action({ type: 'message_action', callback_id: 'does_not_exist' }, ({ }) => { actionFn(); });
-          app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); });
-          app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); });
-          app.view('view_callback_id', ({ }) => { viewFn(); });
-          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, ({ }) => { viewFn(); });
-          app.options('external_select_action_id', ({ }) => { optionsFn(); });
-          app.options({ callback_id: 'dialog_suggestion_callback_id' }, ({ }) => { optionsFn(); });
+            () => { actionFn(); },
+          );
+          app.action({ type: 'message_action', callback_id: 'does_not_exist' }, () => { actionFn(); });
+          app.action({ callback_id: 'interactive_message_callback_id' }, () => { actionFn(); });
+          app.action({ callback_id: 'dialog_submission_callback_id' }, () => { actionFn(); });
+          app.view('view_callback_id', () => { viewFn(); });
+          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, () => { viewFn(); });
+          app.options('external_select_action_id', () => { optionsFn(); });
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, () => { optionsFn(); });
 
-          app.event('app_home_opened', ({ }) => { /* noop */ });
-          app.message('hello', ({ }) => { /* noop */ });
-          app.command('/echo', ({ }) => { /* noop */ });
+          app.event('app_home_opened', () => { /* noop */ });
+          app.message('hello', () => { /* noop */ });
+          app.command('/echo', () => { /* noop */ });
 
           // invalid view constraints
           const invalidViewConstraints1 = {
@@ -529,7 +541,7 @@ describe('App', () => {
             type: 'view_submission',
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints1, ({ }) => { /* noop */ });
+          app.view(invalidViewConstraints1, () => { /* noop */ });
           assert.isTrue(fakeLogger.error.called);
 
           fakeLogger.error = sinon.fake();
@@ -539,7 +551,7 @@ describe('App', () => {
             type: undefined,
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints2, ({ }) => { /* noop */ });
+          app.view(invalidViewConstraints2, () => { /* noop */ });
           assert.isTrue(fakeLogger.error.called);
 
           app.error(fakeErrorHandler);
@@ -556,10 +568,9 @@ describe('App', () => {
       });
 
       describe('logger', () => {
-
         it('should be available in middleware/listener args', async () => {
           // Arrange
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const App = await importApp(overrides);
           const fakeLogger = createFakeLogger();
           const app = new App({
             logger: fakeLogger,
@@ -607,10 +618,9 @@ describe('App', () => {
       });
 
       describe('client', () => {
-
         it('should be available in middleware/listener args', async () => {
           // Arrange
-          const App = await importApp(mergeOverrides( // tslint:disable-line:variable-name
+          const App = await importApp(mergeOverrides(
             withNoopAppMetadata(),
             withSuccessfulBotUserFetchingWebClient('B123', 'U123'),
           ));
@@ -663,7 +673,7 @@ describe('App', () => {
           const receiverEvents = [event, event, event];
 
           // Act
-          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
+          receiverEvents.forEach(ev => fakeReceiver.emit('message', ev));
           await delay();
 
           // Assert
@@ -679,7 +689,6 @@ describe('App', () => {
       });
 
       describe('say()', () => {
-
         function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {
           return [
             // IncomingEventType.Event with channel in payload
@@ -688,6 +697,7 @@ describe('App', () => {
                 event: {
                   channel: channelId,
                 },
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 team_id: 'TEAM_ID',
               },
               respond: noop,
@@ -701,6 +711,7 @@ describe('App', () => {
                     channel: channelId,
                   },
                 },
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 team_id: 'TEAM_ID',
               },
               respond: noop,
@@ -710,7 +721,9 @@ describe('App', () => {
             {
               body: {
                 command: '/COMMAND_NAME',
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 channel_id: channelId,
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 team_id: 'TEAM_ID',
               },
               respond: noop,
@@ -756,8 +769,8 @@ describe('App', () => {
         it('should send a simple message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
-          const overrides = buildOverrides(withPostMessage(fakePostMessage));
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const appOverrides = buildOverrides(withPostMessage(fakePostMessage));
+          const App = await importApp(appOverrides);
 
           const dummyMessage = 'test';
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -787,8 +800,8 @@ describe('App', () => {
         it('should send a complex message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
-          const overrides = buildOverrides(withPostMessage(fakePostMessage));
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const appOverrides = buildOverrides(withPostMessage(fakePostMessage));
+          const App = await importApp(appOverrides);
 
           const dummyMessage = { text: 'test' };
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -811,7 +824,9 @@ describe('App', () => {
             const firstArg = call.args[0];
             assert.propertyVal(firstArg, 'channel', dummyChannelId);
             for (const prop in dummyMessage) {
-              assert.propertyVal(firstArg, prop, (dummyMessage as any)[prop]);
+              if (Object.prototype.hasOwnProperty.call(dummyMessage, prop)) {
+                assert.propertyVal(firstArg, prop, (dummyMessage as any)[prop]);
+              }
             }
           });
           assert(fakeErrorHandler.notCalled);
@@ -858,6 +873,7 @@ describe('App', () => {
               body: {
                 event: {
                 },
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 team_id: 'TEAM_ID',
               },
               respond: noop,
@@ -868,8 +884,8 @@ describe('App', () => {
 
         it('should not exist in the arguments on incoming events that don\'t support say', async () => {
           // Arrange
-          const overrides = buildOverrides(withNoopWebClient());
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const appOverrides = buildOverrides(withNoopWebClient());
+          const App = await importApp(appOverrides);
 
           const assertionAggregator = sinon.fake();
           const dummyReceiverEvents = createReceiverEventsWithoutSay(dummyChannelId);
@@ -892,8 +908,8 @@ describe('App', () => {
         it('should handle failures through the App\'s global error handler', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
-          const overrides = buildOverrides(withPostMessage(fakePostMessage));
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const appOverrides = buildOverrides(withPostMessage(fakePostMessage));
+          const App = await importApp(appOverrides);
 
           const dummyMessage = { text: 'test' };
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -948,16 +964,21 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
     '@slack/web-api': {
       WebClient: class {
         public token?: string;
-        constructor(token?: string, _options?: WebClientOptions) {
+
+        public constructor(token?: string, _options?: WebClientOptions) {
           this.token = token;
         }
+
         public auth = {
+          // eslint-disable-next-line @typescript-eslint/camelcase
           test: sinon.fake.resolves({ user_id: botUserId }),
         };
+
         public users = {
           info: sinon.fake.resolves({
             user: {
               profile: {
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 bot_id: botId,
               },
             },
@@ -968,7 +989,7 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
   };
 }
 
-function withPostMessage(spy: SinonSpy): Override {
+function withPostMessage(spy: sinon.SinonSpy): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
@@ -980,7 +1001,7 @@ function withPostMessage(spy: SinonSpy): Override {
   };
 }
 
-function withMemoryStore(spy: SinonSpy): Override {
+function withMemoryStore(spy: sinon.SinonSpy): Override {
   return {
     './conversation-store': {
       MemoryStore: spy,
@@ -988,7 +1009,7 @@ function withMemoryStore(spy: SinonSpy): Override {
   };
 }
 
-function withConversationContext(spy: SinonSpy): Override {
+function withConversationContext(spy: sinon.SinonSpy): Override {
   return {
     './conversation-store': {
       conversationContext: spy,
@@ -997,14 +1018,14 @@ function withConversationContext(spy: SinonSpy): Override {
 }
 
 // Fakes
-type FakeReceiver = SinonSpy & EventEmitter & {
-  start: SinonSpy<Parameters<Receiver['start']>, ReturnType<Receiver['start']>>;
-  stop: SinonSpy<Parameters<Receiver['stop']>, ReturnType<Receiver['stop']>>;
+type FakeReceiver = sinon.SinonSpy & EventEmitter & {
+  start: sinon.SinonSpy<Parameters<Receiver['start']>, ReturnType<Receiver['start']>>;
+  stop: sinon.SinonSpy<Parameters<Receiver['stop']>, ReturnType<Receiver['stop']>>;
 };
 
 function createFakeReceiver(
-  startSpy: SinonSpy = sinon.fake.resolves(undefined),
-  stopSpy: SinonSpy = sinon.fake.resolves(undefined),
+  startSpy: sinon.SinonSpy = sinon.fake.resolves(undefined),
+  stopSpy: sinon.SinonSpy = sinon.fake.resolves(undefined),
 ): FakeReceiver {
   const mock = new EventEmitter();
   (mock as FakeReceiver).start = startSpy;
@@ -1027,8 +1048,8 @@ function createDummyReceiverEvent(): ReceiverEvent {
 }
 
 // Utility functions
-const noop = () => { }; // tslint:disable-line:no-empty
-const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
-const noopAuthorize = (() => Promise.resolve({}));
+const noop = (): void => { };
+const noopMiddleware = ({ next }: { next: NextMiddleware }): void => { next(); };
+const noopAuthorize = (): Promise<any> => Promise.resolve({});
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time

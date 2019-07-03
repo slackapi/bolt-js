@@ -40,7 +40,7 @@ export interface OptionsRequest<Source extends OptionsSource = OptionsSource> ex
 
   name: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
   callback_id: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-  action_ts:  Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
+  action_ts: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
 
   message_ts: Source extends 'interactive_message' ? string : never;
   attachment_id: Source extends 'interactive_message' ? string : never;
@@ -64,9 +64,11 @@ export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block
  * function is used to fulfill the options request from a listener or middleware.
  */
 type OptionsAckFn<Source extends OptionsSource> =
-  Source extends 'block_suggestion' ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>> :
-  Source extends 'interactive_message' ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>> :
-    AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
+  Source extends 'block_suggestion'
+    ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
+    : Source extends 'interactive_message'
+      ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
+      : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
 
 interface BlockOptions {
   options: Option[];

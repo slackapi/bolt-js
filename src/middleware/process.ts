@@ -1,3 +1,5 @@
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 import {
   Middleware,
   Context,
@@ -5,11 +7,21 @@ import {
   NextMiddleware,
   PostProcessFn,
 } from '../types';
-import { WebClient } from '@slack/web-api';
-import { Logger } from '@slack/logger';
+
+const noopPostProcess: PostProcessFn = (error, done) => { done(error); };
 
 // TODO: what happens if an error is thrown inside a middleware/listener function? it should propagate up and eventually
 // be dealt with by the global error handler
+/**
+ * Processes the current request
+ * @param initialArguments middleware arguments
+ * @param middleware middleware being processed
+ * @param afterMiddleware function fired after middleware executes
+ * @param afterPostProcess function fired after processing
+ * @param context middleware context
+ * @param logger logger instance
+ * @param client web client
+ */
 export function processMiddleware(
   initialArguments: AnyMiddlewareArgs,
   middleware: Middleware<AnyMiddlewareArgs>[],
@@ -19,7 +31,6 @@ export function processMiddleware(
   logger: Logger,
   client: WebClient,
 ): void {
-
   // Generate next()
   let middlewareIndex = 0;
   const postProcessFns: PostProcessFn[] = [];
@@ -36,7 +47,13 @@ export function processMiddleware(
 
       // In this condition, errorOrPostProcess will be a postProcess function or undefined
       postProcessFns[middlewareIndex - 1] = errorOrPostProcess === undefined ? noopPostProcess : errorOrPostProcess;
-      thisMiddleware({ context, logger, client, next, ...initialArguments });
+      thisMiddleware({
+        context,
+        logger,
+        client,
+        next,
+        ...initialArguments,
+      });
 
       if (isLastMiddleware) {
         postProcessFns[middlewareIndex] = noopPostProcess;
@@ -47,7 +64,7 @@ export function processMiddleware(
     // Processing is complete, and we should begin bubbling up
     // there's no next middleware or the argument is an error
 
-    function createDone(initialIndex: number): (error?: Error) => void {
+    const createDone = (initialIndex: number): ((error?: Error) => void) => {
       let postProcessIndex = initialIndex;
 
       // done is a function that handles bubbling up in a similar way to next handling propogating down
@@ -64,7 +81,7 @@ export function processMiddleware(
         afterPostProcess(error);
       };
       return done;
-    }
+    };
 
     if (thisMiddleware === undefined) {
       afterMiddleware(context, initialArguments, (error?: Error) => {
@@ -73,11 +90,14 @@ export function processMiddleware(
     } else {
       createDone(middlewareIndex - 1)(errorOrPostProcess as Error);
     }
-
   };
 
   const firstMiddleware = middleware[0];
-  firstMiddleware({ context, logger, client, next, ...initialArguments });
+  firstMiddleware({
+    context,
+    logger,
+    client,
+    next,
+    ...initialArguments,
+  });
 }
-
-const noopPostProcess: PostProcessFn = (error, done) => { done(error); };

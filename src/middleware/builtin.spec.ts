@@ -1,10 +1,15 @@
-// tslint:disable:no-implicit-dependencies
-import 'mocha';
 import { assert } from 'chai';
-import sinon from 'sinon';
-import { ErrorCode } from '../errors';
-import { Override, delay, wrapToResolveOnFirstCall, createFakeLogger } from '../test-helpers';
+import * as sinon from 'sinon';
 import rewiremock from 'rewiremock';
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
+import { ErrorCode } from '../errors';
+import {
+  Override,
+  delay,
+  wrapToResolveOnFirstCall,
+  createFakeLogger,
+} from '../test-helpers';
 import {
   SlackEventMiddlewareArgs,
   NextMiddleware,
@@ -13,11 +18,15 @@ import {
   ContextMissingPropertyError,
   SlackCommandMiddlewareArgs,
 } from '../types';
-import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
+import {
+  onlyCommands,
+  onlyEvents,
+  matchCommandName,
+  matchEventType,
+  subtype,
+} from './builtin';
 import { SlashCommand } from '../types/command/index';
 import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events/base-events';
-import { WebClient } from '@slack/web-api';
-import { Logger } from '@slack/logger';
 
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
@@ -510,7 +519,6 @@ describe('matchCommandName', () => {
 });
 
 describe('onlyEvents', () => {
-
   const logger = createFakeLogger();
   const client = new WebClient(undefined, { logger, slackApiUrl: undefined });
 

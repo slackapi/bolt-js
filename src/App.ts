@@ -1,5 +1,11 @@
+/* eslint-disable no-nested-ternary */
 import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
+import {
+  WebClient,
+  ChatPostMessageArguments,
+  addAppMetadata,
+  WebClientOptions,
+} from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
@@ -37,8 +43,15 @@ import {
   ReceiverEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
-import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
-const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
+import {
+  ErrorCode,
+  CodedError,
+  errorWithCode,
+  asCodedError,
+} from './errors';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const packageJson = require('../package.json');
 
 /** App initialization options */
 export interface AppOptions {
@@ -102,8 +115,17 @@ export interface ErrorHandler {
   (error: CodedError): void;
 }
 
+/**
+ * Holds a pool of web clients
+ */
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
+
+  /**
+   * Gets a creates a pool
+   * @param token pool token
+   * @param clientOptions web client options
+   */
   public getOrCreate(token: string, clientOptions: WebClientOptions): WebClient {
     const cachedClient = this.pool[token];
     if (typeof cachedClient !== 'undefined') {
@@ -119,7 +141,6 @@ class WebClientPool {
  * A Slack App
  */
 export default class App {
-
   /** Slack Web API client */
   public client: WebClient;
 
@@ -144,7 +165,10 @@ export default class App {
 
   private errorHandler: ErrorHandler;
 
-  constructor({
+  /**
+   * @param options app options
+   */
+  public constructor({
     signingSecret = undefined,
     endpoints = undefined,
     agent = undefined,
@@ -160,7 +184,6 @@ export default class App {
     ignoreSelf = true,
     clientOptions = undefined,
   }: AppOptions = {}) {
-
     this.logger = logger;
     this.logger.setLevel(logLevel);
     this.errorHandler = defaultErrorHandler(this.logger);
@@ -198,18 +221,22 @@ export default class App {
     // Check for required arguments of ExpressReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
-    } else {
+    } else if (signingSecret === undefined) {
       // No custom receiver
-      if (signingSecret === undefined) {
-        throw errorWithCode(
-          'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-          'custom receiver.',
-          ErrorCode.AppInitializationError,
-        );
-      } else {
-        // Create default ExpressReceiver
-        this.receiver = new ExpressReceiver({ signingSecret, logger, endpoints, agent, clientTls });
-      }
+      throw errorWithCode(
+        'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+        'custom receiver.',
+        ErrorCode.AppInitializationError,
+      );
+    } else {
+      // Create default ExpressReceiver
+      this.receiver = new ExpressReceiver({
+        signingSecret,
+        logger,
+        endpoints,
+        agent,
+        clientTls,
+      });
     }
 
     // Subscribe to messages and errors from the receiver
@@ -250,10 +277,19 @@ export default class App {
     return this.receiver.start(...args);
   }
 
+  /**
+   * Stops the app
+   * @param args arguments to pass the receiver
+   */
   public stop(...args: any[]): Promise<unknown> {
     return this.receiver.stop(...args);
   }
 
+  /**
+   * Listens for a given event
+   * @param eventName event to listen for
+   * @param listeners listeners to attach
+   */
   public event<EventType extends string = string>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
@@ -265,8 +301,16 @@ export default class App {
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
   // TODO: maybe remove the first two overloads
+  /**
+   * Listens for messages
+   * @param listeners listeners to attach
+   */
   public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public message(
     ...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]
   ): void {
@@ -282,18 +326,27 @@ export default class App {
     );
   }
 
-  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
-  // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
-  public action<Action extends SlackAction = SlackAction>(
+  /**
+   * Listens for a given action
+   * @param actionIdOrConstraints action or constraints to listen for
+   * @param listeners listeners to attach
+   * NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
+   * https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
+   */
+  public action<ActionType extends SlackAction = SlackAction>(
     actionId: string | RegExp,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
   ): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public action<Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
       constraints: Constraints,
       // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
       ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
     ): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public action<Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
       actionIdOrConstraints: string | RegExp | Constraints,
@@ -302,6 +355,7 @@ export default class App {
     // Normalize Constraints
     const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
+        // eslint-disable-next-line @typescript-eslint/camelcase
         { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
@@ -320,26 +374,41 @@ export default class App {
   }
 
   // TODO: should command names also be regex?
+  /**
+   * Listens for a specified command
+   * @param commandName command to listen for
+   * @param listeners listeners to attach
+   */
   public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
     this.listeners.push(
       [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
   }
 
+  /**
+   * Sets the options
+   * @param actionIdOrConstraints action or constraints to set
+   * @param listeners middleware listeners
+   */
   public options<Source extends OptionsSource = OptionsSource>(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public options<Source extends OptionsSource = OptionsSource>(
     constraints: ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public options<Source extends OptionsSource = OptionsSource>(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void {
     const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
+        // eslint-disable-next-line @typescript-eslint/camelcase
         { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
@@ -347,17 +416,27 @@ export default class App {
     );
   }
 
+  /**
+   * Attaches a view listener
+   * @param callbackIdOrConstraints callback or constraints to set
+   * @param listeners middleware listeners
+   */
   public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     callbackId: string | RegExp,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     constraints: ViewConstraints,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void;
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
   public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
-    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]): void {
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
+  ): void {
     const constraints: ViewConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
         { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
@@ -383,12 +462,17 @@ export default class App {
     );
   }
 
+  /**
+   * Handles thrown errors
+   * @param errorHandler handler to use
+   */
   public error(errorHandler: ErrorHandler): void {
     this.errorHandler = errorHandler;
   }
 
   /**
    * Handles events from the receiver
+   * @param event incoming event
    */
   private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
@@ -432,7 +516,8 @@ export default class App {
     if (typeof token !== 'undefined') {
       let pool = this.clients[source.teamId];
       if (typeof pool === 'undefined') {
-        pool = this.clients[source.teamId] = new WebClientPool();
+        pool = new WebClientPool();
+        this.clients[source.teamId] = pool;
       }
       listenerArgClient = pool.getOrCreate(token, this.clientOptions);
     }
@@ -442,15 +527,15 @@ export default class App {
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
     const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
       /** Say function might be set below */
-      say?: SayFn
+      say?: SayFn;
       /** Respond function might be set below */
-      respond?: RespondFn,
+      respond?: RespondFn;
       /** Ack function might be set below */
-      ack?: AckFn<any>,
+      ack?: AckFn<any>;
       /** The logger for this Bolt app */
-      logger?: Logger,
+      logger?: Logger;
       /** WebClient with token  */
-      client?: WebClient,
+      client?: WebClient;
     } = {
       logger: this.logger,
       client: listenerArgClient,
@@ -545,11 +630,11 @@ export default class App {
 
   /**
    * Global error handler. The final destination for all errors (hopefully).
+   * @param error error thrown
    */
   private onGlobalError(error: Error): void {
     this.errorHandler(asCodedError(error));
   }
-
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
@@ -559,6 +644,9 @@ const validViewTypes = ['view_closed', 'view_submission'];
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
+ * @param type event type
+ * @param channelId channel
+ * @param body body to build
  */
 function buildSource(
   type: IncomingEventType,
@@ -568,7 +656,7 @@ function buildSource(
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
 
-  // tslint:disable:max-line-length
+  /* eslint-disable @typescript-eslint/indent,max-len */
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
@@ -590,44 +678,59 @@ function buildSource(
             undefined),
     conversationId: channelId,
   };
-  // tslint:enable:max-line-length
+  /* eslint-enable @typescript-eslint/indent,max-len */
 
   return source;
 }
 
+/**
+ * Determines if a body is a block action or is interactive
+ * @param body body to test
+ */
 function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
+/**
+ * Creates a default error handler
+ * @param logger logger to use
+ */
 function defaultErrorHandler(logger: Logger): ErrorHandler {
-  return (error) => {
+  return (error): void => {
     logger.error(error);
   };
 }
 
+/**
+ * Authorizes a single team
+ * @param client client to authenticate against
+ * @param authorization authorization details to use
+ */
 function singleTeamAuthorization(
   client: WebClient,
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Authorize {
   // TODO: warn when something needed isn't found
-  const identifiers: Promise<{ botUserId: string, botId: string }> = authorization.botUserId !== undefined &&
+  const identifiers: Promise<{ botUserId: string; botId: string }> = authorization.botUserId !== undefined &&
     authorization.botId !== undefined ?
     Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
     client.auth.test({ token: authorization.botToken })
-      .then((result) => {
-        return {
-          botUserId: (result.user_id as string),
-          botId: (result.bot_id as string),
-        };
-      });
+      .then(result => ({
+        botUserId: (result.user_id as string),
+        botId: (result.bot_id as string),
+      }));
 
-  return async () => {
-    return Object.assign({ botToken: authorization.botToken }, await identifiers);
-  };
+  return async (): Promise<AuthorizeResult> => Object.assign({
+    botToken: authorization.botToken,
+  }, await identifiers);
 }
 
+/**
+ * Returns the specified token
+ * @param context context to retrieve token from
+ */
 function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
@@ -636,6 +739,10 @@ function selectToken(context: Context): string | undefined {
 addAppMetadata({ name: packageJson.name, version: packageJson.version });
 
 /* Error handling helpers */
+/**
+ * Creates an auth error from an error
+ * @param original error to convert
+ */
 function authorizationErrorFromOriginal(original: Error): AuthorizationError {
   const error = errorWithCode('Authorization of incoming event did not succeed.', ErrorCode.AuthorizationError);
   (error as AuthorizationError).original = original;

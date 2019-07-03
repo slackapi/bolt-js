@@ -23,15 +23,21 @@ export enum IncomingEventType {
  *
  * This is analogous to WhenEventHasChannelContext and the conditional type that checks SlackAction for a channel
  * context.
+ * @param body body to parse
  */
-export function getTypeAndConversation(body: any): { type?: IncomingEventType, conversationId?: string } {
+export function getTypeAndConversation(body: any): { type?: IncomingEventType; conversationId?: string } {
   if (body.event !== undefined) {
     const eventBody = (body as SlackEventMiddlewareArgs<string>['body']);
+    let convId: string|undefined = undefined;
+    if (eventBody.event.channel !== undefined) {
+      convId = eventBody.event.channel;
+    } else if (eventBody.event.item !== undefined) {
+      convId = eventBody.event.item.channel;
+    }
+
     return {
       type: IncomingEventType.Event,
-      conversationId:
-        eventBody.event.channel !== undefined ? eventBody.event.channel :
-          eventBody.event.item !== undefined ? eventBody.event.item.channel : undefined,
+      conversationId: convId,
     };
   }
   if (body.command !== undefined) {
@@ -64,7 +70,11 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
 
 /* istanbul ignore next */
 
-/** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
+/**
+ * Helper that should never be called, but is useful for exhaustiveness
+ * checking in conditional branches
+ * @param x object to throw
+ */
 export function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${x}`);
 }

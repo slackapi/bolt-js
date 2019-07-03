@@ -28,10 +28,9 @@
     "prepare": "npm run build",
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
-    "lint": "tslint --project .",
-    "test-lint": "tslint \"src/**/*.spec.ts\" && tslint \"src/test-helpers.ts\"",
+    "lint": "eslint src --ext ts,js",
     "mocha": "nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:integration",
+    "test": "npm run lint && npm run mocha && npm run test:integration",
     "test:integration": "cd integration-tests && npm install && npm test",
     "coverage": "codecov"
   },
@@ -56,8 +55,14 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/sinon": "^7.0.11",
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
     "chai": "^4.2.0",
     "codecov": "^3.2.0",
+    "eslint": "^6.0.1",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-jsdoc": "^14.0.0",
     "mocha": "^6.1.4",
     "nyc": "^14.0.0",
     "rewiremock": "^3.13.4",
@@ -65,8 +70,6 @@
     "sinon": "^7.3.1",
     "source-map-support": "^0.5.12",
     "ts-node": "^8.1.0",
-    "tslint": "^5.15.0",
-    "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.4.3"
   }
 }
