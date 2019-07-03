@@ -24,6 +24,8 @@ defaults:
     values:
       layout: "default"
 
+# Translation strings used in templates - they are typically used using t[page.lang]
+# so it's important to have correponding strings for each translated language
 t:
   en:
     basic: Basic concepts
