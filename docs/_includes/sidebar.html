@@ -8,6 +8,10 @@
       Bolt
     </span>
 
+    <!-- Liquid has no ternary operator, so this is just meant to disclude 
+      english sections since they are at the root URL -->
+    {% assign localized_base_url = page.lang | prepend: "/" | remove_first: "/en" %}
+
     <span class="version">
         {% assign release = site.github.releases | where_exp: "release", 
           "release.tag_name contains '@slack/bolt'" | sort: "created_at" | reverse | pop %}
@@ -16,15 +20,15 @@
   </div>
 
   <ul class="sidebar-section">
-    <a href="{{ site.url | append: site.baseurl }}/tutorial/getting-started/"><li class="title">{{ site.t[page.lang].start }}</li></a>
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url  }}/tutorial/getting-started/"><li class="title">{{ site.t[page.lang].start }}</li></a>
   </ul>
 
   <ul class="sidebar-section">
-    <a href="{{ site.url | append: site.baseurl }}/concepts#basic"><li class="title">{{ site.t[page.lang].basic }}</li></a>
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#basic"><li class="title">{{ site.t[page.lang].basic }}</li></a>
     {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
     
     {% for section in basic_sections %}
-      <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}">
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
         <li>{{section.title}}</li>
       </a>
     {% endfor %}
@@ -32,12 +36,12 @@
 
   <ul class="sidebar-section">
 
-    <a href="{{ site.url | append: site.baseurl }}/concepts#advanced">
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#advanced">
       <li class="title">{{ site.t[page.lang].advanced }}</li>
     </a>
     {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
     {% for section in advanced_sections %}
-      <a href="{{ site.url | append: site.baseurl }}/concepts#{{ section.slug }}">
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
         <li>{{section.title}}</li>
       </a>
     {% endfor %}
@@ -46,7 +50,7 @@
   <ul class="sidebar-section">
     {% assign tutorials = site.tutorials | where: "lang", page.lang | where_exp: "tutorial", "tutorial.order > 0" %}
     {% for tutorial in tutorials %}
-      <a href="{{ site.url | append: site.baseurl }}/tutorial/{{ tutorial.slug }}">
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/tutorial/{{ tutorial.slug }}">
         <li class="title">{{tutorial.title}}</li>
       </a>
     {% endfor %}
