@@ -1,14 +1,14 @@
 ---
-title: Adding context
-lang: en
+title: context の追加
+lang: ja-jp
 slug: context
 order: 6
 ---
 
 <div class="section-content">
-All listeners have access to a `context` object, which can be used to enrich events with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
+すべてのリスナーから、情報を追加してイベントを充実させるために使用できる `context` オブジェクトにアクセスすることができます。これはたとえば、サードパーティのシステムからユーザー情報を追加したり、チェーン内の次のミドルウェアの一時的な状態を追加したりする場合に使用します。
 
-`context` is just an object, so you can add to it by setting it to a modified version of itself.
+`context` は単なるオブジェクトであるため、必要な情報をいくらでも追加、編集できます。
 </div>
 
 ```javascript
@@ -19,28 +19,28 @@ async function addTimezoneContext ({ payload, context, next }) {
     include_locale: true
   });
 
-  // Add user's timezone context
+  // ユーザのタイムゾーン情報を追加
   context.tz_offset = user.tz_offset;
 }
 
 app.command('request', addTimezoneContext, async ({ command, ack, context }) => {
-  // Acknowledge command request
+  // コマンドリクエストの確認
   ack();
-  // Get local hour of request
+  // リクエスト時のローカル時間を取得
   const local_hour = (Date.UTC() + context.tz_offset).getHours();
 
-  // Request channel ID
+  // チャンネル ID のリクエスト
   const requestChannel = 'C12345';
 
   const requestText = `:large_blue_circle: *New request from <@${command.user_id}>*: ${command.text}`;
 
-  // If request not inbetween 9AM and 5PM, send request tomorrow
+  // 午前9時〜午後5時以外のリクエストの場合は明日
   if (local_hour > 17 || local_hour < 9) {
-    // Assume function exists to get local tomorrow 9AM from offset
+    // ローカル時間の明日午前９時までの差分を取得する関数があると仮定
     const local_tomorrow = getLocalTomorrow(context.tz_offset);
 
     try {
-      // Schedule message
+      // メッセージ送信スケジュールを調整
       const result = await app.client.chat.scheduleMessage({
         token: context.botToken,
         channel: requestChannel,
@@ -53,7 +53,7 @@ app.command('request', addTimezoneContext, async ({ command, ack, context }) => 
     }
   } else {
     try {
-      // Post now
+      // 送信
       const result = app.client.chat.postMessage({
         token: context.botToken,
         channel: requestChannel,

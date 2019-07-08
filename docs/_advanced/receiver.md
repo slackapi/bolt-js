@@ -1,5 +1,6 @@
 ---
 title: Customizing a receiver
+lang: en
 slug: receiver
 order: 8
 ---

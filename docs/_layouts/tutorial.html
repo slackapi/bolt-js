@@ -10,13 +10,17 @@ sidebar_style: main
   {% include tag_manager.html %}
   <div class="wrapper">
     <div class="panel">
-      {% include en/sidebar.html %}
+      {% include sidebar.html %}
     </div>
 
 
     <div class="content">
         <div class="mainheader">
-          {% include en/header.html %}
+          {% include header.html %}
+        </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
         </div>
         
         <div class="tutorial">
@@ -25,6 +29,8 @@ sidebar_style: main
     </div>
 
   </div>
+  <script src="{{ site.url | append: site.baseurl }}/scripts/tutorial_nav.js"></script>
+
   {% include analytics.html %}
 </body>
 </html>

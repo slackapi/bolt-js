@@ -10,17 +10,17 @@ sidebar_style: main
   {% include tag_manager.html %}
   <div class="wrapper">
     <div class="panel">
-      {% include en/sidebar.html %}
+      {% include sidebar.html %}
     </div>
 
 
     <div class="content">
         <div class="mainheader">
-          {% include en/header.html %}
+          {% include header.html %}
         </div>
 
         <div id="basic">
-        {% assign basic_sections = site.basic | sort: "order" %}
+        {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
         {% for section in basic_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>
@@ -33,7 +33,7 @@ sidebar_style: main
         </div>
 
         <div id="advanced">
-          {% assign advanced_sections = site.advanced | sort: "order" %}
+          {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
           {% for section in advanced_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>

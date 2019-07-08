@@ -1,0 +1,53 @@
+---
+title: アクションのリスニング
+lang: ja-jp
+slug: action-listening
+order: 5
+---
+
+<div class="section-content">
+アプリでは、ボタンのクリック、メニューの選択、メッセージアクションなどのユーザーアクションを、 `action` メソッドを使用してリスニングすることができます。
+
+アクションは文字列型の `action_id` または RegExp オブジェクトでフィルタリングできます。 `action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントの一意の識別子として機能します。 
+
+すべての `action()` の例で `ack()` が使用されていることに注目してください。Slack からイベントを受信したことを確認するために、アクションリスナー内で `ack()` 関数を呼び出す必要があります。これについては、「[イベントの確認](#acknowledge)」 セクションで説明しています。
+
+</div>
+
+```javascript
+// action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される
+app.action('approve_button', async ({ ack, say }) => {
+  ack();
+  // アクションを反映してメッセージをアップデート
+});
+```
+
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
+<h4 class="section-head">制約付きオブジェクトを使用したアクションのリスニング</h4>
+</summary>
+
+<div class="secondary-content" markdown="0">
+制約付きのオブジェクトを使って、 `callback_id` 、 `block_id` 、および `action_id` (またはそれらの組み合わせ) をリスニングすることができます。オブジェクト内の制約には、文字列型または RegExp オブジェクトを使用できます。
+</div>
+
+```javascript
+// action_id が 'select_user' と一致し、block_id が 'assign_ticket' と一致する場合のみミドルウェアが呼び出される
+app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
+  async ({ action, ack, context }) => {
+    ack();
+    try {
+      const result = await app.client.reactions.add({
+        token: context.botToken,
+        name: 'white_check_mark',
+        timestamp: action.ts,
+        channel: action.channel.id
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+});
+```
+
+</details>

@@ -1,5 +1,6 @@
 ---
 title: Global middleware
+lang: en
 slug: global-middleware
 order: 4
 ---

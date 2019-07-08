@@ -1,6 +1,7 @@
 /* Color variables */
 :root {
   --light-grey: #F8F8F8;
+  --grey: #868686;
   --blue: #1264A3;
   --light-blue: #B8D1E3;
   --white: #FFFFFF;
@@ -9,6 +10,7 @@
 
 body {
   background-color: var(--white);
+  font-family: 'Noto Sans JP', 'Slack-Lato', sans-serif;
 }
 
 .content {
@@ -49,12 +51,13 @@ body {
 }
 
 .panel .sidebar-content .logo .version a {
-  color: #868686;
+  color: var(--grey);
   font-size: 0.75em;
 }
 
 .panel .sidebar-content ul.sidebar-section {
   list-style: none;
+  list-style-position: inside;
   padding-top: 0.9em;
   margin: 0;
   font-size: 0.80em;
@@ -93,9 +96,24 @@ body {
 /* Main page */
 .header {
   width: 95%;
-  margin: 0 auto;
+  margin: 0 auto 1em auto;
   height: 5rem;
   padding-top: 1.5em;
+}
+
+.header a:hover {
+  text-decoration: none;
+}
+
+.header a.language-switcher {
+  color: var(--grey);
+  font-weight: 700;
+  padding: 6px 14px 9px;
+  font-size: 15px;
+}
+
+.header a.language-switcher:hover {
+  color: var(--black);
 }
 
 .wrapper {
@@ -117,16 +135,65 @@ body {
     "divider"
 }
 
+.tutorial-nav {
+  width: 20%;
+  position: fixed;
+}
+
+.tutorial-nav ul {
+  margin-left: 3em;
+  padding-left: 1em;
+  border-width: 4px;
+  border-left-style: solid;
+  border-color: #F2F2F2;
+  border-image: linear-gradient(
+    to bottom, 
+    #FFFFFF 0%, 
+    #F2F2F2 6% 92%,
+    #FFFFFF 100%
+  ) 1 100%;
+  list-style: none;
+  padding-top: 1.5em;
+}
+
+.circle {
+  background: #ddd;
+  border-radius: 50%;
+  height: 1em;
+  width: 1em;
+  float: left;
+  margin: 5px 0 0 -1.6em;
+}
+
+.completed {
+  background: #58AF7F;
+}
+
+.tutorial-nav ul li {
+  padding-bottom: 2.5em;
+}
+
+.tutorial-nav a {
+  font-weight: 700;
+  font-size: 0.8em;
+  color: #757575;
+}
+
+.tutorial-nav a:hover {
+  color: #000;
+  text-decoration: none;
+}
+
 .tutorial {
-  width: 80%;
-  margin: 1em auto 0 auto;
+  width: 55%;
+  margin: 1em 0 0 33%;
   padding-bottom: 2em;
   font-size: 1em;
   line-height: 1.75em;
 }
 
 .tutorial img {
-  width: 60%;
+  width: 85%;
   margin: 0.2em auto;
   display: block;
   box-shadow: 0 0 15px #DDDDDD;
@@ -162,7 +229,7 @@ pre code {
 .content .section-wrapper .section-content {
   grid-area: body;
   font-size: 1em;
-  line-height: 1.75em;
+  line-height: 2em;
 }
 
 .content .section-wrapper h3 {
@@ -209,6 +276,12 @@ summary h4 {
 }
 
 /* Responsive */
+@media (min-width: 1024px) {
+  .tutorial-nav ul {
+    margin-left: 5em;
+  }
+}
+
 @media (min-width: 768px) {
   .wrapper {
     display: grid;
@@ -228,11 +301,38 @@ summary h4 {
 }
 
 @media (max-width: 768px) {
-  .header {
-    display: none;
-  }
   .panel {
     display: none;
+  }
+
+  .language-switcher {
+    display: none;
+  }
+
+  .tutorial-nav {
+    display: none;
+  }
+
+  .tutorial {
+    width: 85%;
+    margin: 1em auto;
+  }
+
+  .wrapper {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "content"
+  }
+
+  .section-wrapper {
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "head"
+      "body"
+      "code"
+      "secondary"
+      "divider"
   }
 }
 

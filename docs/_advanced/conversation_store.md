@@ -1,5 +1,6 @@
 ---
 title: Conversation stores
+lang: en
 slug: conversation-store
 order: 3
 ---

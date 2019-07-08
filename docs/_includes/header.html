@@ -1,0 +1,12 @@
+<div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/{{ site.github_username }}/{{ site.repo_name }}" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    {% if page.lang == "ja-jp" %}
+      <a href="{{ site.url | append: site.baseurl }}/" class="header_btn language-switcher float_right">English</a>
+    {% else %}
+      <a href="{{ site.url | append: site.baseurl }}/ja-jp" class="header_btn language-switcher float_right">日本語 (Japanese)</a>
+    {% endif %}
+    </div>
+</div>

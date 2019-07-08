@@ -1,7 +1,8 @@
 ---
 title: Getting started
-order: 1
+order: 0
 slug: getting-started
+lang: en
 layout: tutorial
 permalink: /tutorial/getting-started
 redirect_from:
@@ -12,16 +13,6 @@ redirect_from:
 <div class="section-content">
 This guide is meant to walk you through getting up and running with a Slack app using Bolt. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 </div> 
-
-<div class="supporting-content">
-- [Create an app](#create-an-app)
-- [Tokens and installing apps](#tokens-and-installing-apps)
-- [Setting up your local project](#setting-up-your-local-project)
-- [Setting up events](#setting-up-events)
-- [Listening and responding to a message](#listening-and-responding-to-a-message)
-- [Sending and responding to actions](#sending-and-responding-to-actions)
-- [Next steps](#next-steps)
-</div>
 
 ---
 
@@ -34,7 +25,7 @@ After you fill out an app name (_you can change it later_) and pick a workspace 
 
 This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header. 
 
-![Basic Information page](../assets/basic-information-page.png "Basic Information page")
+![Basic Information page](../../assets/basic-information-page.png "Basic Information page")
 
 Look around, add an app icon and description, and then let's start configuring your app 🔩
 
@@ -55,7 +46,7 @@ Click **Install App** on the left sidebar and click the **Install App to Workspa
 
 Once you authorize the installation, you'll land on the **OAuth & Permissions** page.
 
-![OAuth Tokens](../assets/bot-token.png "OAuth Tokens")
+![OAuth Tokens](../../assets/bot-token.png "OAuth Tokens")
 
 You'll see two tokens. For now, we'll just use the `xoxb` bot token. (If you scroll down this page to the **Scopes** section, you'll see the various scopes you can add to the `xoxp` token.)
 
@@ -147,7 +138,7 @@ Once you’ve installed a development proxy, run it to begin forwarding requests
 ngrok http 3000
 ```
 
-![Running ngrok](../assets/ngrok.gif "Running ngrok")
+![Running ngrok](../../assets/ngrok.gif "Running ngrok")
 
 The output should show a generated URL that you can use (we recommend the one that starts with `https://`). This URL will be the base of your request URL, in this case `https://8e8ec2d7.ngrok.io`.
 
@@ -205,7 +196,7 @@ Back on your app configuration page, click on **Interactive Components** on the 
 
 By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
 
-![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
+![Configuring a Request URL](../../assets/request-url-config.png "Configuring a Request URL")
 
 Now, let's go back to your app's code and add interactivity. This will consist of two steps:
 - First, your app will send a message that contains a button.
