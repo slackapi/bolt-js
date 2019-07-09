@@ -26,7 +26,7 @@ redirect_from:
 
 このページには、後で必要になる重要な認証情報 (**App Credentials**  ヘッダーの下の  `Signing Secret`  など) に加えて、アプリケーションの概要が表示されます。
 
-![Basic Information page](../../../assets/basic-information-page.png "Basic Information page")
+![Basic Information page](../../assets/basic-information-page.png "Basic Information page")
 
 ひと通り確認し、アプリのアイコンと説明を追加してから、アプリの設定 🔩 を始めましょう。
 
@@ -47,7 +47,7 @@ Slack へのメッセージの送信権限を持つボットユーザーが追�
 
 インストールを承認すると、**OAuth & Permissions**  ページが表示されます。
 
-![OAuth Tokens](../../../assets/bot-token.png "OAuth Tokens")
+![OAuth Tokens](../../assets/bot-token.png "OAuth Tokens")
 
 2 つのトークンが表示されます。今回は`xoxb` ボットトークンを使用します。(このページを下にスクロールして  **Scope**  セクションを表示すると、`xoxp` トークンに追加できるさまざまなスコープが確認できます。)
 
@@ -140,7 +140,7 @@ node app.js
 ngrok http 3000
 ```
 
-![Running ngrok](../../../assets/ngrok.gif "Running ngrok")
+![Running ngrok](../../assets/ngrok.gif "Running ngrok")
 
 使用可能な URL が生成され、出力されます ( `https://` で始まる URL をお勧めします)。この URL がリクエスト URL のベースになります。この例では `https://8e8ec2d7.ngrok.io` です。
 
@@ -199,7 +199,7 @@ app.message('hello', ({ message, say }) => {
 
 デフォルトでは、Bolt はイベントに使用しているのと同じエンドポイントをインタラクティブコンポーネントに使用するように設定されているため、上記と同じリクエスト URL (この例では `https://8e8ec2d7.ngrok.io/slack/events`) を使用します。右下隅にある  **Save Changes**  ボタンを押してください。これでアプリのインタラクティブなコンポーネントの設定が有効になりました!
 
-![Configuring a Request URL](../../../assets/request-url-config.png "Configuring a Request URL")
+![Configuring a Request URL](../../assets/request-url-config.png "Configuring a Request URL")
 
 それでは、アプリのコードに戻り、インタラクティブな処理を追加しましょう。この実装は以下の二つのステップで構成されます。
 - 最初に、アプリからボタンを含むメッセージを送信します。
