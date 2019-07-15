@@ -21,6 +21,7 @@ async function addTimezoneContext ({ payload, context, next }) {
 
   // ユーザのタイムゾーン情報を追加
   context.tz_offset = user.tz_offset;
+  next();
 }
 
 app.command('request', addTimezoneContext, async ({ command, ack, context }) => {
