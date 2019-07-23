@@ -15,6 +15,11 @@ export interface PostProcessFn {
 }
 
 export interface Context extends StringIndexed {
+  // See also AuthorizeResult in src/App.ts
+  botToken?: string;
+  userToken?: string;
+  botId?: string;
+  botUserId?: string;
 }
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
