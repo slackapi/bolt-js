@@ -86,7 +86,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     };
 
     if (req.body && req.body.response_url) {
-      event.respond = (response): void => {
+      event.respond = async (response): Promise<void> => {
         axios.post(req.body.response_url, response)
           .catch((e) => {
             this.emit('error', e);

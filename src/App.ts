@@ -339,10 +339,10 @@ export default class App {
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.userToken;
-      return (message: Parameters<SayFn>[0]) => {
+      return async (message: Parameters<SayFn>[0]) => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
-        this.client.chat.postMessage(postMessageArguments)
+        await this.client.chat.postMessage(postMessageArguments)
           .catch(error => this.onGlobalError(error));
       };
     };
@@ -410,28 +410,30 @@ export default class App {
     }
 
     // Dispatch event through global middleware
-    processMiddleware(
-      listenerArgs as AnyMiddlewareArgs,
+    await processMiddleware(
+      listenerArgs as AnyMiddlewareArgs,  
       this.middleware,
-      (globalProcessedContext: Context, globalProcessedArgs: AnyMiddlewareArgs, startGlobalBubble) => {
-        this.listeners.forEach((listenerMiddleware) => {
-          // Dispatch event through all listeners
-          processMiddleware(
-            globalProcessedArgs,
-            listenerMiddleware,
-            (_listenerProcessedContext, _listenerProcessedArgs, startListenerBubble) => {
-              startListenerBubble();
-            },
-            (error) => {
-              startGlobalBubble(error);
-            },
-            globalProcessedContext,
-          );
-        });
+      async (globalProcessedContext: Context, globalProcessedArgs: AnyMiddlewareArgs, startGlobalBubble) => {
+        // Dispatch event through all listeners
+        await Promise.all(
+          this.listeners.map(async (listenerMiddleware) => {
+            await processMiddleware(
+              globalProcessedArgs,
+              listenerMiddleware,
+              async (_listenerProcessedContext, _listenerProcessedArgs, startListenerBubble) => {
+                await startListenerBubble();
+              },
+              async (error) => {
+                await startGlobalBubble(error);
+              },
+              globalProcessedContext,
+            );
+          })
+        )
       },
-      (globalError?: CodedError | Error) => {
+      async (globalError?: CodedError | Error) => {
         if (globalError !== undefined) {
-          this.onGlobalError(globalError);
+          await this.onGlobalError(globalError);
         }
       },
       context,
@@ -441,7 +443,7 @@ export default class App {
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  private onGlobalError(error: Error): void {
+  private async onGlobalError(error: Error): Promise<void> {
     this.errorHandler(asCodedError(error));
   }
 

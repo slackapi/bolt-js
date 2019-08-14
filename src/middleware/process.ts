@@ -8,19 +8,19 @@ import {
 
 // TODO: what happens if an error is thrown inside a middleware/listener function? it should propagate up and eventually
 // be dealt with by the global error handler
-export function processMiddleware(
+export async function processMiddleware(
   initialArguments: AnyMiddlewareArgs,
   middleware: Middleware<AnyMiddlewareArgs>[],
-  afterMiddleware: (context: Context, args: AnyMiddlewareArgs, startBubble: (error?: Error) => void) => void,
-  afterPostProcess: (error?: Error) => void,
+  afterMiddleware: (context: Context, args: AnyMiddlewareArgs, startBubble: (error?: Error) => Promise<void>) => Promise<void>,
+  afterPostProcess: (error?: Error) => Promise<void>,
   context: Context = {},
-): void {
+): Promise<void> {
 
   // Generate next()
   let middlewareIndex = 0;
   const postProcessFns: PostProcessFn[] = [];
 
-  const next: NextMiddleware = (
+  const next: NextMiddleware = async (
     errorOrPostProcess?: (Error | PostProcessFn),
   ) => {
     middlewareIndex += 1;
@@ -33,50 +33,49 @@ export function processMiddleware(
 
       // In this condition, errorOrPostProcess will be a postProcess function or undefined
       postProcessFns[middlewareIndex - 1] = errorOrPostProcess === undefined ? noopPostProcess : errorOrPostProcess;
-      thisMiddleware({ context, next: nextWhenNotLast, ...initialArguments });
+      await thisMiddleware({ context, next: nextWhenNotLast, ...initialArguments });
 
       if (isLastMiddleware) {
         postProcessFns[middlewareIndex] = noopPostProcess;
-        process.nextTick(next);
+        await next();
       }
       return;
     }
 
     // Processing is complete, and we should begin bubbling up
     // there's no next middleware or the argument is an error
-
-    function createDone(initialIndex: number): (error?: Error) => void {
+    function createDone(initialIndex: number): (error?: Error) => Promise<void> {
       let postProcessIndex = initialIndex;
 
       // done is a function that handles bubbling up in a similar way to next handling propogating down
-      const done = (error?: Error): void => {
+      const done = async (error?: Error): Promise<void> => {
         postProcessIndex -= 1;
 
         const thisPostProcess = postProcessFns[postProcessIndex];
 
         if (thisPostProcess !== undefined) {
-          thisPostProcess(error, done);
+          await thisPostProcess(error, done);
           return;
         }
 
-        afterPostProcess(error);
+        await afterPostProcess(error);
       };
       return done;
     }
 
     if (thisMiddleware === undefined) {
-      afterMiddleware(context, initialArguments, (error?: Error) => {
-        createDone(middleware.length)(error);
+      await afterMiddleware(context, initialArguments, async (error?: Error) => {
+        await createDone(middleware.length)(error);
       });
     } else {
-      createDone(middlewareIndex - 1)(errorOrPostProcess as Error);
+      await createDone(middlewareIndex - 1)(errorOrPostProcess as Error);
     }
 
   };
 
   const firstMiddleware = middleware[0];
-  firstMiddleware({ context, next, ...initialArguments });
+  await firstMiddleware({ context, next, ...initialArguments });
 }
 
-function noop(): void { } // tslint:disable-line:no-empty
-const noopPostProcess: PostProcessFn = (error, done) => { done(error); };
+async function noop(): Promise<void> { } // tslint:disable-line:no-empty
+const noopPostProcess: PostProcessFn = async (error, done) => { await done(error); };

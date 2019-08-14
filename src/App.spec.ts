@@ -394,7 +394,7 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
             say(dummyMessage);
@@ -425,7 +425,7 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
             say(dummyMessage);
@@ -506,7 +506,7 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             assert.isUndefined((args as any).say);
             // If the above assertion fails, then it would throw an AssertionError and the following line will not be
             // called
@@ -530,7 +530,7 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
             say(dummyMessage);
@@ -653,7 +653,7 @@ function createDummyReceiverEvent(): ReceiverEvent {
 }
 
 // Utility functions
-const noop = () => { }; // tslint:disable-line:no-empty
+const noop = async () => { }; // tslint:disable-line:no-empty
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
 

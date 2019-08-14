@@ -55,13 +55,13 @@ export function conversationContext<ConversationState = any>(
   store: ConversationStore<ConversationState>,
   logger: Logger,
 ): Middleware<AnyMiddlewareArgs> {
-  return (args) => {
+  return async (args) => {
     const { body, context, next } = args;
     const { conversationId } = getTypeAndConversation(body as any);
     if (conversationId !== undefined) {
       // TODO: expiresAt is not passed through to store.set
       context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
-      store.get(conversationId)
+      await store.get(conversationId)
         .then((conversationState) => {
           context.conversation = conversationState;
           logger.debug(`Conversation context loaded for ID ${conversationId}`);
@@ -72,7 +72,7 @@ export function conversationContext<ConversationState = any>(
         .then(next);
     } else {
       logger.debug('No conversation ID for incoming event');
-      next();
+      await next();
     }
   };
 }
