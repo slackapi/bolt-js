@@ -3,10 +3,12 @@ import { SlackEventMiddlewareArgs } from './events';
 import { SlackActionMiddlewareArgs } from './actions';
 import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
+import { SlackViewMiddlewareArgs } from './view';
 import { CodedError, ErrorCode } from '../errors';
 
 export type AnyMiddlewareArgs =
-  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs | SlackOptionsMiddlewareArgs;
+  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs |
+  SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs;
 
 export interface PostProcessFn {
   (error: Error | undefined, done: (error?: Error) => void): unknown;

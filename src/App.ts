@@ -12,6 +12,8 @@ import {
   onlyEvents,
   matchEventType,
   matchMessage,
+  matchCallbackId,
+  onlyViewSubmits,
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
@@ -22,6 +24,7 @@ import {
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
+  SlackViewMiddlewareArgs,
   SlackAction,
   Context,
   SayFn,
@@ -301,6 +304,12 @@ export default class App {
     );
   }
 
+  public view(callbackId: string | RegExp, ...listeners: Middleware<SlackViewMiddlewareArgs>[]): void {
+    this.listeners.push(
+      [onlyViewSubmits, matchCallbackId(callbackId), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
   public error(errorHandler: ErrorHandler): void {
     this.errorHandler = errorHandler;
   }
@@ -465,11 +474,11 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs)['body']).team.id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmit) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.id as string :
        assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs)['body']).team.enterprise_id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmit) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.enterprise_id as string :
        undefined),
     userId:
       ((type === IncomingEventType.Event) ?
@@ -478,7 +487,7 @@ function buildSource(
          ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
          ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
          undefined) :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs)['body']).user.id as string :
+       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmit) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
        (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
        undefined),
     conversationId: channelId,

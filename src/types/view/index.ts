@@ -1,8 +1,16 @@
+import { StringIndexed } from '../helpers';
+import { SayFn, RespondArguments, AckFn } from '../utilities';
+
 /**
- * A Slack view submit action wrapped in the standard metadata.
- *
- * This describes the entire JSON-encoded body of a request from Slack views (modals).
+ * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */
+export interface SlackViewMiddlewareArgs {
+  payload: ViewSubmit;
+  command: this['payload'];
+  body: this['payload'];
+  say: SayFn;
+  ack: AckFn<string | RespondArguments>;
+}
 
 interface PlainTextElementOutput {
   type: 'plain_text';
@@ -10,7 +18,12 @@ interface PlainTextElementOutput {
   emoji: boolean;
 }
 
-export interface ViewSubmitAction {
+/**
+ * A Slack view_submission event wrapped in the standard metadata.
+ *
+ * This describes the entire JSON-encoded body of a request from Slack's slash commands.
+ */
+export interface ViewSubmit extends StringIndexed {
   type: 'view_submission';
   callback_id: string;
   team: {
@@ -26,13 +39,13 @@ export interface ViewSubmitAction {
   };
   view: {
     id: string;
-    // callback_id: string;
+    // callback_id: string; // TODO
     team_id: string;
     app_id: string | null;
     bot_id: string;
     title: PlainTextElementOutput;
     type: string;
-    blocks: any[];
+    blocks: StringIndexed; // TODO: should this just be any?
     close: PlainTextElementOutput | null;
     submit: PlainTextElementOutput | null;
     state: object; // TODO: this should probably be expanded in the future
@@ -46,15 +59,4 @@ export interface ViewSubmitAction {
   };
   api_app_id: string;
   token: string;
-}
-
-/**
- * A Slack dialog submission validation response. Use an object of this type to describe errors regarding inputs that
- * were part of the submission.
- */
-export interface DialogValidation {
-  errors: {
-    name: string;
-    error: string;
-  }[];
 }
