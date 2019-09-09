@@ -15,6 +15,7 @@ export enum IncomingEventType {
   Action,
   Command,
   Options,
+  ViewSubmit,
 }
 
 /**
@@ -47,9 +48,15 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'message_action') {
+    const actionBody = (body as SlackActionMiddlewareArgs<SlackAction>['body']);
     return {
       type: IncomingEventType.Action,
-      conversationId: (body as SlackActionMiddlewareArgs<SlackAction>['body']).channel.id,
+      conversationId: actionBody.channel.id,
+    };
+  }
+  if (body.type === 'view_submission') {
+    return {
+      type: IncomingEventType.ViewSubmit,
     };
   }
   return {};
