@@ -321,10 +321,10 @@ export default class App {
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
-
     // Introspect the body to determine what type of incoming event is being handled, and any channel context
+    console.log(body);
     const { type, conversationId } = getTypeAndConversation(body);
-
+    console.log('HEY!');
     // If the type could not be determined, warn and exit
     if (type === undefined) {
       this.logger.warn('Could not determine the type of an incoming event. No listeners will be called.');
