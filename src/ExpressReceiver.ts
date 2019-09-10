@@ -93,7 +93,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
           });
       };
     }
-    console.log(event);
+
     this.emit('message', event);
   }
 
