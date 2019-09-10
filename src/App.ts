@@ -12,8 +12,8 @@ import {
   onlyEvents,
   matchEventType,
   matchMessage,
-  matchCallbackId,
   onlyViewSubmits,
+  matchCallbackId,
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
@@ -322,6 +322,7 @@ export default class App {
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
 
+    console.log('onIncomingEvent()');
     // Introspect the body to determine what type of incoming event is being handled, and any channel context
     const { type, conversationId } = getTypeAndConversation(body);
 
