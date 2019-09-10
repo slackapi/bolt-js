@@ -179,6 +179,9 @@ export function verifySignatureAndParseBody(
       try {
         await verifyRequestSignature(signingSecret, stringBody, signature, ts);
       } catch (e) {
+        console.log(stringBody);
+        console.log(signature);
+        console.log(ts);
         return next(e);
       }
 

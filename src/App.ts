@@ -398,6 +398,9 @@ export default class App {
     } else if (type === IncomingEventType.Options) {
       const optionListenerArgs = listenerArgs as SlackOptionsMiddlewareArgs<OptionsSource>;
       optionListenerArgs.options = optionListenerArgs.payload;
+    } else if (type === IncomingEventType.ViewSubmit) {
+      const viewListenerArgs = listenerArgs as SlackViewMiddlewareArgs;
+      viewListenerArgs.view = viewListenerArgs.payload;
     }
 
     // Set say() utility

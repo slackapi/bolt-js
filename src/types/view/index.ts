@@ -6,7 +6,7 @@ import { SayFn, RespondArguments, AckFn } from '../utilities';
  */
 export interface SlackViewMiddlewareArgs {
   payload: ViewSubmit;
-  command: this['payload'];
+  view: this['payload'];
   body: this['payload'];
   say: SayFn;
   ack: AckFn<string | RespondArguments>;
