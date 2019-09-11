@@ -15,7 +15,7 @@ export enum IncomingEventType {
   Action,
   Command,
   Options,
-  ViewSubmit,
+  ViewSubmitAction,
 }
 
 /**
@@ -56,7 +56,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
   }
   if (body.type === 'view_submission') {
     return {
-      type: IncomingEventType.ViewSubmit,
+      type: IncomingEventType.ViewSubmitAction,
     };
   }
   return {};

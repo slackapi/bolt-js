@@ -1,14 +1,13 @@
 import { StringIndexed } from '../helpers';
-import { SayFn, RespondArguments, AckFn } from '../utilities';
+import { RespondArguments, AckFn } from '../utilities';
 
 /**
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */
 export interface SlackViewMiddlewareArgs {
-  payload: ViewSubmit;
+  payload: ViewOutput;
   view: this['payload'];
-  body: this['payload'];
-  say: SayFn;
+  body: ViewSubmitAction;
   ack: AckFn<string | RespondArguments>;
 }
 
@@ -21,11 +20,10 @@ interface PlainTextElementOutput {
 /**
  * A Slack view_submission event wrapped in the standard metadata.
  *
- * This describes the entire JSON-encoded body of a request from Slack's slash commands.
+ * This describes the entire JSON-encoded body of a view_submission event.
  */
-export interface ViewSubmit extends StringIndexed {
+export interface ViewSubmitAction extends StringIndexed {
   type: 'view_submission';
-  callback_id: string;
   team: {
     id: string;
     domain: string;
@@ -37,26 +35,28 @@ export interface ViewSubmit extends StringIndexed {
     name: string;
     team_id?: string; // undocumented
   };
-  view: {
-    id: string;
-    // callback_id: string; // TODO
-    team_id: string;
-    app_id: string | null;
-    bot_id: string;
-    title: PlainTextElementOutput;
-    type: string;
-    blocks: StringIndexed; // TODO: should this just be any?
-    close: PlainTextElementOutput | null;
-    submit: PlainTextElementOutput | null;
-    state: object; // TODO: this should probably be expanded in the future
-    hash: string;
-    private_metadata: string;
-    root_view_id: string | null;
-    previous_view_id: string | null;
-    clear_on_close: boolean;
-    notify_on_close: boolean;
-    external_id?: string;
-  };
+  view: ViewOutput;
   api_app_id: string;
   token: string;
 }
+
+export interface ViewOutput {
+  id: string;
+  callback_id: string;
+  team_id: string;
+  app_id: string | null;
+  bot_id: string;
+  title: PlainTextElementOutput;
+  type: string;
+  blocks: StringIndexed; // TODO: should this just be any?
+  close: PlainTextElementOutput | null;
+  submit: PlainTextElementOutput | null;
+  state: object; // TODO: this should probably be expanded in the future
+  hash: string;
+  private_metadata: string;
+  root_view_id: string | null;
+  previous_view_id: string | null;
+  clear_on_close: boolean;
+  notify_on_close: boolean;
+  external_id?: string;
+};

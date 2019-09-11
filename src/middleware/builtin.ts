@@ -8,7 +8,7 @@ import {
   SlackEvent,
   SlackAction,
   SlashCommand,
-  ViewSubmit,
+  ViewSubmitAction,
   OptionsRequest,
   InteractiveMessage,
   DialogSubmitAction,
@@ -16,6 +16,7 @@ import {
   BlockElementAction,
   ContextMissingPropertyError,
   SlackViewMiddlewareArgs,
+  ViewOutput,
 } from '../types';
 import { ActionConstraints } from '../App';
 import { ErrorCode, errorWithCode } from '../errors';
@@ -75,7 +76,7 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that filters out any event that isn't a view_submission
  */
-export const onlyViewSubmits: Middleware<AnyMiddlewareArgs & { view?: ViewSubmit }> = ({ view, next }) => {
+export const onlyViewSubmits: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction }> = ({ view, next }) => {
   // Filter out anything that isn't a view_submission
   if (view === undefined) {
     return;
@@ -89,18 +90,18 @@ export const onlyViewSubmits: Middleware<AnyMiddlewareArgs & { view?: ViewSubmit
 export function matchCallbackId(
     callbackId: string | RegExp,
 ): Middleware<SlackViewMiddlewareArgs> {
-  return ({ body, next, context }) => {
+  return ({ payload, next, context }) => {
     let tempMatches: RegExpMatchArray | null;
 
-    if (!isCallbackIdentifiedBody(body)) {
+    if (!isCallbackIdentifiedBody(payload)) {
       return;
     }
     if (typeof callbackId === 'string') {
-      if (body.callback_id !== callbackId) {
+      if (payload.callback_id !== callbackId) {
         return;
       }
     } else {
-      tempMatches = body.callback_id.match(callbackId);
+      tempMatches = payload.callback_id.match(callbackId);
 
       if (tempMatches !== null) {
         context['callbackIdMatches'] = tempMatches;
@@ -335,12 +336,12 @@ function isBlockPayload(
 type CallbackIdentifiedBody =
   | InteractiveMessage
   | DialogSubmitAction
-  | ViewSubmit
+  | ViewOutput
   | MessageAction
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
 function isCallbackIdentifiedBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['payload'],
 ): body is CallbackIdentifiedBody {
   return (body as CallbackIdentifiedBody).callback_id !== undefined;
 }
