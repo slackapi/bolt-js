@@ -49,6 +49,7 @@ export interface AppOptions {
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
+  slackApiUrl?: string;
   ignoreSelf?: boolean;
 }
 
