@@ -126,6 +126,7 @@ export default class App {
     authorize = undefined,
     logger = new ConsoleLogger(),
     logLevel = LogLevel.INFO,
+    slackApiUrl = 'https://slack.com/api/',
     ignoreSelf = true,
   }: AppOptions = {}) {
 
@@ -134,7 +135,7 @@ export default class App {
     this.errorHandler = defaultErrorHandler(this.logger);
 
     // TODO: other webclient options (such as proxy)
-    this.client = new WebClient(undefined, { logLevel });
+    this.client = new WebClient(undefined, { logLevel, slackApiUrl });
 
     if (token !== undefined) {
       if (authorize !== undefined) {
