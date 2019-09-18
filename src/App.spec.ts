@@ -833,7 +833,7 @@ function createDummyReceiverEvent(): ReceiverEvent {
 }
 
 // Utility functions
-const noop = () => { }; // tslint:disable-line:no-empty
+const noop = async () => { }; // tslint:disable-line:no-empty
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
 

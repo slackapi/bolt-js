@@ -1,5 +1,5 @@
 {
-  "name": "@slack/bolt",
+  "name": "@flore2003/bolt",
   "version": "1.4.1",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, Inc.",

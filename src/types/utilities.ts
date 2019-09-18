@@ -8,7 +8,7 @@ export type SayArguments = Pick<ChatPostMessageArguments, Exclude<KnownKeys<Chat
 };
 
 export interface SayFn {
-  (message: string | SayArguments): void;
+  (message: string | SayArguments): PromiseLike<void>;
 }
 
 export type RespondArguments = SayArguments & {
@@ -19,9 +19,9 @@ export type RespondArguments = SayArguments & {
 };
 
 export interface RespondFn {
-  (message: string | RespondArguments): void;
+  (message: string | RespondArguments): PromiseLike<void>;
 }
 
 export interface AckFn<Response> {
-  (response?: Response): void;
+  (response?: Response): PromiseLike<void>;
 }

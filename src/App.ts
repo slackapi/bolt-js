@@ -395,10 +395,10 @@ export default class App {
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.userToken;
-      return (message: Parameters<SayFn>[0]) => {
+      return async (message: Parameters<SayFn>[0]) => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
-        this.client.chat.postMessage(postMessageArguments)
+        await this.client.chat.postMessage(postMessageArguments)
           .catch(error => this.onGlobalError(error));
       };
     };
