@@ -11,6 +11,8 @@ If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> 
 <code>view()</code> requires a <code>callback_id</code> of type <code>string</code> or <code>RegExp</code>.
 
 You can access the value of the <code>input</code> blocks by accessing the <code>state</code> object. <code>state</code> contains a <code>values</code> object that uses the <code>block_id</code> and unique <code>action_id</code> to store the input values.
+
+Read more about view submissions in our <a href="https://api.slack.com/block-kit/surfaces/modals#handling_submissions">API documentation</a>.
 </div>
 
 ```javascript
