@@ -22,6 +22,7 @@ app.command('/ticket', ({ ack, payload, context }) => {
   try {
     const result = app.client.views.open({
       token: context.botToken,
+      type: 'modal',
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: payload.trigger_id,
       // View payload
