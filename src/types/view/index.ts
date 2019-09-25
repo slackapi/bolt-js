@@ -22,7 +22,7 @@ interface PlainTextElementOutput {
  *
  * This describes the entire JSON-encoded body of a view_submission event.
  */
-export interface ViewSubmitAction extends StringIndexed {
+export interface ViewSubmitAction {
   type: 'view_submission';
   team: {
     id: string;
@@ -59,4 +59,4 @@ export interface ViewOutput {
   clear_on_close: boolean;
   notify_on_close: boolean;
   external_id?: string;
-};
+}
