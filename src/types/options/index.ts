@@ -27,7 +27,7 @@ export interface OptionsRequest<Source extends OptionsSource = OptionsSource> ex
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
   };
-  channel: {
+  channel?: {
     id: string;
     name: string;
   };
