@@ -115,8 +115,9 @@ app.message('happy', async ({ message, context }) => {
     const result = await app.client.reactions.add({
       // Use token from context
       token: context.botToken,
-      name: ':grinning:',
-      channel: message.channel_id
+      name: 'grinning',
+      channel: message.channel,
+      timestamp: message.ts
     });
     console.log(result);
   } catch (error) {
