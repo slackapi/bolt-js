@@ -15,6 +15,7 @@ export enum IncomingEventType {
   Action,
   Command,
   Options,
+  ViewSubmitAction,
 }
 
 /**
@@ -40,16 +41,22 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
     };
   }
   if (body.name !== undefined || body.type === 'block_suggestion') {
+    const optionsBody = (body as SlackOptionsMiddlewareArgs<OptionsSource>['body']);
     return {
       type: IncomingEventType.Options,
-      conversationId:
-        (body as SlackOptionsMiddlewareArgs<OptionsSource>['body']).channel.id,
+      conversationId: optionsBody.channel ? optionsBody.channel.id : undefined,
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'message_action') {
+    const actionBody = (body as SlackActionMiddlewareArgs<SlackAction>['body']);
     return {
       type: IncomingEventType.Action,
-      conversationId: (body as SlackActionMiddlewareArgs<SlackAction>['body']).channel.id,
+      conversationId: actionBody.channel !== undefined ? actionBody.channel.id : undefined,
+    };
+  }
+  if (body.type === 'view_submission') {
+    return {
+      type: IncomingEventType.ViewSubmitAction,
     };
   }
   return {};
