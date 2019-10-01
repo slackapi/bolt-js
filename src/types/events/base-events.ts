@@ -17,7 +17,9 @@ export type SlackEvent =
   | ChannelHistoryChangedEvent
   | ChannelLeftEvent
   | ChannelRenameEvent
+  | ChannelSharedEvent
   | ChannelUnarchiveEvent
+  | ChannelUnsharedEvent
   | DNDUpdatedEvent
   | DNDUpdatedUserEvent
   | EmailDomainChangedEvent
@@ -196,10 +198,25 @@ export interface ChannelRenameEvent extends StringIndexed {
   };
 }
 
+export interface ChannelSharedEvent extends StringIndexed {
+  type: 'channel_shared';
+  connected_team_id: string;
+  channel: string;
+  event_ts: string;
+}
+
 export interface ChannelUnarchiveEvent extends StringIndexed {
   type: 'channel_unarchive';
   channel: string;
   user: string;
+}
+
+export interface ChannelUnsharedEvent extends StringIndexed {
+  type: 'channel_unshared';
+  previously_connected_team_id: string;
+  channel: string;
+  is_ext_shared: boolean;
+  event_ts: string;
 }
 
 export interface DNDUpdatedEvent extends StringIndexed {
