@@ -160,7 +160,7 @@ export default class App {
     this.listeners = [];
 
     // Check for required arguments of ExpressReceiver
-    if (signingSecret !== undefined) {
+    if (signingSecret !== undefined && receiver === undefined) {
       this.receiver = new ExpressReceiver({ signingSecret, logger, endpoints });
     } else if (receiver === undefined) {
       // Check for custom receiver
