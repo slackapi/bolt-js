@@ -6,8 +6,9 @@ import { assert } from 'chai';
 import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
-import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
+import { Receiver, ReceiverEvent, SayFn, NextMiddleware, Middleware, AnyMiddlewareArgs } from './types';
 import { ConversationStore } from './conversation-store';
+import { AuthorizeResult } from './App';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -247,6 +248,20 @@ describe('App', () => {
       });
       app.use(fakeMiddleware);
       app.error(fakeErrorHandler);
+
+      interface AdditionalContext {
+        additionalInfo?: string;
+      }
+      app.event<AdditionalContext>('reaction_added', ({ context }) => {
+        context.additionalInfo;
+        // context.botId; - doesn't compile
+      });
+      type MoreContext = AuthorizeResult & AdditionalContext;
+      app.event<MoreContext>('reaction_added', ({ context }) => {
+        context.additionalInfo;
+        context.botId;
+        context.whateverBecauseAuthorizeResultIsStringIndexed;
+      });
       fakeReceiver.emit('message', dummyReceiverEvent);
       await delay();
 
@@ -656,5 +671,26 @@ function createDummyReceiverEvent(): ReceiverEvent {
 const noop = () => { }; // tslint:disable-line:no-empty
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
+
+interface AliceContext {
+  alice: string;
+}
+interface BobContext {
+  bob: string;
+}
+export function firstMiddleware(): Middleware<AnyMiddlewareArgs, AliceContext> {
+  return ({ context, next }) => {
+    context.alice;
+    // context.bob; - doesn't compile
+    next();
+  };
+}
+export function secondMiddleware(): Middleware<AnyMiddlewareArgs, AliceContext & BobContext> {
+  return ({ context, next }) => {
+    context.alice;
+    context.bob;
+    next();
+  };
+}
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time

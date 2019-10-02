@@ -27,6 +27,7 @@ import {
   SlackViewMiddlewareArgs,
   SlackAction,
   Context,
+  StringIndexedContext,
   SayFn,
   AckFn,
   RespondFn,
@@ -80,7 +81,7 @@ export interface AuthorizeResult {
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
-  [ key: string ]: any;
+  [key: string]: any;
 }
 
 export interface ActionConstraints {
@@ -111,10 +112,10 @@ export default class App {
   private authorize: Authorize;
 
   /** Global middleware */
-  private middleware: Middleware<AnyMiddlewareArgs>[];
+  private middleware: Middleware<AnyMiddlewareArgs, Context>[];
 
   /** Listeners (and their middleware) */
-  private listeners: Middleware<AnyMiddlewareArgs>[][];
+  private listeners: Middleware<AnyMiddlewareArgs, Context>[][];
 
   private errorHandler: ErrorHandler;
 
@@ -195,8 +196,9 @@ export default class App {
    *
    * @param m global middleware function
    */
-  public use(m: Middleware<AnyMiddlewareArgs>): this {
-    this.middleware.push(m);
+  public use<CurrentContext extends Context = StringIndexedContext>(
+    m: Middleware<AnyMiddlewareArgs, CurrentContext>): this {
+    this.middleware.push(m as Middleware<AnyMiddlewareArgs, Context>);
     return this;
   }
 
@@ -215,21 +217,29 @@ export default class App {
     return this.receiver.stop(...args);
   }
 
-  public event<EventType extends string = string>(
+  public event<
+    CurrentContext extends Context = StringIndexedContext,
+    EventType extends string = string
+  >(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>, CurrentContext>[]
   ): void {
     this.listeners.push(
-      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs, Context>[],
     );
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
   // TODO: maybe remove the first two overloads
-  public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(
-    ...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]
+  public message<CurrentContext extends Context = StringIndexedContext>(
+    ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>, CurrentContext>[]): void;
+
+  public message<CurrentContext extends Context = StringIndexedContext>(
+    pattern: string | RegExp,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>, CurrentContext>[]): void;
+
+  public message<CurrentContext extends Context = StringIndexedContext>(
+    ...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>, CurrentContext>)[]
   ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
       if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
@@ -239,27 +249,38 @@ export default class App {
     });
 
     this.listeners.push(
-      [onlyEvents, matchEventType('message'), ...messageMiddleware] as Middleware<AnyMiddlewareArgs>[],
+      [onlyEvents, matchEventType('message'), ...messageMiddleware] as Middleware<AnyMiddlewareArgs, Context>[],
     );
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
-  public action<ActionType extends SlackAction = SlackAction>(
+  public action<
+    CurrentContext extends Context = StringIndexedContext,
+    ActionType extends SlackAction = SlackAction
+  >(
     actionId: string | RegExp,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>, CurrentContext>[]
   ): void;
-  public action<ActionType extends SlackAction = SlackAction>(
+
+  public action<
+    CurrentContext extends Context = StringIndexedContext,
+    ActionType extends SlackAction = SlackAction
+  >(
     constraints: ActionConstraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>, CurrentContext>[]
   ): void;
-  public action<ActionType extends SlackAction = SlackAction>(
+
+  public action<
+    CurrentContext extends Context = StringIndexedContext,
+    ActionType extends SlackAction = SlackAction
+  >(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>, CurrentContext>[]
   ): void {
     const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+        { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
@@ -272,41 +293,56 @@ export default class App {
     }
 
     this.listeners.push(
-      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs, Context>[],
     );
   }
 
   // TODO: should command names also be regex?
-  public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
+  public command<CurrentContext extends Context = StringIndexedContext>(
+    commandName: string,
+    ...listeners: Middleware<SlackCommandMiddlewareArgs, CurrentContext>[]): void {
     this.listeners.push(
-      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs, Context>[],
     );
   }
 
-  public options<Source extends OptionsSource = OptionsSource>(
+  public options<
+    CurrentContext extends Context = StringIndexedContext,
+    Source extends OptionsSource = OptionsSource
+  >(
     actionId: string | RegExp,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, CurrentContext>[]
   ): void;
-  public options<Source extends OptionsSource = OptionsSource>(
+
+  public options<
+    CurrentContext extends Context = StringIndexedContext,
+    Source extends OptionsSource = OptionsSource
+  >(
     constraints: ActionConstraints,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, CurrentContext>[]
   ): void;
-  public options<Source extends OptionsSource = OptionsSource>(
+
+  public options<
+    CurrentContext extends Context = StringIndexedContext,
+    Source extends OptionsSource = OptionsSource
+  >(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, CurrentContext>[]
   ): void {
     const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+        { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
-      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs, Context>[],
     );
   }
 
-  public view(callbackId: string | RegExp, ...listeners: Middleware<SlackViewMiddlewareArgs>[]): void {
+  public view<CurrentContext extends Context = StringIndexedContext>(
+    callbackId: string | RegExp,
+    ...listeners: Middleware<SlackViewMiddlewareArgs, CurrentContext>[]): void {
     this.listeners.push(
-      [onlyViewSubmits, matchCallbackId(callbackId), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+      [onlyViewSubmits, matchCallbackId(callbackId), ...listeners] as Middleware<AnyMiddlewareArgs, Context>[],
     );
   }
 
@@ -341,7 +377,7 @@ export default class App {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
       return;
     }
-    const context: Context = { ...authorizeResult };
+    const context: Context & AuthorizeResult = { ...authorizeResult };
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
@@ -366,20 +402,20 @@ export default class App {
         /** Ack function might be set below */
         ack?: AckFn<any>,
       } = {
-        body: bodyArg,
-        payload:
-          (type === IncomingEventType.Event) ?
-            (bodyArg as SlackEventMiddlewareArgs['body']).event :
+      body: bodyArg,
+      payload:
+        (type === IncomingEventType.Event) ?
+          (bodyArg as SlackEventMiddlewareArgs['body']).event :
           (type === IncomingEventType.ViewSubmitAction) ?
             (bodyArg as SlackViewMiddlewareArgs['body']).view :
-          (type === IncomingEventType.Action &&
-            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
-            (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
-          (bodyArg as (
-            Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs> |
-            SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-          )['body']),
-      };
+            (type === IncomingEventType.Action &&
+              isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
+              (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
+              (bodyArg as (
+                Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs> |
+                SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+              )['body']),
+    };
 
     // Set aliases
     if (type === IncomingEventType.Event) {
@@ -477,22 +513,22 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmitAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.id as string :
-       assertNever(type)),
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmitAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.id as string :
+          assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmitAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.enterprise_id as string :
-       undefined),
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmitAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.enterprise_id as string :
+          undefined),
     userId:
       ((type === IncomingEventType.Event) ?
         ((typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string') ? (body as SlackEventMiddlewareArgs['body']).event.user as string :
-         (typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object') ? (body as SlackEventMiddlewareArgs['body']).event.user.id as string :
-         ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
-         ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
-         undefined) :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmitAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
-       (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
-       undefined),
+          (typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object') ? (body as SlackEventMiddlewareArgs['body']).event.user.id as string :
+            ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
+              ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
+                undefined) :
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewSubmitAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
+          (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
+            undefined),
     conversationId: channelId,
   };
   // tslint:enable:max-line-length

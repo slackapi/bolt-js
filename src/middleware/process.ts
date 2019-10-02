@@ -10,7 +10,7 @@ import {
 // be dealt with by the global error handler
 export function processMiddleware(
   initialArguments: AnyMiddlewareArgs,
-  middleware: Middleware<AnyMiddlewareArgs>[],
+  middleware: Middleware<AnyMiddlewareArgs, Context>[],
   afterMiddleware: (context: Context, args: AnyMiddlewareArgs, startBubble: (error?: Error) => void) => void,
   afterPostProcess: (error?: Error) => void,
   context: Context = {},

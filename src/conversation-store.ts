@@ -1,6 +1,7 @@
 import { Middleware, AnyMiddlewareArgs } from './types';
 import { Logger } from '@slack/logger';
 import { getTypeAndConversation } from './helpers';
+import { Context } from './types/middleware';
 
 /**
  * Storage backend used by the conversation context middleware
@@ -41,6 +42,11 @@ export class MemoryStore<ConversationState = any> implements ConversationStore<C
   }
 }
 
+interface ConversationContext extends Context {
+  updateConversation?: (s: any) => Promise<unknown>;
+  conversation?: any;
+}
+
 /**
  * Conversation context global middleware.
  *
@@ -54,7 +60,7 @@ export class MemoryStore<ConversationState = any> implements ConversationStore<C
 export function conversationContext<ConversationState = any>(
   store: ConversationStore<ConversationState>,
   logger: Logger,
-): Middleware<AnyMiddlewareArgs> {
+): Middleware<AnyMiddlewareArgs, ConversationContext> {
   return (args) => {
     const { body, context, next } = args;
     const { conversationId } = getTypeAndConversation(body as any);
