@@ -308,7 +308,7 @@ describe('App', () => {
         return overrides;
       }
 
-      describe('ack()', () => {
+      describe('routing', () => {
 
         function createReceiverEvents(): ReceiverEvent[] {
           return [
@@ -328,6 +328,21 @@ describe('App', () => {
             },
             { // IncomingEventType.Action (app.action)
               body: {
+                type: 'block_actions',
+                actions: [{
+                  action_id: 'block_action_id'
+                }],
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action (app.action)
+              body: {
+                type: 'interactive_message',
+                callback_id: 'interactive_message_callback_id',
                 actions: [{}],
                 channel: {},
                 user: {},
@@ -339,6 +354,31 @@ describe('App', () => {
             { // IncomingEventType.Action with dialog submission (app.action)
               body: {
                 type: 'dialog_submission',
+                callback_id: 'dialog_submission_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action for an external_select block (app.options)
+              body: {
+                type: 'block_suggestion',
+                action_id: 'external_select_action_id',
+                channel: {},
+                user: {},
+                team: {},
+                actions: [],
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action for "data_source": "external" in dialogs (app.options)
+              body: {
+                type: 'dialog_suggestion',
+                callback_id: 'dialog_suggestion_callback_id',
+                name: 'the name',
                 channel: {},
                 user: {},
                 team: {},
@@ -352,6 +392,9 @@ describe('App', () => {
                 channel: {},
                 user: {},
                 team: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                }
               },
               respond: noop,
               ack: noop,
@@ -363,6 +406,9 @@ describe('App', () => {
             //     channel: {},
             //     user: {},
             //     team: {},
+            //     view: {
+            //       callback_id: 'view_callback_id',
+            //     }
             //   },
             //   respond: noop,
             //   ack: noop,
@@ -372,20 +418,33 @@ describe('App', () => {
 
         it('should acknowledge any of possible events', async () => {
           // Arrange
-          const fakeAckFn = sinon.fake.resolves({});
+          const ackFn = sinon.fake.resolves({});
+          const actionFn = sinon.fake.resolves({});
+          const viewFn = sinon.fake.resolves({});
+          const optionsFn = sinon.fake.resolves({});
           const overrides = buildOverrides(withNoopWebClient());
           const App = await importApp(overrides); // tslint:disable-line:variable-name
           const dummyReceiverEvents = createReceiverEvents();
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((_args) => { fakeAckFn(); });
+          app.use((_args) => { ackFn(); });
+          app.action('block_action_id', ({ }) => { actionFn(); })
+          app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); })
+          app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); })
+          app.view('view_callback_id', ({ }) => { viewFn(); })
+          app.options('external_select_action_id', ({ }) => { optionsFn(); });
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, ({ }) => { optionsFn(); });
+
           app.error(fakeErrorHandler);
           dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
           await delay();
 
           // Assert
-          assert.equal(fakeAckFn.callCount, dummyReceiverEvents.length);
+          assert.equal(actionFn.callCount, 3);
+          assert.equal(viewFn.callCount, 1);
+          assert.equal(optionsFn.callCount, 2);
+          assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
         });
       });
