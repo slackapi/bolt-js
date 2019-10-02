@@ -341,6 +341,17 @@ describe('App', () => {
             },
             { // IncomingEventType.Action (app.action)
               body: {
+                type: 'message_action',
+                callback_id: 'message_action_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action (app.action)
+              body: {
                 type: 'interactive_message',
                 callback_id: 'interactive_message_callback_id',
                 actions: [{}],
@@ -430,6 +441,7 @@ describe('App', () => {
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use((_args) => { ackFn(); });
           app.action('block_action_id', ({ }) => { actionFn(); })
+          app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); })
           app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); })
           app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); })
           app.view('view_callback_id', ({ }) => { viewFn(); })
@@ -441,7 +453,7 @@ describe('App', () => {
           await delay();
 
           // Assert
-          assert.equal(actionFn.callCount, 3);
+          assert.equal(actionFn.callCount, 4);
           assert.equal(viewFn.callCount, 1);
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
