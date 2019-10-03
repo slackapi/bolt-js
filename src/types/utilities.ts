@@ -25,3 +25,7 @@ export interface RespondFn {
 export interface AckFn<Response> {
   (response?: Response): void;
 }
+
+export interface ReactFn {
+  (reaction: string): void;
+}

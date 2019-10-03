@@ -7,7 +7,7 @@ import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { MessageAction } from './message-action';
-import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
+import { SayFn, SayArguments, RespondFn, AckFn, ReactFn } from '../utilities';
 
 /**
  * All known actions from Slack's Blot Kit interactive components, message actions, dialogs, and legacy interactive
@@ -44,6 +44,7 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
   // all action types except dialog submission have a channel context
   say: Action extends Exclude<SlackAction, DialogSubmitAction> ? SayFn : never;
   respond: RespondFn;
+  react: ReactFn;
   ack: ActionAckFn<Action>;
 }
 
