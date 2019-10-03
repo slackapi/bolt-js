@@ -35,6 +35,7 @@ import {
   InteractiveMessage,
   Receiver,
   ReceiverEvent,
+  TellFn,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
@@ -354,6 +355,17 @@ export default class App {
       };
     };
 
+    const createTell = (): TellFn => {
+      const token = context.botToken !== undefined ? context.botToken : context.userToken;
+      return (channel_id: Parameters<TellFn>[0], message: Parameters<TellFn>[1]) => {
+        const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
+          { token, text: message, channel: channel_id } : { ...message, token, channel: channel_id };
+
+        this.client.chat.postMessage(postMessageArguments)
+          .catch(error => this.onGlobalError(error));
+      };
+    };
+
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
@@ -365,6 +377,8 @@ export default class App {
         respond?: RespondFn,
         /** Ack function might be set below */
         ack?: AckFn<any>,
+        /** Tell function might be set below */
+        tell?: TellFn,
       } = {
         body: bodyArg,
         payload:
@@ -403,9 +417,10 @@ export default class App {
       viewListenerArgs.view = viewListenerArgs.payload;
     }
 
-    // Set say() utility
+    // Set say() and tell() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
       listenerArgs.say = createSay(conversationId);
+      listenerArgs.tell = createTell();
     }
 
     // Set respond() utility
