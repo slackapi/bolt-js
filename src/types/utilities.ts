@@ -25,3 +25,7 @@ export interface RespondFn {
 export interface AckFn<Response> {
   (response?: Response): void;
 }
+
+export interface TellFn {
+  (channel_id: string, message: string | SayArguments): void;
+}
