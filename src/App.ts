@@ -1,5 +1,5 @@
 import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata } from '@slack/web-api';
+import { WebClient, ChatPostMessageArguments, addAppMetadata, ReactionsAddArguments } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
@@ -35,6 +35,7 @@ import {
   InteractiveMessage,
   Receiver,
   ReceiverEvent,
+  ReactFn,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
@@ -354,6 +355,22 @@ export default class App {
       };
     };
 
+    // Factory for react() utility
+    const createReact = (): ReactFn => {
+      const token = context.botToken !== undefined ? context.botToken : context.userToken;
+      return (reaction: Parameters<ReactFn>[0]) => {
+        const reactMessageArguments: ReactionsAddArguments = {
+          token,
+          name: reaction,
+          channel: context.channel,
+          timestamp: context.ts,
+        }
+
+        this.client.reactions.add(reactMessageArguments)
+          .catch(error => this.onGlobalError(error));
+      };
+    };
+
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
@@ -365,6 +382,8 @@ export default class App {
         respond?: RespondFn,
         /** Ack function might be set below */
         ack?: AckFn<any>,
+        /** React function might be set below */
+        react?: ReactFn,
       } = {
         body: bodyArg,
         payload:
@@ -406,6 +425,9 @@ export default class App {
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
       listenerArgs.say = createSay(conversationId);
+      
+      // Set react() utility
+      listenerArgs.react = createReact();
     }
 
     // Set respond() utility
