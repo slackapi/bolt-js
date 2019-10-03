@@ -160,17 +160,20 @@ export default class App {
     this.listeners = [];
 
     // Check for required arguments of ExpressReceiver
-    if (signingSecret !== undefined && receiver === undefined) {
-      this.receiver = new ExpressReceiver({ signingSecret, logger, endpoints });
-    } else if (receiver === undefined) {
-      // Check for custom receiver
-      throw errorWithCode(
-        'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-        'custom receiver.',
-        ErrorCode.AppInitializationError,
-      );
-    } else {
+    if (receiver !== undefined) {
       this.receiver = receiver;
+    } else {
+      // No custom receiver
+      if (signingSecret === undefined) {
+        throw errorWithCode(
+          'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+          'custom receiver.',
+          ErrorCode.AppInitializationError,
+        );
+      } else {
+        // Create default ExpressReceiver
+        this.receiver = new ExpressReceiver({ signingSecret, logger, endpoints });
+      }
     }
 
     // Subscribe to messages and errors from the receiver
