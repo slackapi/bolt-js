@@ -7,7 +7,7 @@ import { RespondArguments, AckFn } from '../utilities';
 export interface SlackViewMiddlewareArgs {
   payload: ViewOutput;
   view: this['payload'];
-  body: ViewSubmitAction;
+  body: ViewSubmitAction | ViewClosedAction;
   ack: AckFn<string | RespondArguments>;
 }
 
@@ -38,6 +38,30 @@ export interface ViewSubmitAction {
   view: ViewOutput;
   api_app_id: string;
   token: string;
+}
+
+/**
+ * A Slack view_closed event wrapped in the standard metadata.
+ *
+ * This describes the entire JSON-encoded body of a view_closed event.
+ */
+export interface ViewClosedAction {
+  type: 'view_closed';
+  team: {
+    id: string;
+    domain: string;
+    enterprise_id?: string; // undocumented
+    enterprise_name?: string; // undocumented
+  };
+  user: {
+    id: string;
+    name: string;
+    team_id?: string; // undocumented
+  };
+  view: ViewOutput;
+  api_app_id: string;
+  token: string;
+  is_cleared: boolean;
 }
 
 export interface ViewOutput {

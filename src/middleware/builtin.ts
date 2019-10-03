@@ -16,9 +16,9 @@ import {
   BlockElementAction,
   ContextMissingPropertyError,
   SlackViewMiddlewareArgs,
-  ViewOutput,
+  ViewClosedAction,
 } from '../types';
-import { ActionConstraints } from '../App';
+import { ActionConstraints, ViewConstraints } from '../App';
 import { ErrorCode, errorWithCode } from '../errors';
 
 /**
@@ -74,107 +74,92 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 };
 
 /**
- * Middleware that filters out any event that isn't a view_submission
+ * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewSubmits: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction }> = ({ view, next }) => {
-  // Filter out anything that isn't a view_submission
-  if (view === undefined) {
-    return;
-  }
-
-  // It matches so we should continue down this middleware listener chain
-  next();
-};
-
-// TODO: is there a way to consolidate the next two methods without too much type refactoring?
-export function matchCallbackId(
-    callbackId: string | RegExp,
-): Middleware<SlackViewMiddlewareArgs> {
-  return ({ payload, next, context }) => {
-    let tempMatches: RegExpMatchArray | null;
-
-    if (!isCallbackIdentifiedBody(payload)) {
+export const onlyViewActions: Middleware<AnyMiddlewareArgs &
+  { view?: (ViewSubmitAction | ViewClosedAction) }> = ({ view, next }) => {
+    // Filter out anything that doesn't have a view
+    if (view === undefined) {
       return;
     }
-    if (typeof callbackId === 'string') {
-      if (payload.callback_id !== callbackId) {
-        return;
-      }
-    } else {
-      tempMatches = payload.callback_id.match(callbackId);
 
-      if (tempMatches !== null) {
-        context['callbackIdMatches'] = tempMatches;
-      } else {
-        return;
-      }
-    }
-
+    // It matches so we should continue down this middleware listener chain
     next();
   };
-}
 
 /**
  * Middleware that checks for matches given constraints
  */
 export function matchConstraints(
-    constraints: ActionConstraints,
-  ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
+    constraints: ActionConstraints | ViewConstraints,
+  ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
   return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
     let tempMatches: RegExpMatchArray | null;
 
-    if (constraints.block_id !== undefined) {
+    // Narrow type for ActionConstraints
+    if ('block_id' in constraints || 'action_id' in constraints) {
       if (!isBlockPayload(payload)) {
         return;
       }
 
-      if (typeof constraints.block_id === 'string') {
-        if (payload.block_id !== constraints.block_id) {
-          return;
-        }
-      } else {
-        tempMatches = payload.block_id.match(constraints.block_id);
+      // Check block_id
+      if (constraints.block_id !== undefined) {
 
-        if (tempMatches !== null) {
-          context['blockIdMatches'] = tempMatches;
+        if (typeof constraints.block_id === 'string') {
+          if (payload.block_id !== constraints.block_id) {
+            return;
+          }
         } else {
-          return;
+          tempMatches = payload.block_id.match(constraints.block_id);
+
+          if (tempMatches !== null) {
+            context['blockIdMatches'] = tempMatches;
+          } else {
+            return;
+          }
+        }
+      }
+
+      // Check action_id
+      if (constraints.action_id !== undefined) {
+        if (typeof constraints.action_id === 'string') {
+          if (payload.action_id !== constraints.action_id) {
+            return;
+          }
+        } else {
+          tempMatches = payload.action_id.match(constraints.action_id);
+
+          if (tempMatches !== null) {
+            context['actionIdMatches'] = tempMatches;
+          } else {
+            return;
+          }
         }
       }
     }
 
-    if (constraints.action_id !== undefined) {
-      if (!isBlockPayload(payload)) {
-        return;
-      }
+    // Check callback_id
+    if ('callback_id' in constraints && constraints.callback_id !== undefined) {
+      let callbackId: string = '';
 
-      if (typeof constraints.action_id === 'string') {
-        if (payload.action_id !== constraints.action_id) {
-          return;
-        }
+      if (isViewBody(body)) {
+        callbackId = body['view']['callback_id'];
       } else {
-        tempMatches = payload.action_id.match(constraints.action_id);
-
-        if (tempMatches !== null) {
-          context['actionIdMatches'] = tempMatches;
+        if (isCallbackIdentifiedBody(body)) {
+          callbackId = body['callback_id'];
         } else {
           return;
         }
       }
-    }
 
-    if (constraints.callback_id !== undefined) {
-      if (!isCallbackIdentifiedBody(body)) {
-        return;
-      }
       if (typeof constraints.callback_id === 'string') {
-        if (body.callback_id !== constraints.callback_id) {
+        if (callbackId !== constraints.callback_id) {
           return;
         }
       } else {
-        tempMatches = body.callback_id.match(constraints.callback_id);
+        tempMatches = callbackId.match(constraints.callback_id);
 
         if (tempMatches !== null) {
           context['callbackIdMatches'] = tempMatches;
@@ -182,6 +167,11 @@ export function matchConstraints(
           return;
         }
       }
+    }
+
+    // Check type
+    if ('type' in constraints) {
+      if (body.type !== constraints.type) return;
     }
 
     next();
@@ -328,7 +318,10 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
 }
 
 function isBlockPayload(
-  payload: SlackActionMiddlewareArgs['payload'] | SlackOptionsMiddlewareArgs['payload'],
+  payload:
+    | SlackActionMiddlewareArgs['payload']
+    | SlackOptionsMiddlewareArgs['payload']
+    | SlackViewMiddlewareArgs['payload'],
 ): payload is BlockElementAction | OptionsRequest<'block_suggestion'> {
   return (payload as BlockElementAction | OptionsRequest<'block_suggestion'>).action_id !== undefined;
 }
@@ -336,14 +329,19 @@ function isBlockPayload(
 type CallbackIdentifiedBody =
   | InteractiveMessage
   | DialogSubmitAction
-  | ViewOutput
   | MessageAction
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
 function isCallbackIdentifiedBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['payload'],
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'],
 ): body is CallbackIdentifiedBody {
   return (body as CallbackIdentifiedBody).callback_id !== undefined;
+}
+
+function isViewBody(
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
+): body is (ViewSubmitAction | ViewClosedAction) {
+  return (body as ViewSubmitAction).view !== undefined;
 }
 
 function isEventArgs(
