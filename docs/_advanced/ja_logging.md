@@ -32,6 +32,7 @@ const app = new App({
 | メソッド      | パラメーター        | 戻り値の型    |
 |--------------|-------------------|-------------|
 | `setLevel()` | `level: LogLevel` | `void`      |
+| `getLevel()` | なし               | `string` (値は `error`, `warn`, `info`, `debug` のいずれか)  |
 | `setName()`  | `name: string`    | `void`      |
 | `debug()`    | `...msgs: any[]`  | `void`      |
 | `info()`     | `...msgs: any[]`  | `void`      |
