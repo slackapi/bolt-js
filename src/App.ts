@@ -323,6 +323,16 @@ export default class App {
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
       { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
 
+      // Fail early if the constraints contain invalid keys
+    const unknownConstraintKeys = Object.keys(constraints)
+      .filter(k => (k !== 'callback_id' && k !== 'type'));
+    if (unknownConstraintKeys.length > 0) {
+      this.logger.error(
+        `View listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
+      );
+      return;
+    }
+
     this.listeners.push(
       [onlyViewActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
     );
