@@ -265,7 +265,14 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
       }
 
       // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
-      if (botUserId !== undefined && args.event.user === botUserId) {
+      // However, some events still must be fired, because they can make sense.
+      const eventsWhichShouldBeKept = [
+        'member_joined_channel',
+        'member_left_channel',
+      ];
+      const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
+
+      if (botUserId !== undefined && args.event.user === botUserId && !isEventShouldBeKept) {
         return;
       }
     }
