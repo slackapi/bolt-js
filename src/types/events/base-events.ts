@@ -7,6 +7,7 @@ import { MessageAttachment, KnownBlock, Block } from '@slack/types';
  * This is a discriminated union. The discriminant is the `type` property.
  */
 export type SlackEvent =
+  | AppRequestedEvent
   | AppHomeOpenedEvent
   | AppMentionEvent
   | AppUninstalledEvent
@@ -16,7 +17,9 @@ export type SlackEvent =
   | ChannelHistoryChangedEvent
   | ChannelLeftEvent
   | ChannelRenameEvent
+  | ChannelSharedEvent
   | ChannelUnarchiveEvent
+  | ChannelUnsharedEvent
   | DNDUpdatedEvent
   | DNDUpdatedUserEvent
   | EmailDomainChangedEvent
@@ -78,6 +81,52 @@ export interface BasicSlackEvent<Type extends string = string> extends StringInd
 
 // TODO: why are these all StringIndexed? who does that really help when going more than one level deep means you have
 // to start coercing types anyway?
+
+export interface AppRequestedEvent extends StringIndexed {
+  type: 'app_requested';
+  app_request: {
+    id: string;
+    app: {
+      id: string;
+      name: string;
+      description: string;
+      help_url: string;
+      privacy_policy_url: string;
+      app_homepage_url: string;
+      app_directory_url: string;
+      is_app_directory_approved: boolean;
+      is_internal: boolean;
+      additional_info: string;
+    };
+  };
+  previous_resolution: {
+    status: 'approved' | 'restricted';
+    scopes: {
+      name: string;
+      description: string;
+      is_dangerous: boolean;
+      token_type: 'bot' | 'user' | 'app' | null;
+    };
+  } | null;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  team: {
+    id: string;
+    name: string;
+    domain: string;
+  };
+  scopes: {
+    name: string;
+    description: string;
+    is_dangerous: boolean;
+    token_type: 'bot' | 'user' | 'app' | null;
+  };
+  message: string;
+  date_created: number;
+}
 
 export interface AppHomeOpenedEvent extends StringIndexed {
   type: 'app_home_opened';
@@ -149,10 +198,25 @@ export interface ChannelRenameEvent extends StringIndexed {
   };
 }
 
+export interface ChannelSharedEvent extends StringIndexed {
+  type: 'channel_shared';
+  connected_team_id: string;
+  channel: string;
+  event_ts: string;
+}
+
 export interface ChannelUnarchiveEvent extends StringIndexed {
   type: 'channel_unarchive';
   channel: string;
   user: string;
+}
+
+export interface ChannelUnsharedEvent extends StringIndexed {
+  type: 'channel_unshared';
+  previously_connected_team_id: string;
+  channel: string;
+  is_ext_shared: boolean;
+  event_ts: string;
 }
 
 export interface DNDUpdatedEvent extends StringIndexed {

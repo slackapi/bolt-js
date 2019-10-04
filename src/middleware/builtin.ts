@@ -8,12 +8,15 @@ import {
   SlackEvent,
   SlackAction,
   SlashCommand,
+  ViewSubmitAction,
   OptionsRequest,
   InteractiveMessage,
   DialogSubmitAction,
   MessageAction,
   BlockElementAction,
   ContextMissingPropertyError,
+  SlackViewMiddlewareArgs,
+  ViewOutput,
 } from '../types';
 import { ActionConstraints } from '../App';
 import { ErrorCode, errorWithCode } from '../errors';
@@ -71,11 +74,52 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 };
 
 /**
+ * Middleware that filters out any event that isn't a view_submission
+ */
+export const onlyViewSubmits: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction }> = ({ view, next }) => {
+  // Filter out anything that isn't a view_submission
+  if (view === undefined) {
+    return;
+  }
+
+  // It matches so we should continue down this middleware listener chain
+  next();
+};
+
+// TODO: is there a way to consolidate the next two methods without too much type refactoring?
+export function matchCallbackId(
+    callbackId: string | RegExp,
+): Middleware<SlackViewMiddlewareArgs> {
+  return ({ payload, next, context }) => {
+    let tempMatches: RegExpMatchArray | null;
+
+    if (!isCallbackIdentifiedBody(payload)) {
+      return;
+    }
+    if (typeof callbackId === 'string') {
+      if (payload.callback_id !== callbackId) {
+        return;
+      }
+    } else {
+      tempMatches = payload.callback_id.match(callbackId);
+
+      if (tempMatches !== null) {
+        context['callbackIdMatches'] = tempMatches;
+      } else {
+        return;
+      }
+    }
+
+    next();
+  };
+}
+
+/**
  * Middleware that checks for matches given constraints
  */
 export function matchConstraints(
-    constraints: ActionConstraints,
-  ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
+  constraints: ActionConstraints,
+): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs> {
   return ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
@@ -231,7 +275,14 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
       }
 
       // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
-      if (botUserId !== undefined && args.event.user === botUserId) {
+      // However, some events still must be fired, because they can make sense.
+      const eventsWhichShouldBeKept = [
+        'member_joined_channel',
+        'member_left_channel',
+      ];
+      const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
+
+      if (botUserId !== undefined && args.event.user === botUserId && !isEventShouldBeKept) {
         return;
       }
     }
@@ -292,11 +343,12 @@ function isBlockPayload(
 type CallbackIdentifiedBody =
   | InteractiveMessage
   | DialogSubmitAction
+  | ViewOutput
   | MessageAction
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
 function isCallbackIdentifiedBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'],
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['payload'],
 ): body is CallbackIdentifiedBody {
   return (body as CallbackIdentifiedBody).callback_id !== undefined;
 }
