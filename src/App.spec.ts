@@ -437,20 +437,19 @@ describe('App', () => {
               respond: noop,
               ack: noop,
             },
-            // TODO: https://github.com/slackapi/bolt/issues/263
-            // {
-            //   body: {
-            //     type: 'view_closed',
-            //     channel: {},
-            //     user: {},
-            //     team: {},
-            //     view: {
-            //       callback_id: 'view_callback_id',
-            //     }
-            //   },
-            //   respond: noop,
-            //   ack: noop,
-            // },
+            {
+              body: {
+                type: 'view_closed',
+                channel: {},
+                user: {},
+                team: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                }
+              },
+              respond: noop,
+              ack: noop,
+            },
           ];
         }
 
