@@ -378,6 +378,159 @@ describe('App', () => {
         return overrides;
       }
 
+      describe('routing', () => {
+
+        function createReceiverEvents(): ReceiverEvent[] {
+          return [
+            { // IncomingEventType.Event (app.event)
+              body: {
+                event: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Command (app.command)
+              body: {
+                command: '/COMMAND_NAME',
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action (app.action)
+              body: {
+                type: 'block_actions',
+                actions: [{
+                  action_id: 'block_action_id'
+                }],
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action (app.action)
+              body: {
+                type: 'message_action',
+                callback_id: 'message_action_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action (app.action)
+              body: {
+                type: 'interactive_message',
+                callback_id: 'interactive_message_callback_id',
+                actions: [{}],
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action with dialog submission (app.action)
+              body: {
+                type: 'dialog_submission',
+                callback_id: 'dialog_submission_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action for an external_select block (app.options)
+              body: {
+                type: 'block_suggestion',
+                action_id: 'external_select_action_id',
+                channel: {},
+                user: {},
+                team: {},
+                actions: [],
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.Action for "data_source": "external" in dialogs (app.options)
+              body: {
+                type: 'dialog_suggestion',
+                callback_id: 'dialog_suggestion_callback_id',
+                name: 'the name',
+                channel: {},
+                user: {},
+                team: {},
+              },
+              respond: noop,
+              ack: noop,
+            },
+            { // IncomingEventType.ViewSubmitAction (app.view)
+              body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                team: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                }
+              },
+              respond: noop,
+              ack: noop,
+            },
+            // TODO: https://github.com/slackapi/bolt/issues/263
+            // {
+            //   body: {
+            //     type: 'view_closed',
+            //     channel: {},
+            //     user: {},
+            //     team: {},
+            //     view: {
+            //       callback_id: 'view_callback_id',
+            //     }
+            //   },
+            //   respond: noop,
+            //   ack: noop,
+            // },
+          ];
+        }
+
+        it('should acknowledge any of possible events', async () => {
+          // Arrange
+          const ackFn = sinon.fake.resolves({});
+          const actionFn = sinon.fake.resolves({});
+          const viewFn = sinon.fake.resolves({});
+          const optionsFn = sinon.fake.resolves({});
+          const overrides = buildOverrides(withNoopWebClient());
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const dummyReceiverEvents = createReceiverEvents();
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.use((_args) => { ackFn(); });
+          app.action('block_action_id', ({ }) => { actionFn(); })
+          app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); })
+          app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); })
+          app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); })
+          app.view('view_callback_id', ({ }) => { viewFn(); })
+          app.options('external_select_action_id', ({ }) => { optionsFn(); });
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, ({ }) => { optionsFn(); });
+
+          app.error(fakeErrorHandler);
+          dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
+          await delay();
+
+          // Assert
+          assert.equal(actionFn.callCount, 4);
+          assert.equal(viewFn.callCount, 1);
+          assert.equal(optionsFn.callCount, 2);
+          assert.equal(ackFn.callCount, dummyReceiverEvents.length);
+          assert(fakeErrorHandler.notCalled);
+        });
+      });
+
       describe('say()', () => {
 
         function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {
