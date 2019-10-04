@@ -2,7 +2,7 @@
 title: オプションのリスニングと応答
 lang: ja-jp
 slug: options
-order: 9
+order: 12
 ---
 
 <div class="section-content">
@@ -10,7 +10,7 @@ order: 9
 
 `external_select` メニューには `action_id` を使用することをお勧めしますが、ダイアログはまだ Block Kit をサポートしていないため、制約オブジェクトを用いて `callback_id` でフィルタリングする必要があります。
 
-オプションリクエストに応答するためには、適切なオプションを指定して `ack()` を実行する必要があります。[external_select の応答の例](https://api.slack.com/reference/messaging/block-elements#external-select)も[ダイアログ応答の例](https://api.slack.com/dialogs#dynamic_select_elements_external)も API サイトで参照できます
+オプションリクエストに応答するためには、適切なオプションを指定して `ack()` を実行する必要があります。[external_select の応答の例](https://api.slack.com/reference/messaging/block-elements#external-select)も[ダイアログ応答の例](https://api.slack.com/dialogs#dynamic_select_elements_external)も API サイトで参照できます。
 </div>
 
 ```javascript
