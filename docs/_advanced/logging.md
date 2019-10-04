@@ -32,6 +32,7 @@ If you want to send logs to somewhere besides the console or want more control o
 | Method       | Parameters        | Return type |
 |--------------|-------------------|-------------|
 | `setLevel()` | `level: LogLevel` | `void`      |
+| `getLevel()` | None              | `string` with value `error`, `warn`, `info`, or `debug`  |
 | `setName()`  | `name: string`    | `void`      |
 | `debug()`    | `...msgs: any[]`  | `void`      |
 | `info()`     | `...msgs: any[]`  | `void`      |
