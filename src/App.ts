@@ -145,6 +145,7 @@ export default class App {
     this.client = new WebClient(undefined, {
       agent,
       logLevel,
+      logger,
       tls: clientTls,
       slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
     });
