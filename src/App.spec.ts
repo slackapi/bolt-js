@@ -8,6 +8,7 @@ import rewiremock from 'rewiremock';
 import { ErrorCode } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
+import { LogLevel } from '@slack/logger';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -155,6 +156,32 @@ describe('App', () => {
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
+    it('with clientOptions', async () => {
+      const fakeConstructor = sinon.fake()
+      const overrides = mergeOverrides(
+        withNoopAppMetadata(),
+        {
+          '@slack/web-api': {
+            WebClient: class {
+              constructor() {
+                fakeConstructor(...arguments)
+              }
+            },
+          }
+        }
+      )
+      const App = await importApp(overrides);
+
+      const clientOptions = { slackApiUrl: 'proxy.slack.com' };
+      new App({ authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR, clientOptions });
+
+      assert.ok(fakeConstructor.called);
+
+      const [token, options] = fakeConstructor.lastCall.args;
+      assert.strictEqual(undefined, token, 'token should be undefined');
+      assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
+      assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
+    })
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
     // TODO: tests for providing botId and botUserId options

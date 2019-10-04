@@ -1,5 +1,5 @@
 import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata } from '@slack/web-api';
+import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
@@ -53,6 +53,7 @@ export interface AppOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
+  clientOptions?: WebClientOptions;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -130,14 +131,18 @@ export default class App {
     logger = new ConsoleLogger(),
     logLevel = LogLevel.INFO,
     ignoreSelf = true,
+    clientOptions = undefined,
   }: AppOptions = {}) {
 
     this.logger = logger;
     this.logger.setLevel(logLevel);
     this.errorHandler = defaultErrorHandler(this.logger);
 
-    // TODO: other webclient options (such as proxy)
-    this.client = new WebClient(undefined, { logLevel });
+    let options = { logLevel };
+    if (clientOptions !== undefined) {
+      options = { ...clientOptions, ...options };
+    }
+    this.client = new WebClient(undefined, options);
 
     if (token !== undefined) {
       if (authorize !== undefined) {
