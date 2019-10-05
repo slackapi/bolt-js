@@ -151,7 +151,7 @@ ngrok http 3000
 
 **Request URL**  ボックスの  **Enable Events**  スイッチの下のフィールドにこの URL を貼り付けます。Bolt アプリが引き続き実行されている場合は、URL が検証されチェックマークが表示されます。
 
-Request URL が検証されたら、**Subscribe to Bot Events** までスクロールします。メッセージに関する4つのイベントがあります−
+Request URL が検証されたら、**Subscribe to Bot Events** までスクロールします。メッセージに関するイベントが４つあります−
 message.channels (パブリックチャンネルのメッセージをリスニング), message.groups (プライベートチャンネルのメッセージをリスニング), message.im (App Home とダイレクトメッセージのリスニング), and message.mpim (グループ DM のリスニング)
 
 もしボットに全てのメッセージイベントのリスニングをさせたいならば、これら４つ全てのイベントを選んでください。終わったら緑の **Save Changes** ボタンをクリックします。
