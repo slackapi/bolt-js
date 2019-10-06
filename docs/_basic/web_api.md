@@ -45,12 +45,12 @@ You can add emoji reactions to the message you are listening to using the `react
 // Reacts to "I like you" messages with a heart emoji
 app.message('I like you', async ({ message, context }) => {
   try {
-  const result = await app.client.reactions.add({
-    token: context.botToken,
-    name: 'heart',
-    channel: message.channel,
-    timestamp: message.ts
-  });
+    const result = await app.client.reactions.add({
+      token: context.botToken,
+      name: 'heart',
+      channel: message.channel,
+      timestamp: message.ts
+    });
   }
   catch (error) {
     console.log(error);
