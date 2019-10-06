@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import { ErrorCode } from '../errors';
 import { Override, delay, wrapToResolveOnFirstCall } from '../test-helpers';
 import rewiremock from 'rewiremock';
-import { SlackEventMiddlewareArgs, NextMiddleware, Context, MessageEvent } from '../types';
+import { SlackEventMiddlewareArgs, NextMiddleware, Context, MessageEvent, ContextMissingPropertyError, SlackCommandMiddlewareArgs } from '../types';
 
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
@@ -261,6 +261,167 @@ describe('directMention()', () => {
   });
 });
 
+describe('ignoreSelf()', () => {
+  it('should handle context missing error', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = undefined;
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId },
+    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware, contextMissingPropertyError } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    const expectedError = contextMissingPropertyError(
+      'botId',
+      'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
+    );
+
+    const contextMissingError: ContextMissingPropertyError = fakeNext.getCall(0).lastArg;
+
+    assert.equal(contextMissingError.code, expectedError.code);
+    assert.equal(contextMissingError.missingProperty, expectedError.missingProperty);
+  });
+
+  it('should immediately call next(), because incoming middleware args don\'t contain event', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId },
+      command: {
+        command: '/fakeCommand',
+      },
+    } as unknown as CommandMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.calledOnce);
+  });
+
+  it('should look for an event identified as a bot message from the same bot ID as this app and skip it', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    // TODO: Fix typings here
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+      event: {
+        type: 'message',
+        subtype: 'bot_message',
+        bot_id: fakeBotUserId,
+      },
+      message: {
+        type: 'message',
+        subtype: 'bot_message',
+        bot_id: fakeBotUserId,
+      },
+    } as any;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('should filter an event out, because it matches our own app and shouldn\'t be retained', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+      event: {
+        type: 'tokens_revoked',
+        user: fakeBotUserId,
+      },
+    } as unknown as TokensRevokedMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('should filter an event out, because it matches our own app and shouldn\'t be retained', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+      event: {
+        type: 'tokens_revoked',
+        user: fakeBotUserId,
+      },
+    } as unknown as TokensRevokedMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('shouldn\'t filter an event out, because it should be retained', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const eventsWhichShouldNotBeFilteredOut = ['member_joined_channel', 'member_left_channel'];
+
+    const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => {
+      return {
+        next: fakeNext,
+        context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+        event: {
+          type: eventType,
+          user: fakeBotUserId,
+        },
+      } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
+    });
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    listOfFakeArgs.forEach(middleware);
+
+    await delay();
+
+    // Assert
+    assert.equal(fakeNext.callCount, listOfFakeArgs.length);
+  });
+});
+
 /* Testing Harness */
 
 interface DummyContext {
@@ -268,6 +429,12 @@ interface DummyContext {
 }
 
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & { next: NextMiddleware, context: Context };
+type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & { next: NextMiddleware, context: Context };
+
+type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'>
+  & { next: NextMiddleware, context: Context };
+
+type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & { next: NextMiddleware; context: Context };
 
 async function importBuiltin(
   overrides: Override = {},
