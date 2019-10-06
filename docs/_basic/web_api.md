@@ -31,3 +31,31 @@ app.message('wake me up', async ({ message, context }) => {
   }
 });
 ```
+
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
+<h4 class="section-head">Reacting to messages</h4>
+</summary>
+
+<div class="secondary-content" markdown="0">
+You can add emoji reactions to the message you are listening to using the `reactions.add()` method available at the `app.client` context.
+</div>
+
+```javascript
+// Reacts to "I like you" messages with a heart emoji
+app.message('I like you', async ({ message, context }) => {
+  try {
+  const result = await app.client.reactions.add({
+    token: context.botToken,
+    name: 'heart',
+    channel: message.channel,
+    timestamp: message.ts
+  });
+  }
+  catch (error) {
+    console.log(error);
+  }
+});
+```
+
+</details>
