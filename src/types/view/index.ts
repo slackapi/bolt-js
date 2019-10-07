@@ -2,12 +2,17 @@ import { StringIndexed } from '../helpers';
 import { RespondArguments, AckFn } from '../utilities';
 
 /**
+ * Known view action types
+ */
+export type SlackViewAction = ViewSubmitAction | ViewClosedAction;
+// <ViewAction extends SlackViewAction = ViewSubmitAction>
+/**
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */
-export interface SlackViewMiddlewareArgs {
+export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction = ViewSubmitAction> {
   payload: ViewOutput;
   view: this['payload'];
-  body: ViewSubmitAction | ViewClosedAction;
+  body: ViewActionType;
   ack: AckFn<string | RespondArguments>;
 }
 

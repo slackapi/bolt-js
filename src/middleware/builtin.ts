@@ -17,6 +17,7 @@ import {
   MessageAction,
   BlockElementAction,
   ContextMissingPropertyError,
+  SlackViewAction,
 } from '../types';
 import { ActionConstraints, ViewConstraints } from '../App';
 import { ErrorCode, errorWithCode } from '../errors';
@@ -346,9 +347,12 @@ function isCallbackIdentifiedBody(
 }
 
 function isViewBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
-): body is (ViewSubmitAction | ViewClosedAction) {
-  return (body as ViewSubmitAction).view !== undefined;
+  body:
+    SlackActionMiddlewareArgs['body']
+    | SlackOptionsMiddlewareArgs['body']
+    | SlackViewMiddlewareArgs<SlackViewAction>['body'],
+): body is SlackViewAction {
+  return (body as SlackViewAction).view !== undefined;
 }
 
 function isEventArgs(

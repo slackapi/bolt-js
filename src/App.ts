@@ -34,6 +34,8 @@ import {
   InteractiveMessage,
   Receiver,
   ReceiverEvent,
+  SlackViewAction,
+  ViewSubmitAction,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
@@ -316,23 +318,23 @@ export default class App {
     );
   }
 
-  public view(
+  public view<ViewActionType extends SlackViewAction = ViewSubmitAction>(
     callbackId: string | RegExp,
-    ...listeners: Middleware<SlackViewMiddlewareArgs>[]
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void;
-  public view(
+  public view<ViewActionType extends SlackViewAction = ViewSubmitAction>(
     constraints: ViewConstraints,
-    ...listeners: Middleware<SlackViewMiddlewareArgs>[]
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void;
-  public view(
+  public view<ViewActionType extends SlackViewAction = ViewSubmitAction>(
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
-    ...listeners: Middleware<SlackViewMiddlewareArgs>[]): void {
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]): void {
     const constraints: ViewConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
       { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
-      .filter(k => ( k !== 'callback_id' && k !== 'type'));
+      .filter(k => (k !== 'callback_id' && k !== 'type'));
     if (unknownConstraintKeys.length > 0) {
       this.logger.error(
         `View listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
@@ -340,7 +342,7 @@ export default class App {
       return;
     }
 
-    if (constraints.type !== undefined && validViewTypes.includes(constraints.type)) {
+    if (constraints.type !== undefined && !validViewTypes.includes(constraints.type)) {
       this.logger.error(
         `View listener cannot be attached using unknown view event type ${constraints.type}`,
       );
@@ -365,6 +367,7 @@ export default class App {
     // with "finally" type error situations.
     // Introspect the body to determine what type of incoming event is being handled, and any channel context
     const { type, conversationId } = getTypeAndConversation(body);
+    console.log(type);
     // If the type could not be determined, warn and exit
     if (type === undefined) {
       this.logger.warn('Could not determine the type of an incoming event. No listeners will be called.');
@@ -413,7 +416,7 @@ export default class App {
           (type === IncomingEventType.Event) ?
             (bodyArg as SlackEventMiddlewareArgs['body']).event :
           (type === IncomingEventType.ViewAction) ?
-            (bodyArg as SlackViewMiddlewareArgs['body']).view :
+            (bodyArg as SlackViewMiddlewareArgs<SlackViewAction>['body']).view :
           (type === IncomingEventType.Action &&
             isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
             (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
@@ -504,7 +507,7 @@ export default class App {
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
   'should be initialized with a authorize.';
 
-const validViewTypes = ['view_submission', 'view_closed'];
+const validViewTypes = ['view_closed', 'view_submission'];
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
