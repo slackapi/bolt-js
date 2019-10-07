@@ -5,18 +5,18 @@ import {
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
+  SlackViewMiddlewareArgs,
   SlackEvent,
   SlackAction,
   SlashCommand,
   ViewSubmitAction,
+  ViewClosedAction,
   OptionsRequest,
   InteractiveMessage,
   DialogSubmitAction,
   MessageAction,
   BlockElementAction,
   ContextMissingPropertyError,
-  SlackViewMiddlewareArgs,
-  ViewClosedAction,
 } from '../types';
 import { ActionConstraints, ViewConstraints } from '../App';
 import { ErrorCode, errorWithCode } from '../errors';

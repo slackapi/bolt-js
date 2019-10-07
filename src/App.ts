@@ -330,7 +330,7 @@ export default class App {
     const constraints: ViewConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
       { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
-
+    const test = constraints['type'];
       // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
       .filter(k => (k !== 'callback_id' && k !== 'type'));

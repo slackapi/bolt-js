@@ -33,7 +33,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   constructor({
     signingSecret = '',
     logger = new ConsoleLogger(),
-    endpoints = { events: '/slack/events' }
+    endpoints = { events: '/slack/events' },
   }: ExpressReceiverOptions) {
     super();
 
@@ -256,7 +256,7 @@ function parseRequestBody(
       // Parse this body anyway
       return JSON.parse(stringBody);
     } catch (e) {
-      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`)
+      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
       throw e;
     }
   }
