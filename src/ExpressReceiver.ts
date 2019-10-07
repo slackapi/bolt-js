@@ -270,7 +270,7 @@ function parseRequestBody(
       // Parse this body anyway
       return JSON.parse(stringBody);
     } catch (e) {
-      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`)
+      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
       throw e;
     }
   }

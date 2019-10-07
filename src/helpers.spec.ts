@@ -77,6 +77,21 @@ describe('getTypeAndConversation()', () => {
     });
   });
 
+  describe('view types', () => {
+    // Arrange
+    const dummyViewBodies = createFakeViews();
+
+    dummyViewBodies.forEach((viewBody) => {
+      it(`should find Action type for ${viewBody.type}`, () => {
+        // Act
+        const typeAndConversation = getTypeAndConversation(viewBody);
+
+        // Assert
+        assert(typeAndConversation.type === IncomingEventType.ViewAction);
+      });
+    });
+  });
+
   describe('invalid events', () => {
     // Arrange
     const fakeEventBody = {
@@ -147,6 +162,21 @@ function createFakeOptions(conversationId: string): any[] {
     {
       type: 'block_suggestion',
       channel: { id: conversationId },
+    },
+  ];
+}
+
+function createFakeViews(): any[] {
+  return [
+    // Body for a view_submission event
+    {
+      type: 'view_submission',
+      view: { id: 'V123' },
+    },
+    // Body for a view_closed event
+    {
+      type: 'view_closed',
+      view: { id: 'V456' },
     },
   ];
 }

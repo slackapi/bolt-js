@@ -432,25 +432,24 @@ describe('App', () => {
                 team: {},
                 view: {
                   callback_id: 'view_callback_id',
-                }
+                },
               },
               respond: noop,
               ack: noop,
             },
-            // TODO: https://github.com/slackapi/bolt/issues/263
-            // {
-            //   body: {
-            //     type: 'view_closed',
-            //     channel: {},
-            //     user: {},
-            //     team: {},
-            //     view: {
-            //       callback_id: 'view_callback_id',
-            //     }
-            //   },
-            //   respond: noop,
-            //   ack: noop,
-            // },
+            {
+              body: {
+                type: 'view_closed',
+                channel: {},
+                user: {},
+                team: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
           ];
         }
 
@@ -467,11 +466,12 @@ describe('App', () => {
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use((_args) => { ackFn(); });
-          app.action('block_action_id', ({ }) => { actionFn(); })
-          app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); })
-          app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); })
-          app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); })
-          app.view('view_callback_id', ({ }) => { viewFn(); })
+          app.action('block_action_id', ({ }) => { actionFn(); });
+          app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
+          app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); });
+          app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); });
+          app.view('view_callback_id', ({ }) => { viewFn(); });
+          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, ({ }) => { viewFn(); });
           app.options('external_select_action_id', ({ }) => { optionsFn(); });
           app.options({ callback_id: 'dialog_suggestion_callback_id' }, ({ }) => { optionsFn(); });
 
@@ -481,7 +481,7 @@ describe('App', () => {
 
           // Assert
           assert.equal(actionFn.callCount, 4);
-          assert.equal(viewFn.callCount, 1);
+          assert.equal(viewFn.callCount, 2);
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
