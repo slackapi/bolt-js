@@ -330,13 +330,19 @@ export default class App {
     const constraints: ViewConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
       { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
-    const test = constraints['type'];
-      // Fail early if the constraints contain invalid keys
+    // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
-      .filter(k => (k !== 'callback_id' && k !== 'type'));
+      .filter(k => ( k !== 'callback_id' && k !== 'type'));
     if (unknownConstraintKeys.length > 0) {
       this.logger.error(
         `View listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
+      );
+      return;
+    }
+
+    if (constraints.type !== undefined && validViewTypes.includes(constraints.type)) {
+      this.logger.error(
+        `View listener cannot be attached using unknown view event type ${constraints.type}`,
       );
       return;
     }
@@ -497,6 +503,8 @@ export default class App {
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
   'should be initialized with a authorize.';
+
+const validViewTypes = ['view_submission', 'view_closed'];
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
