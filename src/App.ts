@@ -344,7 +344,7 @@ export default class App {
 
     if (constraints.type !== undefined && !validViewTypes.includes(constraints.type)) {
       this.logger.error(
-        `View listener cannot be attached using unknown view event type ${constraints.type}`,
+        `View listener cannot be attached using unknown view event type: ${constraints.type}`,
       );
       return;
     }
