@@ -366,7 +366,6 @@ export default class App {
     // with "finally" type error situations.
     // Introspect the body to determine what type of incoming event is being handled, and any channel context
     const { type, conversationId } = getTypeAndConversation(body);
-    console.log(type);
     // If the type could not be determined, warn and exit
     if (type === undefined) {
       this.logger.warn('Could not determine the type of an incoming event. No listeners will be called.');
