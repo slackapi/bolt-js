@@ -44,6 +44,8 @@ const packageJson = require('../package.json'); // tslint:disable-line:no-requir
 export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
+  agent?: ExpressReceiverOptions['agent']; // also WebClientOptions['agent']
+  clientTls?: ExpressReceiverOptions['clientTls']; // also WebClientOptions['tls']
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
@@ -53,7 +55,7 @@ export interface AppOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
-  clientOptions?: WebClientOptions;
+  clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -127,6 +129,8 @@ export default class App {
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
+    agent = undefined,
+    clientTls = undefined,
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
@@ -143,11 +147,13 @@ export default class App {
     this.logger.setLevel(logLevel);
     this.errorHandler = defaultErrorHandler(this.logger);
 
-    let options = { logLevel };
-    if (clientOptions !== undefined) {
-      options = { ...clientOptions, ...options };
-    }
-    this.client = new WebClient(undefined, options);
+    this.client = new WebClient(undefined, {
+      agent,
+      logLevel,
+      logger,
+      tls: clientTls,
+      slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
+    });
 
     if (token !== undefined) {
       if (authorize !== undefined) {
@@ -182,7 +188,7 @@ export default class App {
         );
       } else {
         // Create default ExpressReceiver
-        this.receiver = new ExpressReceiver({ signingSecret, logger, endpoints });
+        this.receiver = new ExpressReceiver({ signingSecret, logger, endpoints, agent, clientTls });
       }
     }
 
