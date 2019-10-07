@@ -32,10 +32,9 @@ import {
   OptionsSource,
   BlockAction,
   InteractiveMessage,
+  SlackViewAction,
   Receiver,
   ReceiverEvent,
-  SlackViewAction,
-  ViewSubmitAction,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
@@ -318,15 +317,15 @@ export default class App {
     );
   }
 
-  public view<ViewActionType extends SlackViewAction = ViewSubmitAction>(
+  public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     callbackId: string | RegExp,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void;
-  public view<ViewActionType extends SlackViewAction = ViewSubmitAction>(
+  public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     constraints: ViewConstraints,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void;
-  public view<ViewActionType extends SlackViewAction = ViewSubmitAction>(
+  public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]): void {
     const constraints: ViewConstraints =
@@ -416,7 +415,7 @@ export default class App {
           (type === IncomingEventType.Event) ?
             (bodyArg as SlackEventMiddlewareArgs['body']).event :
           (type === IncomingEventType.ViewAction) ?
-            (bodyArg as SlackViewMiddlewareArgs<SlackViewAction>['body']).view :
+            (bodyArg as SlackViewMiddlewareArgs['body']).view :
           (type === IncomingEventType.Action &&
             isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
             (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :

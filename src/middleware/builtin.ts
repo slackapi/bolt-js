@@ -350,7 +350,7 @@ function isViewBody(
   body:
     SlackActionMiddlewareArgs['body']
     | SlackOptionsMiddlewareArgs['body']
-    | SlackViewMiddlewareArgs<SlackViewAction>['body'],
+    | SlackViewMiddlewareArgs['body'],
 ): body is SlackViewAction {
   return (body as SlackViewAction).view !== undefined;
 }

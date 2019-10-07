@@ -9,7 +9,7 @@ export type SlackViewAction = ViewSubmitAction | ViewClosedAction;
 /**
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */
-export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction = ViewSubmitAction> {
+export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction = SlackViewAction> {
   payload: ViewOutput;
   view: this['payload'];
   body: ViewActionType;
