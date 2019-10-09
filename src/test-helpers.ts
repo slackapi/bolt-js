@@ -34,6 +34,7 @@ function mergeObjProperties(first: Override, second: Override): Override {
 
 export interface FakeLogger extends Logger {
   setLevel: SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>;
+  getLevel: SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>;
   setName: SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>;
   debug: SinonSpy<Parameters<Logger['debug']>, ReturnType<Logger['debug']>>;
   info: SinonSpy<Parameters<Logger['info']>, ReturnType<Logger['info']>>;
@@ -46,6 +47,7 @@ export function createFakeLogger(): FakeLogger {
     // NOTE: the two casts are because of a TypeScript inconsistency with tuple types and any[]. all tuple types
     // should be assignable to any[], but TypeScript doesn't think so.
     setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
+    getLevel: sinon.fake() as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
     setName: sinon.fake() as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
     debug: sinon.fake(),
     info: sinon.fake(),
