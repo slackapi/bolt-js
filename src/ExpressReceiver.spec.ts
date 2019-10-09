@@ -15,7 +15,7 @@ describe('ExpressReceiver', () => {
     warn(..._msg: any[]): void { },
     error(..._msg: any[]): void { },
     setLevel(_level: LogLevel): void { },
-    getLevel(): LogLevel { },
+    getLevel(): LogLevel { return LogLevel.DEBUG; },
     setName(_name: string): void { },
   };
 
