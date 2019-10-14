@@ -23,11 +23,11 @@ app.command('/ticket', ({ ack, payload, context }) => {
   try {
     const result = app.client.views.open({
       token: context.botToken,
-      type: 'modal',
       // 適切な trigger_id を受け取ってから 3 秒以内に渡す
       trigger_id: payload.trigger_id,
       // view の値をペイロードに含む
       view: {
+        type: 'modal',
         // callback_id が view を特定するための識別子
         callback_id: 'view_1',
         title: {
