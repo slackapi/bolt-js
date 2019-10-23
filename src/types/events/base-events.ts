@@ -1,5 +1,5 @@
 import { StringIndexed } from '../helpers';
-import { MessageAttachment, KnownBlock, Block } from '@slack/types';
+import { MessageAttachment, KnownBlock, Block, View } from '@slack/types';
 
 /**
  * All known event types in Slack's Events API
@@ -132,6 +132,8 @@ export interface AppHomeOpenedEvent extends StringIndexed {
   type: 'app_home_opened';
   user: string;
   channel: string;
+  tab?: 'home' | 'messages';
+  view?: View;
   event_ts: string;
 }
 
