@@ -25,6 +25,7 @@ app.action('button_abc', ({ ack, body, context }) => {
 
   try {
     const result = app.client.views.update({
+      type: 'modal',
       token: context.botToken,
       // Pass the view_id
       view_id: body.view.id,

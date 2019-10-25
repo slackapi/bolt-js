@@ -26,6 +26,7 @@ app.action('button_abc', ({ ack, body, context }) => {
 
   try {
     const result = app.client.views.update({
+      type: 'modal',
       token: context.botToken,
       // リクエストに含まれる view_id を渡す
       view_id: body.view.id,
