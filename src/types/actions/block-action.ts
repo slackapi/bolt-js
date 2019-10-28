@@ -114,6 +114,15 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
 }
 
 /**
+ * An action from a radio button element
+ */
+export interface RadioButtonsAction extends BasicElementAction<'radio_buttons'> {
+  selected_option: Option;
+  initial_option?: Option;
+  confirm?: Confirmation;
+}
+
+/**
  * A Slack Block Kit element action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack's Block Kit interactive components.
