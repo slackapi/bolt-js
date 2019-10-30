@@ -14,7 +14,7 @@ To update a view, you can use the built-in client to call <code>views.update</co
 <strong><code>views.push</code></strong><br>
 To push a new view onto the view stack, you can use the built-in client to call <code>views.push</code> with a valid <code>trigger_id</code> a new <a href="https://api.slack.com/reference/block-kit/views">view payload</a>. The arguments for `views.push` is the same as <a href="#creating-modals">opening modals</a>. After you open a modal, you may only push two additional views onto the view stack.
 
-Learn more about updating and pushing views in our <a href="https://api.slack.com/block-kit/surfaces/modals#updating_views">API documentation</a>.
+Learn more about updating and pushing views in our <a href="https://api.slack.com/surfaces/modals/using#modifying">API documentation</a>.
 </div>
 
 ```javascript
