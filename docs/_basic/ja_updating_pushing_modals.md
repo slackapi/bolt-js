@@ -14,7 +14,7 @@ order: 10
 <strong><code>views.push</code></strong><br>
 ビューのスタックに新しいビューを積み重ねるには、組み込みの API クライアントを使って <code>views.push</code> を呼び出します。この API 呼び出しには、適切な <code>trigger_id</code> と新しく生成する <a href="https://api.slack.com/reference/block-kit/views">ビュー部分のペイロード</a>を渡します。`views.push` の引数は <a href="#creating-modals">ビューをオープンするとき</a>と同様です。最初のモーダルビューをオープンした後、その上にさらに二つまで追加のビューをスタックに積み重ねることができます。
 
-より詳細な情報は <a href="https://api.slack.com/block-kit/surfaces/modals#updating_views">API ドキュメント</a>を参照してください。
+より詳細な情報は <a href="https://slack.dev/bolt/concepts#view_submissions">API ドキュメント</a>を参照してください。
 </div>
 
 ```javascript
