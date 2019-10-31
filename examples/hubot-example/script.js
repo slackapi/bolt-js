@@ -238,6 +238,7 @@ app.message(directMention(), 'sleep it off', async ({ context, say }) => {
   try {
     await context.updateConversation({ ...context.conversation, sodasHad: 0 });
     say('zzzzz');
+    say('good night')
   } catch (error) {
     console.error(error);
   }
