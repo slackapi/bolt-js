@@ -25,12 +25,12 @@ app.action('button_abc', ({ ack, body, context }) => {
 
   try {
     const result = app.client.views.update({
-      type: 'modal',
       token: context.botToken,
       // Pass the view_id
       view_id: body.view.id,
       // View payload with updated blocks
       view: {
+        type: 'modal',
         // View identifier
         callback_id: 'view_1',
         title: {

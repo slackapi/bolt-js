@@ -26,12 +26,12 @@ app.action('button_abc', ({ ack, body, context }) => {
 
   try {
     const result = app.client.views.update({
-      type: 'modal',
       token: context.botToken,
       // リクエストに含まれる view_id を渡す
       view_id: body.view.id,
       // 更新された view の値をペイロードに含む
       view: {
+        type: 'modal',
         // callback_id が view を特定するための識別子
         callback_id: 'view_1',
         title: {
