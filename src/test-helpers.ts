@@ -46,9 +46,14 @@ export function createFakeLogger(): FakeLogger {
   return {
     // NOTE: the two casts are because of a TypeScript inconsistency with tuple types and any[]. all tuple types
     // should be assignable to any[], but TypeScript doesn't think so.
-    setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
-    getLevel: sinon.fake() as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
-    setName: sinon.fake() as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
+    // UPDATE (Nov 2019):
+    // src/test-helpers.ts:49:15 - error TS2352: Conversion of type 'SinonSpy<any[], any>' to type 'SinonSpy<[LogLevel], void>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    //   Property '0' is missing in type 'any[]' but required in type '[LogLevel]'.
+    // 49     setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
+    //                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    setLevel: sinon.fake() as unknown as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
+    getLevel: sinon.fake() as unknown as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
+    setName: sinon.fake() as unknown as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
     debug: sinon.fake(),
     info: sinon.fake(),
     warn: sinon.fake(),

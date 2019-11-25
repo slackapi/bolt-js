@@ -220,7 +220,14 @@ function createFakeStore(
   setSpy: SinonSpy = sinon.fake.resolves({}),
 ): FakeStore {
   return {
-    set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
-    get: getSpy as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
+    // NOTE (Nov 2019): We had to convert to 'unknown' first due to the following error:
+    // src/conversation-store.spec.ts:223:10 - error TS2352: Conversion of type 'SinonSpy<any[], any>' to type 'SinonSpy<[string, any, (number | undefined)?], Promise<unknown>>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    //   Types of property 'firstCall' are incompatible.
+    //     Type 'SinonSpyCall<any[], any>' is not comparable to type 'SinonSpyCall<[string, any, (number | undefined)?], Promise<unknown>>'.
+    //       Type 'any[]' is not comparable to type '[string, any, (number | undefined)?]'.
+    // 223     set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
+    //              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    set: setSpy as unknown as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
+    get: getSpy as unknown as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
   };
 }
