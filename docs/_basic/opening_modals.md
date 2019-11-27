@@ -10,7 +10,7 @@ order: 9
 
 Your app receives <code>trigger_id</code>s in payloads sent to your Request URL triggered user invocation like a slash command, button press, or interaction with a select menu.
 
-Read more about modal composition in the <a href="https://api.slack.com/block-kit/surfaces/modals#composing_modal">API documentation</a>.
+Read more about modal composition in the <a href="https://api.slack.com/surfaces/modals/using#composing_views">API documentation</a>.
 </div>
 
 ```javascript

@@ -11,7 +11,7 @@ order: 9
 
 <code>trigger_id</code> はコマンド、ボタンの押下、メニューの選択などによって Request URL に送信されたペイロードの項目として入手することができます。
 
-モーダルビューの作成についてのより詳細な情報は <a href="https://api.slack.com/block-kit/surfaces/modals#composing_modal">API ドキュメント</a>を参照してください。
+モーダルビューの作成についてのより詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#composing_views">API ドキュメント</a>を参照してください。
 </div>
 
 ```javascript

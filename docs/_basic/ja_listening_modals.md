@@ -12,7 +12,7 @@ order: 11
 
 <code>input</code> ブロックの値は <code>state</code> オブジェクトを参照することで取得できます。<code>state</code> 内には <code>values</code> というオブジェクトがあり、これは <code>block_id</code> と一意な <code>action_id</code> に紐づける形で入力値を保持しています。
 
-より詳細な情報は <a href="https://api.slack.com/block-kit/surfaces/modals#handling_submissions">API ドキュメント</a>を参照してください。
+より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
 </div>
 
 ```javascript
