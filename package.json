@@ -39,8 +39,8 @@
   },
   "dependencies": {
     "@slack/logger": ">=1.0.0 <3.0.0",
-    "@slack/types": "^1.0.0",
-    "@slack/web-api": "^5.0.0",
+    "@slack/types": "^1.2.1",
+    "@slack/web-api": "^5.2.1",
     "@types/express": "^4.16.1",
     "@types/node": ">=10",
     "axios": "^0.18.1",
