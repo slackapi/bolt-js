@@ -87,6 +87,7 @@ export interface AuthorizeResult {
 }
 
 export interface ActionConstraints {
+  type?: string,
   block_id?: string | RegExp;
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
@@ -282,7 +283,7 @@ export default class App {
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
-      .filter(k => (k !== 'action_id' && k !== 'block_id' && k !== 'callback_id'));
+      .filter(k => (k !== 'action_id' && k !== 'block_id' && k !== 'callback_id' && k !== 'type'));
     if (unknownConstraintKeys.length > 0) {
       this.logger.error(
         `Action listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
