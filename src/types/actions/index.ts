@@ -10,7 +10,7 @@ import { MessageAction } from './message-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
 
 /**
- * All known actions from Slack's Blot Kit interactive components, message actions, dialogs, and legacy interactive
+ * All known actions from Slack's Block Kit interactive components, message actions, dialogs, and legacy interactive
  * messages.
  *
  * TODO: BlockAction's default generic parameter (ElementAction) might be too specific to allow for this type to be used
