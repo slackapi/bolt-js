@@ -270,6 +270,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
       const eventsWhichShouldBeKept = [
         'member_joined_channel',
         'member_left_channel',
+        'im_open',
       ];
       const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
 
