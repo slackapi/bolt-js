@@ -134,7 +134,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     return new Promise((resolve, reject) => {
       // TODO: what about synchronous errors?
       this.server.close((error) => {
-        if (error) {
+        if (Boolean(error)) {
           reject(error);
           return;
         }
@@ -218,7 +218,7 @@ async function verifyRequestSignature(
   body: string,
   signature: string,
   requestTimestamp: number): Promise<void> {
-  if (!signature || !requestTimestamp) {
+  if (!Boolean(signature) || !Boolean(requestTimestamp)) {
     const error = errorWithCode(
       'Slack request signing verification failed. Some headers are missing.',
       ErrorCode.ExpressReceiverAuthenticityError,
@@ -254,25 +254,26 @@ async function verifyRequestSignature(
 function parseRequestBody(
   logger: Logger,
   stringBody: string,
-  contentType: string | undefined) {
+  contentType: string | undefined): string | querystring.ParsedUrlQuery {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
     if (typeof parsedBody.payload === 'string') {
       return JSON.parse(parsedBody.payload);
-    } else {
-      return parsedBody;
     }
-  } else if (contentType === 'application/json') {
+    return parsedBody;
+  }
+
+  if (contentType === 'application/json') {
     return JSON.parse(stringBody);
-  } else {
-    logger.warn(`Unexpected content-type detected: ${contentType}`);
-    try {
-      // Parse this body anyway
-      return JSON.parse(stringBody);
-    } catch (e) {
-      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
-      throw e;
-    }
+  }
+
+  logger.warn(`Unexpected content-type detected: ${contentType}`);
+  try {
+    // Parse this body anyway
+    return JSON.parse(stringBody);
+  } catch (e) {
+    logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
+    throw e;
   }
 }
 
