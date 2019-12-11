@@ -1,6 +1,9 @@
 // tslint:disable:no-implicit-dependencies
 import sinon, { SinonSpy } from 'sinon';
 import { Logger } from '@slack/logger';
+import crypto from 'crypto';
+import { MessageEvent } from './types';
+import rewiremock from 'rewiremock';
 
 export interface Override {
   [packageName: string]: {
@@ -99,5 +102,98 @@ export function wrapToResolveOnFirstCall<T extends (...args: any[]) => void>(
   return {
     promise: firstCallPromise,
     fn: wrapped,
+  };
+}
+
+// Below functions used to help ensure downstream apps consuming the package can effectively test
+
+export interface ServerlessEvent {
+  body: string;
+  headers: { [key: string]: string };
+  httpMethod: string;
+  path: string;
+}
+
+const createRequest = (data: any): ServerlessEvent => {
+  const body = JSON.stringify(data);
+  const version = 'v0';
+  const timestamp = Math.floor(Date.now() / 1000);
+  const hmac = crypto.createHmac('sha256', 'SECRET');
+
+  hmac.update(`${version}:${timestamp}:${body}`);
+
+  return {
+    body,
+    headers: {
+      'content-type': 'application/json',
+      'x-slack-request-timestamp': timestamp.toString(),
+      'x-slack-signature': `${version}=${hmac.digest('hex')}`,
+    },
+    httpMethod: 'POST',
+    path: '/slack/events',
+  };
+};
+
+export const createFakeMessageEvent = (
+  content: string | MessageEvent['blocks'] = '',
+): MessageEvent => {
+  const event: Partial<MessageEvent> = {
+    type: 'message',
+    channel: 'CHANNEL_ID',
+    ts: 'MESSAGE_ID',
+    user: 'USER_ID',
+  };
+
+  if (typeof content === 'string') {
+    event.text = content;
+  } else {
+    event.blocks = content;
+  }
+
+  return event as MessageEvent;
+};
+
+export const createEventRequest = (event: MessageEvent): ServerlessEvent =>
+  createRequest({ event });
+
+export const createMessageEventRequest = (message: string): ServerlessEvent =>
+  createRequest({ event: createFakeMessageEvent(message) });
+
+export async function importAppWithMockSlackClient(
+  overrides: Override = mergeOverrides(
+    withNoopAppMetadata(),
+    withNoopWebClient(),
+  ),
+): Promise<typeof import('./App').default> {
+  return (await rewiremock.module(() => import('./App'), overrides)).default;
+}
+
+// Composable overrides
+function withNoopWebClient(): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {
+        public auth = {
+          test: sinon.fake.resolves({ user_id: 'BOT_USER_ID' }),
+        };
+        public users = {
+          info: sinon.fake.resolves({
+            user: {
+              profile: {
+                bot_id: 'BOT_ID',
+              },
+            },
+          }),
+        };
+      },
+    },
+  };
+}
+
+function withNoopAppMetadata(): Override {
+  return {
+    '@slack/web-api': {
+      addAppMetadata: sinon.fake(),
+    },
   };
 }
