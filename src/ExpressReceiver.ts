@@ -134,7 +134,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     return new Promise((resolve, reject) => {
       // TODO: what about synchronous errors?
       this.server.close((error) => {
-        if (Boolean(error)) {
+        if (error !== undefined) {
           reject(error);
           return;
         }
@@ -218,7 +218,7 @@ async function verifyRequestSignature(
   body: string,
   signature: string,
   requestTimestamp: number): Promise<void> {
-  if (!Boolean(signature) || !Boolean(requestTimestamp)) {
+  if (signature === undefined || requestTimestamp === undefined) {
     const error = errorWithCode(
       'Slack request signing verification failed. Some headers are missing.',
       ErrorCode.ExpressReceiverAuthenticityError,
@@ -254,7 +254,7 @@ async function verifyRequestSignature(
 function parseRequestBody(
   logger: Logger,
   stringBody: string,
-  contentType: string | undefined): string | querystring.ParsedUrlQuery {
+  contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
     if (typeof parsedBody.payload === 'string') {
