@@ -87,7 +87,7 @@ export interface AuthorizeResult {
 }
 
 export interface ActionConstraints {
-  type?: string,
+  type?: string;
   block_id?: string | RegExp;
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
