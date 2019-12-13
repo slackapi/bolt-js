@@ -108,13 +108,24 @@ describe('ExpressReceiver', () => {
       })
     }
 
-    it('should detect headers missing', async () => {
+    it('should detect headers missing signature', async () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
       (reqAsStream as { [key: string]: any }).headers = {
-        'x-slack-signature': signature /*,
-        'x-slack-request-timestamp': requestTimestamp */
+        // 'x-slack-signature': signature ,
+        'x-slack-request-timestamp': requestTimestamp
+      };
+      await verifyMissingHeaderDetection(reqAsStream as Request);
+    });
+
+    it('should detect headers missing timestamp', async () => {
+      const reqAsStream = new Readable();
+      reqAsStream.push(body);
+      reqAsStream.push(null); // indicate EOF
+      (reqAsStream as { [key: string]: any }).headers = {
+        'x-slack-signature': signature /* ,
+        'x-slack-request-timestamp': requestTimestamp*/
       };
       await verifyMissingHeaderDetection(reqAsStream as Request);
     });

@@ -218,7 +218,7 @@ async function verifyRequestSignature(
   body: string,
   signature: string,
   requestTimestamp: number): Promise<void> {
-  if (signature === undefined || requestTimestamp === undefined) {
+  if (signature === undefined || isNaN(requestTimestamp)) {
     const error = errorWithCode(
       'Slack request signing verification failed. Some headers are missing.',
       ErrorCode.ExpressReceiverAuthenticityError,
