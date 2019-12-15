@@ -142,6 +142,34 @@ describe('ExpressReceiver', () => {
     });
 
     // ----------------------------
+    // verifyInvalidTimestampError
+
+    function verifyInvalidTimestampError(req: Request): Promise<any> {
+      // Arrange
+      const resp = {} as Response;
+      let errorResult: any;
+      const next = (error: any) => { errorResult = error; };
+
+      // Act
+      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+      return verifier(req, resp, next).then((_: any) => {
+        // Assert
+        assert.equal(errorResult, 'Error: Slack request signing verification failed. Timestamp is invalid.');
+      });
+    }
+
+    it('should detect invalid timestamp header', async () => {
+      const reqAsStream = new Readable();
+      reqAsStream.push(body);
+      reqAsStream.push(null); // indicate EOF
+      (reqAsStream as { [key: string]: any }).headers = {
+        'x-slack-signature': signature,
+        'x-slack-request-timestamp': 'Hello there!',
+      };
+      await verifyInvalidTimestampError(reqAsStream as Request);
+    });
+
+    // ----------------------------
     // verifyTooOldTimestampError
 
     function verifyTooOldTimestampError(req: Request): Promise<any> {
@@ -161,11 +189,11 @@ describe('ExpressReceiver', () => {
       });
     }
 
-    it('should detect too old tiestamp', async () => {
+    it('should detect too old timestamp', async () => {
       await verifyTooOldTimestampError(buildExpressRequest());
     });
 
-    it('should detect too old tiestamp on GCP', async () => {
+    it('should detect too old timestamp on GCP', async () => {
       await verifyTooOldTimestampError(buildGCPRequest());
     });
 
