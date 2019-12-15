@@ -198,9 +198,9 @@ describe('ExpressReceiver', () => {
     });
 
     // ----------------------------
-    // verifySingnatureMismatch
+    // verifySignatureMismatch
 
-    function verifySingnatureMismatch(req: Request): Promise<any> {
+    function verifySignatureMismatch(req: Request): Promise<any> {
       // Arrange
       const resp = {} as Response;
       let errorResult: any;
@@ -224,7 +224,7 @@ describe('ExpressReceiver', () => {
         'x-slack-request-timestamp': requestTimestamp + 10
       };
       const req = reqAsStream as Request;
-      await verifySingnatureMismatch(req);
+      await verifySignatureMismatch(req);
     });
 
     it('should detect signature mismatch on GCP', async () => {
@@ -236,7 +236,7 @@ describe('ExpressReceiver', () => {
         }
       };
       const req = untypedReq as Request;
-      await verifySingnatureMismatch(req);
+      await verifySignatureMismatch(req);
     });
 
   });
