@@ -141,7 +141,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     name: string;
     team_id?: string; // undocumented
   };
-  channel: {
+  channel?: {
     id: string;
     name: string;
   };
