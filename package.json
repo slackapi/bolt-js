@@ -29,7 +29,8 @@
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "tslint --project .",
-    "test": "nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
+    "mocha": "nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
+    "test": "npm run lint && npm run mocha",
     "coverage": "codecov"
   },
   "repository": "slackapi/bolt",

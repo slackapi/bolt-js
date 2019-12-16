@@ -108,13 +108,24 @@ describe('ExpressReceiver', () => {
       })
     }
 
-    it('should detect headers missing', async () => {
+    it('should detect headers missing signature', async () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
       (reqAsStream as { [key: string]: any }).headers = {
-        'x-slack-signature': signature /*,
-        'x-slack-request-timestamp': requestTimestamp */
+        // 'x-slack-signature': signature ,
+        'x-slack-request-timestamp': requestTimestamp
+      };
+      await verifyMissingHeaderDetection(reqAsStream as Request);
+    });
+
+    it('should detect headers missing timestamp', async () => {
+      const reqAsStream = new Readable();
+      reqAsStream.push(body);
+      reqAsStream.push(null); // indicate EOF
+      (reqAsStream as { [key: string]: any }).headers = {
+        'x-slack-signature': signature /* ,
+        'x-slack-request-timestamp': requestTimestamp*/
       };
       await verifyMissingHeaderDetection(reqAsStream as Request);
     });
@@ -128,6 +139,34 @@ describe('ExpressReceiver', () => {
         }
       };
       await verifyMissingHeaderDetection(untypedReq as Request);
+    });
+
+    // ----------------------------
+    // verifyInvalidTimestampError
+
+    function verifyInvalidTimestampError(req: Request): Promise<any> {
+      // Arrange
+      const resp = {} as Response;
+      let errorResult: any;
+      const next = (error: any) => { errorResult = error; };
+
+      // Act
+      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+      return verifier(req, resp, next).then((_: any) => {
+        // Assert
+        assert.equal(errorResult, 'Error: Slack request signing verification failed. Timestamp is invalid.');
+      });
+    }
+
+    it('should detect invalid timestamp header', async () => {
+      const reqAsStream = new Readable();
+      reqAsStream.push(body);
+      reqAsStream.push(null); // indicate EOF
+      (reqAsStream as { [key: string]: any }).headers = {
+        'x-slack-signature': signature,
+        'x-slack-request-timestamp': 'Hello there!',
+      };
+      await verifyInvalidTimestampError(reqAsStream as Request);
     });
 
     // ----------------------------
@@ -150,18 +189,18 @@ describe('ExpressReceiver', () => {
       });
     }
 
-    it('should detect too old tiestamp', async () => {
+    it('should detect too old timestamp', async () => {
       await verifyTooOldTimestampError(buildExpressRequest());
     });
 
-    it('should detect too old tiestamp on GCP', async () => {
+    it('should detect too old timestamp on GCP', async () => {
       await verifyTooOldTimestampError(buildGCPRequest());
     });
 
     // ----------------------------
-    // verifySingnatureMismatch
+    // verifySignatureMismatch
 
-    function verifySingnatureMismatch(req: Request): Promise<any> {
+    function verifySignatureMismatch(req: Request): Promise<any> {
       // Arrange
       const resp = {} as Response;
       let errorResult: any;
@@ -185,7 +224,7 @@ describe('ExpressReceiver', () => {
         'x-slack-request-timestamp': requestTimestamp + 10
       };
       const req = reqAsStream as Request;
-      await verifySingnatureMismatch(req);
+      await verifySignatureMismatch(req);
     });
 
     it('should detect signature mismatch on GCP', async () => {
@@ -197,7 +236,7 @@ describe('ExpressReceiver', () => {
         }
       };
       const req = untypedReq as Request;
-      await verifySingnatureMismatch(req);
+      await verifySignatureMismatch(req);
     });
 
   });

@@ -87,7 +87,7 @@ export interface AuthorizeResult {
 }
 
 export interface ActionConstraints {
-  type?: string,
+  type?: string;
   block_id?: string | RegExp;
   action_id?: string | RegExp;
   callback_id?: string | RegExp;
@@ -407,29 +407,28 @@ export default class App {
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
-    const listenerArgs:
-      Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
-        /** Say function might be set below */
-        say?: SayFn
-        /** Respond function might be set below */
-        respond?: RespondFn,
-        /** Ack function might be set below */
-        ack?: AckFn<any>,
-      } = {
-        body: bodyArg,
-        payload:
-          (type === IncomingEventType.Event) ?
-            (bodyArg as SlackEventMiddlewareArgs['body']).event :
-          (type === IncomingEventType.ViewAction) ?
-            (bodyArg as SlackViewMiddlewareArgs['body']).view :
-          (type === IncomingEventType.Action &&
-            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
-            (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
-          (bodyArg as (
-            Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs> |
-            SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-          )['body']),
-      };
+    const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+      /** Say function might be set below */
+      say?: SayFn
+      /** Respond function might be set below */
+      respond?: RespondFn,
+      /** Ack function might be set below */
+      ack?: AckFn<any>,
+    } = {
+      body: bodyArg,
+      payload:
+        (type === IncomingEventType.Event) ?
+          (bodyArg as SlackEventMiddlewareArgs['body']).event :
+        (type === IncomingEventType.ViewAction) ?
+          (bodyArg as SlackViewMiddlewareArgs['body']).view :
+        (type === IncomingEventType.Action &&
+          isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
+          (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
+        (bodyArg as (
+          Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs> |
+          SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+        )['body']),
+    };
 
     // Set aliases
     if (type === IncomingEventType.Event) {

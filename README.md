@@ -87,7 +87,7 @@ called with arguments that make it easy to build a rich app.
    types of data are only available outside the event payload itself, such as `api_app_id`, `authed_users`, etc. This
    argument should rarely be needed, but for completeness it is provided here.
 
-The arguments are grouped into properties of one object, so that its easier to pick just the ones your listener needs
+The arguments are grouped into properties of one object, so that it's easier to pick just the ones your listener needs
 (using
 [object destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter)).
 Here is an example where the app sends a simple response, so there's no need for most of these arguments:
@@ -173,7 +173,7 @@ app.action({ callbackId: 'my_dialog_callback' }, async ({ action, ack }) => {
 
 ## Handling errors
 
-If an error occurs in a listener function, its strongly recommended to handle it directly. There are a few cases where
+If an error occurs in a listener function, it's strongly recommended to handle it directly. There are a few cases where
 those errors may occur after your listener function has returned (such as when calling `say()` or `respond()`, or
 forgetting to call `ack()`). In these cases, your app will be notified about the error in an error handler function.
 Your app should register an error handler using the `App#error(fn)` method.
@@ -239,7 +239,7 @@ app.message('whoami', ({ say, context }) => { say(`User Details: ${JSON.stringif
 })();
 
 // Authentication middleware - Calls Acme identity provider to associate the incoming event with the user who sent it
-// Its a function just like listeners, but it also uses the next argument
+// It's a function just like listeners, but it also uses the next argument
 function authWithAcme({ payload, context, say, next }) {
   const slackUserId = payload.user;
 
