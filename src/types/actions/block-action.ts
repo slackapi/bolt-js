@@ -9,12 +9,18 @@ import { StringIndexed } from '../helpers';
 export type BlockElementAction =
   | ButtonAction
   | UsersSelectAction
+  | MultiUsersSelectAction
   | StaticSelectAction
+  | MultiStaticSelectAction
   | ConversationsSelectAction
+  | MultiConversationsSelectAction
   | ChannelsSelectAction
+  | MultiChannelsSelectAction
   | ExternalSelectAction
+  | MultiExternalSelectAction
   | OverflowAction
-  | DatepickerAction;
+  | DatepickerAction
+  | RadioButtonsAction;
 
 /**
  * Any action from Slack's interactive elements
@@ -53,11 +59,36 @@ export interface StaticSelectAction extends BasicElementAction<'static_select'> 
 }
 
 /**
+ * An action from a multi select menu with static options
+ */
+export interface MultiStaticSelectAction extends BasicElementAction<'multi_static_select'> {
+  selected_options: [
+    {
+      text: PlainTextElement,
+      value: string;
+    }
+  ];
+  initial_options?: [Option];
+  placeholder?: PlainTextElement;
+  confirm?: Confirmation;
+}
+
+/**
  * An action from a select menu with user list
  */
 export interface UsersSelectAction extends BasicElementAction<'users_select'> {
   selected_user: string;
   initial_user?: string;
+  placeholder?: PlainTextElement;
+  confirm?: Confirmation;
+}
+
+/**
+ * An action from a multi select menu with user list
+ */
+export interface MultiUsersSelectAction extends BasicElementAction<'multi_users_select'> {
+  selected_user: [string];
+  initial_user?: [string];
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
 }
@@ -73,6 +104,16 @@ export interface ConversationsSelectAction extends BasicElementAction<'conversat
 }
 
 /**
+ * An action from a multi select menu with conversations list
+ */
+export interface MultiConversationsSelectAction extends BasicElementAction<'multi_conversations_select'> {
+  selected_conversations: [string];
+  initial_conversations?: [string];
+  placeholder?: PlainTextElement;
+  confirm?: Confirmation;
+}
+
+/**
  * An action from a select menu with channels list
  */
 export interface ChannelsSelectAction extends BasicElementAction<'channels_select'> {
@@ -83,10 +124,32 @@ export interface ChannelsSelectAction extends BasicElementAction<'channels_selec
 }
 
 /**
+ * An action from a multi select menu with channels list
+ */
+export interface MultiChannelsSelectAction extends BasicElementAction<'multi_channels_select'> {
+  selected_channels: [string];
+  initial_channels?: [string];
+  placeholder?: PlainTextElement;
+  confirm?: Confirmation;
+}
+
+/**
  * An action from a select menu with external data source
  */
 export interface ExternalSelectAction extends BasicElementAction<'external_select'> {
+  selected_option?: Option;
   initial_option?: Option;
+  placeholder?: PlainTextElement;
+  min_query_length?: number;
+  confirm?: Confirmation;
+}
+
+/**
+ * An action from a multi select menu with external data source
+ */
+export interface MultiExternalSelectAction extends BasicElementAction<'multi_external_select'> {
+  selected_options?: [Option];
+  initial_options?: [Option];
   placeholder?: PlainTextElement;
   min_query_length?: number;
   confirm?: Confirmation;
