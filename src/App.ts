@@ -98,13 +98,13 @@ export interface ViewConstraints {
   type?: 'view_closed' | 'view_submission';
 }
 
-export interface ErrorHandler {
-  (error: CodedError): void;
-}
-
 export interface AuthConstraints {
   botUserId: string;
   botId: string;
+}
+
+export interface ErrorHandler {
+  (error: CodedError): void;
 }
 
 /**
