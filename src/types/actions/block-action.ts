@@ -1,4 +1,4 @@
-import { PlainTextElement, Confirmation, Option } from '@slack/types';
+import { PlainTextElement, Confirmation, Option, View } from '@slack/types';
 import { StringIndexed } from '../helpers';
 
 /**
@@ -204,7 +204,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     name: string;
     team_id?: string; // undocumented
   };
-  channel: {
+  channel?: {
     id: string;
     name: string;
   };
@@ -215,6 +215,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     text?: string; // undocumented that this is optional, but how could it exist on block kit based messages?
     [key: string]: any;
   };
+  view?: View;
   token: string;
   response_url: string;
   trigger_id: string;
