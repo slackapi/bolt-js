@@ -134,7 +134,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     return new Promise((resolve, reject) => {
       // TODO: what about synchronous errors?
       this.server.close((error) => {
-        if (error) {
+        if (error !== undefined) {
           reject(error);
           return;
         }
@@ -174,7 +174,8 @@ const respondToUrlVerification: RequestHandler = (req, res, next) => {
  */
 export function verifySignatureAndParseBody(
   logger: Logger,
-  signingSecret: string): RequestHandler {
+  signingSecret: string,
+): RequestHandler {
   return async (req, _res, next) => {
     try {
       // *** Request verification ***
@@ -187,14 +188,19 @@ export function verifySignatureAndParseBody(
       } else {
         stringBody = (await rawBody(req)).toString();
       }
-      const signature = req.headers['x-slack-signature'] as string;
-      const ts = Number(req.headers['x-slack-request-timestamp']);
 
-      try {
-        await verifyRequestSignature(signingSecret, stringBody, signature, ts);
-      } catch (e) {
-        return next(e);
-      }
+      const {
+        'x-slack-signature': signature,
+        'x-slack-request-timestamp': requestTimestamp,
+        'content-type': contentType,
+      } = req.headers;
+
+      await verifyRequestSignature(
+        signingSecret,
+        stringBody,
+        signature as string | undefined,
+        requestTimestamp as string | undefined,
+      );
 
       // *** Parsing body ***
       // As the verification passed, parse the body as an object and assign it to req.body
@@ -202,12 +208,11 @@ export function verifySignatureAndParseBody(
 
       // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
       // and overwrites `req.body` with the parsed JS object.
-      const contentType = req.headers['content-type'];
       req.body = parseRequestBody(logger, stringBody, contentType);
 
-      next();
+      return next();
     } catch (error) {
-      next(error);
+      return next(error);
     }
   };
 }
@@ -216,63 +221,70 @@ export function verifySignatureAndParseBody(
 async function verifyRequestSignature(
   signingSecret: string,
   body: string,
-  signature: string,
-  requestTimestamp: number): Promise<void> {
-  if (!signature || !requestTimestamp) {
-    const error = errorWithCode(
+  signature: string | undefined,
+  requestTimestamp: string | undefined,
+): Promise<void> {
+  if (signature === undefined || requestTimestamp === undefined) {
+    throw errorWithCode(
       'Slack request signing verification failed. Some headers are missing.',
       ErrorCode.ExpressReceiverAuthenticityError,
     );
-    throw error;
+  }
+
+  const ts = Number(requestTimestamp);
+  if (isNaN(ts)) {
+    throw errorWithCode(
+      'Slack request signing verification failed. Timestamp is invalid.',
+      ErrorCode.ExpressReceiverAuthenticityError,
+    );
   }
 
   // Divide current date to match Slack ts format
   // Subtract 5 minutes from current time
   const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
 
-  if (requestTimestamp < fiveMinutesAgo) {
-    const error = errorWithCode(
+  if (ts < fiveMinutesAgo) {
+    throw errorWithCode(
       'Slack request signing verification failed. Timestamp is too old.',
       ErrorCode.ExpressReceiverAuthenticityError,
     );
-    throw error;
   }
 
   const hmac = crypto.createHmac('sha256', signingSecret);
   const [version, hash] = signature.split('=');
-  hmac.update(`${version}:${requestTimestamp}:${body}`);
+  hmac.update(`${version}:${ts}:${body}`);
 
   if (!tsscmp(hash, hmac.digest('hex'))) {
-    const error = errorWithCode(
+    throw errorWithCode(
       'Slack request signing verification failed. Signature mismatch.',
       ErrorCode.ExpressReceiverAuthenticityError,
     );
-    throw error;
   }
 }
 
 function parseRequestBody(
   logger: Logger,
   stringBody: string,
-  contentType: string | undefined) {
+  contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
     if (typeof parsedBody.payload === 'string') {
       return JSON.parse(parsedBody.payload);
-    } else {
-      return parsedBody;
     }
-  } else if (contentType === 'application/json') {
+    return parsedBody;
+  }
+
+  if (contentType === 'application/json') {
     return JSON.parse(stringBody);
-  } else {
-    logger.warn(`Unexpected content-type detected: ${contentType}`);
-    try {
-      // Parse this body anyway
-      return JSON.parse(stringBody);
-    } catch (e) {
-      logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
-      throw e;
-    }
+  }
+
+  logger.warn(`Unexpected content-type detected: ${contentType}`);
+  try {
+    // Parse this body anyway
+    return JSON.parse(stringBody);
+  } catch (e) {
+    logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
+    throw e;
   }
 }
 

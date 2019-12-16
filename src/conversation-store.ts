@@ -69,7 +69,8 @@ export function conversationContext<ConversationState = any>(
         .catch((error) => {
           logger.debug(`Conversation context not loaded: ${error.message}`);
         })
-        .then(next);
+        .then(next)
+        .catch(error => logger.debug(error.message));
     } else {
       logger.debug('No conversation ID for incoming event');
       next();

@@ -31,7 +31,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
       type: IncomingEventType.Event,
       conversationId:
         eventBody.event.channel !== undefined ? eventBody.event.channel :
-        eventBody.event.item !== undefined ? eventBody.event.item.channel : undefined,
+          eventBody.event.item !== undefined ? eventBody.event.item.channel : undefined,
     };
   }
   if (body.command !== undefined) {
@@ -44,7 +44,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
     const optionsBody = (body as SlackOptionsMiddlewareArgs<OptionsSource>['body']);
     return {
       type: IncomingEventType.Options,
-      conversationId: optionsBody.channel ? optionsBody.channel.id : undefined,
+      conversationId: optionsBody.channel !== undefined ? optionsBody.channel.id : undefined,
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'message_action') {
