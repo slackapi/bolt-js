@@ -286,6 +286,7 @@ function parseRequestBody(
     logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
     throw e;
   }
+
 }
 
 function receiverAckTimeoutError(message: string): ReceiverAckTimeoutError {

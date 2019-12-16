@@ -430,8 +430,9 @@ export default class App {
               isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
               (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
               (bodyArg as (
-                Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs> |
-                SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+                Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs |
+                  SlackViewMiddlewareArgs> | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction |
+                    InteractiveMessage>>
               )['body']),
     };
 
@@ -576,17 +577,19 @@ function singleTeamAuthorization(
   const auth: Promise<AuthConstraints> = authorization.botUserId !== undefined && authorization.botId !== undefined ?
     Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
     client.auth.test({ token: authorization.botToken })
-      .then(result => {
+      .then((result) => {
         return {
           botUserId: (result.user_id as string),
-          botId: (result.bot_id as string)
-        }
+          botId: (result.bot_id as string),
+        };
       });
 
-  return async () => ({
-    botToken: authorization.botToken,
-    botId: (await auth).botId,
-    botUserId: (await auth).botUserId,
+  return () => auth.then((result) => {
+    return {
+      botToken: authorization.botToken,
+      botId: result.botId,
+      botUserId: result.botUserId,
+    };
   });
 }
 
