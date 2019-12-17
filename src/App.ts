@@ -83,7 +83,7 @@ export interface AuthorizeResult {
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
-  [ key: string ]: any;
+  [key: string]: any;
 }
 
 export interface ActionConstraints {
@@ -279,7 +279,7 @@ export default class App {
   ): void {
     const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+        { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
@@ -317,7 +317,7 @@ export default class App {
   ): void {
     const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-      { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+        { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
     this.listeners.push(
       [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
@@ -337,7 +337,7 @@ export default class App {
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]): void {
     const constraints: ViewConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
-      { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
+        { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints)
       .filter(k => (k !== 'callback_id' && k !== 'type'));
@@ -419,15 +419,16 @@ export default class App {
       payload:
         (type === IncomingEventType.Event) ?
           (bodyArg as SlackEventMiddlewareArgs['body']).event :
-        (type === IncomingEventType.ViewAction) ?
-          (bodyArg as SlackViewMiddlewareArgs['body']).view :
-        (type === IncomingEventType.Action &&
-          isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
-          (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
-        (bodyArg as (
-          Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs> |
-          SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-        )['body']),
+          (type === IncomingEventType.ViewAction) ?
+            (bodyArg as SlackViewMiddlewareArgs['body']).view :
+            (type === IncomingEventType.Action &&
+              isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
+              (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
+              (bodyArg as (
+                Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs |
+                  SlackViewMiddlewareArgs> | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction |
+                    InteractiveMessage>>
+              )['body']),
     };
 
     // Set aliases
@@ -528,22 +529,22 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.id as string :
-       assertNever(type)),
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.id as string :
+          assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.enterprise_id as string :
-       undefined),
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.enterprise_id as string :
+          undefined),
     userId:
       ((type === IncomingEventType.Event) ?
         ((typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string') ? (body as SlackEventMiddlewareArgs['body']).event.user as string :
-         (typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object') ? (body as SlackEventMiddlewareArgs['body']).event.user.id as string :
-         ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
-         ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
-         undefined) :
-       (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
-       (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
-       undefined),
+          (typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object') ? (body as SlackEventMiddlewareArgs['body']).event.user.id as string :
+            ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
+              ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
+                undefined) :
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
+          (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
+            undefined),
     conversationId: channelId,
   };
   // tslint:enable:max-line-length
@@ -568,19 +569,20 @@ function singleTeamAuthorization(
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Authorize {
   // TODO: warn when something needed isn't found
-  const botUserId: Promise<string> = authorization.botUserId !== undefined ?
-    Promise.resolve(authorization.botUserId) :
+  const identifiers: Promise<{ botUserId: string, botId: string }> = authorization.botUserId !== undefined &&
+    authorization.botId !== undefined ?
+    Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
     client.auth.test({ token: authorization.botToken })
-      .then(result => result.user_id as string);
-  const botId: Promise<string> = authorization.botId !== undefined ?
-    Promise.resolve(authorization.botId) :
-    botUserId.then(id => client.users.info({ token: authorization.botToken, user: id }))
-      .then(result => ((result.user as any).profile.bot_id as string));
-  return async () => ({
-    botToken: authorization.botToken,
-    botId: await botId,
-    botUserId: await botUserId,
-  });
+      .then((result) => {
+        return {
+          botUserId: (result.user_id as string),
+          botId: (result.bot_id as string),
+        };
+      });
+
+  return async () => {
+    return Object.assign({ botToken: authorization.botToken }, await identifiers);
+  };
 }
 
 /* Instrumentation */
