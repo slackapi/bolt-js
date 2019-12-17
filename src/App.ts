@@ -98,11 +98,6 @@ export interface ViewConstraints {
   type?: 'view_closed' | 'view_submission';
 }
 
-export interface AuthConstraints {
-  botUserId: string;
-  botId: string;
-}
-
 export interface ErrorHandler {
   (error: CodedError): void;
 }
@@ -574,7 +569,8 @@ function singleTeamAuthorization(
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Authorize {
   // TODO: warn when something needed isn't found
-  const auth: Promise<AuthConstraints> = authorization.botUserId !== undefined && authorization.botId !== undefined ?
+  const identifiers: Promise<{ botUserId: string, botId: string }> = authorization.botUserId !== undefined &&
+    authorization.botId !== undefined ?
     Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
     client.auth.test({ token: authorization.botToken })
       .then((result) => {
@@ -584,13 +580,9 @@ function singleTeamAuthorization(
         };
       });
 
-  return () => auth.then((result) => {
-    return {
-      botToken: authorization.botToken,
-      botId: result.botId,
-      botUserId: result.botUserId,
-    };
-  });
+  return async () => {
+    return Object.assign({ botToken: authorization.botToken }, await identifiers);
+  };
 }
 
 /* Instrumentation */
