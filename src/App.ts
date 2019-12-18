@@ -86,11 +86,11 @@ export interface AuthorizeResult {
   [key: string]: any;
 }
 
-export interface ActionConstraints {
-  type?: string;
-  block_id?: string | RegExp;
-  action_id?: string | RegExp;
-  callback_id?: string | RegExp;
+export interface ActionConstraints<A extends SlackAction = SlackAction> {
+  type?: A['type'];
+  block_id?: A extends BlockAction ? (string | RegExp) : never;
+  action_id?: A extends BlockAction ? (string | RegExp) : never;
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? (string | RegExp) : never;
 }
 
 export interface ViewConstraints {
@@ -265,19 +265,23 @@ export default class App {
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
-  public action<ActionType extends SlackAction = SlackAction>(
-    actionId: string | RegExp,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
-  ): void;
-  public action<ActionType extends SlackAction = SlackAction>(
-    constraints: ActionConstraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
-  ): void;
-  public action<ActionType extends SlackAction = SlackAction>(
-    actionIdOrConstraints: string | RegExp | ActionConstraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<ActionType>>[]
-  ): void {
-    const constraints: ActionConstraints =
+  public action<Action extends SlackAction = SlackAction>(
+      actionId: string | RegExp,
+      ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
+    ): void;
+  public action<Action extends SlackAction = SlackAction,
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
+      constraints: Constraints,
+      // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
+      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+    ): void;
+  public action<Action extends SlackAction = SlackAction,
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
+      actionIdOrConstraints: string | RegExp | Constraints,
+      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+    ): void {
+    // Normalize Constraints
+    const constraints: ActionConstraints  =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
         { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
