@@ -30,7 +30,8 @@
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "tslint --project .",
     "mocha": "nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run lint && npm run mocha",
+    "test": "npm run lint && npm run mocha && npm run test:integration",
+    "test:integration": "cd integration-tests && npm install && npm test",
     "coverage": "codecov"
   },
   "repository": "slackapi/bolt",

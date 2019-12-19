@@ -1,0 +1,19 @@
+{
+  "name": "@slack/bolt-integration-tests",
+  "private": true,
+  "description": "Integration tests for Bolt",
+  "author": "Slack Technologies, Inc.",
+  "license": "MIT",
+  "scripts": {
+    "test": "npm run test:typechecker",
+    "test:typechecker": "dtslint types"
+  },
+  "dependencies": {
+    "@slack/bolt": "file:..",
+    "@types/node": "^10.0.0"
+  },
+  "devDependencies": {
+    "dtslint": "^0.5.4",
+    "typescript": "^3.7.3"
+  }
+}
