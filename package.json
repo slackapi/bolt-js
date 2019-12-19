@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, Inc.",
   "license": "MIT",
