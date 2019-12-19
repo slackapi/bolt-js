@@ -9,11 +9,11 @@
     "test:typechecker": "dtslint types"
   },
   "dependencies": {
-    "@slack/bolt": "^1.4.1",
-    "@types/node": "^8.10.43"
+    "@slack/bolt": "file:..",
+    "@types/node": "^10.0.0"
   },
   "devDependencies": {
     "dtslint": "^0.5.4",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.7.3"
   }
 }
