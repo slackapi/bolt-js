@@ -221,7 +221,7 @@ app.message('hello', ({ message, say }) => {
   say({
     blocks: [
     {
-	    "type": "section",
+      "type": "section",
       "text": {
         "type": "mrkdwn",
         "text": `Hey there <@${message.user}>!`
@@ -234,7 +234,7 @@ app.message('hello', ({ message, say }) => {
         },
         "action_id": "button_click"
       }
-     }
+    }
     ]
   });
 });
