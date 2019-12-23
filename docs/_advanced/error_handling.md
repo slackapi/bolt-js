@@ -13,7 +13,7 @@ If you want more control over errors, it’s advised to use the [`chat.postMessa
 
 ```javascript
 app.error((error) => {
-	// Check the details of the error to handle cases where you should retry sending a message or stop the app
-	console.error(error);
+  // Check the details of the error to handle cases where you should retry sending a message or stop the app
+  console.error(error);
 });
 ```

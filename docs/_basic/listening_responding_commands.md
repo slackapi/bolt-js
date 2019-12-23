@@ -18,7 +18,7 @@ There are two ways to respond to slash commands. The first way is to use `say()`
 app.command('/echo', async ({ command, ack, say }) => {
   // Acknowledge command request
   ack();
-  
+
   say(`${command.text}`);
 });
 ```

@@ -18,7 +18,7 @@ order: 8
 app.command('/echo', async ({ command, ack, say }) => {
   // コマンドリクエストを確認
   ack();
-  
+
   say(`${command.text}`);
 });
 ```

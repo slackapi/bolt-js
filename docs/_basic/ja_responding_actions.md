@@ -30,10 +30,10 @@ app.action('approve_button', ({ ack, say }) => {
 </div>
 
 ```javascript
-// “user_select” の action_id がトリガーされたアクションをリスニング
+// "user_select" の action_id がトリガーされたアクションをリスニング
 app.action('user_choice', ({ action, ack, respond }) => {
-	ack();
-	respond(`You selected <@${action.selected_user}>`);
+  ack();
+  respond(`You selected <@${action.selected_user}>`);
 });
 ```
 

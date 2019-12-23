@@ -32,8 +32,8 @@ Since `respond()` is a utility for calling the `response_url`, it behaves in the
 ```javascript
 // Listens to actions triggered with action_id of “user_select”
 app.action('user_choice', ({ action, ack, respond }) => {
-	ack();
-	respond(`You selected <@${action.selected_user}>`);
+  ack();
+  respond(`You selected <@${action.selected_user}>`);
 });
 ```
 

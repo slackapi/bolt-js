@@ -47,7 +47,7 @@ class simpleReceiver extends EventEmitter {
         this.server.listen(port, () => {
           resolve(this.server);
         });
-      } catch(error) {
+      } catch (error) {
         reject(error);
       }
     });

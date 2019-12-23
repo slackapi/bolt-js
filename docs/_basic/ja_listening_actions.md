@@ -47,7 +47,7 @@ app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
     catch (error) {
       console.error(error);
     }
-});
+  });
 ```
 
 </details>
