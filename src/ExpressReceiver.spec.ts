@@ -2,10 +2,12 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Request, Response } from 'express';
-import { verifySignatureAndParseBody } from './ExpressReceiver';
+import { verifySignatureAndParseBody, respondToSslCheck, respondToUrlVerification } from './ExpressReceiver';
 import sinon, { SinonFakeTimers } from 'sinon';
 import { Readable } from 'stream';
 import { Logger, LogLevel } from '@slack/logger';
+import ExpressReceiver from './ExpressReceiver';
+import { Agent } from 'http';
 
 describe('ExpressReceiver', () => {
 
@@ -18,6 +20,91 @@ describe('ExpressReceiver', () => {
     getLevel(): LogLevel { return LogLevel.DEBUG; },
     setName(_name: string): void { },
   };
+
+  describe('constructor', () => {
+    it('should accept supported arguments', async () => {
+      const receiver = new ExpressReceiver({
+        signingSecret: 'my-secret',
+        logger: noopLogger,
+        endpoints: { events: '/custom-endpoint' },
+        agent: new Agent({
+          maxSockets: 999
+        }),
+        clientTls: undefined
+      });
+      assert.isNotNull(receiver);
+    });
+  });
+
+  describe('built-in middleware', () => {
+    describe('ssl_check requset handler', () => {
+      it('should handle valid requests', async () => {
+        // Arrange
+        const req = { body: { ssl_check: 1 } } as Request;
+        let sent = false;
+        const resp = { send: () => { sent = true; } } as Response;
+        let errorResult: any;
+        const next = (error: any) => { errorResult = error; };
+
+        // Act
+        respondToSslCheck(req, resp, next);
+
+        // Assert
+        assert.isTrue(sent);
+        assert.isUndefined(errorResult);
+      });
+
+      it('should work with other requests', async () => {
+        // Arrange
+        const req = { body: { type: 'block_actions' } } as Request;
+        let sent = false;
+        const resp = { send: () => { sent = true; } } as Response;
+        let errorResult: any;
+        const next = (error: any) => { errorResult = error; };
+
+        // Act
+        respondToSslCheck(req, resp, next);
+
+        // Assert
+        assert.isFalse(sent);
+        assert.isUndefined(errorResult);
+      });
+    });
+
+    describe('url_verification requset handler', () => {
+      it('should handle valid requests', async () => {
+        // Arrange
+        const req = { body: { type: 'url_verification', challenge: 'this is it' } } as Request;
+        let sentBody = undefined;
+        const resp = { json: (body) => { sentBody = body; } } as Response;
+        let errorResult: any;
+        const next = (error: any) => { errorResult = error; };
+
+        // Act
+        respondToUrlVerification(req, resp, next);
+
+        // Assert
+        assert.equal(JSON.stringify({ challenge: 'this is it' }), JSON.stringify(sentBody));
+        assert.isUndefined(errorResult);
+      });
+
+      it('should work with other requests', async () => {
+        // Arrange
+        const req = { body: { ssl_check: 1 } } as Request;
+        let sentBody = undefined;
+        const resp = { json: (body) => { sentBody = body; } } as Response;
+        let errorResult: any;
+        const next = (error: any) => { errorResult = error; };
+
+        // Act
+        respondToUrlVerification(req, resp, next);
+
+        // Assert
+        assert.isUndefined(sentBody);
+        assert.isUndefined(errorResult);
+      });
+    });
+  });
 
   describe('verifySignatureAndParseBody', () => {
 
@@ -45,7 +132,8 @@ describe('ExpressReceiver', () => {
       reqAsStream.push(null); // indicate EOF
       (reqAsStream as { [key: string]: any }).headers = {
         'x-slack-signature': signature,
-        'x-slack-request-timestamp': requestTimestamp
+        'x-slack-request-timestamp': requestTimestamp,
+        'content-type': 'application/x-www-form-urlencoded'
       };
       const req = reqAsStream as Request;
       return req;
@@ -56,7 +144,8 @@ describe('ExpressReceiver', () => {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
-          'x-slack-request-timestamp': requestTimestamp
+          'x-slack-request-timestamp': requestTimestamp,
+          'content-type': 'application/x-www-form-urlencoded'
         }
       };
       const req = untypedReq as Request;
@@ -66,29 +155,49 @@ describe('ExpressReceiver', () => {
     // ----------------------------
     // runWithValidRequest
 
-    async function runWithValidRequest(req: Request, errorResult: any) {
+    async function runWithValidRequest(req: Request, state: any) {
       // Arrange
       const resp = {} as Response;
-      const next = (error: any) => { errorResult = error; };
+      const next = (error: any) => { state.error = error; };
 
       // Act
       const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
-      return errorResult;
     }
 
     it('should verify requests', async () => {
-      let errorResult: any;
-      runWithValidRequest(buildExpressRequest(), errorResult);
+      const state: any = {};
+      await runWithValidRequest(buildExpressRequest(), state);
       // Assert
-      assert.isUndefined(errorResult);
+      assert.isUndefined(state.error);
     });
 
     it('should verify requests on GCP', async () => {
-      let errorResult: any;
-      runWithValidRequest(buildGCPRequest(), errorResult);
+      const state: any = {};
+      await runWithValidRequest(buildGCPRequest(), state);
       // Assert
-      assert.isUndefined(errorResult);
+      assert.isUndefined(state.error);
+    });
+
+    // ----------------------------
+    // parse error
+
+    it('should verify requests and then catch parse failures', async () => {
+      const state: any = {};
+      const req = buildExpressRequest();
+      req.headers['content-type'] = undefined;
+      await runWithValidRequest(req, state);
+      // Assert
+      assert.equal(state.error, 'SyntaxError: Unexpected token o in JSON at position 1');
+    });
+
+    it('should verify requests on GCP and then catch parse failures', async () => {
+      const state: any = {};
+      const req = buildGCPRequest();
+      req.headers['content-type'] = undefined;
+      await runWithValidRequest(req, state);
+      // Assert
+      assert.equal(state.error, 'SyntaxError: Unexpected token o in JSON at position 1');
     });
 
     // ----------------------------

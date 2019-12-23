@@ -151,7 +151,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }
 }
 
-const respondToSslCheck: RequestHandler = (req, res, next) => {
+export const respondToSslCheck: RequestHandler = (req, res, next) => {
   if (req.body && req.body.ssl_check) {
     res.send();
     return;
@@ -159,7 +159,7 @@ const respondToSslCheck: RequestHandler = (req, res, next) => {
   next();
 };
 
-const respondToUrlVerification: RequestHandler = (req, res, next) => {
+export const respondToUrlVerification: RequestHandler = (req, res, next) => {
   if (req.body && req.body.type && req.body.type === 'url_verification') {
     res.json({ challenge: req.body.challenge });
     return;
