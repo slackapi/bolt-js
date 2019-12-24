@@ -612,6 +612,56 @@ describe('App', () => {
         });
       });
 
+      describe('logger', () => {
+
+        it('should be available in middleware/listener args', async () => {
+          // Arrange
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+          app.use(({ logger, body }) => {
+            logger.info(body);
+          });
+
+          app.event('app_home_opened', ({ logger, event }) => {
+            logger.debug(event);
+          });
+
+          const receiverEvents = [
+            {
+              body: {
+                type: 'event_callback',
+                token: 'XXYYZZ',
+                team_id: 'TXXXXXXXX',
+                api_app_id: 'AXXXXXXXXX',
+                event: {
+                  type: 'app_home_opened',
+                  event_ts: '1234567890.123456',
+                  user: 'UXXXXXXX1',
+                  text: 'hello friends!',
+                  tab: 'home',
+                  view: {},
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+          ];
+
+          // Act
+          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
+          await delay();
+
+          // Assert
+          assert.isTrue(fakeLogger.info.called);
+          assert.isTrue(fakeLogger.debug.called);
+        });
+      });
+
       describe('say()', () => {
 
         function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {

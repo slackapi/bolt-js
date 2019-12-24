@@ -1,5 +1,6 @@
 import { StringIndexed } from '../helpers';
 import { RespondArguments, AckFn } from '../utilities';
+import { Logger } from '@slack/logger';
 
 /**
  * Known view action types
@@ -10,6 +11,7 @@ export type SlackViewAction = ViewSubmitAction | ViewClosedAction;
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */
 export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction = SlackViewAction> {
+  logger: Logger;
   payload: ViewOutput;
   view: this['payload'];
   body: ViewActionType;
