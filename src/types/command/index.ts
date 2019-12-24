@@ -1,12 +1,14 @@
 import { StringIndexed } from '../helpers';
 import { SayFn, RespondFn, RespondArguments, AckFn } from '../utilities';
 import { Logger } from '@slack/logger';
+import { WebClient } from '@slack/web-api';
 
 /**
  * Arguments which listeners and middleware receive to process a slash command from Slack.
  */
 export interface SlackCommandMiddlewareArgs {
   logger: Logger;
+  client: WebClient;
   payload: SlashCommand;
   command: this['payload'];
   body: this['payload'];
