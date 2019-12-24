@@ -5,7 +5,14 @@ import sinon from 'sinon';
 import { ErrorCode } from '../errors';
 import { Override, delay, wrapToResolveOnFirstCall } from '../test-helpers';
 import rewiremock from 'rewiremock';
-import { SlackEventMiddlewareArgs, NextMiddleware, Context, MessageEvent, ContextMissingPropertyError, SlackCommandMiddlewareArgs } from '../types';
+import {
+  SlackEventMiddlewareArgs,
+  NextMiddleware,
+  Context,
+  MessageEvent,
+  ContextMissingPropertyError,
+  SlackCommandMiddlewareArgs,
+} from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command/index';
 import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events/base-events';
@@ -431,12 +438,12 @@ describe('onlyCommands', () => {
     const payload: SlashCommand = { ...validCommandPayload };
     const fakeNext = sinon.fake();
     onlyCommands({
-      payload: payload,
+      payload,
       command: payload,
       body: payload,
-      say: () => { },
-      respond: () => { },
-      ack: () => { },
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
       next: fakeNext,
       context: {},
     });
@@ -447,13 +454,13 @@ describe('onlyCommands', () => {
     const payload: any = {};
     const fakeNext = sinon.fake();
     onlyCommands({
-      payload: payload,
+      payload,
       action: payload,
       command: undefined,
       body: payload,
-      say: () => { },
-      respond: () => { },
-      ack: () => { },
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
       next: fakeNext,
       context: {},
     });
@@ -462,15 +469,15 @@ describe('onlyCommands', () => {
 });
 
 describe('matchCommandName', () => {
-  function buildArgs(fakeNext: NextMiddleware) {
+  function buildArgs(fakeNext: NextMiddleware): SlackCommandMiddlewareArgs & { next: any, context: any } {
     const payload: SlashCommand = { ...validCommandPayload };
     return {
-      payload: payload,
+      payload,
       command: payload,
       body: payload,
-      say: () => { },
-      respond: () => { },
-      ack: () => { },
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
       next: fakeNext,
       context: {},
     };
@@ -505,9 +512,9 @@ describe('onlyEvents', () => {
         type: 'event_callback',
         event_id: 'event-id-value',
         event_time: 123,
-        authed_users: []
+        authed_users: [],
       },
-      say: () => { },
+      say: () => { /* noop */ },
     };
     onlyEvents({ next: fakeNext, context: {}, ...args });
     assert.isTrue(fakeNext.called);
@@ -517,12 +524,12 @@ describe('onlyEvents', () => {
     const payload: SlashCommand = { ...validCommandPayload };
     const fakeNext = sinon.fake();
     onlyEvents({
-      payload: payload,
+      payload,
       command: payload,
       body: payload,
-      say: () => { },
-      respond: () => { },
-      ack: () => { },
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
       next: fakeNext,
       context: {},
     });
@@ -544,9 +551,9 @@ describe('matchEventType', () => {
         type: 'event_callback',
         event_id: 'event-id-value',
         event_time: 123,
-        authed_users: []
+        authed_users: [],
       },
-      say: () => { },
+      say: () => { /* noop */ },
     };
   }
 
@@ -577,9 +584,9 @@ describe('subtype', () => {
         type: 'event_callback',
         event_id: 'event-id-value',
         event_time: 123,
-        authed_users: []
+        authed_users: [],
       },
-      say: () => { },
+      say: () => { /* noop */ },
     };
   }
 
@@ -603,7 +610,8 @@ interface DummyContext {
 }
 
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & { next: NextMiddleware, context: Context };
-type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & { next: NextMiddleware, context: Context };
+type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'>
+  & { next: NextMiddleware, context: Context };
 
 type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'>
   & { next: NextMiddleware, context: Context };
@@ -651,7 +659,7 @@ const appMentionEvent: AppMentionEvent = {
   text: 'this is my message',
   ts: '123.123',
   channel: 'C1234567',
-  event_ts: '123.123'
+  event_ts: '123.123',
 };
 
 const botMessageEvent: BotMessageEvent & MessageEvent = {
@@ -661,5 +669,5 @@ const botMessageEvent: BotMessageEvent & MessageEvent = {
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',
-  bot_id: 'B1234567'
+  bot_id: 'B1234567',
 };

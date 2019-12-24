@@ -157,23 +157,25 @@ describe('App', () => {
       });
     });
     it('with clientOptions', async () => {
-      const fakeConstructor = sinon.fake()
+      const fakeConstructor = sinon.fake();
       const overrides = mergeOverrides(
         withNoopAppMetadata(),
         {
           '@slack/web-api': {
             WebClient: class {
               constructor() {
-                fakeConstructor(...arguments)
+                fakeConstructor(...arguments);
               }
             },
-          }
-        }
-      )
+          },
+        },
+      );
+      // tslint:disable-next-line: variable-name
       const App = await importApp(overrides);
 
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
-      new App({ authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR, clientOptions });
+      // tslint:disable-next-line: no-unused-expression
+      new App({ clientOptions, authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR });
 
       assert.ok(fakeConstructor.called);
 
@@ -181,7 +183,7 @@ describe('App', () => {
       assert.strictEqual(undefined, token, 'token should be undefined');
       assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
       assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
-    })
+    });
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
     // TODO: tests for providing botId and botUserId options
@@ -322,7 +324,7 @@ describe('App', () => {
       const dummyChannelId = 'CHANNEL_ID';
       let overrides: Override;
 
-      function buildOverrides(secondOverride: Override) {
+      function buildOverrides(secondOverride: Override): Override {
         fakeReceiver = createFakeReceiver();
         fakeErrorHandler = sinon.fake();
         dummyAuthorizationResult = { botToken: '', botId: '' };
@@ -330,7 +332,7 @@ describe('App', () => {
           withNoopAppMetadata(),
           secondOverride,
           withMemoryStore(sinon.fake()),
-          withConversationContext(sinon.fake.returns(noopMiddleware))
+          withConversationContext(sinon.fake.returns(noopMiddleware)),
         );
         return overrides;
       }
@@ -357,7 +359,7 @@ describe('App', () => {
               body: {
                 type: 'block_actions',
                 actions: [{
-                  action_id: 'block_action_id'
+                  action_id: 'block_action_id',
                 }],
                 channel: {},
                 user: {},
@@ -479,7 +481,9 @@ describe('App', () => {
           app.use((_args) => { ackFn(); });
           app.action('block_action_id', ({ }) => { actionFn(); });
           app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
-          app.action({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, ({ }) => { actionFn(); });
+          app.action(
+            { type: 'message_action', callback_id: 'another_message_action_callback_id' },
+            ({ }) => { actionFn(); });
           app.action({ type: 'message_action', callback_id: 'does_not_exist' }, ({ }) => { actionFn(); });
           app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); });
           app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); });
