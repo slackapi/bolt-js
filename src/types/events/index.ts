@@ -2,11 +2,13 @@ export * from './base-events';
 import { SlackEvent, BasicSlackEvent } from './base-events';
 import { StringIndexed } from '../helpers';
 import { SayFn } from '../utilities';
+import { Logger } from '@slack/logger';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
  */
 export interface SlackEventMiddlewareArgs<EventType extends string = string> {
+  logger: Logger;
   payload: EventFromType<EventType>;
   event: this['payload'];
   message: EventType extends 'message' ? this['payload'] : never;
