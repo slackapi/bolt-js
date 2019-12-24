@@ -601,6 +601,54 @@ describe('App', () => {
         });
       });
 
+      describe('client', () => {
+
+        it('should be available in middleware/listener args', async () => {
+          // Arrange
+          const App = await importApp(mergeOverrides( // tslint:disable-line:variable-name
+            withNoopAppMetadata(),
+            withSuccessfulBotUserFetchingWebClient('B123', 'U123'),
+          ));
+          const app = new App({
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+          app.use(async ({ client }) => {
+            await client.auth.test();
+          });
+          app.event('app_home_opened', async ({ client }) => {
+            await client.auth.test();
+          });
+
+          const receiverEvents = [
+            {
+              body: {
+                type: 'event_callback',
+                token: 'XXYYZZ',
+                team_id: 'TXXXXXXXX',
+                api_app_id: 'AXXXXXXXXX',
+                event: {
+                  type: 'app_home_opened',
+                  event_ts: '1234567890.123456',
+                  user: 'UXXXXXXX1',
+                  text: 'hello friends!',
+                  tab: 'home',
+                  view: {},
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+          ];
+
+          // Act
+          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
+          await delay();
+
+          // Assert
+        });
+      });
+
       describe('say()', () => {
 
         function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {
