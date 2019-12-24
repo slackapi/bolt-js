@@ -9,6 +9,7 @@ import { ErrorCode } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
+import { ViewConstraints } from './App';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -463,6 +464,22 @@ describe('App', () => {
               respond: noop,
               ack: noop,
             },
+            {
+              body: {
+                type: 'event_callback',
+                token: 'XXYYZZ',
+                team_id: 'TXXXXXXXX',
+                api_app_id: 'AXXXXXXXXX',
+                event: {
+                  type: 'message',
+                  event_ts: '1234567890.123456',
+                  user: 'UXXXXXXX1',
+                  text: 'hello friends!',
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
           ];
         }
 
@@ -477,7 +494,13 @@ describe('App', () => {
           const dummyReceiverEvents = createReceiverEvents();
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+
           app.use((_args) => { ackFn(); });
           app.action('block_action_id', ({ }) => { actionFn(); });
           app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
@@ -491,6 +514,29 @@ describe('App', () => {
           app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, ({ }) => { viewFn(); });
           app.options('external_select_action_id', ({ }) => { optionsFn(); });
           app.options({ callback_id: 'dialog_suggestion_callback_id' }, ({ }) => { optionsFn(); });
+
+          app.event('app_home_opened', ({ }) => { /* noop */ });
+          app.message('hello', ({ }) => { /* noop */ });
+          app.command('/echo', ({ }) => { /* noop */ });
+
+          // invalid view constraints
+          const invalidViewConstraints1 = {
+            callback_id: 'foo',
+            type: 'view_submission',
+            unknown_key: 'should be detected',
+          } as any as ViewConstraints;
+          app.view(invalidViewConstraints1, ({ }) => { /* noop */ });
+          assert.isTrue(fakeLogger.error.called);
+
+          fakeLogger.error = sinon.fake();
+
+          const invalidViewConstraints2 = {
+            callback_id: 'foo',
+            type: undefined,
+            unknown_key: 'should be detected',
+          } as any as ViewConstraints;
+          app.view(invalidViewConstraints2, ({ }) => { /* noop */ });
+          assert.isTrue(fakeLogger.error.called);
 
           app.error(fakeErrorHandler);
           dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));

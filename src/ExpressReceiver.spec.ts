@@ -41,6 +41,17 @@ describe('ExpressReceiver', () => {
     });
   });
 
+  describe('start/stop', () => {
+    it('should be available', async () => {
+      const receiver = new ExpressReceiver({
+        signingSecret: 'my-secret',
+        logger: noopLogger,
+      });
+      await receiver.start(9999);
+      await receiver.stop();
+    });
+  });
+
   describe('built-in middleware', () => {
     describe('ssl_check requset handler', () => {
       it('should handle valid requests', async () => {
