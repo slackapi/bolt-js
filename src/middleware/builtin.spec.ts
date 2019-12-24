@@ -3,7 +3,7 @@ import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { ErrorCode } from '../errors';
-import { Override, delay, wrapToResolveOnFirstCall } from '../test-helpers';
+import { Override, delay, wrapToResolveOnFirstCall, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import {
   SlackEventMiddlewareArgs,
@@ -433,11 +433,13 @@ describe('ignoreSelf()', () => {
 });
 
 describe('onlyCommands', () => {
+  const logger = createFakeLogger();
 
   it('should detect valid requests', async () => {
     const payload: SlashCommand = { ...validCommandPayload };
     const fakeNext = sinon.fake();
     onlyCommands({
+      logger,
       payload,
       command: payload,
       body: payload,
@@ -454,6 +456,7 @@ describe('onlyCommands', () => {
     const payload: any = {};
     const fakeNext = sinon.fake();
     onlyCommands({
+      logger,
       payload,
       action: payload,
       command: undefined,
@@ -469,9 +472,12 @@ describe('onlyCommands', () => {
 });
 
 describe('matchCommandName', () => {
+  const logger = createFakeLogger();
+
   function buildArgs(fakeNext: NextMiddleware): SlackCommandMiddlewareArgs & { next: any, context: any } {
     const payload: SlashCommand = { ...validCommandPayload };
     return {
+      logger,
       payload,
       command: payload,
       body: payload,
@@ -498,9 +504,12 @@ describe('matchCommandName', () => {
 
 describe('onlyEvents', () => {
 
+  const logger = createFakeLogger();
+
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
     const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
+      logger,
       payload: appMentionEvent,
       event: appMentionEvent,
       message: null as never, // a bit hackey to sartisfy TS compiler
@@ -524,6 +533,7 @@ describe('onlyEvents', () => {
     const payload: SlashCommand = { ...validCommandPayload };
     const fakeNext = sinon.fake();
     onlyEvents({
+      logger,
       payload,
       command: payload,
       body: payload,
@@ -538,8 +548,11 @@ describe('onlyEvents', () => {
 });
 
 describe('matchEventType', () => {
+  const logger = createFakeLogger();
+
   function buildArgs(): SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } {
     return {
+      logger,
       payload: appMentionEvent,
       event: appMentionEvent,
       message: null as never, // a bit hackey to sartisfy TS compiler
@@ -571,8 +584,11 @@ describe('matchEventType', () => {
 });
 
 describe('subtype', () => {
+  const logger = createFakeLogger();
+
   function buildArgs(): SlackEventMiddlewareArgs<'message'> & { event?: SlackEvent } {
     return {
+      logger,
       payload: botMessageEvent,
       event: botMessageEvent,
       message: botMessageEvent,

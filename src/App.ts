@@ -411,7 +411,7 @@ export default class App {
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
-    const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+    const listenerArgs: Pick<AnyMiddlewareArgs, 'logger' | 'body' | 'payload'> & {
       /** Say function might be set below */
       say?: SayFn
       /** Respond function might be set below */
@@ -419,6 +419,7 @@ export default class App {
       /** Ack function might be set below */
       ack?: AckFn<any>,
     } = {
+      logger: this.logger,
       body: bodyArg,
       payload:
         (type === IncomingEventType.Event) ?
