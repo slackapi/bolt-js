@@ -20,7 +20,7 @@ To respond to options requests, you'll need to `ack()` with valid options. Both 
 app.options('external_action', async ({ options, ack }) => {
   // Get information specific to a team or channel
   const results = await db.get(options.team.id);
-  
+
   if (results) {
     let options = [];
     // Collect information in options array to send in Slack ack response

@@ -47,14 +47,14 @@ const authorizeFn = async ({ teamId, enterpriseId }) => {
     if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
       // 一致したワークスペースの認証情報を使用
       return {
-        // かわりに userToken を使用
+        // 代わりに userToken をセットしても OK
         botToken: team.botToken,
         botId: team.botId,
         botUserId: team.botUserId
       };
     }
   }
-  
+
   throw new Error('No matching authorizations'); // 認証エラー
 }
 ```

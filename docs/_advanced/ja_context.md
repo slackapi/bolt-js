@@ -12,7 +12,7 @@ order: 6
 </div>
 
 ```javascript
-async function addTimezoneContext ({ payload, context, next }) {
+async function addTimezoneContext({ payload, context, next }) {
   const user = await app.client.users.info({
     token: context.botToken,
     user: payload.user_id,

@@ -12,7 +12,7 @@ All listeners have access to a `context` object, which can be used to enrich eve
 </div>
 
 ```javascript
-async function addTimezoneContext ({ payload, context, next }) {
+async function addTimezoneContext({ payload, context, next }) {
   const user = await app.client.users.info({
     token: context.botToken,
     user: payload.user_id,
@@ -21,7 +21,7 @@ async function addTimezoneContext ({ payload, context, next }) {
 
   // Add user's timezone context
   context.tz_offset = user.tz_offset;
-  
+
   // Pass control to the next middleware function
   next();
 }

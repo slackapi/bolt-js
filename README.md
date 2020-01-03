@@ -259,7 +259,7 @@ function authWithAcme({ payload, context, say, next }) {
         // In the real world, you would need to check if the say function was defined, falling back to the respond
         // function if not, and then falling back to only logging the error as a last resort.
         say(`I'm sorry <@${slackUserId}, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
-         return;
+        return;
       }
 
       // This middleware doesn't know how to handle any other errors. Pass control to the previous middleware (if there
@@ -267,7 +267,6 @@ function authWithAcme({ payload, context, say, next }) {
       next(error);
     });
 }
-
 ```
 
 ### Listener middleware
@@ -285,14 +284,14 @@ before the listener attached to `message` events:
 // Listener middleware - filters out messages that have subtype 'bot_message'
 function noBotMessages({ message, next }) {
   if (!message.subtype || message.subtype !== 'bot_message') {
-     next();
+    next();
   }
 }
 
 // The listener only sees messages from human users
 app.message(noBotMessages, ({ message }) => console.log(
-`(MSG) User: ${message.user}
-       Message: ${message.text}`
+  `(MSG) User: ${message.user}
+         Message: ${message.text}`
 ));
 ```
 
@@ -307,8 +306,8 @@ const { App, subtype } = require('@slack/bolt');
 
 // The listener only sees messages from bot users (apps)
 app.message(subtype('bot_message'), ({ message }) => console.log(
-`(MSG) Bot: ${message.bot_id}
-       Message: ${message.text}`
+  `(MSG) Bot: ${message.bot_id}
+         Message: ${message.text}`
 ));
 ```
 

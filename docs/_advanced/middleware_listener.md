@@ -20,7 +20,7 @@ As an example, let’s say your listener should only deal with messages from hum
 // Listener middleware that filters out messages with 'bot_message' subtype
 function noBotMessages({ message, next }) {
   if (!message.subtype || message.subtype !== 'bot_message') {
-     next();
+    next();
   }
 }
 
