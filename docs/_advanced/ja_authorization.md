@@ -54,7 +54,7 @@ const authorizeFn = async ({ teamId, enterpriseId }) => {
       };
     }
   }
-  
+
   throw new Error('No matching authorizations'); // 認証エラー
 }
 ```
