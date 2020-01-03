@@ -5,7 +5,17 @@ import sinon from 'sinon';
 import { ErrorCode } from '../errors';
 import { Override, delay, wrapToResolveOnFirstCall } from '../test-helpers';
 import rewiremock from 'rewiremock';
-import { SlackEventMiddlewareArgs, NextMiddleware, Context, MessageEvent, ContextMissingPropertyError, SlackCommandMiddlewareArgs } from '../types';
+import {
+  SlackEventMiddlewareArgs,
+  NextMiddleware,
+  Context,
+  MessageEvent,
+  ContextMissingPropertyError,
+  SlackCommandMiddlewareArgs,
+} from '../types';
+import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
+import { SlashCommand } from '../types/command/index';
+import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events/base-events';
 
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
@@ -422,6 +432,177 @@ describe('ignoreSelf()', () => {
   });
 });
 
+describe('onlyCommands', () => {
+
+  it('should detect valid requests', async () => {
+    const payload: SlashCommand = { ...validCommandPayload };
+    const fakeNext = sinon.fake();
+    onlyCommands({
+      payload,
+      command: payload,
+      body: payload,
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
+      next: fakeNext,
+      context: {},
+    });
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should skip other requests', async () => {
+    const payload: any = {};
+    const fakeNext = sinon.fake();
+    onlyCommands({
+      payload,
+      action: payload,
+      command: undefined,
+      body: payload,
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
+      next: fakeNext,
+      context: {},
+    });
+    assert.isTrue(fakeNext.notCalled);
+  });
+});
+
+describe('matchCommandName', () => {
+  function buildArgs(fakeNext: NextMiddleware): SlackCommandMiddlewareArgs & { next: any, context: any } {
+    const payload: SlashCommand = { ...validCommandPayload };
+    return {
+      payload,
+      command: payload,
+      body: payload,
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
+      next: fakeNext,
+      context: {},
+    };
+  }
+
+  it('should detect valid requests', async () => {
+    const fakeNext = sinon.fake();
+    matchCommandName('/hi')(buildArgs(fakeNext));
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should skip other requests', async () => {
+    const fakeNext = sinon.fake();
+    matchCommandName('/hello')(buildArgs(fakeNext));
+    assert.isTrue(fakeNext.notCalled);
+  });
+});
+
+describe('onlyEvents', () => {
+
+  it('should detect valid requests', async () => {
+    const fakeNext = sinon.fake();
+    const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
+      payload: appMentionEvent,
+      event: appMentionEvent,
+      message: null as never, // a bit hackey to sartisfy TS compiler
+      body: {
+        token: 'token-value',
+        team_id: 'T1234567',
+        api_app_id: 'A1234567',
+        event: appMentionEvent,
+        type: 'event_callback',
+        event_id: 'event-id-value',
+        event_time: 123,
+        authed_users: [],
+      },
+      say: () => { /* noop */ },
+    };
+    onlyEvents({ next: fakeNext, context: {}, ...args });
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should skip other requests', async () => {
+    const payload: SlashCommand = { ...validCommandPayload };
+    const fakeNext = sinon.fake();
+    onlyEvents({
+      payload,
+      command: payload,
+      body: payload,
+      say: () => { /* noop */ },
+      respond: () => { /* noop */ },
+      ack: () => { /* noop */ },
+      next: fakeNext,
+      context: {},
+    });
+    assert.isFalse(fakeNext.called);
+  });
+});
+
+describe('matchEventType', () => {
+  function buildArgs(): SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } {
+    return {
+      payload: appMentionEvent,
+      event: appMentionEvent,
+      message: null as never, // a bit hackey to sartisfy TS compiler
+      body: {
+        token: 'token-value',
+        team_id: 'T1234567',
+        api_app_id: 'A1234567',
+        event: appMentionEvent,
+        type: 'event_callback',
+        event_id: 'event-id-value',
+        event_time: 123,
+        authed_users: [],
+      },
+      say: () => { /* noop */ },
+    };
+  }
+
+  it('should detect valid requests', async () => {
+    const fakeNext = sinon.fake();
+    matchEventType('app_mention')({ next: fakeNext, context: {}, ...buildArgs() });
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should skip other requests', async () => {
+    const fakeNext = sinon.fake();
+    matchEventType('app_home_opened')({ next: fakeNext, context: {}, ...buildArgs() });
+    assert.isFalse(fakeNext.called);
+  });
+});
+
+describe('subtype', () => {
+  function buildArgs(): SlackEventMiddlewareArgs<'message'> & { event?: SlackEvent } {
+    return {
+      payload: botMessageEvent,
+      event: botMessageEvent,
+      message: botMessageEvent,
+      body: {
+        token: 'token-value',
+        team_id: 'T1234567',
+        api_app_id: 'A1234567',
+        event: botMessageEvent,
+        type: 'event_callback',
+        event_id: 'event-id-value',
+        event_time: 123,
+        authed_users: [],
+      },
+      say: () => { /* noop */ },
+    };
+  }
+
+  it('should detect valid requests', async () => {
+    const fakeNext = sinon.fake();
+    subtype('bot_message')({ next: fakeNext, context: {}, ...buildArgs() });
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should skip other requests', async () => {
+    const fakeNext = sinon.fake();
+    subtype('me_message')({ next: fakeNext, context: {}, ...buildArgs() });
+    assert.isFalse(fakeNext.called);
+  });
+});
+
 /* Testing Harness */
 
 interface DummyContext {
@@ -429,7 +610,8 @@ interface DummyContext {
 }
 
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & { next: NextMiddleware, context: Context };
-type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & { next: NextMiddleware, context: Context };
+type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'>
+  & { next: NextMiddleware, context: Context };
 
 type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'>
   & { next: NextMiddleware, context: Context };
@@ -456,3 +638,36 @@ function createFakeMessageEvent(content: string | MessageEvent['blocks'] = ''): 
   }
   return event as MessageEvent;
 }
+
+const validCommandPayload: SlashCommand = {
+  token: 'token-value',
+  command: '/hi',
+  text: 'Steve!',
+  response_url: 'https://hooks.slack.com/foo/bar',
+  trigger_id: 'trigger-id-value',
+  user_id: 'U1234567',
+  user_name: 'steve',
+  team_id: 'T1234567',
+  team_domain: 'awesome-eng-team',
+  channel_id: 'C1234567',
+  channel_name: 'random',
+};
+
+const appMentionEvent: AppMentionEvent = {
+  type: 'app_mention',
+  user: 'U1234567',
+  text: 'this is my message',
+  ts: '123.123',
+  channel: 'C1234567',
+  event_ts: '123.123',
+};
+
+const botMessageEvent: BotMessageEvent & MessageEvent = {
+  type: 'message',
+  subtype: 'bot_message',
+  channel: 'C1234567',
+  user: 'U1234567',
+  ts: '123.123',
+  text: 'this is my message',
+  bot_id: 'B1234567',
+};

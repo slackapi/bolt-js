@@ -29,8 +29,9 @@
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "tslint --project .",
+    "test-lint": "tslint \"src/**/*.spec.ts\" && tslint \"src/test-helpers.ts\"",
     "mocha": "nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run lint && npm run mocha && npm run test:integration",
+    "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:integration",
     "test:integration": "cd integration-tests && npm install && npm test",
     "coverage": "codecov"
   },
