@@ -18,7 +18,7 @@ order: 12
 app.options('external_action', async ({ options, ack }) => {
   // チームまたはチャンネル情報を取得
   const results = await db.get(options.team.id);
-  
+
   if (results) {
     let options = [];
     // ack 応答 するために options 配列に情報をプッシュ

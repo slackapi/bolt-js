@@ -19,7 +19,7 @@ order: 5
 // 'bot_message' サブタイプを持つメッセージをフィルタリングするリスナーミドルウェア
 function noBotMessages({ message, next }) {
   if (!message.subtype || message.subtype !== 'bot_message') {
-     next();
+    next();
   }
 }
 

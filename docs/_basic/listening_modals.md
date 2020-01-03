@@ -31,7 +31,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
   let msg = '';
   // Save to DB
   const results = await db.set(user.input, val);
-  
+
   if (results) {
     // DB save was successful
     msg = 'Your submission was successful';
@@ -50,6 +50,6 @@ app.view('view_b', async ({ ack, body, view, context }) => {
   catch (error) {
     console.error(error);
   }
-  
+
 });
 ```

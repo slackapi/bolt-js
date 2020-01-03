@@ -13,7 +13,7 @@ order: 1
 
 ```javascript
 app.error((error) => {
-	// メッセージ再送信もしくはアプリを停止するかの決定をくだすために、エラーの詳細をチェック 
-	console.error(error);
+  // メッセージ再送信もしくはアプリを停止するかの判断をするためにエラーの詳細を出力して確認
+  console.error(error);
 });
 ```
