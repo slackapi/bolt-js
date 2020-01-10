@@ -235,8 +235,8 @@ describe('App', () => {
       // TODO: create many more invalid receiver events (fuzzing)
       return [{
         body: {},
-        respond: sinon.fake(),
-        ack: sinon.fake(),
+        respond: sinon.fake.resolves(undefined),
+        ack: sinon.fake.resolves(undefined),
       }];
     }
 
@@ -637,10 +637,10 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
-            say(dummyMessage);
+            await say(dummyMessage);
           });
           app.error(fakeErrorHandler);
           dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
@@ -668,10 +668,10 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
-            say(dummyMessage);
+            await say(dummyMessage);
           });
           app.error(fakeErrorHandler);
           dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
@@ -773,10 +773,10 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
-            say(dummyMessage);
+            await say(dummyMessage);
           });
           app.error(fakeErrorHandler);
           dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
@@ -896,7 +896,7 @@ function createDummyReceiverEvent(): ReceiverEvent {
 }
 
 // Utility functions
-const noop = () => { }; // tslint:disable-line:no-empty
+const noop = (() => Promise.resolve(undefined));
 const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
 const noopAuthorize = (() => Promise.resolve({}));
 

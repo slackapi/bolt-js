@@ -1,5 +1,11 @@
 import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
+import {
+  WebClient,
+  ChatPostMessageArguments,
+  addAppMetadata,
+  WebClientOptions,
+  WebAPICallResult,
+} from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
@@ -400,10 +406,10 @@ export default class App {
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.userToken;
-      return (message: Parameters<SayFn>[0]) => {
+      return (message: Parameters<SayFn>[0]): Promise<void | WebAPICallResult> => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
-        this.client.chat.postMessage(postMessageArguments)
+        return this.client.chat.postMessage(postMessageArguments)
           .catch(error => this.onGlobalError(error));
       };
     };
@@ -472,7 +478,7 @@ export default class App {
       listenerArgs.ack = ack;
     } else {
       // Events API requests are acknowledged right away, since there's no data expected
-      ack();
+      await ack();
     }
 
     // Dispatch event through global middleware

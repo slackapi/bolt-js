@@ -82,7 +82,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     );
     const event: ReceiverEvent = {
       body: req.body as { [key: string]: any },
-      ack: (response: any): void => {
+      ack: async (response: any): Promise<void> => {
         // TODO: if app tries acknowledging more than once, emit a warning
         if (timer !== undefined) {
           clearTimeout(timer);
@@ -101,11 +101,8 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     };
 
     if (req.body && req.body.response_url) {
-      event.respond = (response): void => {
-        this.axios.post(req.body.response_url, response)
-          .catch((e) => {
-            this.emit('error', e);
-          });
+      event.respond = async (response) => {
+        await this.axios.post(req.body.response_url, response);
       };
     }
 
