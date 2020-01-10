@@ -324,13 +324,13 @@ describe('App', () => {
       const dummyChannelId = 'CHANNEL_ID';
       let overrides: Override;
 
-      function buildOverrides(secondOverride: Override): Override {
+      function buildOverrides(secondOverrides: Override[]): Override {
         fakeReceiver = createFakeReceiver();
         fakeErrorHandler = sinon.fake();
         dummyAuthorizationResult = { botToken: '', botId: '' };
         overrides = mergeOverrides(
           withNoopAppMetadata(),
-          secondOverride,
+          ...secondOverrides,
           withMemoryStore(sinon.fake()),
           withConversationContext(sinon.fake.returns(noopMiddleware)),
         );
@@ -476,7 +476,7 @@ describe('App', () => {
           const actionFn = sinon.fake.resolves({});
           const viewFn = sinon.fake.resolves({});
           const optionsFn = sinon.fake.resolves({});
-          const overrides = buildOverrides(withNoopWebClient());
+          const overrides = buildOverrides([withNoopWebClient()]);
           const App = await importApp(overrides); // tslint:disable-line:variable-name
           const dummyReceiverEvents = createReceiverEvents();
 
@@ -535,6 +535,44 @@ describe('App', () => {
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
+        });
+      });
+
+      describe('respond()', () => {
+        it('should respond to events with a response_url', async () => {
+          // Arrange
+          const responseText = 'response';
+          const responseUrl = 'https://fake.slack/response_url';
+          const actionId = 'block_action_id';
+          const fakeAxiosPost = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.action(actionId, async ({ respond }) => {
+            await respond(responseText);
+          });
+          app.error(fakeErrorHandler);
+          fakeReceiver.emit('message', { // IncomingEventType.Action (app.action)
+            body: {
+              type: 'block_actions',
+              response_url: responseUrl,
+              actions: [{
+                action_id: actionId,
+              }],
+              channel: {},
+              user: {},
+              team: {},
+            },
+            ack: noop,
+          });
+          await delay();
+
+          // Assert
+          assert.equal(fakeAxiosPost.callCount, 1);
+          // Assert that each call to fakeAxiosPost had the right arguments
+          assert(fakeAxiosPost.calledWith(responseUrl, responseText));
         });
       });
 
@@ -611,7 +649,7 @@ describe('App', () => {
         it('should send a simple message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
-          const overrides = buildOverrides(withPostMessage(fakePostMessage));
+          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
           const App = await importApp(overrides); // tslint:disable-line:variable-name
 
           const dummyMessage = 'test';
@@ -642,7 +680,7 @@ describe('App', () => {
         it('should send a complex message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
-          const overrides = buildOverrides(withPostMessage(fakePostMessage));
+          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
           const App = await importApp(overrides); // tslint:disable-line:variable-name
 
           const dummyMessage = { text: 'test' };
@@ -720,7 +758,7 @@ describe('App', () => {
 
         it('should not exist in the arguments on incoming events that don\'t support say', async () => {
           // Arrange
-          const overrides = buildOverrides(withNoopWebClient());
+          const overrides = buildOverrides([withNoopWebClient()]);
           const App = await importApp(overrides); // tslint:disable-line:variable-name
 
           const assertionAggregator = sinon.fake();
@@ -744,7 +782,7 @@ describe('App', () => {
         it('should handle failures through the App\'s global error handler', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
-          const overrides = buildOverrides(withPostMessage(fakePostMessage));
+          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
           const App = await importApp(overrides); // tslint:disable-line:variable-name
 
           const dummyMessage = { text: 'test' };
@@ -824,6 +862,16 @@ function withPostMessage(spy: SinonSpy): Override {
           postMessage: spy,
         };
       },
+    },
+  };
+}
+
+function withAxiosPost(spy: SinonSpy): Override {
+  return {
+    axios: {
+      create: () => ({
+        post: spy,
+      }),
     },
   };
 }
