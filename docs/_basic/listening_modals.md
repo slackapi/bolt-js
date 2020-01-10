@@ -41,7 +41,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
 
   // Message the user
   try {
-    app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       token: context.botToken,
       channel: user,
       text: msg

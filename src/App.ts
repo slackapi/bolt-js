@@ -7,6 +7,7 @@ import {
   WebAPICallResult,
 } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
+import axios, { AxiosInstance } from 'axios';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
   ignoreSelf as ignoreSelfMiddleware,
@@ -133,6 +134,8 @@ export default class App {
 
   private errorHandler: ErrorHandler;
 
+  private axios: AxiosInstance;
+
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
@@ -161,6 +164,14 @@ export default class App {
       tls: clientTls,
       slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
     });
+
+    this.axios = axios.create(Object.assign(
+      {
+        httpAgent: agent,
+        httpsAgent: agent,
+      },
+      clientTls,
+    ));
 
     if (token !== undefined) {
       if (authorize !== undefined) {
@@ -377,7 +388,8 @@ export default class App {
   /**
    * Handles events from the receiver
    */
-  private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
+  private async onIncomingEvent(event: ReceiverEvent): Promise<void> {
+    const { body, ack } = event;
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
@@ -469,8 +481,12 @@ export default class App {
     }
 
     // Set respond() utility
-    if (respond !== undefined) {
-      listenerArgs.respond = respond;
+    if (body.response_url) {
+      listenerArgs.respond = async (response): Promise<any> => {
+        const postResponse = await this.axios.post(body.response_url, response);
+
+        return postResponse.data;
+      };
     }
 
     // Set ack() utility

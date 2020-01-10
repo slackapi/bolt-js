@@ -17,8 +17,8 @@ order: 8
 // この echo コマンドは 単純にコマンドをエコー（こだま）
 app.command('/echo', async ({ command, ack, say }) => {
   // コマンドリクエストを確認
-  ack();
+  await ack();
 
-  say(`${command.text}`);
+  await say(`${command.text}`);
 });
 ```

@@ -16,12 +16,12 @@ order: 9
 
 ```javascript
 // コマンド起動をリッスン
-app.command('/ticket', ({ ack, payload, context }) => {
+app.command('/ticket', async ({ ack, payload, context }) => {
   // コマンドのリクエストを確認
-  ack();
+  await ack();
 
   try {
-    const result = app.client.views.open({
+    const result = await app.client.views.open({
       token: context.botToken,
       // 適切な trigger_id を受け取ってから 3 秒以内に渡す
       trigger_id: payload.trigger_id,

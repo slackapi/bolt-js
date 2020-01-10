@@ -34,11 +34,11 @@ app.options('external_action', async ({ options, ack }) => {
       });
     }
 
-    ack({
+    await ack({
       "options": options
     });
   } else {
-    ack();
+    await ack();
   }
 });
 ```

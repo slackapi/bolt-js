@@ -235,7 +235,6 @@ describe('App', () => {
       // TODO: create many more invalid receiver events (fuzzing)
       return [{
         body: {},
-        respond: sinon.fake.resolves(undefined),
         ack: sinon.fake.resolves(undefined),
       }];
     }
@@ -346,14 +345,12 @@ describe('App', () => {
               body: {
                 event: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Command (app.command)
               body: {
                 command: '/COMMAND_NAME',
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action (app.action)
@@ -366,7 +363,6 @@ describe('App', () => {
                 user: {},
                 team: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action (app.action)
@@ -377,7 +373,6 @@ describe('App', () => {
                 user: {},
                 team: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action (app.action)
@@ -388,7 +383,6 @@ describe('App', () => {
                 user: {},
                 team: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action (app.action)
@@ -400,7 +394,6 @@ describe('App', () => {
                 user: {},
                 team: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action with dialog submission (app.action)
@@ -411,7 +404,6 @@ describe('App', () => {
                 user: {},
                 team: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action for an external_select block (app.options)
@@ -423,7 +415,6 @@ describe('App', () => {
                 team: {},
                 actions: [],
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.Action for "data_source": "external" in dialogs (app.options)
@@ -435,7 +426,6 @@ describe('App', () => {
                 user: {},
                 team: {},
               },
-              respond: noop,
               ack: noop,
             },
             { // IncomingEventType.ViewSubmitAction (app.view)
@@ -448,7 +438,6 @@ describe('App', () => {
                   callback_id: 'view_callback_id',
                 },
               },
-              respond: noop,
               ack: noop,
             },
             {
@@ -461,7 +450,6 @@ describe('App', () => {
                   callback_id: 'view_callback_id',
                 },
               },
-              respond: noop,
               ack: noop,
             },
             {
@@ -477,7 +465,6 @@ describe('App', () => {
                   text: 'hello friends!',
                 },
               },
-              respond: noop,
               ack: noop,
             },
           ];
@@ -563,7 +550,6 @@ describe('App', () => {
                 },
                 team_id: 'TEAM_ID',
               },
-              respond: noop,
               ack: noop,
             },
             // IncomingEventType.Event with channel in item
@@ -576,7 +562,6 @@ describe('App', () => {
                 },
                 team_id: 'TEAM_ID',
               },
-              respond: noop,
               ack: noop,
             },
             // IncomingEventType.Command
@@ -586,7 +571,6 @@ describe('App', () => {
                 channel_id: channelId,
                 team_id: 'TEAM_ID',
               },
-              respond: noop,
               ack: noop,
             },
             // IncomingEventType.Action from block action, interactive message, or message action
@@ -603,7 +587,6 @@ describe('App', () => {
                   id: 'TEAM_ID',
                 },
               },
-              respond: noop,
               ack: noop,
             },
             // IncomingEventType.Action from dialog submission
@@ -620,7 +603,6 @@ describe('App', () => {
                   id: 'TEAM_ID',
                 },
               },
-              respond: noop,
               ack: noop,
             },
           ];
@@ -706,7 +688,6 @@ describe('App', () => {
                   id: 'TEAM_ID',
                 },
               },
-              respond: noop,
               ack: noop,
             },
             // IncomingEventType.Options from interactive message or dialog
@@ -723,7 +704,6 @@ describe('App', () => {
                   id: 'TEAM_ID',
                 },
               },
-              respond: noop,
               ack: noop,
             },
             // IncomingEventType.Event without a channel context
@@ -733,7 +713,6 @@ describe('App', () => {
                 },
                 team_id: 'TEAM_ID',
               },
-              respond: noop,
               ack: noop,
             },
           ];
@@ -890,7 +869,6 @@ function createDummyReceiverEvent(): ReceiverEvent {
       event: {
       },
     },
-    respond: noop,
     ack: noop,
   };
 }

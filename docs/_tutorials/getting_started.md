@@ -169,9 +169,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say(`Hey there <@${message.user}>!`);
+  await say(`Hey there <@${message.user}>!`);
 });
 
 (async () => {
@@ -213,9 +213,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say({
+  await say({
     blocks: [
     {
       "type": "section",
@@ -263,9 +263,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say({
+  await say({
     blocks: [
       {
         "type": "section",
@@ -286,10 +286,10 @@ app.message('hello', ({ message, say }) => {
   });
 });
 
-app.action('button_click', ({ body, ack, say }) => {
+app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action
-  ack();
-  say(`<@${body.user.id}> clicked the button`);
+  await ack();
+  await say(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {

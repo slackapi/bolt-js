@@ -31,9 +31,9 @@ To explore adding rich message layouts to your app, read through [the guide on o
 
 ```javascript
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
-app.event('reaction_added', ({ event, say }) => {
+app.event('reaction_added', async ({ event, say }) => {
   if (event.reaction === 'calendar') {
-    say({
+    await say({
       blocks: [{
         "type": "section",
         "text": {

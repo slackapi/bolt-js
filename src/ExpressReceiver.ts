@@ -3,7 +3,6 @@ import { Receiver, ReceiverEvent, ReceiverAckTimeoutError } from './types';
 import { createServer, Server, Agent } from 'http';
 import { SecureContextOptions } from 'tls';
 import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
-import axios, { AxiosInstance } from 'axios';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
@@ -33,14 +32,10 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
 
   private server: Server;
 
-  private axios: AxiosInstance;
-
   constructor({
     signingSecret = '',
     logger = new ConsoleLogger(),
     endpoints = { events: '/slack/events' },
-    agent = undefined,
-    clientTls = undefined,
   }: ExpressReceiverOptions) {
     super();
 
@@ -48,13 +43,6 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     this.app.use(this.errorHandler.bind(this));
     // TODO: what about starting an https server instead of http? what about other options to create the server?
     this.server = createServer(this.app);
-    this.axios = axios.create(Object.assign(
-      {
-        httpAgent: agent,
-        httpsAgent: agent,
-      },
-      clientTls,
-    ));
 
     const expressMiddleware: RequestHandler[] = [
       verifySignatureAndParseBody(logger, signingSecret),
@@ -97,14 +85,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
           }
         }
       },
-      respond: undefined,
     };
-
-    if (req.body && req.body.response_url) {
-      event.respond = async (response) => {
-        await this.axios.post(req.body.response_url, response);
-      };
-    }
 
     this.emit('message', event);
   }

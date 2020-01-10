@@ -17,7 +17,7 @@ order: 5
 ```javascript
 // action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される
 app.action('approve_button', async ({ ack, say }) => {
-  ack();
+  await ack();
   // アクションを反映してメッセージをアップデート
 });
 ```

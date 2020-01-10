@@ -19,7 +19,7 @@ export type RespondArguments = SayArguments & {
 };
 
 export interface RespondFn {
-  (message: string | RespondArguments): Promise<void>;
+  (message: string | RespondArguments): Promise<any>;
 }
 
 export interface AckFn<Response> {

@@ -31,9 +31,9 @@ app.message('knock knock', ({ message, say }) => {
 
 ```javascript
 // 誰かが 📅 絵文字でリアクションした時に、日付ピッカー block を送信
-app.event('reaction_added', ({ event, say }) => {
+app.event('reaction_added', async ({ event, say }) => {
   if (event.reaction === 'calendar') {
-    say({
+    await say({
       blocks: [{
         "type": "section",
         "text": {

@@ -15,12 +15,12 @@ Read more about modal composition in the <a href="https://api.slack.com/surfaces
 
 ```javascript
 // Listen for a slash command invocation
-app.command('/ticket', ({ ack, payload, context }) => {
+app.command('/ticket', async ({ ack, payload, context }) => {
   // Acknowledge the command request
-  ack();
+  await ack();
 
   try {
-    const result = app.client.views.open({
+    const result = await app.client.views.open({
       token: context.botToken,
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: payload.trigger_id,
