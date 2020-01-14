@@ -17,7 +17,7 @@ This guide is meant to walk you through getting up and running with a Slack app 
 ---
 
 ### Create an app
-First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new). 
+First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps?new_granular_bot_app=1). 
 
 > 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
 
@@ -38,17 +38,15 @@ There are two token types available to a Slack app: user (`xoxp`) and bot (`xoxb
 
 For brevity, we're going to use bot tokens for this guide.
 
-To add a bot user, click **Bot Users** on the left sidebar and then **Add A Bot User**. Give it a display name and username, then click **Add Bot User**.
+Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
 
-Now that you have a bot user with permission to send messages to Slack, let's install the app to your workspace.
+For now, we'll just add one scope: [`chat:write`](https://api.slack.com/scopes/chat:write). This grants your app the permission to post messages in channels it's a member of.
 
-Click **Install App** on the left sidebar and click the **Install App to Workspace** button at the top of the page. You'll see a screen that details what permissions the app is requesting, which correlate to the scopes applied to your app's OAuth token(s).
+Scroll up to the top of the OAuth & Permissions page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
 
-Once you authorize the installation, you'll land on the **OAuth & Permissions** page.
+Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
-![OAuth Tokens](../assets/bot-token.png "OAuth Tokens")
-
-You'll see two tokens. For now, we'll just use the `xoxb` bot token. (If you scroll down this page to the **Scopes** section, you'll see the various scopes you can add to the `xoxp` token.)
+![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
 > 💡 Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
 
