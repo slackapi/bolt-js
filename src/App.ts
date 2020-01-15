@@ -418,11 +418,11 @@ export default class App {
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.userToken;
-      return (message: Parameters<SayFn>[0]): Promise<void | WebAPICallResult> => {
+      return (message: Parameters<SayFn>[0]): Promise<WebAPICallResult> => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
-        return this.client.chat.postMessage(postMessageArguments)
-          .catch(error => this.onGlobalError(error));
+
+        return this.client.chat.postMessage(postMessageArguments);
       };
     };
 

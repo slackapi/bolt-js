@@ -13,8 +13,8 @@ In the case that you'd like to send a message outside of a listener or you want 
 
 ```javascript
 // Listens for messages containing "knock knock" and responds with an italicized "who's there?"
-app.message('knock knock', ({ message, say }) => {
-  say(`_Who's there?_`);
+app.message('knock knock', async ({ message, say }) => {
+  await say(`_Who's there?_`);
 });
 ```
 

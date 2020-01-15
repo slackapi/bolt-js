@@ -441,7 +441,7 @@ describe('onlyCommands', () => {
       payload,
       command: payload,
       body: payload,
-      say: noop,
+      say: sayNoop,
       respond: noop,
       ack: noop,
       next: fakeNext,
@@ -458,7 +458,7 @@ describe('onlyCommands', () => {
       action: payload,
       command: undefined,
       body: payload,
-      say: noop,
+      say: sayNoop,
       respond: noop,
       ack: noop,
       next: fakeNext,
@@ -475,7 +475,7 @@ describe('matchCommandName', () => {
       payload,
       command: payload,
       body: payload,
-      say: noop,
+      say: sayNoop,
       respond: noop,
       ack: noop,
       next: fakeNext,
@@ -514,7 +514,7 @@ describe('onlyEvents', () => {
         event_time: 123,
         authed_users: [],
       },
-      say: () => Promise.resolve(undefined),
+      say: sayNoop,
     };
     onlyEvents({ next: fakeNext, context: {}, ...args });
     assert.isTrue(fakeNext.called);
@@ -527,7 +527,7 @@ describe('onlyEvents', () => {
       payload,
       command: payload,
       body: payload,
-      say: noop,
+      say: sayNoop,
       respond: noop,
       ack: noop,
       next: fakeNext,
@@ -553,7 +553,7 @@ describe('matchEventType', () => {
         event_time: 123,
         authed_users: [],
       },
-      say: noop,
+      say: sayNoop,
     };
   }
 
@@ -586,7 +586,7 @@ describe('subtype', () => {
         event_time: 123,
         authed_users: [],
       },
-      say: noop,
+      say: sayNoop,
     };
   }
 
@@ -673,3 +673,4 @@ const botMessageEvent: BotMessageEvent & MessageEvent = {
 };
 
 const noop = () => Promise.resolve(undefined);
+const sayNoop = () => Promise.resolve({ ok: true });

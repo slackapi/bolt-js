@@ -13,8 +13,8 @@ order: 2
 
 ```javascript
 // "knock knock" を含むメッセージをリスニングし、 "who's there?" というメッセージをイタリック体で送信
-app.message('knock knock', ({ message, say }) => {
-  say(`_Who's there?_`);
+app.message('knock knock', async ({ message, say }) => {
+  await say(`_Who's there?_`);
 });
 ```
 

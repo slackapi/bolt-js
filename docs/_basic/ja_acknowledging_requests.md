@@ -21,7 +21,7 @@ app.action({ callback_id: 'ticket_submit' }, async ({ action, ack }) => {
     await ack();
   } else {
     // メールアドレスが無効。エラーを確認
-    ack({
+    await ack({
       errors: [{
         "name": "email_address",
         "error": "Sorry, this isn’t a valid email"

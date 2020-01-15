@@ -778,30 +778,6 @@ describe('App', () => {
           // Assert
           assert.equal(assertionAggregator.callCount, dummyReceiverEvents.length);
         });
-
-        it('should handle failures through the App\'s global error handler', async () => {
-          // Arrange
-          const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
-          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // tslint:disable-line:variable-name
-
-          const dummyMessage = { text: 'test' };
-          const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
-
-          // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use(async (args) => {
-            // By definition, these events should all produce a say function, so we cast args.say into a SayFn
-            const say = (args as any).say as SayFn;
-            await say(dummyMessage);
-          });
-          app.error(fakeErrorHandler);
-          dummyReceiverEvents.forEach(dummyEvent => fakeReceiver.emit('message', dummyEvent));
-          await delay();
-
-          // Assert
-          assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
-        });
       });
     });
   });

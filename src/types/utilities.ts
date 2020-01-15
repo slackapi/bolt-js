@@ -8,7 +8,7 @@ export type SayArguments = Pick<ChatPostMessageArguments, Exclude<KnownKeys<Chat
 };
 
 export interface SayFn {
-  (message: string | SayArguments): Promise<void | WebAPICallResult>;
+  (message: string | SayArguments): Promise<WebAPICallResult>;
 }
 
 export type RespondArguments = SayArguments & {
