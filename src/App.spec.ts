@@ -9,7 +9,7 @@ import { ErrorCode } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
-import { ViewConstraints } from './App';
+import App, { ViewConstraints } from './App';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -228,6 +228,16 @@ describe('App', () => {
   });
 
   describe('event processing', () => {
+    let fakeReceiver: FakeReceiver;
+    let fakeErrorHandler: SinonSpy;
+    let dummyAuthorizationResult: { botToken: string, botId: string };
+
+    beforeEach(() => {
+      fakeReceiver = createFakeReceiver();
+      fakeErrorHandler = sinon.fake();
+      dummyAuthorizationResult = { botToken: '', botId: '' };
+    });
+
     // TODO: verify that authorize callback is called with the correct properties and responds correctly to
     // various return values
 
@@ -241,7 +251,6 @@ describe('App', () => {
 
     it('should warn and skip when processing a receiver event with unknown type (never crash)', async () => {
       // Arrange
-      const fakeReceiver = createFakeReceiver();
       const fakeLogger = createFakeLogger();
       const fakeMiddleware = sinon.fake(noopMiddleware);
       const invalidReceiverEvents = createInvalidReceiverEvents();
@@ -255,15 +264,14 @@ describe('App', () => {
       }
 
       // Assert
+      assert(fakeErrorHandler.notCalled);
       assert(fakeMiddleware.notCalled);
       assert.isAtLeast(fakeLogger.warn.callCount, invalidReceiverEvents.length);
     });
     it('should warn, send to global error handler, and skip when a receiver event fails authorization', async () => {
       // Arrange
-      const fakeReceiver = createFakeReceiver();
       const fakeLogger = createFakeLogger();
       const fakeMiddleware = sinon.fake(noopMiddleware);
-      const fakeErrorHandler = sinon.fake();
       const dummyAuthorizationError = new Error();
       const dummyReceiverEvent = createDummyReceiverEvent();
       const App = await importApp(); // tslint:disable-line:variable-name
@@ -287,47 +295,67 @@ describe('App', () => {
       assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'original', dummyAuthorizationError);
     });
     describe('global middleware', () => {
-      it('should process receiver events in order of #use', async () => {
-        // Arrange
-        const fakeReceiver = createFakeReceiver();
-        const fakeFirstMiddleware = sinon.fake(noopMiddleware);
-        const fakeSecondMiddleware = sinon.fake(noopMiddleware);
-        const dummyReceiverEvent = createDummyReceiverEvent();
-        const dummyAuthorizationResult = { botToken: '', botId: '' };
+      let fakeFirstMiddleware: SinonSpy;
+      let fakeSecondMiddleware: SinonSpy;
+      let app: App;
+      let dummyReceiverEvent: ReceiverEvent;
+
+      beforeEach(async () => {
+        const fakeConversationContext = sinon.fake.returns(noopMiddleware);
         const overrides = mergeOverrides(
-          withNoopAppMetadata(),
-          withNoopWebClient(),
-          withMemoryStore(sinon.fake()),
-          withConversationContext(sinon.fake.returns(noopMiddleware)),
+            withNoopAppMetadata(),
+            withNoopWebClient(),
+            withMemoryStore(sinon.fake()),
+            withConversationContext(fakeConversationContext),
         );
         const App = await importApp(overrides); // tslint:disable-line:variable-name
 
+        dummyReceiverEvent = createDummyReceiverEvent();
+        fakeFirstMiddleware = sinon.fake(noopMiddleware);
+        fakeSecondMiddleware = sinon.fake(noopMiddleware);
+
+        app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      });
+
+      it('should process receiver events in order of #use', async () => {
         // Act
-        const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
         app.use(fakeFirstMiddleware);
         app.use(fakeSecondMiddleware);
+        app.error(fakeErrorHandler);
         fakeReceiver.emit('message', dummyReceiverEvent);
         await delay();
 
         // Assert
+        assert(fakeErrorHandler.notCalled);
         assert(fakeFirstMiddleware.calledOnce);
         assert(fakeFirstMiddleware.calledBefore(fakeSecondMiddleware));
         assert(fakeSecondMiddleware.calledOnce);
       });
+
+      it('should error if next called multiple times', async () => {
+        // Arrange
+        app.use(fakeFirstMiddleware);
+        app.use(async ({ next }) => {
+          await next();
+          await next();
+        });
+        app.use(fakeSecondMiddleware);
+        app.error(fakeErrorHandler);
+        fakeReceiver.emit('message', dummyReceiverEvent);
+        await delay();
+
+        // Assert
+        assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+      });
     });
 
     describe('middleware and listener arguments', () => {
-
-      let fakeReceiver: FakeReceiver;
       let fakeErrorHandler: SinonSpy;
-      let dummyAuthorizationResult: { [key: string]: any };
       const dummyChannelId = 'CHANNEL_ID';
       let overrides: Override;
 
       function buildOverrides(secondOverrides: Override[]): Override {
-        fakeReceiver = createFakeReceiver();
         fakeErrorHandler = sinon.fake();
-        dummyAuthorizationResult = { botToken: '', botId: '' };
         overrides = mergeOverrides(
           withNoopAppMetadata(),
           ...secondOverrides,
@@ -349,7 +377,7 @@ describe('App', () => {
             },
             { // IncomingEventType.Command (app.command)
               body: {
-                command: '/COMMAND_NAME',
+                command: { command: '/COMMAND_NAME' },
               },
               ack: noop,
             },
@@ -488,23 +516,26 @@ describe('App', () => {
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
 
-          app.use((_args) => { ackFn(); });
-          app.action('block_action_id', ({ }) => { actionFn(); });
-          app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
+          app.use(async ({ next }) => {
+            await ackFn();
+            await next();
+          });
+          app.action('block_action_id', async ({ }) => { await actionFn(); });
+          app.action({ callback_id: 'message_action_callback_id' }, async ({ }) => { await actionFn(); });
           app.action(
             { type: 'message_action', callback_id: 'another_message_action_callback_id' },
-            ({ }) => { actionFn(); });
-          app.action({ type: 'message_action', callback_id: 'does_not_exist' }, ({ }) => { actionFn(); });
-          app.action({ callback_id: 'interactive_message_callback_id' }, ({ }) => { actionFn(); });
-          app.action({ callback_id: 'dialog_submission_callback_id' }, ({ }) => { actionFn(); });
-          app.view('view_callback_id', ({ }) => { viewFn(); });
-          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, ({ }) => { viewFn(); });
-          app.options('external_select_action_id', ({ }) => { optionsFn(); });
-          app.options({ callback_id: 'dialog_suggestion_callback_id' }, ({ }) => { optionsFn(); });
+            async ({ }) => { await actionFn(); });
+          app.action({ type: 'message_action', callback_id: 'does_not_exist' }, async ({ }) => { await actionFn(); });
+          app.action({ callback_id: 'interactive_message_callback_id' }, async ({ }) => { await actionFn(); });
+          app.action({ callback_id: 'dialog_submission_callback_id' }, async ({ }) => { await actionFn(); });
+          app.view('view_callback_id', async ({ }) => { await viewFn(); });
+          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async ({ }) => { await viewFn(); });
+          app.options('external_select_action_id', async ({ }) => { await optionsFn(); });
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, async ({ }) => { await optionsFn(); });
 
-          app.event('app_home_opened', ({ }) => { /* noop */ });
-          app.message('hello', ({ }) => { /* noop */ });
-          app.command('/echo', ({ }) => { /* noop */ });
+          app.event('app_home_opened', async ({ }) => { /* noop */ });
+          app.message('hello', async ({ }) => { /* noop */ });
+          // app.command('/echo', async ({ }) => { /* noop */ });
 
           // invalid view constraints
           const invalidViewConstraints1 = {
@@ -512,7 +543,7 @@ describe('App', () => {
             type: 'view_submission',
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints1, ({ }) => { /* noop */ });
+          app.view(invalidViewConstraints1, async ({ }) => { /* noop */ });
           assert.isTrue(fakeLogger.error.called);
 
           fakeLogger.error = sinon.fake();
@@ -522,7 +553,7 @@ describe('App', () => {
             type: undefined,
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints2, ({ }) => { /* noop */ });
+          app.view(invalidViewConstraints2, async ({ }) => { /* noop */ });
           assert.isTrue(fakeLogger.error.called);
 
           app.error(fakeErrorHandler);
@@ -570,6 +601,7 @@ describe('App', () => {
           await delay();
 
           // Assert
+          assert(fakeErrorHandler.notCalled);
           assert.equal(fakeAxiosPost.callCount, 1);
           // Assert that each call to fakeAxiosPost had the right arguments
           assert(fakeAxiosPost.calledWith(responseUrl, { text: responseText }));
@@ -641,7 +673,7 @@ describe('App', () => {
             // IncomingEventType.Command
             {
               body: {
-                command: '/COMMAND_NAME',
+                command: { command: '/COMMAND_NAME' },
                 channel_id: channelId,
                 team_id: 'TEAM_ID',
               },
@@ -802,7 +834,7 @@ describe('App', () => {
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-          app.use((args) => {
+          app.use(async (args) => {
             assert.isUndefined((args as any).say);
             // If the above assertion fails, then it would throw an AssertionError and the following line will not be
             // called
@@ -935,7 +967,7 @@ function createDummyReceiverEvent(): ReceiverEvent {
 
 // Utility functions
 const noop = (() => Promise.resolve(undefined));
-const noopMiddleware = ({ next }: { next: NextMiddleware; }) => { next(); };
+const noopMiddleware = async ({ next }: { next: NextMiddleware; }) => { await next(); };
 const noopAuthorize = (() => Promise.resolve({}));
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time

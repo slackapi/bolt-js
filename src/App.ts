@@ -498,34 +498,28 @@ export default class App {
       // Events API requests are acknowledged right away, since there's no data expected
       await ack();
     }
+    const middlewareChain = [...this.middleware];
+
+    if (this.listeners.length > 0) {
+      middlewareChain.push(async (ctx) => {
+        const { next } = ctx;
+
+        await Promise.all(this.listeners.map(
+            listener => processMiddleware(listener, ctx)));
+
+        await next();
+      });
+    }
 
     // Dispatch event through global middleware
-    processMiddleware(
-      listenerArgs as AnyMiddlewareArgs,
-      this.middleware,
-      (globalProcessedContext: Context, globalProcessedArgs: AnyMiddlewareArgs, startGlobalBubble) => {
-        this.listeners.forEach((listenerMiddleware) => {
-          // Dispatch event through all listeners
-          processMiddleware(
-            globalProcessedArgs,
-            listenerMiddleware,
-            (_listenerProcessedContext, _listenerProcessedArgs, startListenerBubble) => {
-              startListenerBubble();
-            },
-            (error) => {
-              startGlobalBubble(error);
-            },
-            globalProcessedContext,
-          );
-        });
-      },
-      (globalError?: CodedError | Error) => {
-        if (globalError !== undefined) {
-          this.onGlobalError(globalError);
-        }
-      },
-      context,
-    );
+    try {
+      await processMiddleware(middlewareChain, {
+        context,
+        ...(listenerArgs as AnyMiddlewareArgs),
+      });
+    } catch (error) {
+      this.onGlobalError(error);
+    }
   }
 
   /**

@@ -23,7 +23,7 @@ describe('conversationContext middleware', () => {
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
-    middleware(fakeArgs);
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeLogger.debug.called);
@@ -54,7 +54,7 @@ describe('conversationContext middleware', () => {
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
-    middleware(fakeArgs);
+    await middleware(fakeArgs);
 
     // Assert
     async function assertions(...args: any[]): Promise<void> {
@@ -92,7 +92,7 @@ describe('conversationContext middleware', () => {
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
-    middleware(fakeArgs);
+    await middleware(fakeArgs);
 
     // Assert
     async function assertions(...args: any[]): Promise<void> {

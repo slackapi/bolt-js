@@ -55,7 +55,7 @@ export function conversationContext<ConversationState = any>(
   store: ConversationStore<ConversationState>,
   logger: Logger,
 ): Middleware<AnyMiddlewareArgs> {
-  return (args) => {
+  return async (args) => {
     const { body, context, next } = args;
     const { conversationId } = getTypeAndConversation(body as any);
     if (conversationId !== undefined) {
@@ -73,7 +73,7 @@ export function conversationContext<ConversationState = any>(
         .catch(error => logger.debug(error.message));
     } else {
       logger.debug('No conversation ID for incoming event');
-      next();
+      await next();
     }
   };
 }
