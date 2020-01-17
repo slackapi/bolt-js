@@ -2,12 +2,18 @@
 import 'mocha';
 import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
-import { Override, createFakeLogger, delay, wrapToResolveOnFirstCall } from './test-helpers';
+import { Override, createFakeLogger, wrapToResolveOnFirstCall } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
 import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
+
+function delay(ms: number = 0): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 describe('conversationContext middleware', () => {
   it('should forward events that have no conversation ID', async () => {

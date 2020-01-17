@@ -4,7 +4,6 @@ import { SlackActionMiddlewareArgs } from './actions';
 import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
 import { SlackViewMiddlewareArgs } from './view';
-import { CodedError, ErrorCode } from '../errors';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
@@ -33,8 +32,3 @@ export interface Middleware<Args> {
 }
 
 export type NextMiddleware = () => Promise<unknown>;
-
-export interface ContextMissingPropertyError extends CodedError {
-  code: ErrorCode.ContextMissingPropertyError;
-  missingProperty: string;
-}

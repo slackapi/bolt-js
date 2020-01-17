@@ -1,5 +1,6 @@
 import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
 import { KnownKeys } from './helpers';
+import { CodedError } from '../errors';
 
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
 // listener. Therefore, specifying the `channel` argument is not required.
@@ -23,5 +24,5 @@ export interface RespondFn {
 }
 
 export interface AckFn<Response> {
-  (response?: Response): Promise<void>;
+  (response?: Response | CodedError): Promise<void>;
 }

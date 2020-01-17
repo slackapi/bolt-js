@@ -10,7 +10,7 @@ export enum ErrorCode {
 
   ReceiverAckTimeoutError = 'slack_bolt_receiver_ack_timeout_error',
 
-  ExpressReceiverAuthenticityError = 'slack_bolt_express_receiver_authenticity_error',
+  ReceiverAuthenticityError = 'slack_bolt_receiver_authenticity_error',
 
   /**
    * This value is used to assign to errors that occur inside the framework but do not have a code, to keep interfaces
@@ -19,16 +19,54 @@ export enum ErrorCode {
   UnknownError = 'slack_bolt_unknown_error',
 }
 
-export function errorWithCode(message: string, code: ErrorCode): CodedError {
-  const error = new Error(message);
-  (error as CodedError).code = code;
-  return error as CodedError;
-}
-
 export function asCodedError(error: CodedError | Error): CodedError {
   if ((error as CodedError).code !== undefined) {
     return error as CodedError;
   }
-  (error as CodedError).code = ErrorCode.UnknownError;
-  return error as CodedError;
+
+  return new UnknownError(error);
+}
+
+export class AppInitializationError extends Error implements CodedError {
+  public code = ErrorCode.AppInitializationError;
+}
+
+export class AuthorizationError extends Error implements CodedError {
+  public code = ErrorCode.AuthorizationError;
+  public original: Error;
+
+  constructor(message: string, original: Error) {
+    super(message);
+
+    this.original = original;
+  }
+}
+
+export class ContextMissingPropertyError extends Error implements CodedError {
+  public code = ErrorCode.ContextMissingPropertyError;
+  public missingProperty: string;
+
+  constructor(missingProperty: string, message: string) {
+    super(message);
+    this.missingProperty = missingProperty;
+  }
+}
+
+export class ReceiverAckTimeoutError extends Error implements CodedError {
+  public code = ErrorCode.ReceiverAckTimeoutError;
+}
+
+export class ReceiverAuthenticityError extends Error implements CodedError {
+  public code = ErrorCode.ReceiverAuthenticityError;
+}
+
+export class UnknownError extends Error implements CodedError {
+  public code = ErrorCode.UnknownError;
+  public original: Error;
+
+  constructor(original: Error) {
+    super(original.message);
+
+    this.original = original;
+  }
 }

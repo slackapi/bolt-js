@@ -16,11 +16,10 @@ import {
   DialogSubmitAction,
   MessageAction,
   BlockElementAction,
-  ContextMissingPropertyError,
   SlackViewAction,
 } from '../types';
 import { ActionConstraints, ViewConstraints } from '../App';
-import { ErrorCode, errorWithCode } from '../errors';
+import { ContextMissingPropertyError } from '../errors';
 
 /**
  * Middleware that filters out any event that isn't an action
@@ -241,7 +240,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return async (args) => {
     // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
     if (args.context.botId === undefined) {
-      throw contextMissingPropertyError(
+      throw new ContextMissingPropertyError(
         'botId',
         'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
       );
@@ -296,7 +295,7 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
   return async ({ message, context, next }) => {
     // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
     if (context.botUserId === undefined) {
-      throw contextMissingPropertyError(
+      throw new ContextMissingPropertyError(
         'botUserId',
         'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
       );
@@ -357,11 +356,4 @@ function isEventArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackEventMiddlewareArgs {
   return (args as SlackEventMiddlewareArgs).event !== undefined;
-}
-
-export function contextMissingPropertyError(propertyName: string, message?: string): ContextMissingPropertyError {
-  const m = message === undefined ? `Context missing property: ${propertyName}` : message;
-  const error = errorWithCode(m, ErrorCode.ContextMissingPropertyError);
-  (error as ContextMissingPropertyError).missingProperty = propertyName;
-  return error as ContextMissingPropertyError;
 }

@@ -2,6 +2,12 @@
 import sinon, { SinonSpy } from 'sinon';
 import { Logger } from '@slack/logger';
 
+export function delay(ms: number = 0): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export interface Override {
   [packageName: string]: {
     [exportName: string]: any;
@@ -61,12 +67,6 @@ export function createFakeLogger(): FakeLogger {
     warn: sinon.fake(),
     error: sinon.fake(),
   };
-}
-
-export function delay(ms: number = 0): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }
 
 export function wrapToResolveOnFirstCall<T extends (...args: any[]) => void>(
