@@ -42,7 +42,7 @@ const installations = [
 
 const authorizeFn = async ({ teamId, enterpriseId }) => {
   // データベースから team 情報を取得
-  for (const team in installations) {
+  for (const team of installations) {
     // installations 配列から teamId と enterpriseId が一致するかチェック
     if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
       // 一致したワークスペースの認証情報を使用
