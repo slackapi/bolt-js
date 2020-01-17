@@ -42,7 +42,7 @@ const installations = [
 
 const authorizeFn = async ({ teamId, enterpriseId }) => {
   // Fetch team info from database
-  for (const team in installations) {
+  for (const team of installations) {
     // Check for matching teamId and enterpriseId in the installations array
     if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
       // This is a match. Use these installation credentials.
