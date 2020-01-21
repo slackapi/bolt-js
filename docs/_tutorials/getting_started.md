@@ -17,7 +17,7 @@ This guide is meant to walk you through getting up and running with a Slack app 
 ---
 
 ### Create an app
-First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps?new_granular_bot_app=1). 
+First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new). 
 
 > 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
 
