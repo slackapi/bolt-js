@@ -88,8 +88,9 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
           clearTimeout(timer);
           timer = undefined;
 
-          if (!response) res.send('');
-          if (typeof response === 'string') {
+          if (!response) {
+            res.send('');
+          } else if (typeof response === 'string') {
             res.send(response);
           } else {
             res.json(response);
