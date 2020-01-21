@@ -10,6 +10,7 @@ import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import { ErrorCode, errorWithCode } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
+import { RespondArguments } from './types/utilities';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -101,8 +102,10 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     };
 
     if (req.body && req.body.response_url) {
-      event.respond = (response): void => {
-        this.axios.post(req.body.response_url, response)
+      event.respond = (response: string | RespondArguments): void => {
+        const validResponse: RespondArguments =
+          (typeof response === 'string') ? { text: response } : response;
+        this.axios.post(req.body.response_url, validResponse)
           .catch((e) => {
             this.emit('error', e);
           });

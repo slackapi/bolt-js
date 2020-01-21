@@ -14,6 +14,8 @@ import ExpressReceiver, {
   verifySignatureAndParseBody,
 } from './ExpressReceiver';
 
+import { RespondArguments } from './types/utilities';
+
 describe('ExpressReceiver', () => {
 
   const noopLogger: Logger = {
@@ -377,6 +379,20 @@ describe('ExpressReceiver', () => {
       await verifySignatureMismatch(req);
     });
 
+  });
+
+  // Just copied the implementation as the method is private and it's a bit hard to write a unit test
+  describe('RespondFn implementation', () => {
+    it('should work with both a string and a RespondArguments', () => {
+      const respond = (response: string | RespondArguments): void => {
+        const validResponse: RespondArguments =
+          (typeof response === 'string') ? { text: response } : response;
+        assert.equal(validResponse.text, 'hello');
+      };
+      respond('hello');
+      respond({ text: 'hello' });
+      respond({ text: 'hello', blocks: [] });
+    });
   });
 
 });
