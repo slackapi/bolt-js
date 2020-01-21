@@ -18,7 +18,7 @@ redirect_from:
 ---
 
 ### アプリを作成する
-最初にやるべきこと: Bolt で開発を始める前に、 [Slack アプリを作成](https://api.slack.com/apps/new?new_granular_bot_app=1)します。
+最初にやるべきこと: Bolt で開発を始める前に、 [Slack アプリを作成](https://api.slack.com/apps/new)します。
 
 > 💡 いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをお勧めします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
 
