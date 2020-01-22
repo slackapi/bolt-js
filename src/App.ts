@@ -41,7 +41,8 @@ import {
   InteractiveMessage,
   SlackViewAction,
   Receiver,
-  ReceiverEvent, RespondArguments,
+  ReceiverEvent,
+  RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';

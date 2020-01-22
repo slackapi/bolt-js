@@ -572,7 +572,43 @@ describe('App', () => {
           // Assert
           assert.equal(fakeAxiosPost.callCount, 1);
           // Assert that each call to fakeAxiosPost had the right arguments
-          assert(fakeAxiosPost.calledWith(responseUrl, responseText));
+          assert(fakeAxiosPost.calledWith(responseUrl, { text: responseText }));
+        });
+
+        it('should respond with a response object', async () => {
+          // Arrange
+          const responseObject = { text: 'response' };
+          const responseUrl = 'https://fake.slack/response_url';
+          const actionId = 'block_action_id';
+          const fakeAxiosPost = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.action(actionId, async ({ respond }) => {
+            await respond(responseObject);
+          });
+          app.error(fakeErrorHandler);
+          fakeReceiver.emit('message', { // IncomingEventType.Action (app.action)
+            body: {
+              type: 'block_actions',
+              response_url: responseUrl,
+              actions: [{
+                action_id: actionId,
+              }],
+              channel: {},
+              user: {},
+              team: {},
+            },
+            ack: noop,
+          });
+          await delay();
+
+          // Assert
+          assert.equal(fakeAxiosPost.callCount, 1);
+          // Assert that each call to fakeAxiosPost had the right arguments
+          assert(fakeAxiosPost.calledWith(responseUrl, responseObject));
         });
       });
 
