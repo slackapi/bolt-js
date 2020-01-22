@@ -177,45 +177,59 @@ export function verifySignatureAndParseBody(
   logger: Logger,
   signingSecret: string,
 ): RequestHandler {
-  return async (req, _res, next) => {
-    try {
-      // *** Request verification ***
-      let stringBody: string;
-      // On some environments like GCP (Google Cloud Platform),
-      // req.body can be pre-parsed and be passed as req.rawBody here
-      const preparsedRawBody: any = (req as any).rawBody;
-      if (preparsedRawBody !== undefined) {
-        stringBody = preparsedRawBody.toString();
-      } else {
-        stringBody = (await rawBody(req)).toString();
-      }
+  return async (req, res, next) => {
 
+    let stringBody: string;
+    // On some environments like GCP (Google Cloud Platform),
+    // req.body can be pre-parsed and be passed as req.rawBody here
+    const preparsedRawBody: any = (req as any).rawBody;
+    if (preparsedRawBody !== undefined) {
+      stringBody = preparsedRawBody.toString();
+    } else {
+      stringBody = (await rawBody(req)).toString();
+    }
+
+    // *** Request verification ***
+    try {
       const {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': requestTimestamp,
-        'content-type': contentType,
       } = req.headers;
-
       await verifyRequestSignature(
         signingSecret,
         stringBody,
         signature as string | undefined,
         requestTimestamp as string | undefined,
       );
+    } catch (error) {
+      // Deny the request as something wrong with the signature
+      logError(logger, 'Request verification failed', error);
+      return res.status(401).send();
+    }
 
-      // *** Parsing body ***
-      // As the verification passed, parse the body as an object and assign it to req.body
-      // Following middlewares can expect `req.body` is already a parsed one.
+    // *** Parsing body ***
+    // As the verification passed, parse the body as an object and assign it to req.body
+    // Following middlewares can expect `req.body` is already a parsed one.
 
+    try {
       // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
       // and overwrites `req.body` with the parsed JS object.
+      const contentType = req.headers['content-type'];
       req.body = parseRequestBody(logger, stringBody, contentType);
-
       return next();
     } catch (error) {
-      return next(error);
+      // Deny a bad request
+      logError(logger, 'Parsing request body failed', error);
+      return res.status(400).send();
     }
   };
+}
+
+function logError(logger: Logger, message: string, error: any): void {
+  const logMessage = ('code' in error)
+    ? `${message} (code: ${error.code}, message: ${error.message})`
+    : `${message} (error: ${error})`;
+  logger.warn(logMessage);
 }
 
 // TODO: this should be imported from another package
