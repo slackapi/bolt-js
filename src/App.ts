@@ -41,7 +41,7 @@ import {
   InteractiveMessage,
   SlackViewAction,
   Receiver,
-  ReceiverEvent,
+  ReceiverEvent, RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
@@ -482,10 +482,11 @@ export default class App {
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = async (response): Promise<any> => {
-        const postResponse = await this.axios.post(body.response_url, response);
+      listenerArgs.respond = (response: string | RespondArguments): Promise<any> => {
+        const validResponse: RespondArguments =
+            (typeof response === 'string') ? { text: response } : response;
 
-        return postResponse.data;
+        return this.axios.post(body.response_url, validResponse);
       };
     }
 
