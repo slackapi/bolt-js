@@ -28,6 +28,17 @@ describe('ExpressReceiver', () => {
     setName(_name: string): void { /* noop */ },
   };
 
+  function buildResponseToVerify(result: any): Response {
+    return {
+      status: (code: number) => {
+        result.code = code;
+        return {
+          send: () => { result.sent = true; },
+        } as any as Response;
+      },
+    } as any as Response;
+  }
+
   describe('constructor', () => {
     it('should accept supported arguments', async () => {
       const receiver = new ExpressReceiver({
@@ -108,7 +119,7 @@ describe('ExpressReceiver', () => {
         respondToUrlVerification(req, resp, next);
 
         // Assert
-        assert.equal(JSON.stringify({ challenge: 'this is it' }), JSON.stringify(sentBody));
+        assert.equal(JSON.stringify(sentBody), JSON.stringify({ challenge: 'this is it' }));
         assert.isUndefined(errorResult);
       });
 
@@ -183,8 +194,7 @@ describe('ExpressReceiver', () => {
 
     async function runWithValidRequest(req: Request, state: any): Promise<void> {
       // Arrange
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      const resp = {} as Response;
+      const resp = buildResponseToVerify(state);
       const next = (error: any) => { state.error = error; };
 
       // Act
@@ -215,7 +225,8 @@ describe('ExpressReceiver', () => {
       req.headers['content-type'] = undefined;
       await runWithValidRequest(req, state);
       // Assert
-      assert.equal(state.error, 'SyntaxError: Unexpected token o in JSON at position 1');
+      assert.equal(state.code, 400);
+      assert.equal(state.sent, true);
     });
 
     it('should verify requests on GCP and then catch parse failures', async () => {
@@ -224,25 +235,80 @@ describe('ExpressReceiver', () => {
       req.headers['content-type'] = undefined;
       await runWithValidRequest(req, state);
       // Assert
-      assert.equal(state.error, 'SyntaxError: Unexpected token o in JSON at position 1');
+      assert.equal(state.code, 400);
+      assert.equal(state.sent, true);
+    });
+
+    // ----------------------------
+    // verifyContentTypeAbsence
+
+    async function verifyRequestsWithoutContentTypeHeader(req: Request): Promise<void> {
+      // Arrange
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+
+      let error: string = '';
+      let warn: string = '';
+      const logger = {
+        error: (msg: string) => { error = msg; },
+        warn: (msg: string) => { warn = msg; },
+      } as any as Logger;
+
+      const next = sinon.fake();
+
+      // Act
+      const verifier = verifySignatureAndParseBody(logger, signingSecret);
+      await verifier(req, resp, next);
+
+      // Assert
+      assert.equal(result.code, 400);
+      assert.equal(result.sent, true);
+      assert.equal(error, 'Failed to parse body as JSON data for content-type: undefined');
+      assert.equal(warn, 'Parsing request body failed (error: SyntaxError: Unexpected token o in JSON at position 1)');
+    }
+
+    it('should fail to parse request body without content-type header', async () => {
+      const reqAsStream = new Readable();
+      reqAsStream.push(body);
+      reqAsStream.push(null); // indicate EOF
+      (reqAsStream as { [key: string]: any }).headers = {
+        'x-slack-signature': signature,
+        'x-slack-request-timestamp': requestTimestamp,
+        // 'content-type': 'application/x-www-form-urlencoded',
+      };
+      const req = reqAsStream as Request;
+      await verifyRequestsWithoutContentTypeHeader(req);
+    });
+
+    it('should verify parse request body without content-type header on GCP', async () => {
+      const untypedReq: { [key: string]: any } = {
+        rawBody: body,
+        headers: {
+          'x-slack-signature': signature,
+          'x-slack-request-timestamp': requestTimestamp,
+          // 'content-type': 'application/x-www-form-urlencoded',
+        },
+      };
+      const req = untypedReq as Request;
+      await verifyRequestsWithoutContentTypeHeader(req);
     });
 
     // ----------------------------
     // verifyMissingHeaderDetection
 
-    function verifyMissingHeaderDetection(req: Request): Promise<any> {
+    async function verifyMissingHeaderDetection(req: Request): Promise<void> {
       // Arrange
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      const resp = {} as Response;
-      let errorResult: any;
-      const next = (error: any) => { errorResult = error; };
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
 
       // Act
       const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
-      return verifier(req, resp, next).then((_: any) => {
-        // Assert
-        assert.equal(errorResult, 'Error: Slack request signing verification failed. Some headers are missing.');
-      });
+      await verifier(req, resp, next);
+
+      // Assert
+      assert.equal(result.code, 401);
+      assert.equal(result.sent, true);
     }
 
     it('should detect headers missing signature', async () => {
@@ -252,6 +318,7 @@ describe('ExpressReceiver', () => {
       (reqAsStream as { [key: string]: any }).headers = {
         // 'x-slack-signature': signature ,
         'x-slack-request-timestamp': requestTimestamp,
+        'content-type': 'application/x-www-form-urlencoded',
       };
       await verifyMissingHeaderDetection(reqAsStream as Request);
     });
@@ -262,7 +329,8 @@ describe('ExpressReceiver', () => {
       reqAsStream.push(null); // indicate EOF
       (reqAsStream as { [key: string]: any }).headers = {
         'x-slack-signature': signature,
-        /*'x-slack-request-timestamp': requestTimestamp*/
+        /*'x-slack-request-timestamp': requestTimestamp, */
+        'content-type': 'application/x-www-form-urlencoded',
       };
       await verifyMissingHeaderDetection(reqAsStream as Request);
     });
@@ -272,7 +340,8 @@ describe('ExpressReceiver', () => {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
-          /*'x-slack-request-timestamp': requestTimestamp */
+          /*'x-slack-request-timestamp': requestTimestamp, */
+          'content-type': 'application/x-www-form-urlencoded',
         },
       };
       await verifyMissingHeaderDetection(untypedReq as Request);
@@ -281,19 +350,19 @@ describe('ExpressReceiver', () => {
     // ----------------------------
     // verifyInvalidTimestampError
 
-    function verifyInvalidTimestampError(req: Request): Promise<any> {
+    async function verifyInvalidTimestampError(req: Request): Promise<void> {
       // Arrange
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      const resp = {} as Response;
-      let errorResult: any;
-      const next = (error: any) => { errorResult = error; };
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
 
       // Act
       const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
-      return verifier(req, resp, next).then((_: any) => {
-        // Assert
-        assert.equal(errorResult, 'Error: Slack request signing verification failed. Timestamp is invalid.');
-      });
+      await verifier(req, resp, next);
+
+      // Assert
+      assert.equal(result.code, 401);
+      assert.equal(result.sent, true);
     }
 
     it('should detect invalid timestamp header', async () => {
@@ -303,6 +372,7 @@ describe('ExpressReceiver', () => {
       (reqAsStream as { [key: string]: any }).headers = {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': 'Hello there!',
+        'content-type': 'application/x-www-form-urlencoded',
       };
       await verifyInvalidTimestampError(reqAsStream as Request);
     });
@@ -310,22 +380,22 @@ describe('ExpressReceiver', () => {
     // ----------------------------
     // verifyTooOldTimestampError
 
-    function verifyTooOldTimestampError(req: Request): Promise<any> {
+    async function verifyTooOldTimestampError(req: Request): Promise<void> {
       // Arrange
       // restore the valid clock
       clock.restore();
 
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      const resp = {} as Response;
-      let errorResult: any;
-      const next = (error: any) => { errorResult = error; };
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
 
       // Act
       const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
-      return verifier(req, resp, next).then((_: any) => {
-        // Assert
-        assert.equal(errorResult, 'Error: Slack request signing verification failed. Timestamp is too old.');
-      });
+      await verifier(req, resp, next);
+
+      // Assert
+      assert.equal(result.code, 401);
+      assert.equal(result.sent, true);
     }
 
     it('should detect too old timestamp', async () => {
@@ -339,20 +409,20 @@ describe('ExpressReceiver', () => {
     // ----------------------------
     // verifySignatureMismatch
 
-    function verifySignatureMismatch(req: Request): Promise<any> {
+    async function verifySignatureMismatch(req: Request): Promise<void> {
       // Arrange
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      const resp = {} as Response;
-      let errorResult: any;
-      const next = (error: any) => { errorResult = error; };
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
 
       // Act
       const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
       verifier(req, resp, next);
-      return verifier(req, resp, next).then((_: any) => {
-        // Assert
-        assert.equal(errorResult, 'Error: Slack request signing verification failed. Signature mismatch.');
-      });
+      await verifier(req, resp, next);
+
+      // Assert
+      assert.equal(result.code, 401);
+      assert.equal(result.sent, true);
     }
 
     it('should detect signature mismatch', async () => {
@@ -362,6 +432,7 @@ describe('ExpressReceiver', () => {
       (reqAsStream as { [key: string]: any }).headers = {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': requestTimestamp + 10,
+        'content-type': 'application/x-www-form-urlencoded',
       };
       const req = reqAsStream as Request;
       await verifySignatureMismatch(req);
@@ -373,6 +444,7 @@ describe('ExpressReceiver', () => {
         headers: {
           'x-slack-signature': signature,
           'x-slack-request-timestamp': requestTimestamp + 10,
+          'content-type': 'application/x-www-form-urlencoded',
         },
       };
       const req = untypedReq as Request;
