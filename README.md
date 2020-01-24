@@ -202,7 +202,7 @@ In fact, middleware can be _chained_ so that any number of middleware functions 
 and they each run in the order they were added to the chain.
 
 Middleware are just functions - nearly identical to listener functions. They can choose to respond right away, to extend
-the `context` argument and continue, or trigger an error. The only difference is that middleware use a special `next()`
+the `context` argument and continue, or trigger an error. The only difference is that middleware use a special `next`
 argument, a function that's called to let the app know it can continue to the next middleware (or listener) in the
 chain.
 
@@ -230,7 +230,7 @@ const app = new App({
 app.use(authWithAcme);
 
 // The listener now has access to the user details
-app.message('whoami', ({ say, context }) => { say(`User Details: ${JSON.stringify(context.user)}`) });
+app.message('whoami', async ({ say, context }) => { await say(`User Details: ${JSON.stringify(context.user)}`) });
 
 (async () => {
   // Start the app
@@ -240,32 +240,33 @@ app.message('whoami', ({ say, context }) => { say(`User Details: ${JSON.stringif
 
 // Authentication middleware - Calls Acme identity provider to associate the incoming event with the user who sent it
 // It's a function just like listeners, but it also uses the next argument
-function authWithAcme({ payload, context, say, next }) {
+async function authWithAcme({ payload, context, say, next }) {
   const slackUserId = payload.user;
 
-  // Assume we have a function that can take a Slack user ID as input to find user details from the provider
-  acme.lookupBySlackId(slackUserId)
-    .then((user) => {
-      // When the user lookup is successful, add the user details to the context
-      context.user = user;
-
-      // Pass control to the next middleware (if there are any) and the listener functions
-      next();
-    })
-    .catch(async (error) => {
-      // Uh oh, this user hasn't registered with Acme. Send them a registration link, and don't let the
-      // middleware/listeners continue
-      if (error.message === 'Not Found') {
+  try {
+    // Assume we have a function that can take a Slack user ID as input to find user details from the provider
+    const user = await acme.lookupBySlackId(slackUserId);
+      
+    // When the user lookup is successful, add the user details to the context
+    context.user = user;
+  } catch (error) {
+    // middleware/listeners continue
+    if (error.message === 'Not Found') {
         // In the real world, you would need to check if the say function was defined, falling back to the respond
         // function if not, and then falling back to only logging the error as a last resort.
         await say(`I'm sorry <@${slackUserId}, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
         return;
-      }
-
-      // This middleware doesn't know how to handle any other errors. Pass control to the previous middleware (if there
-      // are any) or the global error handler.
-      next(error);
-    });
+    }
+    
+    // This middleware doesn't know how to handle any other errors. 
+    // Pass control to the previous middleware (if there are any) or the global error handler.
+    throw error;
+  }
+  
+  // Pass control to the next middleware (if there are any) and the listener functions
+  // Note: You probably don't want to call this inside a `try` block, or any middleware
+  //       after this one that throws will be caught by it. 
+  await next();
 }
 ```
 
@@ -282,9 +283,9 @@ before the listener attached to `message` events:
 
 ```js
 // Listener middleware - filters out messages that have subtype 'bot_message'
-function noBotMessages({ message, next }) {
+async function noBotMessages({ message, next }) {
   if (!message.subtype || message.subtype !== 'bot_message') {
-    next();
+    await next();
   }
 }
 
@@ -317,36 +318,62 @@ The examples above all illustrate how middleware can be used to process an event
 middleware in the chain) run. However, middleware can be designed to process the event _after_ the listener finishes.
 In general, a middleware can run both before and after the remaining middleware chain.
 
-In order to process the event after the listener, the middleware passes a function to `next()`. The function receives
-two arguments:
+In order to process the event after the listener, the middleware passes a function to `await next()`. How you use `next` can
+have four different effects:
 
-* `error` - The value is falsy when the middleware chain finished handling the event normally. When a later
-  middleware calls `next(error)` (where `error` is an `Error`), then this value is set to the `error`.
+* **To do processing after listeners** - You can choose to do work going _before_ listener functions by putting code
+  before `await next()` and _after_ by putting code after `await next()`. `await next()` passes control down the middleware
+  stack in the order it was defined, then back up it in reverse order.
 
-* `done` - A callback that **must** be called when processing is complete. When there is no error, or the incoming
-  error has been handled, `done()` should be called with no parameters. If instead the middleware is propagating an
-  error up the middleware chain, `done(error)` should be called with the error as its only parameter.
+* **To throw an error** - If you don't want to handle an error in a listener, or want to let an upstream listener
+  handle it, you can simply **not** call `await next()` and `throw` and `Error`.
+
+* **To handle mid-processing errors** - While not commonly used, as `App#error` is essentially a global version of this,
+  you can catch any error of any downstream middleware by surrounding `await next()` in a `try-catch` block.
+
+* **To break the middleware chain** - You can stop middleware from progressing by simply not calling `await next()`.
+  By it's nature, throwing an error tends to be an example of this as code after a throw isn't executed.
 
 The following example shows a global middleware that calculates the total processing time for the middleware chain by
 calculating the time difference from before the listener and after the listener:
 
 ```js
-function logProcessingTime({ next }) {
+async function logProcessingTime({ next }) {
   const startTimeMs = Date.now();
-  next((error, done) => {
-    // This middleware doesn't deal with any errors, so it propagates any truthy value to the previous middleware
-    if (error) {
-      done(error);
-      return;
-    }
-
-    const endTimeMs = Date.now();
-    console.log(`Total processing time: ${endTimeMs - startTimeMs}`);
-
-    // Continue normally
-    done();
-  });
+  
+  await next();
+  
+  const endTimeMs = Date.now();
+  console.log(`Total processing time: ${endTimeMs - startTimeMs}`);
 }
 
 app.use(logProcessingTime)
 ```
+
+The next example shows a series of global middleware where one generates an error
+and the other handles it.
+
+```js
+app.use(async ({ next, say }) => {
+  try {
+    await next();
+  } catch (error) {
+    if (error.message === "channel_not_found") {
+      // Handle known errors
+      await say("It appears we can't access that channel")
+    } else {
+      // Rethrow for an upstream error handler
+      throw error;
+    }
+  }
+})
+
+app.use(async () => {
+  throw new Error("channel_not_found")
+})
+
+app.use(async () => {
+  // This never gets called as the middleware above never calls next
+})
+```
+

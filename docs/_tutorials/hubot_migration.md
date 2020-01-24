@@ -117,11 +117,11 @@ To use the built-in `WebClient`, you’ll need to pass the token used to instant
 ```javascript
 app.message('react', async ({ message, context }) => {
   try {
-      const result = await app.client.reactions.add({
-      	  token: context.botToken,
-        name: ‘star’,
-        channel: message.channel,
-        timestamp: message.ts
+    const result = await app.client.reactions.add({
+      token: context.botToken,
+      name: 'star',
+      channel: message.channel,
+      timestamp: message.ts,
     });
   }
   catch (error) {
@@ -141,11 +141,11 @@ Bolt only has two kinds of middleware — global and listener:
 - Global middleware runs before any listener middleware is called. It’s attached to the Bolt app itself. [Read more about Bolt’s global middleware](https://slack.dev/bolt/concepts#global-middleware).
 - Listener middleware only runs for listener functions it’s attached to. [Read more about Bolt’s listener middleware](https://slack.dev/bolt/concepts#listener-middleware).
 
-With Bolt, both kinds of middleware must call `next()` to pass control of execution from one middleware to the next. If your middleware encounters an error during execution, you can pass an `Error` to `next()` and the error will be bubbled up through the previously-executed middleware chain.
+With Bolt, both kinds of middleware must call `await next()` to pass control of execution from one middleware to the next. If your middleware encounters an error during execution, you can `throw` it and the error will be bubbled up through the previously-executed middleware chain.
 
 To migrate your existing middleware functions, it’s evident that Hubot’s receive middleware aligns with the use case for global middleware in Bolt. And Hubot and Bolt’s listener middleware are nearly the same. To migrate Hubot’s response middleware, you can use a Bolt concept called a post-process function.
 
-If your middleware needs to perform post-processing of an event, you can call `next()` with a post-processing function rather than it calling it with `undefined`. A post-processing function must call `done()` in the same way a middleware function must call `next()` (and can also be called with an `Error`).
+If your middleware needs to perform post-processing of an event, you can call `await next()` and any code after will be processed after the downstream middleware has been called.
 
 ### Migrating the brain to the conversation store
 Hubot has an in-memory store called the brain. This enables a Hubot script to `get` and `set` basic pieces of data. Bolt uses something called a conversation store, which is a global middleware with a `get()`/`set()` interface.
