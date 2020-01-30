@@ -45,6 +45,7 @@ export type SlackEvent =
   | IMCreatedEvent
   | IMHistoryChangedEvent
   | IMOpenEvent
+  | InviteRequestedEvent
   | LinkSharedEvent
   | MemberJoinedChannelEvent
   | MemberLeftChannelEvent
@@ -415,6 +416,26 @@ export interface IMOpenEvent extends StringIndexed {
   type: 'im_open';
   user: string;
   channel: string;
+}
+
+export interface InviteRequestedEvent extends StringIndexed {
+  type: 'invite_requested';
+  invite_request: {
+    id: string;
+    email: string;
+    date_created: number;
+    requester_ids: string[];
+    channel_ids: string[];
+    invite_type: string;
+    real_name: string;
+    date_expire: number;
+    request_reason: string;
+    team: {
+      id: string;
+      name: string;
+      domain: string;
+    }
+  };
 }
 
 export interface LinkSharedEvent extends StringIndexed {
