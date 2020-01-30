@@ -102,6 +102,19 @@ export interface ErrorHandler {
   (error: CodedError): void;
 }
 
+class WebClientPool {
+  private pool: { [token: string]: WebClient } = {};
+  public getOrCreate(token: string, clientOptions: WebClientOptions): WebClient {
+    const cachedClient = this.pool[token];
+    if (typeof cachedClient !== 'undefined') {
+      return cachedClient;
+    }
+    const client = new WebClient(token, clientOptions);
+    this.pool[token] = client;
+    return client;
+  }
+}
+
 /**
  * A Slack App
  */
@@ -109,6 +122,10 @@ export default class App {
 
   /** Slack Web API client */
   public client: WebClient;
+
+  private clientOptions: WebClientOptions;
+
+  private clients: {[teamId: string]: WebClientPool} = {};
 
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
@@ -148,13 +165,15 @@ export default class App {
     this.logger.setLevel(logLevel);
     this.errorHandler = defaultErrorHandler(this.logger);
 
-    this.client = new WebClient(undefined, {
+    this.clientOptions = {
       agent,
       logLevel,
       logger,
       tls: clientTls,
       slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
-    });
+    };
+    // the public WebClient instance (app.client) - this one doesn't have a token
+    this.client = new WebClient(undefined, this.clientOptions);
 
     if (token !== undefined) {
       if (authorize !== undefined) {
@@ -399,7 +418,7 @@ export default class App {
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
-      const token = context.botToken !== undefined ? context.botToken : context.userToken;
+      const token = selectToken(context);
       return (message: Parameters<SayFn>[0]) => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
@@ -407,6 +426,16 @@ export default class App {
           .catch(error => this.onGlobalError(error));
       };
     };
+
+    let listenerArgClient = this.client;
+    const token = selectToken(context);
+    if (typeof token !== 'undefined') {
+      let pool = this.clients[source.teamId];
+      if (typeof pool === 'undefined') {
+        pool = this.clients[source.teamId] = new WebClientPool();
+      }
+      listenerArgClient = pool.getOrCreate(token, this.clientOptions);
+    }
 
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
@@ -420,7 +449,7 @@ export default class App {
       ack?: AckFn<any>,
     } = {
       logger: this.logger,
-      client: this.client,
+      client: listenerArgClient,
       body: bodyArg,
       payload:
         (type === IncomingEventType.Event) ?
@@ -589,6 +618,10 @@ function singleTeamAuthorization(
   return async () => {
     return Object.assign({ botToken: authorization.botToken }, await identifiers);
   };
+}
+
+function selectToken(context: Context): string | undefined {
+  return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
 /* Instrumentation */
