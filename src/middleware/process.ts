@@ -5,6 +5,8 @@ import {
   NextMiddleware,
   PostProcessFn,
 } from '../types';
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 
 // TODO: what happens if an error is thrown inside a middleware/listener function? it should propagate up and eventually
 // be dealt with by the global error handler
@@ -14,6 +16,8 @@ export function processMiddleware(
   afterMiddleware: (context: Context, args: AnyMiddlewareArgs, startBubble: (error?: Error) => void) => void,
   afterPostProcess: (error?: Error) => void,
   context: Context = {},
+  logger: Logger,
+  client: WebClient,
 ): void {
 
   // Generate next()
@@ -33,7 +37,7 @@ export function processMiddleware(
 
       // In this condition, errorOrPostProcess will be a postProcess function or undefined
       postProcessFns[middlewareIndex - 1] = errorOrPostProcess === undefined ? noopPostProcess : errorOrPostProcess;
-      thisMiddleware({ context, next: nextWhenNotLast, ...initialArguments });
+      thisMiddleware({ context, logger, client, next: nextWhenNotLast, ...initialArguments });
 
       if (isLastMiddleware) {
         postProcessFns[middlewareIndex] = noopPostProcess;
@@ -75,7 +79,7 @@ export function processMiddleware(
   };
 
   const firstMiddleware = middleware[0];
-  firstMiddleware({ context, next, ...initialArguments });
+  firstMiddleware({ context, logger, client, next, ...initialArguments });
 }
 
 function noop(): void { } // tslint:disable-line:no-empty

@@ -8,8 +8,6 @@ import { InteractiveMessage } from './interactive-message';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { MessageAction } from './message-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
-import { Logger } from '@slack/logger';
-import { WebClient } from '@slack/web-api';
 
 /**
  * All known actions from Slack's Block Kit interactive components, message actions, dialogs, and legacy interactive
@@ -36,8 +34,6 @@ export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction 
  * this case `ElementAction` must extend `BasicElementAction`.
  */
 export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> {
-  logger: Logger;
-  client: WebClient;
   payload: (
     Action extends BlockAction<infer ElementAction> ? ElementAction :
     Action extends InteractiveMessage<infer InteractiveAction> ? InteractiveAction :
