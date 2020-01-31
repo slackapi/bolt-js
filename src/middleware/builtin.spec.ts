@@ -17,6 +17,7 @@ import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } f
 import { SlashCommand } from '../types/command/index';
 import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events/base-events';
 import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
@@ -479,12 +480,12 @@ describe('matchCommandName', () => {
   const logger = createFakeLogger();
   const client = new WebClient(undefined, { logger, slackApiUrl: undefined });
 
-  function buildArgs(fakeNext: NextMiddleware): SlackCommandMiddlewareArgs & { next: any, context: any } {
+  function buildArgs(fakeNext: NextMiddleware): SlackCommandMiddlewareArgs & MiddlewareCommonArgs {
     const payload: SlashCommand = { ...validCommandPayload };
     return {
+      payload,
       logger,
       client,
-      payload,
       command: payload,
       body: payload,
       say: () => { /* noop */ },
@@ -516,8 +517,6 @@ describe('onlyEvents', () => {
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
     const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
-      logger,
-      client,
       payload: appMentionEvent,
       event: appMentionEvent,
       message: null as never, // a bit hackey to sartisfy TS compiler
@@ -533,7 +532,13 @@ describe('onlyEvents', () => {
       },
       say: () => { /* noop */ },
     };
-    onlyEvents({ next: fakeNext, context: {}, ...args });
+    onlyEvents({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...args,
+    });
     assert.isTrue(fakeNext.called);
   });
 
@@ -562,8 +567,6 @@ describe('matchEventType', () => {
 
   function buildArgs(): SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } {
     return {
-      logger,
-      client,
       payload: appMentionEvent,
       event: appMentionEvent,
       message: null as never, // a bit hackey to sartisfy TS compiler
@@ -583,13 +586,25 @@ describe('matchEventType', () => {
 
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
-    matchEventType('app_mention')({ next: fakeNext, context: {}, ...buildArgs() });
+    matchEventType('app_mention')({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
     assert.isTrue(fakeNext.called);
   });
 
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
-    matchEventType('app_home_opened')({ next: fakeNext, context: {}, ...buildArgs() });
+    matchEventType('app_home_opened')({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
     assert.isFalse(fakeNext.called);
   });
 });
@@ -600,8 +615,6 @@ describe('subtype', () => {
 
   function buildArgs(): SlackEventMiddlewareArgs<'message'> & { event?: SlackEvent } {
     return {
-      logger,
-      client,
       payload: botMessageEvent,
       event: botMessageEvent,
       message: botMessageEvent,
@@ -621,13 +634,25 @@ describe('subtype', () => {
 
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
-    subtype('bot_message')({ next: fakeNext, context: {}, ...buildArgs() });
+    subtype('bot_message')({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
     assert.isTrue(fakeNext.called);
   });
 
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
-    subtype('me_message')({ next: fakeNext, context: {}, ...buildArgs() });
+    subtype('me_message')({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
     assert.isFalse(fakeNext.called);
   });
 });
@@ -638,14 +663,19 @@ interface DummyContext {
   matches?: RegExpExecArray;
 }
 
-type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & { next: NextMiddleware, context: Context };
-type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'>
-  & { next: NextMiddleware, context: Context };
+interface MiddlewareCommonArgs {
+  next: NextMiddleware;
+  context: Context;
+  logger: Logger;
+  client: WebClient;
+}
+type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
+type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
 type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'>
-  & { next: NextMiddleware, context: Context };
+  & MiddlewareCommonArgs;
 
-type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & { next: NextMiddleware; context: Context };
+type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & MiddlewareCommonArgs;
 
 async function importBuiltin(
   overrides: Override = {},

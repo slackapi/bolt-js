@@ -1,15 +1,11 @@
 import { Option } from '@slack/types';
 import { StringIndexed, XOR } from '../helpers';
 import { AckFn } from '../utilities';
-import { Logger } from '@slack/logger';
-import { WebClient } from '@slack/web-api';
 
 /**
  * Arguments which listeners and middleware receive to process an options request from Slack
  */
 export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = OptionsSource> {
-  logger: Logger;
-  client: WebClient;
   payload: OptionsRequest<Source>;
   body: this['payload'];
   options: this['payload'];

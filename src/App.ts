@@ -125,7 +125,7 @@ export default class App {
 
   private clientOptions: WebClientOptions;
 
-  private clients: {[teamId: string]: WebClientPool} = {};
+  private clients: { [teamId: string]: WebClientPool } = {};
 
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
@@ -285,9 +285,9 @@ export default class App {
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
   public action<Action extends SlackAction = SlackAction>(
-      actionId: string | RegExp,
-      ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
-    ): void;
+    actionId: string | RegExp,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
+  ): void;
   public action<Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
       constraints: Constraints,
@@ -300,7 +300,7 @@ export default class App {
       ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
     ): void {
     // Normalize Constraints
-    const constraints: ActionConstraints  =
+    const constraints: ActionConstraints =
       (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
         { action_id: actionIdOrConstraints } : actionIdOrConstraints;
 
@@ -440,13 +440,17 @@ export default class App {
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
-    const listenerArgs: Pick<AnyMiddlewareArgs, 'logger' | 'client' | 'body' | 'payload'> & {
+    const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
       /** Say function might be set below */
       say?: SayFn
       /** Respond function might be set below */
       respond?: RespondFn,
       /** Ack function might be set below */
       ack?: AckFn<any>,
+      /** The logger for this Bolt app */
+      logger?: Logger,
+      /** WebClient with token  */
+      client?: WebClient,
     } = {
       logger: this.logger,
       client: listenerArgClient,
@@ -523,6 +527,8 @@ export default class App {
               startGlobalBubble(error);
             },
             globalProcessedContext,
+            this.logger,
+            listenerArgClient,
           );
         });
       },
@@ -532,6 +538,8 @@ export default class App {
         }
       },
       context,
+      this.logger,
+      listenerArgClient,
     );
   }
 
