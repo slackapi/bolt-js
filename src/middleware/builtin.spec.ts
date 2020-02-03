@@ -441,9 +441,9 @@ describe('onlyCommands', () => {
       payload,
       command: payload,
       body: payload,
-      say: () => { /* noop */ },
-      respond: () => { /* noop */ },
-      ack: () => { /* noop */ },
+      say: sayNoop,
+      respond: noop,
+      ack: noop,
       next: fakeNext,
       context: {},
     });
@@ -458,9 +458,9 @@ describe('onlyCommands', () => {
       action: payload,
       command: undefined,
       body: payload,
-      say: () => { /* noop */ },
-      respond: () => { /* noop */ },
-      ack: () => { /* noop */ },
+      say: sayNoop,
+      respond: noop,
+      ack: noop,
       next: fakeNext,
       context: {},
     });
@@ -475,9 +475,9 @@ describe('matchCommandName', () => {
       payload,
       command: payload,
       body: payload,
-      say: () => { /* noop */ },
-      respond: () => { /* noop */ },
-      ack: () => { /* noop */ },
+      say: sayNoop,
+      respond: noop,
+      ack: noop,
       next: fakeNext,
       context: {},
     };
@@ -514,7 +514,7 @@ describe('onlyEvents', () => {
         event_time: 123,
         authed_users: [],
       },
-      say: () => { /* noop */ },
+      say: sayNoop,
     };
     onlyEvents({ next: fakeNext, context: {}, ...args });
     assert.isTrue(fakeNext.called);
@@ -527,9 +527,9 @@ describe('onlyEvents', () => {
       payload,
       command: payload,
       body: payload,
-      say: () => { /* noop */ },
-      respond: () => { /* noop */ },
-      ack: () => { /* noop */ },
+      say: sayNoop,
+      respond: noop,
+      ack: noop,
       next: fakeNext,
       context: {},
     });
@@ -553,7 +553,7 @@ describe('matchEventType', () => {
         event_time: 123,
         authed_users: [],
       },
-      say: () => { /* noop */ },
+      say: sayNoop,
     };
   }
 
@@ -586,7 +586,7 @@ describe('subtype', () => {
         event_time: 123,
         authed_users: [],
       },
-      say: () => { /* noop */ },
+      say: sayNoop,
     };
   }
 
@@ -671,3 +671,6 @@ const botMessageEvent: BotMessageEvent & MessageEvent = {
   text: 'this is my message',
   bot_id: 'B1234567',
 };
+
+const noop = () => Promise.resolve(undefined);
+const sayNoop = () => Promise.resolve({ ok: true });

@@ -13,10 +13,10 @@ order: 6
 
 ```javascript
 // action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される
-app.action('approve_button', ({ ack, say }) => {
+app.action('approve_button', async ({ ack, say }) => {
   // アクションリクエストの確認
-  ack();
-  say('Request approved 👍');
+  await ack();
+  await say('Request approved 👍');
 });
 ```
 
@@ -31,9 +31,9 @@ app.action('approve_button', ({ ack, say }) => {
 
 ```javascript
 // "user_select" の action_id がトリガーされたアクションをリスニング
-app.action('user_choice', ({ action, ack, respond }) => {
-  ack();
-  respond(`You selected <@${action.selected_user}>`);
+app.action('user_choice', async ({ action, ack, respond }) => {
+  await ack();
+  await respond(`You selected <@${action.selected_user}>`);
 });
 ```
 

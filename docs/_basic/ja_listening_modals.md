@@ -19,7 +19,7 @@ order: 11
 // モーダルビューでのデータ送信イベントを処理します
 app.view('view_b', async ({ ack, body, view, context }) => {
   // モーダルビューでのデータ送信イベントを確認
-  ack();
+  await ack();
 
   // 入力値を使ってやりたいことをここで実装 - ここでは DB に保存して送信内容の確認を送っている
 
@@ -41,7 +41,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
 
   // ユーザーにメッセージを送信
   try {
-    app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       token: context.botToken,
       channel: user,
       text: msg

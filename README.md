@@ -70,15 +70,17 @@ called with arguments that make it easy to build a rich app.
 *  `say` - A function to respond to an incoming event. This argument is only available when the listener is triggered
    for event that contains a `channel_id` (including `message` events). Call this function to send a message back to the
    same channel as the incoming event. It accepts both simple strings (for plain messages) and objects (for complex
-   messages, including blocks or attachments).
+   messages, including blocks or attachments). `say` returns a promise that will resolve with a
+   [response](https://api.slack.com/methods/chat.postMessage) from `chat.postMessage`.
 
 *  `ack` - A function to acknowledge that an incoming event was received by the app. Incoming events from actions,
    commands, and options requests **must** be acknowledged by calling this function. See [acknowledging
-   events](#acknowledging-events) for details.
+   events](#acknowledging-events) for details. `ack` returns a promise that resolves when complete.
 
 *  `respond` - A function to respond to an incoming event. This argument is only available when the listener is
    triggered for an event that contains a `response_url` (actions and commands). Call this function to send a message
-   back to the same channel as the incoming event, but using the semantics of the `response_url`.
+   back to the same channel as the incoming event, but using the semantics of the `response_url`. `respond`
+   returns a promise that resolves with the results of responding using the `response_url`.
 
 *  `context` - The event context. This object contains data about the message and the app, such as the `botId`.
    See [advanced usage](#advanced-usage) for more details.
@@ -94,9 +96,9 @@ Here is an example where the app sends a simple response, so there's no need for
 
 ```js
 // Reverse all messages the app can hear
-app.message(({ message, say }) => {
+app.message(async ({ message, say }) => {
   const reversedText = message.text.split('').reverse().join('');
-  say(reversedText);
+  await say(reversedText);
 });
 ```
 
@@ -157,7 +159,7 @@ The following is an example of acknowledging a dialog submission:
 app.action({ callbackId: 'my_dialog_callback' }, async ({ action, ack }) => {
   // Expect the ticketId value to begin with "CODE"
   if (action.submission.ticketId.indexOf('CODE') !== 0) {
-    ack({
+    await ack({
       errors: [{
         name: 'ticketId',
         error: 'This value must begin with CODE',
@@ -165,7 +167,7 @@ app.action({ callbackId: 'my_dialog_callback' }, async ({ action, ack }) => {
     });
     return;
   }
-  ack();
+  await ack();
 
   // Do some work
 });
@@ -188,9 +190,7 @@ app.error((error) => {
 If you do not attach an error handler, the app will log these errors to the console by default.
 
 The `app.error()` method should be used as a last resort to catch errors. It is always better to deal with errors in the
-listeners where they occur because you can use all the context available in that listener. If the app expects that using
-`say()` or `respond()` can fail, it's always possible to use `app.client.chat.postMessage()` instead, which returns a
-`Promise` that can be caught to deal with the error.
+listeners where they occur because you can use all the context available in that listener.
 
 ## Advanced usage
 
@@ -252,13 +252,13 @@ function authWithAcme({ payload, context, say, next }) {
       // Pass control to the next middleware (if there are any) and the listener functions
       next();
     })
-    .catch((error) => {
+    .catch(async (error) => {
       // Uh oh, this user hasn't registered with Acme. Send them a registration link, and don't let the
       // middleware/listeners continue
       if (error.message === 'Not Found') {
         // In the real world, you would need to check if the say function was defined, falling back to the respond
         // function if not, and then falling back to only logging the error as a last resort.
-        say(`I'm sorry <@${slackUserId}, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
+        await say(`I'm sorry <@${slackUserId}, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
         return;
       }
 

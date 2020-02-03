@@ -15,13 +15,13 @@ We recommend calling `ack()` right away before sending a new message or fetching
 // Regex to determine if this is a valid email
 let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 // This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit 
-app.action({ callback_id: 'ticket_submit' }, ({ action, ack }) => {
+app.action({ callback_id: 'ticket_submit' }, async ({ action, ack }) => {
   // it’s a valid email, accept the submission
   if (isEmail.test(action.submission.email)) {
-    ack();
+    await ack();
   } else {
     // if it isn’t a valid email, acknowledge with an error
-    ack({
+    await ack({
       errors: [{
         "name": "email_address",
         "error": "Sorry, this isn’t a valid email"

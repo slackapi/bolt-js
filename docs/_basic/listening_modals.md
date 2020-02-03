@@ -19,7 +19,7 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 // Handle a view_submission event
 app.view('view_b', async ({ ack, body, view, context }) => {
   // Acknowledge the view_submission event
-  ack();
+  await ack();
 
   // Do whatever you want with the input data - here we're saving it to a DB then sending the user a verifcation of their submission
 
@@ -41,7 +41,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
 
   // Message the user
   try {
-    app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       token: context.botToken,
       channel: user,
       text: msg

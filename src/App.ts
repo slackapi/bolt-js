@@ -1,6 +1,13 @@
 import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
+import {
+  WebClient,
+  ChatPostMessageArguments,
+  addAppMetadata,
+  WebClientOptions,
+  WebAPICallResult,
+} from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
+import axios, { AxiosInstance } from 'axios';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
   ignoreSelf as ignoreSelfMiddleware,
@@ -35,6 +42,7 @@ import {
   SlackViewAction,
   Receiver,
   ReceiverEvent,
+  RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
@@ -127,6 +135,8 @@ export default class App {
 
   private errorHandler: ErrorHandler;
 
+  private axios: AxiosInstance;
+
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
@@ -155,6 +165,14 @@ export default class App {
       tls: clientTls,
       slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
     });
+
+    this.axios = axios.create(Object.assign(
+      {
+        httpAgent: agent,
+        httpsAgent: agent,
+      },
+      clientTls,
+    ));
 
     if (token !== undefined) {
       if (authorize !== undefined) {
@@ -371,7 +389,8 @@ export default class App {
   /**
    * Handles events from the receiver
    */
-  private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
+  private async onIncomingEvent(event: ReceiverEvent): Promise<void> {
+    const { body, ack } = event;
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
@@ -400,11 +419,11 @@ export default class App {
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = context.botToken !== undefined ? context.botToken : context.userToken;
-      return (message: Parameters<SayFn>[0]) => {
+      return (message: Parameters<SayFn>[0]): Promise<WebAPICallResult> => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
-        this.client.chat.postMessage(postMessageArguments)
-          .catch(error => this.onGlobalError(error));
+
+        return this.client.chat.postMessage(postMessageArguments);
       };
     };
 
@@ -463,8 +482,13 @@ export default class App {
     }
 
     // Set respond() utility
-    if (respond !== undefined) {
-      listenerArgs.respond = respond;
+    if (body.response_url) {
+      listenerArgs.respond = (response: string | RespondArguments): Promise<any> => {
+        const validResponse: RespondArguments =
+            (typeof response === 'string') ? { text: response } : response;
+
+        return this.axios.post(body.response_url, validResponse);
+      };
     }
 
     // Set ack() utility
@@ -472,7 +496,7 @@ export default class App {
       listenerArgs.ack = ack;
     } else {
       // Events API requests are acknowledged right away, since there's no data expected
-      ack();
+      await ack();
     }
 
     // Dispatch event through global middleware

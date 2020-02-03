@@ -1,4 +1,4 @@
-import { RespondFn, AckFn } from '../types';
+import { AckFn } from '../types';
 import { StringIndexed } from './helpers';
 import { CodedError, ErrorCode } from '../errors';
 
@@ -7,7 +7,6 @@ export interface ReceiverEvent {
   // TODO: there should maybe be some more help for implementors of Receiver to know what kind of argument the AckFn
   // is expected to deal with.
   ack: AckFn<any>;
-  respond?: RespondFn;
 }
 
 export interface Receiver {
