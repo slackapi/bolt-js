@@ -29,15 +29,13 @@ export function processMiddleware(
     // Continue processing
     if (thisMiddleware !== undefined && !(errorOrPostProcess instanceof Error)) {
       const isLastMiddleware = middlewareIndex === (middleware.length - 1);
-      const nextWhenNotLast = isLastMiddleware ? noop : next;
 
       // In this condition, errorOrPostProcess will be a postProcess function or undefined
       postProcessFns[middlewareIndex - 1] = errorOrPostProcess === undefined ? noopPostProcess : errorOrPostProcess;
-      thisMiddleware({ context, next: nextWhenNotLast, ...initialArguments });
+      thisMiddleware({ context, next, ...initialArguments });
 
       if (isLastMiddleware) {
         postProcessFns[middlewareIndex] = noopPostProcess;
-        process.nextTick(next);
       }
       return;
     }
@@ -78,5 +76,4 @@ export function processMiddleware(
   firstMiddleware({ context, next, ...initialArguments });
 }
 
-function noop(): void { } // tslint:disable-line:no-empty
 const noopPostProcess: PostProcessFn = (error, done) => { done(error); };

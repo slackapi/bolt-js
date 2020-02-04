@@ -501,7 +501,10 @@ describe('App', () => {
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
 
-          app.use((_args) => { ackFn(); });
+          app.use((_args) => {
+            ackFn();
+            _args.next();
+          });
           app.action('block_action_id', ({ }) => { actionFn(); });
           app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
           app.action(
