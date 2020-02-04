@@ -28,7 +28,7 @@ describe('processMiddleware()', () => {
         // ensure that the last middleware ran to completion (i.e., called `next`) before afterMiddleware is called
         assert.isTrue(context.one);
         assert.isTrue(context.two);
-        done()
+        done();
       },
       (error?: Error) => {
         if (error) {
@@ -36,6 +36,9 @@ describe('processMiddleware()', () => {
         }
         assert(false);
       },
+      {},
+      null,
+      null,
     );
   });
 });
