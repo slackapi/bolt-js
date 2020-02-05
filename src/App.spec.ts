@@ -10,6 +10,7 @@ import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
 import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
 import { ViewConstraints } from './App';
+import { WebClientOptions, WebClient } from '@slack/web-api';
 
 describe('App', () => {
   describe('constructor', () => {
@@ -612,6 +613,127 @@ describe('App', () => {
         });
       });
 
+      describe('logger', () => {
+
+        it('should be available in middleware/listener args', async () => {
+          // Arrange
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+          app.use(({ logger, body }) => {
+            logger.info(body);
+          });
+
+          app.event('app_home_opened', ({ logger, event }) => {
+            logger.debug(event);
+          });
+
+          const receiverEvents = [
+            {
+              body: {
+                type: 'event_callback',
+                token: 'XXYYZZ',
+                team_id: 'TXXXXXXXX',
+                api_app_id: 'AXXXXXXXXX',
+                event: {
+                  type: 'app_home_opened',
+                  event_ts: '1234567890.123456',
+                  user: 'UXXXXXXX1',
+                  text: 'hello friends!',
+                  tab: 'home',
+                  view: {},
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+          ];
+
+          // Act
+          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
+          await delay();
+
+          // Assert
+          assert.isTrue(fakeLogger.info.called);
+          assert.isTrue(fakeLogger.debug.called);
+        });
+      });
+
+      describe('client', () => {
+
+        it('should be available in middleware/listener args', async () => {
+          // Arrange
+          const App = await importApp(mergeOverrides( // tslint:disable-line:variable-name
+            withNoopAppMetadata(),
+            withSuccessfulBotUserFetchingWebClient('B123', 'U123'),
+          ));
+          const tokens = [
+            'xoxb-123',
+            'xoxp-456',
+            'xoxb-123',
+          ];
+          const app = new App({
+            receiver: fakeReceiver,
+            authorize: () => {
+              const token = tokens.pop();
+              if (typeof token === 'undefined') {
+                return Promise.resolve({ botId: 'B123' });
+              }
+              if (token.startsWith('xoxb-')) {
+                return Promise.resolve({ botToken: token, botId: 'B123' });
+              }
+              return Promise.resolve({ userToken: token, botId: 'B123' });
+            },
+          });
+          app.use(async ({ client }) => {
+            await client.auth.test();
+          });
+          const clients: WebClient[] = [];
+          app.event('app_home_opened', async ({ client }) => {
+            clients.push(client);
+            await client.auth.test();
+          });
+
+          const event = {
+            body: {
+              type: 'event_callback',
+              token: 'legacy',
+              team_id: 'T123',
+              api_app_id: 'A123',
+              event: {
+                type: 'app_home_opened',
+                event_ts: '123.123',
+                user: 'U123',
+                text: 'Hi there!',
+                tab: 'home',
+                view: {},
+              },
+            },
+            respond: noop,
+            ack: noop,
+          };
+          const receiverEvents = [event, event, event];
+
+          // Act
+          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
+          await delay();
+
+          // Assert
+          assert.isUndefined(app.client.token);
+
+          assert.equal(clients[0].token, 'xoxb-123');
+          assert.equal(clients[1].token, 'xoxp-456');
+          assert.equal(clients[2].token, 'xoxb-123');
+
+          assert.notEqual(clients[0], clients[1]);
+          assert.strictEqual(clients[0], clients[2]);
+        });
+      });
+
       describe('say()', () => {
 
         function createChannelContextualReceiverEvents(channelId: string): ReceiverEvent[] {
@@ -849,6 +971,10 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
   return {
     '@slack/web-api': {
       WebClient: class {
+        public token?: string;
+        constructor(token?: string, _options?: WebClientOptions) {
+          this.token = token;
+        }
         public auth = {
           test: sinon.fake.resolves({ user_id: botUserId }),
         };
