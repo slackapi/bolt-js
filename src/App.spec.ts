@@ -656,8 +656,9 @@ describe('App', () => {
             receiver: fakeReceiver,
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
-          app.use(async ({ logger, body }) => {
+          app.use(async ({ logger, body, next }) => {
             logger.info(body);
+            await next();
           });
 
           app.event('app_home_opened', async ({ logger, event }) => {
@@ -721,8 +722,9 @@ describe('App', () => {
               return Promise.resolve({ userToken: token, botId: 'B123' });
             },
           });
-          app.use(async ({ client }) => {
+          app.use(async ({ client, next }) => {
             await client.auth.test();
+            await next();
           });
           const clients: WebClient[] = [];
           app.event('app_home_opened', async ({ client }) => {
