@@ -3,19 +3,18 @@ import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { ErrorCode } from '../errors';
-import { Override, delay, wrapToResolveOnFirstCall, createFakeLogger } from '../test-helpers';
+import { Override, wrapToResolveOnFirstCall, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import {
   SlackEventMiddlewareArgs,
   NextMiddleware,
   Context,
   MessageEvent,
-  ContextMissingPropertyError,
   SlackCommandMiddlewareArgs,
 } from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
-import { SlashCommand } from '../types/command/index';
-import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events/base-events';
+import { SlashCommand } from '../types/command';
+import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
@@ -47,8 +46,7 @@ describe('matchMessage()', () => {
 
       // Act
       const middleware = matchMessage(pattern);
-      middleware(fakeArgs);
-      await delay();
+      await middleware(fakeArgs);
 
       // Assert
       async function assertions(...args: any[]): Promise<void> {
@@ -81,8 +79,7 @@ describe('matchMessage()', () => {
 
       // Act
       const middleware = matchMessage(pattern);
-      middleware(fakeArgs);
-      await delay();
+      await middleware(fakeArgs);
 
       // Assert
       assert(fakeNext.notCalled);
@@ -104,8 +101,7 @@ describe('matchMessage()', () => {
 
       // Act
       const middleware = matchMessage(pattern);
-      middleware(fakeArgs);
-      await delay();
+      await middleware(fakeArgs);
 
       // Assert
       assert(fakeNext.notCalled);
@@ -141,9 +137,8 @@ describe('matchMessage()', () => {
 describe('directMention()', () => {
   it('should bail when the context does not provide a bot user ID', async () => {
     // Arrange
-    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
     const fakeArgs = {
-      next,
+      next: () => Promise.resolve(),
       message: createFakeMessageEvent(),
       context: {},
     } as unknown as MessageMiddlewareArgs;
@@ -151,17 +146,18 @@ describe('directMention()', () => {
 
     // Act
     const middleware = directMention();
-    middleware(fakeArgs);
-    await delay();
 
-    // Assert
-    async function assertions(...args: any[]): Promise<void> {
-      const firstArg = args[0];
-      assert.instanceOf(firstArg, Error);
-      assert.propertyVal(firstArg, 'code', ErrorCode.ContextMissingPropertyError);
-      assert.propertyVal(firstArg, 'missingProperty', 'botUserId');
+    let error;
+
+    try {
+      await middleware(fakeArgs);
+    } catch (err) {
+      error = err;
     }
-    return onNextFirstCall;
+
+    assert.instanceOf(error, Error);
+    assert.propertyVal(error, 'code', ErrorCode.ContextMissingPropertyError);
+    assert.propertyVal(error, 'missingProperty', 'botUserId');
   });
 
   it('should match message events that mention the bot user ID at the beginning of message text', async () => {
@@ -178,8 +174,7 @@ describe('directMention()', () => {
 
     // Act
     const middleware = directMention();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     async function assertions(...args: any[]): Promise<void> {
@@ -203,8 +198,7 @@ describe('directMention()', () => {
 
     // Act
     const middleware = directMention();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -224,8 +218,7 @@ describe('directMention()', () => {
 
     // Act
     const middleware = directMention();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -244,8 +237,7 @@ describe('directMention()', () => {
 
     // Act
     const middleware = directMention();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -265,8 +257,7 @@ describe('directMention()', () => {
 
     // Act
     const middleware = directMention();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -276,19 +267,24 @@ describe('directMention()', () => {
 describe('ignoreSelf()', () => {
   it('should handle context missing error', async () => {
     // Arrange
-    const fakeNext = sinon.fake();
+    const fakeNext = sinon.fake.resolves(null);
     const fakeBotUserId = undefined;
     const fakeArgs = {
       next: fakeNext,
-      context: { botUserId: fakeBotUserId },
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
     } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware, contextMissingPropertyError } = await importBuiltin();
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
-    middleware(fakeArgs);
-    await delay();
+
+    let error;
+    try {
+      await middleware(fakeArgs);
+    } catch (err) {
+      error = err;
+    }
 
     // Assert
     const expectedError = contextMissingPropertyError(
@@ -296,10 +292,8 @@ describe('ignoreSelf()', () => {
       'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
     );
 
-    const contextMissingError: ContextMissingPropertyError = fakeNext.getCall(0).lastArg;
-
-    assert.equal(contextMissingError.code, expectedError.code);
-    assert.equal(contextMissingError.missingProperty, expectedError.missingProperty);
+    assert.equal(error.code, expectedError.code);
+    assert.equal(error.missingProperty, expectedError.missingProperty);
   });
 
   it('should immediately call next(), because incoming middleware args don\'t contain event', async () => {
@@ -308,7 +302,7 @@ describe('ignoreSelf()', () => {
     const fakeBotUserId = 'BUSER1';
     const fakeArgs = {
       next: fakeNext,
-      context: { botUserId: fakeBotUserId },
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       command: {
         command: '/fakeCommand',
       },
@@ -318,8 +312,7 @@ describe('ignoreSelf()', () => {
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.calledOnce);
@@ -349,8 +342,7 @@ describe('ignoreSelf()', () => {
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -373,8 +365,7 @@ describe('ignoreSelf()', () => {
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -397,8 +388,7 @@ describe('ignoreSelf()', () => {
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
-    middleware(fakeArgs);
-    await delay();
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeNext.notCalled);
@@ -425,9 +415,7 @@ describe('ignoreSelf()', () => {
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
-    listOfFakeArgs.forEach(middleware);
-
-    await delay();
+    await Promise.all(listOfFakeArgs.map(middleware));
 
     // Assert
     assert.equal(fakeNext.callCount, listOfFakeArgs.length);
@@ -441,7 +429,7 @@ describe('onlyCommands', () => {
   it('should detect valid requests', async () => {
     const payload: SlashCommand = { ...validCommandPayload };
     const fakeNext = sinon.fake();
-    onlyCommands({
+    await onlyCommands({
       logger,
       client,
       payload,
@@ -459,7 +447,7 @@ describe('onlyCommands', () => {
   it('should skip other requests', async () => {
     const payload: any = {};
     const fakeNext = sinon.fake();
-    onlyCommands({
+    await onlyCommands({
       logger,
       client,
       payload,
@@ -498,13 +486,13 @@ describe('matchCommandName', () => {
 
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
-    matchCommandName('/hi')(buildArgs(fakeNext));
+    await matchCommandName('/hi')(buildArgs(fakeNext));
     assert.isTrue(fakeNext.called);
   });
 
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
-    matchCommandName('/hello')(buildArgs(fakeNext));
+    await matchCommandName('/hello')(buildArgs(fakeNext));
     assert.isTrue(fakeNext.notCalled);
   });
 });
@@ -532,7 +520,7 @@ describe('onlyEvents', () => {
       },
       say: sayNoop,
     };
-    onlyEvents({
+    await onlyEvents({
       logger,
       client,
       next: fakeNext,
@@ -545,7 +533,7 @@ describe('onlyEvents', () => {
   it('should skip other requests', async () => {
     const payload: SlashCommand = { ...validCommandPayload };
     const fakeNext = sinon.fake();
-    onlyEvents({
+    await onlyEvents({
       logger,
       client,
       payload,
@@ -586,7 +574,7 @@ describe('matchEventType', () => {
 
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
-    matchEventType('app_mention')({
+    await matchEventType('app_mention')({
       logger,
       client,
       next: fakeNext,
@@ -598,7 +586,7 @@ describe('matchEventType', () => {
 
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
-    matchEventType('app_home_opened')({
+    await matchEventType('app_home_opened')({
       logger,
       client,
       next: fakeNext,
@@ -634,7 +622,7 @@ describe('subtype', () => {
 
   it('should detect valid requests', async () => {
     const fakeNext = sinon.fake();
-    subtype('bot_message')({
+    await subtype('bot_message')({
       logger,
       client,
       next: fakeNext,
@@ -646,7 +634,7 @@ describe('subtype', () => {
 
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
-    subtype('me_message')({
+    await subtype('me_message')({
       logger,
       client,
       next: fakeNext,

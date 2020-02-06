@@ -12,30 +12,27 @@ export type AnyMiddlewareArgs =
   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs |
   SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs;
 
-export interface PostProcessFn {
-  (error: Error | undefined, done: (error?: Error) => void): unknown;
-}
-
 export interface Context extends StringIndexed {
 }
+
+export type ProcessMiddlewareContext<Args> = Args & {
+  next?: NextMiddleware, context: Context,
+  logger: Logger,
+  client: WebClient,
+};
+
+export type MiddlewareContext<Args> = ProcessMiddlewareContext<Args> & {
+  next: NextMiddleware,
+};
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
 // constraint would mess up the interface of App#event(), App#message(), etc.
 export interface Middleware<Args> {
   // TODO: is there something nice we can do to get context's property types to flow from one middleware to the next?
-  (args: Args & {
-    next: NextMiddleware,
-    context: Context,
-    logger: Logger,
-    client: WebClient,
-  }): unknown;
+  (ctx: MiddlewareContext<Args>): Promise<unknown>;
 }
 
-export interface NextMiddleware {
-  (error: Error): void;
-  (postProcess: PostProcessFn): void;
-  (): void;
-}
+export type NextMiddleware = () => Promise<unknown>;
 
 export interface ContextMissingPropertyError extends CodedError {
   code: ErrorCode.ContextMissingPropertyError;
