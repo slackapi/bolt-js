@@ -378,7 +378,7 @@ describe('App', () => {
             },
             { // IncomingEventType.Command (app.command)
               body: {
-                command: { command: '/COMMAND_NAME' },
+                command: '/COMMAND_NAME',
               },
               ack: noop,
             },
@@ -536,7 +536,7 @@ describe('App', () => {
 
           app.event('app_home_opened', async ({ }) => { /* noop */ });
           app.message('hello', async ({ }) => { /* noop */ });
-          // app.command('/echo', async ({ }) => { /* noop */ });
+          app.command('/echo', async ({ }) => { /* noop */ });
 
           // invalid view constraints
           const invalidViewConstraints1 = {
@@ -797,7 +797,7 @@ describe('App', () => {
             // IncomingEventType.Command
             {
               body: {
-                command: { command: '/COMMAND_NAME' },
+                command: '/COMMAND_NAME',
                 channel_id: channelId,
                 team_id: 'TEAM_ID',
               },
