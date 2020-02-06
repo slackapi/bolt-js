@@ -6,6 +6,8 @@ import { Override, createFakeLogger, delay, wrapToResolveOnFirstCall } from './t
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
 import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 
 describe('conversationContext middleware', () => {
   it('should forward events that have no conversation ID', async () => {
@@ -19,7 +21,11 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = { body: {}, context: dummyContext, next: fakeNext } as unknown as MiddlewareArgs;
+    const fakeArgs = {
+      body: {},
+      context: dummyContext,
+      next: fakeNext,
+    } as unknown as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
@@ -186,7 +192,12 @@ describe('MemoryStore', () => {
 
 /* Testing Harness */
 
-type MiddlewareArgs = AnyMiddlewareArgs & { next: NextMiddleware, context: Context };
+type MiddlewareArgs = AnyMiddlewareArgs & {
+  next: NextMiddleware,
+  context: Context,
+  logger: Logger,
+  client: WebClient,
+};
 
 interface DummyContext<ConversationState> {
   conversation?: ConversationState;

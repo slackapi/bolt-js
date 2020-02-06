@@ -5,6 +5,8 @@ import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
 import { SlackViewMiddlewareArgs } from './view';
 import { CodedError, ErrorCode } from '../errors';
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 
 export type AnyMiddlewareArgs =
   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs |
@@ -15,6 +17,8 @@ export interface Context extends StringIndexed {
 
 export type ProcessMiddlewareContext<Args> = Args & {
   next?: NextMiddleware, context: Context,
+  logger: Logger,
+  client: WebClient,
 };
 
 export type MiddlewareContext<Args> = ProcessMiddlewareContext<Args> & {
