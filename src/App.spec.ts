@@ -502,7 +502,10 @@ describe('App', () => {
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
 
-          app.use((_args) => { ackFn(); });
+          app.use((_args) => {
+            ackFn();
+            _args.next();
+          });
           app.action('block_action_id', ({ }) => { actionFn(); });
           app.action({ callback_id: 'message_action_callback_id' }, ({ }) => { actionFn(); });
           app.action(
@@ -563,8 +566,9 @@ describe('App', () => {
             receiver: fakeReceiver,
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
-          app.use(({ logger, body }) => {
+          app.use(({ logger, body, next }) => {
             logger.info(body);
+            next();
           });
 
           app.event('app_home_opened', ({ logger, event }) => {
@@ -628,8 +632,9 @@ describe('App', () => {
               return Promise.resolve({ userToken: token, botId: 'B123' });
             },
           });
-          app.use(async ({ client }) => {
+          app.use(async ({ client, next }) => {
             await client.auth.test();
+            next();
           });
           const clients: WebClient[] = [];
           app.event('app_home_opened', async ({ client }) => {
