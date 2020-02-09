@@ -240,15 +240,18 @@ export function matchEventType(type: string): Middleware<SlackEventMiddlewareArg
 export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return (args) => {
     // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
-    if (args.context.botId === undefined) {
+    if (
+        (!Array.isArray(args.context.botId) && args.context.botId === undefined)
+        || Array.isArray(args.context.botId) && args.context.botId.length === 0
+    ) {
       args.next(contextMissingPropertyError(
         'botId',
-        'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
+        'Cannot ignore events from the app without atleast 1 bot ID. Ensure authorize callback returns a botId or array of botIds.',
       ));
       return;
     }
 
-    const botId = args.context.botId as string;
+    const botIdOrArray: string | string[] = args.context.botId;
     const botUserId = args.context.botUserId !== undefined ? args.context.botUserId as string : undefined;
 
     if (isEventArgs(args)) {
@@ -260,7 +263,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
         // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
         // type narrowing
         // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
-        if (message.subtype === 'bot_message' && message.bot_id === botId) {
+        if (message.subtype === 'bot_message' && botIdOrArray.includes(message.bot_id)) {
           return;
         }
       }

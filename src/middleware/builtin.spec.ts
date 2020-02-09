@@ -302,6 +302,33 @@ describe('ignoreSelf()', () => {
     assert.equal(contextMissingError.missingProperty, expectedError.missingProperty);
   });
 
+  it('should handle context missing error, botId array cannot be empty', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = undefined;
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: [] },
+    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware, contextMissingPropertyError } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    const expectedError = contextMissingPropertyError(
+      'botId',
+      'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
+    );
+
+    const contextMissingError: ContextMissingPropertyError = fakeNext.getCall(0).lastArg;
+    assert.equal(contextMissingError.code, expectedError.code);
+    assert.equal(contextMissingError.missingProperty, expectedError.missingProperty);
+  });
+
   it('should immediately call next(), because incoming middleware args don\'t contain event', async () => {
     // Arrange
     const fakeNext = sinon.fake();
@@ -431,6 +458,30 @@ describe('ignoreSelf()', () => {
 
     // Assert
     assert.equal(fakeNext.callCount, listOfFakeArgs.length);
+  });
+
+  it('filters an event out botIds is an array, matches our own app and shouldn\'t be retained', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: [fakeBotUserId] },
+      event: {
+        type: 'tokens_revoked',
+        user: fakeBotUserId,
+      },
+    } as unknown as TokensRevokedMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    middleware(fakeArgs);
+    await delay();
+
+    // Assert
+    assert(fakeNext.notCalled);
   });
 });
 

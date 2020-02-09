@@ -81,7 +81,7 @@ export interface AuthorizeResult {
   // one of either botToken or userToken are required
   botToken?: string; // used by `say` (preferred over userToken)
   userToken?: string; // used by `say` (overridden by botToken)
-  botId?: string; // required for `ignoreSelf` global middleware
+  botId?: string | string[] | undefined; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
   [key: string]: any;
 }
@@ -612,7 +612,7 @@ function singleTeamAuthorization(
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Authorize {
   // TODO: warn when something needed isn't found
-  const identifiers: Promise<{ botUserId: string, botId: string }> = authorization.botUserId !== undefined &&
+  const identifiers: Promise<{ botUserId: string, botId: string | string[] }> = authorization.botUserId !== undefined &&
     authorization.botId !== undefined ?
     Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
     client.auth.test({ token: authorization.botToken })
