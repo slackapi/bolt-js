@@ -14,7 +14,7 @@ import {
   OptionsRequest,
   InteractiveMessage,
   DialogSubmitAction,
-  GlobalAction,
+  Shortcut,
   MessageAction,
   BlockElementAction,
   ContextMissingPropertyError,
@@ -339,7 +339,7 @@ type CallbackIdentifiedBody =
   | InteractiveMessage
   | DialogSubmitAction
   | MessageAction
-  | GlobalAction
+  | Shortcut
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
 function isCallbackIdentifiedBody(
