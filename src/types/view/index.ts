@@ -82,8 +82,10 @@ export interface ViewOutput {
   close: PlainTextElementOutput | null;
   submit: PlainTextElementOutput | null;
   state: {
-    [blockId: string]: {
-      [actionId: string]: any; // TODO: a union of all the input elements' output payload
+    values: {
+      [blockId: string]: {
+        [actionId: string]: any; // TODO: a union of all the input elements' output payload
+      };
     };
   };
   hash: string;
