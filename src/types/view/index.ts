@@ -1,5 +1,6 @@
 import { StringIndexed } from '../helpers';
-import { RespondArguments, AckFn } from '../utilities';
+import { AckFn } from '../utilities';
+import { View } from '@slack/types';
 
 /**
  * Known view action types
@@ -13,7 +14,7 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
   payload: ViewOutput;
   view: this['payload'];
   body: ViewActionType;
-  ack: AckFn<string | RespondArguments>;
+  ack: ViewAckFn<ViewActionType>;
 }
 
 interface PlainTextElementOutput {
@@ -80,7 +81,11 @@ export interface ViewOutput {
   blocks: StringIndexed; // TODO: should this just be any?
   close: PlainTextElementOutput | null;
   submit: PlainTextElementOutput | null;
-  state: object; // TODO: this should probably be expanded in the future
+  state: {
+    [blockId: string]: {
+      [actionId: string]: any; // TODO: a union of all the input elements' output payload
+    };
+  };
   hash: string;
   private_metadata: string;
   root_view_id: string | null;
@@ -89,3 +94,37 @@ export interface ViewOutput {
   notify_on_close: boolean;
   external_id?: string;
 }
+
+export interface ViewUpdateResponseAction {
+  response_action: 'update';
+  view: View;
+}
+
+export interface ViewPushResponseAction {
+  response_action: 'push';
+  view: View;
+}
+
+export interface ViewClearResponseAction {
+  response_action: 'clear';
+}
+
+export interface ViewErrorsResponseAction {
+  response_action: 'errors';
+  errors: {
+    [blockId: string]: string;
+  };
+}
+
+export type ViewResponseAction =
+  ViewUpdateResponseAction | ViewPushResponseAction | ViewClearResponseAction | ViewErrorsResponseAction;
+
+/**
+ * Type function which given a view action `VA` returns a corresponding type for the `ack()` function. The function is
+ * used to acknowledge the receipt (and possibly signal failure) of an view submission or closure from a listener or
+ * middleware.
+ */
+type ViewAckFn<VA extends SlackViewAction = SlackViewAction> =
+  VA extends ViewSubmitAction ? AckFn<ViewResponseAction> :
+  // ViewClosedActions can only be acknowledged, there are no arguments
+  AckFn<void>;
