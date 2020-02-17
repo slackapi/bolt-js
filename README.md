@@ -36,14 +36,19 @@ event, there's a method to attach a listener function.
 // Listen for an event from the Events API
 app.event(eventType, fn);
 
-// Listen for an action from a block element (buttons, menus, etc), dialog submission, message action, or legacy action
+// Listen for an action from a block element (buttons, menus, etc)
 app.action(actionId, fn);
+// Listen for dialog submission, message action, or legacy action
+app.action({ callback_id: callbackId }, fn);
 
 // Listen for a slash command
 app.command(commandName, fn);
 
 // Listen for options requests (from menus with an external data source)
 app.options(actionId, fn);
+
+// Listen for modal view requests
+app.view(callbackId, fn);
 ```
 
 There's a special method that's provided as a convenience to handle Events API events with the type `message`. Also, you
