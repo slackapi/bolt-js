@@ -20,7 +20,8 @@ export type BlockElementAction =
   | MultiExternalSelectAction
   | OverflowAction
   | DatepickerAction
-  | RadioButtonsAction;
+  | RadioButtonsAction
+  | CheckboxesAction;
 
 /**
  * Any action from Slack's interactive elements
@@ -182,6 +183,15 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
 export interface RadioButtonsAction extends BasicElementAction<'radio_buttons'> {
   selected_option: Option;
   initial_option?: Option;
+  confirm?: Confirmation;
+}
+
+/**
+ * An action from a checkboxes element
+ */
+export interface CheckboxesAction extends BasicElementAction<'checkboxes'> {
+  selected_options: Option[];
+  initial_options?: Option[];
   confirm?: Confirmation;
 }
 
