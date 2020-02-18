@@ -1,5 +1,4 @@
-import { createServer, Server, Agent } from 'http';
-import { SecureContextOptions } from 'tls';
+import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
 import rawBody from 'raw-body';
 import App from './App';
@@ -15,8 +14,6 @@ export interface ExpressReceiverOptions {
   endpoints?: string | {
     [endpointType: string]: string;
   };
-  agent?: Agent;
-  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
 }
 
 /**

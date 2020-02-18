@@ -3,7 +3,6 @@ import 'mocha';
 import { Logger, LogLevel } from '@slack/logger';
 import { assert } from 'chai';
 import { Request, Response } from 'express';
-import { Agent } from 'http';
 import sinon, { SinonFakeTimers } from 'sinon';
 import { Readable } from 'stream';
 
@@ -41,10 +40,6 @@ describe('ExpressReceiver', () => {
         signingSecret: 'my-secret',
         logger: noopLogger,
         endpoints: { events: '/custom-endpoint' },
-        agent: new Agent({
-          maxSockets: 999,
-        }),
-        clientTls: undefined,
       });
       assert.isNotNull(receiver);
     });

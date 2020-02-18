@@ -1,3 +1,5 @@
+import { Agent } from 'http';
+import { SecureContextOptions } from 'tls';
 import util from 'util';
 import {
   WebClient,
@@ -55,8 +57,8 @@ const packageJson = require('../package.json'); // tslint:disable-line:no-requir
 export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
-  agent?: ExpressReceiverOptions['agent']; // also WebClientOptions['agent']
-  clientTls?: ExpressReceiverOptions['clientTls']; // also WebClientOptions['tls']
+  agent?: Agent;
+  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
@@ -226,7 +228,7 @@ export default class App {
         );
       }
       // Create default ExpressReceiver
-      this.receiver = new ExpressReceiver({ signingSecret, logger,  endpoints, agent, clientTls });
+      this.receiver = new ExpressReceiver({ signingSecret, logger,  endpoints });
     }
     this.receiver.init(this);
 
