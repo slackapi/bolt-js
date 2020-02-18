@@ -10,7 +10,7 @@ import { Logger, ConsoleLogger } from '@slack/logger';
 // if that's the reason, let's document that with a comment.
 export interface ExpressReceiverOptions {
   signingSecret: string;
-  logger: Logger;
+  logger?: Logger;
   endpoints?: string | {
     [endpointType: string]: string;
   };
