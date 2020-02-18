@@ -258,7 +258,7 @@ function authWithAcme({ payload, context, say, next }) {
       if (error.message === 'Not Found') {
         // In the real world, you would need to check if the say function was defined, falling back to the respond
         // function if not, and then falling back to only logging the error as a last resort.
-        await say(`I'm sorry <@${slackUserId}, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
+        await say(`I'm sorry <@${slackUserId}>, you aren't registered with Acme. Please use <https://acme.com/register> to use this app.`);
         return;
       }
 
