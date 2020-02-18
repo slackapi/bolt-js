@@ -705,12 +705,12 @@ describe('App', () => {
             receiver: fakeReceiver,
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
-          app.use(({ logger, body, next }) => {
+          app.use(async ({ logger, body, next }) => {
             logger.info(body);
-            next();
+            await next();
           });
 
-          app.event('app_home_opened', ({ logger, event }) => {
+          app.event('app_home_opened', async ({ logger, event }) => {
             logger.debug(event);
           });
 
