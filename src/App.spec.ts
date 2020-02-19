@@ -694,6 +694,56 @@ describe('App', () => {
           assert.isTrue(fakeLogger.info.called);
           assert.isTrue(fakeLogger.debug.called);
         });
+
+        it('should work in the case both logger and logLevel are given', async () => {
+          // Arrange
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            logLevel: LogLevel.DEBUG,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+          app.use(async ({ logger, body, next }) => {
+            logger.info(body);
+            await next();
+          });
+
+          app.event('app_home_opened', async ({ logger, event }) => {
+            logger.debug(event);
+          });
+
+          const receiverEvents = [
+            {
+              body: {
+                type: 'event_callback',
+                token: 'XXYYZZ',
+                team_id: 'TXXXXXXXX',
+                api_app_id: 'AXXXXXXXXX',
+                event: {
+                  type: 'app_home_opened',
+                  event_ts: '1234567890.123456',
+                  user: 'UXXXXXXX1',
+                  text: 'hello friends!',
+                  tab: 'home',
+                  view: {},
+                },
+              },
+              respond: noop,
+              ack: noop,
+            },
+          ];
+
+          // Act
+          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
+          await delay();
+
+          // Assert
+          assert.isTrue(fakeLogger.info.called);
+          assert.isTrue(fakeLogger.debug.called);
+          assert.isTrue(fakeLogger.setLevel.called);
+        });
       });
 
       describe('client', () => {
