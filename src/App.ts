@@ -170,20 +170,28 @@ export default class App {
     botId = undefined,
     botUserId = undefined,
     authorize = undefined,
-    logger = new ConsoleLogger(),
-    logLevel = LogLevel.INFO,
+    logger = undefined,
+    logLevel = undefined,
     ignoreSelf = true,
     clientOptions = undefined,
   }: AppOptions = {}) {
 
-    this.logger = logger;
-    this.logger.setLevel(logLevel);
+    if (typeof logger === 'undefined') {
+      // Initialize with the default logger
+      const consoleLogger = new ConsoleLogger();
+      consoleLogger.setName('bolt-app');
+      this.logger = consoleLogger;
+    } else {
+      this.logger = logger;
+    }
+    if (typeof logLevel !== 'undefined' && this.logger.getLevel() !== logLevel) {
+      this.logger.setLevel(logLevel);
+    }
     this.errorHandler = defaultErrorHandler(this.logger);
-
     this.clientOptions = {
       agent,
-      logLevel,
-      logger,
+      // App propagates only the log level to WebClient as WebClient has its own logger
+      logLevel: this.logger.getLevel(),
       tls: clientTls,
       slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
     };
@@ -226,9 +234,14 @@ export default class App {
             'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
             'custom receiver.',
         );
+      } else {
+        // Create default ExpressReceiver
+        this.receiver = new ExpressReceiver({
+          signingSecret,
+          endpoints,
+          logger: this.logger,
+        });
       }
-      // Create default ExpressReceiver
-      this.receiver = new ExpressReceiver({ signingSecret, logger,  endpoints });
     }
     this.receiver.init(this);
 
