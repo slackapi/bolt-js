@@ -863,8 +863,7 @@ describe('App', () => {
           ];
 
           // Act
-          receiverEvents.forEach(event => fakeReceiver.emit('message', event));
-          await delay();
+          await Promise.all(receiverEvents.map(event => fakeReceiver.sendEvent(event)));
 
           // Assert
           assert.isTrue(fakeLogger.info.called);

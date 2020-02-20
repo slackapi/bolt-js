@@ -2,9 +2,8 @@
 import { assert } from 'chai';
 import querystring from 'querystring';
 import sinon, { SinonFakeTimers } from 'sinon';
-import { parseRequestBody } from '../dist';
 import { CodedError, ReceiverAuthenticityError } from './errors';
-import { verifyRequestSignature } from './receiver';
+import { verifyRequestSignature, parseRequestBody } from './receiver';
 import { StringIndexed } from './types/helpers';
 
 describe('receiver', () => {
