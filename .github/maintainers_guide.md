@@ -32,6 +32,8 @@ To build the docs locally, you can run `bundle exec jekyll serve`.
 
 1.  Create the commit for the release:
     *  Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`.
+    *  Update any dependency versions 
+    *  Confirm tests pass by running `npm test`
     *  Commit with a message including the new version number. For example `v1.5.0`.
     *  Tag the commit with the version number. For example `@slack/bolt@1.5.0`.
 
