@@ -88,8 +88,8 @@ export interface UsersSelectAction extends BasicElementAction<'users_select'> {
  * An action from a multi select menu with user list
  */
 export interface MultiUsersSelectAction extends BasicElementAction<'multi_users_select'> {
-  selected_user: [string];
-  initial_user?: [string];
+  selected_users: [string];
+  initial_users?: [string];
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
 }
