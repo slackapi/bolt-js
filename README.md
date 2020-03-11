@@ -1,9 +1,9 @@
-# Slack ⚡️ Bolt
+# Slack ⚡️ Bolt for JavaScript
 
 [![Build Status](https://travis-ci.org/slackapi/bolt.svg?branch=master)](https://travis-ci.org/slackapi/bolt)
 [![codecov](https://codecov.io/gh/slackapi/bolt/branch/master/graph/badge.svg)](https://codecov.io/gh/slackapi/bolt)
 
-A framework to build Slack apps, _fast_.
+A JavaScript framework to build Slack apps _in a flash_.
 
 ## Initialization
 
@@ -153,7 +153,7 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
    to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the
    message to remove the interactive elements is a best practice for any action that should only be performed once.
 
-If an app does not call `ack()` within the time limit, Bolt will generate an error. See [handling
+If an app does not call `ack()` within the time limit, Bolt for JavaScript will generate an error. See [handling
 errors](#handling-errors) for more details.
 
 The following is an example of acknowledging a dialog submission:
@@ -300,7 +300,7 @@ app.message(noBotMessages, ({ message }) => console.log(
 ));
 ```
 
-Message subtype matching is common, so Bolt ships with a builtin listener middleware that filters all messages that
+Message subtype matching is common, so Bolt for JavaScript ships with a builtin listener middleware that filters all messages that
 match a given subtype. The following is an example of the opposite of the one above - the listener only sees messages
 that _are_ `bot_message`s.
 
