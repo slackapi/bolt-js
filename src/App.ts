@@ -41,10 +41,11 @@ import {
   BlockAction,
   InteractiveMessage,
   SlackViewAction,
+  Receiver,
+  ReceiverEvent,
   RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
-import { Receiver, ReceiverEvent } from './receiver';
 import {
   CodedError,
   asCodedError,

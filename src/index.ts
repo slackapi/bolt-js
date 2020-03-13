@@ -21,7 +21,6 @@ export {
 
 export * from './errors';
 export * from './middleware/builtin';
-export * from './receiver';
 export * from './types';
 
 export {
