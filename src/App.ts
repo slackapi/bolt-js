@@ -9,6 +9,7 @@ import {
   onlyCommands,
   matchCommandName,
   onlyOptions,
+  onlyShortcuts,
   onlyEvents,
   matchEventType,
   matchMessage,
@@ -23,8 +24,10 @@ import {
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
+  SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackAction,
+  SlackShortcut,
   Context,
   SayFn,
   AckFn,
@@ -91,6 +94,11 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
   block_id?: A extends BlockAction ? (string | RegExp) : never;
   action_id?: A extends BlockAction ? (string | RegExp) : never;
   callback_id?: Extract<A, { callback_id?: string }> extends any ? (string | RegExp) : never;
+}
+
+export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
+  type?: S['type'];
+  callback_id?: string | RegExp;
 }
 
 export interface ViewConstraints {
@@ -296,6 +304,27 @@ export default class App {
     );
   }
 
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
+    callbackId: string | RegExp,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  ): void;
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
+    constraints: ShortcutConstraints,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  ): void;
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
+    callbackIdOrConstraints: string | RegExp | ShortcutConstraints,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  ): void {
+    const constraints: ShortcutConstraints =
+      (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
+        { callback_id: callbackIdOrConstraints } : callbackIdOrConstraints;
+
+    this.listeners.push(
+      [onlyShortcuts, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
+    );
+  }
+
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
   public action<Action extends SlackAction = SlackAction>(
@@ -405,6 +434,7 @@ export default class App {
    * Handles events from the receiver
    */
   private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
+
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
@@ -474,13 +504,15 @@ export default class App {
           (bodyArg as SlackEventMiddlewareArgs['body']).event :
           (type === IncomingEventType.ViewAction) ?
             (bodyArg as SlackViewMiddlewareArgs['body']).view :
-            (type === IncomingEventType.Action &&
-              isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
-              (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
-              (bodyArg as (
-                Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs |
-                  SlackViewMiddlewareArgs> | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction |
-                    InteractiveMessage>>
+            (type === IncomingEventType.Shortcut) ?
+              (bodyArg as SlackShortcutMiddlewareArgs['body']) :
+              (type === IncomingEventType.Action &&
+                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
+                (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
+                (bodyArg as (
+                  Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs |
+                    SlackViewMiddlewareArgs> | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction |
+                      InteractiveMessage>>
               )['body']),
     };
 
@@ -504,6 +536,9 @@ export default class App {
     } else if (type === IncomingEventType.ViewAction) {
       const viewListenerArgs = listenerArgs as SlackViewMiddlewareArgs;
       viewListenerArgs.view = viewListenerArgs.payload;
+    } else if (type === IncomingEventType.Shortcut) {
+      const shortcutListenerArgs = listenerArgs as SlackShortcutMiddlewareArgs;
+      shortcutListenerArgs.shortcut = shortcutListenerArgs.payload;
     }
 
     // Set say() utility
@@ -586,11 +621,11 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.id as string :
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team.id as string :
           assertNever(type)),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).team.enterprise_id as string :
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team.enterprise_id as string :
           undefined),
     userId:
       ((type === IncomingEventType.Event) ?
@@ -599,7 +634,7 @@ function buildSource(
             ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
               ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
                 undefined) :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
+        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
           (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
             undefined),
     conversationId: channelId,

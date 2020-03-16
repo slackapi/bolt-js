@@ -3,7 +3,7 @@
  *
  * This describes the entire JSON-encoded body of a request from Slack global actions.
  */
-export interface Shortcut {
+export interface GlobalShortcut {
   type: 'shortcut';
   callback_id: string;
   trigger_id: string;
@@ -11,9 +11,6 @@ export interface Shortcut {
     id: string;
     name: string;
   };
-  // remove this once we move to shortcut method
-  // needed because of line 54 in helpers.ts
-  channel?: undefined;
   team: {
     id: string;
     domain: string;
