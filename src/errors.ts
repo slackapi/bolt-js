@@ -9,7 +9,7 @@ export enum ErrorCode {
   ContextMissingPropertyError = 'slack_bolt_context_missing_property_error',
 
   ReceiverAckTimeoutError = 'slack_bolt_receiver_ack_timeout_error',
-
+  ReceiverAckTwiceError = 'slack_bolt_receiver_ack_twice_error',
   ReceiverAuthenticityError = 'slack_bolt_receiver_authenticity_error',
 
   /**
@@ -54,6 +54,14 @@ export class ContextMissingPropertyError extends Error implements CodedError {
 
 export class ReceiverAckTimeoutError extends Error implements CodedError {
   public code = ErrorCode.ReceiverAckTimeoutError;
+}
+
+export class ReceiverMultipleAckError extends Error implements CodedError {
+  public code = ErrorCode.ReceiverAckTimeoutError;
+
+  constructor() {
+    super("The receiver's `ack` function was called multiple times.");
+  }
 }
 
 export class ReceiverAuthenticityError extends Error implements CodedError {

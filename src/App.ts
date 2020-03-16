@@ -244,7 +244,6 @@ export default class App {
         });
       }
     }
-    this.receiver.init(this);
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
@@ -257,6 +256,9 @@ export default class App {
       const store: ConversationStore = convoStore === undefined ? new MemoryStore() : convoStore;
       this.use(conversationContext(store, this.logger));
     }
+
+    // Should be last to avoid exposing partially initialized app
+    this.receiver.init(this);
   }
 
   /**
@@ -444,6 +446,7 @@ export default class App {
       authorizeResult = await this.authorize(source, bodyArg);
     } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+      this.handleError(error);
       return;
     }
 
@@ -567,7 +570,6 @@ export default class App {
         ...(listenerArgs as MiddlewareContext<AnyMiddlewareArgs>),
       });
     } catch (error) {
-      await event.ack(asCodedError(error));
       return this.handleError(error);
     }
   }
@@ -634,7 +636,7 @@ function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error) => {
     logger.error(error);
 
-    throw error;
+    return Promise.reject(error);
   };
 }
 

@@ -6,7 +6,7 @@ import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import App from './App';
-import { ReceiverAuthenticityError } from './errors';
+import { ReceiverAuthenticityError, ReceiverAckTimeoutError, ReceiverMultipleAckError } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
@@ -54,9 +54,9 @@ export default class ExpressReceiver implements Receiver {
   }
 
   private async requestHandler(req: Request, res: Response): Promise<void> {
-    let timer: NodeJS.Timer | undefined = setTimeout(
+    let timer: NodeJS.Timeout | undefined = setTimeout(
       () => {
-        this.bolt?.handleError(new ReceiverAuthenticityError(
+        this.bolt?.handleError(new ReceiverAckTimeoutError(
           'An incoming event was not acknowledged before the timeout. ' +
           'Ensure that the ack() argument is called in your listeners.',
         ));
@@ -64,6 +64,7 @@ export default class ExpressReceiver implements Receiver {
       },
       2800,
     );
+
     const event: ReceiverEvent = {
       body: req.body,
       ack: async (response): Promise<void> => {
@@ -71,27 +72,32 @@ export default class ExpressReceiver implements Receiver {
           clearTimeout(timer);
           timer = undefined;
 
-          if (response instanceof Error) {
-            res.send(500);
-          } else if (!response) {
+          if (!response) {
             res.send('');
           } else if (typeof response === 'string') {
             res.send(response);
           } else {
             res.json(response);
           }
+        } else {
+          this.bolt?.handleError(new ReceiverMultipleAckError());
         }
       },
     };
 
-    await this.bolt?.processEvent(event);
+    try {
+      await this.bolt?.processEvent(event);
+    } catch (err) {
+      res.send(500);
+      throw err;
+    }
   }
 
   public init(bolt: App): void {
     this.bolt = bolt;
   }
 
-    // TODO: the arguments should be defined as the arguments of Server#listen()
+  // TODO: the arguments should be defined as the arguments of Server#listen()
   // TODO: the return value should be defined as a type that both http and https servers inherit from, or a union
   public start(port: number): Promise<Server> {
     return new Promise((resolve, reject) => {

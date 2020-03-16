@@ -213,17 +213,18 @@ describe('App', () => {
   describe('#start', () => {
     it('should pass calls through to receiver', async () => {
       // Arrange
+      const dummyReturn = Symbol();
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
       const App = await importApp(); // tslint:disable-line:variable-name
+      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+      fakeReceiver.start = sinon.fake.returns(dummyReturn);
 
       // Act
-      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
-      sinon.spy(app, 'start');
       const actualReturn = await app.start(...dummyParams);
 
       // Assert
-      assert.deepEqual(actualReturn, dummyParams);
+      assert.deepEqual(actualReturn, dummyReturn);
       assert.deepEqual(dummyParams, fakeReceiver.start.firstCall.args);
     });
   });
@@ -231,16 +232,18 @@ describe('App', () => {
   describe('#stop', () => {
     it('should pass calls through to receiver', async () => {
       // Arrange
-      const dummyParams = [1, 2];
+      const dummyReturn = Symbol();
+      const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
       const App = await importApp(); // tslint:disable-line:variable-name
+      fakeReceiver.stop = sinon.fake.returns(dummyReturn);
 
       // Act
       const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
       const actualReturn = await app.stop(...dummyParams);
 
       // Assert
-      assert.deepEqual(actualReturn, dummyParams);
+      assert.deepEqual(actualReturn, dummyReturn);
       assert.deepEqual(dummyParams, fakeReceiver.stop.firstCall.args);
     });
   });
@@ -277,8 +280,8 @@ describe('App', () => {
       // Act
       const app = new App({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
       app.use(fakeMiddleware);
-
       await Promise.all(invalidReceiverEvents.map(event => fakeReceiver.sendEvent(event)));
+
       // Assert
       assert(fakeErrorHandler.notCalled);
       assert(fakeMiddleware.notCalled);
@@ -393,6 +396,11 @@ describe('App', () => {
         const message = ':wave:';
         let middlewareCount = 0;
 
+        /**
+         * Middleware that, when calls, asserts that it was called in the correct order
+         * @param orderDown The order it should be called when processing middleware down the stack
+         * @param orderUp The order it should be called when processing middleware up the stack
+         */
         const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: any) => {
           await delay(100);
           middlewareCount += 1;
@@ -422,43 +430,20 @@ describe('App', () => {
         assert(fakeErrorHandler.notCalled);
       });
 
-      it('should, on error, ack an error, then global error handler', async () => {
+      it('should, on error call the global error handler', async () => {
         const error = new Error('Everything is broke, you probably should restart, if not then good luck');
-        let callCount = 0;
-
-        const assertOrder = (order: number) => {
-          callCount += 1;
-          assert.equal(callCount, order);
-        };
 
         app.use(() => {
-          assertOrder(1);
           throw error;
         });
-
-        const event = {
-          ...dummyReceiverEvent,
-          ack: (actualError: Error): Promise<void> => {
-            if (actualError instanceof Error) {
-              assert.instanceOf(actualError, UnknownError);
-              assert.equal(actualError.message, error.message);
-              assertOrder(2);
-            }
-
-            return Promise.resolve();
-          },
-        };
 
         app.error(async (actualError) => {
           assert.instanceOf(actualError, UnknownError);
           assert.equal(actualError.message, error.message);
-          assertOrder(3);
           await delay(); // Make this async to make sure error handlers can be tested
         });
 
-        await fakeReceiver.sendEvent(event);
-
-        assert.equal(callCount, 3);
+        await fakeReceiver.sendEvent(dummyReceiverEvent);
       });
 
       it('with a default global error handler, rejects App#ProcessEvent', async () => {
@@ -1143,7 +1128,7 @@ describe('App', () => {
           assert.equal(assertionAggregator.callCount, dummyReceiverEvents.length);
         });
 
-        it('should handle failures through the App\'s global error handler', async () => {
+        it("should handle failures through the App's global error handler", async () => {
           // Arrange
           const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
           const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
