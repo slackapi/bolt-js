@@ -17,7 +17,7 @@ import {
   InteractiveMessage,
   DialogSubmitAction,
   GlobalShortcut,
-  MessageAction,
+  MessageShortcut,
   BlockElementAction,
   ContextMissingPropertyError,
   SlackViewAction,
@@ -353,7 +353,7 @@ function isBlockPayload(
 type CallbackIdentifiedBody =
   | InteractiveMessage
   | DialogSubmitAction
-  | MessageAction
+  | MessageShortcut
   | GlobalShortcut
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 

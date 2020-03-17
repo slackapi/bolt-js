@@ -48,14 +48,14 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
       conversationId: optionsBody.channel !== undefined ? optionsBody.channel.id : undefined,
     };
   }
-  if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'message_action') {
+  if (body.actions !== undefined || body.type === 'dialog_submission') {
     const actionBody = (body as SlackActionMiddlewareArgs<SlackAction>['body']);
     return {
       type: IncomingEventType.Action,
       conversationId: actionBody.channel !== undefined ? actionBody.channel.id : undefined,
     };
   }
-  if (body.type === 'shortcut') {
+  if (body.type === 'shortcut' || body.type === 'message_action') {
     return {
       type: IncomingEventType.Shortcut,
     };
