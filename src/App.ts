@@ -446,8 +446,7 @@ export default class App {
       authorizeResult = await this.authorize(source, bodyArg);
     } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      this.handleError(error);
-      return;
+      return this.handleError(error);
     }
 
     const context: Context = { ...authorizeResult };
