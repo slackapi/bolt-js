@@ -42,7 +42,7 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
  * Middleware that filters out any event that isn't a shortcut
  */
 export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = ({ shortcut, next }) => {
-  // Filter out any non-actions
+  // Filter out any non-shortcuts
   if (shortcut === undefined) {
     return;
   }

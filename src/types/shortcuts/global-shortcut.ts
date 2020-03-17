@@ -1,7 +1,7 @@
 /**
- * A Slack global action wrapped in the standard metadata.
+ * A Slack global shortcut wrapped in the standard metadata.
  *
- * This describes the entire JSON-encoded body of a request from Slack global actions.
+ * This describes the entire JSON-encoded body of a request from Slack global shortcuts.
  */
 export interface GlobalShortcut {
   type: 'shortcut';
@@ -9,14 +9,14 @@ export interface GlobalShortcut {
   trigger_id: string;
   user: {
     id: string;
-    name: string;
+    username: string;
+    team_id: string;
   };
   team: {
     id: string;
     domain: string;
-    // remove this once we move to shortcut
-    // needed because of line 540 in App.ts
     enterprise_id?: string;
+    enterprise_name?: string;
   };
   token: string;
   action_ts: string;
