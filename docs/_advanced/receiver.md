@@ -6,7 +6,7 @@ order: 8
 ---
 
 <div class="section-content">
-A receiver is responsible for handling and parsing any incoming events from Slack, then emitting the event so the Bolt app can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
+A receiver is responsible for handling and parsing any incoming events from Slack, then emitting the event so the Bolt for JavaScript app can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
 
 | Method       | Parameters                       | Return type |
 |--------------|----------------------------------|-------------|
@@ -14,11 +14,11 @@ A receiver is responsible for handling and parsing any incoming events from Slac
 | `start()`    | None                             | `Promise`   |
 | `stop()`     | None                             | `Promise`   |
 
-`on()` is called two times in the Bolt app:
-* `Receiver.on('message',  listener)` should route all incoming requests that have been parsed to `onIncomingEvent()`. It’s called in the Bolt app as `this.receiver.on('message', message => this.onIncomingEvent(message))`.
-* `Receiver.on('error',  listener)` should route errors to the global error handler. It’s called in the Bolt app as `this.receiver.on('error', error => this.onGlobalError(error))`.
+`on()` is called two times in a Bolt for JavaScript app:
+* `Receiver.on('message',  listener)` should route all incoming requests that have been parsed to `onIncomingEvent()`. It’s called in the Bolt for JavaScript app as `this.receiver.on('message', message => this.onIncomingEvent(message))`.
+* `Receiver.on('error',  listener)` should route errors to the global error handler. It’s called in the Bolt for JavaScript app as `this.receiver.on('error', error => this.onGlobalError(error))`.
 
-To use a custom receiver, you can pass it into the constructor when initializing your Bolt app. Here is what a basic custom receiver might look like.
+To use a custom receiver, you can pass it into the constructor when initializing your Bolt for JavaScript app. Here is what a basic custom receiver might look like.
 
 For a more in-depth look at a receiver, [read the source code for the built-in Express receiver](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)
 </div>
