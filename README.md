@@ -38,8 +38,11 @@ app.event(eventType, fn);
 
 // Listen for an action from a block element (buttons, menus, etc)
 app.action(actionId, fn);
-// Listen for dialog submission, message action, or legacy action
+// Listen for dialog submission, message shortcut, or legacy action
 app.action({ callback_id: callbackId }, fn);
+
+// Listen for a global shortcut
+app.shortcut(callbackId, fn);
 
 // Listen for a slash command
 app.command(commandName, fn);
@@ -142,7 +145,7 @@ soon as possible.
 
 Depending on the type of incoming event a listener is meant for, `ack()` should be called with a parameter:
 
-*  Block actions and message actions: Call `ack()` with no parameters.
+*  Block actions, global shortcuts, and message shortcuts: Call `ack()` with no parameters.
 
 *  Dialog submissions: Call `ack()` with no parameters when the inputs are all valid, or an object describing the
    validation errors if any inputs are not valid.
