@@ -6,7 +6,7 @@ order: 8
 ---
 
 <div class="section-content">
-[Global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) are invokable UI elements within Slack clients, available in the composer and search menus. Your app can use the `shortcut()` method to listen to incoming global shortcut events. The method requires a `callbackId` parameter of type `string` or `RegExp`.
+[Global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) are invokable UI elements within Slack clients, available in the composer and search menus. Your app can use the `shortcut()` method to listen to incoming global shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
 Global shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
 
