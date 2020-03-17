@@ -1,8 +1,8 @@
 ---
-title: モーダルビューのオープン
+title: views.open を使ったモーダルビューのオープン
 lang: ja-jp
 slug: creating-modals
-order: 9
+order: 10
 ---
 
 <div class="section-content">
