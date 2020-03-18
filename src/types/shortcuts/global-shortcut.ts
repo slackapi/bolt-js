@@ -11,7 +11,6 @@ export interface GlobalShortcut {
     id: string;
     username: string;
     team_id: string;
-    name: string;
   };
   team: {
     id: string;
