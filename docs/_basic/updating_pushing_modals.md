@@ -2,7 +2,7 @@
 title: Updating and pushing views
 lang: en
 slug: updating-pushing-views
-order: 10
+order: 11
 ---
 
 <div class="section-content">
