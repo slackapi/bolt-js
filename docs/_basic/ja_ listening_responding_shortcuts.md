@@ -12,7 +12,7 @@ order: 8
 
 グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](#creating-modals)などの用途に使用できる `trigger_id` を含んでいます。グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを使用できます。
 
-⚠️ [メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)はh時期続き[`action()` メソッド](#action-listening)を使用するので注意してください。**Bolt の次のメジャーバージョンからはグローバルショートカットもメッセージショートカットも両方とも `shortcut()` メソッドを使用します。**
+⚠️ [メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)は引き続き[`action()` メソッド](#action-listening)を使用するので注意してください。**Bolt の次のメジャーバージョンからはグローバルショートカットもメッセージショートカットも両方とも `shortcut()` メソッドを使用します。**
 </div>
 
 ```javascript
