@@ -2,7 +2,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { ErrorCode } from '../errors';
+import { ErrorCode, ContextMissingPropertyError } from '../errors';
 import { Override, wrapToResolveOnFirstCall, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import {
@@ -274,7 +274,7 @@ describe('ignoreSelf()', () => {
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
     } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
 
-    const { ignoreSelf: getIgnoreSelfMiddleware, contextMissingPropertyError } = await importBuiltin();
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
     // Act
     const middleware = getIgnoreSelfMiddleware();
@@ -287,7 +287,7 @@ describe('ignoreSelf()', () => {
     }
 
     // Assert
-    const expectedError = contextMissingPropertyError(
+    const expectedError = new ContextMissingPropertyError(
       'botId',
       'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
     );

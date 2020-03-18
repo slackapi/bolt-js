@@ -1,3 +1,5 @@
+import { Agent } from 'http';
+import { SecureContextOptions } from 'tls';
 import util from 'util';
 import {
   WebClient,
@@ -44,7 +46,11 @@ import {
   RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
-import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
+import {
+  CodedError,
+  asCodedError,
+  AppInitializationError,
+} from './errors';
 import { MiddlewareContext } from './types/middleware';
 const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
@@ -52,8 +58,8 @@ const packageJson = require('../package.json'); // tslint:disable-line:no-requir
 export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
-  agent?: ExpressReceiverOptions['agent']; // also WebClientOptions['agent']
-  clientTls?: ExpressReceiverOptions['clientTls']; // also WebClientOptions['tls']
+  agent?: Agent;
+  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
@@ -72,7 +78,7 @@ export { LogLevel, Logger } from '@slack/logger';
 export interface Authorize {
   (
     source: AuthorizeSourceData,
-    body: ReceiverEvent['body'],
+    body: AnyMiddlewareArgs['body'],
   ): Promise<AuthorizeResult>;
 }
 
@@ -107,7 +113,7 @@ export interface ViewConstraints {
 }
 
 export interface ErrorHandler {
-  (error: CodedError): void;
+  (error: CodedError): Promise<void>;
 }
 
 class WebClientPool {
@@ -203,16 +209,14 @@ export default class App {
 
     if (token !== undefined) {
       if (authorize !== undefined) {
-        throw errorWithCode(
+        throw new AppInitializationError(
           `Both token and authorize options provided. ${tokenUsage}`,
-          ErrorCode.AppInitializationError,
         );
       }
       this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
     } else if (authorize === undefined) {
-      throw errorWithCode(
+      throw new AppInitializationError(
         `No token and no authorize options provided. ${tokenUsage}`,
-        ErrorCode.AppInitializationError,
       );
     } else {
       this.authorize = authorize;
@@ -227,26 +231,19 @@ export default class App {
     } else {
       // No custom receiver
       if (signingSecret === undefined) {
-        throw errorWithCode(
-          'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-          'custom receiver.',
-          ErrorCode.AppInitializationError,
+        throw new AppInitializationError(
+            'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+            'custom receiver.',
         );
       } else {
         // Create default ExpressReceiver
         this.receiver = new ExpressReceiver({
           signingSecret,
           endpoints,
-          agent,
-          clientTls,
           logger: this.logger,
         });
       }
     }
-
-    // Subscribe to messages and errors from the receiver
-    this.receiver.on('message', message => this.onIncomingEvent(message));
-    this.receiver.on('error', error => this.onGlobalError(error));
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
@@ -259,6 +256,9 @@ export default class App {
       const store: ConversationStore = convoStore === undefined ? new MemoryStore() : convoStore;
       this.use(conversationContext(store, this.logger));
     }
+
+    // Should be last to avoid exposing partially initialized app
+    this.receiver.init(this);
   }
 
   /**
@@ -422,7 +422,7 @@ export default class App {
   /**
    * Handles events from the receiver
    */
-  private async onIncomingEvent(event: ReceiverEvent): Promise<void> {
+  public async processEvent(event: ReceiverEvent): Promise<void> {
     const { body, ack } = event;
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
@@ -440,13 +440,15 @@ export default class App {
 
     // Initialize context (shallow copy to enforce object identity separation)
     const source = buildSource(type, conversationId, bodyArg);
-    const authorizeResult = await (this.authorize(source, bodyArg).catch((error) => {
-      this.onGlobalError(authorizationErrorFromOriginal(error));
-    }));
-    if (authorizeResult === undefined) {
+    let authorizeResult;
+
+    try {
+      authorizeResult = await this.authorize(source, bodyArg);
+    } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      return;
+      return this.handleError(error);
     }
+
     const context: Context = { ...authorizeResult };
 
     // Factory for say() utility
@@ -567,15 +569,15 @@ export default class App {
         ...(listenerArgs as MiddlewareContext<AnyMiddlewareArgs>),
       });
     } catch (error) {
-      this.onGlobalError(error);
+      return this.handleError(error);
     }
   }
 
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  private onGlobalError(error: Error): void {
-    this.errorHandler(asCodedError(error));
+  public handleError(error: Error): Promise<void> {
+    return this.errorHandler(asCodedError(error));
   }
 
 }
@@ -632,6 +634,8 @@ function isBlockActionOrInteractiveMessageBody(
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error) => {
     logger.error(error);
+
+    return Promise.reject(error);
   };
 }
 
@@ -662,15 +666,3 @@ function selectToken(context: Context): string | undefined {
 
 /* Instrumentation */
 addAppMetadata({ name: packageJson.name, version: packageJson.version });
-
-/* Error handling helpers */
-function authorizationErrorFromOriginal(original: Error): AuthorizationError {
-  const error = errorWithCode('Authorization of incoming event did not succeed.', ErrorCode.AuthorizationError);
-  (error as AuthorizationError).original = original;
-  return error as AuthorizationError;
-}
-
-export interface AuthorizationError extends CodedError {
-  code: ErrorCode.AuthorizationError;
-  original: Error;
-}

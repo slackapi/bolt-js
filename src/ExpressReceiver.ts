@@ -1,13 +1,12 @@
-import { EventEmitter } from 'events';
-import { Receiver, ReceiverEvent, ReceiverAckTimeoutError } from './types';
-import { createServer, Server, Agent } from 'http';
-import { SecureContextOptions } from 'tls';
+import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
+import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
-import { ErrorCode, errorWithCode } from './errors';
+import App from './App';
+import { ReceiverAuthenticityError, ReceiverAckTimeoutError, ReceiverMultipleAckError } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
@@ -18,34 +17,31 @@ export interface ExpressReceiverOptions {
   endpoints?: string | {
     [endpointType: string]: string;
   };
-  agent?: Agent;
-  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
 }
 
 /**
  * Receives HTTP requests with Events, Slash Commands, and Actions
  */
-export default class ExpressReceiver extends EventEmitter implements Receiver {
+export default class ExpressReceiver implements Receiver {
 
   /* Express app */
   public app: Application;
 
   private server: Server;
+  private bolt: App | undefined;
 
   constructor({
     signingSecret = '',
     logger = new ConsoleLogger(),
     endpoints = { events: '/slack/events' },
   }: ExpressReceiverOptions) {
-    super();
-
     this.app = express();
     this.app.use(this.errorHandler.bind(this));
     // TODO: what about starting an https server instead of http? what about other options to create the server?
     this.server = createServer(this.app);
 
     const expressMiddleware: RequestHandler[] = [
-      verifySignatureAndParseBody(logger, signingSecret),
+      verifySignatureAndParseRawBody(logger, signingSecret),
       respondToSslCheck,
       respondToUrlVerification,
       this.requestHandler.bind(this),
@@ -57,10 +53,10 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
     }
   }
 
-  private requestHandler(req: Request, res: Response): void {
-    let timer: NodeJS.Timer | undefined = setTimeout(
+  private async requestHandler(req: Request, res: Response): Promise<void> {
+    let timer: NodeJS.Timeout | undefined = setTimeout(
       () => {
-        this.emit('error', receiverAckTimeoutError(
+        this.bolt?.handleError(new ReceiverAckTimeoutError(
           'An incoming event was not acknowledged before the timeout. ' +
           'Ensure that the ack() argument is called in your listeners.',
         ));
@@ -68,10 +64,10 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
       },
       2800,
     );
+
     const event: ReceiverEvent = {
-      body: req.body as { [key: string]: any },
-      ack: async (response: any): Promise<void> => {
-        // TODO: if app tries acknowledging more than once, emit a warning
+      body: req.body,
+      ack: async (response): Promise<void> => {
         if (timer !== undefined) {
           clearTimeout(timer);
           timer = undefined;
@@ -83,11 +79,22 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
           } else {
             res.json(response);
           }
+        } else {
+          this.bolt?.handleError(new ReceiverMultipleAckError());
         }
       },
     };
 
-    this.emit('message', event);
+    try {
+      await this.bolt?.processEvent(event);
+    } catch (err) {
+      res.send(500);
+      throw err;
+    }
+  }
+
+  public init(bolt: App): void {
+    this.bolt = bolt;
   }
 
   // TODO: the arguments should be defined as the arguments of Server#listen()
@@ -124,7 +131,7 @@ export default class ExpressReceiver extends EventEmitter implements Receiver {
   }
 
   private errorHandler(err: any, _req: Request, _res: Response, next: NextFunction): void {
-    this.emit('error', err);
+    this.bolt?.handleError(err);
     // Forward to express' default error handler (which knows how to print stack traces in development)
     next(err);
   }
@@ -151,7 +158,7 @@ export const respondToUrlVerification: RequestHandler = (req, res, next) => {
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-export function verifySignatureAndParseBody(
+export function verifySignatureAndParseRawBody(
   logger: Logger,
   signingSecret: string,
 ): RequestHandler {
@@ -167,24 +174,6 @@ export function verifySignatureAndParseBody(
       stringBody = (await rawBody(req)).toString();
     }
 
-    // *** Request verification ***
-    try {
-      const {
-        'x-slack-signature': signature,
-        'x-slack-request-timestamp': requestTimestamp,
-      } = req.headers;
-      await verifyRequestSignature(
-        signingSecret,
-        stringBody,
-        signature as string | undefined,
-        requestTimestamp as string | undefined,
-      );
-    } catch (error) {
-      // Deny the request as something wrong with the signature
-      logError(logger, 'Request verification failed', error);
-      return res.status(401).send();
-    }
-
     // *** Parsing body ***
     // As the verification passed, parse the body as an object and assign it to req.body
     // Following middlewares can expect `req.body` is already a parsed one.
@@ -192,14 +181,20 @@ export function verifySignatureAndParseBody(
     try {
       // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
       // and overwrites `req.body` with the parsed JS object.
-      const contentType = req.headers['content-type'];
-      req.body = parseRequestBody(logger, stringBody, contentType);
-      return next();
+      req.body = verifySignatureAndParseBody(signingSecret, stringBody, req.headers);
     } catch (error) {
-      // Deny a bad request
-      logError(logger, 'Parsing request body failed', error);
-      return res.status(400).send();
+      if (error) {
+        if (error instanceof ReceiverAuthenticityError) {
+          logError(logger, 'Request verification failed', error);
+          return res.status(401).send();
+        }
+
+        logError(logger, 'Parsing request body failed', error);
+        return res.status(400).send();
+      }
     }
+
+    return next();
   };
 }
 
@@ -210,25 +205,22 @@ function logError(logger: Logger, message: string, error: any): void {
   logger.warn(logMessage);
 }
 
-// TODO: this should be imported from another package
-async function verifyRequestSignature(
-  signingSecret: string,
-  body: string,
-  signature: string | undefined,
-  requestTimestamp: string | undefined,
-): Promise<void> {
+function verifyRequestSignature(
+    signingSecret: string,
+    body: string,
+    signature: string | undefined,
+    requestTimestamp: string | undefined,
+): void {
   if (signature === undefined || requestTimestamp === undefined) {
-    throw errorWithCode(
-      'Slack request signing verification failed. Some headers are missing.',
-      ErrorCode.ExpressReceiverAuthenticityError,
+    throw new ReceiverAuthenticityError(
+        'Slack request signing verification failed. Some headers are missing.',
     );
   }
 
   const ts = Number(requestTimestamp);
   if (isNaN(ts)) {
-    throw errorWithCode(
-      'Slack request signing verification failed. Timestamp is invalid.',
-      ErrorCode.ExpressReceiverAuthenticityError,
+    throw new ReceiverAuthenticityError(
+        'Slack request signing verification failed. Timestamp is invalid.',
     );
   }
 
@@ -237,9 +229,8 @@ async function verifyRequestSignature(
   const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
 
   if (ts < fiveMinutesAgo) {
-    throw errorWithCode(
-      'Slack request signing verification failed. Timestamp is too old.',
-      ErrorCode.ExpressReceiverAuthenticityError,
+    throw new ReceiverAuthenticityError(
+        'Slack request signing verification failed. Timestamp is too old.',
     );
   }
 
@@ -248,42 +239,52 @@ async function verifyRequestSignature(
   hmac.update(`${version}:${ts}:${body}`);
 
   if (!tsscmp(hash, hmac.digest('hex'))) {
-    throw errorWithCode(
-      'Slack request signing verification failed. Signature mismatch.',
-      ErrorCode.ExpressReceiverAuthenticityError,
+    throw new ReceiverAuthenticityError(
+        'Slack request signing verification failed. Signature mismatch.',
     );
   }
 }
 
+/**
+ * This request handler has two responsibilities:
+ * - Verify the request signature
+ * - Parse request.body and assign the successfully parsed object to it.
+ */
+function verifySignatureAndParseBody(
+    signingSecret: string,
+    body: string,
+    headers: Record<string, any>,
+): AnyMiddlewareArgs['body'] {
+  // *** Request verification ***
+  const {
+    'x-slack-signature': signature,
+    'x-slack-request-timestamp': requestTimestamp,
+    'content-type': contentType,
+  } = headers;
+
+  verifyRequestSignature(
+      signingSecret,
+      body,
+      signature,
+      requestTimestamp,
+  );
+
+  return parseRequestBody(body, contentType);
+}
+
 function parseRequestBody(
-  logger: Logger,
-  stringBody: string,
-  contentType: string | undefined): any {
+    stringBody: string,
+    contentType: string | undefined,
+): any {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
+
     if (typeof parsedBody.payload === 'string') {
       return JSON.parse(parsedBody.payload);
     }
+
     return parsedBody;
   }
 
-  if (contentType === 'application/json') {
-    return JSON.parse(stringBody);
-  }
-
-  logger.warn(`Unexpected content-type detected: ${contentType}`);
-  try {
-    // Parse this body anyway
-    return JSON.parse(stringBody);
-  } catch (e) {
-    logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
-    throw e;
-  }
-
-}
-
-function receiverAckTimeoutError(message: string): ReceiverAckTimeoutError {
-  const error = new Error(message);
-  (error as ReceiverAckTimeoutError).code = ErrorCode.ReceiverAckTimeoutError;
-  return (error as ReceiverAckTimeoutError);
+  return JSON.parse(stringBody);
 }
