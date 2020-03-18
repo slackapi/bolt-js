@@ -321,7 +321,7 @@ In general, a middleware can run both before and after the remaining middleware 
 In order to process the event after the listener, the middleware passes a function to `await next()`. How you use `next` can
 have four different effects:
 
-* **To do processing after listeners** - You can choose to do work going _before_ listener functions by putting code
+* **To both preprocess and post-process events** - You can choose to do work going _before_ listener functions by putting code
   before `await next()` and _after_ by putting code after `await next()`. `await next()` passes control down the middleware
   stack in the order it was defined, then back up it in reverse order.
 
