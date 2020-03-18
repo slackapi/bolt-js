@@ -326,7 +326,7 @@ have four different effects:
   stack in the order it was defined, then back up it in reverse order.
 
 * **To throw an error** - If you don't want to handle an error in a listener, or want to let an upstream listener
-  handle it, you can simply **not** call `await next()` and `throw` and `Error`.
+  handle it, you can simply **not** call `await next()` and `throw` an `Error`.
 
 * **To handle mid-processing errors** - While not commonly used, as `App#error` is essentially a global version of this,
   you can catch any error of any downstream middleware by surrounding `await next()` in a `try-catch` block.
@@ -376,4 +376,3 @@ app.use(async () => {
   // This never gets called as the middleware above never calls next
 })
 ```
-
