@@ -16,6 +16,7 @@ export enum IncomingEventType {
   Command,
   Options,
   ViewAction,
+  Shortcut,
 }
 
 /**
@@ -52,6 +53,11 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
     return {
       type: IncomingEventType.Action,
       conversationId: actionBody.channel !== undefined ? actionBody.channel.id : undefined,
+    };
+  }
+  if (body.type === 'shortcut') {
+    return {
+      type: IncomingEventType.Shortcut,
     };
   }
   if (body.type === 'view_submission' || body.type === 'view_closed') {
