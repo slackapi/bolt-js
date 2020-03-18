@@ -318,7 +318,7 @@ The examples above all illustrate how middleware can be used to process an event
 middleware in the chain) run. However, middleware can be designed to process the event _after_ the listener finishes.
 In general, a middleware can run both before and after the remaining middleware chain.
 
-In order to process the event after the listener, the middleware passes a function to `await next()`. How you use `next` can
+How you use `next` can
 have four different effects:
 
 * **To both preprocess and post-process events** - You can choose to do work going _before_ listener functions by putting code
