@@ -358,9 +358,9 @@ app.use(async ({ next, say }) => {
   try {
     await next();
   } catch (error) {
-    if (error.message === "channel_not_found") {
+    if (error.message === 'channel_not_found') {
       // Handle known errors
-      await say("It appears we can't access that channel")
+      await say('It appears we can't access that channel')
     } else {
       // Rethrow for an upstream error handler
       throw error;
@@ -369,7 +369,7 @@ app.use(async ({ next, say }) => {
 })
 
 app.use(async () => {
-  throw new Error("channel_not_found")
+  throw new Error('channel_not_found')
 })
 
 app.use(async () => {
