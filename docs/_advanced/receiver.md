@@ -6,17 +6,17 @@ order: 8
 ---
 
 <div class="section-content">
-A receiver is responsible for handling and parsing any incoming events from Slack, then emitting the event so the Bolt app can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
+A receiver is responsible for handling and parsing any incoming events from Slack, then sending the event to the Bolt app so it can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
 
 | Method       | Parameters                       | Return type |
 |--------------|----------------------------------|-------------|
-| `on()`       | `type: string`, `listener: fn()` | `unknown`   |
+| `init()`     | `app: App`                       | `unknown`   |
 | `start()`    | None                             | `Promise`   |
 | `stop()`     | None                             | `Promise`   |
 
-`on()` is called two times in the Bolt app:
-* `Receiver.on('message',  listener)` should route all incoming requests that have been parsed to `onIncomingEvent()`. It’s called in the Bolt app as `this.receiver.on('message', message => this.onIncomingEvent(message))`.
-* `Receiver.on('error',  listener)` should route errors to the global error handler. It’s called in the Bolt app as `this.receiver.on('error', error => this.onGlobalError(error))`.
+`init()` is called after it's been passed to a created Bolt app, it's purpose is to give you an instance of bolt so that you can call:
+* `await app.processEvent(event)` whenever your app receives an event from Slack. It will reject if there is an unhandled error.
+* `await app.handleError` whenever you need to route errors to the global error handler. This gives the developer a chance to handle it.
 
 To use a custom receiver, you can pass it into the constructor when initializing your Bolt app. Here is what a basic custom receiver might look like.
 
@@ -24,21 +24,21 @@ For a more in-depth look at a receiver, [read the source code for the built-in E
 </div>
 
 ```javascript
-import { EventEmitter } from 'events';
 import { createServer } from 'http';
 import express from 'express';
 
-// EventEmitter handles the on() function for us
-// https://nodejs.org/api/events.html#events_emitter_on_eventname_listener
-class simpleReceiver extends EventEmitter {
+class SimpleReceiver  {
   constructor(signingSecret, endpoints) {
-    super();
     this.app = express();
     this.server = createServer(this.app);
 
     for (const endpoint of endpoints) {
       this.app.post(endpoint, this.requestHandler.bind(this));
     }
+  }
+  
+  init(app) {
+    this.bolt = app;
   }
 
   start(port) {
@@ -66,21 +66,32 @@ class simpleReceiver extends EventEmitter {
   }
 
   // This is a very simple implementation. Look at the ExpressReceiver source for more detail
-  requestHandler(req, res) {
+  async requestHandler(req, res) {
+    let ackCalled = false;
     // Assume parseBody function exists to parse incoming requests
     const parsedReq = parseBody(req);
     const event = {
       body: parsedReq.body,
       // Receivers are responsible for handling acknowledgements
+      // `ack` should be prepared to be called multiple times and 
+      // possibly with `response` as an error
       ack: (response) => {
-        if (!response) {
+        if (ackCalled) {
+          return;
+        }
+        
+        if (response instanceof Error) {
+          res.status(500).send();
+        } else if (!response) {
           res.send('')
         } else {
           res.send(response);
         }
+        
+        ackCalled = true;
       }
     };
-    this.emit('message', event);
+    await this.bolt.processEvent(event);
   }
 }
 ```
