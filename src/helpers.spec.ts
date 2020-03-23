@@ -77,6 +77,25 @@ describe('getTypeAndConversation()', () => {
     });
   });
 
+  describe('shortcut types', () => {
+    // Arrange
+    const conversationId = 'CONVERSATION_ID';
+    const dummyShortcutBodies = createFakeShortcuts(conversationId);
+
+    dummyShortcutBodies.forEach((shortcut) => {
+      it(`should find Shortcut type for ${shortcut.type}`, () => {
+        // Act
+        const typeAndConversation = getTypeAndConversation(shortcut);
+
+        // Assert
+        assert(typeAndConversation.type === IncomingEventType.Shortcut);
+        if (typeAndConversation.conversationId != null) {
+          assert(typeAndConversation.conversationId === conversationId);
+        }
+      });
+    });
+  });
+
   describe('view types', () => {
     // Arrange
     const dummyViewBodies = createFakeViews();
@@ -140,6 +159,20 @@ function createFakeActions(conversationId: string): any[] {
           type: 'static_select',
         },
       ],
+    },
+  ];
+}
+
+function createFakeShortcuts(conversationId: string): any[] {
+  return [
+    // Body for a message shortcut
+    {
+      type: 'message_action',
+      channel: { id: conversationId },
+    },
+    // Body for a global shortcut
+    {
+      type: 'shortcut',
     },
   ];
 }
