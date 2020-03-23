@@ -28,6 +28,7 @@ function createDummyReceiverEvent(): ReceiverEvent {
     },
     ack: noop,
   };
+}
 
 describe('App', () => {
   describe('constructor', () => {
@@ -508,26 +509,26 @@ describe('App', () => {
                 team: {},
               },
             },
-            { // IncomingEventType.Action (app.action)
-              ...baseEvent,
-              body: {
-                type: 'message_action',
-                callback_id: 'message_action_callback_id',
-                channel: {},
-                user: {},
-                team: {},
-              },
-            },
-            { // IncomingEventType.Action (app.action)
-              ...baseEvent,
-              body: {
-                type: 'message_action',
-                callback_id: 'another_message_action_callback_id',
-                channel: {},
-                user: {},
-                team: {},
-              },
-            },
+            // { // IncomingEventType.Action (app.action)
+            //   ...baseEvent,
+            //   body: {
+            //     type: 'message_action',
+            //     callback_id: 'message_action_callback_id',
+            //     channel: {},
+            //     user: {},
+            //     team: {},
+            //   },
+            // },
+            // { // IncomingEventType.Action (app.action)
+            //   ...baseEvent,
+            //   body: {
+            //     type: 'message_action',
+            //     callback_id: 'another_message_action_callback_id',
+            //     channel: {},
+            //     user: {},
+            //     team: {},
+            //   },
+            // },
             { // IncomingEventType.Action (app.action)
               ...baseEvent,
               body: {
@@ -636,11 +637,12 @@ describe('App', () => {
             await next();
           });
           app.action('block_action_id', async ({ }) => { await actionFn(); });
-          app.action({ callback_id: 'message_action_callback_id' }, async ({ }) => { await actionFn(); });
-          app.action(
-            { type: 'message_action', callback_id: 'another_message_action_callback_id' },
-            async ({ }) => { await actionFn(); });
-          app.action({ type: 'message_action', callback_id: 'does_not_exist' }, async ({ }) => { await actionFn(); });
+          // app.action({ callback_id: 'message_action_callback_id' }, async ({ }) => { await actionFn(); });
+          // app.action(
+          //   { type: 'message_action', callback_id: 'another_message_action_callback_id' },
+          //   async ({ }) => { await actionFn(); });
+          // app.action({ type: 'message_action', callback_id: 'does_not_exist' },
+          // async ({ }) => { await actionFn(); });
           app.action({ callback_id: 'interactive_message_callback_id' }, async ({ }) => { await actionFn(); });
           app.action({ callback_id: 'dialog_submission_callback_id' }, async ({ }) => { await actionFn(); });
           app.view('view_callback_id', async ({ }) => { await viewFn(); });
@@ -675,7 +677,7 @@ describe('App', () => {
           await Promise.all(dummyReceiverEvents.map(event => fakeReceiver.sendEvent(event)));
 
           // Assert
-          assert.equal(actionFn.callCount, 5);
+          assert.equal(actionFn.callCount, 3);
           assert.equal(viewFn.callCount, 2);
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);

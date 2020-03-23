@@ -3,8 +3,6 @@ import {
   AnyMiddlewareArgs,
   MiddlewareContext, ProcessMiddlewareContext,
 } from '../types';
-import { WebClient } from '@slack/web-api';
-import { Logger } from '@slack/logger';
 
 function composeMiddleware(middleware: Middleware<AnyMiddlewareArgs>[]): Middleware<AnyMiddlewareArgs> {
   return function (context: ProcessMiddlewareContext<AnyMiddlewareArgs>): Promise<unknown> {

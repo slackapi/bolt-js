@@ -1,5 +1,5 @@
 // import App, { ActionConstraints } from '../../src/App';
-import { App, MessageAction } from '@slack/bolt';
+import { App } from '@slack/bolt';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -16,14 +16,6 @@ app.action({ type: 'message_action', action_id: 'dafasf' }, ({ action }) => {
     return action;
 });
 */
-
-// Action in listner should be - MessageAction
-// $ExpectType void
-app.action({ type: 'message_action' }, async ({
-  action, // $ExpectType MessageAction
- }) => {
-  return action;
-});
 
 // $ExpectType void
 app.action({ type: 'block_actions' }, async ({
@@ -42,14 +34,6 @@ app.action({ type: 'interactive_message' }, async ({
 // $ExpectType void
 app.action({ type: 'dialog_submission' }, async ({
   action, // $ExpectType DialogSubmitAction
- }) => {
-  return action;
-});
-
-// If action is parameterized with MessageAction, action argument in callback should be type MessageAction
-// $ExpectType void
-app.action<MessageAction>({}, async ({
-  action, // $ExpectType MessageAction
  }) => {
   return action;
 });

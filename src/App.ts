@@ -137,19 +137,6 @@ class WebClientPool {
   }
 }
 
-class WebClientPool {
-  private pool: { [token: string]: WebClient } = {};
-  public getOrCreate(token: string, clientOptions: WebClientOptions): WebClient {
-    const cachedClient = this.pool[token];
-    if (typeof cachedClient !== 'undefined') {
-      return cachedClient;
-    }
-    const client = new WebClient(token, clientOptions);
-    this.pool[token] = client;
-    return client;
-  }
-}
-
 /**
  * A Slack App
  */

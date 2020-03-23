@@ -21,7 +21,7 @@ import {
   BlockElementAction,
   SlackViewAction,
 } from '../types';
-import { ActionConstraints, ViewConstraints } from '../App';
+import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
 
 /**
@@ -40,14 +40,15 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = ({ shortcut, next }) => {
+// tslint:disable-next-line: max-line-length
+export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({ shortcut, next }) => {
   // Filter out any non-shortcuts
   if (shortcut === undefined) {
     return;
   }
 
   // It matches so we should continue down this middleware listener chain
-  next();
+  await next();
 };
 
 /**
