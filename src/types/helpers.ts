@@ -1,9 +1,7 @@
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
  */
-export interface StringIndexed {
-  [key: string]: any;
-}
+export type StringIndexed = Record<string, any>;
 
 /**
  * Type function which removes the index signature for the type `T`

@@ -115,11 +115,11 @@ Hubot では、`@slack/client` から `WebClient` パッケージをインポー
 ```javascript
 app.message('react', async ({ message, context }) => {
   try {
-      const result = await app.client.reactions.add({
-      	token: context.botToken,
-        name: ‘star’,
-        channel: message.channel,
-        timestamp: message.ts
+    const result = await app.client.reactions.add({
+      token: context.botToken,
+      name: 'star',
+      channel: message.channel,
+      timestamp: message.ts
     });
   }
   catch (error) {
@@ -139,11 +139,11 @@ Bolt には、グローバルとリスナーという 2 種類のミドルウェ
 - グローバルミドルウェアは、リスナーミドルウェアが呼び出される前に実行されます。Bolt アプリ自体に付属しています。[Bolt のグローバルミドルウェアについてもっと詳しく読む。](https://slack.dev/bolt/ja-jp/concepts#global-middleware).
 - リスナーミドルウェアは、付属するリスナー関数に対してのみ実行されます。[Bolt のリスナーミドルウェアについてもっと詳しく読む。](https://slack.dev/bolt/ja-jp/concepts#listener-middleware)
 
-Bolt では、グローバルとリスナーというミドルウェアはいずれも、`next()` を呼び出して実行の制御を次のミドルウェアに渡す必要があります。ミドルウェアが実行中にエラーを検出した場合、`Error` を `next()` に渡すことができ、エラーはその前に実行されたミドルウェアチェーンにバブルアップされます。
+Bolt では、グローバルとリスナーというミドルウェアはいずれも、`await next()` を呼び出して実行の制御を次のミドルウェアに渡す必要があります。ミドルウェアが実行中にエラーを検出した場合、`Error` を `next()` に渡すことができ、エラーはその前に実行されたミドルウェアチェーンにバブルアップされます。
 
 既存のミドルウェア関数を移行するには、Hubot の受信ミドルウェアは、Bolt のグローバルミドルウェアのユースケースと対応しています。Hubot と Bolt のリスナーミドルウェアは、ほぼ同じです。Hubot の応答ミドルウェアを移行するには、後処理関数と呼ばれる Bolt のコンセプトを使用します。
 
-ミドルウェアがイベントの後処理を実行する必要がある場合、`undefined` で呼び出すのではなく、後処理関数を使用して `next()` を呼び出すことができます。後処理関数は、ミドルウェア関数が `next()` を呼び出すのと同じ方法で` done()` を呼び出す必要があります(`Error` で呼び出すことも可能) 。
+ミドルウェアがイベントの後処理を実行する必要がある場合、`undefined` で呼び出すのではなく、後処理関数を使用して `await next()` を呼び出すことができます。後処理関数は、ミドルウェア関数が `await next()` を呼び出すのと同じ方法で` done()` を呼び出す必要があります(`Error` で呼び出すことも可能) 。
 
 ### Brain を conversation store に移行する
 Hubot には、brain と呼ばれるメモリ内ストレージがあります。これによって、Hubot スクリプトはデータの基本部分を `get` および `set` することができます。Bolt は、conversation store と呼ばれる、`get()`/`set()` インターフェイスを含むグローバルミドルウェアを使用します。

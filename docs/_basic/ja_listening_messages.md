@@ -14,7 +14,7 @@ order: 1
 ```javascript
 // 特定の文字列、この場合 👋絵文字を含むメッセージと一致
 app.message(':wave:', async ({ message, say }) => {
-  say(`Hello, <@${message.user}>`);
+  await say(`Hello, <@${message.user}>`);
 });
 ```
 
@@ -34,7 +34,7 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
   // context.matches の内容が特定の正規表現と一致
   const greeting = context.matches[0];
 
-  say(`${greeting}, how are you?`);
+  await say(`${greeting}, how are you?`);
 });
 ```
 

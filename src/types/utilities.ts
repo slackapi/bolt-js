@@ -1,4 +1,4 @@
-import { ChatPostMessageArguments } from '@slack/web-api';
+import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
 import { KnownKeys } from './helpers';
 
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
@@ -8,7 +8,7 @@ export type SayArguments = Pick<ChatPostMessageArguments, Exclude<KnownKeys<Chat
 };
 
 export interface SayFn {
-  (message: string | SayArguments): void;
+  (message: string | SayArguments): Promise<WebAPICallResult>;
 }
 
 export type RespondArguments = SayArguments & {
@@ -19,9 +19,9 @@ export type RespondArguments = SayArguments & {
 };
 
 export interface RespondFn {
-  (message: string | RespondArguments): void;
+  (message: string | RespondArguments): Promise<any>;
 }
 
 export interface AckFn<Response> {
-  (response?: Response): void;
+  (response?: Response): Promise<void>;
 }
