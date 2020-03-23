@@ -6,7 +6,7 @@ order: 8
 ---
 
 <div class="section-content">
-A receiver is responsible for handling and parsing any incoming events from Slack, then emitting the event so the Bolt for JavaScript app can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
+A receiver is responsible for handling and parsing any incoming events from Slack, then sending the event to the Bolt for JavaScript app so it can add context and pass it to your app’s listeners. Receivers must conform to the Receiver interface:
 
 | Method       | Parameters                       | Return type |
 |--------------|----------------------------------|-------------|

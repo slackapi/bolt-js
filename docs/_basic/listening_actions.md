@@ -6,7 +6,7 @@ order: 5
 ---
 
 <div class="section-content">
-Your app can listen to user actions like button clicks, menu selects, and message shortcuts using the `action` method.
+Your app can listen to user actions like button clicks, and menu selects, using the `action` method.
 
 Actions can be filtered on an `action_id` of type string or RegExp object. `action_id`s act as unique identifiers for interactive components on the Slack platform. 
 

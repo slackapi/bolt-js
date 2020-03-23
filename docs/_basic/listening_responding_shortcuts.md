@@ -1,18 +1,22 @@
 ---
-title: Listening and responding to global shortcuts
+title: Listening and responding to shortcuts
 lang: en
 slug: shortcuts
 order: 8
 ---
 
 <div class="section-content">
-[Global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) are invokable UI elements within Slack clients, available in the composer and search menus. Your app can use the `shortcut()` method to listen to incoming global shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
-Global shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
+The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
-Global shortcut payloads include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking. Note that global shortcut payloads do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal.
+Shortcuts are invokable UI elements within Slack clients. For global shortcuts, they are available in the composer and search menus. For message shortcuts, they are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
-⚠️ Note that [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts) still require apps to use the [`action()` method](#action-listening). **In the next major version of Bolt, both global and message shortcuts will use the `shortcut()` method.**
+Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
+
+Shortcut payloads include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking. 
+
+⚠️ Note that global shortcut payloads do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include channel ID.
+
 </div>
 
 ```javascript
