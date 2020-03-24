@@ -38,20 +38,21 @@ app.event(eventType, fn);
 
 // Listen for an action from a block element (buttons, menus, etc)
 app.action(actionId, fn);
-// Listen for dialog submission, message shortcut, or legacy action
+
+// Listen for dialog submission, or legacy action
 app.action({ callback_id: callbackId }, fn);
 
-// Listen for a global shortcut
+// Listen for a global shortcut, or message shortcut
 app.shortcut(callbackId, fn);
+
+// Listen for modal view requests
+app.view(callbackId, fn);
 
 // Listen for a slash command
 app.command(commandName, fn);
 
 // Listen for options requests (from menus with an external data source)
 app.options(actionId, fn);
-
-// Listen for modal view requests
-app.view(callbackId, fn);
 ```
 
 There's a special method that's provided as a convenience to handle Events API events with the type `message`. Also, you
@@ -157,9 +158,6 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 *  Legacy message button clicks, menu selections, and slash commands: Either call `ack()` with no parameters, a `string`
    to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the
    message to remove the interactive elements is a best practice for any action that should only be performed once.
-
-If an app does not call `ack()` within the time limit, Bolt for JavaScript will generate an error. See [handling
-errors](#handling-errors) for more details.
 
 The following is an example of acknowledging a dialog submission:
 

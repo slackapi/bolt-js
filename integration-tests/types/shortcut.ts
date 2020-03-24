@@ -9,27 +9,18 @@ app.shortcut({ type: 'Something wrong' }, ({ shortcut }) => {
   return shortcut;
 });
 
-// Action in listener should be - MessageAction
+// Shortcut in listener should be - MessageShortcut
 // $ExpectType void
 app.shortcut({ type: 'message_action' }, async ({
-  shortcut, // $ExpectType SlackShortcut
+  shortcut, // $ExpectType MessageShortcut
  }) => {
   return shortcut;
 });
 
-// If action is parameterized with MessageAction, action argument in callback should be type MessageAction
+// If shortcut is parameterized with MessageShortcut, shortcut argument in callback should be type MessageShortcut
 // $ExpectType void
 app.shortcut<MessageShortcut>({}, async ({
   shortcut, // $ExpectType MessageShortcut
  }) => {
   return shortcut;
 });
-
-/* Not Working
-// Should error because MessageAction doesn't have an action_id
-// $ Expect Error
-app.shortcut<MessageShortcut>({ action_id: 'dafasf' }, ({ shortcut }) => {
-    // NOT WORKING
-  return shortcut;
-});
-*/

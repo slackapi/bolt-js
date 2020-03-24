@@ -110,14 +110,14 @@ Bolt for JavaScript uses a method called `event()` that allows you to listen to 
 [Read more about listening to events](https://slack.dev/bolt/concepts#event-listening).
 
 ### Using Web API methods with Bolt for JavaScript
-In Hubot, you needed to import the `WebClient` package from `@slack/client`. Bolt for JavaScript imports a `WebClient` instance for you by default, accessible from `app.client`.
+In Hubot, you needed to import the `WebClient` package from `@slack/client`. Bolt for JavaScript imports a `WebClient` instance for you by default, and exposes it as the `client` argument available on all listeners.
 
 To use the built-in `WebClient`, you’ll need to pass the token used to instantiate your app or the token associated with the team your request is coming from. This is found on the `context` object passed in to your listener functions. For example, to add a reaction to a message, you’d use:
 
 ```javascript
-app.message('react', async ({ message, context }) => {
+app.message('react', async ({ message, context, client }) => {
   try {
-    const result = await app.client.reactions.add({
+    const result = await client.reactions.add({
       token: context.botToken,
       name: 'star',
       channel: message.channel,
@@ -130,7 +130,7 @@ app.message('react', async ({ message, context }) => {
 });
 ```
 
-> 👨‍💻👩‍💻Change your Web API calls to use the built-in client at `app.client`.
+> 👨‍💻👩‍💻Change your Web API calls to use one the `client` argument.
 
 [Read more about using the Web API with Bolt](https://slack.dev/bolt/concepts#web-api).
 
@@ -143,7 +143,7 @@ Bolt for JavaScript only has two kinds of middleware — global and listener:
 
 In Bolt for JavaScript, both kinds of middleware must call `await next()` to pass control of execution from one middleware to the next. If your middleware encounters an error during execution, you can `throw` it and the error will be bubbled up through the previously-executed middleware chain.
 
-To migrate your existing middleware functions, it’s evident that Hubot’s receive middleware aligns with the use case for global middleware in Bolt for JavaScript. And Hubot and Bolt’s listener middleware are nearly the same. To migrate Hubot’s response middleware, you can use a Bolt for JavaScript concept called a post-process function.
+To migrate your existing middleware functions, it’s evident that Hubot’s receive middleware aligns with the use case for global middleware in Bolt for JavaScript. And Hubot and Bolt’s listener middleware are nearly the same. To migrate Hubot’s response middleware, wrap Bolt for JavaScript's `say()` or `respond()` in your own function, and then call it.
 
 If your middleware needs to perform post-processing of an event, you can call `await next()` and any code after will be processed after the downstream middleware has been called.
 

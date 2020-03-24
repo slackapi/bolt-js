@@ -1,5 +1,5 @@
 ---
-title: Opening modals using views.open
+title: Opening modals
 lang: en
 slug: creating-modals
 order: 10

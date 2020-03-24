@@ -130,11 +130,6 @@ describe('getTypeAndConversation()', () => {
 
 function createFakeActions(conversationId: string): any[] {
   return [
-    // Body for a message action
-    // {
-    //   type: 'message_action',
-    //   channel: { id: conversationId },
-    // },
     // Body for a dialog submission
     {
       type: 'dialog_submission',

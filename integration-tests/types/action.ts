@@ -9,14 +9,6 @@ app.action({ type: 'Something wrong' }, ({ action }) => {
   return action;
 });
 
-/* Not working
-// Should error because message_action doesn't have type action_id
-// $ Expect Error
-app.action({ type: 'message_action', action_id: 'dafasf' }, ({ action }) => {
-    return action;
-});
-*/
-
 // $ExpectType void
 app.action({ type: 'block_actions' }, async ({
   action, // $ExpectType BlockElementAction
@@ -37,12 +29,3 @@ app.action({ type: 'dialog_submission' }, async ({
  }) => {
   return action;
 });
-
-/* Not working
-// Should error because MessageAction doesn't have an action_id
-// $ Expect Error
-app.actiong<MessageAction>({ action_id: 'dafasf' }, ({ action }) => {
-    // NOT WORKING
-    return action;
-});
-*/

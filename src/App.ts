@@ -326,17 +326,29 @@ export default class App {
     callbackId: string | RegExp,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
   ): void;
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
-    constraints: ShortcutConstraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut,
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>>(
+      constraints: Constraints,
+      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void;
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
-    callbackIdOrConstraints: string | RegExp | ShortcutConstraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut,
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>>(
+      callbackIdOrConstraints: string | RegExp | Constraints,
+      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void {
     const constraints: ShortcutConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
         { callback_id: callbackIdOrConstraints } : callbackIdOrConstraints;
+
+    // Fail early if the constraints contain invalid keys
+    const unknownConstraintKeys = Object.keys(constraints)
+      .filter(k => (k !== 'callback_id' && k !== 'type'));
+    if (unknownConstraintKeys.length > 0) {
+      this.logger.error(
+        `Slack listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
+      );
+      return;
+    }
 
     this.listeners.push(
       [onlyShortcuts, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
