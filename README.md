@@ -1,9 +1,9 @@
-# Slack ⚡️ Bolt
+# Slack ⚡️ Bolt for JavaScript
 
 [![Build Status](https://travis-ci.org/slackapi/bolt.svg?branch=master)](https://travis-ci.org/slackapi/bolt)
 [![codecov](https://codecov.io/gh/slackapi/bolt/branch/master/graph/badge.svg)](https://codecov.io/gh/slackapi/bolt)
 
-A framework to build Slack apps, _fast_.
+A JavaScript framework to build Slack apps _in a flash_.
 
 ## Initialization
 
@@ -36,8 +36,17 @@ event, there's a method to attach a listener function.
 // Listen for an event from the Events API
 app.event(eventType, fn);
 
-// Listen for an action from a block element (buttons, menus, etc), dialog submission, message action, or legacy action
+// Listen for an action from a block element (buttons, menus, etc)
 app.action(actionId, fn);
+
+// Listen for dialog submission, or legacy action
+app.action({ callback_id: callbackId }, fn);
+
+// Listen for a global shortcut, or message shortcut
+app.shortcut(callbackId, fn);
+
+// Listen for modal view requests
+app.view(callbackId, fn);
 
 // Listen for a slash command
 app.command(commandName, fn);
@@ -139,7 +148,7 @@ soon as possible.
 
 Depending on the type of incoming event a listener is meant for, `ack()` should be called with a parameter:
 
-*  Block actions and message actions: Call `ack()` with no parameters.
+*  Block actions, global shortcuts, and message shortcuts: Call `ack()` with no parameters.
 
 *  Dialog submissions: Call `ack()` with no parameters when the inputs are all valid, or an object describing the
    validation errors if any inputs are not valid.
@@ -149,9 +158,6 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 *  Legacy message button clicks, menu selections, and slash commands: Either call `ack()` with no parameters, a `string`
    to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the
    message to remove the interactive elements is a best practice for any action that should only be performed once.
-
-If an app does not call `ack()` within the time limit, Bolt will generate an error. See [handling
-errors](#handling-errors) for more details.
 
 The following is an example of acknowledging a dialog submission:
 
@@ -296,7 +302,7 @@ app.message(noBotMessages, ({ message }) => console.log(
 ));
 ```
 
-Message subtype matching is common, so Bolt ships with a builtin listener middleware that filters all messages that
+Message subtype matching is common, so Bolt for JavaScript ships with a builtin listener middleware that filters all messages that
 match a given subtype. The following is an example of the opposite of the one above - the listener only sees messages
 that _are_ `bot_message`s.
 

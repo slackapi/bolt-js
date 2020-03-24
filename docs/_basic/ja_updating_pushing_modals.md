@@ -2,7 +2,7 @@
 title: モーダルビューの更新と多重表示
 lang: ja-jp
 slug: updating-pushing-views
-order: 10
+order: 11
 ---
 
 <div class="section-content">

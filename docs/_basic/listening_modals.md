@@ -2,7 +2,7 @@
 title: Listening for view submissions
 lang: en
 slug: view_submissions
-order: 11
+order: 12
 ---
 
 <div class="section-content">

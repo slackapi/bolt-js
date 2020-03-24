@@ -45,6 +45,7 @@ export type SlackEvent =
   | IMCreatedEvent
   | IMHistoryChangedEvent
   | IMOpenEvent
+  | InviteRequestedEvent
   | LinkSharedEvent
   | MemberJoinedChannelEvent
   | MemberLeftChannelEvent

@@ -2,7 +2,7 @@
 title: コマンドのリスニングと応答
 lang: ja-jp
 slug: commands
-order: 8
+order: 9
 ---
 
 <div class="section-content">
