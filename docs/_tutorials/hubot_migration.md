@@ -91,11 +91,11 @@ Hubot scripts use `hear()` listen to messages with a matching pattern. Bolt for 
 #### Responding with a message using `say()` and `respond()`
 Hubot scripts use `send()` to send a message to the same conversation and `reply()` to send a message to the same conversation with an @-mention to the user that sent the original message.
 
-Bolt for JavaScript uses `say()` in place of `send()`, or `respond()` to use the `response_url` to send a reply. To add an @-mention to the beginning of your reply, you can use the user ID found in the `context` object. For example, for a message event you could use `say('<@${message.user}> Hello :wave:')`
+Bolt for JavaScript uses `await say()` in place of `send()`, or `await respond()` to use the `response_url` to send a reply. To add an @-mention to the beginning of your reply, you can use the user ID found in the `context` object. For example, for a message event you could use `await say('<@${message.user}> Hello :wave:')`
 
 The arguments for Hubot’s `send()` and Bolt for JavaScript's `say()` are mostly the same, although `say()` allows you to send messages with [interactive components like buttons, select menus, and datepickers](https://api.slack.com/messaging/interactivity#interaction).
 
-> 👨‍💻👩‍💻Anywhere where you use `send()` in your code, change it to use `say()`
+> 👨‍💻👩‍💻Anywhere where you use `send()` in your code, change it to use `await say()`
 
 [Read more about responding to messages](https://slack.dev/bolt/concepts#message-sending).
 
