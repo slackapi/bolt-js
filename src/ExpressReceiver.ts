@@ -1,12 +1,12 @@
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 import { createServer, Server } from 'http';
-import express, { Request, Response, Application, RequestHandler, NextFunction } from 'express';
+import express, { Request, Response, Application, RequestHandler } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import App from './App';
-import { ReceiverAuthenticityError, ReceiverAckTimeoutError, ReceiverMultipleAckError } from './errors';
+import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
@@ -29,6 +29,7 @@ export default class ExpressReceiver implements Receiver {
 
   private server: Server;
   private bolt: App | undefined;
+  private logger: Logger;
 
   constructor({
     signingSecret = '',
@@ -36,7 +37,6 @@ export default class ExpressReceiver implements Receiver {
     endpoints = { events: '/slack/events' },
   }: ExpressReceiverOptions) {
     this.app = express();
-    this.app.use(this.errorHandler.bind(this));
     // TODO: what about starting an https server instead of http? what about other options to create the server?
     this.server = createServer(this.app);
 
@@ -47,6 +47,7 @@ export default class ExpressReceiver implements Receiver {
       this.requestHandler.bind(this),
     ];
 
+    this.logger = logger;
     const endpointList: string[] = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     for (const endpoint of endpointList) {
       this.app.post(endpoint, ...expressMiddleware);
@@ -54,33 +55,28 @@ export default class ExpressReceiver implements Receiver {
   }
 
   private async requestHandler(req: Request, res: Response): Promise<void> {
-    let timer: NodeJS.Timeout | undefined = setTimeout(
-      () => {
-        this.bolt?.handleError(new ReceiverAckTimeoutError(
-          'An incoming event was not acknowledged before the timeout. ' +
-          'Ensure that the ack() argument is called in your listeners.',
-        ));
-        timer = undefined;
-      },
-      2800,
-    );
+    let isAcknowledged = false;
+    setTimeout(() => {
+      if (!isAcknowledged) {
+        this.logger.error('An incoming event was not acknowledged within 3 seconds. ' +
+            'Ensure that the ack() argument is called in a listener.');
+      }
+    // tslint:disable-next-line: align
+    }, 3001);
 
     const event: ReceiverEvent = {
       body: req.body,
-      ack: async (response): Promise<void> => {
-        if (timer !== undefined) {
-          clearTimeout(timer);
-          timer = undefined;
-
-          if (!response) {
-            res.send('');
-          } else if (typeof response === 'string') {
-            res.send(response);
-          } else {
-            res.json(response);
-          }
+      ack: async (response: any): Promise<void> => {
+        if (isAcknowledged) {
+          throw new ReceiverMultipleAckError();
+        }
+        isAcknowledged = true;
+        if (!response) {
+          res.send('');
+        } else if (typeof response === 'string') {
+          res.send(response);
         } else {
-          this.bolt?.handleError(new ReceiverMultipleAckError());
+          res.json(response);
         }
       },
     };
@@ -128,12 +124,6 @@ export default class ExpressReceiver implements Receiver {
         resolve();
       });
     });
-  }
-
-  private errorHandler(err: any, _req: Request, _res: Response, next: NextFunction): void {
-    this.bolt?.handleError(err);
-    // Forward to express' default error handler (which knows how to print stack traces in development)
-    next(err);
   }
 }
 

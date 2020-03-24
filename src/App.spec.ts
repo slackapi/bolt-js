@@ -440,7 +440,6 @@ describe('App', () => {
         app.error(async (actualError) => {
           assert.instanceOf(actualError, UnknownError);
           assert.equal(actualError.message, error.message);
-          await delay(); // Make this async to make sure error handlers can be tested
         });
 
         await fakeReceiver.sendEvent(dummyReceiverEvent);

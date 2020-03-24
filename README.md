@@ -256,7 +256,6 @@ async function authWithAcme({ payload, context, say, next }) {
     // When the user lookup is successful, add the user details to the context
     context.user = user;
   } catch (error) {
-    // middleware/listeners continue
     if (error.message === 'Not Found') {
         // In the real world, you would need to check if the say function was defined, falling back to the respond
         // function if not, and then falling back to only logging the error as a last resort.
@@ -327,7 +326,7 @@ In general, a middleware can run both before and after the remaining middleware 
 How you use `next` can
 have four different effects:
 
-* **To both preprocess and post-process events** - You can choose to do work going _before_ listener functions by putting code
+* **To both preprocess and post-process events** - You can choose to do work both _before_ listener functions by putting code
   before `await next()` and _after_ by putting code after `await next()`. `await next()` passes control down the middleware
   stack in the order it was defined, then back up it in reverse order.
 

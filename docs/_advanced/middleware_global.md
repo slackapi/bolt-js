@@ -6,7 +6,7 @@ order: 4
 ---
 
 <div class="section-content">
-Global middleware is run for all incoming events before any listener middleware. You can add any number of global middleware to your app by utilizing `app.use(fn({payload,...,next}))`.
+Global middleware is run for all incoming events before any listener middleware. You can add any number of global middleware to your app by utilizing `app.use(fn)`. The middleware function `fn` is called with the same arguments as listeners and an additional `next` function.
 
 Both global and listener middleware must call `await next()` to pass control of the execution chain to the next middleware, or call `throw` to pass an error back up the previously-executed middleware chain.
 
