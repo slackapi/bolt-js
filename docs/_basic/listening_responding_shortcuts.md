@@ -82,7 +82,7 @@ app.shortcut('open_modal', async ({ shortcut, ack, context, client }) => {
 
   ```javascript
   // Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
-  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ action, ack, context, client }) => {
+  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, context, client }) => {
     try {
       // Acknowledge shortcut request
       await ack();

@@ -14,13 +14,12 @@ order: 8
 | `start()`    | None                             | `Promise`   |
 | `stop()`     | None                             | `Promise`   |
 
-Bolt アプリでは `init()` が 2 回呼び出されます。
-* `await app.processEvent(event)` は、解析されたすべての着信リクエストを `onIncomingEvent()` にルーティングする必要があります。これは、Bolt アプリでは `this.receiver.on('message', message => this.onIncomingEvent(message))` として呼び出されます。
-* `await app.handleError` は、エラーをグローバルエラーハンドラーにルーティングする必要があります。これは、Bolt アプリでは `this.receiver.on('error', error => this.onGlobalError(error))` として呼び出されます。
+Bolt アプリでは `init()` が 2 回呼び出されます。このメソッドはレシーバーに `App` の参照を付与するため、これにより以下の呼び出しが可能になります。
+* `await app.processEvent(event)` は Slack から送信されてくるイベントを受け取るたびに呼び出されます。ハンドリングされなかったエラーが発生した場合はそれを throw します。
 
 Bolt アプリを初期化するときにカスタムレシーバーをコンストラクタに渡すことで、そのカスタムレシーバーを使用できます。ここで紹介するのは、基本的なカスタムレシーバーです。
 
-レシーバーについて詳しくは、[組み込み Express レシーバーのソースコード](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)をお読みください。
+レシーバーについて詳しくは、[組み込み `ExpressReceiver` のソースコード](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)をお読みください。
 </div>
 
 ```javascript

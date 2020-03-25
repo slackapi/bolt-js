@@ -15,11 +15,11 @@ A receiver is responsible for handling and parsing any incoming events from Slac
 | `stop()`     | None                             | `Promise`   |
 
 `init()` is called after Bolt for JavaScript app is created. This method gives the receiver a reference to an `App` to store so that it can call:
-* `await app.processEvent(event)` whenever your app receives an event from Slack. It will reject if there is an unhandled error.
+* `await app.processEvent(event)` whenever your app receives an event from Slack. It will throw if there is an unhandled error.
 
 To use a custom receiver, you can pass it into the constructor when initializing your Bolt for JavaScript app. Here is what a basic custom receiver might look like.
 
-For a more in-depth look at a receiver, [read the source code for the built-in Express receiver](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)
+For a more in-depth look at a receiver, [read the source code for the built-in `ExpressReceiver`](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)
 </div>
 
 ```javascript
