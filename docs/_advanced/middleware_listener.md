@@ -14,6 +14,7 @@ But of course, you can write your own middleware for more custom functionality. 
 
 As an example, let’s say your listener should only deal with messages from humans. You can write a listener middleware that excludes any bot messages.
 
+*Note: Since `Bolt@2.x`, listener middleware was updated to support `async` functions! View the [migration guide for V2](https://slack.dev/bolt/tutorial/migration-v2) to learn more.*
 </div>
 
 ```javascript
