@@ -3,7 +3,7 @@
  *
  * This describes the entire JSON-encoded body of a request from Slack message actions.
  */
-export interface MessageAction {
+export interface MessageShortcut {
   type: 'message_action';
   callback_id: string;
   trigger_id: string;

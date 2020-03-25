@@ -1,12 +1,10 @@
 export * from './block-action';
 export * from './interactive-message';
 export * from './dialog-action';
-export * from './message-action';
 
 import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
-import { MessageAction } from './message-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
 
 /**
@@ -23,7 +21,7 @@ import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
  * offered when no generic parameter is bound would be limited to BasicElementAction rather than the union of known
  * actions - ElementAction.
  */
-export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | MessageAction;
+export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction;
 
 /**
  * Arguments which listeners and middleware receive to process an action from Slack's Block Kit interactive components,

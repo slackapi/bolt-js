@@ -2,7 +2,7 @@
 title: モーダルビューでの送信のリスニング
 lang: ja-jp
 slug: view_submissions
-order: 11
+order: 12
 ---
 
 <div class="section-content">

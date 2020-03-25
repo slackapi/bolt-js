@@ -8,10 +8,10 @@ permalink: /tutorial/getting-started
 redirect_from:
   - /getting-started
 ---
-# Getting started with Bolt
+# Getting started with Bolt for JavaScript
 
 <div class="section-content">
-This guide is meant to walk you through getting up and running with a Slack app using Bolt. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
+This guide is meant to walk you through getting up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 </div> 
 
 ---
@@ -63,7 +63,7 @@ npm init
 
 You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
 
-Before we install the Bolt package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
+Before we install the Bolt for JavaScript package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
 
 1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and MacOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
 
@@ -188,7 +188,7 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ### Sending and responding to actions
 
-To use features like buttons, select menus, datepickers, dialogs, and message actions, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
+To use features like buttons, select menus, datepickers, dialogs, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
 
 Back on your app configuration page, click on **Interactive Components** on the left side. You'll see that there's another **Request URL** box.
 
@@ -303,9 +303,9 @@ You can see that we used the `action_id` to add a listener for our button action
 ---
 
 ### Next steps
-You just built your first Bolt app! 🎉
+You just built your first Bolt for JavaScript app! 🎉
 
-Now that you have a basic app up and running, you can start exploring the parts of Bolt that will make your app stand out. Here are some ideas about where to look next:
+Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
 * Read through the [Basic concepts](https://slack.dev/bolt#basic) to learn about the different methods and features your Bolt app has access to.
 

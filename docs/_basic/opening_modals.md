@@ -2,7 +2,7 @@
 title: Opening modals
 lang: en
 slug: creating-modals
-order: 9
+order: 10
 ---
 
 <div class="section-content">

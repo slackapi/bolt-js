@@ -509,7 +509,7 @@ describe('App', () => {
                 team: {},
               },
             },
-            { // IncomingEventType.Action (app.action)
+            { // IncomingEventType.Shortcut (app.shortcut)
               ...baseEvent,
               body: {
                 type: 'message_action',
@@ -519,11 +519,31 @@ describe('App', () => {
                 team: {},
               },
             },
-            { // IncomingEventType.Action (app.action)
+            { // IncomingEventType.Shortcut (app.shortcut)
               ...baseEvent,
               body: {
                 type: 'message_action',
                 callback_id: 'another_message_action_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+              },
+            },
+            { // IncomingEventType.Shortcut (app.shortcut)
+              ...baseEvent,
+              body: {
+                type: 'shortcut',
+                callback_id: 'shortcut_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+              },
+            },
+            { // IncomingEventType.Shortcut (app.shortcut)
+              ...baseEvent,
+              body: {
+                type: 'shortcut',
+                callback_id: 'another_shortcut_callback_id',
                 channel: {},
                 user: {},
                 team: {},
@@ -618,6 +638,7 @@ describe('App', () => {
           // Arrange
           const ackFn = sinon.fake.resolves({});
           const actionFn = sinon.fake.resolves({});
+          const shortcutFn = sinon.fake.resolves({});
           const viewFn = sinon.fake.resolves({});
           const optionsFn = sinon.fake.resolves({});
           const overrides = buildOverrides([withNoopWebClient()]);
@@ -636,12 +657,19 @@ describe('App', () => {
             await ackFn();
             await next();
           });
-          app.action('block_action_id', async ({ }) => { await actionFn(); });
-          app.action({ callback_id: 'message_action_callback_id' }, async ({ }) => { await actionFn(); });
-          app.action(
+          app.shortcut({ callback_id: 'message_action_callback_id' }, async ({ }) => { await shortcutFn(); });
+          app.shortcut(
             { type: 'message_action', callback_id: 'another_message_action_callback_id' },
-            async ({ }) => { await actionFn(); });
-          app.action({ type: 'message_action', callback_id: 'does_not_exist' }, async ({ }) => { await actionFn(); });
+            async ({ }) => { await shortcutFn(); });
+          app.shortcut(
+            { type: 'message_action', callback_id: 'does_not_exist' },
+            async ({ }) => { await shortcutFn(); });
+          app.shortcut({ callback_id: 'shortcut_callback_id' }, async ({ }) => { await shortcutFn(); });
+          app.shortcut(
+            { type: 'shortcut', callback_id: 'another_shortcut_callback_id' },
+            async ({ }) => { await shortcutFn(); });
+          app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async ({ }) => { await shortcutFn(); });
+          app.action('block_action_id', async ({ }) => { await actionFn(); });
           app.action({ callback_id: 'interactive_message_callback_id' }, async ({ }) => { await actionFn(); });
           app.action({ callback_id: 'dialog_submission_callback_id' }, async ({ }) => { await actionFn(); });
           app.view('view_callback_id', async ({ }) => { await viewFn(); });
@@ -676,7 +704,8 @@ describe('App', () => {
           await Promise.all(dummyReceiverEvents.map(event => fakeReceiver.sendEvent(event)));
 
           // Assert
-          assert.equal(actionFn.callCount, 5);
+          assert.equal(actionFn.callCount, 3);
+          assert.equal(shortcutFn.callCount, 4);
           assert.equal(viewFn.callCount, 2);
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);

@@ -5,20 +5,23 @@ import {
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
+  SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackEvent,
   SlackAction,
+  SlackShortcut,
   SlashCommand,
   ViewSubmitAction,
   ViewClosedAction,
   OptionsRequest,
   InteractiveMessage,
   DialogSubmitAction,
-  MessageAction,
+  GlobalShortcut,
+  MessageShortcut,
   BlockElementAction,
   SlackViewAction,
 } from '../types';
-import { ActionConstraints, ViewConstraints } from '../App';
+import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
 
 /**
@@ -27,6 +30,20 @@ import { ContextMissingPropertyError } from '../errors';
 export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = async ({ action, next }) => {
   // Filter out any non-actions
   if (action === undefined) {
+    return;
+  }
+
+  // It matches so we should continue down this middleware listener chain
+  await next();
+};
+
+/**
+ * Middleware that filters out any event that isn't a shortcut
+ */
+// tslint:disable-next-line: max-line-length
+export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({ shortcut, next }) => {
+  // Filter out any non-shortcuts
+  if (shortcut === undefined) {
     return;
   }
 
@@ -91,7 +108,7 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs &
  * Middleware that checks for matches given constraints
  */
 export function matchConstraints(
-    constraints: ActionConstraints | ViewConstraints,
+    constraints: ActionConstraints | ViewConstraints | ShortcutConstraints,
   ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
   return async ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
@@ -334,11 +351,12 @@ function isBlockPayload(
 type CallbackIdentifiedBody =
   | InteractiveMessage
   | DialogSubmitAction
-  | MessageAction
+  | MessageShortcut
+  | GlobalShortcut
   | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
 
 function isCallbackIdentifiedBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'],
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],
 ): body is CallbackIdentifiedBody {
   return (body as CallbackIdentifiedBody).callback_id !== undefined;
 }

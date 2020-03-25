@@ -3,13 +3,14 @@ import { SlackEventMiddlewareArgs } from './events';
 import { SlackActionMiddlewareArgs } from './actions';
 import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
+import { SlackShortcutMiddlewareArgs } from './shortcuts';
 import { SlackViewMiddlewareArgs } from './view';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
 export type AnyMiddlewareArgs =
   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs |
-  SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs;
+  SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs;
 
 export interface Context extends StringIndexed {
 }
