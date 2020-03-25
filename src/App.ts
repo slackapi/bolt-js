@@ -616,7 +616,7 @@ export default class App {
               context,
               client,
               this.logger,
-              async context =>
+              async () =>
                 // When the listener middleware chain is done processing, call the listener without a next fn
                 listener({ ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger }),
             );

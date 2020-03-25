@@ -12,7 +12,7 @@ export async function processMiddleware(
   context: Context,
   client: WebClient,
   logger: Logger,
-  betweenPhases?: (context: Context) => Promise<void>,
+  betweenPhases?: () => Promise<void>,
 ): Promise<void> {
   let middlewareIndex = 0;
 
@@ -30,7 +30,7 @@ export async function processMiddleware(
     }
 
     if (betweenPhases !== undefined) {
-      return betweenPhases(context);
+      return betweenPhases();
     }
   }
 
