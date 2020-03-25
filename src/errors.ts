@@ -12,6 +12,8 @@ export enum ErrorCode {
   ReceiverAckTwiceError = 'slack_bolt_receiver_ack_twice_error',
   ReceiverAuthenticityError = 'slack_bolt_receiver_authenticity_error',
 
+  MultipleListenerError = 'slack_bolt_multiple_listener_error',
+
   /**
    * This value is used to assign to errors that occur inside the framework but do not have a code, to keep interfaces
    * in terms of CodedError.
@@ -66,6 +68,17 @@ export class ReceiverMultipleAckError extends Error implements CodedError {
 
 export class ReceiverAuthenticityError extends Error implements CodedError {
   public code = ErrorCode.ReceiverAuthenticityError;
+}
+
+export class MultipleListenerError extends Error implements CodedError {
+  public code = ErrorCode.MultipleListenerError;
+  public originals: Error[];
+
+  constructor(originals: Error[]) {
+    super('Multiple errors occurred while handling several listeners. The `originals` property contains an array of each error.');
+
+    this.originals = originals;
+  }
 }
 
 export class UnknownError extends Error implements CodedError {

@@ -22,7 +22,7 @@ import {
   matchMessage,
   onlyViewActions,
 } from './middleware/builtin';
-import { processMiddleware } from './middleware/process';
+// import { processMiddleware } from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   Middleware,
@@ -50,8 +50,10 @@ import {
   CodedError,
   asCodedError,
   AppInitializationError,
+  MultipleListenerError,
 } from './errors';
-import { MiddlewareContext } from './types/middleware';
+// import { MiddlewareContext } from './types/middleware';
+import promiseAllsettled, { PromiseRejection } from 'promise.allsettled';
 const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
 /** App initialization options */
@@ -462,16 +464,6 @@ export default class App {
       };
     };
 
-    let listenerArgClient = this.client;
-    const token = selectToken(context);
-    if (typeof token !== 'undefined') {
-      let pool = this.clients[source.teamId];
-      if (typeof pool === 'undefined') {
-        pool = this.clients[source.teamId] = new WebClientPool();
-      }
-      listenerArgClient = pool.getOrCreate(token, this.clientOptions);
-    }
-
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
@@ -482,13 +474,7 @@ export default class App {
       respond?: RespondFn,
       /** Ack function might be set below */
       ack?: AckFn<any>,
-      /** The logger for this Bolt app */
-      logger?: Logger,
-      /** WebClient with token  */
-      client?: WebClient,
     } = {
-      logger: this.logger,
-      client: listenerArgClient,
       body: bodyArg,
       payload:
         (type === IncomingEventType.Event) ?
@@ -549,30 +535,85 @@ export default class App {
       // Events API requests are acknowledged right away, since there's no data expected
       await ack();
     }
-    const middlewareChain = [...this.middleware];
 
-    if (this.listeners.length > 0) {
-      middlewareChain.push(async (ctx) => {
-        const { next } = ctx;
-
-        await Promise.all(this.listeners.map(
-            listener => processMiddleware(listener, ctx)));
-
-        await next();
-      });
+    // Get the client arg
+    let client = this.client;
+    const token = selectToken(context);
+    if (typeof token !== 'undefined') {
+      let pool = this.clients[source.teamId];
+      if (typeof pool === 'undefined') {
+        pool = this.clients[source.teamId] = new WebClientPool();
+      }
+      client = pool.getOrCreate(token, this.clientOptions);
     }
 
-    // Dispatch event through global middleware
-    try {
-      await processMiddleware(middlewareChain, {
-        context,
-        ...(listenerArgs as MiddlewareContext<AnyMiddlewareArgs>),
-      });
-    } catch (error) {
-      return this.handleError(error);
-    }
+    // const middlewareChain = [...this.middleware];
+
+    // if (this.listeners.length > 0) {
+    //   middlewareChain.push(async (ctx) => {
+    //     const { next } = ctx;
+
+    //     await Promise.all(this.listeners.map(
+    //         listener => processMiddleware(listener, ctx)));
+
+    //     await next();
+    //   });
+    // }
+
+    // // Dispatch event through global middleware
+    // try {
+    //   await processMiddleware(middlewareChain, {
+    //     context,
+    //     ...(listenerArgs as MiddlewareContext<AnyMiddlewareArgs>),
+    //   });
+    // } catch (error) {
+    //   return this.handleError(error);
+    // }
+
+    // Dispatch even through the global middleware chain
+    return processMiddleware(
+      this.middleware,
+      listenerArgs as AnyMiddlewareArgs,
+      context,
+      client,
+      this.logger,
+      async () => {
+        // Dispatch the event through the listener middleware chains and aggregate their results
+        // TODO: change the name of this.middleware and this.listeners to help this make more sense
+        const listenerResults = this.listeners.map(async (origListenerMiddleware) => {
+          // Copy the array so modifications don't affect the original
+          const listenerMiddleware = [...origListenerMiddleware];
+
+          // Don't process the last item in the listenerMiddleware array - it shouldn't get a next fn
+          const listener = listenerMiddleware.pop();
+
+          if (listener !== undefined) {
+            return processMiddleware(
+              listenerMiddleware,
+              listenerArgs as AnyMiddlewareArgs,
+              context,
+              client,
+              this.logger,
+              async context =>
+                // When the listener middleware chain is done processing, call the listener without a next fn
+                listener({ ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger }),
+            );
+          }
+        });
+
+        const settledListenerResults = await promiseAllsettled(listenerResults);
+        const rejectedListenerResults =
+          settledListenerResults.filter(lr => lr.status === 'rejected') as PromiseRejection<Error>[];
+        if (rejectedListenerResults.length === 1) {
+          throw rejectedListenerResults[0];
+        } else if (rejectedListenerResults.length > 1) {
+          throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
+        }
+      },
+    );
   }
 
+  // TODO: make the following method private if its no longer being used by Receiver
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
@@ -580,6 +621,37 @@ export default class App {
     return this.errorHandler(asCodedError(error));
   }
 
+}
+
+async function processMiddleware(
+  middleware: Middleware<AnyMiddlewareArgs>[],
+  initialArgs: AnyMiddlewareArgs,
+  context: Context,
+  client: WebClient,
+  logger: Logger,
+  betweenPhases?: (context: Context) => Promise<void>,
+): Promise<void> {
+  let middlewareIndex = 0;
+
+  async function invokeCurrentMiddleware(): ReturnType<Middleware<AnyMiddlewareArgs>> {
+    if (middlewareIndex !== middleware.length) {
+      const result = await middleware[middlewareIndex]({
+        next: invokeCurrentMiddleware,
+        ...initialArgs,
+        context,
+        client,
+        logger,
+      });
+      middlewareIndex += 1;
+      return result;
+    }
+
+    if (betweenPhases !== undefined) {
+      return betweenPhases(context);
+    }
+  }
+
+  return invokeCurrentMiddleware();
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +

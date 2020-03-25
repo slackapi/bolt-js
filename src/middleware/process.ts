@@ -1,7 +1,7 @@
 import {
   Middleware,
   AnyMiddlewareArgs,
-  MiddlewareContext, ProcessMiddlewareContext,
+  // MiddlewareContext, ProcessMiddlewareContext,
 } from '../types';
 
 function composeMiddleware(middleware: Middleware<AnyMiddlewareArgs>[]): Middleware<AnyMiddlewareArgs> {
