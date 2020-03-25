@@ -1,47 +1,38 @@
 import {
   Middleware,
   AnyMiddlewareArgs,
-  // MiddlewareContext, ProcessMiddlewareContext,
+  Context,
 } from '../types';
-
-function composeMiddleware(middleware: Middleware<AnyMiddlewareArgs>[]): Middleware<AnyMiddlewareArgs> {
-  return function (context: ProcessMiddlewareContext<AnyMiddlewareArgs>): Promise<unknown> {
-    // last called middleware #
-    let index = -1;
-
-    async function dispatch(order: number): Promise<unknown> {
-      if (order < index) {
-        return Promise.reject(new Error('next() called multiple times'));
-      }
-
-      index = order;
-
-      let fn: Middleware<AnyMiddlewareArgs> | undefined  = middleware[order];
-
-      if (order === middleware.length) {
-        fn = context.next;
-      }
-
-      if (fn === null || fn === undefined) {
-        return;
-      }
-
-      context.next = dispatch.bind(null, order + 1);
-
-      return fn((context as MiddlewareContext<AnyMiddlewareArgs>));
-    }
-
-    return dispatch(0);
-  };
-}
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 
 export async function processMiddleware(
-    middleware: Middleware<AnyMiddlewareArgs>[],
-    context: ProcessMiddlewareContext<AnyMiddlewareArgs>,
-): Promise<unknown> {
-  return composeMiddleware(middleware)({
-    ...context,
-    next: /* istanbul ignore next: Code can't be reached, noop instead of `null` for typing */
-        () => Promise.resolve(),
-  });
+  middleware: Middleware<AnyMiddlewareArgs>[],
+  initialArgs: AnyMiddlewareArgs,
+  context: Context,
+  client: WebClient,
+  logger: Logger,
+  betweenPhases?: (context: Context) => Promise<void>,
+): Promise<void> {
+  let middlewareIndex = 0;
+
+  async function invokeCurrentMiddleware(): ReturnType<Middleware<AnyMiddlewareArgs>> {
+    if (middlewareIndex !== middleware.length) {
+      const result = await middleware[middlewareIndex]({
+        next: invokeCurrentMiddleware,
+        ...initialArgs,
+        context,
+        client,
+        logger,
+      });
+      middlewareIndex += 1;
+      return result;
+    }
+
+    if (betweenPhases !== undefined) {
+      return betweenPhases(context);
+    }
+  }
+
+  return invokeCurrentMiddleware();
 }

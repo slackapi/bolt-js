@@ -23,7 +23,7 @@ import {
   matchMessage,
   onlyViewActions,
 } from './middleware/builtin';
-// import { processMiddleware } from './middleware/process';
+import { processMiddleware } from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   Middleware,
@@ -55,7 +55,6 @@ import {
   AppInitializationError,
   MultipleListenerError,
 } from './errors';
-// import { MiddlewareContext } from './types/middleware';
 import promiseAllsettled, { PromiseRejection } from 'promise.allsettled';
 const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
@@ -593,29 +592,6 @@ export default class App {
       client = pool.getOrCreate(token, this.clientOptions);
     }
 
-    // const middlewareChain = [...this.middleware];
-
-    // if (this.listeners.length > 0) {
-    //   middlewareChain.push(async (ctx) => {
-    //     const { next } = ctx;
-
-    //     await Promise.all(this.listeners.map(
-    //         listener => processMiddleware(listener, ctx)));
-
-    //     await next();
-    //   });
-    // }
-
-    // // Dispatch event through global middleware
-    // try {
-    //   await processMiddleware(middlewareChain, {
-    //     context,
-    //     ...(listenerArgs as MiddlewareContext<AnyMiddlewareArgs>),
-    //   });
-    // } catch (error) {
-    //   return this.handleError(error);
-    // }
-
     // Dispatch even through the global middleware chain
     return processMiddleware(
       this.middleware,
@@ -667,37 +643,6 @@ export default class App {
     return this.errorHandler(asCodedError(error));
   }
 
-}
-
-async function processMiddleware(
-  middleware: Middleware<AnyMiddlewareArgs>[],
-  initialArgs: AnyMiddlewareArgs,
-  context: Context,
-  client: WebClient,
-  logger: Logger,
-  betweenPhases?: (context: Context) => Promise<void>,
-): Promise<void> {
-  let middlewareIndex = 0;
-
-  async function invokeCurrentMiddleware(): ReturnType<Middleware<AnyMiddlewareArgs>> {
-    if (middlewareIndex !== middleware.length) {
-      const result = await middleware[middlewareIndex]({
-        next: invokeCurrentMiddleware,
-        ...initialArgs,
-        context,
-        client,
-        logger,
-      });
-      middlewareIndex += 1;
-      return result;
-    }
-
-    if (betweenPhases !== undefined) {
-      return betweenPhases(context);
-    }
-  }
-
-  return invokeCurrentMiddleware();
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
