@@ -474,24 +474,44 @@ describe('App', () => {
     });
 
     describe('listener middleware', () => {
-      it('should aggregate multiple errors in listeners for the same incoming event', async () => {
-        // Arrange
+      let app: App;
+      const eventType = 'some_event_type';
+      const dummyReceiverEvent =  createDummyReceiverEvent(eventType);
+
+      beforeEach(async () => {
         const App = await importApp(); // tslint:disable-line:variable-name
-        const app = new App({
+        app = new App({
           receiver: fakeReceiver,
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
-        const eventType = 'some_event_type';
-        const dummyReceiverEvent = createDummyReceiverEvent(eventType);
         app.error(fakeErrorHandler);
+      });
+
+      it('should bubble up errors in listeners to the global error handler', async () => {
+        // Arrange
+        const errorToThrow = new Error('listener error');
+
+        // Act
+        app.event(eventType, async () => { throw errorToThrow; });
+        await fakeReceiver.sendEvent(dummyReceiverEvent);
+
+        // Assert
+        assert(fakeErrorHandler.calledOnce);
+        const error = fakeErrorHandler.firstCall.args[0];
+        assert.equal(error.code, ErrorCode.UnknownError);
+        assert.equal(error.original, errorToThrow);
+      });
+
+      it('should aggregate multiple errors in listeners for the same incoming event', async () => {
+        // Arrange
         const errorsToThrow = [new Error('first listener error'), new Error('second listener error')];
         function createThrowingListener(toBeThrown: Error): () => Promise<void> {
           return async () => { throw toBeThrown; };
         }
 
         // Act
-        app.event('some_event_type', createThrowingListener(errorsToThrow[0]));
-        app.event('some_event_type', createThrowingListener(errorsToThrow[1]));
+        app.event(eventType, createThrowingListener(errorsToThrow[0]));
+        app.event(eventType, createThrowingListener(errorsToThrow[1]));
         await fakeReceiver.sendEvent(dummyReceiverEvent);
 
         // Assert

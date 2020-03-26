@@ -12,7 +12,7 @@ export async function processMiddleware(
   context: Context,
   client: WebClient,
   logger: Logger,
-  last: () => Promise<void> = async () => { return; },
+  last: () => Promise<void>,
 ): Promise<void> {
   let lastCalledMiddlewareIndex = -1;
 

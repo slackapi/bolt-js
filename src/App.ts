@@ -628,7 +628,7 @@ export default class App {
           const rejectedListenerResults =
             settledListenerResults.filter(lr => lr.status === 'rejected') as allSettled.PromiseRejection<Error>[];
           if (rejectedListenerResults.length === 1) {
-            throw rejectedListenerResults[0];
+            throw rejectedListenerResults[0].reason;
           } else if (rejectedListenerResults.length > 1) {
             throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
           }
