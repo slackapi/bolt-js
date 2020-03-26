@@ -73,6 +73,7 @@ export interface AppOptions {
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
+  processBeforeResponse?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -183,6 +184,7 @@ export default class App {
     logLevel = undefined,
     ignoreSelf = true,
     clientOptions = undefined,
+    processBeforeResponse = false,
   }: AppOptions = {}) {
 
     if (typeof logger === 'undefined') {
@@ -248,6 +250,7 @@ export default class App {
         this.receiver = new ExpressReceiver({
           signingSecret,
           endpoints,
+          processBeforeResponse,
           logger: this.logger,
         });
       }
