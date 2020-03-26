@@ -4,7 +4,7 @@ import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
-import { ErrorCode, UnknownError } from './errors';
+import { ErrorCode, UnknownError, AuthorizationError } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextFn } from './types';
 import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
@@ -289,11 +289,12 @@ describe('App', () => {
       assert.isAtLeast(fakeLogger.warn.callCount, invalidReceiverEvents.length);
     });
 
-    it('should warn and skip when a receiver event fails authorization', async () => {
+    it('should warn, send to global error handler, and skip when a receiver event fails authorization', async () => {
       // Arrange
       const fakeLogger = createFakeLogger();
       const fakeMiddleware = sinon.fake(noopMiddleware);
-      const dummyAuthorizationError = new Error();
+      const dummyOrigError = new Error('auth failed');
+      const dummyAuthorizationError = new AuthorizationError('auth failed', dummyOrigError);
       const dummyReceiverEvent = createDummyReceiverEvent();
       const App = await importApp(); // tslint:disable-line:variable-name
 
@@ -310,6 +311,9 @@ describe('App', () => {
       // Assert
       assert(fakeMiddleware.notCalled);
       assert(fakeLogger.warn.called);
+      assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+      assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
+      assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'original', dummyAuthorizationError.original);
     });
 
     describe('global middleware', () => {
@@ -445,7 +449,6 @@ describe('App', () => {
         app.error(async (actualError) => {
           assert.instanceOf(actualError, UnknownError);
           assert.equal(actualError.message, error.message);
-          await delay(); // Make this async to make sure error handlers can be tested
         });
 
         await fakeReceiver.sendEvent(dummyReceiverEvent);

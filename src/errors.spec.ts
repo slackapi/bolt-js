@@ -7,8 +7,8 @@ import {
   AppInitializationError,
   AuthorizationError,
   ContextMissingPropertyError,
-  ReceiverAckTimeoutError,
   ReceiverAuthenticityError,
+  ReceiverMultipleAckError,
   UnknownError,
 } from './errors';
 
@@ -19,8 +19,8 @@ describe('Errors', () => {
       [ErrorCode.AppInitializationError]: new AppInitializationError(),
       [ErrorCode.AuthorizationError]: new AuthorizationError('auth failed', new Error('auth failed')),
       [ErrorCode.ContextMissingPropertyError]: new ContextMissingPropertyError('foo', "can't find foo"),
-      [ErrorCode.ReceiverAckTimeoutError]: new ReceiverAckTimeoutError(),
       [ErrorCode.ReceiverAuthenticityError]: new ReceiverAuthenticityError(),
+      [ErrorCode.ReceiverMultipleAckError]: new ReceiverMultipleAckError(),
       [ErrorCode.UnknownError]: new UnknownError(new Error('It errored')),
     };
 
