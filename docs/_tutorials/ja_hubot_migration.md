@@ -1,6 +1,6 @@
 ---
 title: Hubot のアプリを Bolt に移行する方法
-order: 1
+order: 2
 slug: hubot-migration
 lang: ja-jp
 layout: tutorial
