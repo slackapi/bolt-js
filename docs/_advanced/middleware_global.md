@@ -12,7 +12,7 @@ Both global and listener middleware must call `await next()` to pass control of 
 
 As an example, let's say your app should only respond to users identified with a corresponding internal authentication service (an SSO provider or LDAP, for example). You may define a global middleware that looks up a user record in the authentication service and errors if the user is not found.
 
-*Note: Since `Bolt@2.x`, global middleware was updated to support `async` functions! View the [migration guide for V2](https://slack.dev/bolt/tutorial/migration-v2) to learn more.*
+*Note: Since v2, global middleware was updated to support `async` functions! View the [migration guide for V2](https://slack.dev/bolt/tutorial/migration-v2) to learn about the changes.*
 </div>
 
 ```javascript

@@ -9,7 +9,7 @@ permalink: /tutorial/migration-v2
 # Migrating to v2.x
 
 <div class="section-content">
-This guide will walk you through the process of updating your app from using `bolt@v1.x` to `bolt@2.x`. 
+This guide will walk you through the process of updating your app from using `@slack/bolt@1.x` to `@slack/bolt@2.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes. 
 </div> 
 
 ---
@@ -66,8 +66,8 @@ app.error((error) => {
 
 Other error related changes include:
 
-- When your listener doesn’t call `ack` within the 3 section time limit, we log the failure instead of throwing an error.
-- If you have multiple errors at once when running middleware, Bolt for Javascript will return a wrapper error with a `code` parameter of `slack_bolt_multiple_listener_error` and an `original` parameter that contains an array of all of the errors. 
+- When your listener doesn’t call `ack` within the 3 second time limit, we log the failure instead of throwing an error.
+- If multiple errors occur when processing multiple listeners for a single event, Bolt for Javascript will return a wrapper error with a `code` property of `ErrorCode.MultipleListenerError` and an `originals` property that contains an array of the individual errors. 
 
 
 ## Message Shortcuts
@@ -77,7 +77,7 @@ Other error related changes include:
 Before:
 
 ```javascript
-app.action('message-action-callback', ({action, ack, context}) => {
+app.action({ callback_id: 'message-action-callback' }, ({action, ack, context}) => {
   ack();
   // Do stuff
 })
