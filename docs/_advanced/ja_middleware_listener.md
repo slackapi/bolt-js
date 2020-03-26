@@ -14,7 +14,7 @@ order: 5
 
 たとえば、リスナーが人間からのメッセージのみを扱うのであれば、ボットメッセージを除外するリスナーミドルウェアを作成できます。
 
-*注: Bolt 2.x からミドルウェアが `async` 関数をサポートしました！詳細は [2.x マイグレーションガイド](https://slack.dev/bolt/ja-jp/tutorial/migration-v2)を参照してください。*
+*注: Bolt 2.x からミドルウェアが `async` 関数をサポートしました！この変更については [2.x マイグレーションガイド](https://slack.dev/bolt/ja-jp/tutorial/migration-v2)を参照してください。*
 </div>
 
 ```javascript

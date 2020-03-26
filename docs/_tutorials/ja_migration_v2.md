@@ -9,7 +9,7 @@ permalink: /ja-jp/tutorial/migration-v2
 # 2.x マイグレーションガイド
 
 <div class="section-content">
-このガイドは Bolt 1.x を利用しているアプリを 2.x にアップグレードするための手順について説明します。
+このガイドは Bolt 1.x を利用しているアプリを 2.x にアップグレードするための手順について説明します。いくつかの変更が必要とはなりますが、ほとんどのアプリの場合で、おそらく対応に必要な時間は 5 〜 15 分程度です。
 </div> 
 
 ---
@@ -67,7 +67,7 @@ app.error((error) => {
 その他のエラーに関する変更:
 
 - リスナー関数が `ack()` メソッドを 3 秒間のうちに呼び出さなかった場合、これまでのように例外を投げるのではなくログを出力するようになりました
-- もしミドルウェア実行中に複数のエラーが発生した場合、Bolt for JavaScript は `slack_bolt_multiple_listener_error` という `code` と全てのエラーで構成される配列を含む `original` というパラメーターをラップしたエラーを返します
+- もし一つのイベントに対して複数のリスナー関数を実行中に複数のエラーが発生した場合、Bolt for JavaScript は `ErrorCode.MultipleListenerError` の値での `code` と、発生した個々のエラーの配列を含む `originals` というパラメーターをラップしたエラーを返します
 
 ## メッセージショートカット
 
@@ -76,7 +76,7 @@ app.error((error) => {
 これまで:
 
 ```javascript
-app.action('message-action-callback', ({action, ack, context}) => {
+app.action({ callback_id: 'message-action-callback' }, ({action, ack, context}) => {
   ack();
   // ここで処理を行う
 })
