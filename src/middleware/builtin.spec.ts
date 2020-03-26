@@ -7,7 +7,7 @@ import { Override, wrapToResolveOnFirstCall, createFakeLogger } from '../test-he
 import rewiremock from 'rewiremock';
 import {
   SlackEventMiddlewareArgs,
-  NextMiddleware,
+  NextFn,
   Context,
   MessageEvent,
   SlackCommandMiddlewareArgs,
@@ -468,7 +468,7 @@ describe('matchCommandName', () => {
   const logger = createFakeLogger();
   const client = new WebClient(undefined, { logger, slackApiUrl: undefined });
 
-  function buildArgs(fakeNext: NextMiddleware): SlackCommandMiddlewareArgs & MiddlewareCommonArgs {
+  function buildArgs(fakeNext: NextFn): SlackCommandMiddlewareArgs & MiddlewareCommonArgs {
     const payload: SlashCommand = { ...validCommandPayload };
     return {
       payload,
@@ -652,7 +652,7 @@ interface DummyContext {
 }
 
 interface MiddlewareCommonArgs {
-  next: NextMiddleware;
+  next: NextFn;
   context: Context;
   logger: Logger;
   client: WebClient;

@@ -12,27 +12,29 @@ export async function processMiddleware(
   context: Context,
   client: WebClient,
   logger: Logger,
-  betweenPhases?: () => Promise<void>,
+  last: () => Promise<void> = async () => { return; },
 ): Promise<void> {
-  let middlewareIndex = 0;
+  let lastCalledMiddlewareIndex = -1;
 
-  async function invokeCurrentMiddleware(): ReturnType<Middleware<AnyMiddlewareArgs>> {
-    if (middlewareIndex !== middleware.length) {
-      const result = await middleware[middlewareIndex]({
-        next: invokeCurrentMiddleware,
+  async function invokeMiddleware(toCallMiddlewareIndex: number): ReturnType<Middleware<AnyMiddlewareArgs>> {
+    if (lastCalledMiddlewareIndex >= toCallMiddlewareIndex) {
+      // TODO: use a coded error
+      throw Error('next() called multiple times');
+    }
+
+    if (toCallMiddlewareIndex < middleware.length) {
+      lastCalledMiddlewareIndex = toCallMiddlewareIndex;
+      return middleware[toCallMiddlewareIndex]({
+        next: () => invokeMiddleware(toCallMiddlewareIndex + 1),
         ...initialArgs,
         context,
         client,
         logger,
       });
-      middlewareIndex += 1;
-      return result;
     }
 
-    if (betweenPhases !== undefined) {
-      return betweenPhases();
-    }
+    return last();
   }
 
-  return invokeCurrentMiddleware();
+  return invokeMiddleware(0);
 }

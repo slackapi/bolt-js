@@ -8,23 +8,26 @@ import { SlackViewMiddlewareArgs } from './view';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
+// TODO: rename this to AnyListenerArgs, and all the constituent types
 export type AnyMiddlewareArgs =
   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs |
   SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs;
 
-export interface Context extends StringIndexed {
+interface AllMiddlewareArgs {
+  context: Context;
+  logger: Logger;
+  client: WebClient;
+  // TODO: figure out how to make next non-optional
+  next?: NextFn;
 }
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
 // constraint would mess up the interface of App#event(), App#message(), etc.
 export interface Middleware<Args> {
-  // TODO: is there something nice we can do to get context's property types to flow from one middleware to the next?
-  (args: Args & {
-    next?: NextMiddleware,
-    context: Context,
-    logger: Logger,
-    client: WebClient,
-  }): Promise<void>;
+  (args: Args & AllMiddlewareArgs): Promise<void>;
 }
 
-export type NextMiddleware = () => Promise<void>;
+export interface Context extends StringIndexed {
+}
+
+export type NextFn = () => Promise<void>;

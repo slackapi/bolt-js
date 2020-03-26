@@ -55,7 +55,7 @@ import {
   AppInitializationError,
   MultipleListenerError,
 } from './errors';
-import promiseAllsettled, { PromiseRejection } from 'promise.allsettled';
+import allSettled = require('promise.allsettled'); // tslint:disable-line:no-require-imports import-name
 const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
 /** App initialization options */
@@ -156,13 +156,13 @@ export default class App {
   /** Logger */
   private logger: Logger;
 
-  /**  */
+  /** Authorize */
   private authorize: Authorize;
 
-  /** Global middleware */
+  /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
 
-  /** Listeners (and their middleware) */
+  /** Listener middleware chains */
   private listeners: Middleware<AnyMiddlewareArgs>[][];
 
   private errorHandler: ErrorHandler;
@@ -593,46 +593,50 @@ export default class App {
     }
 
     // Dispatch even through the global middleware chain
-    return processMiddleware(
-      this.middleware,
-      listenerArgs as AnyMiddlewareArgs,
-      context,
-      client,
-      this.logger,
-      async () => {
-        // Dispatch the event through the listener middleware chains and aggregate their results
-        // TODO: change the name of this.middleware and this.listeners to help this make more sense
-        const listenerResults = this.listeners.map(async (origListenerMiddleware) => {
-          // Copy the array so modifications don't affect the original
-          const listenerMiddleware = [...origListenerMiddleware];
+    try {
+      await processMiddleware(
+        this.middleware,
+        listenerArgs as AnyMiddlewareArgs,
+        context,
+        client,
+        this.logger,
+        async () => {
+          // Dispatch the event through the listener middleware chains and aggregate their results
+          // TODO: change the name of this.middleware and this.listeners to help this make more sense
+          const listenerResults = this.listeners.map(async (origListenerMiddleware) => {
+            // Copy the array so modifications don't affect the original
+            const listenerMiddleware = [...origListenerMiddleware];
 
-          // Don't process the last item in the listenerMiddleware array - it shouldn't get a next fn
-          const listener = listenerMiddleware.pop();
+            // Don't process the last item in the listenerMiddleware array - it shouldn't get a next fn
+            const listener = listenerMiddleware.pop();
 
-          if (listener !== undefined) {
-            return processMiddleware(
-              listenerMiddleware,
-              listenerArgs as AnyMiddlewareArgs,
-              context,
-              client,
-              this.logger,
-              async () =>
-                // When the listener middleware chain is done processing, call the listener without a next fn
-                listener({ ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger }),
-            );
+            if (listener !== undefined) {
+              return processMiddleware(
+                listenerMiddleware,
+                listenerArgs as AnyMiddlewareArgs,
+                context,
+                client,
+                this.logger,
+                async () =>
+                  // When the listener middleware chain is done processing, call the listener without a next fn
+                  listener({ ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger }),
+              );
+            }
+          });
+
+          const settledListenerResults = await allSettled(listenerResults);
+          const rejectedListenerResults =
+            settledListenerResults.filter(lr => lr.status === 'rejected') as allSettled.PromiseRejection<Error>[];
+          if (rejectedListenerResults.length === 1) {
+            throw rejectedListenerResults[0];
+          } else if (rejectedListenerResults.length > 1) {
+            throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
           }
-        });
-
-        const settledListenerResults = await promiseAllsettled(listenerResults);
-        const rejectedListenerResults =
-          settledListenerResults.filter(lr => lr.status === 'rejected') as PromiseRejection<Error>[];
-        if (rejectedListenerResults.length === 1) {
-          throw rejectedListenerResults[0];
-        } else if (rejectedListenerResults.length > 1) {
-          throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
-        }
-      },
-    );
+        },
+      );
+    } catch (error) {
+      return this.handleError(error);
+    }
   }
 
   // TODO: make the following method private if its no longer being used by Receiver
