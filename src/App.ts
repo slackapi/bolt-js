@@ -62,6 +62,7 @@ const packageJson = require('../package.json'); // tslint:disable-line:no-requir
 export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
+  processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -74,7 +75,6 @@ export interface AppOptions {
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
-  processBeforeResponse?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';

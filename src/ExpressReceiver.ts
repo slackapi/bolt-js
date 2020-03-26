@@ -68,32 +68,21 @@ export default class ExpressReceiver implements Receiver {
     // tslint:disable-next-line: align
     }, 3001);
 
-    let event: ReceiverEvent;
     let storedResponse = undefined;
-    if (this.processBeforeResponse) {
-      event = {
-        body: req.body,
-        ack: async (response): Promise<void> => {
-          if (isAcknowledged) {
-            throw new ReceiverMultipleAckError();
-          }
-          isAcknowledged = true;
+    const event: ReceiverEvent = {
+      body: req.body,
+      ack: async (response): Promise<void> => {
+        if (isAcknowledged) {
+          throw new ReceiverMultipleAckError();
+        }
+        isAcknowledged = true;
+        if (this.processBeforeResponse) {
           if (!response) {
-            res.send('');
+            storedResponse = '';
           } else {
             storedResponse = response;
           }
-        },
-      };
-
-    } else {
-      event = {
-        body: req.body,
-        ack: async (response): Promise<void> => {
-          if (isAcknowledged) {
-            throw new ReceiverMultipleAckError();
-          }
-          isAcknowledged = true;
+        } else {
           if (!response) {
             res.send('');
           } else if (typeof response === 'string') {
@@ -101,9 +90,9 @@ export default class ExpressReceiver implements Receiver {
           } else {
             res.json(response);
           }
-        },
-      };
-    }
+        }
+      },
+    };
 
     try {
       await this.bolt?.processEvent(event);
