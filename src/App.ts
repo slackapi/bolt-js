@@ -622,7 +622,7 @@ export default class App {
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  public handleError(error: Error): Promise<void> {
+  private handleError(error: Error): Promise<void> {
     return this.errorHandler(asCodedError(error));
   }
 
