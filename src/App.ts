@@ -584,9 +584,9 @@ export default class App {
     // Get the client arg
     let client = this.client;
     const token = selectToken(context);
-    if (typeof token !== 'undefined') {
+    if (token !== undefined) {
       let pool = this.clients[source.teamId];
-      if (typeof pool === 'undefined') {
+      if (pool === undefined) {
         pool = this.clients[source.teamId] = new WebClientPool();
       }
       client = pool.getOrCreate(token, this.clientOptions);

@@ -1012,6 +1012,25 @@ describe('App', () => {
           assert.notEqual(clients[0], clients[1]);
           assert.strictEqual(clients[0], clients[2]);
         });
+
+        it('should be to the global app client when authorization doesn\'t produce a token', async () => {
+          // Arrange
+          const App = await importApp(); // tslint:disable-line:variable-name
+          const app = new App({
+            receiver: fakeReceiver,
+            authorize: noopAuthorize,
+            ignoreSelf: false,
+          });
+          const globalClient = app.client;
+
+          // Act
+          let clientArg: WebClient | undefined;
+          app.use(async ({ client }) => { clientArg = client; });
+          await fakeReceiver.sendEvent(createDummyReceiverEvent());
+
+          // Assert
+          assert.equal(globalClient, clientArg);
+        });
       });
 
       describe('say()', () => {
