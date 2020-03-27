@@ -73,7 +73,8 @@ export function conversationContext<ConversationState = any>(
         .catch(error => logger.debug(error.message));
     } else {
       logger.debug('No conversation ID for incoming event');
-      await next();
+      // TODO: remove the non-null assertion operator
+      await next!();
     }
   };
 }

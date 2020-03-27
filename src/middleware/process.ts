@@ -1,47 +1,40 @@
 import {
   Middleware,
   AnyMiddlewareArgs,
-  MiddlewareContext, ProcessMiddlewareContext,
+  Context,
 } from '../types';
-
-function composeMiddleware(middleware: Middleware<AnyMiddlewareArgs>[]): Middleware<AnyMiddlewareArgs> {
-  return function (context: ProcessMiddlewareContext<AnyMiddlewareArgs>): Promise<unknown> {
-    // last called middleware #
-    let index = -1;
-
-    async function dispatch(order: number): Promise<unknown> {
-      if (order < index) {
-        return Promise.reject(new Error('next() called multiple times'));
-      }
-
-      index = order;
-
-      let fn: Middleware<AnyMiddlewareArgs> | undefined  = middleware[order];
-
-      if (order === middleware.length) {
-        fn = context.next;
-      }
-
-      if (fn === null || fn === undefined) {
-        return;
-      }
-
-      context.next = dispatch.bind(null, order + 1);
-
-      return fn((context as MiddlewareContext<AnyMiddlewareArgs>));
-    }
-
-    return dispatch(0);
-  };
-}
+import { WebClient } from '@slack/web-api';
+import { Logger } from '@slack/logger';
 
 export async function processMiddleware(
-    middleware: Middleware<AnyMiddlewareArgs>[],
-    context: ProcessMiddlewareContext<AnyMiddlewareArgs>,
-): Promise<unknown> {
-  return composeMiddleware(middleware)({
-    ...context,
-    next: /* istanbul ignore next: Code can't be reached, noop instead of `null` for typing */
-        () => Promise.resolve(),
-  });
+  middleware: Middleware<AnyMiddlewareArgs>[],
+  initialArgs: AnyMiddlewareArgs,
+  context: Context,
+  client: WebClient,
+  logger: Logger,
+  last: () => Promise<void>,
+): Promise<void> {
+  let lastCalledMiddlewareIndex = -1;
+
+  async function invokeMiddleware(toCallMiddlewareIndex: number): ReturnType<Middleware<AnyMiddlewareArgs>> {
+    if (lastCalledMiddlewareIndex >= toCallMiddlewareIndex) {
+      // TODO: use a coded error
+      throw Error('next() called multiple times');
+    }
+
+    if (toCallMiddlewareIndex < middleware.length) {
+      lastCalledMiddlewareIndex = toCallMiddlewareIndex;
+      return middleware[toCallMiddlewareIndex]({
+        next: () => invokeMiddleware(toCallMiddlewareIndex + 1),
+        ...initialArgs,
+        context,
+        client,
+        logger,
+      });
+    }
+
+    return last();
+  }
+
+  return invokeMiddleware(0);
 }

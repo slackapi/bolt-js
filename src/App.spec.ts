@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ErrorCode, UnknownError, AuthorizationError } from './errors';
-import { Receiver, ReceiverEvent, SayFn, NextMiddleware } from './types';
+import { Receiver, ReceiverEvent, SayFn, NextFn } from './types';
 import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
 import App, { ViewConstraints } from './App';
@@ -14,16 +14,17 @@ import { WebClientOptions, WebClient } from '@slack/web-api';
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
 // Utility functions
 const noop = (() => Promise.resolve(undefined));
-const noopMiddleware = async ({ next }: { next: NextMiddleware; }) => { await next(); };
+const noopMiddleware = async ({ next }: { next: NextFn; }) => { await next!(); };
 const noopAuthorize = (() => Promise.resolve({}));
 
 // Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(): ReceiverEvent {
+function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEvent {
   // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
   // IncomingEventType.Event
   return {
     body: {
       event: {
+        type,
       },
     },
     ack: noop,
@@ -346,11 +347,13 @@ describe('App', () => {
         // Arrange
         app.use(fakeFirstMiddleware);
         app.use(async ({ next }) => {
-          await next();
-          await next();
+          await next!();
+          await next!();
         });
         app.use(fakeSecondMiddleware);
         app.error(fakeErrorHandler);
+
+        // Act
         await fakeReceiver.sendEvent(dummyReceiverEvent);
 
         // Assert
@@ -364,7 +367,7 @@ describe('App', () => {
           await delay(100);
           changed = true;
 
-          await next();
+          await next!();
         });
 
         await fakeReceiver.sendEvent(dummyReceiverEvent);
@@ -378,7 +381,7 @@ describe('App', () => {
 
         app.use(async ({ next }) => {
           try {
-            await next();
+            await next!();
           } catch (err) {
             caughtError = err;
           }
@@ -401,15 +404,17 @@ describe('App', () => {
         let middlewareCount = 0;
 
         /**
-         * Middleware that, when calls, asserts that it was called in the correct order
-         * @param orderDown The order it should be called when processing middleware down the stack
-         * @param orderUp The order it should be called when processing middleware up the stack
+         * Middleware that, when called, asserts that it was called in the correct order
+         * @param orderDown The order it should be called when processing middleware down the chain
+         * @param orderUp The order it should be called when processing middleware up the chain
          */
-        const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: any) => {
+        const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
           await delay(100);
           middlewareCount += 1;
           assert.equal(middlewareCount, orderDown);
-          await next();
+          if (next !== undefined) {
+            await next();
+          }
           middlewareCount += 1;
           assert.equal(middlewareCount, orderUp);
         };
@@ -465,6 +470,56 @@ describe('App', () => {
 
         assert.instanceOf(actualError, UnknownError);
         assert.equal(actualError.message, error.message);
+      });
+    });
+
+    describe('listener middleware', () => {
+      let app: App;
+      const eventType = 'some_event_type';
+      const dummyReceiverEvent =  createDummyReceiverEvent(eventType);
+
+      beforeEach(async () => {
+        const App = await importApp(); // tslint:disable-line:variable-name
+        app = new App({
+          receiver: fakeReceiver,
+          authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        });
+        app.error(fakeErrorHandler);
+      });
+
+      it('should bubble up errors in listeners to the global error handler', async () => {
+        // Arrange
+        const errorToThrow = new Error('listener error');
+
+        // Act
+        app.event(eventType, async () => { throw errorToThrow; });
+        await fakeReceiver.sendEvent(dummyReceiverEvent);
+
+        // Assert
+        assert(fakeErrorHandler.calledOnce);
+        const error = fakeErrorHandler.firstCall.args[0];
+        assert.equal(error.code, ErrorCode.UnknownError);
+        assert.equal(error.original, errorToThrow);
+      });
+
+      it('should aggregate multiple errors in listeners for the same incoming event', async () => {
+        // Arrange
+        const errorsToThrow = [new Error('first listener error'), new Error('second listener error')];
+        function createThrowingListener(toBeThrown: Error): () => Promise<void> {
+          return async () => { throw toBeThrown; };
+        }
+
+        // Act
+        app.event(eventType, createThrowingListener(errorsToThrow[0]));
+        app.event(eventType, createThrowingListener(errorsToThrow[1]));
+        await fakeReceiver.sendEvent(dummyReceiverEvent);
+
+        // Assert
+        assert(fakeErrorHandler.calledOnce);
+        const error = fakeErrorHandler.firstCall.args[0];
+        assert.instanceOf(error, Error);
+        assert(error.code === ErrorCode.MultipleListenerError);
+        assert.sameMembers(error.originals, errorsToThrow);
       });
     });
 
@@ -658,7 +713,7 @@ describe('App', () => {
 
           app.use(async ({ next }) => {
             await ackFn();
-            await next();
+            await next!();
           });
           app.shortcut({ callback_id: 'message_action_callback_id' }, async ({ }) => { await shortcutFn(); });
           app.shortcut(
@@ -802,7 +857,7 @@ describe('App', () => {
           });
           app.use(async ({ logger, body, next }) => {
             logger.info(body);
-            await next();
+            await next!();
           });
 
           app.event('app_home_opened', async ({ logger, event }) => {
@@ -850,7 +905,7 @@ describe('App', () => {
           });
           app.use(async ({ logger, body, next }) => {
             logger.info(body);
-            await next();
+            await next!();
           });
 
           app.event('app_home_opened', async ({ logger, event }) => {
@@ -916,7 +971,7 @@ describe('App', () => {
           });
           app.use(async ({ client, next }) => {
             await client.auth.test();
-            await next();
+            await next!();
           });
           const clients: WebClient[] = [];
           app.event('app_home_opened', async ({ client }) => {
@@ -956,6 +1011,25 @@ describe('App', () => {
 
           assert.notEqual(clients[0], clients[1]);
           assert.strictEqual(clients[0], clients[2]);
+        });
+
+        it('should be to the global app client when authorization doesn\'t produce a token', async () => {
+          // Arrange
+          const App = await importApp(); // tslint:disable-line:variable-name
+          const app = new App({
+            receiver: fakeReceiver,
+            authorize: noopAuthorize,
+            ignoreSelf: false,
+          });
+          const globalClient = app.client;
+
+          // Act
+          let clientArg: WebClient | undefined;
+          app.use(async ({ client }) => { clientArg = client; });
+          await fakeReceiver.sendEvent(createDummyReceiverEvent());
+
+          // Assert
+          assert.equal(globalClient, clientArg);
         });
       });
 

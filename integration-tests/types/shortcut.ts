@@ -5,8 +5,8 @@ const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
 // calling shortcut method with incorrect an type constraint value should not work
 // $ExpectError
-app.shortcut({ type: 'Something wrong' }, ({ shortcut }) => {
-  return shortcut;
+app.shortcut({ type: 'Something wrong' }, async ({ shortcut }) => {
+  await Promise.resolve(shortcut);
 });
 
 // Shortcut in listener should be - MessageShortcut
@@ -14,7 +14,7 @@ app.shortcut({ type: 'Something wrong' }, ({ shortcut }) => {
 app.shortcut({ type: 'message_action' }, async ({
   shortcut, // $ExpectType MessageShortcut
  }) => {
-  return shortcut;
+  await Promise.resolve(shortcut);
 });
 
 // If shortcut is parameterized with MessageShortcut, shortcut argument in callback should be type MessageShortcut
@@ -22,5 +22,5 @@ app.shortcut({ type: 'message_action' }, async ({
 app.shortcut<MessageShortcut>({}, async ({
   shortcut, // $ExpectType MessageShortcut
  }) => {
-  return shortcut;
+  await Promise.resolve(shortcut);
 });

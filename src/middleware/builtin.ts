@@ -34,7 +34,8 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
   }
 
   // It matches so we should continue down this middleware listener chain
-  await next();
+  // TODO: remove the non-null assertion operator
+  await next!();
 };
 
 /**
@@ -48,7 +49,8 @@ export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackSho
   }
 
   // It matches so we should continue down this middleware listener chain
-  await next();
+  // TODO: remove the non-null assertion operator
+  await next!();
 };
 
 /**
@@ -61,7 +63,8 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
   }
 
   // It matches so we should continue down this middleware listener chain
-  await next();
+  // TODO: remove the non-null assertion operator
+  await next!();
 };
 
 /**
@@ -74,7 +77,8 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequ
   }
 
   // It matches so we should continue down this middleware listener chain
-  await next();
+  // TODO: remove the non-null assertion operator
+  await next!();
 };
 
 /**
@@ -87,7 +91,8 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
   }
 
   // It matches so we should continue down this middleware listener chain
-  await next();
+  // TODO: remove the non-null assertion operator
+  await next!();
 };
 
 /**
@@ -101,7 +106,8 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs &
     }
 
     // It matches so we should continue down this middleware listener chain
-    await next();
+  // TODO: remove the non-null assertion operator
+    await next!();
   };
 
 /**
@@ -191,7 +197,8 @@ export function matchConstraints(
       if (body.type !== constraints.type) return;
     }
 
-    await next();
+  // TODO: remove the non-null assertion operator
+    await next!();
   };
 }
 
@@ -221,7 +228,8 @@ export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMid
       }
     }
 
-    await next();
+  // TODO: remove the non-null assertion operator
+    await next!();
   };
 }
 
@@ -235,7 +243,8 @@ export function matchCommandName(name: string): Middleware<SlackCommandMiddlewar
       return;
     }
 
-    await next();
+  // TODO: remove the non-null assertion operator
+    await next!();
   };
 }
 
@@ -249,7 +258,8 @@ export function matchEventType(type: string): Middleware<SlackEventMiddlewareArg
       return;
     }
 
-    await next();
+  // TODO: remove the non-null assertion operator
+    await next!();
   };
 }
 
@@ -294,14 +304,16 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
     }
 
     // If all the previous checks didn't skip this message, then its okay to resume to next
-    await args.next();
+  // TODO: remove the non-null assertion operator
+    await args.next!();
   };
 }
 
 export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return async ({ message, next }) => {
     if (message.subtype === subtype) {
-      await next();
+      // TODO: remove the non-null assertion operator
+      await next!();
     }
   };
 }
@@ -335,7 +347,8 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       return;
     }
 
-    await next();
+  // TODO: remove the non-null assertion operator
+    await next!();
   };
 }
 
