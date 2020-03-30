@@ -17,6 +17,7 @@ export interface ExpressReceiverOptions {
   endpoints?: string | {
     [endpointType: string]: string;
   };
+  processBeforeResponse?: boolean;
 }
 
 /**
@@ -30,11 +31,13 @@ export default class ExpressReceiver implements Receiver {
   private server: Server;
   private bolt: App | undefined;
   private logger: Logger;
+  private processBeforeResponse: boolean;
 
   constructor({
     signingSecret = '',
     logger = new ConsoleLogger(),
     endpoints = { events: '/slack/events' },
+    processBeforeResponse = false,
   }: ExpressReceiverOptions) {
     this.app = express();
     // TODO: what about starting an https server instead of http? what about other options to create the server?
@@ -47,6 +50,7 @@ export default class ExpressReceiver implements Receiver {
       this.requestHandler.bind(this),
     ];
 
+    this.processBeforeResponse = processBeforeResponse;
     this.logger = logger;
     const endpointList: string[] = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     for (const endpoint of endpointList) {
@@ -64,25 +68,41 @@ export default class ExpressReceiver implements Receiver {
     // tslint:disable-next-line: align
     }, 3001);
 
+    let storedResponse = undefined;
     const event: ReceiverEvent = {
       body: req.body,
-      ack: async (response: any): Promise<void> => {
+      ack: async (response): Promise<void> => {
         if (isAcknowledged) {
           throw new ReceiverMultipleAckError();
         }
         isAcknowledged = true;
-        if (!response) {
-          res.send('');
-        } else if (typeof response === 'string') {
-          res.send(response);
+        if (this.processBeforeResponse) {
+          if (!response) {
+            storedResponse = '';
+          } else {
+            storedResponse = response;
+          }
         } else {
-          res.json(response);
+          if (!response) {
+            res.send('');
+          } else if (typeof response === 'string') {
+            res.send(response);
+          } else {
+            res.json(response);
+          }
         }
       },
     };
 
     try {
       await this.bolt?.processEvent(event);
+      if (storedResponse !== undefined) {
+        if (typeof storedResponse === 'string') {
+          res.send(storedResponse);
+        } else {
+          res.json(storedResponse);
+        }
+      }
     } catch (err) {
       res.send(500);
       throw err;

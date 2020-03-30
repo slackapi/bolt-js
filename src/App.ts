@@ -62,6 +62,7 @@ const packageJson = require('../package.json'); // tslint:disable-line:no-requir
 export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
+  processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -184,6 +185,7 @@ export default class App {
     logLevel = undefined,
     ignoreSelf = true,
     clientOptions = undefined,
+    processBeforeResponse = false,
   }: AppOptions = {}) {
 
     if (typeof logger === 'undefined') {
@@ -249,6 +251,7 @@ export default class App {
         this.receiver = new ExpressReceiver({
           signingSecret,
           endpoints,
+          processBeforeResponse,
           logger: this.logger,
         });
       }
