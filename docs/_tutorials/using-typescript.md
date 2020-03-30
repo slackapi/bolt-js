@@ -14,5 +14,4 @@ This page helps describe how to use this package from a project that also uses T
 
 ### Minimum version
 
-The latest major version of `@slack/bolt` is supported to build against a minimum TypeScript version of v3.7.0.
-
+The latest major version of `@slack/bolt` is supported to build against a minimum TypeScript version of v3.7.

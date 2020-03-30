@@ -129,4 +129,4 @@ async function noBotMessages({ message, next }) {
 
 ### Minimum TypeScript Version
 
-As outlined in our [using TypeScript guide](https://slack.dev/bolt/tutorial/using-typescript), `@slack/bolt@2.x` requires a minimum TypeScript version of 3.7.0.
+As outlined in our [using TypeScript guide](https://slack.dev/bolt/tutorial/using-typescript), `@slack/bolt@2.x` requires a minimum TypeScript version of 3.7.
