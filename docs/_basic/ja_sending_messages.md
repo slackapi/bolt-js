@@ -13,8 +13,8 @@ order: 2
 
 ```javascript
 // "knock knock" を含むメッセージをリスニングし、 "who's there?" というメッセージをイタリック体で送信
-app.message('knock knock', ({ message, say }) => {
-  say(`_Who's there?_`);
+app.message('knock knock', async ({ message, say }) => {
+  await say(`_Who's there?_`);
 });
 ```
 
@@ -31,9 +31,9 @@ app.message('knock knock', ({ message, say }) => {
 
 ```javascript
 // 誰かが 📅 絵文字でリアクションした時に、日付ピッカー block を送信
-app.event('reaction_added', ({ event, say }) => {
+app.event('reaction_added', async ({ event, say }) => {
   if (event.reaction === 'calendar') {
-    say({
+    await say({
       blocks: [{
         "type": "section",
         "text": {

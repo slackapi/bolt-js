@@ -170,9 +170,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say(`Hey there <@${message.user}>!`);
+  await say(`Hey there <@${message.user}>!`);
 });
 
 (async () => {
@@ -191,7 +191,7 @@ app.message('hello', ({ message, say }) => {
 
 ### アクションの送信と応答
 
-ボタン、選択メニュー、日付ピッカー、ダイアログ、メッセージショートカットなどの機能を使用するには、インタラクティブ性を有効にする必要があります。イベントと同様に、Slack の URL を指定してアクション ( 「ボタン・クリック」など) を送信する必要があります。
+ボタン、選択メニュー、日付ピッカー、ダイアログなどの機能を使用するには、インタラクティブ性を有効にする必要があります。イベントと同様に、Slack の URL を指定してアクション ( 「ボタン・クリック」など) を送信する必要があります。
 
 アプリ設定ページに戻り、左側の  **Interactive Components**  をクリックします。**Request URL**  ボックスがもう 1 つあることがわかります。
 
@@ -214,9 +214,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say({
+  await say({
     blocks: [
     {
       "type": "section",
@@ -264,9 +264,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say({
+  await say({
     blocks: [
       {
         "type": "section",
@@ -287,10 +287,10 @@ app.message('hello', ({ message, say }) => {
   });
 });
 
-app.action('button_click', ({ body, ack, say }) => {
+app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action
-  ack();
-  say(`<@${body.user.id}> clicked the button`);
+  await ack();
+  await say(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {

@@ -8,19 +8,18 @@ order: 8
 <div class="section-content">
 レシーバーは、Slack から送信されたイベントを処理およびパースして発行するので、Bolt アプリがそのイベントにコンテキストを追加し、アプリのリスナーに渡すことができます。レシーバーは、レシーバーのインターフェイスに準拠している必要があります。
 
-| メソッド      | パラメーター                       | 戻り値の型    |
+| メソッド      | パラメーター                     | 戻り値の型   |
 |--------------|----------------------------------|-------------|
-| `on()`       | `type: string`, `listener: fn()` | `unknown`   |
+| `init()`     | `app: App`                       | `unknown`   |
 | `start()`    | None                             | `Promise`   |
 | `stop()`     | None                             | `Promise`   |
 
-Bolt アプリでは `on()` が 2 回呼び出されます。
-* `Receiver.on('message', listener)` は、解析されたすべての着信リクエストを `onIncomingEvent()` にルーティングする必要があります。これは、Bolt アプリでは `this.receiver.on('message', message => this.onIncomingEvent(message))` として呼び出されます。
-* `Receiver.on('error', listener)` は、エラーをグローバルエラーハンドラーにルーティングする必要があります。これは、Bolt アプリでは `this.receiver.on('error', error => this.onGlobalError(error))` として呼び出されます。
+Bolt アプリでは `init()` が 2 回呼び出されます。このメソッドはレシーバーに `App` の参照を付与するため、これにより以下の呼び出しが可能になります。
+* `await app.processEvent(event)` は Slack から送信されてくるイベントを受け取るたびに呼び出されます。ハンドリングされなかったエラーが発生した場合はそれを throw します。
 
 Bolt アプリを初期化するときにカスタムレシーバーをコンストラクタに渡すことで、そのカスタムレシーバーを使用できます。ここで紹介するのは、基本的なカスタムレシーバーです。
 
-レシーバーについて詳しくは、[組み込み Express レシーバーのソースコード](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)をお読みください。
+レシーバーについて詳しくは、[組み込み `ExpressReceiver` のソースコード](https://github.com/slackapi/bolt/blob/master/src/ExpressReceiver.ts)をお読みください。
 </div>
 
 ```javascript
@@ -39,6 +38,10 @@ class simpleReceiver extends EventEmitter {
     for (const endpoint of endpoints) {
       this.app.post(endpoint, this.requestHandler.bind(this));
     }
+  }
+  
+  init(app) {
+    this.bolt = app;
   }
 
   start(port) {
@@ -65,21 +68,30 @@ class simpleReceiver extends EventEmitter {
     })
   }
 
-  requestHandler(req, res) {
+  async requestHandler(req, res) {
+    let ackCalled = false;
     // 着信リクエストをパースするparseBody 関数があると仮定
     const parsedReq = parseBody(req);
     const event = {
       body: parsedReq.body,
       // レシーバーが確認作業に重要
       ack: (response) => {
-        if (!response) {
+        if (ackCalled) {
+          return;
+        }
+        
+        if (response instanceof Error) {
+          res.status(500).send();
+        } else if (!response) {
           res.send('')
         } else {
           res.send(response);
         }
+        
+        ackCalled = true;
       }
     };
-    this.emit('message', event);
+    await this.bolt.processEvent(event);
   }
 }
 ```

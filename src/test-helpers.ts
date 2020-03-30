@@ -84,7 +84,7 @@ export function wrapToResolveOnFirstCall<T extends (...args: any[]) => void>(
 
   const wrapped = async function (this: ThisParameterType<T>, ...args: Parameters<T>): Promise<void> {
     try {
-      await original.call(this, ...args);
+      original.call(this, ...args);
       firstCallResolve();
     } catch (error) {
       firstCallReject(error);

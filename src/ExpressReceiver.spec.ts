@@ -1,23 +1,18 @@
 // tslint:disable:no-implicit-dependencies
 import 'mocha';
-
 import { Logger, LogLevel } from '@slack/logger';
 import { assert } from 'chai';
 import { Request, Response } from 'express';
-import { Agent } from 'http';
 import sinon, { SinonFakeTimers } from 'sinon';
 import { Readable } from 'stream';
 
 import ExpressReceiver, {
   respondToSslCheck,
   respondToUrlVerification,
-  verifySignatureAndParseBody,
+  verifySignatureAndParseRawBody,
 } from './ExpressReceiver';
 
-import { RespondArguments } from './types/utilities';
-
 describe('ExpressReceiver', () => {
-
   const noopLogger: Logger = {
     debug(..._msg: any[]): void { /* noop */ },
     info(..._msg: any[]): void { /* noop */ },
@@ -45,10 +40,7 @@ describe('ExpressReceiver', () => {
         signingSecret: 'my-secret',
         logger: noopLogger,
         endpoints: { events: '/custom-endpoint' },
-        agent: new Agent({
-          maxSockets: 999,
-        }),
-        clientTls: undefined,
+        processBeforeResponse: true,
       });
       assert.isNotNull(receiver);
     });
@@ -60,13 +52,14 @@ describe('ExpressReceiver', () => {
         signingSecret: 'my-secret',
         logger: noopLogger,
       });
+
       await receiver.start(9999);
       await receiver.stop();
     });
   });
 
   describe('built-in middleware', () => {
-    describe('ssl_check requset handler', () => {
+    describe('ssl_check request handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
         // tslint:disable-next-line: no-object-literal-type-assertion
@@ -104,7 +97,7 @@ describe('ExpressReceiver', () => {
       });
     });
 
-    describe('url_verification requset handler', () => {
+    describe('url_verification request handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
         // tslint:disable-next-line: no-object-literal-type-assertion
@@ -143,7 +136,7 @@ describe('ExpressReceiver', () => {
     });
   });
 
-  describe('verifySignatureAndParseBody', () => {
+  describe('verifySignatureAndParseRawBody', () => {
 
     let clock: SinonFakeTimers;
 
@@ -198,7 +191,7 @@ describe('ExpressReceiver', () => {
       const next = (error: any) => { state.error = error; };
 
       // Act
-      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
     }
 
@@ -247,24 +240,15 @@ describe('ExpressReceiver', () => {
       const result: any = {};
       const resp = buildResponseToVerify(result);
 
-      let error: string = '';
-      let warn: string = '';
-      const logger = {
-        error: (msg: string) => { error = msg; },
-        warn: (msg: string) => { warn = msg; },
-      } as any as Logger;
-
       const next = sinon.fake();
 
       // Act
-      const verifier = verifySignatureAndParseBody(logger, signingSecret);
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
 
       // Assert
       assert.equal(result.code, 400);
       assert.equal(result.sent, true);
-      assert.equal(error, 'Failed to parse body as JSON data for content-type: undefined');
-      assert.equal(warn, 'Parsing request body failed (error: SyntaxError: Unexpected token o in JSON at position 1)');
     }
 
     it('should fail to parse request body without content-type header', async () => {
@@ -303,7 +287,7 @@ describe('ExpressReceiver', () => {
       const next = sinon.fake();
 
       // Act
-      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
 
       // Assert
@@ -357,7 +341,8 @@ describe('ExpressReceiver', () => {
       const next = sinon.fake();
 
       // Act
-      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
 
       // Assert
@@ -390,7 +375,7 @@ describe('ExpressReceiver', () => {
       const next = sinon.fake();
 
       // Act
-      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
 
       // Assert
@@ -416,7 +401,7 @@ describe('ExpressReceiver', () => {
       const next = sinon.fake();
 
       // Act
-      const verifier = verifySignatureAndParseBody(noopLogger, signingSecret);
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       verifier(req, resp, next);
       await verifier(req, resp, next);
 
@@ -450,21 +435,5 @@ describe('ExpressReceiver', () => {
       const req = untypedReq as Request;
       await verifySignatureMismatch(req);
     });
-
   });
-
-  // Just copied the implementation as the method is private and it's a bit hard to write a unit test
-  describe('RespondFn implementation', () => {
-    it('should work with both a string and a RespondArguments', () => {
-      const respond = (response: string | RespondArguments): void => {
-        const validResponse: RespondArguments =
-          (typeof response === 'string') ? { text: response } : response;
-        assert.equal(validResponse.text, 'hello');
-      };
-      respond('hello');
-      respond({ text: 'hello' });
-      respond({ text: 'hello', blocks: [] });
-    });
-  });
-
 });

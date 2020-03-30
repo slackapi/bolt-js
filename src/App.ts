@@ -1,6 +1,14 @@
+import { Agent } from 'http';
+import { SecureContextOptions } from 'tls';
 import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
+import {
+  WebClient,
+  ChatPostMessageArguments,
+  addAppMetadata,
+  WebClientOptions,
+} from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
+import axios, { AxiosInstance } from 'axios';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
   ignoreSelf as ignoreSelfMiddleware,
@@ -38,17 +46,25 @@ import {
   SlackViewAction,
   Receiver,
   ReceiverEvent,
+  RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
-import { ErrorCode, CodedError, errorWithCode, asCodedError } from './errors';
+import {
+  CodedError,
+  asCodedError,
+  AppInitializationError,
+  MultipleListenerError,
+} from './errors';
+import allSettled = require('promise.allsettled'); // tslint:disable-line:no-require-imports import-name
 const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
 
 /** App initialization options */
 export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
-  agent?: ExpressReceiverOptions['agent']; // also WebClientOptions['agent']
-  clientTls?: ExpressReceiverOptions['clientTls']; // also WebClientOptions['tls']
+  processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
+  agent?: Agent;
+  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
@@ -67,7 +83,7 @@ export { LogLevel, Logger } from '@slack/logger';
 export interface Authorize {
   (
     source: AuthorizeSourceData,
-    body: ReceiverEvent['body'],
+    body: AnyMiddlewareArgs['body'],
   ): Promise<AuthorizeResult>;
 }
 
@@ -107,7 +123,7 @@ export interface ViewConstraints {
 }
 
 export interface ErrorHandler {
-  (error: CodedError): void;
+  (error: CodedError): Promise<void>;
 }
 
 class WebClientPool {
@@ -141,16 +157,18 @@ export default class App {
   /** Logger */
   private logger: Logger;
 
-  /**  */
+  /** Authorize */
   private authorize: Authorize;
 
-  /** Global middleware */
+  /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
 
-  /** Listeners (and their middleware) */
+  /** Listener middleware chains */
   private listeners: Middleware<AnyMiddlewareArgs>[][];
 
   private errorHandler: ErrorHandler;
+
+  private axios: AxiosInstance;
 
   constructor({
     signingSecret = undefined,
@@ -167,6 +185,7 @@ export default class App {
     logLevel = undefined,
     ignoreSelf = true,
     clientOptions = undefined,
+    processBeforeResponse = false,
   }: AppOptions = {}) {
 
     if (typeof logger === 'undefined') {
@@ -191,18 +210,24 @@ export default class App {
     // the public WebClient instance (app.client) - this one doesn't have a token
     this.client = new WebClient(undefined, this.clientOptions);
 
+    this.axios = axios.create(Object.assign(
+      {
+        httpAgent: agent,
+        httpsAgent: agent,
+      },
+      clientTls,
+    ));
+
     if (token !== undefined) {
       if (authorize !== undefined) {
-        throw errorWithCode(
+        throw new AppInitializationError(
           `Both token and authorize options provided. ${tokenUsage}`,
-          ErrorCode.AppInitializationError,
         );
       }
       this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
     } else if (authorize === undefined) {
-      throw errorWithCode(
+      throw new AppInitializationError(
         `No token and no authorize options provided. ${tokenUsage}`,
-        ErrorCode.AppInitializationError,
       );
     } else {
       this.authorize = authorize;
@@ -217,26 +242,20 @@ export default class App {
     } else {
       // No custom receiver
       if (signingSecret === undefined) {
-        throw errorWithCode(
-          'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-          'custom receiver.',
-          ErrorCode.AppInitializationError,
+        throw new AppInitializationError(
+            'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+            'custom receiver.',
         );
       } else {
         // Create default ExpressReceiver
         this.receiver = new ExpressReceiver({
           signingSecret,
           endpoints,
-          agent,
-          clientTls,
+          processBeforeResponse,
           logger: this.logger,
         });
       }
     }
-
-    // Subscribe to messages and errors from the receiver
-    this.receiver.on('message', message => this.onIncomingEvent(message));
-    this.receiver.on('error', error => this.onGlobalError(error));
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
@@ -249,6 +268,9 @@ export default class App {
       const store: ConversationStore = convoStore === undefined ? new MemoryStore() : convoStore;
       this.use(conversationContext(store, this.logger));
     }
+
+    // Should be last to avoid exposing partially initialized app
+    this.receiver.init(this);
   }
 
   /**
@@ -308,17 +330,29 @@ export default class App {
     callbackId: string | RegExp,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
   ): void;
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
-    constraints: ShortcutConstraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut,
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>>(
+      constraints: Constraints,
+      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void;
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
-    callbackIdOrConstraints: string | RegExp | ShortcutConstraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+  public shortcut<Shortcut extends SlackShortcut = SlackShortcut,
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>>(
+      callbackIdOrConstraints: string | RegExp | Constraints,
+      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void {
     const constraints: ShortcutConstraints =
       (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
         { callback_id: callbackIdOrConstraints } : callbackIdOrConstraints;
+
+    // Fail early if the constraints contain invalid keys
+    const unknownConstraintKeys = Object.keys(constraints)
+      .filter(k => (k !== 'callback_id' && k !== 'type'));
+    if (unknownConstraintKeys.length > 0) {
+      this.logger.error(
+        `Slack listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
+      );
+      return;
+    }
 
     this.listeners.push(
       [onlyShortcuts, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
@@ -433,8 +467,8 @@ export default class App {
   /**
    * Handles events from the receiver
    */
-  private async onIncomingEvent({ body, ack, respond }: ReceiverEvent): Promise<void> {
-
+  public async processEvent(event: ReceiverEvent): Promise<void> {
+    const { body, ack } = event;
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
@@ -451,13 +485,15 @@ export default class App {
 
     // Initialize context (shallow copy to enforce object identity separation)
     const source = buildSource(type, conversationId, bodyArg);
-    const authorizeResult = await (this.authorize(source, bodyArg).catch((error) => {
-      this.onGlobalError(authorizationErrorFromOriginal(error));
-    }));
-    if (authorizeResult === undefined) {
+    let authorizeResult;
+
+    try {
+      authorizeResult = await this.authorize(source, bodyArg);
+    } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      return;
+      return this.handleError(error);
     }
+
     const context: Context = { ...authorizeResult };
 
     // Factory for say() utility
@@ -466,20 +502,10 @@ export default class App {
       return (message: Parameters<SayFn>[0]) => {
         const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
           { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
-        this.client.chat.postMessage(postMessageArguments)
-          .catch(error => this.onGlobalError(error));
+
+        return this.client.chat.postMessage(postMessageArguments);
       };
     };
-
-    let listenerArgClient = this.client;
-    const token = selectToken(context);
-    if (typeof token !== 'undefined') {
-      let pool = this.clients[source.teamId];
-      if (typeof pool === 'undefined') {
-        pool = this.clients[source.teamId] = new WebClientPool();
-      }
-      listenerArgClient = pool.getOrCreate(token, this.clientOptions);
-    }
 
     // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
     // NOTE: the following doesn't work because... distributive?
@@ -491,13 +517,7 @@ export default class App {
       respond?: RespondFn,
       /** Ack function might be set below */
       ack?: AckFn<any>,
-      /** The logger for this Bolt app */
-      logger?: Logger,
-      /** WebClient with token  */
-      client?: WebClient,
     } = {
-      logger: this.logger,
-      client: listenerArgClient,
       body: bodyArg,
       payload:
         (type === IncomingEventType.Event) ?
@@ -547,8 +567,13 @@ export default class App {
     }
 
     // Set respond() utility
-    if (respond !== undefined) {
-      listenerArgs.respond = respond;
+    if (body.response_url) {
+      listenerArgs.respond = (response: string | RespondArguments): Promise<any> => {
+        const validResponse: RespondArguments =
+            (typeof response === 'string') ? { text: response } : response;
+
+        return this.axios.post(body.response_url, validResponse);
+      };
     }
 
     // Set ack() utility
@@ -556,47 +581,73 @@ export default class App {
       listenerArgs.ack = ack;
     } else {
       // Events API requests are acknowledged right away, since there's no data expected
-      ack();
+      await ack();
     }
 
-    // Dispatch event through global middleware
-    processMiddleware(
-      listenerArgs as AnyMiddlewareArgs,
-      this.middleware,
-      (globalProcessedContext: Context, globalProcessedArgs: AnyMiddlewareArgs, startGlobalBubble) => {
-        this.listeners.forEach((listenerMiddleware) => {
-          // Dispatch event through all listeners
-          processMiddleware(
-            globalProcessedArgs,
-            listenerMiddleware,
-            (_listenerProcessedContext, _listenerProcessedArgs, startListenerBubble) => {
-              startListenerBubble();
-            },
-            (error) => {
-              startGlobalBubble(error);
-            },
-            globalProcessedContext,
-            this.logger,
-            listenerArgClient,
-          );
-        });
-      },
-      (globalError?: CodedError | Error) => {
-        if (globalError !== undefined) {
-          this.onGlobalError(globalError);
-        }
-      },
-      context,
-      this.logger,
-      listenerArgClient,
-    );
+    // Get the client arg
+    let client = this.client;
+    const token = selectToken(context);
+    if (token !== undefined) {
+      let pool = this.clients[source.teamId];
+      if (pool === undefined) {
+        pool = this.clients[source.teamId] = new WebClientPool();
+      }
+      client = pool.getOrCreate(token, this.clientOptions);
+    }
+
+    // Dispatch even through the global middleware chain
+    try {
+      await processMiddleware(
+        this.middleware,
+        listenerArgs as AnyMiddlewareArgs,
+        context,
+        client,
+        this.logger,
+        async () => {
+          // Dispatch the event through the listener middleware chains and aggregate their results
+          // TODO: change the name of this.middleware and this.listeners to help this make more sense
+          const listenerResults = this.listeners.map(async (origListenerMiddleware) => {
+            // Copy the array so modifications don't affect the original
+            const listenerMiddleware = [...origListenerMiddleware];
+
+            // Don't process the last item in the listenerMiddleware array - it shouldn't get a next fn
+            const listener = listenerMiddleware.pop();
+
+            if (listener !== undefined) {
+              return processMiddleware(
+                listenerMiddleware,
+                listenerArgs as AnyMiddlewareArgs,
+                context,
+                client,
+                this.logger,
+                async () =>
+                  // When the listener middleware chain is done processing, call the listener without a next fn
+                  listener({ ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger }),
+              );
+            }
+          });
+
+          const settledListenerResults = await allSettled(listenerResults);
+          const rejectedListenerResults =
+            settledListenerResults.filter(lr => lr.status === 'rejected') as allSettled.PromiseRejection<Error>[];
+          if (rejectedListenerResults.length === 1) {
+            throw rejectedListenerResults[0].reason;
+          } else if (rejectedListenerResults.length > 1) {
+            throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
+          }
+        },
+      );
+    } catch (error) {
+      return this.handleError(error);
+    }
   }
 
+  // TODO: make the following method private if its no longer being used by Receiver
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  private onGlobalError(error: Error): void {
-    this.errorHandler(asCodedError(error));
+  private handleError(error: Error): Promise<void> {
+    return this.errorHandler(asCodedError(error));
   }
 
 }
@@ -653,6 +704,8 @@ function isBlockActionOrInteractiveMessageBody(
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error) => {
     logger.error(error);
+
+    return Promise.reject(error);
   };
 }
 
@@ -683,15 +736,3 @@ function selectToken(context: Context): string | undefined {
 
 /* Instrumentation */
 addAppMetadata({ name: packageJson.name, version: packageJson.version });
-
-/* Error handling helpers */
-function authorizationErrorFromOriginal(original: Error): AuthorizationError {
-  const error = errorWithCode('Authorization of incoming event did not succeed.', ErrorCode.AuthorizationError);
-  (error as AuthorizationError).original = original;
-  return error as AuthorizationError;
-}
-
-export interface AuthorizationError extends CodedError {
-  code: ErrorCode.AuthorizationError;
-  original: Error;
-}

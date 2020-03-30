@@ -21,11 +21,14 @@ async function addTimezoneContext({ payload, context, next }) {
 
   // ユーザのタイムゾーン情報を追加
   context.tz_offset = user.tz_offset;
+  
+  // 制御とリスナー関数を次のミドルウェアに引き渡し
+  await next();
 }
 
 app.command('request', addTimezoneContext, async ({ command, ack, context }) => {
   // コマンドリクエストの確認
-  ack();
+  await ack();
   // リクエスト時のローカル時間を取得
   const local_hour = (Date.UTC() + context.tz_offset).getHours();
 

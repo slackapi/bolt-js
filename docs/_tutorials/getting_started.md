@@ -167,9 +167,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say(`Hey there <@${message.user}>!`);
+  await say(`Hey there <@${message.user}>!`);
 });
 
 (async () => {
@@ -188,7 +188,7 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ### Sending and responding to actions
 
-To use features like buttons, select menus, datepickers, dialogs, and message shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
+To use features like buttons, select menus, datepickers, dialogs, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
 
 Back on your app configuration page, click on **Interactive Components** on the left side. You'll see that there's another **Request URL** box.
 
@@ -211,9 +211,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say({
+  await say({
     blocks: [
     {
       "type": "section",
@@ -261,9 +261,9 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
-  say({
+  await say({
     blocks: [
       {
         "type": "section",
@@ -284,10 +284,10 @@ app.message('hello', ({ message, say }) => {
   });
 });
 
-app.action('button_click', ({ body, ack, say }) => {
+app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action
-  ack();
-  say(`<@${body.user.id}> clicked the button`);
+  await ack();
+  await say(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {

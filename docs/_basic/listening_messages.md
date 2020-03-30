@@ -14,7 +14,7 @@ To listen to messages that [your app has access to receive](https://api.slack.co
 ```javascript
 // This will match any message that contains 👋
 app.message(':wave:', async ({ message, say }) => {
-  say(`Hello, <@${message.user}>`);
+  await say(`Hello, <@${message.user}>`);
 });
 ```
 
@@ -34,7 +34,7 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
   // RegExp matches are inside of context.matches
   const greeting = context.matches[0];
 
-  say(`${greeting}, how are you?`);
+  await say(`${greeting}, how are you?`);
 });
 ```
 

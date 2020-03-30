@@ -9,19 +9,17 @@ export {
   Authorize,
   AuthorizeSourceData,
   AuthorizeResult,
-  AuthorizationError,
   ActionConstraints,
   LogLevel,
   Logger,
 } from './App';
-
-export { ErrorCode } from './errors';
 
 export {
   default as ExpressReceiver,
   ExpressReceiverOptions,
 } from './ExpressReceiver';
 
+export * from './errors';
 export * from './middleware/builtin';
 export * from './types';
 

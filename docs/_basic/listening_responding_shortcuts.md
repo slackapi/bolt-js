@@ -1,56 +1,61 @@
 ---
-title: Listening and responding to global shortcuts
+title: Listening and responding to shortcuts
 lang: en
 slug: shortcuts
 order: 8
 ---
 
 <div class="section-content">
-[Global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) are invokable UI elements within Slack clients, available in the composer and search menus. Your app can use the `shortcut()` method to listen to incoming global shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
-Global shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
+The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
-Global shortcut payloads include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking. Note that global shortcut payloads do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal.
+Shortcuts are invokable UI elements within Slack clients. For global shortcuts, they are available in the composer and search menus. For message shortcuts, they are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
-⚠️ Note that [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts) still require apps to use the [`action()` method](#action-listening). **In the next major version of Bolt, both global and message shortcuts will use the `shortcut()` method.**
+Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
+
+Shortcuts include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking. 
+
+⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include channel ID.
+
 </div>
 
 ```javascript
 // The open_modal shortcut opens a plain old modal
-app.shortcut('open_modal', async ({ payload, ack, context }) => {
-  // Acknowledge global shortcut request
-  ack();
+app.shortcut('open_modal', async ({ shortcut, ack, context, client }) => {
 
   try {
-    // Call the views.open method using the built-in WebClient
-    const result = await app.client.views.open({
+    // Acknowledge shortcut request
+    await ack();
+
+    // Call the views.open method using one of the built-in WebClients
+    const result = await client.views.open({
       // The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
-      trigger_id: payload.trigger_id,
+      trigger_id: shortcut.trigger_id,
       view: {
-        "type": "modal",
-        "title": {
-          "type": "plain_text",
-          "text": "My App"
+        type: "modal",
+        title: {
+          type: "plain_text",
+          text: "My App"
         },
-        "close": {
-          "type": "plain_text",
-          "text": "Close"
+        close: {
+          type: "plain_text",
+          text: "Close"
         },
-        "blocks": [
+        blocks: [
           {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
             }
           },
           {
-            "type": "context",
-            "elements": [
+            type: "context",
+            elements: [
               {
-                "type": "mrkdwn",
-                "text": "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
+                type: "mrkdwn",
+                text: "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
               }
             ]
           }
@@ -65,3 +70,65 @@ app.shortcut('open_modal', async ({ payload, ack, context }) => {
   }
 });
 ```
+
+<details class="secondary-wrapper">
+  <summary class="section-head" markdown="0">
+  <h4 class="section-head">Listening to shortcuts using a constraint object</h4>
+  </summary>
+
+  <div class="secondary-content" markdown="0">
+  You can use a constraints object to listen to `callback_id`s, and `type`s. Constraints in the object can be of type string or RegExp object.
+  </div>
+
+  ```javascript
+  // Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
+  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, context, client }) => {
+    try {
+      // Acknowledge shortcut request
+      await ack();
+
+      // Call the views.open method using one of the built-in WebClients
+      const result = await client.views.open({
+        // The token you used to initialize your app is stored in the `context` object
+        token: context.botToken,
+        trigger_id: shortcut.trigger_id,
+        view: {
+          type: "modal",
+          title: {
+            type: "plain_text",
+            text: "My App"
+          },
+          close: {
+            type: "plain_text",
+            text: "Close"
+          },
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
+              }
+            },
+            {
+              type: "context",
+              elements: [
+                {
+                  type: "mrkdwn",
+                  text: "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
+                }
+              ]
+            }
+          ]
+        }
+      });
+
+      console.log(result);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  });
+  ```
+
+</details>

@@ -5,7 +5,7 @@ import sinon, { SinonSpy } from 'sinon';
 import { Override, createFakeLogger, delay, wrapToResolveOnFirstCall } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
-import { AnyMiddlewareArgs, NextMiddleware, Context } from './types';
+import { AnyMiddlewareArgs, NextFn, Context } from './types';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
@@ -29,7 +29,7 @@ describe('conversationContext middleware', () => {
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
-    middleware(fakeArgs);
+    await middleware(fakeArgs);
 
     // Assert
     assert(fakeLogger.debug.called);
@@ -60,7 +60,7 @@ describe('conversationContext middleware', () => {
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
-    middleware(fakeArgs);
+    await middleware(fakeArgs);
 
     // Assert
     async function assertions(...args: any[]): Promise<void> {
@@ -98,7 +98,7 @@ describe('conversationContext middleware', () => {
 
     // Act
     const middleware = conversationContext(fakeStore, fakeLogger);
-    middleware(fakeArgs);
+    await middleware(fakeArgs);
 
     // Assert
     async function assertions(...args: any[]): Promise<void> {
@@ -193,7 +193,7 @@ describe('MemoryStore', () => {
 /* Testing Harness */
 
 type MiddlewareArgs = AnyMiddlewareArgs & {
-  next: NextMiddleware,
+  next: NextFn,
   context: Context,
   logger: Logger,
   client: WebClient,
