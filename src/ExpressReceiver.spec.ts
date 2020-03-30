@@ -40,6 +40,7 @@ describe('ExpressReceiver', () => {
         signingSecret: 'my-secret',
         logger: noopLogger,
         endpoints: { events: '/custom-endpoint' },
+        processBeforeResponse: true,
       });
       assert.isNotNull(receiver);
     });
@@ -58,7 +59,7 @@ describe('ExpressReceiver', () => {
   });
 
   describe('built-in middleware', () => {
-    describe('ssl_check requset handler', () => {
+    describe('ssl_check request handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
         // tslint:disable-next-line: no-object-literal-type-assertion
