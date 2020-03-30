@@ -126,3 +126,7 @@ async function noBotMessages({ message, next }) {
 ### @slack/bolt@1.x support schedule
 
 `@slack/bolt@1.x` will be deprecated on **June 30th, 2020**. We plan on continuing to implement bug fixes and will also consider back-porting new features on a case by case basis up until then. Once `@slack/bolt@1.x` has been deprecated, we will only implement **critical bug fixes** until the official end of life date and close non critical issues and pull requests. End of life is slated for **April 30th, 2021**. At this time, development will fully stop for `@slack/bolt@1.x` and all remaining open issues and pull requests will be closed. 
+
+### Minimum TypeScript Version
+
+As outlined in our [using TypeScript guide](https://slack.dev/bolt/tutorial/using-typescript), `@slack/bolt@2.x` requires a minimum TypeScript version of 3.7.

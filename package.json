@@ -69,6 +69,6 @@
     "ts-node": "^8.1.0",
     "tslint": "^5.15.0",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.4.3"
+    "typescript": "^3.7.2"
   }
 }
