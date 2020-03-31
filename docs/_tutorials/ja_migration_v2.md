@@ -10,6 +10,8 @@ permalink: /ja-jp/tutorial/migration-v2
 
 <div class="section-content">
 このガイドは Bolt 1.x を利用しているアプリを 2.x にアップグレードするための手順について説明します。いくつかの変更が必要とはなりますが、ほとんどのアプリの場合で、おそらく対応に必要な時間は 5 〜 15 分程度です。
+
+*注: もしすぐにアップグレードをしない場合は、[Bolt 1.x に関するサポートスケジュール](#bolt-1x-%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%82%B9%E3%82%B1%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)をご確認ください*
 </div> 
 
 ---
@@ -87,7 +89,7 @@ app.action({ callback_id: 'message-action-callback' }, ({action, ack, context}) 
 ```javascript
 app.shortcut('message-action-callback', async ({shortcut, ack, context}) => {
   await ack();
-  // Do stuff
+  // ここで処理を行う
 })
 ```
 
@@ -118,3 +120,11 @@ async function noBotMessages({message, next }) {
   }
 }
 ```
+
+### Bolt 1.x のサポートスケジュール
+
+`@slack/bolt@1.x` は **2020 年 6 月 30 日** より非推奨となります。それまでの期間はケースバイケースでバグ修正や新機能のバックポートを対応を継続します。`@slack/bolt@1.x` が非推奨となった後は、End of life（正式サポートの終了日）まで **クリティカルなバグ修正のみ** を実装し、クリティカルではない issue や pull request はクローズします。End of life は **2021 年 4 月 30 日** の予定です。この日からは `@slack/bolt@1.x` の開発は完全に終了となり、残っている open issue や pull request もクローズされます。
+
+### TypeScript の最低必須バージョン
+
+[TypeScript 利用ガイド]({{ site.url | append: site.baseurl }}/ja-jp/tutorial/using-typescript) でも説明していますが、`@slack/bolt@2.x` は TypeScirpt 3.7 以上が必須バージョンです。
