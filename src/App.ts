@@ -154,6 +154,9 @@ export default class App {
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
 
+  /** Always call ack() after event listener completion if true */
+  private processBeforeResponse: boolean = false;
+
   /** Logger */
   private logger: Logger;
 
@@ -256,6 +259,7 @@ export default class App {
         });
       }
     }
+    this.processBeforeResponse = processBeforeResponse;
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
@@ -580,8 +584,11 @@ export default class App {
     if (type !== IncomingEventType.Event) {
       listenerArgs.ack = ack;
     } else {
-      // Events API requests are acknowledged right away, since there's no data expected
-      await ack();
+      // If processBeforeResponse is true, ack() call should be after the listener completion
+      if (!this.processBeforeResponse) {
+        // Events API requests are acknowledged right away, since there's no data expected
+        await ack();
+      }
     }
 
     // Get the client arg
@@ -634,6 +641,9 @@ export default class App {
             throw rejectedListenerResults[0].reason;
           } else if (rejectedListenerResults.length > 1) {
             throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
+          }
+          if (this.processBeforeResponse && type === IncomingEventType.Event) {
+            await ack();
           }
         },
       );

@@ -96,12 +96,24 @@ export default class ExpressReceiver implements Receiver {
 
     try {
       await this.bolt?.processEvent(event);
-      if (storedResponse !== undefined) {
-        if (typeof storedResponse === 'string') {
-          res.send(storedResponse);
-        } else {
-          res.json(storedResponse);
+
+      if (this.processBeforeResponse) {
+        let spentMillis = 0;
+        const millisForTimeout = 10;
+        // Wait here until the isAcknowledged is marked as true or 3 seconds have passed
+        while (!isAcknowledged && spentMillis < 3000) {
+          await new Promise(resolve => setTimeout(resolve, millisForTimeout));
+          spentMillis += millisForTimeout;
         }
+        if (isAcknowledged) {
+          this.logger.debug(`The listener execution completed in ${spentMillis} millis`);
+          if (typeof storedResponse === 'string') {
+            res.send(storedResponse);
+          }  else {
+            res.json(storedResponse);
+          }
+          this.logger.debug('Acknowledged after the listener completion');
+        } // Otherwise, this Bolt app never responds to this request and above setTimeout outputs an error message
       }
     } catch (err) {
       res.send(500);
