@@ -35,7 +35,7 @@ async function authWithAcme({ payload, context, next }) {
           token: context.botToken,
           channel: payload.channel,
           user: slackUserId,
-          text: `Sorry <@${slackUserId}, you aren't registered in Acme. Please post in <#${helpChannelId} for assistance.`
+          text: `Sorry <@${slackUserId}>, you aren't registered in Acme. Please post in <#${helpChannelId}> for assistance.`
         });
         return;
     }
