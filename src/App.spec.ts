@@ -1257,6 +1257,89 @@ describe('App', () => {
           assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
         });
       });
+
+      describe('processBeforeResponse', () => {
+
+        it('should call ack() after event listener completion', async () => {
+          // Arrange
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+            processBeforeResponse: true,
+          });
+
+          let acknowledged = false;
+
+          app.event('app_home_opened', async ({}) => {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isFalse(acknowledged);
+          });
+
+          const event = {
+            body: {
+              type: 'event_callback',
+              token: 'XXYYZZ',
+              team_id: 'TXXXXXXXX',
+              api_app_id: 'AXXXXXXXXX',
+              event: {
+                type: 'app_home_opened',
+                event_ts: '1234567890.123456',
+                user: 'UXXXXXXX1',
+                text: 'hello friends!',
+                tab: 'home',
+                view: {},
+              },
+            },
+            respond: noop,
+            ack: async (_res: any) => {
+              acknowledged = true;
+            },
+          };
+
+          // Act
+          await fakeReceiver.sendEvent(event);
+
+          // Assert
+          assert.isTrue(acknowledged);
+        });
+
+        it('should call ack() after command listener completion', async () => {
+          // Arrange
+          const App = await importApp(overrides); // tslint:disable-line:variable-name
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+            processBeforeResponse: true,
+          });
+
+          let acknowledged = false;
+
+          app.command('/hello', async ({ ack }) => {
+            assert.isFalse(acknowledged);
+            await ack();
+          });
+
+          const event = {
+            ...baseEvent,
+            body: {
+              command: '/hello',
+            },
+            ack: async (_res: any) => {
+              acknowledged = true;
+            },
+          };
+
+          // Act
+          await fakeReceiver.sendEvent(event);
+          // Assert
+          assert.isTrue(acknowledged);
+        });
+      });
     });
   });
 });
