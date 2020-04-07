@@ -1,4 +1,4 @@
-# Slack ⚡️ Bolt for JavaScript
+# ![Bolt logo](docs/assets/bolt-logo.svg) Bolt for JavaScript
 
 [![Build Status](https://travis-ci.org/slackapi/bolt.svg?branch=master)](https://travis-ci.org/slackapi/bolt)
 [![codecov](https://codecov.io/gh/slackapi/bolt/branch/master/graph/badge.svg)](https://codecov.io/gh/slackapi/bolt)
