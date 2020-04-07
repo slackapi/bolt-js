@@ -2,10 +2,13 @@
 :root {
   --light-grey: #F8F8F8;
   --grey: #868686;
+  --dark-grey: #616061;
+  --soft-grey: #DDDDDD;
   --blue: #1264A3;
+  --green: #00B073;
   --light-blue: #B8D1E3;
   --white: #FFFFFF;
-  --black: #000000;
+  --black: #1D1C1D;
 }
 
 body {
@@ -29,45 +32,53 @@ body {
 }
 
 .panel .sidebar-content {
-  width: 70%;
+  width: 75%;
   margin: 30px auto 20px auto;
-  left: 1em;
 }
 
 .panel .sidebar-content .logo {
   padding-top: 1em;
+  position: relative;
 }
 
 .panel .sidebar-content .logo .icon img {
-  width: 16px;
-  margin-right: 4px;
-  margin-top: -8px;
-  margin-left: -15px;
+  width: 30px;
+  margin-right: 6px;
 }
 
 .panel .sidebar-content .logo .name {
   font-weight: 800;
-  font-size: 1.5em;
+  font-size: 1.7em;
+  vertical-align: bottom;
+}
+
+.panel .sidebar-content .logo .version {
+  line-height: 1em;
+  vertical-align: bottom;
 }
 
 .panel .sidebar-content .logo .version a {
-  color: var(--grey);
-  font-size: 0.75em;
+  color: var(--dark-grey);
+  background-color: var(--soft-grey);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+  
 }
 
 .panel .sidebar-content ul.sidebar-section {
   list-style: none;
   list-style-position: inside;
   padding-top: 0.9em;
-  margin: 0;
+  margin: 0 0 0 -8px;
   font-size: 0.80em;
 }
 
 .panel .sidebar-content ul.sidebar-section li {
-  border-radius: 6px;
-  padding-left: 10px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  border-radius: 8px;
+  padding: 2px 0 2px 8px;
   margin: 3px 0;
   color: var(--black);
 }
