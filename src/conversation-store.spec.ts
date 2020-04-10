@@ -2,7 +2,7 @@
 import 'mocha';
 import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
-import { Override, createFakeLogger, delay, wrapToResolveOnFirstCall } from './test-helpers';
+import { Override, createFakeLogger, delay } from './test-helpers';
 import rewiremock from 'rewiremock';
 import { ConversationStore } from './conversation-store';
 import { AnyMiddlewareArgs, NextFn, Context } from './types';
@@ -52,31 +52,32 @@ describe('conversationContext middleware', () => {
       sinon.fake.resolves(dummyStoreSetResult),
     );
     const fakeLogger = createFakeLogger();
-    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+    const fakeNext = sinon.fake();
     const dummyContext: DummyContext<symbol> = {};
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = { next, body: {}, context: dummyContext, logger: fakeLogger } as unknown as MiddlewareArgs;
+    const fakeArgs = {
+      body: {},
+      context: dummyContext,
+      next: fakeNext,
+      logger: fakeLogger,
+    } as unknown as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
     await middleware(fakeArgs);
 
     // Assert
-    async function assertions(...args: any[]): Promise<void> {
-      assert.notExists(args[0]);
-      assert.notProperty(dummyContext, 'conversation');
-      if (dummyContext.updateConversation !== undefined) {
-        const result = await dummyContext.updateConversation(dummyConversationState);
-        assert.equal(result, dummyStoreSetResult);
-        assert(fakeStore.set.calledOnce);
-        assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState));
-      } else {
-        assert.fail();
-      }
+    assert(fakeNext.called);
+    assert.notProperty(dummyContext, 'conversation');
+    // NOTE: chai types do not offer assertion signatures yet, and neither do node's assert module types.
+    if (dummyContext.updateConversation === undefined) {
+      assert.fail();
     }
-    return onNextFirstCall;
+    assert.equal(await dummyContext.updateConversation(dummyConversationState), dummyStoreSetResult);
+    assert(fakeStore.set.calledOnce);
+    assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState));
   });
 
   it('should add to the context for events within a conversation that was previously stored', async () => {
@@ -90,32 +91,33 @@ describe('conversationContext middleware', () => {
       sinon.fake.resolves(dummyStoreSetResult),
     );
     const fakeLogger = createFakeLogger();
-    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+    const fakeNext = sinon.fake();
     const dummyContext: DummyContext<symbol> = {};
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = { next, body: {}, context: dummyContext, logger: fakeLogger } as unknown as MiddlewareArgs;
+    const fakeArgs = {
+      body: {},
+      context: dummyContext,
+      next: fakeNext,
+      logger: fakeLogger,
+    } as unknown as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
     await middleware(fakeArgs);
 
     // Assert
-    async function assertions(...args: any[]): Promise<void> {
-      assert.notExists(args[0]);
-      assert.equal(dummyContext.conversation, dummyConversationState);
-      if (dummyContext.updateConversation !== undefined) {
-        const newDummyConversationState = Symbol();
-        const result = await dummyContext.updateConversation(newDummyConversationState);
-        assert.equal(result, dummyStoreSetResult);
-        assert(fakeStore.set.calledOnce);
-        assert(fakeStore.set.calledWith(dummyConversationId, newDummyConversationState));
-      } else {
-        assert.fail();
-      }
+    assert.equal(dummyContext.conversation, dummyConversationState);
+    // NOTE: chai types do not offer assertion signatures yet, and neither do node's assert module types.
+    if (dummyContext.updateConversation === undefined) {
+      assert.fail();
     }
-    return onNextFirstCall;
+    const newDummyConversationState = Symbol();
+    const result = await dummyContext.updateConversation(newDummyConversationState);
+    assert.equal(result, dummyStoreSetResult);
+    assert(fakeStore.set.calledOnce);
+    assert(fakeStore.set.calledWith(dummyConversationId, newDummyConversationState));
   });
 });
 
