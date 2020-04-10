@@ -20,8 +20,12 @@
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": null,
       "env": {
-        "NODE_ENV": "testing"
-      }
+        "NODE_ENV": "testing",
+        "TS_NODE_PROJECT": "tsconfig.test.json"
+      },
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     }
   ]
 }
