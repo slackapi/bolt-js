@@ -3,7 +3,7 @@ import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { ErrorCode, ContextMissingPropertyError } from '../errors';
-import { Override, wrapToResolveOnFirstCall, createFakeLogger } from '../test-helpers';
+import { Override, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import {
   SlackEventMiddlewareArgs,
@@ -36,9 +36,9 @@ describe('matchMessage()', () => {
     return async () => {
       // Arrange
       const dummyContext: DummyContext = {};
-      const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+      const fakeNext = sinon.fake();
       const fakeArgs = {
-        next,
+        next: fakeNext,
         message: createFakeMessageEvent(matchingText),
         context: dummyContext,
       } as unknown as MessageMiddlewareArgs;
@@ -49,19 +49,15 @@ describe('matchMessage()', () => {
       await middleware(fakeArgs);
 
       // Assert
-      async function assertions(...args: any[]): Promise<void> {
-        // Assert that there is no error
-        assert.notExists(args[0]);
-        // The following assertion(s) check behavior that is only targeted at RegExp patterns
-        if (typeof pattern !== 'string') {
-          if (dummyContext.matches !== undefined) {
-            assert.lengthOf(dummyContext.matches, 1);
-          } else {
-            assert.fail();
-          }
+      assert(fakeNext.called);
+      // The following assertion(s) check behavior that is only targeted at RegExp patterns
+      if (typeof pattern !== 'string') {
+        if (dummyContext.matches !== undefined) {
+          assert.lengthOf(dummyContext.matches, 1);
+        } else {
+          assert.fail();
         }
       }
-      return onNextFirstCall;
     };
   }
 
@@ -164,9 +160,9 @@ describe('directMention()', () => {
     // Arrange
     const fakeBotUserId = 'B123456';
     const messageText = `<@${fakeBotUserId}> hi`;
-    const { fn: next, promise: onNextFirstCall } = wrapToResolveOnFirstCall(assertions);
+    const fakeNext = sinon.fake();
     const fakeArgs = {
-      next,
+      next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
     } as unknown as MessageMiddlewareArgs;
@@ -177,11 +173,7 @@ describe('directMention()', () => {
     await middleware(fakeArgs);
 
     // Assert
-    async function assertions(...args: any[]): Promise<void> {
-      // Assert that there is no error
-      assert.notExists(args[0]);
-    }
-    return onNextFirstCall;
+    assert(fakeNext.called);
   });
 
   it('should not match message events that do not mention the bot user ID', async () => {
