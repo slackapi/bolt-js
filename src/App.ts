@@ -266,7 +266,7 @@ export default class App {
     if (convoStore !== false) {
       // Use the memory store by default, or another store if provided
       const store: ConversationStore = convoStore === undefined ? new MemoryStore() : convoStore;
-      this.use(conversationContext(store, this.logger));
+      this.use(conversationContext(store));
     }
 
     // Should be last to avoid exposing partially initialized app

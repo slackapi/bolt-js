@@ -25,10 +25,11 @@ describe('conversationContext middleware', () => {
       body: {},
       context: dummyContext,
       next: fakeNext,
+      logger: fakeLogger,
     } as unknown as MiddlewareArgs;
 
     // Act
-    const middleware = conversationContext(fakeStore, fakeLogger);
+    const middleware = conversationContext(fakeStore);
     await middleware(fakeArgs);
 
     // Assert
@@ -56,10 +57,10 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = { next, body: {}, context: dummyContext } as unknown as MiddlewareArgs;
+    const fakeArgs = { next, body: {}, context: dummyContext, logger: fakeLogger } as unknown as MiddlewareArgs;
 
     // Act
-    const middleware = conversationContext(fakeStore, fakeLogger);
+    const middleware = conversationContext(fakeStore);
     await middleware(fakeArgs);
 
     // Assert
@@ -94,10 +95,10 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = { next, body: {}, context: dummyContext } as unknown as MiddlewareArgs;
+    const fakeArgs = { next, body: {}, context: dummyContext, logger: fakeLogger } as unknown as MiddlewareArgs;
 
     // Act
-    const middleware = conversationContext(fakeStore, fakeLogger);
+    const middleware = conversationContext(fakeStore);
     await middleware(fakeArgs);
 
     // Assert
