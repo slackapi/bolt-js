@@ -1,5 +1,4 @@
 import { Middleware, AnyMiddlewareArgs } from './types';
-import { Logger } from '@slack/logger';
 import { getTypeAndConversation } from './helpers';
 
 /**
@@ -53,28 +52,22 @@ export class MemoryStore<ConversationState = any> implements ConversationStore<C
  */
 export function conversationContext<ConversationState = any>(
   store: ConversationStore<ConversationState>,
-  logger: Logger,
 ): Middleware<AnyMiddlewareArgs> {
-  return async (args) => {
-    const { body, context, next } = args;
-    const { conversationId } = getTypeAndConversation(body as any);
+  return async ({ body, context, next, logger }) => {
+    const { conversationId } = getTypeAndConversation(body);
     if (conversationId !== undefined) {
       // TODO: expiresAt is not passed through to store.set
       context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
-      store.get(conversationId)
-        .then((conversationState) => {
-          context.conversation = conversationState;
-          logger.debug(`Conversation context loaded for ID ${conversationId}`);
-        })
-        .catch((error) => {
-          logger.debug(`Conversation context not loaded: ${error.message}`);
-        })
-        .then(next)
-        .catch(error => logger.debug(error.message));
+      try {
+        context.conversation = await store.get(conversationId);
+        logger.debug(`Conversation context loaded for ID ${conversationId}`);
+      } catch (error) {
+        logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${error.message}`);
+      }
     } else {
       logger.debug('No conversation ID for incoming event');
-      // TODO: remove the non-null assertion operator
-      await next!();
     }
+    // TODO: remove the non-null assertion operator
+    await next!();
   };
 }

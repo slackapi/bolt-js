@@ -266,7 +266,7 @@ export default class App {
     if (convoStore !== false) {
       // Use the memory store by default, or another store if provided
       const store: ConversationStore = convoStore === undefined ? new MemoryStore() : convoStore;
-      this.use(conversationContext(store, this.logger));
+      this.use(conversationContext(store));
     }
 
     // Should be last to avoid exposing partially initialized app
@@ -595,7 +595,7 @@ export default class App {
       client = pool.getOrCreate(token, this.clientOptions);
     }
 
-    // Dispatch even through the global middleware chain
+    // Dispatch event through the global middleware chain
     try {
       await processMiddleware(
         this.middleware,
@@ -642,7 +642,6 @@ export default class App {
     }
   }
 
-  // TODO: make the following method private if its no longer being used by Receiver
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
