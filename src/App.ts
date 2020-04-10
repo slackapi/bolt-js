@@ -595,7 +595,7 @@ export default class App {
       client = pool.getOrCreate(token, this.clientOptions);
     }
 
-    // Dispatch even through the global middleware chain
+    // Dispatch event through the global middleware chain
     try {
       await processMiddleware(
         this.middleware,
@@ -642,7 +642,6 @@ export default class App {
     }
   }
 
-  // TODO: make the following method private if its no longer being used by Receiver
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */

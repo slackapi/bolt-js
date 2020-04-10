@@ -72,6 +72,7 @@ export default class ExpressReceiver implements Receiver {
     const event: ReceiverEvent = {
       body: req.body,
       ack: async (response): Promise<void> => {
+        this.logger.debug('ack() begin');
         if (isAcknowledged) {
           throw new ReceiverMultipleAckError();
         }
@@ -82,6 +83,7 @@ export default class ExpressReceiver implements Receiver {
           } else {
             storedResponse = response;
           }
+          this.logger.debug('ack() response stored');
         } else {
           if (!response) {
             res.send('');
@@ -90,6 +92,7 @@ export default class ExpressReceiver implements Receiver {
           } else {
             res.json(response);
           }
+          this.logger.debug('ack() response sent');
         }
       },
     };
@@ -102,6 +105,7 @@ export default class ExpressReceiver implements Receiver {
         } else {
           res.json(storedResponse);
         }
+        this.logger.debug('stored response sent');
       }
     } catch (err) {
       res.send(500);
