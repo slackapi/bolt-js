@@ -250,3 +250,5 @@ export type BlockChannelsSelectAction = BlockAction<ChannelsSelectAction>;
 export type BlockExternalSelectAction = BlockAction<ExternalSelectAction>;
 export type BlockOverflowAction = BlockAction<OverflowAction>;
 export type BlockDatepickerAction = BlockAction<DatepickerAction>;
+export type BlockRadioButtonsAction = BlockAction<RadioButtonsAction>;
+export type BlockCheckboxesAction = BlockAction<CheckboxesAction>;
