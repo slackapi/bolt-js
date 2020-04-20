@@ -1,6 +1,6 @@
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 import { createServer, Server } from 'http';
-import express, { Request, Response, Application, RequestHandler } from 'express';
+import express, { Request, Response, Application, RequestHandler, Router } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
@@ -8,6 +8,7 @@ import tsscmp from 'tsscmp';
 import App from './App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
+import { InstallProvider, StateStore, InstallationStore, OAuthInterface, CallbackOptions } from '@slack/oauth';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -18,6 +19,15 @@ export interface ExpressReceiverOptions {
     [endpointType: string]: string;
   };
   processBeforeResponse?: boolean;
+  clientId?: string;
+  clientSecret?: string;
+  stateStore?: StateStore; // default ClearStateStore
+  stateSecret?: string; // ClearStateStoreOptions['secret']; // required when using default stateStore
+  installationStore?: InstallationStore; // default MemoryInstallationStore
+  authVersion?: 'v1' | 'v2'; // default 'v2'
+  scopes?: string | string[];
+  metadata?: string;
+  oAuthCallbackOptions?: CallbackOptions;
 }
 
 /**
@@ -32,18 +42,28 @@ export default class ExpressReceiver implements Receiver {
   private bolt: App | undefined;
   private logger: Logger;
   private processBeforeResponse: boolean;
+  public router: Router;
+  public oauthAuthorize: OAuthInterface['authorize'] | undefined;
 
   constructor({
     signingSecret = '',
     logger = new ConsoleLogger(),
     endpoints = { events: '/slack/events' },
     processBeforeResponse = false,
+    clientId = undefined,
+    clientSecret = undefined,
+    stateStore = undefined,
+    stateSecret = undefined,
+    installationStore = undefined,
+    authVersion = 'v2',
+    metadata = undefined,
+    scopes = undefined,
   }: ExpressReceiverOptions) {
     this.app = express();
     // TODO: what about starting an https server instead of http? what about other options to create the server?
     this.server = createServer(this.app);
 
-    const expressMiddleware: RequestHandler[] = [
+    const expressMiddleware = [
       verifySignatureAndParseRawBody(logger, signingSecret),
       respondToSslCheck,
       respondToUrlVerification,
@@ -52,9 +72,49 @@ export default class ExpressReceiver implements Receiver {
 
     this.processBeforeResponse = processBeforeResponse;
     this.logger = logger;
-    const endpointList: string[] = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
+    const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
+    this.router = Router();
     for (const endpoint of endpointList) {
-      this.app.post(endpoint, ...expressMiddleware);
+      this.router.post(endpoint, ...expressMiddleware);
+    }
+    this.app.use(this.router);
+    this.oauthAuthorize = undefined;
+
+    let oauthInstaller: OAuthInterface | undefined = undefined;
+    if (
+      clientId !== undefined
+      && clientSecret !== undefined
+      && (stateSecret !== undefined || stateStore !== undefined)
+    ) {
+
+      oauthInstaller = new InstallProvider({
+        clientId,
+        clientSecret,
+        stateSecret,
+        stateStore,
+        installationStore,
+        authVersion,
+      });
+    }
+
+    // Add OAuth routes to receiver
+    if (oauthInstaller !== undefined) {
+      this.app.use('/slack/install', (req, res) => {
+        return oauthInstaller!.handleCallback(req, res, {});
+      });
+      this.app.get('/slack/begin_auth', (_req, res, next) => {
+        // TODO, take in arguments or function for
+        oauthInstaller!.generateInstallUrl({
+          metadata,
+          scopes: scopes!,
+        }).then((url: string) => {
+          res.send(`<a href=${url}><img alt=""Add to Slack"" height="40" width="139"
+            src="https://platform.slack-edge.com/img/add_to_slack.png"
+            srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x,
+            https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>`);
+        }).catch(next);
+      });
+      this.oauthAuthorize = oauthInstaller.authorize;
     }
   }
 

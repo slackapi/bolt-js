@@ -63,6 +63,14 @@ export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
   processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
+  clientId?: ExpressReceiverOptions['clientId'];
+  clientSecret?: ExpressReceiverOptions['clientSecret'];
+  stateStore?: ExpressReceiverOptions['stateStore']; // default ClearStateStore
+  stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
+  installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
+  authVersion?: ExpressReceiverOptions['authVersion']; // default 'v2'
+  scopes?: ExpressReceiverOptions['scopes'];
+  metadata?: ExpressReceiverOptions['metadata'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -83,7 +91,7 @@ export { LogLevel, Logger } from '@slack/logger';
 export interface Authorize {
   (
     source: AuthorizeSourceData,
-    body: AnyMiddlewareArgs['body'],
+    body?: AnyMiddlewareArgs['body'],
   ): Promise<AuthorizeResult>;
 }
 
@@ -158,7 +166,7 @@ export default class App {
   private logger: Logger;
 
   /** Authorize */
-  private authorize: Authorize;
+  private authorize!: Authorize;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -186,6 +194,14 @@ export default class App {
     ignoreSelf = true,
     clientOptions = undefined,
     processBeforeResponse = false,
+    clientId = undefined,
+    clientSecret = undefined,
+    stateStore = undefined,
+    stateSecret = undefined,
+    installationStore = undefined,
+    authVersion = 'v2',
+    scopes = undefined,
+    metadata = undefined,
   }: AppOptions = {}) {
 
     if (typeof logger === 'undefined') {
@@ -218,21 +234,6 @@ export default class App {
       clientTls,
     ));
 
-    if (token !== undefined) {
-      if (authorize !== undefined) {
-        throw new AppInitializationError(
-          `Both token and authorize options provided. ${tokenUsage}`,
-        );
-      }
-      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined) {
-      throw new AppInitializationError(
-        `No token and no authorize options provided. ${tokenUsage}`,
-      );
-    } else {
-      this.authorize = authorize;
-    }
-
     this.middleware = [];
     this.listeners = [];
 
@@ -252,9 +253,48 @@ export default class App {
           signingSecret,
           endpoints,
           processBeforeResponse,
+          clientId,
+          clientSecret,
+          stateStore,
+          stateSecret,
+          installationStore,
+          authVersion,
+          metadata,
+          scopes,
           logger: this.logger,
         });
       }
+    }
+
+    let usingBuiltinOauth = undefined;
+    if (
+      clientId !== undefined
+      && clientSecret !== undefined
+      && (stateSecret !== undefined || stateStore !== undefined)
+      && this.receiver instanceof ExpressReceiver
+    ) {
+      usingBuiltinOauth = true;
+    }
+
+    if (token !== undefined) {
+      if (authorize !== undefined || usingBuiltinOauth !== undefined) {
+        throw new AppInitializationError(
+          `token as well as authorize options or installer options were provided. ${tokenUsage}`,
+        );
+      }
+      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
+    } else if (authorize === undefined && usingBuiltinOauth === undefined) {
+      throw new AppInitializationError(
+        `No token, no authorize options, and no installer options provided. ${tokenUsage}`,
+      );
+    } else if (authorize !== undefined && usingBuiltinOauth !== undefined) {
+      throw new AppInitializationError(
+        `Both authorize options and installer options provided. ${tokenUsage}`,
+      );
+    } else if (authorize === undefined && usingBuiltinOauth !== undefined) {
+      this.authorize = (this.receiver as ExpressReceiver).oauthAuthorize as Authorize;
+    } else if (authorize !== undefined && usingBuiltinOauth === undefined) {
+      this.authorize = authorize;
     }
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
