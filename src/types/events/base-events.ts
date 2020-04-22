@@ -66,7 +66,8 @@ export type SlackEvent =
   | TeamJoinEvent
   | TeamRenameEvent
   | TokensRevokedEvent
-  | UserChangeEvent;
+  | UserChangeEvent
+  | WorkflowStepStartedEvent;
 
 /**
  * Any event in Slack's Events API
@@ -750,6 +751,23 @@ export interface UserChangeEvent extends StringIndexed {
   // https://api.slack.com/types/user
   user: {
   };
+}
+
+export interface WorkflowStepStartedEvent extends StringIndexed {
+  type: 'workflow_step_started';
+  callback_id: string;
+  workflow_step: {
+    workflow_step: {
+      context_id: string;
+      inputs: object;
+      outputs: {
+        name: string;
+        type: string;
+        label: string;
+      }[];
+    };
+  };
+  event_ts: string;
 }
 
 // NOTE: `user_resourced_denied`, `user_resource_granted`, `user_resourced_removed` are left out because they are
