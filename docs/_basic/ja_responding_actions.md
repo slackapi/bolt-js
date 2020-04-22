@@ -33,7 +33,7 @@ app.action('approve_button', async ({ ack, say }) => {
 // "user_select" の action_id がトリガーされたアクションをリスニング
 app.action('user_choice', async ({ action, ack, respond }) => {
   await ack();
-  await respond(`You selected <@${action.selected_user}>`);
+  await respond({ text: `You selected <@${action.selected_user}>` });
 });
 ```
 
