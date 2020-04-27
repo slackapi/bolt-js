@@ -108,7 +108,7 @@ export default class ExpressReceiver implements Receiver {
         this.logger.debug('stored response sent');
       }
     } catch (err) {
-      res.send(500);
+      res.status(500).send();
       throw err;
     }
   }
