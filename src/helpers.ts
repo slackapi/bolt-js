@@ -80,6 +80,6 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
 /* istanbul ignore next */
 
 /** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
-export function assertNever(x: never): never {
+export function assertNever(x?: never): never {
   throw new Error(`Unexpected object: ${x}`);
 }

@@ -8,7 +8,7 @@ import tsscmp from 'tsscmp';
 import App from './App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
-import { InstallProvider, StateStore, InstallationStore, OAuthInterface, CallbackOptions } from '@slack/oauth';
+import { InstallProvider, StateStore, InstallationStore, CallbackOptions } from '@slack/oauth';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -21,13 +21,20 @@ export interface ExpressReceiverOptions {
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
-  stateStore?: StateStore; // default ClearStateStore
   stateSecret?: string; // ClearStateStoreOptions['secret']; // required when using default stateStore
   installationStore?: InstallationStore; // default MemoryInstallationStore
-  authVersion?: 'v1' | 'v2'; // default 'v2'
   scopes?: string | string[];
+  installerOptions?: InstallerOptions;
+}
+
+// Additional Installer Options
+interface InstallerOptions {
+  stateStore?: StateStore; // default ClearStateStore
+  authVersion?: 'v1' | 'v2'; // default 'v2'
   metadata?: string;
-  oAuthCallbackOptions?: CallbackOptions;
+  installPath?: string;
+  redirectUriPath?: string;
+  callbackOptions?: CallbackOptions;
 }
 
 /**
@@ -43,7 +50,7 @@ export default class ExpressReceiver implements Receiver {
   private logger: Logger;
   private processBeforeResponse: boolean;
   public router: Router;
-  public oauthAuthorize: OAuthInterface['authorize'] | undefined;
+  public installer: InstallProvider | undefined = undefined;
 
   constructor({
     signingSecret = '',
@@ -52,18 +59,16 @@ export default class ExpressReceiver implements Receiver {
     processBeforeResponse = false,
     clientId = undefined,
     clientSecret = undefined,
-    stateStore = undefined,
     stateSecret = undefined,
     installationStore = undefined,
-    authVersion = 'v2',
-    metadata = undefined,
     scopes = undefined,
+    installerOptions = {},
   }: ExpressReceiverOptions) {
     this.app = express();
     // TODO: what about starting an https server instead of http? what about other options to create the server?
     this.server = createServer(this.app);
 
-    const expressMiddleware = [
+    const expressMiddleware: RequestHandler[] = [
       verifySignatureAndParseRawBody(logger, signingSecret),
       respondToSslCheck,
       respondToUrlVerification,
@@ -77,45 +82,50 @@ export default class ExpressReceiver implements Receiver {
     for (const endpoint of endpointList) {
       this.router.post(endpoint, ...expressMiddleware);
     }
-    this.app.use(this.router);
-    this.oauthAuthorize = undefined;
 
-    let oauthInstaller: OAuthInterface | undefined = undefined;
     if (
       clientId !== undefined
       && clientSecret !== undefined
-      && (stateSecret !== undefined || stateStore !== undefined)
+      && (stateSecret !== undefined || installerOptions.stateStore !== undefined)
     ) {
 
-      oauthInstaller = new InstallProvider({
+      this.installer = new InstallProvider({
         clientId,
         clientSecret,
         stateSecret,
-        stateStore,
         installationStore,
-        authVersion,
+        stateStore: installerOptions.stateStore,
+        authVersion: installerOptions.authVersion!,
       });
     }
 
     // Add OAuth routes to receiver
-    if (oauthInstaller !== undefined) {
-      this.app.use('/slack/install', (req, res) => {
-        return oauthInstaller!.handleCallback(req, res, {});
+    if (this.installer !== undefined) {
+      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
+        '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      this.router.use(redirectUriPath, async (req, res) => {
+        await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
       });
-      this.app.get('/slack/begin_auth', (_req, res, next) => {
-        // TODO, take in arguments or function for
-        oauthInstaller!.generateInstallUrl({
-          metadata,
-          scopes: scopes!,
-        }).then((url: string) => {
+
+      const installPath = installerOptions.installPath === undefined ?
+      '/slack/install' : installerOptions.installPath;
+      this.router.get(installPath, async (_req, res, next) => {
+        try {
+          const url = await this.installer!.generateInstallUrl({
+            metadata: installerOptions.metadata,
+            scopes: scopes!,
+          });
           res.send(`<a href=${url}><img alt=""Add to Slack"" height="40" width="139"
-            src="https://platform.slack-edge.com/img/add_to_slack.png"
-            srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x,
-            https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>`);
-        }).catch(next);
+              src="https://platform.slack-edge.com/img/add_to_slack.png"
+              srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x,
+              https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>`);
+        } catch (error) {
+          next(error);
+        }
       });
-      this.oauthAuthorize = oauthInstaller.authorize;
     }
+
+    this.app.use(this.router);
   }
 
   private async requestHandler(req: Request, res: Response): Promise<void> {

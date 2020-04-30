@@ -65,12 +65,10 @@ export interface AppOptions {
   processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
   clientId?: ExpressReceiverOptions['clientId'];
   clientSecret?: ExpressReceiverOptions['clientSecret'];
-  stateStore?: ExpressReceiverOptions['stateStore']; // default ClearStateStore
   stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
   installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
-  authVersion?: ExpressReceiverOptions['authVersion']; // default 'v2'
   scopes?: ExpressReceiverOptions['scopes'];
-  metadata?: ExpressReceiverOptions['metadata'];
+  installerOptions?: ExpressReceiverOptions['installerOptions'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -196,12 +194,10 @@ export default class App {
     processBeforeResponse = false,
     clientId = undefined,
     clientSecret = undefined,
-    stateStore = undefined,
     stateSecret = undefined,
     installationStore = undefined,
-    authVersion = 'v2',
     scopes = undefined,
-    metadata = undefined,
+    installerOptions = undefined,
   }: AppOptions = {}) {
 
     if (typeof logger === 'undefined') {
@@ -255,46 +251,47 @@ export default class App {
           processBeforeResponse,
           clientId,
           clientSecret,
-          stateStore,
           stateSecret,
           installationStore,
-          authVersion,
-          metadata,
+          installerOptions,
           scopes,
           logger: this.logger,
         });
       }
     }
 
-    let usingBuiltinOauth = undefined;
+    let usingBuiltinOauth = false;
     if (
       clientId !== undefined
       && clientSecret !== undefined
-      && (stateSecret !== undefined || stateStore !== undefined)
+      && (stateSecret !== undefined || (installerOptions !== undefined && installerOptions.stateStore !== undefined))
       && this.receiver instanceof ExpressReceiver
     ) {
       usingBuiltinOauth = true;
     }
 
     if (token !== undefined) {
-      if (authorize !== undefined || usingBuiltinOauth !== undefined) {
+      if (authorize !== undefined || usingBuiltinOauth) {
         throw new AppInitializationError(
-          `token as well as authorize options or installer options were provided. ${tokenUsage}`,
+          `token as well as authorize options or oauth installer options were provided. ${tokenUsage}`,
         );
       }
       this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined && usingBuiltinOauth === undefined) {
+    } else if (authorize === undefined && !usingBuiltinOauth) {
       throw new AppInitializationError(
-        `No token, no authorize options, and no installer options provided. ${tokenUsage}`,
+        `No token, no authorize options, and no oauth installer options provided. ${tokenUsage}`,
       );
-    } else if (authorize !== undefined && usingBuiltinOauth !== undefined) {
+    } else if (authorize !== undefined && usingBuiltinOauth) {
       throw new AppInitializationError(
-        `Both authorize options and installer options provided. ${tokenUsage}`,
+        `Both authorize options and oauth installer options provided. ${tokenUsage}`,
       );
-    } else if (authorize === undefined && usingBuiltinOauth !== undefined) {
-      this.authorize = (this.receiver as ExpressReceiver).oauthAuthorize as Authorize;
-    } else if (authorize !== undefined && usingBuiltinOauth === undefined) {
+    } else if (authorize === undefined && usingBuiltinOauth) {
+      this.authorize = (this.receiver as ExpressReceiver).installer?.authorize as Authorize;
+    } else if (authorize !== undefined && !usingBuiltinOauth) {
       this.authorize = authorize;
+    } else {
+      this.logger.error('Never should have reached this point, please report to the team');
+      assertNever();
     }
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
@@ -692,7 +689,7 @@ export default class App {
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
-  'should be initialized with a authorize.';
+  'should be initialized with oauth installer or authorize.';
 
 const validViewTypes = ['view_closed', 'view_submission'];
 
