@@ -56,4 +56,4 @@ plugins:
   - jemoji
   - jekyll-redirect-from
 
-repository: slackapi/bolt
+repository: slackapi/bolt-js
