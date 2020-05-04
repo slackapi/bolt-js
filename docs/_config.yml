@@ -5,7 +5,7 @@ description: >-
   A framework that makes Slack app development fast and straight-forward. 
   With a single interface for Slack’s Web API, Events API, and interactive features, 
   Bolt gives you the full power of the Slack platform out of the box.
-baseurl: /bolt
+baseurl: /bolt-js
 url: https://slack.dev
 
 collections:
