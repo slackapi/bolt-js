@@ -36,9 +36,9 @@
     "coverage": "codecov"
   },
   "repository": "slackapi/bolt",
-  "homepage": "https://slack.dev/bolt",
+  "homepage": "https://slack.dev/bolt-js",
   "bugs": {
-    "url": "https://github.com/slackapi/bolt/issues"
+    "url": "https://github.com/slackapi/bolt-js/issues"
   },
   "dependencies": {
     "@slack/logger": "^2.0.0",
