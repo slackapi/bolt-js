@@ -3,8 +3,8 @@
  *
  * This describes the entire JSON-encoded body of a request from Slack workflow step actions.
  */
-export interface WorkflowStepAction {
-  type: 'workflow_step_action';
+export interface WorkflowStepEdit {
+  type: 'workflow_step_edit';
   callback_id: string;
   trigger_id: string;
   user: {
@@ -25,6 +25,6 @@ export interface WorkflowStepAction {
   token: string;
   action_ts: string; // undocumented
   workflow_step: {
-    context_id: string;
+    workflow_step_edit_id: string;
   };
 }
