@@ -41,6 +41,13 @@ describe('ExpressReceiver', () => {
         logger: noopLogger,
         endpoints: { events: '/custom-endpoint' },
         processBeforeResponse: true,
+        clientId: 'my-clientId',
+        clientSecret: 'my-client-secret',
+        stateSecret: 'state-secret',
+        scopes: ['channels:read'],
+        installerOptions: {
+          authVersion: 'v2',
+        },
       });
       assert.isNotNull(receiver);
     });
