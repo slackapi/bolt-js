@@ -67,7 +67,7 @@ export type SlackEvent =
   | TeamRenameEvent
   | TokensRevokedEvent
   | UserChangeEvent
-  | WorkflowStepStartedEvent;
+  | WorkflowStepExecuteEvent;
 
 /**
  * Any event in Slack's Events API
@@ -748,12 +748,12 @@ export interface UserChangeEvent extends StringIndexed {
   user: {};
 }
 
-export interface WorkflowStepStartedEvent extends StringIndexed {
-  type: 'workflow_step_started';
+export interface WorkflowStepExecuteEvent extends StringIndexed {
+  type: 'workflow_step_execute';
   callback_id: string;
   workflow_step: {
     workflow_step: {
-      context_id: string;
+      workflow_step_execute_id: string;
       inputs: object;
       outputs: {
         name: string;
