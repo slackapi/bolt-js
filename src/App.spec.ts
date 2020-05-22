@@ -66,19 +66,20 @@ describe('App', () => {
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
       assert.instanceOf(app, App);
     });
-    it('should fail without a token for single team authorization or authorize callback', async () => {
-      // Arrange
-      const App = await importApp(); // tslint:disable-line:variable-name
+    it('should fail without a token for single team authorization or authorize callback or oauth installer',
+       async () => {
+          // Arrange
+         const App = await importApp(); // tslint:disable-line:variable-name
 
-      // Act
-      try {
-        new App({ signingSecret: '' }); // tslint:disable-line:no-unused-expression
-        assert.fail();
-      } catch (error) {
-        // Assert
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
-      }
-    });
+          // Act
+         try {
+           new App({ signingSecret: '' }); // tslint:disable-line:no-unused-expression
+           assert.fail();
+         } catch (error) {
+            // Assert
+           assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+         }
+       });
     it('should fail when both a token and authorize callback are specified', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
@@ -88,6 +89,38 @@ describe('App', () => {
       try {
         // tslint:disable-next-line:no-unused-expression
         new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert(authorizeCallback.notCalled);
+      }
+    });
+    it('should fail when both a token is specified and OAuthInstaller is initialized', async () => {
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      try {
+        // tslint:disable-next-line:no-unused-expression
+        new App({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert(authorizeCallback.notCalled);
+      }
+    });
+    it('should fail when both a authorize callback is specified and OAuthInstaller is initialized', async () => {
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // tslint:disable-line:variable-name
+
+      // Act
+      try {
+        // tslint:disable-next-line:no-unused-expression
+        new App({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
         assert.fail();
       } catch (error) {
         // Assert

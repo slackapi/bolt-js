@@ -63,6 +63,12 @@ export interface AppOptions {
   signingSecret?: ExpressReceiverOptions['signingSecret'];
   endpoints?: ExpressReceiverOptions['endpoints'];
   processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
+  clientId?: ExpressReceiverOptions['clientId'];
+  clientSecret?: ExpressReceiverOptions['clientSecret'];
+  stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
+  installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
+  scopes?: ExpressReceiverOptions['scopes'];
+  installerOptions?: ExpressReceiverOptions['installerOptions'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -83,7 +89,7 @@ export { LogLevel, Logger } from '@slack/logger';
 export interface Authorize {
   (
     source: AuthorizeSourceData,
-    body: AnyMiddlewareArgs['body'],
+    body?: AnyMiddlewareArgs['body'],
   ): Promise<AuthorizeResult>;
 }
 
@@ -158,7 +164,7 @@ export default class App {
   private logger: Logger;
 
   /** Authorize */
-  private authorize: Authorize;
+  private authorize!: Authorize;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -186,6 +192,12 @@ export default class App {
     ignoreSelf = true,
     clientOptions = undefined,
     processBeforeResponse = false,
+    clientId = undefined,
+    clientSecret = undefined,
+    stateSecret = undefined,
+    installationStore = undefined,
+    scopes = undefined,
+    installerOptions = undefined,
   }: AppOptions = {}) {
 
     if (typeof logger === 'undefined') {
@@ -218,21 +230,6 @@ export default class App {
       clientTls,
     ));
 
-    if (token !== undefined) {
-      if (authorize !== undefined) {
-        throw new AppInitializationError(
-          `Both token and authorize options provided. ${tokenUsage}`,
-        );
-      }
-      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined) {
-      throw new AppInitializationError(
-        `No token and no authorize options provided. ${tokenUsage}`,
-      );
-    } else {
-      this.authorize = authorize;
-    }
-
     this.middleware = [];
     this.listeners = [];
 
@@ -252,9 +249,49 @@ export default class App {
           signingSecret,
           endpoints,
           processBeforeResponse,
+          clientId,
+          clientSecret,
+          stateSecret,
+          installationStore,
+          installerOptions,
+          scopes,
           logger: this.logger,
         });
       }
+    }
+
+    let usingBuiltinOauth = false;
+    if (
+      clientId !== undefined
+      && clientSecret !== undefined
+      && (stateSecret !== undefined || (installerOptions !== undefined && installerOptions.stateStore !== undefined))
+      && this.receiver instanceof ExpressReceiver
+    ) {
+      usingBuiltinOauth = true;
+    }
+
+    if (token !== undefined) {
+      if (authorize !== undefined || usingBuiltinOauth) {
+        throw new AppInitializationError(
+          `token as well as authorize options or oauth installer options were provided. ${tokenUsage}`,
+        );
+      }
+      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
+    } else if (authorize === undefined && !usingBuiltinOauth) {
+      throw new AppInitializationError(
+        `No token, no authorize options, and no oauth installer options provided. ${tokenUsage}`,
+      );
+    } else if (authorize !== undefined && usingBuiltinOauth) {
+      throw new AppInitializationError(
+        `Both authorize options and oauth installer options provided. ${tokenUsage}`,
+      );
+    } else if (authorize === undefined && usingBuiltinOauth) {
+      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
+    } else if (authorize !== undefined && !usingBuiltinOauth) {
+      this.authorize = authorize;
+    } else {
+      this.logger.error('Never should have reached this point, please report to the team');
+      assertNever();
     }
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
@@ -652,7 +689,7 @@ export default class App {
 }
 
 const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
-  'should be initialized with a authorize.';
+  'should be initialized with oauth installer or authorize.';
 
 const validViewTypes = ['view_closed', 'view_submission'];
 
