@@ -286,7 +286,7 @@ export default class App {
         `Both authorize options and oauth installer options provided. ${tokenUsage}`,
       );
     } else if (authorize === undefined && usingBuiltinOauth) {
-      this.authorize = (this.receiver as ExpressReceiver).installer?.authorize as Authorize;
+      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
     } else if (authorize !== undefined && !usingBuiltinOauth) {
       this.authorize = authorize;
     } else {
