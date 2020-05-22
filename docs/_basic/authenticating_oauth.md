@@ -41,7 +41,7 @@ const app = new App({
 </summary>
 
 <div class="secondary-content" markdown="0">
-You can override the default OAuth using the `installOptions` object, which can be passed in during the initialization of `App`. You can override the following:
+You can override the default OAuth using the `installerOptions` object, which can be passed in during the initialization of `App`. You can override the following:
 
 - `authVersion`: Used to toggle between new Slack Apps and Classic Slack Apps
 - `metadata`: Used to pass around session related information
