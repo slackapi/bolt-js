@@ -32,14 +32,18 @@ describe('matchMessage()', () => {
     };
   }
 
-  function matchesPatternTestCase(pattern: string | RegExp, matchingText: string): Mocha.AsyncFunc {
+  function matchesPatternTestCase(
+      pattern: string | RegExp,
+      matchingText: string,
+      buildFakeEvent: (content: string) => SlackEvent,
+    ): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const dummyContext: DummyContext = {};
       const fakeNext = sinon.fake();
       const fakeArgs = {
         next: fakeNext,
-        message: createFakeMessageEvent(matchingText),
+        event: buildFakeEvent(matchingText),
         context: dummyContext,
       } as unknown as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
@@ -61,13 +65,17 @@ describe('matchMessage()', () => {
     };
   }
 
-  function notMatchesPatternTestCase(pattern: string | RegExp, nonMatchingText: string): Mocha.AsyncFunc {
+  function notMatchesPatternTestCase(
+      pattern: string | RegExp,
+      nonMatchingText: string,
+      buildFakeEvent: (content: string) => SlackEvent,
+    ): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const dummyContext = {};
       const fakeNext = sinon.fake();
       const fakeArgs = {
-        message: createFakeMessageEvent(nonMatchingText),
+        event: buildFakeEvent(nonMatchingText),
         context: dummyContext,
         next: fakeNext,
       } as unknown as MessageMiddlewareArgs;
@@ -89,7 +97,7 @@ describe('matchMessage()', () => {
       const dummyContext = {};
       const fakeNext = sinon.fake();
       const fakeArgs = {
-        message: createFakeMessageEvent([{ type: 'divider' }]),
+        event: createFakeMessageEvent([{ type: 'divider' }]),
         context: dummyContext,
         next: fakeNext,
       } as unknown as MessageMiddlewareArgs;
@@ -110,10 +118,22 @@ describe('matchMessage()', () => {
     const matchingText = 'foobar';
     const nonMatchingText = 'bar';
     it('should initialize', initializeTestCase(pattern));
-    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern, matchingText));
-    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(
-      pattern, nonMatchingText,
-    ));
+    it(
+      'should match message events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeMessageEvent),
+    );
+    it(
+      'should match app_mention events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeAppMentionEvent),
+    );
+    it(
+      'should filter out message events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeMessageEvent),
+    );
+    it(
+      'should filter out app_mention events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeAppMentionEvent),
+    );
     it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
 
@@ -122,10 +142,22 @@ describe('matchMessage()', () => {
     const matchingText = 'foobar';
     const nonMatchingText = 'bar';
     it('should initialize', initializeTestCase(pattern));
-    it('should match message events with a pattern that matches', matchesPatternTestCase(pattern, matchingText));
-    it('should filter out message events with a pattern that does not match', notMatchesPatternTestCase(
-      pattern, nonMatchingText,
-    ));
+    it(
+      'should match message events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeMessageEvent),
+    );
+    it(
+      'should match app_mention events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeAppMentionEvent),
+    );
+    it(
+      'should filter out message events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeMessageEvent),
+    );
+    it(
+      'should filter out app_mention events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeAppMentionEvent),
+    );
     it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
 });
@@ -676,6 +708,18 @@ function createFakeMessageEvent(content: string | MessageEvent['blocks'] = ''): 
     event.blocks = content;
   }
   return event as MessageEvent;
+}
+
+function createFakeAppMentionEvent(text: string = ''): AppMentionEvent {
+  const event: Partial<AppMentionEvent> = {
+    text,
+    type: 'app_mention',
+    user: 'USER_ID',
+    ts: 'MESSAGE_ID',
+    channel: 'CHANNEL_ID',
+    event_ts: 'MESSAGE_ID',
+  };
+  return event as AppMentionEvent;
 }
 
 const validCommandPayload: SlashCommand = {

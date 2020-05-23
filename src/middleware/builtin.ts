@@ -205,21 +205,23 @@ export function matchConstraints(
 /*
  * Middleware that filters out messages that don't match pattern
  */
-export function matchMessage(pattern: string | RegExp): Middleware<SlackEventMiddlewareArgs<'message'>> {
-  return async ({ message, context, next }) => {
+export function matchMessage(
+    pattern: string | RegExp,
+  ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
+  return async ({ event, context, next }) => {
     let tempMatches: RegExpMatchArray | null;
 
-    if (message.text === undefined) {
+    if (event.text === undefined) {
       return;
     }
 
-    // Filter out messages that don't contain the pattern
+    // Filter out messages or app mentions that don't contain the pattern
     if (typeof pattern === 'string') {
-      if (!message.text.includes(pattern)) {
+      if (!event.text.includes(pattern)) {
         return;
       }
     } else {
-      tempMatches = message.text.match(pattern);
+      tempMatches = event.text.match(pattern);
 
       if (tempMatches !== null) {
         context['matches'] = tempMatches;
