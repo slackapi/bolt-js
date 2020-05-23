@@ -260,34 +260,32 @@ export default class App {
       }
     }
 
-    let usingBuiltinOauth = false;
-    if (
-      clientId !== undefined
-      && clientSecret !== undefined
-      && (stateSecret !== undefined || (installerOptions !== undefined && installerOptions.stateStore !== undefined))
-      && this.receiver instanceof ExpressReceiver
-    ) {
-      usingBuiltinOauth = true;
+    let usingOauth = false;
+    if ((this.receiver as ExpressReceiver).installer !== undefined
+        && (this.receiver as ExpressReceiver).installer!.authorize !== undefined) {
+      // This supports using the built in ExpressReceiver, declaring your own ExpressReceiver
+      // and theoretically, doing a fully custom (non express) receiver that implements OAuth
+      usingOauth = true;
     }
 
     if (token !== undefined) {
-      if (authorize !== undefined || usingBuiltinOauth) {
+      if (authorize !== undefined || usingOauth) {
         throw new AppInitializationError(
           `token as well as authorize options or oauth installer options were provided. ${tokenUsage}`,
         );
       }
       this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined && !usingBuiltinOauth) {
+    } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
         `No token, no authorize options, and no oauth installer options provided. ${tokenUsage}`,
       );
-    } else if (authorize !== undefined && usingBuiltinOauth) {
+    } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(
         `Both authorize options and oauth installer options provided. ${tokenUsage}`,
       );
-    } else if (authorize === undefined && usingBuiltinOauth) {
+    } else if (authorize === undefined && usingOauth) {
       this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
-    } else if (authorize !== undefined && !usingBuiltinOauth) {
+    } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
     } else {
       this.logger.error('Never should have reached this point, please report to the team');
