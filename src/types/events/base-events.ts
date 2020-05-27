@@ -11,6 +11,7 @@ export type SlackEvent =
   | AppHomeOpenedEvent
   | AppMentionEvent
   | AppUninstalledEvent
+  | CallsRejectedEvent
   | ChannelArchiveEvent
   | ChannelCreatedEvent
   | ChannelDeletedEvent
@@ -157,6 +158,14 @@ export interface AppMentionEvent extends StringIndexed {
 
 export interface AppUninstalledEvent extends StringIndexed {
   type: 'app_uninstalled';
+}
+
+export interface CallsRejectedEvent extends StringIndexed {
+  type: 'calls_rejected';
+  call_id: string;
+  user_id: string;
+  channel_id: string;
+  external_unique_id: string;
 }
 
 export interface ChannelArchiveEvent extends StringIndexed {
