@@ -25,6 +25,7 @@ export interface WorkflowStepEdit {
   token: string;
   action_ts: string; // undocumented
   workflow_step: {
-    workflow_step_edit_id: string;
+    workflow_id: string;
+    step_id: string;
   };
 }

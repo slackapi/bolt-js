@@ -741,15 +741,16 @@ export interface WorkflowStepExecuteEvent extends StringIndexed {
   type: 'workflow_step_execute';
   callback_id: string;
   workflow_step: {
-    workflow_step: {
-      workflow_step_execute_id: string;
-      inputs: object;
-      outputs: {
-        name: string;
-        type: string;
-        label: string;
-      }[];
-    };
+    workflow_step_execute_id: string;
+    workflow_id: string,
+    workflow_instance_id: string,
+    step_id: string,
+    inputs: object;
+    outputs: {
+      name: string;
+      type: string;
+      label: string;
+    }[];
   };
   event_ts: string;
 }
