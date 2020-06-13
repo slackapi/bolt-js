@@ -7,7 +7,7 @@ order: 9
 
 <div class="section-content">
 
-Adding custom HTTP routes is quite straightforward when using Bolt's built-in `ExpressReceiver`. Since `Bolt@v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which more routes can be added.
+Adding custom HTTP routes is quite straightforward when using Bolt's built-in `ExpressReceiver`. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which more routes can be added.
 
 </div>
 
