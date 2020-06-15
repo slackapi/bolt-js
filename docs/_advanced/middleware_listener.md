@@ -26,7 +26,7 @@ async function noBotMessages({ message, next }) {
 }
 
 // The listener only receives messages from humans
-app.message(noBotMessages, ({ message }) => console.log(
+app.message(noBotMessages, async ({ message }) => console.log(
   `(MSG) User: ${message.user}
    Message: ${message.text}`
 ));
