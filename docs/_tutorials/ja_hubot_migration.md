@@ -1,5 +1,5 @@
 ---
-title: Hubot のアプリを Bolt に移行する方法
+title: Hubot から Bolt に移行する方法
 order: 2
 slug: hubot-migration
 lang: ja-jp
@@ -11,22 +11,22 @@ redirect_from:
 # Hubot のアプリを Bolt に移行する方法
 
 <div class="section-content">
-Bolt は、Slack アプリを構築する時間と手間を減らすために作成されたフレームワークで、Slack 開発者のみなさんに最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot  で作成されたアプリを Bolt  アプリに](https://hubot.github.com/docs/)移行するプロセスを順を追って説明します。
+Bolt は、Slack アプリを構築する時間と手間を減らすために作成されたフレームワークで、Slack 開発者のみなさんに最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot で作成されたアプリを Bolt アプリに](https://hubot.github.com/docs/)移行するプロセスを順を追って説明します。
 
-すでに [ボットユーザーがいるアプリ](https://api.slack.com/bot-users#getting-started) を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに[Bolt リポジトリのサンプルスクリプト](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js) を読むとよいでしょう。
+すでに [ボットユーザーがいるアプリ](https://api.slack.com/bot-users#getting-started) を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに[Bolt リポジトリのサンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) を読むとよいでしょう。
 </div> 
 
 ---
 
 ### まずはじめに
-Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握しているとさらに理解を深めることができるでしょう。Slack の Hubot アダプターは、　WebSocket をベースとした [RTM API](https://api.slack.com/rtm) と接続するように実装されているので、Hubot アプリには一連のワークスペースイベントが一気にストリーミングされます。そして、RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでお勧めできません。
+Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握しているとさらに理解を深めることができるでしょう。Slack の Hubot アダプターは、　WebSocket をベースとした [RTM API](https://api.slack.com/rtm) と接続するように実装されているので、Hubot アプリには一連のワークスペースイベントが一気にストリーミングされます。そして、RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでおすすめできません。
 
 デフォルトの Bolt レシーバーは、[Events API](https://api.slack.com/events-api) をサポートするように構築されています。これは、HTTP ベースのイベントサブスクリプションを使用して Bolt アプリに JSON ペイロードを送信します。Events API には、RTM にはない新機能のイベントも含まれており、より細かい制御が可能でスケーラブルですのでほとんどのユースケースで推奨されています。しかし例外として、RTM API を使用し続けなければならない理由の 1 つに、アプリをホストしているサーバーにファイアウォールがあり、HTTP 送信リクエストのみを許可して、受信リクエストを許可しないというようなケースが挙げられます。
 
 Bolt アプリを作成する前に考慮に入れた方がよい違いがほかにもあります。
 - Bolt は Node v10.0.0 以上で動作します。アプリをホストしているサーバーが、v10 をサポートできない場合は、現時点でアプリを Bolt に移行することはできません。
-- Bolt は、外部スクリプトをサポートしていません。Hubot アプリがアプリの機能または展開に必要な外部スクリプトを使用している場合、当面は Hubot のままでいいと思われます。アプリに外部スクリプトがあるかどうかわからない場合は、`external-scripts.json` ファイルをチェックしてください。Slack は Bolt の開発を続けていきますので、将来的にどう改良し続けていくかを常に検討しています。外部スクリプトでどうしても必要、というリクエストなどがある場合、[専用の Github の Issues で要望を 聞かせてください](https://github.com/slackapi/bolt/issues/119)。
-- Hubot アプリは、CoffeeScript で書かれており、JavaScript にトランスパイルされます。Slack は、Bolt を TypeScript で書くことでリッチな型情報にアクセスできるようにしました。Bolt アプリは、TypeScript または JavaScript を使用して開発できます。こちらの [サンプルスクリプト](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js) は、CoffeeScript がどのように JavaScript に変換されるかを示しています。あなたのアプリが比較的複雑なスクリプトである場合、[Decaffeinate](https://github.com/decaffeinate/decaffeinate) などのプロジェクトを調べて、CoffeeScript を JavaScript に変換するとよいかもしれません。
+- Bolt は、外部スクリプトをサポートしていません。Hubot アプリがアプリの機能または展開に必要な外部スクリプトを使用している場合、当面は Hubot のままでいいと思われます。アプリに外部スクリプトがあるかどうかわからない場合は、`external-scripts.json` ファイルをチェックしてください。Slack は Bolt の開発を続けていきますので、将来的にどう改良し続けていくかを常に検討しています。外部スクリプトでどうしても必要、というリクエストなどがある場合、[専用の Github の Issues で要望を 聞かせてください](https://github.com/slackapi/bolt-js/issues/119)。
+- Hubot アプリは、CoffeeScript で書かれており、JavaScript にトランスパイルされます。Slack は、Bolt を TypeScript で書くことでリッチな型情報にアクセスできるようにしました。Bolt アプリは、TypeScript または JavaScript を使用して開発できます。こちらの [サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) は、CoffeeScript がどのように JavaScript に変換されるかを示しています。あなたのアプリが比較的複雑なスクリプトである場合、[Decaffeinate](https://github.com/decaffeinate/decaffeinate) などのプロジェクトを調べて、CoffeeScript を JavaScript に変換するとよいかもしれません。
 
 ---
 
@@ -36,7 +36,7 @@ Bolt アプリを作成する前に考慮に入れた方がよい違いがほか
 #### Slack アプリを作成する
 まず最初に、Slack アプリを作成します。
 
-> 💡ここでは普段の仕事の支障にならないように、開発専用のワークスペースを使用することをお勧めします — [新しいワークスペースの作成はここから](https://api.slack.com/apps/new)。
+> 💡ここでは普段の仕事の支障にならないように、開発専用のワークスペースを使用することをおすすめします — [新しいワークスペースの作成はここから](https://api.slack.com/apps/new)。
 
 アプリ名を入力し、インストール先のワークスペースを選択したら、`Create App` ボタンをクリックします。そうすると、アプリの **Basic Information** ページが表示されます。
  
@@ -78,7 +78,7 @@ Bolt のインターフェイスは、可能な限り Slack API 言語に適合�
 
 Bolt は、`res` を使用せず、Slack からの raw リクエストを公開しません。代わりに、`payload` 使ってペイロードボディを取得したり、`say()` を使ってメッセージを送信するといった一般的な機能を使用したりできます。
 
-> ⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、[Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています。](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js)
+> ⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、[Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています。](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js)
 
 #### `message()` を使用したパターンのリスニング
 Hubot スクリプトは、`hear()` を使用して、一致するパターンを持つメッセージをリスニングします。代わりに、 Bolt は `message()` を使用して、そのパターンの `string` または `RegExp` を受け入れます。
@@ -101,7 +101,7 @@ Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()`
 #### `respond` と `react`
 前のセクションで、Hubot スクリプトで `respond()` が使用されている場合は `app_mention` イベントを、`react()` が使用されている場合は `reaction_added` をサブスクライブするようにアプリを設定しました。
 
-Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリスニングできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
+Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリスニングできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
 
 > 👨‍💻👩‍💻コードで `respond()` が使用されている箇所はすべて、app.event ('app_mention') を使用するように変更してください。`react` が使用されている箇所はすべて `app.event('reaction_added')` に変更してください。
 
@@ -152,7 +152,7 @@ Hubot には、brain と呼ばれるメモリ内ストレージがあります�
 - conversation ID を使用して `app.convoStore.get()` を呼び出して conversation の状態情報を取得する方法と、conversation ID、 conversation の状態情報 (キーと値のペア) 、オプションで `expriesAt` 時間 (ミリ秒) を使用して `app.convoStore.set()` を呼び出す方法です。
 - リスナーミドルウェアでは、`context.updateConversation()` を呼び出して更新されたconversation の状態情報を得るか、`context.conversation` を使用して現在のconversation の状態情報にアクセスします。
 
-アプリのインスタンスが複数実行されている場合、組み込みの conversation store はプロセス間で共有されないため、データベースから conversation の状態を取得する conversation store を実装することをお勧めします。
+アプリのインスタンスが複数実行されている場合、組み込みの conversation store はプロセス間で共有されないため、データベースから conversation の状態を取得する conversation store を実装することをおすすめします。
 
 [会話ストアについてもっと詳しく読む](https://slack.dev/bolt/ja-jp/concepts#conversation-store).
 
@@ -164,4 +164,4 @@ Hubot には、brain と呼ばれるメモリ内ストレージがあります�
 - こちらの [ドキュメント](https://slack.dev/bolt/ja-jp/concepts) を読んで、Bolt でほかに何ができるか探してみてください。
 - イベントやインタラクティブコンポーネントの使用方法を示す [サンプルアプリ](https://glitch.com/~slack-bolt) をチェックしてみてください。
 
-開発中に問題が発生した場合は、Slack の開発者サポートチーム[developers@slack.com](mailto:developers@slack.com)までお問合せください。フレームワークで問題が発生した場合は、[Githubで issues を開いてください](https://github.com/slackapi/bolt/issues/new)。
+開発中に問題が発生した場合は、Slack の開発者サポートチーム[developers@slack.com](mailto:developers@slack.com)までお問合せください。フレームワークで問題が発生した場合は、[Githubで issues を開いてください](https://github.com/slackapi/bolt-js/issues/new)。

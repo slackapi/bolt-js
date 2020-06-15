@@ -6,9 +6,9 @@ order: 1
 ---
 
 <div class="section-content">
-[アプリが受信権限を持っている](https://api.slack.com/messaging/retrieving#permissions)メッセージをリスニングするには、`message`型でないイベントを除外する`message()` メソッドを使用します。
+[アプリが受信可能な](https://api.slack.com/messaging/retrieving#permissions)メッセージをリスニングするには、`message` 型でないイベントを除外する `message()` メソッドを使用します。
 
-`message()` は、パターンと一致しないメッセージを除外する、 `string` 型の `pattern` パラメーター (オプション) または `RegExp` オブジェクトを受け入れます。
+`message()` は、`string` 型か `RegExp` 型の、指定パターンに一致しないメッセージを除外する `pattern` パラメーター（指定は必須ではありません）を受け付けます。
 </div>
 
 ```javascript
@@ -24,9 +24,9 @@ app.message(':wave:', async ({ message, say }) => {
 </summary>
 
 <div class="secondary-content" markdown="0">
-文字列の代わりに 正規表現(RegExp) パターンを使用すると、照合の精度を高めることができます。
+文字列の代わりに 正規表現(RegExp) パターンを使用すると、より細やかなマッチングが可能です。
 
-RegExp の一致結果はすべて `context.matches` に格納されます。
+RegExp の一致結果はすべて `context.matches` に保持されます。
 </div>
 
 ```javascript

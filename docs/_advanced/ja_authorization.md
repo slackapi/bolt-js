@@ -1,28 +1,27 @@
 ---
-title: 承認
+title: 認可（Authorization）
 lang: ja-jp
 slug: authorization
 order: 2
 ---
 
 <div class="section-content">
-承認は、特定の着信イベントの処理中にどの Slack 認証情報 (ボットトークンなど) を使用可能にするかを決定するプロセスです。
+認可（Authorization）は、Slack からのイベントを処理するにあたって、どの Slack クレデンシャル (ボットトークンなど) を使用可能にするかを決定するプロセスです。
 
-1 つのワークスペースにインストールされたカスタムアプリでは、`App` 初期化時に `token` オプションを使用できます。ただし、複数のワークスペースにインストールされる場合や、複数のユーザートークンにアクセスする必要がある場合など、アプリが複数のトークンを処理しなければならない場合には、代わりに `authorize` オプションを使用する必要があります。
+1 つだけのワークスペースにインストールされたカスタムアプリであれば `App` 初期化時に単に `token` オプションを使用するだけで OK です。一方で、複数のワークスペースにインストールされる、複数のユーザートークンを使用するといったケースのように、アプリが複数のトークンを処理しなければならない場合があります。このようなケースでは `token` の代わりに `authorize` オプションを使用する必要があります。
 
-`authorize` オプションは、イベントソースを入力値として受け取る関数に設定でき、許可された認証情報を含むオブジェクトに Promise を返す必要があります。ソースには、 `teamId` (常に利用可能)、 `userId`、`conversationId`、`enterpriseId` のようなプロパティを使用して、イベントの送信者や送信元に関する情報が含まれています。
+`authorize` オプションには、イベントソースを入力値として受け取り、許可された認可されたクレデンシャルを含むオブジェクトを Promise の値として返す関数を指定します。このイベントソースの情報には、 `teamId` (常に存在します)、 `userId`、`conversationId`、`enterpriseId` のような、イベントが誰によって発生させられたか、どこで発生したかに関する情報が含まれます。
 
-許可された認証情報には、`botToken`、`userToken`、`botId` (アプリがボット自体からのメッセージを無視するために必要)、 `botUserId` などの固有のプロパティもいくつか含まれています。その他、 [`context`](#context) オブジェクトを使用すれば他のプロパティの指定もできるようになります。
+許可されたクレデンシャルには、`botToken`、`userToken`、`botId` (アプリがボット自体からのメッセージを無視するために必要です)、 `botUserId` が含まれます。[`context`](#context) オブジェクトに、これ以外の他のプロパティを自由に設定することもできます。
 
-`botToken` プロパティと `userToken` プロパティは、一方または両方を必ず指定する必要があります。`say()` のようなヘルパーを動作させるには、どちらか一方は指定しなければなりません。両方指定した場合は、`botToken` が優先されます。
+`botToken` と `userToken` は、どちらか、またはその両方を必ず設定してください。`say()` のようなユーティリティを動作させるには、どちらか一方が存在している必要があります。両方指定した場合、`say()` では `botToken` が優先されます。
 </div>
 
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
 
 // 注: これはデモの目的のみの例です
-// 実際は重要なデータはセキュリティの高いデータベースに保存してください
-// このアプリは bot トークンのみのしようと仮定、ここで使われるオブジェクトは、複数ワークスペースにアプリをインストールする際の認証情報を保管するモデルとします
+// 実際は重要なデータはセキュリティの高いデータベースに保存してください。このアプリは bot トークンのみを使用すると仮定しています。ここで使われるオブジェクトは、複数ワークスペースにアプリをインストールした場合のクレデンシャルを保管するモデルです。
 
 const installations = [
   {
@@ -41,11 +40,11 @@ const installations = [
 ];
 
 const authorizeFn = async ({ teamId, enterpriseId }) => {
-  // データベースから team 情報を取得
+  // データベースから team（ワークスペース）を取得
   for (const team of installations) {
-    // installations 配列から teamId と enterpriseId が一致するかチェック
+    // installations 配列から teamId と enterpriseId（Enterprise Grid の OrG の ID）が一致するかチェック
     if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
-      // 一致したワークスペースの認証情報を使用
+      // 一致したワークスペースのクレデンシャルを使用
       return {
         // 代わりに userToken をセットしても OK
         botToken: team.botToken,
@@ -55,6 +54,6 @@ const authorizeFn = async ({ teamId, enterpriseId }) => {
     }
   }
 
-  throw new Error('No matching authorizations'); // 認証エラー
+  throw new Error('No matching authorizations');
 }
 ```
