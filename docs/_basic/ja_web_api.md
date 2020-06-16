@@ -6,9 +6,9 @@ order: 4
 ---
 
 <div class="section-content">
-[Web API メソッド](https://api.slack.com/methods)を呼び出すには、Bolt アプリに提供されている [`WebClient`](https://slack.dev/node-slack-sdk/web-api) を `app.client` として使用します (この場合、適切なアプリのスコープを設定が必要です)。クライアントのメソッドの 1 つを呼び出すと、Slack からの応答を含む Promise が返されます。
+[Web API メソッド](https://api.slack.com/methods)を呼び出すには、Bolt アプリに `app.client` として提供されている [`WebClient`](https://slack.dev/node-slack-sdk/web-api) を使用します (各 API に必要となるスコープの適切な設定が必要です)。クライアントが提供するメソッドを 1 つ呼び出すと、それへの Slack からの応答を含む Promise の値が返されます。
 
-Bolt の初期化に使用されるトークンは `context` オブジェクト内にあり、ほとんどの Web API メソッドで必須です。
+Bolt の初期化時に使用されたトークンは `context` オブジェクト内に保持されています。このトークンは、ほとんどの Web API メソッドの実行に必要となります。
 </div>
 
 ```javascript

@@ -6,15 +6,15 @@ order: 3
 ---
 
 <div class="section-content">
-[Events API イベント](https://api.slack.com/events)をリスニングするには、 `event()` メソッドをアプリ設定でサブスクライブしてから使用します。これにより、Slack で何かが発生した (ユーザーがメッセージにリアクションした、チャンネルに参加したなど) ときに、アプリでアクションを実行できます。
+[Events API イベント](https://api.slack.com/events)のリスニングは、Slack アプリの設定画面でサブスクリプション設定を行った上で `event()` メソッドを使用します。これにより、Slack で何かが発生した (例：ユーザーがメッセージにリアクションした、チャンネルに参加した) ときに Bolt アプリ側で処理を実行できます。
 
-`event()` メソッドは、文字列型の `eventType` を必要とします。
+`event()` メソッドは、文字列型の `eventType` を指定する必要があります。
 </div>
 
 ```javascript
 const welcomeChannelId = 'C12345';
 
-// ユーザーが新規でチームに加入した際に、指定のチャンネルにメッセージを送信して自己紹介を促す
+// 新しいユーザーがワークスペースに加入したタイミングで、指定のチャンネルにメッセージを送信して自己紹介を促す
 app.event('team_join', async ({ event, context }) => {
   try {
     const result = await app.client.chat.postMessage({
@@ -36,9 +36,9 @@ app.event('team_join', async ({ event, context }) => {
 </summary>
 
 <div class="secondary-content" markdown="0">
-`message()` リスナーは `event('message')` に相当します。
+`message()` リスナーは `event('message')` と等価の機能を提供します。
 
-イベントのサブタイプをフィルタリングするには、組み込みの `matchEventSubtype()` ミドルウェアを使用します。 `bot_message` や `message_replied` のような一般的なメッセージサブタイプは、[メッセージイベントページ](https://api.slack.com/events/message#message_subtypes)にあります。
+イベントのサブタイプをフィルタリングしたい場合、組み込みの `matchEventSubtype()` ミドルウェアを使用できます。 `bot_message` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
 </div>
 
 ```javascript

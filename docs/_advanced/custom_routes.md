@@ -19,8 +19,8 @@ const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_
 
 // Create the Bolt App, using the receiver
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN, 
-  receiver 
+  token: process.env.SLACK_BOT_TOKEN,
+  receiver
 });
 
 // Slack interactions are methods on app

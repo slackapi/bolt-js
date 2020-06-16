@@ -6,7 +6,7 @@ order: 7
 ---
 
 <div class="section-content">
-デフォルトでは、Bolt はアプリからコンソールに情報をログします。ログ取集が行われる回数をカスタマイズするには、コンストラクタで `logLevel` を渡します。使用可能なログレベルは、レベルの高い方から順に、`DEBUG`、 `INFO`、`WARN`、および `ERROR` です。 
+Bolt はデフォルトの設定では、標準出力のコンソールにログ上を出力します。どれくらいのどれくらいのログが出力されるかは、コンストラクターの引数の `logLevel` を指定して、カスタマイズできます。使用可能なログレベルは、頻度の高い方から順に、`DEBUG`、`INFO`、`WARN`、`ERROR` です。
 </div>
 
 ```javascript
@@ -27,7 +27,7 @@ const app = new App({
 </summary>
 
 <div class="secondary-content" markdown="0">
-ログの送信先をコンソール以外に設定するなど、logger をよりスマートに管理するには、カスタム logger を実装します。カスタム logger には、以下の特定のメソッド (`Logger` インターフェイスと呼ばれる) を実装する必要があります。
+ログの送信先をコンソール以外に設定したり、よりロガーを細かくコントロールしたい場合は、カスタムロガーを実装します。カスタムロガーは、以下のメソッド (`Logger` インターフェイスに定義されているもの) を実装する必要があります。
 
 | メソッド      | パラメーター        | 戻り値の型    |
 |--------------|-------------------|-------------|
@@ -50,7 +50,7 @@ const logWritable = createWriteStream('/var/my_log_file');
 const app = new App({
   token,
   signingSecret,
-  // リテラルオブジェクトとしてクラスを指定する感じで logger を生成。
+  // リテラルオブジェクトとして logger を設定（必要なメソッドを持つクラスを指定するイメージで）
   logger: {
     debug(...msgs): { logWritable.write('debug: ' + JSON.stringify(msgs)); },
     info(...msgs): { logWritable.write('info: ' + JSON.stringify(msgs)); },

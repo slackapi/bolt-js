@@ -1,5 +1,5 @@
 ---
-title: Conversation stores
+title: 会話ストア
 lang: ja-jp
 slug: conversation-store
 order: 3
@@ -12,7 +12,7 @@ Bolt は、会話 (conversation) に関連する state を設定および取得�
 
 `conversationContext()` は、他のミドルウェアによる会話の更新を可能にする組み込みの[グローバルミドルウェア](#global-middleware)です。イベントを受け取ると、ミドルウェア関数は `context.updateConversation()` を使用して状態を設定でき、`context.conversation` を使用してその state を取得できます。
 
-組み込みの conversation store は、シンプルに会話の state をメモリーに格納します。状況によってはこれで十分ですが、アプリのインスタンスが複数実行されている場合、状態はプロセス間で共有されないため、データベースを使用して会話の state を取得する conversation store を実装することをお勧めします。
+組み込みの conversation store は、シンプルに会話の state をメモリーに格納します。状況によってはこれで十分ですが、アプリのインスタンスが複数実行されている場合、状態はプロセス間で共有されないため、データベースを使用して会話の state を取得する conversation store を実装することをおすすめします。
 </div>
 
 ```javascript

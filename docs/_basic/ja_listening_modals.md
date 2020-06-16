@@ -1,12 +1,12 @@
 ---
-title: モーダルビューでの送信のリスニング
+title: モーダルでの送信のリスニング
 lang: ja-jp
 slug: view_submissions
 order: 12
 ---
 
 <div class="section-content">
-<a href="https://api.slack.com/reference/block-kit/views">モーダルビューのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために <code>view_submission</code> のイベントをリスニングする必要があります。<code>view_submission</code> イベントをリスニングするためには、組み込みの <code>view()</code> メソッドを使用します。
+<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために <code>view_submission</code> のイベントをリスニングする必要があります。<code>view_submission</code> イベントをリスニングするためには、組み込みの <code>view()</code> メソッドを使用します。
 
 <code>view()</code> メソッドは、文字列型または <code>RegeExp</code>型 の <code>callback_id</code> を必要とします。
 
@@ -16,9 +16,9 @@ order: 12
 </div>
 
 ```javascript
-// モーダルビューでのデータ送信イベントを処理します
+// モーダルでのデータ送信イベントを処理します
 app.view('view_b', async ({ ack, body, view, context }) => {
-  // モーダルビューでのデータ送信イベントを確認
+  // モーダルでのデータ送信イベントを確認
   await ack();
 
   // 入力値を使ってやりたいことをここで実装 - ここでは DB に保存して送信内容の確認を送っている

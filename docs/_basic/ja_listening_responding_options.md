@@ -6,11 +6,11 @@ order: 13
 ---
 
 <div class="section-content">
-`option()` メソッドは、Slack からの着信オプションリクエストペイロードをリッスンします。 [`actions()` と同様](#action-listening)に、 `action_id` オブジェクトまたは制約付きオブジェクトが必要です。
+`options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様](#action-listening)に、文字列型の `action_id` または制約付きオブジェクトが必要です。
 
-`external_select` メニューには `action_id` を使用することをお勧めしますが、ダイアログはまだ Block Kit をサポートしていないため、制約オブジェクトを用いて `callback_id` でフィルタリングする必要があります。
+`external_select` メニューには `action_id` を使用することをおすすめしますが、ダイアログはまだ Block Kit をサポートしていないため、制約オブジェクトを用いて `callback_id` でフィルタリングする必要があります。
 
-オプションリクエストに応答するためには、適切なオプションを指定して `ack()` を実行する必要があります。[external_select の応答の例](https://api.slack.com/reference/messaging/block-elements#external-select)も[ダイアログ応答の例](https://api.slack.com/dialogs#dynamic_select_elements_external)も API サイトで参照できます。
+オプションのリクエストへの応答には、適切なオプションを指定して `ack()` を実行する必要があります。API サイトに掲載されている[external_select の応答の例](https://api.slack.com/reference/messaging/block-elements#external-select)や[ダイアログ応答の例](https://api.slack.com/dialogs#dynamic_select_elements_external)を参考にしてください。
 </div>
 
 ```javascript

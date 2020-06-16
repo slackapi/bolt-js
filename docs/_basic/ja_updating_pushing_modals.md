@@ -1,25 +1,25 @@
 ---
-title: モーダルビューの更新と多重表示
+title: モーダルの更新と多重表示
 lang: ja-jp
 slug: updating-pushing-views
 order: 11
 ---
 
 <div class="section-content">
-モーダルビューの表示は、複数のビューをスタックとして保持する場合があります。<a href="https://api.slack.com/methods/views.open">`views.open`</a> という API を呼び出すと、まずルートのモーダルビューが生成されます。その最初の呼び出しの後で、<a href="https://api.slack.com/methods/views.update">`views.update`</a> によって動的にそのビューを書き換えたり、<a href="https://api.slack.com/methods/views.push">`views.push`</a> で新しいビューをその上に積み重ねて表示したりといったことができます。
+モーダルでは、複数のモーダルをスタックのように積み重ねて表示できます。<a href="https://api.slack.com/methods/views.open">`views.open`</a> という API を呼び出すと、まず親の（最初の）モーダルが表示されます。この最初の呼び出しの後、<a href="https://api.slack.com/methods/views.update">`views.update`</a> を実行することでそのビューを書き換えることもできますし、最初に述べたように <a href="https://api.slack.com/methods/views.push">`views.push`</a> で新しいモーダルを積み重ねて表示することもできます。
 
 <strong><code>views.update</code></strong><br>
-モーダルビューを更新するには組み込みの API クライアントを使って <code>views.update</code> を呼び出します。この API 呼び出しにはそのビューをオープンしたときに生成された <code>view_id</code> と、書き換えられた <code>blocks</code> の配列を渡します。ユーザーが既存のビューの中にある要素とインタラクションを行なったことをきっかけにビューを更新する場合は、そのリクエストの <code>body</code> に <code>view_id</code> が含まれています。
+モーダルの更新には、組み込みの API クライアントを使って <code>views.update</code> を呼び出します。この API 呼び出しには、そのモーダルを開いたときに生成された <code>view_id</code> と、更新後の内容を表現する <code>blocks</code> の配列を含む新しい <code>view</code> を渡します。ユーザーが既存のモーダル内の要素とインタラクションを行なった（例：ボタンを押す、メニューから選択する）ことをトリガーにビューを更新する場合、そのリクエストの <code>body</code> に <code>view_id</code> が含まれます。
 
 <strong><code>views.push</code></strong><br>
-ビューのスタックに新しいビューを積み重ねるには、組み込みの API クライアントを使って <code>views.push</code> を呼び出します。この API 呼び出しには、適切な <code>trigger_id</code> と新しく生成する <a href="https://api.slack.com/reference/block-kit/views">ビュー部分のペイロード</a>を渡します。`views.push` の引数は <a href="#creating-modals">ビューをオープンするとき</a>と同様です。最初のモーダルビューをオープンした後、その上にさらに二つまで追加のビューをスタックに積み重ねることができます。
+モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて <code>views.push</code> を呼び出します。この API 呼び出しには、有効な <code>trigger_id</code> と、新しく生成する <a href="https://api.slack.com/reference/block-kit/views">ビュー部分のペイロード</a>を渡します。`views.push` の引数は <a href="#creating-modals">モーダルを開始するとき</a>と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
 
 より詳細な情報は <a href="https://slack.dev/bolt/concepts#view_submissions">API ドキュメント</a>を参照してください。
 </div>
 
 ```javascript
 // action_id: button_abc のボタンを押すイベントをリッスン
-// （そのボタンはモーダルビューの中にあるという想定）
+// （そのボタンはモーダルの中にあるという想定）
 app.action('button_abc', async ({ ack, body, context }) => {
   // ボタンを押したイベントを確認
   await ack();

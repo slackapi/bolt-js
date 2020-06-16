@@ -6,9 +6,9 @@ order: 6
 ---
 
 <div class="section-content">
-すべてのリスナーから、情報を追加してイベントを充実させるために使用できる `context` オブジェクトにアクセスすることができます。これはたとえば、サードパーティのシステムからユーザー情報を追加したり、チェーン内の次のミドルウェアの一時的な状態を追加したりする場合に使用します。
+`context` オブジェクトは、受信イベントに付加情報を提供するために使用されるもので、全てのリスナーがこれを使用できます。例えば、3rd party のシステムからユーザー情報を追加したり、ミドルウェアのチェインの中で次のミドルウェアが必要とする一時的な状態を追加したりといった用途に利用できます。
 
-`context` は単なるオブジェクトであるため、必要な情報をいくらでも追加、編集できます。
+`context` は、ただのオブジェクトなので、いくらでも属性を追加、編集することができます。
 </div>
 
 ```javascript
@@ -37,9 +37,9 @@ app.command('request', addTimezoneContext, async ({ command, ack, context }) => 
 
   const requestText = `:large_blue_circle: *New request from <@${command.user_id}>*: ${command.text}`;
 
-  // 午前9時〜午後5時以外のリクエストの場合は明日
+  // 午前 9 時〜午後 5 時以外のリクエストの場合は明日
   if (local_hour > 17 || local_hour < 9) {
-    // ローカル時間の明日午前９時までの差分を取得する関数があると仮定
+    // ローカル時間の明日午前 9 時までの差分を取得する関数があると仮定
     const local_tomorrow = getLocalTomorrow(context.tz_offset);
 
     try {
