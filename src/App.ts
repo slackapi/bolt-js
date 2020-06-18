@@ -95,7 +95,7 @@ export interface Authorize {
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
 export interface AuthorizeSourceData {
-  teamId: string;
+  teamId: string | undefined;
   enterpriseId?: string;
   userId?: string;
   conversationId?: string;
@@ -623,9 +623,9 @@ export default class App {
     let client = this.client;
     const token = selectToken(context);
     if (token !== undefined) {
-      let pool = this.clients[source.teamId];
+      let pool = this.clients[source.teamId!];
       if (pool === undefined) {
-        pool = this.clients[source.teamId] = new WebClientPool();
+        pool = this.clients[source.teamId!] = new WebClientPool();
       }
       client = pool.getOrCreate(token, this.clientOptions);
     }
@@ -706,12 +706,14 @@ function buildSource(
   const source: AuthorizeSourceData = {
     teamId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team.id as string :
-          assertNever(type)),
+        ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.team !== null) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.id as string :
+          ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.user !== undefined) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).user.team_id as string :
+            undefined),
     enterpriseId:
       ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team.enterprise_id as string :
-          undefined),
+        ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.team !== null) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.enterprise_id as string :
+          ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.enterprise !== undefined) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).enterprise!.id as string :
+            undefined),
     userId:
       ((type === IncomingEventType.Event) ?
         ((typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string') ? (body as SlackEventMiddlewareArgs['body']).event.user as string :
