@@ -38,5 +38,5 @@ receiver.router.post('/secret-page', (req, res) => {
 (async () => {
   await app.start(8080);
   console.log('app is running');
-}());
+})();
 ```
