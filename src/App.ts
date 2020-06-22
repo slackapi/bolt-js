@@ -129,7 +129,7 @@ export interface ViewConstraints {
 }
 
 export interface ErrorHandler {
-  (error: CodedError, middlewareArgs?: Object): Promise<void>;
+  (error: CodedError, middlewareArgs: Object): Promise<void>;
 }
 
 class WebClientPool {
@@ -526,7 +526,7 @@ export default class App {
       authorizeResult = await this.authorize(source, bodyArg);
     } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      return this.handleError(error);
+      return this.handleError(error, { body: bodyArg, logger: this.logger });
     }
 
     const context: Context = { ...authorizeResult };
@@ -680,7 +680,7 @@ export default class App {
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  private handleError(error: Error, middlewareArgs?: Object): Promise<void> {
+  private handleError(error: Error, middlewareArgs: Object): Promise<void> {
     return this.errorHandler(asCodedError(error), middlewareArgs);
   }
 
