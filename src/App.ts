@@ -129,7 +129,7 @@ export interface ViewConstraints {
 }
 
 export interface ErrorHandler {
-  (error: CodedError): Promise<void>;
+  (error: CodedError, middlewareArgs?: Object): Promise<void>;
 }
 
 class WebClientPool {
@@ -673,15 +673,15 @@ export default class App {
         },
       );
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, { ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger });
     }
   }
 
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  private handleError(error: Error): Promise<void> {
-    return this.errorHandler(asCodedError(error));
+  private handleError(error: Error, middlewareArgs?: Object): Promise<void> {
+    return this.errorHandler(asCodedError(error), middlewareArgs);
   }
 
 }

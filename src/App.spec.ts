@@ -479,7 +479,8 @@ describe('App', () => {
           throw error;
         });
 
-        app.error(async (actualError) => {
+        app.error(async (actualError, middlewareArgs) => {
+          assert.isDefined(middlewareArgs);
           assert.instanceOf(actualError, UnknownError);
           assert.equal(actualError.message, error.message);
         });
