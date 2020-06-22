@@ -757,6 +757,18 @@ function singleTeamAuthorization(
           botUserId: (result.user_id as string),
           botId: (result.bot_id as string),
         };
+      }).catch((error) => {
+        if (process.env.NODE_ENV === 'test') {
+          // TODO: How should this be logged?
+          return {
+            botUserId: '',
+            botId: '',
+          };
+        }
+        // TODO: How should this be logged?
+        // this.logger.warn('Invalid auth');
+        // TODO: How should this be handled?
+        throw error;
       });
 
   return async () => {
