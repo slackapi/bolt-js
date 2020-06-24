@@ -1,0 +1,55 @@
+5 ESLint rules behave differently from their TSLint counterparts:
+  * camelcase:
+    - Leading undescores in variable names will now be ignored.
+  * no-underscore-dangle:
+    - Leading and trailing underscores (_) on identifiers will now be ignored.
+  * eqeqeq:
+    - Option "smart" allows for comparing two literal values, evaluating the value of typeof and null comparisons.
+  * @typescript-eslint/quotes:
+    - Option "jsx-double" is not supported by ESLint.
+    - Option "avoid-template" is not supported by ESLint.
+  * @typescript-eslint/no-unused-expressions:
+    - The TSLint optional config "allow-new" is the default ESLint behavior and will no longer be ignored.
+
+Could not resolve ESLint extension 'eslint-plugin-airbnb-base'.: Error: Cannot find module '/Users/kattari/Desktop/bolt-js/eslint-plugin-airbnb-base'
+Require stack:
+- /Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/adapters/nativeImporter.js
+- /Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/cli/main.js
+- /Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/bin/tslint-to-eslint-config
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:794:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:687:27)
+    at Module.require (internal/modules/cjs/loader.js:849:19)
+    at require (internal/modules/cjs/helpers.js:74:18)
+    at /Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/adapters/nativeImporter.js:25:64
+    at processTicksAndRejections (internal/process/task_queues.js:93:5)
+    at async Object.exports.nativeImporter (/Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/adapters/nativeImporter.js:25:16)
+    at async importFile (/Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/input/importer.js:32:20)
+    at async exports.importer (/Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/input/importer.js:50:28)
+    at async /Users/kattari/.npm/_npx/2695/lib/node_modules/tslint-to-eslint-config/src/creation/summarization/retrieveExtendsValues.js:50:26
+
+
+20 rules are not known by tslint-to-eslint-config to have ESLint equivalents:
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "array-bracket-spacing".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "block-spacing".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "brace-style".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "function-name".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "import-name".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "no-dynamic-delete".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "no-else-after-return".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "no-function-constructor-with-string-args".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "no-increment-decrement".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "object-curly-spacing".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "object-shorthand-properties-first".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "prefer-array-literal".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "space-in-parens".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "ter-arrow-parens".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "ter-computed-property-spacing".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "ter-func-call-spacing".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "ter-indent".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "ter-prefer-arrow-callback".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "typedef".
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "whitespace".
+
+1 editor setting is not known by tslint-to-eslint-config to have an ESLint equivalent:
+  * tslint-to-eslint-config does not know the ESLint equivalent for TSLint's "editor.rulers".
+
