@@ -1,0 +1,6 @@
+# builtin file has a lot of formatting issues 
+builtin.ts
+
+**/*.spec.ts 
+
+src/test-helpers.ts
