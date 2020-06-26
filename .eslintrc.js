@@ -14,7 +14,7 @@ Happy linting! 💖
 module.exports = {
     "env": {
         "es6": true,
-        "node": true
+        "node": true,
     },
     "extends": [
         "airbnb-base"
@@ -142,7 +142,7 @@ module.exports = {
             "1tbs"
         ],
         "callback-return": "off",
-        "camelcase": "error",
+        "camelcase": "off",
         "capitalized-comments": [
             "off",
             "never",
@@ -389,7 +389,7 @@ module.exports = {
         ],
         "import/no-webpack-loader-syntax": "error",
         "import/order": [
-            "error",
+            "off",
             {
                 "groups": [
                     [
@@ -400,51 +400,52 @@ module.exports = {
                 ]
             }
         ],
-        "import/prefer-default-export": "error",
+        "import/prefer-default-export": "off",
         "import/unambiguous": "off",
         "indent": [
-            "error",
+            "off",
             2,
-            {
-                "SwitchCase": 1,
-                "VariableDeclarator": 1,
-                "outerIIFEBody": 1,
-                "FunctionDeclaration": {
-                    "parameters": 1,
-                    "body": 1
-                },
-                "FunctionExpression": {
-                    "parameters": 1,
-                    "body": 1
-                },
-                "CallExpression": {
-                    "arguments": 1
-                },
-                "ArrayExpression": 1,
-                "ObjectExpression": 1,
-                "ImportDeclaration": 1,
-                "flatTernaryExpressions": false,
-                "ignoredNodes": [
-                    "JSXElement",
-                    "JSXElement > *",
-                    "JSXAttribute",
-                    "JSXIdentifier",
-                    "JSXNamespacedName",
-                    "JSXMemberExpression",
-                    "JSXSpreadAttribute",
-                    "JSXExpressionContainer",
-                    "JSXOpeningElement",
-                    "JSXClosingElement",
-                    "JSXFragment",
-                    "JSXOpeningFragment",
-                    "JSXClosingFragment",
-                    "JSXText",
-                    "JSXEmptyExpression",
-                    "JSXSpreadChild"
-                ],
-                "ignoreComments": false,
-                "offsetTernaryExpressions": false
-            }
+            // optional additions if ESLint indent is used
+            // {
+            //     "SwitchCase": 1,
+            //     "VariableDeclarator": 1,
+            //     "outerIIFEBody": 1,
+            //     "FunctionDeclaration": {
+            //         "parameters": 1,
+            //         "body": 1
+            //     },
+            //     "FunctionExpression": {
+            //         "parameters": 1,
+            //         "body": 1
+            //     },
+            //     "CallExpression": {
+            //         "arguments": 1
+            //     },
+            //     "ArrayExpression": 1,
+            //     "ObjectExpression": 1,
+            //     "ImportDeclaration": 1,
+            //     "flatTernaryExpressions": false,
+            //     "ignoredNodes": [
+            //         "JSXElement",
+            //         "JSXElement > *",
+            //         "JSXAttribute",
+            //         "JSXIdentifier",
+            //         "JSXNamespacedName",
+            //         "JSXMemberExpression",
+            //         "JSXSpreadAttribute",
+            //         "JSXExpressionContainer",
+            //         "JSXOpeningElement",
+            //         "JSXClosingElement",
+            //         "JSXFragment",
+            //         "JSXOpeningFragment",
+            //         "JSXClosingFragment",
+            //         "JSXText",
+            //         "JSXEmptyExpression",
+            //         "JSXSpreadChild"
+            //     ],
+            //     "ignoreComments": false,
+            //     "offsetTernaryExpressions": false
+            // }
         ],
         "init-declarations": "off",
         // "jsdoc/check-alignment": "error",
