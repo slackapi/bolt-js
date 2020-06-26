@@ -17,7 +17,9 @@ module.exports = {
         "node": true,
     },
     "extends": [
-        "airbnb-base"
+        "airbnb-base",
+        // "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -30,7 +32,20 @@ module.exports = {
     ],
     "rules": {
         "@typescript-eslint/await-thenable": "error",
-        "@typescript-eslint/class-name-casing": "error",
+        "@typescript-eslint/naming-convention": [
+            "error",
+            // custom rule to ignore cases that require quoting
+            {
+                "selector": "property",
+                "format": ["camelCase"],
+                "leadingUnderscore": "allow",
+                "filter": {
+                    // you can expand this regex as you find more cases that require quoting that you want to allow
+                    "regex": "[_ ]",
+                    "match": false
+                }
+            }
+        ],
         "@typescript-eslint/consistent-type-assertions": "error",
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/explicit-member-accessibility": [
@@ -72,12 +87,12 @@ module.exports = {
         "@typescript-eslint/no-empty-function": "error",
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-for-in-array": "error",
-        "@typescript-eslint/no-param-reassign": "error",
         "@typescript-eslint/no-require-imports": "error",
         "@typescript-eslint/no-this-alias": "error",
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
         "@typescript-eslint/no-unused-expressions": "error",
         "@typescript-eslint/no-var-requires": "error",
+        "@typescript-eslint/prefer-regexp-exec" : "off",
         "@typescript-eslint/quotes": [
             "error",
             "single",
