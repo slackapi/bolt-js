@@ -1,5 +1,0 @@
-# spec files
-**/*.spec.ts
-
-# test helpers
-src/test-helpers.ts

@@ -1409,5 +1409,6 @@ module.exports = {
             "node_modules",
             "\\.(coffee|scss|css|less|hbs|svg|json)$"
         ]
-    }
+    },
+    "ignorePatterns": ["**/*.spec.ts", "src/test-helpers.ts"],
 };

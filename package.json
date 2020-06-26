@@ -29,7 +29,7 @@
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "eslint src/**/*.ts",
-    "test-lint": "tslint --project tsconfig.test.json \"src/**/*.spec.ts\" && tslint --project tsconfig.test.json \"src/test-helpers.ts\"",
+    "test-lint": "eslint -c .eslintrc.test.js \"src/**/*.spec.ts\" --no-ignore && eslint -c .eslintrc.test.js \"src/test-helpers.ts\" --no-ignore",
     "mocha": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
     "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:types",
     "test:types": "tsd",
