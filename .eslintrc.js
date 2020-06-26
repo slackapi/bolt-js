@@ -971,12 +971,7 @@ module.exports = {
         //     }
         // ],
         "no-use-before-define": [
-            "error",
-            {
-                "functions": true,
-                "classes": true,
-                "variables": true
-            }
+            "off"
         ],
         "no-useless-backreference": "off",
         "no-useless-call": "off",
