@@ -3,6 +3,8 @@ import pleaseUpgradeNode from 'please-upgrade-node';
 
 pleaseUpgradeNode(packageJson);
 
+console.log('Bolt v1.x has been deprecated. Please upgrade to Bolt v2.x. Migration guide available at https://slack.dev/bolt-js/tutorial/migration-v2.');
+
 export {
   default as App,
   AppOptions,
