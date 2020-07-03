@@ -612,18 +612,18 @@ export interface PinRemovedEvent extends StringIndexed {
 }
 
 interface ReactionMessageItem {
-  type: "message";
+  type: 'message';
   channel: string;
   ts: string;
 }
 
 interface ReactionFileItem {
-  type: "file";
+  type: 'file';
   file: string;
 }
 
 interface ReactionFileCommentItem {
-  type: "file_comment";
+  type: 'file_comment';
   file_comment: string;
   file: string;
 }
