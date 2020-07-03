@@ -611,6 +611,23 @@ export interface PinRemovedEvent extends StringIndexed {
   event_ts: string;
 }
 
+interface ReactionMessageItem {
+  type: "message";
+  channel: string;
+  ts: string;
+}
+
+interface ReactionFileItem {
+  type: "file";
+  file: string;
+}
+
+interface ReactionFileCommentItem {
+  type: "file_comment";
+  file_comment: string;
+  file: string;
+}
+
 export interface ReactionAddedEvent extends StringIndexed {
   type: 'reaction_added';
   user: string;
@@ -618,8 +635,7 @@ export interface ReactionAddedEvent extends StringIndexed {
   item_user: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
   // https://api.slack.com/events/reaction_added
-  item: {
-  };
+  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
   event_ts: string;
 }
 
