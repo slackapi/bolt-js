@@ -11,7 +11,7 @@ order: 14
 
 Bolt for JavaScript は、アプリのインストールフローを完了した後の遷移先の URL である **Redirect URL** のためのパスとして `slack/oauth_redirect` を有効にします。この URL を Slack アプリの設定画面の **OAuth and Permissions** セクション内で **Redirect URL** として指定してください。この設定のカスタマイズは以下で説明する `installerOptions` を指定することで可能です。
 
-Bolt for JavaScript は `slack/install` というパスも生成します。これは、Slack アプリのダイレクトインストールのために `Add to Slack` ボタンを置く場合に指定できる URL です。アプリはすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`app.installer.generateInstallUrl()` を用いてその URL を生成することができます。詳細は [OAuth ライブラリのドキュメント](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
+Bolt for JavaScript は `slack/install` というパスも生成します。これは、Slack アプリのダイレクトインストールのために `Add to Slack` ボタンを置く場合に指定できる URL です。アプリはすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳細は [OAuth ライブラリのドキュメント](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
 Slack の OAuth インストールフローについてもっと知りたい場合は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
 </div>
