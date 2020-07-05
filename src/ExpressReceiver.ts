@@ -114,9 +114,9 @@ export default class ExpressReceiver implements Receiver {
       this.router.get(installPath, async (_req, res, next) => {
         try {
           const url = await this.installer!.generateInstallUrl({
+            userScopes,
             metadata: installerOptions.metadata,
             scopes: scopes!,
-            userScopes
           });
           res.send(`<a href=${url}><img alt=""Add to Slack"" height="40" width="139"
               src="https://platform.slack-edge.com/img/add_to_slack.png"
