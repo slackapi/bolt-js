@@ -45,7 +45,7 @@ describe('ExpressReceiver', () => {
         clientSecret: 'my-client-secret',
         stateSecret: 'state-secret',
         scopes: ['channels:read'],
-        userScopes: ['chat:writeFix'],
+        userScopes: ['chat:write'],
         installerOptions: {
           authVersion: 'v2',
         },
