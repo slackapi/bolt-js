@@ -77,15 +77,10 @@
     "source-map-support": "^0.5.12",
     "ts-node": "^8.1.0",
     "tsd": "^0.13.1",
-    "tslint": "^5.15.0",
-<<<<<<< HEAD
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.7.2"
   },
   "tsd": {
     "directory": "types-tests"
-=======
-    "typescript": "^3.7.2"
->>>>>>> reverted ts upgrade and specified eslintignore
   }
 }
