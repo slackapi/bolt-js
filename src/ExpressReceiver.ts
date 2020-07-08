@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
+
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, Router } from 'express';

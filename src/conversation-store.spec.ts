@@ -1,4 +1,4 @@
-// tslint:disable:no-implicit-dependencies
+// eslint-disable import/no-extraneous-dependencies
 import 'mocha';
 import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
@@ -125,7 +125,7 @@ describe('MemoryStore', () => {
   describe('constructor', () => {
     it('should initialize successfully', async () => {
       // Arrange
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -143,7 +143,7 @@ describe('MemoryStore', () => {
       // Arrange
       const dummyConversationState = Symbol();
       const dummyConversationId = 'CONVERSATION_ID';
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -156,7 +156,7 @@ describe('MemoryStore', () => {
 
     it('should reject lookup of conversation state when the conversation is not stored', async () => {
       // Arrange
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -175,7 +175,7 @@ describe('MemoryStore', () => {
       const dummyConversationId = 'CONVERSATION_ID';
       const dummyConversationState = Symbol();
       const expiresInMs = 5;
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();

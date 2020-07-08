@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 import { Agent } from 'http';
 import { SecureContextOptions } from 'tls';
 import util from 'util';
@@ -55,8 +56,8 @@ import {
   AppInitializationError,
   MultipleListenerError,
 } from './errors';
-import allSettled = require('promise.allsettled'); // tslint:disable-line:no-require-imports import-name
-const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
+import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
+const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 
 /** App initialization options */
 export interface AppOptions {

@@ -4,5 +4,5 @@
   "compilerOptions": {
     // ensure that this config cannot be used for a build
     "noEmit": true
-  }
+  },
 }

@@ -1,4 +1,3 @@
-// eslint-disable import/no-extraneous-dependencies
 import 'mocha';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
@@ -44,7 +43,7 @@ describe('App', () => {
           withNoopAppMetadata(),
           withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
         );
-        const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
         // Act
         const app = new App({ token: '', signingSecret: '' });
@@ -57,7 +56,7 @@ describe('App', () => {
     it('should succeed with an authorize callback', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       const app = new App({ authorize: authorizeCallback, signingSecret: '' });
@@ -69,7 +68,7 @@ describe('App', () => {
     it('should fail without a token for single team authorization or authorize callback or oauth installer',
        async () => {
           // Arrange
-         const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+         const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           // Act
          try {
@@ -83,7 +82,7 @@ describe('App', () => {
     it('should fail when both a token and authorize callback are specified', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       try {
@@ -99,7 +98,7 @@ describe('App', () => {
     it('should fail when both a token is specified and OAuthInstaller is initialized', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       try {
@@ -115,7 +114,7 @@ describe('App', () => {
     it('should fail when both a authorize callback is specified and OAuthInstaller is initialized', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       try {
@@ -131,7 +130,7 @@ describe('App', () => {
     describe('with a custom receiver', () => {
       it('should succeed with no signing secret', async () => {
         // Arrange
-        const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+        const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
         // Act
         const app = new App({ receiver: new FakeReceiver(), authorize: noopAuthorize });
@@ -142,7 +141,7 @@ describe('App', () => {
     });
     it('should fail when no signing secret for the default receiver is specified', async () => {
       // Arrange
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       try {
@@ -163,7 +162,7 @@ describe('App', () => {
         withMemoryStore(fakeMemoryStore),
         withConversationContext(fakeConversationContext),
       );
-      const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       const app = new App({ authorize: noopAuthorize, signingSecret: '' });
@@ -181,7 +180,7 @@ describe('App', () => {
         withNoopWebClient(),
         withConversationContext(fakeConversationContext),
       );
-      const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       const app = new App({ convoStore: false, authorize: noopAuthorize, signingSecret: '' });
@@ -200,7 +199,7 @@ describe('App', () => {
           withConversationContext(fakeConversationContext),
         );
         const dummyConvoStore = Symbol() as unknown as ConversationStore;
-        const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
         // Act
         const app = new App({ convoStore: dummyConvoStore, authorize: noopAuthorize, signingSecret: '' });
@@ -224,12 +223,12 @@ describe('App', () => {
           },
         },
       );
-      // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
-      const App = await importApp(overrides);
+      
+      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
-      // eslint-disable-line @typescript-eslint/no-unused-expressions
-      new App({ clientOptions, authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR });
+      
+      new App({ clientOptions, authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR }); // eslint-disable-line @typescript-eslint/no-unused-expressions
 
       assert.ok(fakeConstructor.called);
 
@@ -250,7 +249,7 @@ describe('App', () => {
       const dummyReturn = Symbol();
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
       const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
       fakeReceiver.start = sinon.fake.returns(dummyReturn);
 
@@ -269,11 +268,11 @@ describe('App', () => {
       const dummyReturn = Symbol();
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
       fakeReceiver.stop = sinon.fake.returns(dummyReturn);
 
       // Act
-      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize }); // eslint-disable-line @typescript-eslint/no-unused-expressions
       const actualReturn = await app.stop(...dummyParams);
 
       // Assert
@@ -309,7 +308,7 @@ describe('App', () => {
       const fakeLogger = createFakeLogger();
       const fakeMiddleware = sinon.fake(noopMiddleware);
       const invalidReceiverEvents = createInvalidReceiverEvents();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       const app = new App({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
@@ -329,7 +328,7 @@ describe('App', () => {
       const dummyOrigError = new Error('auth failed');
       const dummyAuthorizationError = new AuthorizationError('auth failed', dummyOrigError);
       const dummyReceiverEvent = createDummyReceiverEvent();
-      const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
       // Act
       const app = new App({
@@ -363,7 +362,7 @@ describe('App', () => {
             withMemoryStore(sinon.fake()),
             withConversationContext(fakeConversationContext),
         );
-        const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
         dummyReceiverEvent = createDummyReceiverEvent();
         fakeFirstMiddleware = sinon.fake(noopMiddleware);
@@ -512,7 +511,7 @@ describe('App', () => {
       const dummyReceiverEvent =  createDummyReceiverEvent(eventType);
 
       beforeEach(async () => {
-        const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+        const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
         app = new App({
           receiver: fakeReceiver,
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
@@ -733,7 +732,7 @@ describe('App', () => {
           const viewFn = sinon.fake.resolves({});
           const optionsFn = sinon.fake.resolves({});
           const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
           const dummyReceiverEvents = createReceiverEvents();
 
           // Act
@@ -812,7 +811,7 @@ describe('App', () => {
           const actionId = 'block_action_id';
           const fakeAxiosPost = sinon.fake.resolves({});
           const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -848,7 +847,7 @@ describe('App', () => {
           const actionId = 'block_action_id';
           const fakeAxiosPost = sinon.fake.resolves({});
           const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           // Act
           const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
@@ -881,7 +880,7 @@ describe('App', () => {
 
         it('should be available in middleware/listener args', async () => {
           // Arrange
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
           const fakeLogger = createFakeLogger();
           const app = new App({
             logger: fakeLogger,
@@ -928,7 +927,7 @@ describe('App', () => {
 
         it('should work in the case both logger and logLevel are given', async () => {
           // Arrange
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
           const fakeLogger = createFakeLogger();
           const app = new App({
             logger: fakeLogger,
@@ -980,7 +979,7 @@ describe('App', () => {
 
         it('should be available in middleware/listener args', async () => {
           // Arrange
-          const App = await importApp(mergeOverrides( // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(mergeOverrides( // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
             withNoopAppMetadata(),
             withSuccessfulBotUserFetchingWebClient('B123', 'U123'),
           ));
@@ -1048,7 +1047,7 @@ describe('App', () => {
 
         it('should be to the global app client when authorization doesn\'t produce a token', async () => {
           // Arrange
-          const App = await importApp(); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
           const app = new App({
             receiver: fakeReceiver,
             authorize: noopAuthorize,
@@ -1140,7 +1139,7 @@ describe('App', () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
           const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           const dummyMessage = 'test';
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -1170,7 +1169,7 @@ describe('App', () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
           const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           const dummyMessage = { text: 'test' };
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -1247,7 +1246,7 @@ describe('App', () => {
         it('should not exist in the arguments on incoming events that don\'t support say', async () => {
           // Arrange
           const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           const assertionAggregator = sinon.fake();
           const dummyReceiverEvents = createReceiverEventsWithoutSay(dummyChannelId);
@@ -1271,7 +1270,7 @@ describe('App', () => {
           // Arrange
           const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
           const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // eslint-disable-line camelcase, no-underscore-dangle, id-blacklist, id-match
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
           const dummyMessage = { text: 'test' };
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);

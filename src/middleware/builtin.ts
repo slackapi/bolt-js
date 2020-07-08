@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/dot-notation */
+
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -311,7 +313,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   };
 }
 
-export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
+export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> { // eslint-disable-line no-shadow
   return async ({ message, next }) => {
     if (message.subtype === subtype) {
       // TODO: remove the non-null assertion operator
