@@ -68,7 +68,6 @@ export interface AppOptions {
   stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
   installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
   scopes?: ExpressReceiverOptions['scopes'];
-  userScopes?: ExpressReceiverOptions['userScopes'];
   installerOptions?: ExpressReceiverOptions['installerOptions'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
@@ -198,7 +197,6 @@ export default class App {
     stateSecret = undefined,
     installationStore = undefined,
     scopes = undefined,
-    userScopes = undefined,
     installerOptions = undefined,
   }: AppOptions = {}) {
 
@@ -257,7 +255,6 @@ export default class App {
           installationStore,
           installerOptions,
           scopes,
-          userScopes,
           logger: this.logger,
         });
       }

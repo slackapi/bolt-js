@@ -24,7 +24,6 @@ export interface ExpressReceiverOptions {
   stateSecret?: string; // ClearStateStoreOptions['secret']; // required when using default stateStore
   installationStore?: InstallationStore; // default MemoryInstallationStore
   scopes?: string | string[];
-  userScopes?: string | string[];
   installerOptions?: InstallerOptions;
 }
 
@@ -36,6 +35,7 @@ interface InstallerOptions {
   installPath?: string;
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
+  userScopes?: string | string[];
 }
 
 /**
@@ -63,7 +63,6 @@ export default class ExpressReceiver implements Receiver {
     stateSecret = undefined,
     installationStore = undefined,
     scopes = undefined,
-    userScopes = undefined,
     installerOptions = {},
   }: ExpressReceiverOptions) {
     this.app = express();
@@ -114,9 +113,9 @@ export default class ExpressReceiver implements Receiver {
       this.router.get(installPath, async (_req, res, next) => {
         try {
           const url = await this.installer!.generateInstallUrl({
-            userScopes,
             metadata: installerOptions.metadata,
             scopes: scopes!,
+            userScopes: installerOptions.userScopes,
           });
           res.send(`<a href=${url}><img alt=""Add to Slack"" height="40" width="139"
               src="https://platform.slack-edge.com/img/add_to_slack.png"

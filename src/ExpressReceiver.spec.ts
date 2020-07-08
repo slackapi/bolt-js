@@ -45,9 +45,9 @@ describe('ExpressReceiver', () => {
         clientSecret: 'my-client-secret',
         stateSecret: 'state-secret',
         scopes: ['channels:read'],
-        userScopes: ['chat:write'],
         installerOptions: {
           authVersion: 'v2',
+          userScopes: ['chat:write'],
         },
       });
       assert.isNotNull(receiver);
