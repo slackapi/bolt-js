@@ -16,7 +16,7 @@ module.exports = {
 	parserOptions: {
 		project: './tsconfig.eslint.json',
 	},
-	plugins: ['@typescript-eslint', 'jsdoc'],
+	plugins: ['@typescript-eslint'],
 	ignorePatterns: ["**/*.spec.ts", "src/test-helpers.ts"],
 	rules: {
     /* Below are some of the  new 'airbnb-typescript' rules that the project currently does not follow.
