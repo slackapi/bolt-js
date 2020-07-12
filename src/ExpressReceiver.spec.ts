@@ -47,6 +47,7 @@ describe('ExpressReceiver', () => {
         scopes: ['channels:read'],
         installerOptions: {
           authVersion: 'v2',
+          userScopes: ['chat:write'],
         },
       });
       assert.isNotNull(receiver);
