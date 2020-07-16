@@ -753,9 +753,9 @@ export interface WorkflowStepExecuteEvent extends StringIndexed {
   callback_id: string;
   workflow_step: {
     workflow_step_execute_id: string;
-    workflow_id: string,
-    workflow_instance_id: string,
-    step_id: string,
+    workflow_id: string;
+    workflow_instance_id: string;
+    step_id: string;
     inputs: object;
     outputs: {
       name: string;
