@@ -9,7 +9,7 @@ export interface WorkflowStepEdit {
   trigger_id: string;
   user: {
     id: string;
-    name: string;
+    username: string;
     team_id?: string; // undocumented
   };
   team: {
@@ -27,5 +27,7 @@ export interface WorkflowStepEdit {
   workflow_step: {
     workflow_id: string;
     step_id: string;
+    inputs: object;
+    outputs: [];
   };
 }
