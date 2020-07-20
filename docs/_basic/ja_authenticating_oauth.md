@@ -50,7 +50,7 @@ const app = new App({
 - `installPath`: "Add to Slack" ボタンのためのパスを変更するために使用
 - `redirectUriPath`: Redirect URL を変更するために使用
 - `callbackOptions`: OAuth フロー完了時の成功・エラー完了画面をカスタマイズするために使用
-- `stateStore`: 組み込みの `ClearStatStore` の代わりにカスタムのデータストアを有効にするために使用
+- `stateStore`: 組み込みの `ClearStateStore` の代わりにカスタムのデータストアを有効にするために使用
 
 </div>
 
