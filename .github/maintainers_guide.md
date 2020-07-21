@@ -34,23 +34,41 @@ To build the docs locally, you can run `bundle exec jekyll serve`.
     *  Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`.
     *  Update any dependency versions 
     *  Confirm tests pass by running `npm test`
-    *  Commit with a message including the new version number. For example `v1.5.0`.
-    *  Tag the commit with the version number. For example `@slack/bolt@1.5.0`.
+    *  Commit with a message including the new version number. For example `v2.2.0`.
+    *  Tag the commit with the version number. For example `git tag @slack/bolt@2.2.0`.
 
-2.  Merge into master repository
+2.  Merge into main repository
     *  Create a pull request with the commit that was just made. Be certain to include the tag. For
-       example: `git push username master:rel-v1.0.8 && git push --tags username`.
+       example: `git push username main:rel-v1.0.8 && git push --tags username`.
     *  Once tests pass and a reviewer has approved, merge the pull request. You will also want to
-       update your local `master` branch.
+       update your local `main` branch.
+    *  Push the new tag up to origin `git push --tags origin`.
 
 3.  Distribute the release
-    *  Publish to the package manager. Once you have permission to publish on npm, you can run `npm publish`.
+    *  Publish to the package manager. Once you have permission to publish on npm, you can run `npm publish . --otp YOUR_OTP_CODE`.
     *  Create a GitHub Release with release notes. Release notes should mention contributors (@-mentions) and issues/PRs (#-mentions) for the release.
     *  Example release: https://github.com/slackapi/bolt/releases/tag/%40slack%2Fbolt%401.5.0
 
 4.  (Slack Internal) Communicate the release internally. Include a link to the GitHub Release.
 
 5.  Announce on community.slack.com in #slack-api
+
+#### Beta Release
+
+1. Create the commit for the release:
+    * Follow normal release steps above for creating a release with a few minor changes:
+        *  Set version to the format of `Major.Minor.Patch-BetaNameSpace-BetaVersion` (example: `2.1.1-workflowStepsBeta.1`)
+
+2. Merge into feature branch on origin
+    * Push commit + git tag to origin. example: `git push origin feat-the-feature && git push --tags origin`
+
+3. Distribute the release
+    *  Publish to the package manager. Once you have permission to publish on npm, you can run `npm publish . --otp YOUR_OTP_CODE`.
+        * Update `latest` dist-tag on npm back to the last non beta release `npm dist-tag add @slack/bolt@VERSION latest --otp YOUR-OTP-CODE`
+        * Add a new dist-tag for your feature. `npm dist-tag add @slack/bolt@VERSION-BetaNameSpace-BetaVersion feat-the-feature --otp YOUR-OTP-CODE`
+    *  Create a GitHub Release with release notes. Release notes should mention contributors (@-mentions) and issues/PRs (#-mentions) for the release. Make sure to check the pre release option.
+    *  Example release: https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.1.1-workflowStepsBeta.1
+
 
 ## Workflow
 
