@@ -175,12 +175,10 @@ export function matchConstraints(
 
       if (isViewBody(body)) {
         callbackId = body['view']['callback_id'];
+      } else if (isCallbackIdentifiedBody(body)) {
+        callbackId = body['callback_id'];
       } else {
-        if (isCallbackIdentifiedBody(body)) {
-          callbackId = body['callback_id'];
-        } else {
-          return;
-        }
+        return;
       }
 
       if (typeof constraints.callback_id === 'string') {

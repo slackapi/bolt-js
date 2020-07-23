@@ -1,5 +1,5 @@
-const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 import pleaseUpgradeNode from 'please-upgrade-node';
+import packageJson from '../package.json';
 
 pleaseUpgradeNode(packageJson);
 

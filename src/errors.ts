@@ -35,6 +35,7 @@ export class AppInitializationError extends Error implements CodedError {
 
 export class AuthorizationError extends Error implements CodedError {
   public code = ErrorCode.AuthorizationError;
+
   public original: Error;
 
   constructor(message: string, original: Error) {
@@ -46,6 +47,7 @@ export class AuthorizationError extends Error implements CodedError {
 
 export class ContextMissingPropertyError extends Error implements CodedError {
   public code = ErrorCode.ContextMissingPropertyError;
+
   public missingProperty: string;
 
   constructor(missingProperty: string, message: string) {
@@ -68,6 +70,7 @@ export class ReceiverAuthenticityError extends Error implements CodedError {
 
 export class MultipleListenerError extends Error implements CodedError {
   public code = ErrorCode.MultipleListenerError;
+
   public originals: Error[];
 
   constructor(originals: Error[]) {
@@ -81,6 +84,7 @@ export class MultipleListenerError extends Error implements CodedError {
 
 export class UnknownError extends Error implements CodedError {
   public code = ErrorCode.UnknownError;
+
   public original: Error;
 
   constructor(original: Error) {

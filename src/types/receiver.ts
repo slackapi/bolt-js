@@ -1,5 +1,5 @@
 import App from '../App';
-import { AckFn } from '../types';
+import { AckFn } from './index';
 import { StringIndexed } from './helpers';
 
 export interface ReceiverEvent {

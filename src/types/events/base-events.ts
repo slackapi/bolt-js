@@ -1,5 +1,5 @@
-import { StringIndexed } from '../helpers';
 import { MessageAttachment, KnownBlock, Block, View } from '@slack/types';
+import { StringIndexed } from '../helpers';
 
 /**
  * All known event types in Slack's Events API

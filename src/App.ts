@@ -6,6 +6,7 @@ import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions }
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance } from 'axios';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
+import packageJson from '../package.json';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -46,8 +47,8 @@ import {
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError } from './errors';
+// eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
-const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 
 /** App initialization options */
 export interface AppOptions {
@@ -122,6 +123,7 @@ export interface ErrorHandler {
 
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
+
   public getOrCreate(token: string, clientOptions: WebClientOptions): WebClient {
     const cachedClient = this.pool[token];
     if (typeof cachedClient !== 'undefined') {
@@ -208,15 +210,11 @@ export default class App {
     // the public WebClient instance (app.client) - this one doesn't have a token
     this.client = new WebClient(undefined, this.clientOptions);
 
-    this.axios = axios.create(
-      Object.assign(
-        {
-          httpAgent: agent,
-          httpsAgent: agent,
-        },
-        clientTls,
-      ),
-    );
+    this.axios = axios.create({
+      httpAgent: agent,
+      httpsAgent: agent,
+      ...clientTls,
+    });
 
     this.middleware = [];
     this.listeners = [];
@@ -224,28 +222,26 @@ export default class App {
     // Check for required arguments of ExpressReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
-    } else {
+    } else if (signingSecret === undefined) {
       // No custom receiver
-      if (signingSecret === undefined) {
-        throw new AppInitializationError(
-          'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-            'custom receiver.',
-        );
-      } else {
-        // Create default ExpressReceiver
-        this.receiver = new ExpressReceiver({
-          signingSecret,
-          endpoints,
-          processBeforeResponse,
-          clientId,
-          clientSecret,
-          stateSecret,
-          installationStore,
-          installerOptions,
-          scopes,
-          logger: this.logger,
-        });
-      }
+      throw new AppInitializationError(
+        'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+          'custom receiver.',
+      );
+    } else {
+      // Create default ExpressReceiver
+      this.receiver = new ExpressReceiver({
+        signingSecret,
+        endpoints,
+        processBeforeResponse,
+        clientId,
+        clientSecret,
+        stateSecret,
+        installationStore,
+        installerOptions,
+        scopes,
+        logger: this.logger,
+      });
     }
 
     let usingOauth = false;
@@ -611,11 +607,12 @@ export default class App {
     }
 
     // Get the client arg
-    let client = this.client;
+    let { client } = this;
     const token = selectToken(context);
     if (token !== undefined) {
       let pool = this.clients[source.teamId];
       if (pool === undefined) {
+        // eslint-disable-next-line no-multi-assign
         pool = this.clients[source.teamId] = new WebClientPool();
       }
       client = pool.getOrCreate(token, this.clientOptions);
@@ -783,7 +780,7 @@ function singleTeamAuthorization(
         });
 
   return async () => {
-    return Object.assign({ botToken: authorization.botToken }, await identifiers);
+    return { botToken: authorization.botToken, ...(await identifiers) };
   };
 }
 

@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 
-import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 import { createServer, Server } from 'http';
 import express, { Request, Response, Application, RequestHandler, Router } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
-import App from './App';
-import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
 import { Logger, ConsoleLogger } from '@slack/logger';
 import { InstallProvider, StateStore, InstallationStore, CallbackOptions } from '@slack/oauth';
+import App from './App';
+import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
+import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -50,10 +50,15 @@ export default class ExpressReceiver implements Receiver {
   public app: Application;
 
   private server: Server;
+
   private bolt: App | undefined;
+
   private logger: Logger;
+
   private processBeforeResponse: boolean;
+
   public router: Router;
+
   public installer: InstallProvider | undefined = undefined;
 
   constructor({
@@ -83,9 +88,9 @@ export default class ExpressReceiver implements Receiver {
     this.logger = logger;
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     this.router = Router();
-    for (const endpoint of endpointList) {
+    endpointList.forEach((endpoint) => {
       this.router.post(endpoint, ...expressMiddleware);
-    }
+    });
 
     if (
       clientId !== undefined &&
@@ -143,7 +148,7 @@ export default class ExpressReceiver implements Receiver {
       // tslint:disable-next-line: align
     }, 3001);
 
-    let storedResponse = undefined;
+    let storedResponse;
     const event: ReceiverEvent = {
       body: req.body,
       ack: async (response): Promise<void> => {
@@ -300,6 +305,7 @@ function verifyRequestSignature(
   }
 
   const ts = Number(requestTimestamp);
+  // eslint-disable-next-line no-restricted-globals
   if (isNaN(ts)) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Timestamp is invalid.');
   }

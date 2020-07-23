@@ -1,6 +1,6 @@
+import { View } from '@slack/types';
 import { StringIndexed } from '../helpers';
 import { AckFn } from '../utilities';
-import { View } from '@slack/types';
 
 /**
  * Known view action types
