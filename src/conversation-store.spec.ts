@@ -21,12 +21,12 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = {
+    const fakeArgs = ({
       body: {},
       context: dummyContext,
       next: fakeNext,
       logger: fakeLogger,
-    } as unknown as MiddlewareArgs;
+    } as unknown) as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
@@ -57,12 +57,12 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = {
+    const fakeArgs = ({
       body: {},
       context: dummyContext,
       next: fakeNext,
       logger: fakeLogger,
-    } as unknown as MiddlewareArgs;
+    } as unknown) as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
@@ -96,12 +96,12 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = {
+    const fakeArgs = ({
       body: {},
       context: dummyContext,
       next: fakeNext,
       logger: fakeLogger,
-    } as unknown as MiddlewareArgs;
+    } as unknown) as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
@@ -196,10 +196,10 @@ describe('MemoryStore', () => {
 /* Testing Harness */
 
 type MiddlewareArgs = AnyMiddlewareArgs & {
-  next: NextFn,
-  context: Context,
-  logger: Logger,
-  client: WebClient,
+  next: NextFn;
+  context: Context;
+  logger: Logger;
+  client: WebClient;
 };
 
 interface DummyContext<ConversationState> {
@@ -208,9 +208,7 @@ interface DummyContext<ConversationState> {
 }
 
 // Loading the system under test using overrides
-async function importConversationStore(
-  overrides: Override = {},
-): Promise<typeof import('./conversation-store')> {
+async function importConversationStore(overrides: Override = {}): Promise<typeof import('./conversation-store')> {
   return rewiremock.module(() => import('./conversation-store'), overrides);
 }
 
@@ -244,7 +242,7 @@ function createFakeStore(
     //       Type 'any[]' is not comparable to type '[string, any, (number | undefined)?]'.
     // 223     set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
     //              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    set: setSpy as unknown as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
-    get: getSpy as unknown as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
+    set: (setSpy as unknown) as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
+    get: (getSpy as unknown) as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
   };
 }

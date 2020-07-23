@@ -17,9 +17,11 @@ import { InstallProvider, StateStore, InstallationStore, CallbackOptions } from 
 export interface ExpressReceiverOptions {
   signingSecret: string;
   logger?: Logger;
-  endpoints?: string | {
-    [endpointType: string]: string;
-  };
+  endpoints?:
+    | string
+    | {
+        [endpointType: string]: string;
+      };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -44,7 +46,6 @@ interface InstallerOptions {
  * Receives HTTP requests with Events, Slash Commands, and Actions
  */
 export default class ExpressReceiver implements Receiver {
-
   /* Express app */
   public app: Application;
 
@@ -87,11 +88,10 @@ export default class ExpressReceiver implements Receiver {
     }
 
     if (
-      clientId !== undefined
-      && clientSecret !== undefined
-      && (stateSecret !== undefined || installerOptions.stateStore !== undefined)
+      clientId !== undefined &&
+      clientSecret !== undefined &&
+      (stateSecret !== undefined || installerOptions.stateStore !== undefined)
     ) {
-
       this.installer = new InstallProvider({
         clientId,
         clientSecret,
@@ -104,14 +104,13 @@ export default class ExpressReceiver implements Receiver {
 
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
-      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
-        '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      const redirectUriPath =
+        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
       this.router.use(redirectUriPath, async (req, res) => {
         await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
       });
 
-      const installPath = installerOptions.installPath === undefined ?
-      '/slack/install' : installerOptions.installPath;
+      const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       this.router.get(installPath, async (_req, res, next) => {
         try {
           const url = await this.installer!.generateInstallUrl({
@@ -136,10 +135,12 @@ export default class ExpressReceiver implements Receiver {
     let isAcknowledged = false;
     setTimeout(() => {
       if (!isAcknowledged) {
-        this.logger.error('An incoming event was not acknowledged within 3 seconds. ' +
-            'Ensure that the ack() argument is called in a listener.');
+        this.logger.error(
+          'An incoming event was not acknowledged within 3 seconds. ' +
+            'Ensure that the ack() argument is called in a listener.',
+        );
       }
-    // tslint:disable-next-line: align
+      // tslint:disable-next-line: align
     }, 3001);
 
     let storedResponse = undefined;
@@ -246,12 +247,8 @@ export const respondToUrlVerification: RequestHandler = (req, res, next) => {
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-export function verifySignatureAndParseRawBody(
-  logger: Logger,
-  signingSecret: string,
-): RequestHandler {
+export function verifySignatureAndParseRawBody(logger: Logger, signingSecret: string): RequestHandler {
   return async (req, res, next) => {
-
     let stringBody: string;
     // On some environments like GCP (Google Cloud Platform),
     // req.body can be pre-parsed and be passed as req.rawBody here
@@ -287,39 +284,32 @@ export function verifySignatureAndParseRawBody(
 }
 
 function logError(logger: Logger, message: string, error: any): void {
-  const logMessage = ('code' in error)
-    ? `${message} (code: ${error.code}, message: ${error.message})`
-    : `${message} (error: ${error})`;
+  const logMessage =
+    'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
   logger.warn(logMessage);
 }
 
 function verifyRequestSignature(
-    signingSecret: string,
-    body: string,
-    signature: string | undefined,
-    requestTimestamp: string | undefined,
+  signingSecret: string,
+  body: string,
+  signature: string | undefined,
+  requestTimestamp: string | undefined,
 ): void {
   if (signature === undefined || requestTimestamp === undefined) {
-    throw new ReceiverAuthenticityError(
-        'Slack request signing verification failed. Some headers are missing.',
-    );
+    throw new ReceiverAuthenticityError('Slack request signing verification failed. Some headers are missing.');
   }
 
   const ts = Number(requestTimestamp);
   if (isNaN(ts)) {
-    throw new ReceiverAuthenticityError(
-        'Slack request signing verification failed. Timestamp is invalid.',
-    );
+    throw new ReceiverAuthenticityError('Slack request signing verification failed. Timestamp is invalid.');
   }
 
   // Divide current date to match Slack ts format
   // Subtract 5 minutes from current time
-  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
+  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 60 * 5;
 
   if (ts < fiveMinutesAgo) {
-    throw new ReceiverAuthenticityError(
-        'Slack request signing verification failed. Timestamp is too old.',
-    );
+    throw new ReceiverAuthenticityError('Slack request signing verification failed. Timestamp is too old.');
   }
 
   const hmac = crypto.createHmac('sha256', signingSecret);
@@ -327,9 +317,7 @@ function verifyRequestSignature(
   hmac.update(`${version}:${ts}:${body}`);
 
   if (!tsscmp(hash, hmac.digest('hex'))) {
-    throw new ReceiverAuthenticityError(
-        'Slack request signing verification failed. Signature mismatch.',
-    );
+    throw new ReceiverAuthenticityError('Slack request signing verification failed. Signature mismatch.');
   }
 }
 
@@ -339,9 +327,9 @@ function verifyRequestSignature(
  * - Parse request.body and assign the successfully parsed object to it.
  */
 function verifySignatureAndParseBody(
-    signingSecret: string,
-    body: string,
-    headers: Record<string, any>,
+  signingSecret: string,
+  body: string,
+  headers: Record<string, any>,
 ): AnyMiddlewareArgs['body'] {
   // *** Request verification ***
   const {
@@ -350,20 +338,12 @@ function verifySignatureAndParseBody(
     'content-type': contentType,
   } = headers;
 
-  verifyRequestSignature(
-      signingSecret,
-      body,
-      signature,
-      requestTimestamp,
-  );
+  verifyRequestSignature(signingSecret, body, signature, requestTimestamp);
 
   return parseRequestBody(body, contentType);
 }
 
-function parseRequestBody(
-    stringBody: string,
-    contentType: string | undefined,
-): any {
+function parseRequestBody(stringBody: string, contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
 

@@ -119,14 +119,16 @@ export interface ViewErrorsResponseAction {
 }
 
 export type ViewResponseAction =
-  ViewUpdateResponseAction | ViewPushResponseAction | ViewClearResponseAction | ViewErrorsResponseAction;
+  | ViewUpdateResponseAction
+  | ViewPushResponseAction
+  | ViewClearResponseAction
+  | ViewErrorsResponseAction;
 
 /**
  * Type function which given a view action `VA` returns a corresponding type for the `ack()` function. The function is
  * used to acknowledge the receipt (and possibly signal failure) of an view submission or closure from a listener or
  * middleware.
  */
-type ViewAckFn<VA extends SlackViewAction = SlackViewAction> =
-  VA extends ViewSubmitAction ? AckFn<ViewResponseAction> :
-  // ViewClosedActions can only be acknowledged, there are no arguments
-  AckFn<void>;
+type ViewAckFn<VA extends SlackViewAction = SlackViewAction> = VA extends ViewSubmitAction
+  ? AckFn<ViewResponseAction> // ViewClosedActions can only be acknowledged, there are no arguments
+  : AckFn<void>;

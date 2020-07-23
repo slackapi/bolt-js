@@ -71,7 +71,9 @@ export class MultipleListenerError extends Error implements CodedError {
   public originals: Error[];
 
   constructor(originals: Error[]) {
-    super('Multiple errors occurred while handling several listeners. The `originals` property contains an array of each error.');
+    super(
+      'Multiple errors occurred while handling several listeners. The `originals` property contains an array of each error.',
+    );
 
     this.originals = originals;
   }

@@ -1,8 +1,4 @@
-import {
-  Middleware,
-  AnyMiddlewareArgs,
-  Context,
-} from '../types';
+import { Middleware, AnyMiddlewareArgs, Context } from '../types';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 

@@ -10,8 +10,12 @@ import { Logger } from '@slack/logger';
 
 // TODO: rename this to AnyListenerArgs, and all the constituent types
 export type AnyMiddlewareArgs =
-  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackCommandMiddlewareArgs |
-  SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs;
+  | SlackEventMiddlewareArgs
+  | SlackActionMiddlewareArgs
+  | SlackCommandMiddlewareArgs
+  | SlackOptionsMiddlewareArgs
+  | SlackViewMiddlewareArgs
+  | SlackShortcutMiddlewareArgs;
 
 interface AllMiddlewareArgs {
   context: Context;
@@ -27,7 +31,6 @@ export interface Middleware<Args> {
   (args: Args & AllMiddlewareArgs): Promise<void>;
 }
 
-export interface Context extends StringIndexed {
-}
+export interface Context extends StringIndexed {}
 
 export type NextFn = () => Promise<void>;

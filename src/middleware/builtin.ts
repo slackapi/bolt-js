@@ -44,7 +44,10 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
  * Middleware that filters out any event that isn't a shortcut
  */
 // tslint:disable-next-line: max-line-length
-export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({ shortcut, next }) => {
+export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({
+  shortcut,
+  next,
+}) => {
   // Filter out any non-shortcuts
   if (shortcut === undefined) {
     return;
@@ -100,24 +103,26 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs &
-  { view?: (ViewSubmitAction | ViewClosedAction) }> = async ({ view, next }) => {
-    // Filter out anything that doesn't have a view
-    if (view === undefined) {
-      return;
-    }
+export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction | ViewClosedAction }> = async ({
+  view,
+  next,
+}) => {
+  // Filter out anything that doesn't have a view
+  if (view === undefined) {
+    return;
+  }
 
-    // It matches so we should continue down this middleware listener chain
+  // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
-    await next!();
-  };
+  await next!();
+};
 
 /**
  * Middleware that checks for matches given constraints
  */
 export function matchConstraints(
-    constraints: ActionConstraints | ViewConstraints | ShortcutConstraints,
-  ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
+  constraints: ActionConstraints | ViewConstraints | ShortcutConstraints,
+): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
   return async ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed
     // which matches (and in which order)
@@ -131,7 +136,6 @@ export function matchConstraints(
 
       // Check block_id
       if (constraints.block_id !== undefined) {
-
         if (typeof constraints.block_id === 'string') {
           if (payload.block_id !== constraints.block_id) {
             return;
@@ -199,7 +203,7 @@ export function matchConstraints(
       if (body.type !== constraints.type) return;
     }
 
-  // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null assertion operator
     await next!();
   };
 }
@@ -208,8 +212,8 @@ export function matchConstraints(
  * Middleware that filters out messages that don't match pattern
  */
 export function matchMessage(
-    pattern: string | RegExp,
-  ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
+  pattern: string | RegExp,
+): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
   return async ({ event, context, next }) => {
     let tempMatches: RegExpMatchArray | null;
 
@@ -232,7 +236,7 @@ export function matchMessage(
       }
     }
 
-  // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null assertion operator
     await next!();
   };
 }
@@ -247,7 +251,7 @@ export function matchCommandName(name: string): Middleware<SlackCommandMiddlewar
       return;
     }
 
-  // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null assertion operator
     await next!();
   };
 }
@@ -262,7 +266,7 @@ export function matchEventType(type: string): Middleware<SlackEventMiddlewareArg
       return;
     }
 
-  // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null assertion operator
     await next!();
   };
 }
@@ -278,7 +282,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
     }
 
     const botId = args.context.botId as string;
-    const botUserId = args.context.botUserId !== undefined ? args.context.botUserId as string : undefined;
+    const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
 
     if (isEventArgs(args)) {
       // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
@@ -296,10 +300,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
 
       // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
       // However, some events still must be fired, because they can make sense.
-      const eventsWhichShouldBeKept = [
-        'member_joined_channel',
-        'member_left_channel',
-      ];
+      const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
       const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
 
       if (botUserId !== undefined && args.event.user === botUserId && !isEventShouldBeKept) {
@@ -308,14 +309,15 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
     }
 
     // If all the previous checks didn't skip this message, then its okay to resume to next
-  // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null assertion operator
     await args.next!();
   };
 }
 
-export function subtype(subtype: string): Middleware<SlackEventMiddlewareArgs<'message'>> { // eslint-disable-line no-shadow
+export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
+  // eslint-disable-line no-shadow
   return async ({ message, next }) => {
-    if (message.subtype === subtype) {
+    if (message.subtype === subtype1) {
       // TODO: remove the non-null assertion operator
       await next!();
     }
@@ -346,12 +348,14 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       matches === null || // stop when no matches are found
       matches.index !== 0 || // stop if match isn't at the beginning
       // stop if match isn't a user mention with the right user ID
-      matches.groups === undefined || matches.groups.type !== '@' || matches.groups.link !== context.botUserId
+      matches.groups === undefined ||
+      matches.groups.type !== '@' ||
+      matches.groups.link !== context.botUserId
     ) {
       return;
     }
 
-  // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null assertion operator
     await next!();
   };
 }
@@ -379,16 +383,11 @@ function isCallbackIdentifiedBody(
 }
 
 function isViewBody(
-  body:
-    SlackActionMiddlewareArgs['body']
-    | SlackOptionsMiddlewareArgs['body']
-    | SlackViewMiddlewareArgs['body'],
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
 ): body is SlackViewAction {
   return (body as SlackViewAction).view !== undefined;
 }
 
-function isEventArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackEventMiddlewareArgs {
+function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
   return (args as SlackEventMiddlewareArgs).event !== undefined;
 }
