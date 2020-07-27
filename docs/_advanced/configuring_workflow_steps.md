@@ -17,19 +17,19 @@ When the builder initially adds your step to their workflow, your app will recei
 
 **2. Opening and listening to configuration modal**
 
-The `workflow_step_edit` action will contain a `trigger_id`. Your app will call `views.open` with this `trigger_id` to open a modal of type `workflow_step`. This modal has more restrictions than typical modals–most notably you cannot include `title`, `submit`, or `close` properties in the payload.
-
-Similar to other modals, your app can listen to this `view_submission` payload with the built-in [`views()` method](#view_submissions).
+The `workflow_step_edit` action will contain a `trigger_id` which your app will use to call `views.open` to open a modal of type `workflow_step`. This configuration modal has more restrictions than typical modals—most notably you cannot include `title`, `submit`, or `close` properties in the payload.
 
 To learn more about configuration modals, [read the documentation](https://api.slack.com/workflows/steps#handle_config_view).
+
+Similar to other modals, your app can listen to this `view_submission` payload with the built-in [`views()` method](#view_submissions).
 
 **3. Updating the builder's workflow**
 
 After your app listens to the `view_submission`, you'll call [`workflows.updateStep`](https://api.slack.com/methods/workflows.updateStep) with the unique `workflow_step_id` (found in the `body`'s `workflow_step` object) to save the configuration for that builder's specific workflow. Two important parameters:
-- `input` indicates the data your app expects to receive from the user when the workflow step is executed. You can include handlebar-style syntax (`{{ variable }}`) for variables that are collected earlier in a workflow.
-- `output` indicates the data your app will provide upon completion.
+- `inputs` is an object with keyed objects representing the data your app expects to receive from the user upo workflow execution. You can include handlebar-style syntax (`{{ variable }}`) for variables that are collected earlier in a workflow.
+- `outputs` is an array of objects indicating the data your app will provide upon workflow step completion.
 
-Read the documentation [for `input`](https://api.slack.com/reference/workflows/workflow_step#input) and [for `output`](https://api.slack.com/reference/workflows/workflow_step#output) to learn more.
+Read the documentation for [`input` objects](https://api.slack.com/reference/workflows/workflow_step#input) and [`output` objects](https://api.slack.com/reference/workflows/workflow_step#output) to learn more about how to structure these parameters.
 
 </div>
 {% endraw %} 
