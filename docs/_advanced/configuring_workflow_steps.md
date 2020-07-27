@@ -26,7 +26,7 @@ Similar to other modals, your app can listen to this `view_submission` payload w
 **3. Updating the builder's workflow**
 
 After your app listens to the `view_submission`, you'll call [`workflows.updateStep`](https://api.slack.com/methods/workflows.updateStep) with the unique `workflow_step_id` (found in the `body`'s `workflow_step` object) to save the configuration for that builder's specific workflow. Two important parameters:
-- `inputs` is an object with keyed child objects representing the data your app expects to receive from the user upon workflow execution. You can include handlebar-style syntax (`{{ variable }}`) for variables that are collected earlier in a workflow.
+- `inputs` is an object with keyed child objects representing the data your app expects to receive from the user upon workflow step execution. You can include handlebar-style syntax (`{{ variable }}`) for variables that are collected earlier in a workflow.
 - `outputs` is an array of objects indicating the data your app will provide upon workflow step completion.
 
 Read the documentation for [`input` objects](https://api.slack.com/reference/workflows/workflow_step#input) and [`output` objects](https://api.slack.com/reference/workflows/workflow_step#output) to learn more about how to structure these parameters.
