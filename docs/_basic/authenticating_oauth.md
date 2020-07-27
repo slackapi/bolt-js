@@ -48,7 +48,7 @@ You can override the default OAuth using the `installerOptions` object, which ca
 - `installPath`: Override default path for "Add to Slack" button
 - `redirectUriPath`: Override default redirect url path
 - `callbackOptions`: Provide custom success and failure pages at the end of the OAuth flow
-- `stateStore`: Provide a custom state store instead of using the built in `ClearStatStore`
+- `stateStore`: Provide a custom state store instead of using the built in `ClearStateStore`
 
 </div>
 
