@@ -13,7 +13,7 @@ When a builder is adding your step to a new or existing workflow, your app will 
 
 **1. Listening for `workflow_step_edit` action**
 
-When the builder initially adds your step to their workflow, your app will receive a `workflow_step_edit` action. Your app can listen to `workflow_step_edit` using `action()` and the `callback_id` in your app's configuration.
+When a builder initially adds (or later edits) your step in their workflow, your app will receive a `workflow_step_edit` action. Your app can listen to `workflow_step_edit` using `action()` and the `callback_id` in your app's configuration.
 
 **2. Opening and listening to configuration modal**
 
