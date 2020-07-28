@@ -39,7 +39,7 @@ t:
     contribute: 貢献
 
 # Metadata
-repo_name: bolt
+repo_name: bolt-js
 github_username: SlackAPI
 
 code_of_conduct_url: https://slackhq.github.io/code-of-conduct
