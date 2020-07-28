@@ -7,7 +7,7 @@ beta: true
 ---
 {% raw %} 
 <div class='section-content'>
-⚠️ Workflow [steps from apps](https://api.slack.com/workflows/steps) is a beta feature. As the feature is developed, **Bolt for JavaScript's API will change to add better native support.**
+⚠️ Workflow [steps from apps](https://api.slack.com/workflows/steps) is a beta feature. As the feature is developed, **Bolt for JavaScript's API will change to add better native support.** To develop with workflow steps in Bolt, use the `@slack/bolt@feat-workflow-steps` version of the package rather than the standard `@slack/bolt`.
 
 When a builder is adding your step to a new or existing workflow, your app will need to configure and update that step:
 
