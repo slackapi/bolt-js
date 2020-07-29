@@ -31,8 +31,8 @@
     "lint": "tslint --project .",
     "test-lint": "tslint --project tsconfig.test.json \"src/**/*.spec.ts\" && tslint --project tsconfig.test.json \"src/test-helpers.ts\"",
     "mocha": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:integration",
-    "test:integration": "cd integration-tests && npm install && npm test",
+    "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:types",
+    "test:types": "tsd",
     "coverage": "codecov"
   },
   "repository": "slackapi/bolt",
@@ -68,8 +68,12 @@
     "sinon": "^7.3.1",
     "source-map-support": "^0.5.12",
     "ts-node": "^8.1.0",
+    "tsd": "^0.13.1",
     "tslint": "^5.15.0",
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.7.2"
+  },
+  "tsd": {
+    "directory": "types-tests"
   }
 }
