@@ -1,4 +1,5 @@
-import { App, InteractiveButtonClick } from '@slack/bolt';
+import { expectError } from 'tsd';
+import { App, InteractiveButtonClick } from '../';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -13,6 +14,5 @@ app.action<InteractiveButtonClick>('my_callback_id', async ({ respond, say }) =>
   await say({ text: 'Some more text' });
 
   // Expect an error when calling say without text
-  // $ExpectError
-  await say({ blocks: [] });
+  expectError(await say({ blocks: [] }));
 });
