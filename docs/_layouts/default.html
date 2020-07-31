@@ -44,6 +44,22 @@ sidebar_style: main
           </div>
         {% endfor %}
         </div>
+
+        <!--Start (temporary) beta sections-->
+        <div id="steps">
+          {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %}
+          {% for section in workflow_steps %}
+          <div class="section-wrapper">
+            <h3 id="{{section.slug}}"><span class="beta">Beta</span> {{ section.title }}</h3>
+
+            {{ section.content | markdownify }}
+
+            <hr>
+          </div>
+        {% endfor %}
+        </div>
+
+        <!--End (temporary) beta sections-->
     </div>
 
   </div>
