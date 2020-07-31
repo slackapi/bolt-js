@@ -20,6 +20,18 @@ body {
   grid-area: content;
 }
 
+span.beta {
+  background-color: #E8F5FA;
+  color: #1264A3;
+  padding: 4px 9px;
+  margin-right: 2px;
+  border-radius: 16px;
+  border: 1px solid #D4ECF6;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.7em;
+}
+
 /* Sidebar */
 .panel {
   position: fixed;
@@ -81,18 +93,6 @@ body {
   padding: 2px 0 2px 8px;
   margin: 3px 0;
   color: var(--black);
-}
-
-.panel .sidebar-content ul.sidebar-section li span.beta {
-  background-color: #E8F5FA;
-  color: #1264A3;
-  padding: 2px 6px;
-  margin-right: 2px;
-  border-radius: 6px;
-  border: 1px solid #D4ECF6;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 0.8em;
 }
 
 .panel .sidebar-content ul.sidebar-section li:hover {

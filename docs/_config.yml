@@ -13,6 +13,8 @@ collections:
     output: false
   advanced:
     output: false
+  steps:
+    output: false
   tutorials:
     output: true
     permalink: /tutorials/:slug
@@ -31,11 +33,14 @@ t:
     basic: Basic concepts
     advanced: Advanced concepts
     start: Getting started
+    steps: Workflow steps
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念
     advanced: 応用コンセプト
     start: Bolt 入門ガイド
+    # TODO: translate this title
+    steps: Workflow steps
     contribute: 貢献
 
 # Metadata
