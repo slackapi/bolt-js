@@ -35,22 +35,30 @@
   </ul>
 
   <ul class="sidebar-section">
-
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#advanced">
       <li class="title">{{ site.t[page.lang].advanced }}</li>
     </a>
     {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
     {% for section in advanced_sections %}
       <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
-        <li>
-          {% if section.beta == true %}
-            <span class="beta">Beta</span>
-          {% endif %}
-         {{section.title}}
-        </li>
+        <li>{{section.title}}</li>
       </a>
     {% endfor %}
   </ul>
+
+  <!--Start (temporary) beta sections. At the moment, there's no ja-jp documentation for this feature-->
+  <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#steps">
+      <li class="title"><span class="beta">Beta</span> {{ site.t[page.lang].steps }}</li>
+    </a>
+    {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %}
+    {% for step in workflow_steps %}
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
+        <li>{{step.title}}</li>
+      </a>
+    {% endfor %}
+  </ul>
+  <!--End (temporary) beta sections-->
 
   <ul class="sidebar-section">
     {% assign tutorials = site.tutorials | where: "lang", page.lang | where_exp: "tutorial", "tutorial.order > 0" %}

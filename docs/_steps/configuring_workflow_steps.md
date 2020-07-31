@@ -2,13 +2,11 @@
 title: Configuring and updating workflow steps
 lang: en
 slug: configuring-steps
-order: 10
+order: 2
 beta: true
 ---
 {% raw %} 
 <div class='section-content'>
-⚠️ Workflow [steps from apps](https://api.slack.com/workflows/steps) is a beta feature. As the feature is developed, **Bolt for JavaScript's API will change to add better native support.** To develop with workflow steps in Bolt, use the `@slack/bolt@feat-workflow-steps` version of the package rather than the standard `@slack/bolt`.
-
 When a builder is adding your step to a new or existing workflow, your app will need to configure and update that step:
 
 **1. Listening for `workflow_step_edit` action**
