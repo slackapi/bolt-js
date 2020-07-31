@@ -759,11 +759,10 @@ function buildSource(
           ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.team !== null) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.id as string :
             ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.user !== undefined) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).user.team_id as string :
               undefined),
-      enterpriseId:
+      enterpriseId: // TODO: double check payloads for event and command below
         ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-          ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.team !== null) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.enterprise_id as string :
-            ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.enterprise !== undefined) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).enterprise!.id as string :
-              ''), // TODO: empty string for enterpriseID is wrong, should be assertNever
+          (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).enterprise!.id as string :
+            assertNever(type)),
       userId:
         ((type === IncomingEventType.Event) ?
           ((typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string') ? (body as SlackEventMiddlewareArgs['body']).event.user as string :
@@ -780,9 +779,8 @@ function buildSource(
     source = {
       teamId:
         ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-          ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.team !== null) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.id as string :
-            ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.user !== undefined) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).user.team_id as string :
-              ''), // TODO: empty string for teamID is wrong, should be assertNever
+          (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.id as string :
+            assertNever(type)), // TODO: empty string for teamID is wrong, should be assertNever
       enterpriseId:
         ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
           ((type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) && body.team !== null) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team!.enterprise_id as string :
