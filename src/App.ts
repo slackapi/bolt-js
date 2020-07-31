@@ -6,7 +6,6 @@ import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions }
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance } from 'axios';
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
-import packageJson from '../package.json';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -49,6 +48,8 @@ import { IncomingEventType, getTypeAndConversation, assertNever } from './helper
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError } from './errors';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 /** App initialization options */
 export interface AppOptions {
