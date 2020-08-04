@@ -297,10 +297,13 @@ export default class App {
       this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
       this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.orgAuthorize as Authorize;
     } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
+      // only supporting org installs
       this.orgAuthorize = orgAuthorize;
     } else if (authorize !== undefined && orgAuthorize === undefined && !usingOauth) {
+      // only supporting non org installs
       this.authorize = authorize;
     } else if (authorize !== undefined && orgAuthorize !== undefined && !usingOauth) {
+      // supporting both org installs and non org installs
       this.authorize = authorize;
       this.orgAuthorize = orgAuthorize;
     } else {
@@ -547,7 +550,12 @@ export default class App {
 
     let authorizeResult;
     let source;
-    if (bodyArg.is_enterprise_install) {
+    if (
+      type === IncomingEventType.Event &&
+      (bodyArg as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+      (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0] !== undefined &&
+      (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0].is_enterprise_install
+    ) {
       // This is an org app
       // Initialize context (shallow copy to enforce object identity separation)
       source = buildSource(type, conversationId, bodyArg);
@@ -671,11 +679,13 @@ export default class App {
       if (source.teamId !== undefined) {
         pool = this.clients[source.teamId];
         if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
           pool = this.clients[source.teamId] = new WebClientPool();
         }
       } else if (source.enterpriseId !== undefined) {
         pool = this.clients[source.enterpriseId];
         if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
           pool = this.clients[source.enterpriseId] = new WebClientPool();
         }
       }
@@ -758,7 +768,6 @@ function buildSource(
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
 
   let source: AuthorizeSourceData | OrgAuthorizeSourceData;
-  // let source: OrgAuthorizeSourceData;
   // tslint:disable:max-line-length
   if (body.is_enterprise_install) {
     source = {
@@ -842,7 +851,7 @@ function buildSource(
               | SlackViewMiddlewareArgs
               | SlackShortcutMiddlewareArgs
             )['body']).team!.id as string)
-          : assertNever(type), // TODO: empty string for teamID is wrong, should be assertNever
+          : assertNever(type),
       enterpriseId:
         type === IncomingEventType.Event || type === IncomingEventType.Command
           ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
@@ -895,7 +904,6 @@ function buildSource(
     };
   }
   // tslint:enable:max-line-length
-
   return source;
 }
 

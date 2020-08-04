@@ -40,4 +40,11 @@ export interface WorkflowStepEdit {
     step_name?: string;
     step_image_url?: string;
   };
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
