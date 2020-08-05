@@ -1,4 +1,4 @@
-// tslint:disable:no-implicit-dependencies
+// eslint-disable import/no-extraneous-dependencies
 import 'mocha';
 import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
@@ -21,12 +21,12 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = {
+    const fakeArgs = ({
       body: {},
       context: dummyContext,
       next: fakeNext,
       logger: fakeLogger,
-    } as unknown as MiddlewareArgs;
+    } as unknown) as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
@@ -57,12 +57,12 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = {
+    const fakeArgs = ({
       body: {},
       context: dummyContext,
       next: fakeNext,
       logger: fakeLogger,
-    } as unknown as MiddlewareArgs;
+    } as unknown) as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
@@ -96,12 +96,12 @@ describe('conversationContext middleware', () => {
     const { conversationContext } = await importConversationStore(
       withGetTypeAndConversation(fakeGetTypeAndConversation),
     );
-    const fakeArgs = {
+    const fakeArgs = ({
       body: {},
       context: dummyContext,
       next: fakeNext,
       logger: fakeLogger,
-    } as unknown as MiddlewareArgs;
+    } as unknown) as MiddlewareArgs;
 
     // Act
     const middleware = conversationContext(fakeStore);
@@ -125,7 +125,7 @@ describe('MemoryStore', () => {
   describe('constructor', () => {
     it('should initialize successfully', async () => {
       // Arrange
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -143,7 +143,7 @@ describe('MemoryStore', () => {
       // Arrange
       const dummyConversationState = Symbol();
       const dummyConversationId = 'CONVERSATION_ID';
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -156,7 +156,7 @@ describe('MemoryStore', () => {
 
     it('should reject lookup of conversation state when the conversation is not stored', async () => {
       // Arrange
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -175,7 +175,7 @@ describe('MemoryStore', () => {
       const dummyConversationId = 'CONVERSATION_ID';
       const dummyConversationState = Symbol();
       const expiresInMs = 5;
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = await importConversationStore(); // eslint-disable-line @typescript-eslint/naming-convention
 
       // Act
       const store = new MemoryStore();
@@ -196,10 +196,10 @@ describe('MemoryStore', () => {
 /* Testing Harness */
 
 type MiddlewareArgs = AnyMiddlewareArgs & {
-  next: NextFn,
-  context: Context,
-  logger: Logger,
-  client: WebClient,
+  next: NextFn;
+  context: Context;
+  logger: Logger;
+  client: WebClient;
 };
 
 interface DummyContext<ConversationState> {
@@ -208,9 +208,7 @@ interface DummyContext<ConversationState> {
 }
 
 // Loading the system under test using overrides
-async function importConversationStore(
-  overrides: Override = {},
-): Promise<typeof import('./conversation-store')> {
+async function importConversationStore(overrides: Override = {}): Promise<typeof import('./conversation-store')> {
   return rewiremock.module(() => import('./conversation-store'), overrides);
 }
 
@@ -244,7 +242,7 @@ function createFakeStore(
     //       Type 'any[]' is not comparable to type '[string, any, (number | undefined)?]'.
     // 223     set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
     //              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    set: setSpy as unknown as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
-    get: getSpy as unknown as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
+    set: (setSpy as unknown) as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
+    get: (getSpy as unknown) as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
   };
 }

@@ -5,13 +5,7 @@ import sinon from 'sinon';
 import { ErrorCode, ContextMissingPropertyError } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
-import {
-  SlackEventMiddlewareArgs,
-  NextFn,
-  Context,
-  MessageEvent,
-  SlackCommandMiddlewareArgs,
-} from '../types';
+import { SlackEventMiddlewareArgs, NextFn, Context, MessageEvent, SlackCommandMiddlewareArgs } from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
 import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events';
@@ -33,19 +27,19 @@ describe('matchMessage()', () => {
   }
 
   function matchesPatternTestCase(
-      pattern: string | RegExp,
-      matchingText: string,
-      buildFakeEvent: (content: string) => SlackEvent,
-    ): Mocha.AsyncFunc {
+    pattern: string | RegExp,
+    matchingText: string,
+    buildFakeEvent: (content: string) => SlackEvent,
+  ): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const dummyContext: DummyContext = {};
       const fakeNext = sinon.fake();
-      const fakeArgs = {
+      const fakeArgs = ({
         next: fakeNext,
         event: buildFakeEvent(matchingText),
         context: dummyContext,
-      } as unknown as MessageMiddlewareArgs;
+      } as unknown) as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
 
       // Act
@@ -66,19 +60,19 @@ describe('matchMessage()', () => {
   }
 
   function notMatchesPatternTestCase(
-      pattern: string | RegExp,
-      nonMatchingText: string,
-      buildFakeEvent: (content: string) => SlackEvent,
-    ): Mocha.AsyncFunc {
+    pattern: string | RegExp,
+    nonMatchingText: string,
+    buildFakeEvent: (content: string) => SlackEvent,
+  ): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const dummyContext = {};
       const fakeNext = sinon.fake();
-      const fakeArgs = {
+      const fakeArgs = ({
         event: buildFakeEvent(nonMatchingText),
         context: dummyContext,
         next: fakeNext,
-      } as unknown as MessageMiddlewareArgs;
+      } as unknown) as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
 
       // Act
@@ -96,11 +90,11 @@ describe('matchMessage()', () => {
       // Arrange
       const dummyContext = {};
       const fakeNext = sinon.fake();
-      const fakeArgs = {
+      const fakeArgs = ({
         event: createFakeMessageEvent([{ type: 'divider' }]),
         context: dummyContext,
         next: fakeNext,
-      } as unknown as MessageMiddlewareArgs;
+      } as unknown) as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
 
       // Act
@@ -165,11 +159,11 @@ describe('matchMessage()', () => {
 describe('directMention()', () => {
   it('should bail when the context does not provide a bot user ID', async () => {
     // Arrange
-    const fakeArgs = {
+    const fakeArgs = ({
       next: () => Promise.resolve(),
       message: createFakeMessageEvent(),
       context: {},
-    } as unknown as MessageMiddlewareArgs;
+    } as unknown) as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -193,11 +187,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = `<@${fakeBotUserId}> hi`;
     const fakeNext = sinon.fake();
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown as MessageMiddlewareArgs;
+    } as unknown) as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -213,11 +207,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = 'hi';
     const fakeNext = sinon.fake();
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown as MessageMiddlewareArgs;
+    } as unknown) as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -233,11 +227,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = `hello <@${fakeBotUserId}>`;
     const fakeNext = sinon.fake();
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown as MessageMiddlewareArgs;
+    } as unknown) as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -252,11 +246,11 @@ describe('directMention()', () => {
     // Arrange
     const fakeBotUserId = 'B123456';
     const fakeNext = sinon.fake();
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       message: createFakeMessageEvent([{ type: 'divider' }]),
       context: { botUserId: fakeBotUserId },
-    } as unknown as MessageMiddlewareArgs;
+    } as unknown) as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -272,11 +266,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = '<#C12345> hi';
     const fakeNext = sinon.fake();
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown as MessageMiddlewareArgs;
+    } as unknown) as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -293,10 +287,10 @@ describe('ignoreSelf()', () => {
     // Arrange
     const fakeNext = sinon.fake.resolves(null);
     const fakeBotUserId = undefined;
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
+    } as unknown) as MemberJoinedOrLeftChannelMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -320,17 +314,17 @@ describe('ignoreSelf()', () => {
     assert.equal(error.missingProperty, expectedError.missingProperty);
   });
 
-  it('should immediately call next(), because incoming middleware args don\'t contain event', async () => {
+  it("should immediately call next(), because incoming middleware args don't contain event", async () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       command: {
         command: '/fakeCommand',
       },
-    } as unknown as CommandMiddlewareArgs;
+    } as unknown) as CommandMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -372,18 +366,18 @@ describe('ignoreSelf()', () => {
     assert(fakeNext.notCalled);
   });
 
-  it('should filter an event out, because it matches our own app and shouldn\'t be retained', async () => {
+  it("should filter an event out, because it matches our own app and shouldn't be retained", async () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       event: {
         type: 'tokens_revoked',
         user: fakeBotUserId,
       },
-    } as unknown as TokensRevokedMiddlewareArgs;
+    } as unknown) as TokensRevokedMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -395,18 +389,18 @@ describe('ignoreSelf()', () => {
     assert(fakeNext.notCalled);
   });
 
-  it('should filter an event out, because it matches our own app and shouldn\'t be retained', async () => {
+  it("should filter an event out, because it matches our own app and shouldn't be retained", async () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
-    const fakeArgs = {
+    const fakeArgs = ({
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       event: {
         type: 'tokens_revoked',
         user: fakeBotUserId,
       },
-    } as unknown as TokensRevokedMiddlewareArgs;
+    } as unknown) as TokensRevokedMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -418,21 +412,21 @@ describe('ignoreSelf()', () => {
     assert(fakeNext.notCalled);
   });
 
-  it('shouldn\'t filter an event out, because it should be retained', async () => {
+  it("shouldn't filter an event out, because it should be retained", async () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
     const eventsWhichShouldNotBeFilteredOut = ['member_joined_channel', 'member_left_channel'];
 
     const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => {
-      return {
+      return ({
         next: fakeNext,
         context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
         event: {
           type: eventType,
           user: fakeBotUserId,
         },
-      } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
+      } as unknown) as MemberJoinedOrLeftChannelMiddlewareArgs;
     });
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
@@ -522,7 +516,6 @@ describe('matchCommandName', () => {
 });
 
 describe('onlyEvents', () => {
-
   const logger = createFakeLogger();
   const client = new WebClient(undefined, { logger, slackApiUrl: undefined });
 
@@ -684,14 +677,14 @@ interface MiddlewareCommonArgs {
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
-type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'>
-  & MiddlewareCommonArgs;
+type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<
+  'member_joined_channel' | 'member_left_channel'
+> &
+  MiddlewareCommonArgs;
 
 type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & MiddlewareCommonArgs;
 
-async function importBuiltin(
-  overrides: Override = {},
-): Promise<typeof import('./builtin')> {
+async function importBuiltin(overrides: Override = {}): Promise<typeof import('./builtin')> {
   return rewiremock.module(() => import('./builtin'), overrides);
 }
 
