@@ -727,6 +727,7 @@ const validCommandPayload: SlashCommand = {
   team_domain: 'awesome-eng-team',
   channel_id: 'C1234567',
   channel_name: 'random',
+  api_app_id: 'A123456',
 };
 
 const appMentionEvent: AppMentionEvent = {

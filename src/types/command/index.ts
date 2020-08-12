@@ -30,6 +30,7 @@ export interface SlashCommand extends StringIndexed {
   team_domain: string;
   channel_id: string;
   channel_name: string;
+  api_app_id: string;
   enterprise_id?: string;
   enterprise_name?: string;
 }
