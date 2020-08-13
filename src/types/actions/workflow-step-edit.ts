@@ -27,7 +27,17 @@ export interface WorkflowStepEdit {
   workflow_step: {
     workflow_id: string;
     step_id: string;
-    inputs: object;
-    outputs: [];
+    inputs: {
+      [key: string]: {
+        value: any;
+      },
+    };
+    outputs: {
+      name: string;
+      type: string;
+      label: string;
+    }[];
+    step_name?: string;
+    step_image_url?: string;
   };
 }
