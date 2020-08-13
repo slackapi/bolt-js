@@ -19,6 +19,8 @@ export enum ErrorCode {
    * in terms of CodedError.
    */
   UnknownError = 'slack_bolt_unknown_error',
+
+  WorkflowStepInitializationError = 'slack_bolt_workflow_step_initialization_error',
 }
 
 export function asCodedError(error: CodedError | Error): CodedError {
@@ -92,4 +94,8 @@ export class UnknownError extends Error implements CodedError {
 
     this.original = original;
   }
+}
+
+export class WorkflowStepInitializationError extends Error implements CodedError {
+  public code = ErrorCode.WorkflowStepInitializationError;
 }

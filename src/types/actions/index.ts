@@ -1,6 +1,7 @@
 export * from './block-action';
 export * from './interactive-message';
 export * from './dialog-action';
+export * from './workflow-step-edit';
 
 import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';

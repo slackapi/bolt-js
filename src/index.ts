@@ -22,3 +22,5 @@ export * from './middleware/builtin';
 export * from './types';
 
 export { ConversationStore, MemoryStore } from './conversation-store';
+
+export { WorkflowStep } from './WorkflowStep';

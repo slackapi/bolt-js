@@ -17,7 +17,8 @@ export type AnyMiddlewareArgs =
   | SlackViewMiddlewareArgs
   | SlackShortcutMiddlewareArgs;
 
-interface AllMiddlewareArgs {
+// TODO :: decide if we really want to export this!
+export interface AllMiddlewareArgs {
   context: Context;
   logger: Logger;
   client: WebClient;

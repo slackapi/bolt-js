@@ -5,7 +5,7 @@ import { AckFn } from '../utilities';
 /**
  * Known view action types
  */
-export type SlackViewAction = ViewSubmitAction | ViewClosedAction;
+export type SlackViewAction = ViewSubmitAction | ViewClosedAction | ViewWorkflowStepSubmitAction;
 // <ViewAction extends SlackViewAction = ViewSubmitAction>
 /**
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
@@ -44,11 +44,6 @@ export interface ViewSubmitAction {
   view: ViewOutput;
   api_app_id: string;
   token: string;
-  workflow_step?: {
-    workflow_step_edit_id: string;
-    workflow_id: string;
-    step_id: string;
-  };
 }
 
 /**
@@ -74,6 +69,22 @@ export interface ViewClosedAction {
   token: string;
   is_cleared: boolean;
   workflow_step?: {
+    workflow_step_edit_id: string;
+    workflow_id: string;
+    step_id: string;
+  };
+}
+
+/**
+ * A Slack view_submission Workflow Step event
+ *
+ * This describes the additional JSON-encoded body details for a step view_submission event
+ */
+
+export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
+  trigger_id: string;
+  response_urls: [];
+  workflow_step: {
     workflow_step_edit_id: string;
     workflow_id: string;
     step_id: string;
