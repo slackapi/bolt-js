@@ -44,6 +44,11 @@ export interface ViewSubmitAction {
   view: ViewOutput;
   api_app_id: string;
   token: string;
+  workflow_step?: {
+    workflow_step_edit_id: string;
+    workflow_id: string;
+    step_id: string;
+  };
 }
 
 /**
@@ -68,6 +73,11 @@ export interface ViewClosedAction {
   api_app_id: string;
   token: string;
   is_cleared: boolean;
+  workflow_step?: {
+    workflow_step_edit_id: string;
+    workflow_id: string;
+    step_id: string;
+  };
 }
 
 export interface ViewOutput {
