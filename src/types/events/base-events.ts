@@ -759,7 +759,7 @@ export interface WorkflowStepExecuteEvent extends StringIndexed {
     inputs: {
       [key: string]: {
         value: any;
-      },
+      };
     };
     outputs: {
       name: string;

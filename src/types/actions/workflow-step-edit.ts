@@ -30,7 +30,7 @@ export interface WorkflowStepEdit {
     inputs: {
       [key: string]: {
         value: any;
-      },
+      };
     };
     outputs: {
       name: string;
