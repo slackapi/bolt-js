@@ -33,7 +33,8 @@
     "mocha": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
     "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:types",
     "test:types": "tsd",
-    "coverage": "codecov"
+    "coverage": "codecov",
+    "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",

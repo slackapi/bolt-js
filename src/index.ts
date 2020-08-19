@@ -22,3 +22,14 @@ export * from './middleware/builtin';
 export * from './types';
 
 export { ConversationStore, MemoryStore } from './conversation-store';
+
+export {
+  Installation,
+  InstallURLOptions,
+  InstallationQuery,
+  InstallationStore,
+  StateStore,
+  InstallProviderOptions,
+} from '@slack/oauth';
+
+export * from '@slack/types';
