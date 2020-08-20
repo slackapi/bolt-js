@@ -25,7 +25,7 @@ export interface ExpressReceiverOptions {
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
-  stateSecret?: InstallProviderOptions['stateSecret']; // ClearStateStoreOptions['secret']; // required when using default stateStore
+  stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
