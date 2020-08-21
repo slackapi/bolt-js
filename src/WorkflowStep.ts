@@ -18,9 +18,9 @@ import { WorkflowStepInitializationError } from './errors';
 
 export interface StepConfigureArguments {
   blocks: [];
-  callback_id?: string;
   private_metadata?: string;
   submit_disabled?: boolean;
+  external_id?: string;
 }
 
 export interface StepUpdateArguments {
@@ -239,11 +239,21 @@ function createStepConfigure(
   const token = selectToken(context);
 
   return (config: Parameters<StepConfigureFn>[0]) => {
-    const { blocks, private_metadata } = config;
+    const { blocks, private_metadata, submit_disabled = false, external_id } = config;
+    const view = { callback_id, blocks, private_metadata, submit_disabled, type: 'workflow_step' };
+
+    if (external_id !== undefined) {
+      // TODO :: remove ignore when external_id is added to types > View
+      // @ts-ignore
+      view.external_id = external_id;
+    }
+
     return client.views.open({
       token,
       trigger_id,
-      view: { blocks, private_metadata, callback_id, type: 'workflow_step' },
+      // TODO :: remove ignore when external_id is added to types > View
+      // @ts-ignore
+      view,
     });
   };
 }
