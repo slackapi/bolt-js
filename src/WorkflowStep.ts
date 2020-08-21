@@ -239,21 +239,21 @@ function createStepConfigure(
   const token = selectToken(context);
 
   return (config: Parameters<StepConfigureFn>[0]) => {
-    const { blocks, private_metadata, submit_disabled = false, external_id } = config;
-    const view = { callback_id, blocks, private_metadata, submit_disabled, type: 'workflow_step' };
-
-    if (external_id !== undefined) {
-      // TODO :: remove ignore when external_id is added to types > View
-      // @ts-ignore
-      view.external_id = external_id;
-    }
-
+    const { blocks, private_metadata, submit_disabled, external_id } = config;
     return client.views.open({
       token,
       trigger_id,
       // TODO :: remove ignore when external_id is added to types > View
       // @ts-ignore
-      view,
+      view: {
+        callback_id,
+        blocks,
+        type: 'workflow_step',
+        // only include private_metadata, submit_disabled + external_id if passed by user
+        ...(private_metadata !== undefined && { private_metadata }),
+        ...(submit_disabled !== undefined && { submit_disabled }),
+        ...(external_id !== undefined && { external_id }),
+      },
     });
   };
 }
@@ -275,14 +275,15 @@ function createStepUpdate(
   const token = selectToken(context);
 
   return (config: Parameters<StepUpdateFn>[0]) => {
-    const { step_name = '', step_image_url = '', inputs = {}, outputs = [] } = config;
+    const { step_name, step_image_url, inputs = {}, outputs = [] } = config;
     return client.workflows.updateStep({
       token,
-      step_name,
-      step_image_url,
+      workflow_step_edit_id,
       inputs,
       outputs,
-      workflow_step_edit_id,
+      // only include step_name + step_image_url if passed by user
+      ...(step_name !== undefined && { step_name }),
+      ...(step_image_url !== undefined && { step_image_url }),
     });
   };
 }
