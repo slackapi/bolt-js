@@ -81,7 +81,7 @@ app.action({ type: 'workflow_step_edit', callback_id: 'add_task' }, async ({ bod
   });
 });
 
-app.views('add_task_config', async ({ ack, view, body, client }) => {
+app.view('add_task_config', async ({ ack, view, body, client }) => {
   // Acknowledge the submission
   ack();
   // Unique workflow edit ID
