@@ -109,4 +109,5 @@ app.views('add_task_config', async ({ ack, view, body, client }) => {
       }
     ]
   });
+});
 ```
