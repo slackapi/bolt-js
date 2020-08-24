@@ -52,7 +52,7 @@ export interface ButtonAction extends BasicElementAction<'button'> {
  */
 export interface StaticSelectAction extends BasicElementAction<'static_select'> {
   selected_option: {
-    text: PlainTextElement,
+    text: PlainTextElement;
     value: string;
   };
   initial_option?: Option;
@@ -66,9 +66,9 @@ export interface StaticSelectAction extends BasicElementAction<'static_select'> 
 export interface MultiStaticSelectAction extends BasicElementAction<'multi_static_select'> {
   selected_options: [
     {
-      text: PlainTextElement,
+      text: PlainTextElement;
       value: string;
-    }
+    },
   ];
   initial_options?: [Option];
   placeholder?: PlainTextElement;
@@ -162,7 +162,7 @@ export interface MultiExternalSelectAction extends BasicElementAction<'multi_ext
  */
 export interface OverflowAction extends BasicElementAction<'overflow'> {
   selected_option: {
-    text: PlainTextElement,
+    text: PlainTextElement;
     value: string;
   };
   confirm?: Confirmation;

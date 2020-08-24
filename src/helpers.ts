@@ -27,14 +27,17 @@ export enum IncomingEventType {
  * This is analogous to WhenEventHasChannelContext and the conditional type that checks SlackAction for a channel
  * context.
  */
-export function getTypeAndConversation(body: any): { type?: IncomingEventType, conversationId?: string } {
+export function getTypeAndConversation(body: any): { type?: IncomingEventType; conversationId?: string } {
   if (body.event !== undefined) {
-    const eventBody = (body as SlackEventMiddlewareArgs<string>['body']);
+    const eventBody = body as SlackEventMiddlewareArgs<string>['body'];
     return {
       type: IncomingEventType.Event,
       conversationId:
-        eventBody.event.channel !== undefined ? eventBody.event.channel :
-          eventBody.event.item !== undefined ? eventBody.event.item.channel : undefined,
+        eventBody.event.channel !== undefined
+          ? eventBody.event.channel
+          : eventBody.event.item !== undefined
+          ? eventBody.event.item.channel
+          : undefined,
     };
   }
   if (body.command !== undefined) {
@@ -44,14 +47,14 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
     };
   }
   if (body.name !== undefined || body.type === 'block_suggestion') {
-    const optionsBody = (body as SlackOptionsMiddlewareArgs<OptionsSource>['body']);
+    const optionsBody = body as SlackOptionsMiddlewareArgs<OptionsSource>['body'];
     return {
       type: IncomingEventType.Options,
       conversationId: optionsBody.channel !== undefined ? optionsBody.channel.id : undefined,
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission') {
-    const actionBody = (body as SlackActionMiddlewareArgs<SlackAction>['body']);
+    const actionBody = body as SlackActionMiddlewareArgs<SlackAction>['body'];
     return {
       type: IncomingEventType.Action,
       conversationId: actionBody.channel !== undefined ? actionBody.channel.id : undefined,
@@ -63,7 +66,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType, c
     };
   }
   if (body.type === 'message_action') {
-    const shortcutBody = (body as SlackShortcutMiddlewareArgs<MessageShortcut>['body']);
+    const shortcutBody = body as SlackShortcutMiddlewareArgs<MessageShortcut>['body'];
     return {
       type: IncomingEventType.Shortcut,
       conversationId: shortcutBody.channel !== undefined ? shortcutBody.channel.id : undefined,

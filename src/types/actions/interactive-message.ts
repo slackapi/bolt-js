@@ -58,7 +58,7 @@ export interface InteractiveMessage<Action extends InteractiveAction = Interacti
   // system express that?
   message_ts?: string;
   // NOTE: the original_message is not available from ephemeral messages
-  original_message?: { [key: string]: string; };
+  original_message?: { [key: string]: string };
 }
 
 /*
