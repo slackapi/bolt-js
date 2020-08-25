@@ -65,10 +65,10 @@ export interface StepFailFn {
   (config: StepFailArguments): Promise<WebAPICallResult>;
 }
 
-interface WorkflowStepOptions {
-  edit: WorkflowStep['edit'];
-  save: WorkflowStep['save'];
-  execute: WorkflowStep['execute'];
+export interface WorkflowStepOptions {
+  edit: WorkflowStepEditMiddleware | WorkflowStepEditMiddleware[];
+  save: WorkflowStepSaveMiddleware | WorkflowStepSaveMiddleware[];
+  execute: WorkflowStepExecuteMiddleware | WorkflowStepExecuteMiddleware[];
 }
 
 /** Types */
@@ -78,12 +78,18 @@ export type SlackWorkflowStepMiddlewareArgs =
   | SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>
   | SlackEventMiddlewareArgs<'workflow_step_execute'>;
 
-type WorkflowStepMiddleware =
-  | Middleware<SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>>[]
-  | Middleware<SlackActionMiddlewareArgs<WorkflowStepEdit>>[]
-  | Middleware<SlackEventMiddlewareArgs<'workflow_step_execute'>>[];
+export type WorkflowStepEditMiddleware = Middleware<SlackActionMiddlewareArgs<WorkflowStepEdit>>;
+export type WorkflowStepSaveMiddleware = Middleware<SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>>;
+export type WorkflowStepExecuteMiddleware = Middleware<SlackEventMiddlewareArgs<'workflow_step_execute'>>;
 
-type AllWorkflowStepMiddlewareArgs<T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs> = T &
+export type WorkflowStepMiddleware =
+  | WorkflowStepEditMiddleware[]
+  | WorkflowStepSaveMiddleware[]
+  | WorkflowStepExecuteMiddleware[];
+
+export type AllWorkflowStepMiddlewareArgs<
+  T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs
+> = T &
   AllMiddlewareArgs & {
     step: T extends SlackActionMiddlewareArgs<WorkflowStepEdit>
       ? WorkflowStepEdit['workflow_step']
@@ -100,16 +106,16 @@ type AllWorkflowStepMiddlewareArgs<T extends SlackWorkflowStepMiddlewareArgs = S
 
 export class WorkflowStep {
   /** Step callback_id */
-  public callbackId: string;
+  private callbackId: string;
 
   /** Step Add/Edit :: 'workflow_step_edit' action */
-  public edit: Middleware<SlackActionMiddlewareArgs<WorkflowStepEdit>>[];
+  private edit: WorkflowStepEditMiddleware[];
 
   /** Step Config Save :: 'view_submission' */
-  public save: Middleware<SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>>[];
+  private save: WorkflowStepSaveMiddleware[];
 
   /** Step Executed/Run :: 'workflow_step_execute' event */
-  public execute: Middleware<SlackEventMiddlewareArgs<'workflow_step_execute'>>[];
+  private execute: WorkflowStepExecuteMiddleware[];
 
   constructor(callbackId: string, config: WorkflowStepOptions) {
     validate(callbackId, config);
@@ -151,7 +157,7 @@ export class WorkflowStep {
       case 'workflow_step_execute':
         return this.execute;
       default:
-        return []; // TODO :: throw error if it gets to this point?
+        return [];
     }
   }
 }
@@ -215,7 +221,7 @@ export async function processStepMiddleware(
   }
 }
 
-function isStepEvent(args: AnyMiddlewareArgs): args is AllWorkflowStepMiddlewareArgs {
+export function isStepEvent(args: AnyMiddlewareArgs): args is AllWorkflowStepMiddlewareArgs {
   const validTypes = new Set(['workflow_step_edit', 'workflow_step', 'workflow_step_execute']);
   return validTypes.has(args.payload.type);
 }
@@ -243,8 +249,6 @@ function createStepConfigure(
     return client.views.open({
       token,
       trigger_id,
-      // TODO :: remove ignore when external_id is added to types > View
-      // @ts-ignore
       view: {
         callback_id,
         blocks,
@@ -350,7 +354,7 @@ export function prepareStepArgs(
   args: SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs,
 ): AllWorkflowStepMiddlewareArgs {
   const { next, ...stepArgs } = args;
-  // const preparedArgs: AllWorkflowStepMiddlewareArgs = { ...stepArgs }; // FIXME :: will take more work to get this proper
+  // const preparedArgs: AllWorkflowStepMiddlewareArgs = { ...stepArgs };
   const preparedArgs: any = { ...stepArgs }; // TODO :: remove any
 
   switch (preparedArgs.payload.type) {
