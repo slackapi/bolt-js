@@ -12,7 +12,7 @@ order: 2
 </div>
 
 ```javascript
-// "knock knock" を含むメッセージをリスニングし、 "who's there?" というメッセージをイタリック体で送信
+// "knock knock" を含むメッセージをリッスンし、 "who's there?" というメッセージをイタリック体で送信
 app.message('knock knock', async ({ message, say }) => {
   await say(`_Who's there?_`);
 });
