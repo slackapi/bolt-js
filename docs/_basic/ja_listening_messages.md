@@ -6,7 +6,7 @@ order: 1
 ---
 
 <div class="section-content">
-[アプリが受信可能な](https://api.slack.com/messaging/retrieving#permissions)メッセージをリスニングするには、`message` 型でないイベントを除外する `message()` メソッドを使用します。
+[アプリが受信可能な](https://api.slack.com/messaging/retrieving#permissions)メッセージをリッスンするには、`message` 型でないイベントを除外する `message()` メソッドを使用します。
 
 `message()` は、`string` 型か `RegExp` 型の、指定パターンに一致しないメッセージを除外する `pattern` パラメーター（指定は必須ではありません）を受け付けます。
 </div>
