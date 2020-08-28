@@ -149,16 +149,16 @@ Now you have a public-facing URL for your app that tunnels to your local machine
 
 Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your URL should become verified.
 
-After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
+After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels that your app is added to), `message.groups` (listens for messages in private channels that your app is added to), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs that your app is added to).
 
-If you want your bot to listen to messages from everywhere it is, choose all four message events. After you’ve added the events you want your bot to listen to, click the green **Save Changes** button.
+If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
 ---
 
 ### Listening and responding to a message
 Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
 
-The following example listens to all messages that contain the word "hello" and responds with "Hey there @user!"
+The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello":
 
 ```javascript
 const { App } = require('@slack/bolt');
@@ -182,7 +182,7 @@ app.message('hello', async ({ message, say }) => {
 })();
 ```
 
-If you restart your app, you should be able to add your bot user to a channel, send any message that contains "hello", and it will respond.
+If you restart your app, so long as your bot user has been added to the channel/DM, when you send any message that contains "hello", it will respond.
 
 This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
 
