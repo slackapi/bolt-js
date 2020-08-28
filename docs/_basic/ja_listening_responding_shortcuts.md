@@ -8,7 +8,7 @@ order: 8
 <div class="section-content">
 `shortcut()` メソッドは、[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)と[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)の両方をサポートします。
 
-ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのイベントをリスニングすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
+ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのイベントをリッスンすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
 
 グローバルショートカットのイベントは Slack へイベントを受信したことを知らせるために `ack()` メソッドで確認する必要があります。
 
@@ -75,7 +75,7 @@ app.shortcut('open_modal', async ({ shortcut, ack, context }) => {
   </summary>
 
   <div class="secondary-content" markdown="0">
-  制約付きオブジェクトを使って `callback_id` や `type` によるリスニングをすることができます。オブジェクト内の制約は文字列型または RegExp オブジェクトを使用できます。
+  制約付きオブジェクトを使って `callback_id` や `type` によるリスニングができます。オブジェクト内の制約は文字列型または RegExp オブジェクトを使用できます。
 
   </div>
 
