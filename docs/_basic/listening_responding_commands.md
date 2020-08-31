@@ -16,6 +16,13 @@ When configuring commands within your app configuration, you'll continue to appe
 </div>
 
 ```javascript
+// Enable the command endpoint in your app
+const app = new App({
+  endpoints: {
+     commands: '/slack/commands'
+   },
+});
+
 // The echo command simply echoes on command
 app.command('/echo', async ({ command, ack, say }) => {
   // Acknowledge command request
