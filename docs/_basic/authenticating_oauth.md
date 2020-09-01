@@ -19,7 +19,7 @@ To learn more about the OAuth installation flow with Slack, [read the API docume
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
@@ -56,7 +56,7 @@ You can override the default OAuth using the `installerOptions` object, which ca
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installerOptions: {
       authVersion: 'v1', // default  is 'v2', 'v1' is used for classic slack apps
