@@ -20,7 +20,7 @@ Slack の OAuth インストールフローについてもっと知りたい場�
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
@@ -58,7 +58,7 @@ const app = new App({
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installerOptions: {
       authVersion: 'v1', // デフォルトは 'v2' (クラシック Slack アプリは 'v1')
