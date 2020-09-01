@@ -14,7 +14,7 @@
 
     <span class="version">
         {% assign release = site.github.releases | where_exp: "release", 
-          "release.tag_name contains '@slack/bolt'" | sort: "created_at" | reverse | pop %}
+          "release.prerelease == false" | sort: "created_at" | reverse | pop %}
         <a href="{{ release[0].html_url }}">v{{ release[0].tag_name | remove: "@slack/bolt@" }}</a>
     </span>
   </div>
