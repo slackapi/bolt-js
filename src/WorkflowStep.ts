@@ -1,4 +1,4 @@
-import { WebAPICallResult } from '@slack/web-api';
+import { WebAPICallResult, KnownBlock, Block } from '@slack/web-api';
 import {
   Middleware,
   AllMiddlewareArgs,
@@ -17,7 +17,7 @@ import { WorkflowStepInitializationError } from './errors';
 /** Interfaces */
 
 export interface StepConfigureArguments {
-  blocks: [];
+  blocks: (KnownBlock | Block)[];
   private_metadata?: string;
   submit_disabled?: boolean;
   external_id?: string;
@@ -101,6 +101,10 @@ export type AllWorkflowStepMiddlewareArgs<
     complete?: StepCompleteFn;
     fail?: StepFailFn;
   };
+
+/** Constants */
+
+const VALID_PAYLOAD_TYPES = new Set(['workflow_step_edit', 'workflow_step', 'workflow_step_execute']);
 
 /** Class */
 
@@ -222,8 +226,7 @@ export async function processStepMiddleware(
 }
 
 export function isStepEvent(args: AnyMiddlewareArgs): args is AllWorkflowStepMiddlewareArgs {
-  const validTypes = new Set(['workflow_step_edit', 'workflow_step', 'workflow_step_execute']);
-  return validTypes.has(args.payload.type);
+  return VALID_PAYLOAD_TYPES.has(args.payload.type);
 }
 
 function selectToken(context: Context): string | undefined {
@@ -245,18 +248,13 @@ function createStepConfigure(
   const token = selectToken(context);
 
   return (config: Parameters<StepConfigureFn>[0]) => {
-    const { blocks, private_metadata, submit_disabled, external_id } = config;
     return client.views.open({
       token,
       trigger_id,
       view: {
         callback_id,
-        blocks,
         type: 'workflow_step',
-        // only include private_metadata, submit_disabled + external_id if passed by user
-        ...(private_metadata !== undefined && { private_metadata }),
-        ...(submit_disabled !== undefined && { submit_disabled }),
-        ...(external_id !== undefined && { external_id }),
+        ...config,
       },
     });
   };
@@ -278,16 +276,11 @@ function createStepUpdate(
   } = args;
   const token = selectToken(context);
 
-  return (config: Parameters<StepUpdateFn>[0]) => {
-    const { step_name, step_image_url, inputs = {}, outputs = [] } = config;
+  return (config: Parameters<StepUpdateFn>[0] = {}) => {
     return client.workflows.updateStep({
       token,
       workflow_step_edit_id,
-      inputs,
-      outputs,
-      // only include step_name + step_image_url if passed by user
-      ...(step_name !== undefined && { step_name }),
-      ...(step_image_url !== undefined && { step_image_url }),
+      ...config,
     });
   };
 }
@@ -308,12 +301,11 @@ function createStepComplete(
   } = args;
   const token = selectToken(context);
 
-  return (config: Parameters<StepCompleteFn>[0]) => {
-    const { outputs = [] } = config;
+  return (config: Parameters<StepCompleteFn>[0] = {}) => {
     return client.workflows.stepCompleted({
       token,
-      outputs,
       workflow_step_execute_id,
+      ...config,
     });
   };
 }
