@@ -167,6 +167,8 @@ export default class App {
 
   private axios: AxiosInstance;
 
+  private installerOptions: ExpressReceiverOptions['installerOptions'];
+
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
@@ -221,6 +223,12 @@ export default class App {
     this.middleware = [];
     this.listeners = [];
 
+    // Add clientOptions to InstallerOptions to pass them to @slack/oauth
+    this.installerOptions = {
+      clientOptions: this.clientOptions,
+      ...installerOptions,
+    };
+
     // Check for required arguments of ExpressReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
@@ -240,8 +248,8 @@ export default class App {
         clientSecret,
         stateSecret,
         installationStore,
-        installerOptions,
         scopes,
+        installerOptions: this.installerOptions,
         logger: this.logger,
       });
     }
