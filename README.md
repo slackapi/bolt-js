@@ -111,7 +111,7 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 
 *  Block actions, global shortcuts, and message shortcuts: Call `ack()` with no parameters.
 
-* View submissions: Call `ack()` with no parameters or a [response action](https://api.slack.com/surfaces/modals/using#updating_response).
+* View submissions: Call `ack()` with no parameters or with a [response action](https://api.slack.com/surfaces/modals/using#updating_response).
 
 *  Options requests: Call `ack()` with an object containing the options for the user to see.
 
