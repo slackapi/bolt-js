@@ -91,7 +91,7 @@ The arguments are grouped into properties of one object, so that it's easier to 
 
 ```js
 // Reverse all messages the app can hear
-app.shortcut('shortcut-name', async ({ message, say }) => {
+app.message(async ({ message, say }) => {
   const reversedText = message.text.split('').reverse().join('');
   await say(reversedText);
 });
