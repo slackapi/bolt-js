@@ -7,7 +7,9 @@ beta: true
 ---
 
 <div class="section-content">
-⚠️ Workflow [steps from apps](https://api.slack.com/workflows/steps) is a beta feature. As the feature is developed, **Bolt for JavaScript's API will change to add better native support.** To develop with workflow steps in Bolt, use the `@slack/bolt@feat-workflow-steps` version of the package rather than the standard `@slack/bolt`.
+Workflow Steps from apps allow your app to create and process custom workflow steps that users can add using [Workflow Builder](https://api.slack.com/workflows).
 
-The [API documentation](https://api.slack.com/workflows/steps) includes more information on setting up a beta app.
+A workflow step is made up of three distinct user events: workflow builders adding or editing the step, saving or updating the step's configuration, and the end user's execution of the step. All three events must be handled for a workflow step to function.
+
+The [API documentation](https://api.slack.com/workflows/steps) includes more information on setting up your app.
 </div>
