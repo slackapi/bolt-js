@@ -45,5 +45,6 @@ type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
  * Type function which tests whether or not the given `Event` contains a channel ID context for where the event
  * occurred, and returns `Type` when the test passes. Otherwise this returns `never`.
  */
-type WhenEventHasChannelContext<Event, Type> =
-  Event extends ({ channel: string; } | { item: { channel: string; }; }) ? Type : never;
+type WhenEventHasChannelContext<Event, Type> = Event extends { channel: string } | { item: { channel: string } }
+  ? Type
+  : never;

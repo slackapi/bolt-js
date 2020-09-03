@@ -13,7 +13,6 @@ import {
 } from './errors';
 
 describe('Errors', () => {
-
   it('has errors matching codes', () => {
     const errorMap = {
       [ErrorCode.AppInitializationError]: new AppInitializationError(),

@@ -20,17 +20,17 @@ Slack の OAuth インストールフローについてもっと知りたい場�
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
-    storeInstallation: (installation) => {
+    storeInstallation: async (installation) => {
       // TODO: 実際のデータベースに保存するために、ここのコードを変更
-      return database.set(installation.team.id, installation);
+      return await database.set(installation.team.id, installation);
     },
-    fetchInstallation: (InstallQuery) => {
+    fetchInstallation: async (InstallQuery) => {
       // TODO: 実際のデータベースから取得するために、ここのコードを変更
-      return database.get(InstallQuery.teamId);
+      return await database.get(InstallQuery.teamId);
     },
   },
 });
@@ -58,7 +58,7 @@ const app = new App({
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installerOptions: {
       authVersion: 'v1', // デフォルトは 'v2' (クラシック Slack アプリは 'v1')
@@ -80,20 +80,20 @@ const app = new App({
 
         // 第一引数は `generateInstallUrl` メソッドに渡される `InstallUrlOptions` オブジェクト、第二引数は日付オブジェクト
         // state の文字列を応答
-        generateStateParam: (installUrlOptions, date) => {
+        generateStateParam: async (installUrlOptions, date) => {
           // URL の state パラメーターとして使用するランダムな文字列を生成
           const randomState = randomStringGenerator();
           // その値をキャッシュ、データベースに保存
-          myDB.set(randomState, installUrlOptions);
+          await myDB.set(randomState, installUrlOptions);
           // データベースに保存されたものを利用可能な値として返却
           return randomState;
         },
 
         // 第一引数は日付オブジェクトで、第二引数は state を表現する文字列
         // `installUrlOptions` オブジェクトを応答
-        verifyStateParam:  (date, state) => {
+        verifyStateParam: async (date, state) => {
           // state をキーに、データベースから保存された installOptions を取得
-          const installUrlOptions = myDB.get(randomState);
+          const installUrlOptions = await myDB.get(randomState);
           return installUrlOptions;
         }
       },

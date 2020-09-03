@@ -36,9 +36,9 @@ Read the documentation for [`input` objects](https://api.slack.com/reference/wor
 // Your app will be called when user adds your step to their workflow
 app.action({ type: 'workflow_step_edit', callback_id: 'add_task' }, async ({ body, ack, client }) => {
   // Acknowledge the event
-  ack();
+  await ack();
   // Open the configuration modal using `views.open`
-  client.views.open({
+  await client.views.open({
     trigger_id: body.trigger_id,
     view: {
       type: 'workflow_step',
@@ -81,16 +81,16 @@ app.action({ type: 'workflow_step_edit', callback_id: 'add_task' }, async ({ bod
   });
 });
 
-app.views('add_task_config', async ({ ack, view, body, client }) => {
+app.view('add_task_config', async ({ ack, view, body, client }) => {
   // Acknowledge the submission
-  ack();
+  await ack();
   // Unique workflow edit ID
   let workflowEditId = body.workflow_step.workflow_step_edit_id;
   // Input values found in the view's state object
   let taskName = view.state.values.task_name_input.name;
   let taskDescription = view.state.values.task_description_input.description;
 
-  client.workflows.updateStep({
+  await client.workflows.updateStep({
     workflow_step_edit_id: workflowEditId,
     inputs: {
       taskName: { value: (taskName || '') },
@@ -109,4 +109,5 @@ app.views('add_task_config', async ({ ack, view, body, client }) => {
       }
     ]
   });
+});
 ```

@@ -14,24 +14,40 @@ import ExpressReceiver, {
 
 describe('ExpressReceiver', () => {
   const noopLogger: Logger = {
-    debug(..._msg: any[]): void { /* noop */ },
-    info(..._msg: any[]): void { /* noop */ },
-    warn(..._msg: any[]): void { /* noop */ },
-    error(..._msg: any[]): void { /* noop */ },
-    setLevel(_level: LogLevel): void { /* noop */ },
-    getLevel(): LogLevel { return LogLevel.DEBUG; },
-    setName(_name: string): void { /* noop */ },
+    debug(..._msg: any[]): void {
+      /* noop */
+    },
+    info(..._msg: any[]): void {
+      /* noop */
+    },
+    warn(..._msg: any[]): void {
+      /* noop */
+    },
+    error(..._msg: any[]): void {
+      /* noop */
+    },
+    setLevel(_level: LogLevel): void {
+      /* noop */
+    },
+    getLevel(): LogLevel {
+      return LogLevel.DEBUG;
+    },
+    setName(_name: string): void {
+      /* noop */
+    },
   };
 
   function buildResponseToVerify(result: any): Response {
-    return {
+    return ({
       status: (code: number) => {
         result.code = code;
-        return {
-          send: () => { result.sent = true; },
-        } as any as Response;
+        return ({
+          send: () => {
+            result.sent = true;
+          },
+        } as any) as Response;
       },
-    } as any as Response;
+    } as any) as Response;
   }
 
   describe('constructor', () => {
@@ -74,9 +90,15 @@ describe('ExpressReceiver', () => {
         const req = { body: { ssl_check: 1 } } as Request;
         let sent = false;
         // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { send: () => { sent = true; } } as Response;
+        const resp = {
+          send: () => {
+            sent = true;
+          },
+        } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any) => {
+          errorResult = error;
+        };
 
         // Act
         respondToSslCheck(req, resp, next);
@@ -92,9 +114,15 @@ describe('ExpressReceiver', () => {
         const req = { body: { type: 'block_actions' } } as Request;
         let sent = false;
         // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { send: () => { sent = true; } } as Response;
+        const resp = {
+          send: () => {
+            sent = true;
+          },
+        } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any) => {
+          errorResult = error;
+        };
 
         // Act
         respondToSslCheck(req, resp, next);
@@ -112,9 +140,15 @@ describe('ExpressReceiver', () => {
         const req = { body: { type: 'url_verification', challenge: 'this is it' } } as Request;
         let sentBody = undefined;
         // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { json: (body) => { sentBody = body; } } as Response;
+        const resp = {
+          json: (body) => {
+            sentBody = body;
+          },
+        } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any) => {
+          errorResult = error;
+        };
 
         // Act
         respondToUrlVerification(req, resp, next);
@@ -130,9 +164,15 @@ describe('ExpressReceiver', () => {
         const req = { body: { ssl_check: 1 } } as Request;
         let sentBody = undefined;
         // tslint:disable-next-line: no-object-literal-type-assertion
-        const resp = { json: (body) => { sentBody = body; } } as Response;
+        const resp = {
+          json: (body) => {
+            sentBody = body;
+          },
+        } as Response;
         let errorResult: any;
-        const next = (error: any) => { errorResult = error; };
+        const next = (error: any) => {
+          errorResult = error;
+        };
 
         // Act
         respondToUrlVerification(req, resp, next);
@@ -145,7 +185,6 @@ describe('ExpressReceiver', () => {
   });
 
   describe('verifySignatureAndParseRawBody', () => {
-
     let clock: SinonFakeTimers;
 
     beforeEach(() => {
@@ -162,7 +201,8 @@ describe('ExpressReceiver', () => {
     const signingSecret = '8f742231b10e8888abcd99yyyzzz85a5';
     const signature = 'v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503';
     const requestTimestamp = 1531420618;
-    const body = 'token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c';
+    const body =
+      'token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c';
 
     function buildExpressRequest(): Request {
       const reqAsStream = new Readable();
@@ -196,7 +236,9 @@ describe('ExpressReceiver', () => {
     async function runWithValidRequest(req: Request, state: any): Promise<void> {
       // Arrange
       const resp = buildResponseToVerify(state);
-      const next = (error: any) => { state.error = error; };
+      const next = (error: any) => {
+        state.error = error;
+      };
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);

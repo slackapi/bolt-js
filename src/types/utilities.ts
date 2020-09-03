@@ -11,10 +11,9 @@ export interface SayFn {
   (message: string | SayArguments): Promise<WebAPICallResult>;
 }
 
-export type RespondArguments =
-Pick<
+export type RespondArguments = Pick<
   ChatPostMessageArguments,
-  Exclude<KnownKeys<ChatPostMessageArguments>, 'channel' | 'text' >
+  Exclude<KnownKeys<ChatPostMessageArguments>, 'channel' | 'text'>
 > & {
   /** Response URLs can be used to send ephemeral messages or in-channel messages using this argument */
   response_type?: 'in_channel' | 'ephemeral';

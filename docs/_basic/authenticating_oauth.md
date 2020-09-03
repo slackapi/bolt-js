@@ -19,17 +19,17 @@ To learn more about the OAuth installation flow with Slack, [read the API docume
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
-    storeInstallation: (installation) => {
+    storeInstallation: async (installation) => {
       // change the line below so it saves to your database
-      return database.set(installation.team.id, installation);
+      return await database.set(installation.team.id, installation);
     },
-    fetchInstallation: (InstallQuery) => {
+    fetchInstallation: async (InstallQuery) => {
       // change the line below so it fetches from your database
-      return database.get(InstallQuery.teamId);
+      return await database.get(InstallQuery.teamId);
     },
   },
 });
@@ -56,7 +56,7 @@ You can override the default OAuth using the `installerOptions` object, which ca
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installerOptions: {
       authVersion: 'v1', // default  is 'v2', 'v1' is used for classic slack apps
@@ -78,19 +78,19 @@ const app = new App({
         // generateStateParam's first argument is the entire InstallUrlOptions object which was passed into generateInstallUrl method
         // the second argument is a date object
         // the method is expected to return a string representing the state
-        generateStateParam: (installUrlOptions, date) => {
+        generateStateParam: async (installUrlOptions, date) => {
           // generate a random string to use as state in the URL
           const randomState = randomStringGenerator();
           // save installOptions to cache/db
-          myDB.set(randomState, installUrlOptions);
+          await myDB.set(randomState, installUrlOptions);
           // return a state string that references saved options in DB
           return randomState;
         },
         // verifyStateParam's first argument is a date object and the second argument is a string representing the state
         // verifyStateParam is expected to return an object representing installUrlOptions
-        verifyStateParam:  (date, state) => {
+        verifyStateParam:  async (date, state) => {
           // fetch saved installOptions from DB using state reference
-          const installUrlOptions = myDB.get(randomState);
+          const installUrlOptions = await myDB.get(randomState);
           return installUrlOptions;
         }
       },
