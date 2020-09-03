@@ -7,7 +7,7 @@ import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import { Logger, ConsoleLogger } from '@slack/logger';
-import { InstallProvider, StateStore, InstallationStore, CallbackOptions } from '@slack/oauth';
+import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
 import App from './App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
@@ -25,21 +25,23 @@ export interface ExpressReceiverOptions {
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
-  stateSecret?: string; // ClearStateStoreOptions['secret']; // required when using default stateStore
-  installationStore?: InstallationStore; // default MemoryInstallationStore
-  scopes?: string | string[];
+  stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
+  scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
 }
 
 // Additional Installer Options
 interface InstallerOptions {
-  stateStore?: StateStore; // default ClearStateStore
-  authVersion?: 'v1' | 'v2'; // default 'v2'
-  metadata?: string;
+  stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
+  metadata?: InstallURLOptions['metadata'];
   installPath?: string;
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
-  userScopes?: string | string[];
+  userScopes?: InstallURLOptions['userScopes'];
+  clientOptions?: InstallProviderOptions['clientOptions'];
+  authorizationUrl?: InstallProviderOptions['authorizationUrl'];
 }
 
 /**
@@ -104,6 +106,8 @@ export default class ExpressReceiver implements Receiver {
         installationStore,
         stateStore: installerOptions.stateStore,
         authVersion: installerOptions.authVersion!,
+        clientOptions: installerOptions.clientOptions,
+        authorizationUrl: installerOptions.authorizationUrl,
       });
     }
 

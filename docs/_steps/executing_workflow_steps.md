@@ -17,7 +17,7 @@ app.event('workflow_step_execute', async ({ event, client }) => {
   let workflowExecuteId = event.workflow_step.workflow_step_execute_id;
   let inputs = event.workflow_step.inputs;
 
-  client.workflows.stepCompleted({
+  await client.workflows.stepCompleted({
     workflow_step_execute_id: workflowExecuteId,
     outputs: {
       taskName: inputs.taskName.value,
