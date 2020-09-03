@@ -103,7 +103,7 @@ In addition to the [`client` property passed to listeners](#making-things-happen
 
 ### Acknowledging events
 
-Some types of events need to be acknowledged in order to ensure a consistent user experience inside the Slack client (web, mobile, and desktop apps). This includes all action, shortcut, view, command, and options requests. Listeners for these events need to call the `ack()` function, which is passed in as an argument.
+Some types of events need to be acknowledged in order to ensure a consistent user experience inside the Slack client (web, mobile, and desktop apps). This includes all action, shortcut, view, command, and options requests. Listeners for these events need to call the `ack()` function, which is passed in as an argument. 
 
 In general, the Slack platform expects an acknowledgement within 3 seconds, so listeners should call this function as soon as possible.
 
@@ -116,6 +116,8 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 *  Options requests: Call `ack()` with an object containing the options for the user to see.
 
 *  Legacy message button clicks, menu selections, and slash commands: Either call `ack()` with no parameters, a `string` to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the message to remove the interactive elements is a best practice for any action that should only be performed once.
+
+* Events API events **do not** need an `ack()` function since they are automatically acknowledged by your app. 
 
 ## Getting Help
 
