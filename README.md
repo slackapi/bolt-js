@@ -76,7 +76,7 @@ app.options(actionId, fn);
 Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are called with a set of arguments.
 
 | Argument  | Description  |
-| ---------   ------------ |
+| --- | --- |
 | `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` array. The `payload` object is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**, or [use TypeScript](#using-typescript). |
 | `say` | Function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and objects (for messages containing blocks). `say` returns a promise that will resolve with a [`chat.postMessage` response](https://api.slack.com/methods/chat.postMessage).
 | `ack` | Function that **must** be called to acknowledge that an incoming event was received by your app. `ack` exists for all actions, shortcuts, view, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](#acknowledging-events)
