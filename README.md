@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/slackapi/bolt-js.svg?branch=master)](https://travis-ci.org/slackapi/bolt-js)
 [![codecov](https://codecov.io/gh/slackapi/bolt/branch/master/graph/badge.svg)](https://codecov.io/gh/slackapi/bolt-js)
 
-A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-js/tutorial/getting-started) to quickly setup and run your first Bolt app.
+A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-js/tutorial/getting-started) to set-up and run your first Bolt app.
 
 Read [the documentation](https://slack.dev/bolt-js) to explore the basic and advanced concepts of Bolt for JavaScript.
 
@@ -116,3 +116,10 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 *  Options requests: Call `ack()` with an object containing the options for the user to see.
 
 *  Legacy message button clicks, menu selections, and slash commands: Either call `ack()` with no parameters, a `string` to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the message to remove the interactive elements is a best practice for any action that should only be performed once.
+
+## Getting Help
+
+If you get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
+
+  * [Issue Tracker](http://github.com/slackapi/bolt-js/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for JavaScript. Try searching for an existing issue before creating a new one.
+  * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`
