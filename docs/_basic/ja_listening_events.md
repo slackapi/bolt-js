@@ -18,7 +18,6 @@ const welcomeChannelId = 'C12345';
 app.event('team_join', async ({ event, client }) => {
   try {
     const result = await client.chat.postMessage({
-      token: context.botToken,
       channel: welcomeChannelId,
       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
