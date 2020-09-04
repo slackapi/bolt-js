@@ -20,13 +20,12 @@ order: 11
 ```javascript
 // action_id: button_abc のボタンを押すイベントをリッスン
 // （そのボタンはモーダルの中にあるという想定）
-app.action('button_abc', async ({ ack, body, context }) => {
+app.action('button_abc', async ({ ack, body, client }) => {
   // ボタンを押したイベントを確認
   await ack();
 
   try {
-    const result = await app.client.views.update({
-      token: context.botToken,
+    const result = await client.views.update({
       // リクエストに含まれる view_id を渡す
       view_id: body.view.id,
       // 更新された view の値をペイロードに含む
