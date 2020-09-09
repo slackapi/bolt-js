@@ -92,7 +92,7 @@ The arguments are grouped into properties of one object, so that it's easier to 
 ```js
 // Reverse all messages the app can hear
 app.message(async ({ message, say }) => {
-  const reversedText = message.text.split('').reverse().join('');
+  const reversedText = [...message.text].reverse().join("");
   await say(reversedText);
 });
 ```
