@@ -3,7 +3,6 @@ title: Executing workflow steps
 lang: en
 slug: executing-steps
 order: 5
-beta: true
 ---
 
 <div class="section-content">

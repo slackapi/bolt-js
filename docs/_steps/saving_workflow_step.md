@@ -3,7 +3,6 @@ title: Saving the step configuration
 lang: en
 slug: saving-steps
 order: 4
-beta: true
 ---
 
 <div class='section-content'>

@@ -3,7 +3,6 @@ title: Adding or editing workflow steps
 lang: en
 slug: adding-editing-steps
 order: 3
-beta: true
 ---
 
 <div class='section-content'>
@@ -21,41 +20,41 @@ To learn more about workflow step configuration modals, [read the documentation]
 ```javascript
 const ws = new WorkflowStep('add_task', {
   edit: async ({ ack, step, configure }) => {
-      await ack();
+    await ack();
 
-      const blocks = [
-        { 
-          'type': 'input',
-          'block_id': 'task_name_input',
-          'element': {
-            'type': 'plain_text_input',
-            'action_id': 'name',
-            'placeholder': {
-              'type': 'plain_text',
-              'text': 'Add a task name'
-            }
+    const blocks = [
+      {
+        type: 'input',
+        block_id: 'task_name_input',
+        element: {
+          type: 'plain_text_input',
+          action_id: 'name',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Add a task name',
           },
-          'label': {
-            'type': 'plain_text',
-            'text': 'Task name'
-          }
         },
-        { 
-          'type': 'input',
-          'block_id': 'task_description_input',
-          'element': {
-            'type': 'plain_text_input',
-            'action_id': 'description',
-            'placeholder': {
-              'type': 'plain_text',
-              'text': 'Add a task description'
-            }
+        label: {
+          type: 'plain_text',
+          text: 'Task name',
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'task_description_input',
+        element: {
+          type: 'plain_text_input',
+          action_id: 'description',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Add a task description',
           },
-          'label': {
-            'type': 'plain_text',
-            'text': 'Task description'
-          }
         },
+        label: {
+          type: 'plain_text',
+          text: 'Task description',
+        },
+      },
     ];
 
     await configure({ blocks });

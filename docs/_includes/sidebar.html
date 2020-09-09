@@ -1,7 +1,7 @@
 <div class="sidebar-content">
   <div class="logo">
     <span class="icon">
-      <img src="{{ site.url | append: site.baseurl }}/assets/bolt-js-logo.svg"/>
+      <img src="{{ site.url | append: site.baseurl }}/assets/bolt-js-logo.svg" />
     </span>
 
     <span class="name">
@@ -13,24 +13,27 @@
     {% assign localized_base_url = page.lang | prepend: "/" | remove_first: "/en" %}
 
     <span class="version">
-        {% assign release = site.github.releases | where_exp: "release", 
-          "release.prerelease == false" | sort: "created_at" | reverse | pop %}
-        <a href="{{ release[0].html_url }}">v{{ release[0].tag_name | remove: "@slack/bolt@" }}</a>
+      {% assign release = site.github.releases | where_exp: "release", "release.prerelease == false" | sort:
+      "created_at" | reverse | pop %}
+      <a href="{{ release[0].html_url }}">v{{ release[0].tag_name | remove: "@slack/bolt@" }}</a>
     </span>
   </div>
 
   <ul class="sidebar-section">
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url  }}/tutorial/getting-started"><li class="title">{{ site.t[page.lang].start }}</li></a>
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url  }}/tutorial/getting-started"
+      ><li class="title">{{ site.t[page.lang].start }}</li></a
+    >
   </ul>
 
   <ul class="sidebar-section">
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#basic"><li class="title">{{ site.t[page.lang].basic }}</li></a>
-    {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
-    
-    {% for section in basic_sections %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
-        <li>{{section.title}}</li>
-      </a>
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#basic"
+      ><li class="title">{{ site.t[page.lang].basic }}</li></a
+    >
+    {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %} {% for section in basic_sections
+    %}
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
+      <li>{{section.title}}</li>
+    </a>
     {% endfor %}
   </ul>
 
@@ -38,38 +41,34 @@
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#advanced">
       <li class="title">{{ site.t[page.lang].advanced }}</li>
     </a>
-    {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
-    {% for section in advanced_sections %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
-        <li>{{section.title}}</li>
-      </a>
+    {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %} {% for section in
+    advanced_sections %}
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
+      <li>{{section.title}}</li>
+    </a>
     {% endfor %}
   </ul>
-
-
-  
-  <!--Start (temporary) beta sections. At the moment, there's no ja-jp documentation for this feature-->
 
   <ul class="sidebar-section">
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#steps">
-      <li class="title"><span class="beta">Beta</span> {{ site.t[page.lang].steps }}</li>
+      <li class="title">{{ site.t[page.lang].steps }}</li>
     </a>
-    {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %}
-    {% for step in workflow_steps %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
-        <li>{{step.title}}</li>
-      </a>
+    {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for step in workflow_steps %}
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
+      <li>{{step.title}}</li>
+    </a>
     {% endfor %}
   </ul>
-  <!--End (temporary) beta sections-->
 
   <ul class="sidebar-section">
-    {% assign tutorials = site.tutorials | where: "lang", page.lang | where_exp: "tutorial", "tutorial.order > 0" %}
-    {% for tutorial in tutorials %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/tutorial/{{ tutorial.slug }}">
-        <li class="title">{{tutorial.title}}</li>
-      </a>
+    {% assign tutorials = site.tutorials | where: "lang", page.lang | where_exp: "tutorial", "tutorial.order > 0" %} {%
+    for tutorial in tutorials %}
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/tutorial/{{ tutorial.slug }}">
+      <li class="title">{{tutorial.title}}</li>
+    </a>
     {% endfor %}
-    <a href="https://github.com/SlackAPI/bolt-js/blob/master/.github/contributing.md"><li class="title">{{ site.t[page.lang].contribute }}</li></a>
+    <a href="https://github.com/SlackAPI/bolt-js/blob/master/.github/contributing.md"
+      ><li class="title">{{ site.t[page.lang].contribute }}</li></a
+    >
   </ul>
 </div>

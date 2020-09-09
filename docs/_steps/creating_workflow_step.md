@@ -3,7 +3,6 @@ title: Creating a workflow step
 lang: en
 slug: creating-steps
 order: 2
-beta: true
 ---
 
 <div class='section-content'>

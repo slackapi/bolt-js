@@ -1,67 +1,61 @@
 ---
 sidebar_style: main
 ---
+
 <!DOCTYPE html>
 <html>
+  {% include head.html %}
 
-{% include head.html %}
+  <body>
+    {% include tag_manager.html %}
+    <div class="wrapper">
+      <div class="panel">
+        {% include sidebar.html %}
+      </div>
 
-<body>
-  {% include tag_manager.html %}
-  <div class="wrapper">
-    <div class="panel">
-      {% include sidebar.html %}
-    </div>
-
-
-    <div class="content">
+      <div class="content">
         <div class="mainheader">
           {% include header.html %}
         </div>
 
         <div id="basic">
-        {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %}
-        {% for section in basic_sections %}
+          {% assign basic_sections = site.basic | sort: "order" | where: "lang", page.lang %} {% for section in
+          basic_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>
 
             {{ section.content | markdownify }}
 
-            <hr>
+            <hr />
           </div>
-        {% endfor %}
+          {% endfor %}
         </div>
 
         <div id="advanced">
-          {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
-          {% for section in advanced_sections %}
+          {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %} {% for section in
+          advanced_sections %}
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">{{ section.title }}</h3>
 
             {{ section.content | markdownify }}
 
-            <hr>
+            <hr />
           </div>
-        {% endfor %}
+          {% endfor %}
         </div>
 
-        <!--Start (temporary) beta sections-->
         <div id="steps">
-          {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %}
-          {% for section in workflow_steps %}
+          {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for section in
+          workflow_steps %}
           <div class="section-wrapper">
-            <h3 id="{{section.slug}}"><span class="beta">Beta</span> {{ section.title }}</h3>
-
+            <h3 id="{{section.slug}}">{{ section.title }}</h3>
             {{ section.content | markdownify }}
-
-            <hr>
+            <hr />
           </div>
-        {% endfor %}
+          {% endfor %}
         </div>
-        <!--End (temporary) beta sections-->
+      </div>
     </div>
-
-  </div>
-  {% include analytics.html %}
-</body>
+    {% include analytics.html %}
+  </body>
 </html>
