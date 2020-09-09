@@ -50,6 +50,8 @@ Once you authorize the installation, you'll land on the **OAuth & Permissions** 
 
 > 💡 Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
 
+---
+
 ### Setting up your local project
 With the initial configuration handled, it's time to set up a new Bolt project. This is where you'll write the code that handles the logic for your app.
 
