@@ -44,6 +44,7 @@
   "dependencies": {
     "@slack/logger": "^2.0.0",
     "@slack/oauth": "^1.4.0",
+    "@slack/socket-mode": "feat-socket-mode",
     "@slack/types": "^1.9.0",
     "@slack/web-api": "^5.14.0",
     "@types/express": "^4.16.1",
