@@ -17,6 +17,8 @@ export {
 
 export { default as ExpressReceiver, ExpressReceiverOptions } from './ExpressReceiver';
 
+export { default as SocketModeReceiver } from './SocketModeReceiver';
+
 export * from './errors';
 export * from './middleware/builtin';
 export * from './types';
