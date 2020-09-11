@@ -100,6 +100,7 @@ export default class ExpressReceiver implements Receiver {
       (stateSecret !== undefined || installerOptions.stateStore !== undefined)
     ) {
       this.installer = new InstallProvider({
+        logger,
         clientId,
         clientSecret,
         stateSecret,
