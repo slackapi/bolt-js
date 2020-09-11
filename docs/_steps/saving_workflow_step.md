@@ -7,7 +7,7 @@ order: 4
 
 <div class='section-content'>
 
-After the configuration modal is opened, your app will listen for the `view_submission` event. The callback assigned to the `save` property of the `WorkflowStep` configuration object passed in during instantiation will run when this event occurs.
+After the configuration modal is opened, your app will listen for the `view_submission` event. The `save` callback in your `WorkflowStep` configuration will be run when this event is received.
 
 Within the `save` callback, the `update()` method can be used to save the builder's step configuration by passing in the following arguments:
 
