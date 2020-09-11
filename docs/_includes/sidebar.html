@@ -54,9 +54,11 @@
       <li class="title">{{ site.t[page.lang].steps }}</li>
     </a>
     {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for step in workflow_steps %}
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
-      <li>{{step.title}}</li>
-    </a>
+      {% if step.slug != "steps-overview" %}
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
+        <li>{{step.title}}</li>
+      </a>
+      {% endif %}
     {% endfor %}
   </ul>
 

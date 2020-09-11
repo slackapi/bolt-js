@@ -1,5 +1,5 @@
 ---
-title: Creating a workflow step
+title: Creating workflow steps
 lang: en
 slug: creating-steps
 order: 2
@@ -7,13 +7,13 @@ order: 2
 
 <div class='section-content'>
 
-To create a new workflow step, Bolt provides the `WorkflowStep` class.
+To create a workflow step, Bolt provides the `WorkflowStep` class.
 
-When instantiating a new `WorkflowStep`, pass in the step's `callback_id`, which is defined in your app configuration, and a step configuration object.
+When instantiating a new `WorkflowStep`, pass in the step's `callback_id` and a configuration object.
 
-The configuration object for a `WorkflowStep` contains three properties: `edit`, `save`, and `execute`. Each of these properties must either hold a value of a single callback or an array of callbacks. All callbacks have access to a `step` object that contains information about the workflow step event, as well as one or more utility functions.
+The configuration object contains three properties: `edit`, `save`, and `execute`. Each of these properties must be a single callback or an array of callbacks. All callbacks have access to a `step` object that contains information about the workflow step event.
 
-After instantiating your workflow step, pass it the instance into `app.step()`. Behind the scenes, your app will listen and respond to the workflow step’s events using the callbacks provided in the configuration object.
+After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind the scenes, your app will listen and respond to the workflow step’s events using the callbacks provided in the configuration object.
 
 </div>
 

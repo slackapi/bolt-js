@@ -7,9 +7,9 @@ order: 5
 
 <div class="section-content">
 
-When your workflow step is executed by an end user, your app will receive a `workflow_step_execute` event. The method assigned to the `execute` property of the `WorkflowStep` configuration object passed in during instantiation will run when this event occurs.
+When your workflow step is executed by an end user, your app will receive a [`workflow_step_execute` event](https://api.slack.com/events/workflow_step_execute). The callback assigned to the `execute` property of the `WorkflowStep` configuration object will run when this event occurs.
 
-Using the `inputs` from the configuration modal submission in the `save` callback, this is where we make third-party API calls, save things to a database, update the end user's Home Tab, and/or decide what outputs will be available to subsequent workflow steps by mapping values to the `outputs` object.
+Using the `inputs` from the `save` callback, this is where you can make third-party API calls, save information to a database, update the user's Home tab, or decide the outputs that will be available to subsequent workflow steps by mapping values to the `outputs` object.
 
 Within the `execute` callback, your app must either call `complete()` to indicate that the step's execution was successful, or `fail()` to indicate that the step's execution failed.
 
