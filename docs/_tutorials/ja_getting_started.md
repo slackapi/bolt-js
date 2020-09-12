@@ -318,6 +318,6 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 * ボットが[`events()` メソッド](https://slack.dev/bolt#event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
 
-* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](https://slack.dev/bolt#web-api)ことができます。API サイトに [130 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
+* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](https://slack.dev/bolt#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
 
 * [API サイト](https://api.slack.com/docs/token-types)ではさまざまなトークンタイプの詳細を確認することができます。アプリには、実行するアクションに応じて異なるトークンが必要になる場合があります。
