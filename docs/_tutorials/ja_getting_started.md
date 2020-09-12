@@ -149,7 +149,7 @@ ngrok http 3000
 
 **Request URL**  ボックスの  **Enable Events**  スイッチの下のフィールドにこの URL を貼り付けます。Bolt アプリが引き続き実行されている場合は、URL が検証されチェックマークが表示されます。
 
-Request URL が検証されたら、**Subscribe to Bot Events** までスクロールします。メッセージに関するイベントが４つあります−
+Request URL が検証されたら、**Subscribe to Bot Events** までスクロールします。メッセージに関するイベントが４つあります:
 - `message.channels` あなたのアプリが追加されているパブリックチャンネルのメッセージをリッスン
 - `message.groups` あなたのアプリが追加されているプライベートチャンネルのメッセージをリッスン
 - `message.im` App Home とダイレクトメッセージのリスニング
