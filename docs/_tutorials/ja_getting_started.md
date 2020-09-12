@@ -315,10 +315,10 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 基本的なアプリの作成ができましたので、次回は是非もっといろいろな、 Bolt の機能を使ってアプリを作ってみましょう。下記のリンクを辿っていろいろアイデアを模索してみてください！
 
-* [基本的な概念](https://slack.dev/bolt#basic)をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
+* [基本的な概念](/bolt-js/ja-jp/concepts#basic)をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
 
-* ボットが[`events()` メソッド](https://slack.dev/bolt#event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
+* ボットが[`events()` メソッド](/bolt-js/ja-jp/concepts#event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
 
-* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](https://slack.dev/bolt#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
+* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/bolt-js/ja-jp/concepts#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
 
 * [API サイト](https://api.slack.com/docs/token-types)ではさまざまなトークンタイプの詳細を確認することができます。アプリには、実行するアクションに応じて異なるトークンが必要になる場合があります。
