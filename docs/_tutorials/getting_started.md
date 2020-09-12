@@ -149,7 +149,11 @@ Now you have a public-facing URL for your app that tunnels to your local machine
 
 Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your URL should become verified.
 
-After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels that your app is added to), `message.groups` (listens for messages in private channels that your app is added to), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs that your app is added to).
+After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages:
+- `message.channels` listens for messages in public channels that your app is added to
+- `message.groups` listens for messages in private channels that your app is added to
+- `message.im` listens for messages in the App Home/DM space
+- `message.mpim` listens for messages in multi-person DMs that your app is added to
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
