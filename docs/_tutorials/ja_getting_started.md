@@ -68,7 +68,7 @@ npm init
 
 Bolt パッケージを新しいプロジェクトにインストールする前に、アプリの設定時に生成されたボットトークンと signing secret (サイン認証) を保存しましょう。これらは環境変数として保存する必要があります。**バージョン管理では保存しない**でください。
 
-1. **Basic Information  ページから  Signing Secret  をコピー**して、新しい環境変数に保存します。次の例は Linux と MacOS で動作します。ただし、[Windows でも同様のコマンドが利用可能](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)です。
+1. **Basic Information  ページから  Signing Secret  をコピー**して、新しい環境変数に保存します。次の例は Linux と macOS で動作します。ただし、[Windows でも同様のコマンドが利用可能](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)です。
 
 ```shell
 export SLACK_SIGNING_SECRET=<your-signing-secret>
