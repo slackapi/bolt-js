@@ -68,13 +68,11 @@ You’ll be prompted with a series of questions to describe your new project (yo
 Before we install the Bolt for JavaScript package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
 
 1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
-
 ```shell
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
 2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another environment variable.
-
 ```shell
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
