@@ -55,9 +55,30 @@ You're all setup with the Heroku tools! Now let's move onto the exciting step of
 
 ### Create an app on Heroku
 
+Now we can create an app on Heroku. You can run the command:
+
+```shell
+heroku create
+```
+
+When the app is created, Heroku will also create a git remote repository.
+
 ---
 
-### Get a Bolt Slack app
+### Get the Bolt Slack app
+
+We're going to use the app that you created in the [Getting Started](/bolt-js/tutorials/getting_started) to learn how to prepare and deploy an app to Heroku.
+
+> 💡 If you have an existing Bolt Slack app that you want to deploy, you should be able to follow along as well.
+
+Let's start by getting a fresh copy of the _Getting Started_ app:
+
+```shell
+git clone https://github.com/mwbrooks/bolt-js-getting-started-app.git
+cd bolt-js-getting-started-app/
+```
+
+Perfect! Now that we have the app, let's move onto preparing it for Heroku.
 
 ---
 
