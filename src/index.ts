@@ -23,7 +23,13 @@ export * from './types';
 
 export { ConversationStore, MemoryStore } from './conversation-store';
 
-export { WorkflowStep } from './WorkflowStep';
+export {
+  WorkflowStep,
+  WorkflowStepOptions,
+  WorkflowStepEditMiddleware,
+  WorkflowStepSaveMiddleware,
+  WorkflowStepExecuteMiddleware,
+} from './WorkflowStep';
 
 export {
   Installation,
