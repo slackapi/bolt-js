@@ -84,10 +84,32 @@ Perfect! Now that we have the app, let's move onto preparing it for Heroku.
 
 ### Prepare the app for Heroku
 
+Heroku is a flexible platform that uses a few conventions to understand how to host your app.
+
+- Track your app in a Git repository `<details>`
+- Add a Heroku Git remote
+- Add a Procfile
+- Existing apps should review https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment
+
 ---
 
 ### Deploy the app
 
+- `heroku ps:scale web=1`
+- `git push heroku main`
+- `heroku open`
+
+---
+
+### Deploy an update
+
+- Update something in the code
+- `git commit`
+- `git push heroku main`
+- `heroku open`
+
 ---
 
 ### Next steps
+
+<!-- Deploying Heroku with OAuth -->
