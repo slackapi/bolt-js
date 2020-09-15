@@ -2,8 +2,8 @@
 # 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 title: Bolt
 description: >-
-  A framework that makes Slack app development fast and straight-forward. 
-  With a single interface for Slack’s Web API, Events API, and interactive features, 
+  A framework that makes Slack app development fast and straight-forward.
+  With a single interface for Slack’s Web API, Events API, and interactive features,
   Bolt gives you the full power of the Slack platform out of the box.
 baseurl: /bolt-js
 url: https://slack.dev
@@ -36,7 +36,7 @@ t:
     advanced: Advanced concepts
     start: Getting started
     steps: Workflow steps
-    deployments: Deployments
+    deployments: Deploying
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念

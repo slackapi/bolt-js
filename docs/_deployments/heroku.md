@@ -1,5 +1,5 @@
 ---
-title: Deploy to Heroku
+title: Deploying to Heroku
 order: 0
 slug: heroku
 lang: en
@@ -8,7 +8,7 @@ permalink: /deployments/heroku
 redirect_from:
   - /deployments
 ---
-# Deploy to Heroku
+# Deploying to Heroku
 
 <div class="section-content">
 This guide is meant to walk you through preparing and deploying a Slack app using Bolt for JavaScript to the [Heroku cloud platform](https://heroku.com/). Along the way, we’ll download the [Getting Started app](/bolt-js/tutorials/getting-started), prepare it for Heroku, create a Heroku instance, and deploy the app.
@@ -20,7 +20,7 @@ This guide is meant to walk you through preparing and deploying a Slack app usin
 
 First off, you will want to setup the Heroku tools on your local machine. This will help you manage, deploy, and debug your app on the Heroku platform.
 
-**Install the Heroku CLI**
+**1. Install the Heroku CLI**
 
 The Heroku tools are available as a Command Line Interface (CLI). Go ahead and [install the Heroku CLI for macOS, Windows, or Linux](https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up). On macOS, you can run the command:
 
@@ -32,7 +32,7 @@ When the install is complete, you will be able to use the `heroku` command in yo
 
 > 💡 If the `heroku` command is not found, you may need to open a new terminal session.
 
-**Log into the Heroku CLI**
+**2. Log into the Heroku CLI**
 
 The Heroku CLI connects your local machine with your Heroku account so that you can create and manage apps. You can log into the Heroku CLI with the command:
 
@@ -40,7 +40,7 @@ The Heroku CLI connects your local machine with your Heroku account so that you 
 heroku login
 ```
 
-**Confirm login for Heroku CLI**
+**3. Confirm login for Heroku CLI**
 
 Lastly, let's double-check that you're logged in by displaying the account that's currently connected to your Heroku CLI:
 
@@ -101,7 +101,7 @@ Heroku is a flexible platform that uses a few conventions to understand how to h
 
 ---
 
-### Deploy an update
+### Update the app
 
 - Update something in the code
 - `git commit`
