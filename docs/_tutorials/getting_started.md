@@ -152,7 +152,7 @@ Under the **Enable Events** switch in the **Request URL** box, go ahead and past
 After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages:
 - `message.channels` listens for messages in public channels that your app is added to
 - `message.groups` listens for messages in private channels that your app is added to
-- `message.im` listens for messages in the App Home/DM space
+- `message.im` listens for messages in your app's DMs with users
 - `message.mpim` listens for messages in multi-person DMs that your app is added to
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
@@ -194,11 +194,11 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ### Sending and responding to actions
 
-To use features like buttons, select menus, datepickers, dialogs, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
+To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
 
 Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
 
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
+By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
 
 ![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
 
@@ -206,7 +206,7 @@ Now, let's go back to your app's code and add interactivity. This will consist o
 - First, your app will send a message that contains a button.
 - Next, your app will listen to the action of a user clicking the button and respond
 
-Below, I've modified the app code we wrote in the last section to send a message with a button rather than a string:
+Below, the code from the last section is modified to send a message containing a button rather than just a string:
 
 ```javascript
 const { App } = require('@slack/bolt');
@@ -249,11 +249,11 @@ app.message('hello', async ({ message, say }) => {
 })();
 ```
 
-The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory.
+The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback for notifications and accessibility.
 
 You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
-> 💡 The [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+> 💡 The [Block Kit Builder](https://app.slack.com/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
 
 Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (*yet!*).
 
@@ -306,7 +306,7 @@ app.action('button_click', async ({ body, ack, say }) => {
 })();
 ```
 
-You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
+You can see that we used `app.action()` to listen for the `action_id` that we named `button_click`. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
 
 ---
 
