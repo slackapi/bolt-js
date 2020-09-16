@@ -12,6 +12,7 @@ import {
 import { Override } from './test-helpers';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, WorkflowStepEdit, Middleware } from './types';
 import { WorkflowStepInitializationError } from './errors';
+import { WebClient } from '@slack/web-api';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('./WorkflowStep')> {
   return rewiremock.module(() => import('./WorkflowStep'), overrides);
@@ -218,6 +219,68 @@ describe('WorkflowStep', () => {
       assert.exists(stepArgs.step);
       assert.exists(stepArgs.complete);
       assert.exists(stepArgs.fail);
+    });
+  });
+
+  describe('step utility functions', () => {
+    it('configure should call views.open', async () => {
+      const fakeEditArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs;
+
+      const fakeClient = { views: { open: sinon.spy() } };
+      fakeEditArgs.client = (fakeClient as unknown) as WebClient;
+
+      const { prepareStepArgs } = await importWorkflowStep();
+      const editStepArgs = prepareStepArgs(fakeEditArgs);
+
+      await editStepArgs.configure!({ blocks: [] });
+
+      assert(fakeClient.views.open.called);
+    });
+
+    it('update should call workflows.updateStep', async () => {
+      const fakeSaveArgs = (createFakeStepSaveEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs;
+
+      const fakeClient = { workflows: { updateStep: sinon.spy() } };
+      fakeSaveArgs.client = (fakeClient as unknown) as WebClient;
+
+      const { prepareStepArgs } = await importWorkflowStep();
+      const saveStepArgs = prepareStepArgs(fakeSaveArgs);
+
+      await saveStepArgs.update!({});
+
+      assert(fakeClient.workflows.updateStep.called);
+    });
+
+    it('complete should call workflows.stepCompleted', async () => {
+      const fakeExecuteArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs;
+
+      const fakeClient = { workflows: { stepCompleted: sinon.spy() } };
+      fakeExecuteArgs.client = (fakeClient as unknown) as WebClient;
+
+      const { prepareStepArgs } = await importWorkflowStep();
+      const executeStepArgs = prepareStepArgs(fakeExecuteArgs);
+
+      await executeStepArgs.complete!({});
+
+      assert(fakeClient.workflows.stepCompleted.called);
+    });
+
+    it('fail should call workflows.stepFailed', async () => {
+      const fakeExecuteArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs;
+
+      const fakeClient = { workflows: { stepFailed: sinon.spy() } };
+      fakeExecuteArgs.client = (fakeClient as unknown) as WebClient;
+
+      const { prepareStepArgs } = await importWorkflowStep();
+      const executeStepArgs = prepareStepArgs(fakeExecuteArgs);
+
+      await executeStepArgs.fail!({ error: { message: 'Failed' } });
+
+      assert(fakeClient.workflows.stepFailed.called);
     });
   });
 
