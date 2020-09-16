@@ -67,14 +67,12 @@ You’ll be prompted with a series of questions to describe your new project (yo
 
 Before we install the Bolt for JavaScript package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
 
-1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and MacOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
-
+1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
 ```shell
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
 2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another environment variable.
-
 ```shell
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
@@ -151,7 +149,11 @@ Now you have a public-facing URL for your app that tunnels to your local machine
 
 Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your URL should become verified.
 
-After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels that your app is added to), `message.groups` (listens for messages in private channels that your app is added to), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs that your app is added to).
+After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages:
+- `message.channels` listens for messages in public channels that your app is added to
+- `message.groups` listens for messages in private channels that your app is added to
+- `message.im` listens for messages in the App Home/DM space
+- `message.mpim` listens for messages in multi-person DMs that your app is added to
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
@@ -194,7 +196,7 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 To use features like buttons, select menus, datepickers, dialogs, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
 
-Back on your app configuration page, click on **Interactive Components** on the left side. You'll see that there's another **Request URL** box.
+Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
 
 By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
 
@@ -313,10 +315,10 @@ You just built your first Bolt for JavaScript app! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
-* Read through the [Basic concepts](https://slack.dev/bolt#basic) to learn about the different methods and features your Bolt app has access to.
+* Read through the [Basic concepts](/bolt-js/concepts#basic) to learn about the different methods and features your Bolt app has access to.
 
-* Explore the different events your bot can listen to with the [`events()` method](https://slack.dev/bolt#event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
+* Explore the different events your bot can listen to with the [`events()` method](/bolt-js/concepts#event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
 
-* Bolt allows you to [call Web API methods](https://slack.dev/bolt#web-api) with the client attached to your app. There are [over 130 methods](https://api.slack.com/methods) on our API site.
+* Bolt allows you to [call Web API methods](/bolt-js/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
 * Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform.
