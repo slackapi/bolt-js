@@ -35,14 +35,14 @@ app.action('approve_button', async ({ ack, say }) => {
 ```javascript
 // action_id が 'select_user' と一致し、block_id が 'assign_ticket' と一致する場合のみミドルウェアが呼び出される
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ action, ack, context }) => {
+  async ({ body, action, ack, context }) => {
     await ack();
     try {
       const result = await app.client.reactions.add({
         token: context.botToken,
         name: 'white_check_mark',
         timestamp: action.ts,
-        channel: action.channel.id
+        channel: body.channel.id
       });
     }
     catch (error) {
