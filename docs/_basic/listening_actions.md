@@ -35,14 +35,14 @@ You can use a constraints object to listen to `callback_id`s, `block_id`s, and `
 ```javascript
 // Your middleware will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ action, ack, context }) => {
+  async ({ body, action, ack, context }) => {
     await ack();
     try {
       const result = await app.client.reactions.add({
         token: context.botToken,
         name: 'white_check_mark',
         timestamp: action.ts,
-        channel: action.channel.id
+        channel: body.channel.id
       });
     }
     catch (error) {

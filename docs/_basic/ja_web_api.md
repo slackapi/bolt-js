@@ -21,7 +21,7 @@ app.message('wake me up', async ({ message, context }) => {
     const result = await app.client.chat.scheduleMessage({
       // アプリの初期化に用いたトークンを `context` オブジェクトに保存
       token: context.botToken,
-      channel: message.channel.id,
+      channel: message.channel,
       post_at: whenSeptemberEnds,
       text: 'Summer has come and passed'
     });

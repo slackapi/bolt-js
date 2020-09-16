@@ -28,6 +28,8 @@ app.action('button_abc', async ({ ack, body, client }) => {
     const result = await client.views.update({
       // Pass the view_id
       view_id: body.view.id,
+      // Pass the current hash to avoid race conditions
+      hash: body.view.hash,
       // View payload with updated blocks
       view: {
         type: 'modal',
