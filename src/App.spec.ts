@@ -9,6 +9,7 @@ import { ConversationStore } from './conversation-store';
 import { LogLevel } from '@slack/logger';
 import App, { ViewConstraints } from './App';
 import { WebClientOptions, WebClient } from '@slack/web-api';
+import { WorkflowStep } from './WorkflowStep';
 
 // TODO: swap out rewiremock for proxyquire to see if it saves execution time
 // Utility functions
@@ -556,6 +557,33 @@ describe('App', () => {
         assert.instanceOf(error, Error);
         assert(error.code === ErrorCode.MultipleListenerError);
         assert.sameMembers(error.originals, errorsToThrow);
+      });
+    });
+
+    describe('WorkflowStep middleware', () => {
+      let app: App;
+
+      beforeEach(async () => {
+        const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        app = new App({
+          receiver: fakeReceiver,
+          authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        });
+      });
+
+      it('should add a listener to middleware for each WorkflowStep passed to app.step', async () => {
+        const ws = new WorkflowStep('test_id', { edit: [], save: [], execute: [] });
+
+        /* middleware is a private property on App. Since app.step relies on app.use,
+        and app.use is fully tested above, we're opting just to ensure that the step listener
+        is added to the global middleware array, rather than repeating the same tests. */
+        const middleware = (app as any).middleware;
+
+        assert.equal(middleware.length, 2);
+
+        app.step(ws);
+
+        assert.equal(middleware.length, 3);
       });
     });
 
