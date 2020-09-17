@@ -21,7 +21,7 @@ app.message('wake me up', async ({ message, client }) => {
   try {
     // Call chat.scheduleMessage with the built-in client
     const result = await client.chat.scheduleMessage({
-      channel: message.channel.id,
+      channel: message.channel,
       post_at: whenSeptemberEnds,
       text: 'Summer has come and passed'
     });
