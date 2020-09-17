@@ -50,37 +50,53 @@ export interface StepFailArguments {
 }
 
 export interface StepConfigureFn {
-  (config: StepConfigureArguments): Promise<WebAPICallResult>;
+  (params: StepConfigureArguments): Promise<WebAPICallResult>;
 }
 
 export interface StepUpdateFn {
-  (config: StepUpdateArguments): Promise<WebAPICallResult>;
+  (params?: StepUpdateArguments): Promise<WebAPICallResult>;
 }
 
 export interface StepCompleteFn {
-  (config: StepCompleteArguments): Promise<WebAPICallResult>;
+  (params?: StepCompleteArguments): Promise<WebAPICallResult>;
 }
 
 export interface StepFailFn {
-  (config: StepFailArguments): Promise<WebAPICallResult>;
+  (params: StepFailArguments): Promise<WebAPICallResult>;
 }
 
-export interface WorkflowStepOptions {
+export interface WorkflowStepConfig {
   edit: WorkflowStepEditMiddleware | WorkflowStepEditMiddleware[];
   save: WorkflowStepSaveMiddleware | WorkflowStepSaveMiddleware[];
   execute: WorkflowStepExecuteMiddleware | WorkflowStepExecuteMiddleware[];
 }
 
+export interface WorkflowStepEditMiddlewareArgs extends SlackActionMiddlewareArgs<WorkflowStepEdit> {
+  step: WorkflowStepEdit['workflow_step'];
+  configure: StepConfigureFn;
+}
+
+export interface WorkflowStepSaveMiddlewareArgs extends SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction> {
+  step: ViewWorkflowStepSubmitAction['workflow_step'];
+  update: StepUpdateFn;
+}
+
+export interface WorkflowStepExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'workflow_step_execute'> {
+  step: WorkflowStepExecuteEvent['workflow_step'];
+  complete: StepCompleteFn;
+  fail: StepFailFn;
+}
+
 /** Types */
 
 export type SlackWorkflowStepMiddlewareArgs =
-  | SlackActionMiddlewareArgs<WorkflowStepEdit>
-  | SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>
-  | SlackEventMiddlewareArgs<'workflow_step_execute'>;
+  | WorkflowStepEditMiddlewareArgs
+  | WorkflowStepSaveMiddlewareArgs
+  | WorkflowStepExecuteMiddlewareArgs;
 
-export type WorkflowStepEditMiddleware = Middleware<SlackActionMiddlewareArgs<WorkflowStepEdit>>;
-export type WorkflowStepSaveMiddleware = Middleware<SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>>;
-export type WorkflowStepExecuteMiddleware = Middleware<SlackEventMiddlewareArgs<'workflow_step_execute'>>;
+export type WorkflowStepEditMiddleware = Middleware<WorkflowStepEditMiddlewareArgs>;
+export type WorkflowStepSaveMiddleware = Middleware<WorkflowStepSaveMiddlewareArgs>;
+export type WorkflowStepExecuteMiddleware = Middleware<WorkflowStepExecuteMiddlewareArgs>;
 
 export type WorkflowStepMiddleware =
   | WorkflowStepEditMiddleware[]
@@ -89,18 +105,7 @@ export type WorkflowStepMiddleware =
 
 export type AllWorkflowStepMiddlewareArgs<
   T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs
-> = T &
-  AllMiddlewareArgs & {
-    step: T extends SlackActionMiddlewareArgs<WorkflowStepEdit>
-      ? WorkflowStepEdit['workflow_step']
-      : T extends SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>
-      ? ViewWorkflowStepSubmitAction['workflow_step']
-      : WorkflowStepExecuteEvent['workflow_step'];
-    configure?: StepConfigureFn;
-    update?: StepUpdateFn;
-    complete?: StepCompleteFn;
-    fail?: StepFailFn;
-  };
+> = T & AllMiddlewareArgs;
 
 /** Constants */
 
@@ -121,7 +126,7 @@ export class WorkflowStep {
   /** Step Executed/Run :: 'workflow_step_execute' event */
   private execute: WorkflowStepExecuteMiddleware[];
 
-  constructor(callbackId: string, config: WorkflowStepOptions) {
+  constructor(callbackId: string, config: WorkflowStepConfig) {
     validate(callbackId, config);
 
     const { save, edit, execute } = config;
@@ -168,7 +173,7 @@ export class WorkflowStep {
 
 /** Helper Functions */
 
-export function validate(callbackId: string, config: WorkflowStepOptions): void {
+export function validate(callbackId: string, config: WorkflowStepConfig): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'WorkflowStep expects a callback_id as the first argument';
@@ -182,8 +187,8 @@ export function validate(callbackId: string, config: WorkflowStepOptions): void 
   }
 
   // Check for missing required keys
-  const requiredKeys: (keyof WorkflowStepOptions)[] = ['save', 'edit', 'execute'];
-  const missingKeys: (keyof WorkflowStepOptions)[] = [];
+  const requiredKeys: (keyof WorkflowStepConfig)[] = ['save', 'edit', 'execute'];
+  const missingKeys: (keyof WorkflowStepConfig)[] = [];
   requiredKeys.forEach((key) => {
     if (config[key] === undefined) {
       missingKeys.push(key);
@@ -196,7 +201,7 @@ export function validate(callbackId: string, config: WorkflowStepOptions): void 
   }
 
   // Ensure a callback or an array of callbacks is present
-  const requiredFns: (keyof WorkflowStepOptions)[] = ['save', 'edit', 'execute'];
+  const requiredFns: (keyof WorkflowStepConfig)[] = ['save', 'edit', 'execute'];
   requiredFns.forEach((fn) => {
     if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
       const errorMsg = `WorkflowStep ${fn} property must be a function or an array of functions`;
@@ -237,9 +242,7 @@ function selectToken(context: Context): string | undefined {
  * Factory for `configure()` utility
  * @param args workflow_step_edit action
  */
-function createStepConfigure(
-  args: AllWorkflowStepMiddlewareArgs<SlackActionMiddlewareArgs<WorkflowStepEdit>>,
-): StepConfigureFn {
+function createStepConfigure(args: AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>): StepConfigureFn {
   const {
     context,
     client,
@@ -247,14 +250,14 @@ function createStepConfigure(
   } = args;
   const token = selectToken(context);
 
-  return (config: Parameters<StepConfigureFn>[0]) => {
+  return (params: Parameters<StepConfigureFn>[0]) => {
     return client.views.open({
       token,
       trigger_id,
       view: {
         callback_id,
         type: 'workflow_step',
-        ...config,
+        ...params,
       },
     });
   };
@@ -264,9 +267,7 @@ function createStepConfigure(
  * Factory for `update()` utility
  * @param args view_submission event
  */
-function createStepUpdate(
-  args: AllWorkflowStepMiddlewareArgs<SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction>>,
-): StepUpdateFn {
+function createStepUpdate(args: AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>): StepUpdateFn {
   const {
     context,
     client,
@@ -276,11 +277,11 @@ function createStepUpdate(
   } = args;
   const token = selectToken(context);
 
-  return (config: Parameters<StepUpdateFn>[0] = {}) => {
+  return (params: Parameters<StepUpdateFn>[0] = {}) => {
     return client.workflows.updateStep({
       token,
       workflow_step_edit_id,
-      ...config,
+      ...params,
     });
   };
 }
@@ -289,9 +290,7 @@ function createStepUpdate(
  * Factory for `complete()` utility
  * @param args workflow_step_execute event
  */
-function createStepComplete(
-  args: AllWorkflowStepMiddlewareArgs<SlackEventMiddlewareArgs<'workflow_step_execute'>>,
-): StepCompleteFn {
+function createStepComplete(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>): StepCompleteFn {
   const {
     context,
     client,
@@ -301,11 +300,11 @@ function createStepComplete(
   } = args;
   const token = selectToken(context);
 
-  return (config: Parameters<StepCompleteFn>[0] = {}) => {
+  return (params: Parameters<StepCompleteFn>[0] = {}) => {
     return client.workflows.stepCompleted({
       token,
       workflow_step_execute_id,
-      ...config,
+      ...params,
     });
   };
 }
@@ -314,9 +313,7 @@ function createStepComplete(
  * Factory for `fail()` utility
  * @param args workflow_step_execute event
  */
-function createStepFail(
-  args: AllWorkflowStepMiddlewareArgs<SlackEventMiddlewareArgs<'workflow_step_execute'>>,
-): StepFailFn {
+function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>): StepFailFn {
   const {
     context,
     client,
@@ -326,12 +323,12 @@ function createStepFail(
   } = args;
   const token = selectToken(context);
 
-  return (config: Parameters<StepFailFn>[0]) => {
-    const { error } = config;
+  return (params: Parameters<StepFailFn>[0]) => {
+    const { error } = params;
     return client.workflows.stepFailed({
       token,
-      error,
       workflow_step_execute_id,
+      error,
     });
   };
 }
@@ -342,12 +339,10 @@ function createStepFail(
  *    - events will *not* continue down global middleware chain to subsequent listeners
  *  2. augments args with step lifecycle-specific properties/utilities
  * */
-export function prepareStepArgs(
-  args: SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs,
-): AllWorkflowStepMiddlewareArgs {
+// TODO :: refactor to incorporate a generic parameter
+export function prepareStepArgs(args: any): AllWorkflowStepMiddlewareArgs {
   const { next, ...stepArgs } = args;
-  // const preparedArgs: AllWorkflowStepMiddlewareArgs = { ...stepArgs };
-  const preparedArgs: any = { ...stepArgs }; // TODO :: remove any
+  const preparedArgs: any = { ...stepArgs };
 
   switch (preparedArgs.payload.type) {
     case 'workflow_step_edit':

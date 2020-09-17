@@ -7,7 +7,10 @@ import {
   SlackWorkflowStepMiddlewareArgs,
   AllWorkflowStepMiddlewareArgs,
   WorkflowStepMiddleware,
-  WorkflowStepOptions,
+  WorkflowStepConfig,
+  WorkflowStepEditMiddlewareArgs,
+  WorkflowStepSaveMiddlewareArgs,
+  WorkflowStepExecuteMiddlewareArgs,
 } from './WorkflowStep';
 import { Override } from './test-helpers';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, WorkflowStepEdit, Middleware } from './types';
@@ -105,8 +108,8 @@ describe('WorkflowStep', () => {
     it('should throw an error if config is not an object', async () => {
       const { validate } = await importWorkflowStep();
 
-      // intentionally casting to WorkflowStepOptions to trigger failure
-      const badConfig = ('' as unknown) as WorkflowStepOptions;
+      // intentionally casting to WorkflowStepConfig to trigger failure
+      const badConfig = ('' as unknown) as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'WorkflowStep expects a configuration object as the second argument';
@@ -116,10 +119,10 @@ describe('WorkflowStep', () => {
     it('should throw an error if required keys are missing', async () => {
       const { validate } = await importWorkflowStep();
 
-      // intentionally casting to WorkflowStepOptions to trigger failure
+      // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = ({
         edit: async () => {},
-      } as unknown) as WorkflowStepOptions;
+      } as unknown) as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'WorkflowStep is missing required keys: save, execute';
@@ -129,12 +132,12 @@ describe('WorkflowStep', () => {
     it('should throw an error if lifecycle props are not a single callback or an array of callbacks', async () => {
       const { validate } = await importWorkflowStep();
 
-      // intentionally casting to WorkflowStepOptions to trigger failure
+      // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = ({
         edit: async () => {},
         save: {},
         execute: async () => {},
-      } as unknown) as WorkflowStepOptions;
+      } as unknown) as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'WorkflowStep save property must be a function or an array of functions';
@@ -194,27 +197,30 @@ describe('WorkflowStep', () => {
     });
 
     it('should augment workflow_step_edit args with step and configure()', async () => {
-      const fakeArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeArgs = createFakeStepEditAction();
       const { prepareStepArgs } = await importWorkflowStep();
-      const stepArgs = prepareStepArgs(fakeArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const stepArgs = prepareStepArgs(fakeArgs) as AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>;
 
       assert.exists(stepArgs.step);
       assert.exists(stepArgs.configure);
     });
 
     it('should augment view_submission with step and update()', async () => {
-      const fakeArgs = (createFakeStepSaveEvent() as unknown) as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeArgs = createFakeStepSaveEvent();
       const { prepareStepArgs } = await importWorkflowStep();
-      const stepArgs = prepareStepArgs(fakeArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const stepArgs = prepareStepArgs(fakeArgs) as AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>;
 
       assert.exists(stepArgs.step);
       assert.exists(stepArgs.update);
     });
 
     it('should augment workflow_step_execute with step, complete() and fail()', async () => {
-      const fakeArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeArgs = createFakeStepExecuteEvent();
       const { prepareStepArgs } = await importWorkflowStep();
-      const stepArgs = prepareStepArgs(fakeArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const stepArgs = prepareStepArgs(fakeArgs) as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>;
 
       assert.exists(stepArgs.step);
       assert.exists(stepArgs.complete);
@@ -224,31 +230,35 @@ describe('WorkflowStep', () => {
 
   describe('step utility functions', () => {
     it('configure should call views.open', async () => {
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeEditArgs = (createFakeStepEditAction() as unknown) as AllWorkflowStepMiddlewareArgs;
 
       const fakeClient = { views: { open: sinon.spy() } };
       fakeEditArgs.client = (fakeClient as unknown) as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
-      const editStepArgs = prepareStepArgs(fakeEditArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const editStepArgs = prepareStepArgs(fakeEditArgs) as AllWorkflowStepMiddlewareArgs<
+        WorkflowStepEditMiddlewareArgs
+      >;
 
-      await editStepArgs.configure!({ blocks: [] });
+      await editStepArgs.configure({ blocks: [] });
 
       assert(fakeClient.views.open.called);
     });
 
     it('update should call workflows.updateStep', async () => {
-      const fakeSaveArgs = (createFakeStepSaveEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeSaveArgs = (createFakeStepSaveEvent() as unknown) as AllWorkflowStepMiddlewareArgs;
 
       const fakeClient = { workflows: { updateStep: sinon.spy() } };
       fakeSaveArgs.client = (fakeClient as unknown) as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
-      const saveStepArgs = prepareStepArgs(fakeSaveArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const saveStepArgs = prepareStepArgs(fakeSaveArgs) as AllWorkflowStepMiddlewareArgs<
+        WorkflowStepSaveMiddlewareArgs
+      >;
 
-      await saveStepArgs.update!({});
+      await saveStepArgs.update();
 
       assert(fakeClient.workflows.updateStep.called);
     });
@@ -261,9 +271,12 @@ describe('WorkflowStep', () => {
       fakeExecuteArgs.client = (fakeClient as unknown) as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
-      const executeStepArgs = prepareStepArgs(fakeExecuteArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const executeStepArgs = prepareStepArgs(fakeExecuteArgs) as AllWorkflowStepMiddlewareArgs<
+        WorkflowStepExecuteMiddlewareArgs
+      >;
 
-      await executeStepArgs.complete!({});
+      await executeStepArgs.complete();
 
       assert(fakeClient.workflows.stepCompleted.called);
     });
@@ -276,9 +289,12 @@ describe('WorkflowStep', () => {
       fakeExecuteArgs.client = (fakeClient as unknown) as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
-      const executeStepArgs = prepareStepArgs(fakeExecuteArgs);
+      // casting to returned type because prepareStepArgs isn't built to do so
+      const executeStepArgs = prepareStepArgs(fakeExecuteArgs) as AllWorkflowStepMiddlewareArgs<
+        WorkflowStepExecuteMiddlewareArgs
+      >;
 
-      await executeStepArgs.fail!({ error: { message: 'Failed' } });
+      await executeStepArgs.fail({ error: { message: 'Failed' } });
 
       assert(fakeClient.workflows.stepFailed.called);
     });

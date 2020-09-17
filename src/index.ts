@@ -25,7 +25,7 @@ export { ConversationStore, MemoryStore } from './conversation-store';
 
 export {
   WorkflowStep,
-  WorkflowStepOptions,
+  WorkflowStepConfig,
   WorkflowStepEditMiddleware,
   WorkflowStepSaveMiddleware,
   WorkflowStepExecuteMiddleware,
