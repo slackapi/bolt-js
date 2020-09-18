@@ -35,12 +35,21 @@ Perfect! Now that we have the app, let's move onto preparing it for Heroku.
 
 ### Prepare the app for Heroku
 
-Heroku is a flexible platform that uses a few conventions to understand how to host your app.
+Heroku is a flexible platform that uses a few conventions to understand how to host your app. In this section, we'll update your app to be compatible with Heroku.
 
-- Track your app in a Git repository `<details>`
-- Add a Heroku Git remote
-- Add a Procfile
-- Existing apps should review https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment
+**1. Add a Procfile**
+
+Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. You can now create a new file called `Procfile` (without any extension) and add the following code:
+
+```yaml
+web: node app.js
+```
+
+**2. A few extra steps for existing apps**
+
+Are you following this guide with an existing app that you created? If so, please read about [preparing a codebase for Heroku guide](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port). The guide will help you setup a Git repository, listen on the correct port, and think about provisioning data storage.
+
+We're done preparing your app for Heroku! Now we can setup the Heroku tools on your local machine.
 
 ---
 
