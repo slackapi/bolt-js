@@ -11,7 +11,7 @@ redirect_from:
 # Deploying to Heroku
 
 <div class="section-content">
-This guide is meant to walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) to the [Heroku cloud platform](https://heroku.com/). Along the way, we’ll download the [Getting Started app](/bolt-js/tutorials/getting-started), prepare it for Heroku, create a Heroku instance, and deploy the app.
+This guide is meant to walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) to the [Heroku platform](https://heroku.com/). Along the way, we’ll download regular Bolt Slack app, prepare it for Heroku, and deploy it on your Heroku account.
 </div>
 
 ---
