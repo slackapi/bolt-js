@@ -18,16 +18,16 @@ This guide is meant to walk you through preparing and deploying a Slack app usin
 
 ### Get a Bolt Slack app
 
-Let's get started! We're going to use the app that you created in the [Getting Started](/bolt-js/tutorials/getting_started) to learn how to prepare and deploy an app to Heroku.
+Let's get started! We're going to use the app that you created in the [Getting Started with Bolt for JavaScript](/bolt-js/tutorials/getting_started) guide. It's a regular Bolt Slack app that we use to learn how to prepare and deploy an app to Heroku.
 
-Let's start by getting a fresh copy of the _Getting Started_ app:
+Get a fresh copy of the _Getting Started with Bolt for JavaScript_ app:
 
 ```shell
-git clone https://github.com/mwbrooks/bolt-js-getting-started-app.git
+git clone https://github.com/slackapi/bolt-js-getting-started-app.git
 cd bolt-js-getting-started-app/
 ```
 
-> 💡 If you have an existing Bolt Slack app that you want to deploy, you can also follow along as well.
+> 💡 You can also follow along with an existing Bolt app.
 
 Perfect! Now that we have the app, let's move onto preparing it for Heroku.
 
