@@ -11,8 +11,36 @@ redirect_from:
 # Deploying to Heroku
 
 <div class="section-content">
-This guide is meant to walk you through preparing and deploying a Slack app using Bolt for JavaScript to the [Heroku cloud platform](https://heroku.com/). Along the way, we’ll download the [Getting Started app](/bolt-js/tutorials/getting-started), prepare it for Heroku, create a Heroku instance, and deploy the app.
+This guide is meant to walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) to the [Heroku cloud platform](https://heroku.com/). Along the way, we’ll download the [Getting Started app](/bolt-js/tutorials/getting-started), prepare it for Heroku, create a Heroku instance, and deploy the app.
 </div>
+
+---
+
+### Get a Bolt Slack app
+
+Let's get started! We're going to use the app that you created in the [Getting Started](/bolt-js/tutorials/getting_started) to learn how to prepare and deploy an app to Heroku.
+
+Let's start by getting a fresh copy of the _Getting Started_ app:
+
+```shell
+git clone https://github.com/mwbrooks/bolt-js-getting-started-app.git
+cd bolt-js-getting-started-app/
+```
+
+> 💡 If you have an existing Bolt Slack app that you want to deploy, you can also follow along as well.
+
+Perfect! Now that we have the app, let's move onto preparing it for Heroku.
+
+---
+
+### Prepare the app for Heroku
+
+Heroku is a flexible platform that uses a few conventions to understand how to host your app.
+
+- Track your app in a Git repository `<details>`
+- Add a Heroku Git remote
+- Add a Procfile
+- Existing apps should review https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment
 
 ---
 
@@ -62,34 +90,6 @@ heroku create
 ```
 
 When the app is created, Heroku will also create a git remote repository.
-
----
-
-### Get the Bolt Slack app
-
-We're going to use the app that you created in the [Getting Started](/bolt-js/tutorials/getting_started) to learn how to prepare and deploy an app to Heroku.
-
-> 💡 If you have an existing Bolt Slack app that you want to deploy, you should be able to follow along as well.
-
-Let's start by getting a fresh copy of the _Getting Started_ app:
-
-```shell
-git clone https://github.com/mwbrooks/bolt-js-getting-started-app.git
-cd bolt-js-getting-started-app/
-```
-
-Perfect! Now that we have the app, let's move onto preparing it for Heroku.
-
----
-
-### Prepare the app for Heroku
-
-Heroku is a flexible platform that uses a few conventions to understand how to host your app.
-
-- Track your app in a Git repository `<details>`
-- Add a Heroku Git remote
-- Add a Procfile
-- Existing apps should review https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment
 
 ---
 
