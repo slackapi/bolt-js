@@ -18,8 +18,15 @@ After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind 
 </div>
 
 ```javascript
-const { WorkflowStep } = require('@slack/bolt');
+const { App, WorkflowStep } = require('@slack/bolt');
 
+// Initiate the Bolt app as you normally would
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN,
+});
+
+// Create a new WorkflowStep instance
 const ws = new WorkflowStep('add_task', {
   edit: async ({ ack, step, configure }) => {},
   save: async ({ ack, step, update }) => {},
