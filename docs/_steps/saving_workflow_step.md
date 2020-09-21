@@ -23,7 +23,7 @@ To learn more about how to structure these parameters, [read the documentation](
 ```javascript
 const ws = new WorkflowStep('add_task', {
   edit: async ({ ack, step, configure }) => {},
-  save: async ({ ack, step, update }) => {
+  save: async ({ ack, step, view, update }) => {
     await ack();
 
     const { values } = view.state;
@@ -31,8 +31,8 @@ const ws = new WorkflowStep('add_task', {
     const taskDescription = values.task_description_input.description;
                 
     const inputs = {
-      taskName: { value: taskName },
-      taskDescription: { value: taskDescription }
+      taskName: { value: taskName.value },
+      taskDescription: { value: taskDescription.value }
     };
 
     const outputs = [

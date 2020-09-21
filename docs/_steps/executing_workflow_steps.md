@@ -23,8 +23,8 @@ const ws = new WorkflowStep('add_task', {
     const { inputs } = step;
 
     const outputs = {
-      taskName: inputs.taskName.value.value,
-      taskDescription: inputs.taskDescription.value.value,
+      taskName: inputs.taskName.value,
+      taskDescription: inputs.taskDescription.value,
     };
 
     // if everything was successful
