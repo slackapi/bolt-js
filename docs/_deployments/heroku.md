@@ -11,53 +11,75 @@ redirect_from:
 # Deploying to Heroku
 
 <div class="section-content">
-This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) to the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it online.
+This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 </div>
 
 ---
 
 ### Get a Bolt Slack app
 
-Let's get started! We're going to use the app that you created in the [Getting Started with Bolt for JavaScript](/bolt-js/tutorials/getting_started) guide. It's a regular Bolt Slack app that we use to learn how to prepare and deploy an app to Heroku.
+We'll continue from the [Getting Started with Bolt for JavaScript](/bolt-js/tutorials/getting_started) guide to learn how to prepare and deploy the Getting Started app to Heroku.
 
-Get a fresh copy of the Getting Started app:
+Download the Getting Started app and change into its directory:
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
 cd bolt-js-getting-started-app/
 ```
 
-> 💡 You can also follow along with an existing Bolt app but there may be a few extra steps to do.
+> 💡 You also can follow along with an existing Bolt app and we'll mention any extra steps that are needed.
 
-Perfect! Now that we have the app, let's move onto preparing it for Heroku.
+Now that you have the app, let's prepare it for Heroku.
 
 ---
 
 ### Prepare the app for Heroku
 
-Heroku is a flexible platform that uses a few conventions to understand how to host your app. In this section, we'll update your app to be compatible with Heroku.
+Heroku is a flexible platform that uses a few conventions to understand how to host your app. In this section, we'll update your app to use those conventions.
 
-**1. Add a Procfile**
+**1. Use a Git repository**
 
-Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. You can now create a new file called `Procfile` (without any extension) and add the following code:
+Before you can deploy your app to Heroku, you need to [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), initialize a local Git repository, and commit your code to it.
+
+> 💡 You can skip this step if you Git cloned the Getting Started app in the previous section.
+
+To initialize a local Git repository, run the command:
+
+```shell
+git init
+```
+
+Now add your code and commit it to the repository:
+
+```shell
+git add .
+git commit -m "Initial commit"
+```
+
+**2. Add a Procfile**
+
+Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. You can now create a new file called `Procfile` (without any extension) with the following code:
 
 ```yaml
 web: node app.js
 ```
 
-<!-- Add Git init instructions -->
+Once you've saved the file, let's commit it to your Git repository:
 
-**2. A few extra steps for existing apps**
+```shell
+git add Procfile
+git commit -m "Add Procfile"
+```
 
-Are you following this guide with an existing app that you created? If so, please read about [preparing a codebase for Heroku guide](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port). The guide will help you setup a Git repository, listen on the correct port, and think about provisioning data storage.
+**3. Extra steps for existing apps**
 
-We're done preparing your app for Heroku! Now we can setup the Heroku tools on your local machine.
+Are you following this guide with an existing app that you created? If so, please review [preparing a codebase for Heroku](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port) to listen on the correct port and think about data storage provisioning.
 
 ---
 
 ### Setup the Heroku tools
 
-Now we can set up the Heroku tools on your local machine. The tools will help you manage, deploy, and debug your app on the Heroku platform.
+Now we can set up the Heroku tools on your local machine. These tools will help you manage, deploy, and debug your app on Heroku's platform.
 
 **1. Install the Heroku CLI**
 
@@ -77,7 +99,7 @@ heroku help
 
 **2. Log into the Heroku CLI**
 
-The Heroku CLI connects your local machine with your Heroku account so that you can create and manage apps. You can now [sign up for a free Heroku account](https://heroku.com) and then log into the Heroku CLI with the command:
+The Heroku CLI connects your local machine with your Heroku account. [Sign up for a free Heroku account](https://heroku.com) and then log into the Heroku CLI with the following command:
 
 ```shell
 heroku login
@@ -86,41 +108,50 @@ heroku login
 
 **3. Confirm you're logged into the Heroku CLI**
 
-Lastly, let's double-check that you're logged in by displaying the account that's currently connected to your Heroku CLI:
+Let's check that you're logged in by displaying the account currently connected to your Heroku CLI:
 
 ```shell
 heroku auth:whoami
-# Output: <your Heroku account>
 ```
 
-You're all setup with the Heroku tools! Now let's move onto the exciting step of creating a instance in the Heroku cloud.
+You're all setup with the Heroku tools! Now let's move onto the exciting step of creating an app on Heroku.
 
 ---
 
 ### Create an app on Heroku
 
-Now we can create an app on the Heroku platform. An app can be created and managed in a couple of ways, including the [Heroku App Dashboard](https://dashboard.heroku.com/) or [Heroku CLI](https://devcenter.heroku.com/articles/creating-apps). In this guide, we'll create an app using the Heroku CLI.
+It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed.
 
-You can create an app using the Heroku CLI with the command:
+When you create an app, you can choose a unique name or have Heroku generate a random one.
 
-```shell
-heroku create my-bolt-app-name
-# or, just 'heroku create' to use a random name
-```
+> 💡 You can [rename a Heroku app](https://devcenter.heroku.com/articles/renaming-apps) at any time, but you may need to update your Git remote and app URL.
 
-> 💡 You can [rename your Heroku app](https://devcenter.heroku.com/articles/renaming-apps) at any time, but you may need to update your Git remotes and app URLs.
-
-When the app creation is complete, the Heroku CLI will magically add a Git remote called `heroku` that's associated with your Heroku app's remote repository.
-
-We'll learn more about the Git remote when we deploy your app, but you can view your local Git remotes with the command:
+Create an app on Heroku with a unique name:
 
 ```shell
-git remote
-# main (or master)
-# heroku
+heroku create my-unique-bolt-app-name
 ```
 
-Now that we have prepared your local app and created a Heroku app, the next step is to deploy it online!
+or, have some fun with a random name:
+
+```shell
+heroku create
+# Creating sharp-rain-871... done, stack is heroku-18
+# https://sharp-rain-871.herokuapp.com/ | https://git.heroku.com/sharp-rain-871.git
+# Git remote heroku added
+```
+
+After your app is created, there are a few things that are worth your attention. In the example above, the app is named `sharp-rain-871`, the web address is `https://sharp-rain-871.herokuapp.com/`, and Heroku initialized an empty Git repository at `https://git.heroku.com/sharp-rain-871.git`.
+
+The Heroku CLI automatically adds a Git remote called `heroku` to your local repository. You can view your Git remotes to confirm `heroku` exists:
+
+```shell
+git remote -v
+# heroku	https://git.heroku.com/sharp-rain-871.git (fetch)
+# heroku	https://git.heroku.com/sharp-rain-871.git (push)
+```
+
+Now that we have prepared your local app and created a Heroku app, the next step is to deploy it!
 
 ---
 
