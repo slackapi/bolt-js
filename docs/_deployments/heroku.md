@@ -126,6 +126,8 @@ It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creat
 
 > 💡 You can [rename a Heroku app](https://devcenter.heroku.com/articles/renaming-apps) at any time, but you may need to update your Git remote and app URL.
 
+**1. Create an app on Heroku**
+
 Create an app on Heroku with a unique name:
 
 ```shell
@@ -147,6 +149,8 @@ After your app is created, there are a few things worth your attention:
 - Web address is `https://sharp-rain-871.herokuapp.com/`
 - Empty Git remote is `https://git.heroku.com/sharp-rain-871.git`
 
+**2. Confirm Heroku Git remote**
+
 The Heroku CLI automatically adds a Git remote called `heroku` to your local repository. You can list your Git remotes to confirm `heroku` exists:
 
 ```shell
@@ -155,7 +159,14 @@ git remote -v
 # heroku	https://git.heroku.com/sharp-rain-871.git (push)
 ```
 
-<!-- TODO - set ENV variables -->
+**3. Set environment variables on Heroku**
+
+In the Getting Started guide, you [exported your signing secret and token](http://localhost:4000/bolt-js/tutorial/getting-started#tokens-and-installing-apps) as environment variables. Now we need to set the same environment variables in your Heroku app:
+
+```shell
+heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
+heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
+```
 
 Now that we have prepared your local app and created a Heroku app, the next step is to deploy it!
 
