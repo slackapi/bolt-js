@@ -41,9 +41,9 @@ Heroku is a flexible platform that uses a few conventions to understand how to h
 
 Before you can deploy your app to Heroku, you need to [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), initialize a local Git repository, and commit your code to it.
 
-> 💡 You can skip this step if you Git cloned the Getting Started app in the previous section.
+> 💡 Skip this step if you used `git clone` in the previous section because you already have a Git repository.
 
-To initialize a local Git repository, run the command:
+To initialize a local Git repository and run the command:
 
 ```shell
 git init
@@ -58,7 +58,9 @@ git commit -m "Initial commit"
 
 **2. Add a Procfile**
 
-Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. You can now create a new file called `Procfile` (without any extension) with the following code:
+Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. A Bolt Slack app will be started as a web server with a public web address.
+
+Create a new file called `Procfile` (without any extension) in your app's root directory with the following code:
 
 ```yaml
 web: node app.js
@@ -89,13 +91,13 @@ The Heroku tools are available as a Command Line Interface (CLI). Go ahead and [
 brew install heroku/brew/heroku
 ```
 
-Once the install is complete, we can test the Heroku CLI by displaying the available commands:
+Once the install is complete, we can test the Heroku CLI by displaying all of the wonderful commands available to you:
 
 ```shell
 heroku help
 ```
 
-> 💡 If the `heroku` command is not found, you can update your path by opening a new terminal session/tab.
+> 💡 If the `heroku` command is not found, you can refresh your path by opening a new terminal session/tab.
 
 **2. Log into the Heroku CLI**
 
@@ -120,9 +122,7 @@ You're all setup with the Heroku tools! Now let's move onto the exciting step of
 
 ### Create an app on Heroku
 
-It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed.
-
-When you create an app, you can choose a unique name or have Heroku generate a random one.
+It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
 
 > 💡 You can [rename a Heroku app](https://devcenter.heroku.com/articles/renaming-apps) at any time, but you may need to update your Git remote and app URL.
 
@@ -141,9 +141,13 @@ heroku create
 # Git remote heroku added
 ```
 
-After your app is created, there are a few things that are worth your attention. In the example above, the app is named `sharp-rain-871`, the web address is `https://sharp-rain-871.herokuapp.com/`, and Heroku initialized an empty Git repository at `https://git.heroku.com/sharp-rain-871.git`.
+After your app is created, there are a few things worth your attention:
 
-The Heroku CLI automatically adds a Git remote called `heroku` to your local repository. You can view your Git remotes to confirm `heroku` exists:
+- App name is `sharp-rain-871`
+- Web address is `https://sharp-rain-871.herokuapp.com/`
+- Empty Git remote is `https://git.heroku.com/sharp-rain-871.git`
+
+The Heroku CLI automatically adds a Git remote called `heroku` to your local repository. You can list your Git remotes to confirm `heroku` exists:
 
 ```shell
 git remote -v
@@ -151,15 +155,17 @@ git remote -v
 # heroku	https://git.heroku.com/sharp-rain-871.git (push)
 ```
 
+<!-- TODO - set ENV variables -->
+
 Now that we have prepared your local app and created a Heroku app, the next step is to deploy it!
 
 ---
 
 ### Deploy the app
 
-To deploy the app, we're going to push your app to a Heroku web server, update your Slack app's settings and then say "hello" to your brand new Heroku app. ✨
+To deploy the app, we're going to push your local code to Heroku, update your Slack app's settings, and say "hello" to your Heroku app. ✨
 
-**1. Deploy to a Heroku web server**
+**1. Deploy the app to Heroku**
 
 When deploying an app to Heroku, you'll typically use the `git push` command. This will push your code from your local repository to your `heroku` remote repository.
 
@@ -179,10 +185,11 @@ heroku ps:scale web=1
 
 **2. Update your Slack app's setting**
 
-Back in the [Getting Started guide][getting-started-guide], you used ngrok to receive HTTP requests for events and interactivity. Now that your app is on Heroku, we need to update the **Request URLs** to be your Heroku app's web address.
+In the [Getting Started guide][getting-started-guide], we used ngrok as your **Request URL** for actions and events. Now we need to use your Heroku web address.
 
 You can update the **Request URL** with the following steps:
 
+<!-- TODO - Improve these steps and replace xxx -->
 1. Browse to your [Slack Apps page](https://api.slack.com/apps)
 1. Select your app
 1. Select **Interactivity & Shortcuts** from the side bar
@@ -192,15 +199,18 @@ You can update the **Request URL** with the following steps:
 
 **3. Test your Slack app**
 
-It's time test your Slack app by saying "hello" (lower-case) in a channel that your app has joined. Just like in the [Getting Started guide](https://slack.dev/bolt-js/tutorial/getting-started#sending-and-responding-to-actions), your app should respond.
+Your app is now deployed and Slack is updated, so let's try it out!
+
+Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](https://slack.dev/bolt-js/tutorial/getting-started#sending-and-responding-to-actions), your app should respond back.
 
 ---
 
 ### Deploying an update
 
-As you build your Slack app, you'll want to continue deploying updates to Heroku. The common steps are to make a change, commit it to Git, and then push it to Heroku.
+As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
-Let's update your your app to respond to "goodbye" by adding the following code to `app.js` ([source code on GitHub](https://github.com)):
+<!-- TODO - Update GitHub link -->
+Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com)):
 
 ```javascript
 // Listens to incoming messages that contain "goodbye"
@@ -222,17 +232,22 @@ Deploy the update by pushing to your `heroku` remote:
 git push heroku main
 ```
 
-When the deploy is complete, you can open a Slack channel that your app has joined and say "goodbye" (lower-case). You should see a friendly goodbye from your Slack app:
-
-> See ya later, Michael 👋
+When the deploy is complete, you can open a Slack channel that your app has joined and say "goodbye" (lower-case). You should see a friendly farewell from your Slack app.
 
 ---
 
 ### Next steps
 
-- Heroku free plan limitations
-- Deploying to Heroku with OAuth
-- Heroku official next steps
+You just deployed your first Bolt for JavaScript app to Heroku! 🚀
+
+Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
+
+- Brush up on important terminology and [How Heroku Works](https://devcenter.heroku.com/articles/free-dyno-hours).
+- Understand the [limitations of a free Heroku app](https://devcenter.heroku.com/articles/free-dyno-hours).
+- Learn how to [view the log messages](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
+- Browse through [add-ons to extend your app](https://elements.heroku.com/addons).
+- Get ready to primetime with [how to scale the app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
+
 <!-- Gotchas -->
 <!-- Deploying Heroku with OAuth -->
 
