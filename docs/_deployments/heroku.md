@@ -198,15 +198,29 @@ heroku ps:scale web=1
 
 In the [Getting Started guide][getting-started-guide], we used ngrok as your **Request URL** for actions and events. Now we need to use your Heroku web address.
 
-You can update the **Request URL** with the following steps:
+Get your Heroku web address with the following command:
 
-<!-- TODO - Improve these steps and replace xxx -->
-1. Browse to your [Slack Apps page](https://api.slack.com/apps)
-1. Select your app
-1. Select **Interactivity & Shortcuts** from the side bar
-  - Update the **Request URL** to xxx
-1. Select **Event Subscriptions** from the side bar
-  - Update the **Request URL** to xxx
+```shell
+heroku info
+# ...
+# Web URL: https://sharp-rain-871.herokuapp.com/
+```
+
+In our example, the web address is `https://sharp-rain-871.herokuapp.com/`.
+
+Now browse to the [Slack App page](https://api.slack.com/apps) and select your app name. Next, we'll update your **Request URL** in two locations to be your web address.
+
+> 💡 Your **Request URL** ends with `/slack/events`, such as `https://sharp-rain-871.herokuapp.com/slack/events`.
+
+First, select **Interativity & Shortcuts** from the side and update the **Request URL**:
+
+![Interactivity & Shortcuts page](../assets/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
+
+Second, select **Event Subscriptionss** from the side and update the **Request URL**:
+
+![Event Subscriptions page](../assets/event-subscriptions-page.png "Event Subscriptions page")
+
+> 💡 Free Heroku apps sleep when inactive. 💤 If your verification fails, please ensure try it again immediately.
 
 **3. Test your Slack app**
 
