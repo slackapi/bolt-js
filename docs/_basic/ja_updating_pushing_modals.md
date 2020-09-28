@@ -28,6 +28,8 @@ app.action('button_abc', async ({ ack, body, client }) => {
     const result = await client.views.update({
       // リクエストに含まれる view_id を渡す
       view_id: body.view.id,
+      // 競合状態を防ぐために更新前の view に含まれる hash を指定
+      hash: body.view.hash,
       // 更新された view の値をペイロードに含む
       view: {
         type: 'modal',
