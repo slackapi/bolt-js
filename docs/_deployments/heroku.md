@@ -14,6 +14,8 @@ redirect_from:
 This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 </div>
 
+When you’re finished, you’ll have this ⚡️[Getting Started with Heroku app](https://github.com/slackapi/bolt-js-getting-started-with-heroku-app) to run, modify, and make your own.
+
 ---
 
 ### Get a Bolt Slack app
@@ -263,7 +265,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ### Next steps
 
-You just deployed your first Bolt for JavaScript app to Heroku! 🚀
+You just deployed your first ⚡️[Bolt for JavaScript app to Heroku](https://github.com/slackapi/bolt-js-getting-started-with-heroku-app)! 🚀
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
@@ -273,7 +275,6 @@ Now that you've deployed a basic app, you can start exploring how to customize a
 - Browse through [add-ons to extend your app](https://elements.heroku.com/addons).
 - Get ready to primetime with [how to scale the app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
 
-<!-- Gotchas -->
-<!-- Deploying Heroku with OAuth -->
+<!-- Add deploying Heroku with OAuth -->
 
 [getting-started-guide]: https://slack.dev/bolt-js/tutorial/getting-started
