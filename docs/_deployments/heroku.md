@@ -18,7 +18,7 @@ This guide will walk you through preparing and deploying a Slack app using [Bolt
 
 ### Get a Bolt Slack app
 
-We'll continue from the [Getting Started with Bolt for JavaScript](/bolt-js/tutorials/getting_started) guide to learn how to prepare and deploy the Getting Started app to Heroku.
+We'll continue from [Getting Started with Bolt for JavaScript](/bolt-js/tutorials/getting_started) to learn how to prepare and deploy the Getting Started app to Heroku.
 
 Download the Getting Started app and change into its directory:
 
@@ -60,7 +60,7 @@ git commit -m "Initial commit"
 
 Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. A Bolt Slack app will be started as a web server with a public web address.
 
-Create a new file called `Procfile` (without any extension) in your app's root directory with the following code:
+Create a new file called `Procfile` (without any extension) in your app's root directory with the following content:
 
 ```yaml
 web: node app.js
@@ -188,7 +188,7 @@ git push heroku main
 
 > 💡 Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches does nothing.
 
-Now that your code is deployed, we need to start a web server instance using the command:
+Now that your code is deployed, we need to start a web server instance using the Heroku CLI:
 
 ```shell
 heroku ps:scale web=1
@@ -216,11 +216,11 @@ First, select **Interativity & Shortcuts** from the side and update the **Reques
 
 ![Interactivity & Shortcuts page](../assets/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
 
-Second, select **Event Subscriptionss** from the side and update the **Request URL**:
+Second, select **Event Subscriptions** from the side and update the **Request URL**:
 
 ![Event Subscriptions page](../assets/event-subscriptions-page.png "Event Subscriptions page")
 
-> 💡 Free Heroku apps sleep when inactive. 💤 If your verification fails, please ensure try it again immediately.
+> 💡 Free Heroku apps sleep when inactive. 💤 If your verification fails, please try it again immediately.
 
 **3. Test your Slack app**
 
@@ -230,12 +230,12 @@ Open a Slack channel that your app has joined and say "hello" (lower-case). Just
 
 ---
 
-### Deploying an update
+### Deploy an update
 
 As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
 <!-- TODO - Update GitHub link -->
-Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com)):
+Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com/slackapi/bolt-js-getting-started-app/blob/master/app.js)):
 
 ```javascript
 // Listens to incoming messages that contain "goodbye"
@@ -267,9 +267,9 @@ You just deployed your first Bolt for JavaScript app to Heroku! 🚀
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
-- Brush up on important terminology and [How Heroku Works](https://devcenter.heroku.com/articles/free-dyno-hours).
+- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works).
 - Understand the [limitations of a free Heroku app](https://devcenter.heroku.com/articles/free-dyno-hours).
-- Learn how to [view the log messages](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
+- Learn how to [view your log messages](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
 - Browse through [add-ons to extend your app](https://elements.heroku.com/addons).
 - Get ready to primetime with [how to scale the app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
 
