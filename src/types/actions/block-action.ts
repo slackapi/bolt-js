@@ -172,7 +172,7 @@ export interface OverflowAction extends BasicElementAction<'overflow'> {
  * An action from a date picker element
  */
 export interface DatepickerAction extends BasicElementAction<'datepicker'> {
-  selected_date: string;
+  selected_date: string | null;
   initial_date?: string;
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
@@ -182,7 +182,7 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
  * An action from a radio button element
  */
 export interface RadioButtonsAction extends BasicElementAction<'radio_buttons'> {
-  selected_option: Option;
+  selected_option: Option | null;
   initial_option?: Option;
   confirm?: Confirmation;
 }
