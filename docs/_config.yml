@@ -15,7 +15,7 @@ collections:
     output: false
   steps:
     output: false
-  deployments:
+  deploying:
     output: true
   tutorials:
     output: true
@@ -36,7 +36,7 @@ t:
     advanced: Advanced concepts
     start: Getting started
     steps: Workflow steps
-    deployments: Deploying
+    deploying: Deploying
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念
@@ -45,7 +45,7 @@ t:
     # TODO: translate this title
     steps: Workflow steps
     # TODO: translate this title
-    deployments: Deploying
+    deploying: Deploying
     contribute: 貢献
 
 # Metadata
