@@ -20,7 +20,7 @@ When you’re finished, you’ll have this ⚡️[Getting Started with Heroku ap
 
 ### Get a Bolt Slack app
 
-We'll continue from [Getting Started with Bolt for JavaScript][getting-started-guide] to learn how to prepare and deploy the Getting Started app to Heroku.
+We'll continue from [Getting Started with Bolt for JavaScript][getting-started-guide] to learn how to prepare and deploy a Slack app to Heroku.
 
 Download the Getting Started app and change into its directory:
 
@@ -142,7 +142,6 @@ or, have some fun with a random name:
 heroku create
 # Creating sharp-rain-871... done, stack is heroku-18
 # https://sharp-rain-871.herokuapp.com/ | https://git.heroku.com/sharp-rain-871.git
-# Git remote heroku added
 ```
 
 After your app is created, there are a few things worth your attention:
