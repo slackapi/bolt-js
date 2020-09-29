@@ -1,9 +1,11 @@
 export * from './block-action';
 export * from './interactive-message';
 export * from './dialog-action';
+export * from './workflow-step-edit';
 
 import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';
+import { WorkflowStepEdit } from './workflow-step-edit';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
 
@@ -21,7 +23,7 @@ import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
  * offered when no generic parameter is bound would be limited to BasicElementAction rather than the union of known
  * actions - ElementAction.
  */
-export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction;
+export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | WorkflowStepEdit;
 
 /**
  * Arguments which listeners and middleware receive to process an action from Slack's Block Kit interactive components,
@@ -40,7 +42,7 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
   action: this['payload'];
   body: Action;
   // all action types except dialog submission have a channel context
-  say: Action extends Exclude<SlackAction, DialogSubmitAction> ? SayFn : never;
+  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : never;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
 }

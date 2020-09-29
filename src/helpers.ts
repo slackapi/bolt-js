@@ -53,7 +53,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       conversationId: optionsBody.channel !== undefined ? optionsBody.channel.id : undefined,
     };
   }
-  if (body.actions !== undefined || body.type === 'dialog_submission') {
+  if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'workflow_step_edit') {
     const actionBody = body as SlackActionMiddlewareArgs<SlackAction>['body'];
     return {
       type: IncomingEventType.Action,

@@ -2,30 +2,36 @@
 title: Executing workflow steps
 lang: en
 slug: executing-steps
-order: 3
-beta: true
+order: 5
 ---
 
 <div class="section-content">
 
-When your workflow is executed by an end user, your app will receive a `workflow_step_execute` event. This event includes the user's `inputs` and a unique workflow execution ID. Your app must either call [`workflows.stepCompleted`](https://api.slack.com/methods/workflows.stepCompleted) with the `outputs` you specified in `workflows.updateStep`, or [`workflows.stepFailed`](https://api.slack.com/methods/workflows.stepFailed) to indicate the step failed.
+When your workflow step is executed by an end user, your app will receive a [`workflow_step_execute` event](https://api.slack.com/events/workflow_step_execute). The `execute` callback in your `WorkflowStep` configuration will be run when this event is received.
+
+Using the `inputs` from the `save` callback, this is where you can make third-party API calls, save information to a database, update the user's Home tab, or decide the outputs that will be available to subsequent workflow steps by mapping values to the `outputs` object.
+
+Within the `execute` callback, your app must either call `complete()` to indicate that the step's execution was successful, or `fail()` to indicate that the step's execution failed.
+
 </div>
 
 ```javascript
-app.event('workflow_step_execute', async ({ event, client }) => {
-  // Unique workflow edit ID
-  let workflowExecuteId = event.workflow_step.workflow_step_execute_id;
-  let inputs = event.workflow_step.inputs;
+const ws = new WorkflowStep('add_task', {
+  edit: async ({ ack, step, configure }) => {},
+  save: async ({ ack, step, update }) => {},
+  execute: async ({ step, complete, fail }) => {
+    const { inputs } = step;
 
-  await client.workflows.stepCompleted({
-    workflow_step_execute_id: workflowExecuteId,
-    outputs: {
+    const outputs = {
       taskName: inputs.taskName.value,
-      taskDescription: inputs.taskDescription.value
-    }
-  });
-  
-  // You can do anything else you want here. Some ideas:
-  // Display results on the user's home tab, update your database, or send a message into a channel
+      taskDescription: inputs.taskDescription.value,
+    };
+
+    // if everything was successful
+    await complete({ outputs });
+
+    // if something went wrong
+    // fail({ error: { message: "Just testing step failure!" } });
+  },
 });
 ```

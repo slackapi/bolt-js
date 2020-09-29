@@ -24,6 +24,14 @@ export * from './types';
 export { ConversationStore, MemoryStore } from './conversation-store';
 
 export {
+  WorkflowStep,
+  WorkflowStepConfig,
+  WorkflowStepEditMiddleware,
+  WorkflowStepSaveMiddleware,
+  WorkflowStepExecuteMiddleware,
+} from './WorkflowStep';
+
+export {
   Installation,
   InstallURLOptions,
   InstallationQuery,

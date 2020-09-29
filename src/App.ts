@@ -21,6 +21,7 @@ import {
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
+import { WorkflowStep } from './WorkflowStep';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -307,6 +308,17 @@ export default class App {
    * @param m global middleware function
    */
   public use(m: Middleware<AnyMiddlewareArgs>): this {
+    this.middleware.push(m);
+    return this;
+  }
+
+  /**
+   * Register WorkflowStep middleware
+   *
+   * @param workflowStep global workflow step middleware function
+   */
+  public step(workflowStep: WorkflowStep): this {
+    const m = workflowStep.getMiddleware();
     this.middleware.push(m);
     return this;
   }
