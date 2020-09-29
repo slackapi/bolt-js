@@ -14,18 +14,18 @@ redirect_from:
 This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 </div>
 
-When you’re finished, you’ll have this ⚡️[Getting Started with Heroku app](https://github.com/slackapi/bolt-js-getting-started-with-heroku-app) to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Getting Started with Heroku app](https://github.com/mwbrooks/bolt-js-getting-started-with-heroku-app) to run, modify, and make your own.
 
 ---
 
 ### Get a Bolt Slack app
 
-We'll continue from [Getting Started with Bolt for JavaScript](/bolt-js/tutorials/getting_started) to learn how to prepare and deploy the Getting Started app to Heroku.
+We'll continue from [Getting Started with Bolt for JavaScript][getting-started-guide] to learn how to prepare and deploy the Getting Started app to Heroku.
 
 Download the Getting Started app and change into its directory:
 
 ```shell
-git clone https://github.com/slackapi/bolt-js-getting-started-app.git
+git clone https://github.com/mwbrooks/bolt-js-getting-started-app.git
 cd bolt-js-getting-started-app/
 ```
 
@@ -228,7 +228,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 Your app is now deployed and Slack is updated, so let's try it out!
 
-Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](https://slack.dev/bolt-js/tutorial/getting-started#sending-and-responding-to-actions), your app should respond back.
+Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](/bolt-js/tutorial/getting-started#sending-and-responding-to-actions), your app should respond back.
 
 ---
 
@@ -237,7 +237,7 @@ Open a Slack channel that your app has joined and say "hello" (lower-case). Just
 As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
 <!-- TODO - Update GitHub link -->
-Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com/slackapi/bolt-js-getting-started-app/blob/master/app.js)):
+Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com/mwbrooks/bolt-js-getting-started-app/blob/master/app.js)):
 
 ```javascript
 // Listens to incoming messages that contain "goodbye"
@@ -265,7 +265,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ### Next steps
 
-You just deployed your first ⚡️[Bolt for JavaScript app to Heroku](https://github.com/slackapi/bolt-js-getting-started-with-heroku-app)! 🚀
+You just deployed your first ⚡️[Bolt for JavaScript app to Heroku](https://github.com/mwbrooks/bolt-js-getting-started-with-heroku-app)! 🚀
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
@@ -277,4 +277,4 @@ Now that you've deployed a basic app, you can start exploring how to customize a
 
 <!-- Add deploying Heroku with OAuth -->
 
-[getting-started-guide]: https://slack.dev/bolt-js/tutorial/getting-started
+[getting-started-guide]: /bolt-js/tutorial/getting-started
