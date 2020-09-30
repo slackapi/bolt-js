@@ -24,23 +24,28 @@ export interface StepConfigureArguments {
 }
 
 export interface StepUpdateArguments {
-  inputs?: {};
-  outputs?: [];
+  inputs?: {
+    [key: string]: {
+      value: any;
+      skip_variable_replacement?: boolean;
+      variables?: {
+        [key: string]: any
+      };
+    }
+  };
+  outputs?: [{
+    name: string;
+    type: string;
+    label: string;
+  }];
   step_name?: string;
   step_image_url?: string;
 }
 
 export interface StepCompleteArguments {
-  inputs?: {
-    [key: string]: {
-      value: string;
-    };
-  };
   outputs?: {
-    type: string;
-    name: string;
-    label: string;
-  }[];
+    [key: string]: any;
+  };
 }
 
 export interface StepFailArguments {
@@ -105,7 +110,7 @@ export type WorkflowStepMiddleware =
 
 export type AllWorkflowStepMiddlewareArgs<
   T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs
-> = T & AllMiddlewareArgs;
+  > = T & AllMiddlewareArgs;
 
 /** Constants */
 
