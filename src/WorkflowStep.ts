@@ -29,15 +29,17 @@ export interface StepUpdateArguments {
       value: any;
       skip_variable_replacement?: boolean;
       variables?: {
-        [key: string]: any
+        [key: string]: any;
       };
-    }
+    };
   };
-  outputs?: [{
-    name: string;
-    type: string;
-    label: string;
-  }];
+  outputs?: [
+    {
+      name: string;
+      type: string;
+      label: string;
+    },
+  ];
   step_name?: string;
   step_image_url?: string;
 }
@@ -110,7 +112,7 @@ export type WorkflowStepMiddleware =
 
 export type AllWorkflowStepMiddlewareArgs<
   T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs
-  > = T & AllMiddlewareArgs;
+> = T & AllMiddlewareArgs;
 
 /** Constants */
 
