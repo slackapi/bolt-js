@@ -28,8 +28,19 @@ interface EnvelopedEvent<Event = BasicSlackEvent> extends StringIndexed {
   type: 'event_callback';
   event_id: string;
   event_time: number;
-  // TODO: is this optional?
-  authed_users: string[];
+  // TODO: the two properties below are being deprecated on Feb 24, 2021
+  authed_users?: string[];
+  authed_teams?: string[];
+  is_ext_shared_channel?: boolean;
+  authorizations?: Authorizations[];
+}
+
+interface Authorizations {
+  enterprise_id: string | null;
+  team_id: string | null;
+  user_id: string;
+  is_bot: boolean;
+  is_enterprise_install?: boolean;
 }
 
 /**
