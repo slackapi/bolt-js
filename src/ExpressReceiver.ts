@@ -212,18 +212,53 @@ export default class ExpressReceiver implements Receiver {
       createServerFn = createHttpsServer;
     }
 
+    if (this.server !== undefined) {
+      // TODO: CodedError
+      return Promise.reject(new Error('The receiver cannot be started because it was already started.'));
+    }
+
     this.server = createServerFn(serverOptions, this.app);
 
     return new Promise((resolve, reject) => {
-      try {
-        // TODO: what about asynchronous errors? should we attach a handler for this.server.on('error', ...)?
-        // if so, how can we check for only errors related to listening, as opposed to later errors?
-        this.server!.listen(portOrListenOptions, () => {
-          resolve(this.server);
-        });
-      } catch (error) {
-        reject(error);
+      if (this.server === undefined) {
+        // TODO: CodedError
+        throw new Error('The receiver cannot be started because private state was mutated. Please report this to ' +
+          'the maintainers.');
       }
+
+      this.server.on('error', (error) => {
+        if (this.server === undefined) {
+          // TODO: CodedError
+          throw new Error('The receiver cannot be started because private state was mutated. Please report this ' +
+            'to the maintainers.');
+        }
+
+        this.server.close();
+
+        // If the error event occurs before listening completes (like EADDRINUSE), this works well. However, if the
+        // error event happens some after the Promise is already resolved, the error would be silently swallowed up.
+        // The documentation doesn't describe any specific errors that can occur after listening has started, so this
+        // feels safe.
+        reject(error);
+      });
+
+      this.server.on('close', () => {
+        // Not removing all listeners because consumers could have added their own `close` event listener, and those
+        // should be called. If the consumer doesn't dispose of any references to the server properly, this would be
+        // a memory leak.
+        // this.server?.removeAllListeners();
+        this.server = undefined;
+      });
+
+      this.server.listen(portOrListenOptions, () => {
+        if (this.server === undefined) {
+          // TODO: CodedError
+          return reject(new Error('The receiver cannot be started because private state was mutated. Please report ' +
+            'this to the maintainers.'));
+        }
+
+        resolve(this.server);
+      });
     });
   }
 
@@ -232,13 +267,13 @@ export default class ExpressReceiver implements Receiver {
   public stop(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.server === undefined) {
-        return reject(new Error('The receiver was not started.'));
+        // TODO: CodedError
+        return reject(new Error('The receiver cannot be stopped because it was not started.'));
       }
-      // TODO: what about synchronous errors?
       this.server.close((error) => {
+        // NOTE: close listener added in start() is responsible for unsetting this.server
         if (error !== undefined) {
-          reject(error);
-          return;
+          return reject(error);
         }
 
         resolve();
