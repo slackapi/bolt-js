@@ -236,7 +236,7 @@ export default class App {
       // No custom receiver
       throw new AppInitializationError(
         'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-          'custom receiver.',
+        'custom receiver.',
       );
     } else {
       // Create default ExpressReceiver
@@ -326,12 +326,12 @@ export default class App {
   /**
    * Convenience method to call start on the receiver
    *
-   * TODO: args could be defined using a generic constraint from the receiver type
+   * TODO: should replace ExpressReceiver in type definition with a generic that is constrained to Receiver
    *
    * @param args receiver-specific start arguments
    */
-  public start(...args: any[]): Promise<unknown> {
-    return this.receiver.start(...args);
+  public start(...args: Parameters<ExpressReceiver['start']>): ReturnType<ExpressReceiver['start']> {
+    return this.receiver.start(...args) as ReturnType<ExpressReceiver['start']>;
   }
 
   public stop(...args: any[]): Promise<unknown> {
@@ -565,19 +565,19 @@ export default class App {
         type === IncomingEventType.Event
           ? (bodyArg as SlackEventMiddlewareArgs['body']).event
           : type === IncomingEventType.ViewAction
-          ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-          : type === IncomingEventType.Shortcut
-          ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
-          : type === IncomingEventType.Action &&
-            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
-          ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
-          : (bodyArg as (
-              | Exclude<
-                  AnyMiddlewareArgs,
-                  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-                >
-              | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-            )['body']),
+            ? (bodyArg as SlackViewMiddlewareArgs['body']).view
+            : type === IncomingEventType.Shortcut
+              ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
+              : type === IncomingEventType.Action &&
+                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
+                ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
+                : (bodyArg as (
+                  | Exclude<
+                    AnyMiddlewareArgs,
+                    SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+                  >
+                  | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+                )['body']),
     };
 
     // Set aliases
@@ -721,13 +721,13 @@ function buildSource(
           type === IncomingEventType.Options ||
           type === IncomingEventType.ViewAction ||
           type === IncomingEventType.Shortcut
-        ? ((body as (
+          ? ((body as (
             | SlackActionMiddlewareArgs
             | SlackOptionsMiddlewareArgs
             | SlackViewMiddlewareArgs
             | SlackShortcutMiddlewareArgs
           )['body']).team.id as string)
-        : assertNever(type),
+          : assertNever(type),
     enterpriseId:
       type === IncomingEventType.Event || type === IncomingEventType.Command
         ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
@@ -735,35 +735,35 @@ function buildSource(
           type === IncomingEventType.Options ||
           type === IncomingEventType.ViewAction ||
           type === IncomingEventType.Shortcut
-        ? ((body as (
+          ? ((body as (
             | SlackActionMiddlewareArgs
             | SlackOptionsMiddlewareArgs
             | SlackViewMiddlewareArgs
             | SlackShortcutMiddlewareArgs
           )['body']).team.enterprise_id as string)
-        : undefined,
+          : undefined,
     userId:
       type === IncomingEventType.Event
         ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
           ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
           : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
-          ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
-          : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
-            (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
-          ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
-          : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
-            (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
-          ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
-          : undefined
+            ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
+            : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
+              (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
+              ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
+              : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
+                (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
+                ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
+                : undefined
         : type === IncomingEventType.Action ||
           type === IncomingEventType.Options ||
           type === IncomingEventType.ViewAction ||
           type === IncomingEventType.Shortcut
-        ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
+          ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
             .id as string)
-        : type === IncomingEventType.Command
-        ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
-        : undefined,
+          : type === IncomingEventType.Command
+            ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
+            : undefined,
     conversationId: channelId,
   };
   // tslint:enable:max-line-length
@@ -794,11 +794,11 @@ function singleTeamAuthorization(
     authorization.botUserId !== undefined && authorization.botId !== undefined
       ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
       : client.auth.test({ token: authorization.botToken }).then((result) => {
-          return {
-            botUserId: result.user_id as string,
-            botId: result.bot_id as string,
-          };
-        });
+        return {
+          botUserId: result.user_id as string,
+          botId: result.bot_id as string,
+        };
+      });
 
   return async () => {
     return { botToken: authorization.botToken, ...(await identifiers) };

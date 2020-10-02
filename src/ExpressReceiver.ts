@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 
-import { createServer, Server } from 'http';
+import { createServer, Server, ServerOptions } from 'http';
+import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
+import { ListenOptions } from 'net';
 import express, { Request, Response, Application, RequestHandler, Router } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
@@ -18,10 +20,10 @@ export interface ExpressReceiverOptions {
   signingSecret: string;
   logger?: Logger;
   endpoints?:
-    | string
-    | {
-        [endpointType: string]: string;
-      };
+  | string
+  | {
+    [endpointType: string]: string;
+  };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -51,7 +53,7 @@ export default class ExpressReceiver implements Receiver {
   /* Express app */
   public app: Application;
 
-  private server: Server;
+  private server?: Server;
 
   private bolt: App | undefined;
 
@@ -76,8 +78,6 @@ export default class ExpressReceiver implements Receiver {
     installerOptions = {},
   }: ExpressReceiverOptions) {
     this.app = express();
-    // TODO: what about starting an https server instead of http? what about other options to create the server?
-    this.server = createServer(this.app);
 
     const expressMiddleware: RequestHandler[] = [
       verifySignatureAndParseRawBody(logger, signingSecret),
@@ -146,7 +146,7 @@ export default class ExpressReceiver implements Receiver {
       if (!isAcknowledged) {
         this.logger.error(
           'An incoming event was not acknowledged within 3 seconds. ' +
-            'Ensure that the ack() argument is called in a listener.',
+          'Ensure that the ack() argument is called in a listener.',
         );
       }
       // tslint:disable-next-line: align
@@ -201,15 +201,24 @@ export default class ExpressReceiver implements Receiver {
     this.bolt = bolt;
   }
 
-  // TODO: the arguments should be defined as the arguments of Server#listen()
-  // TODO: the return value should be defined as a type that both http and https servers inherit from, or a union
-  public start(port: number): Promise<Server> {
+  public start(port: number): Promise<Server>;
+  public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
+  public start(portOrListenOptions: number | ListenOptions, httpsServerOptions?: HTTPSServerOptions): Promise<HTTPSServer>;
+  public start(portOrListenOptions: number | ListenOptions, serverOptions: ServerOptions | HTTPSServerOptions = {}): Promise<Server | HTTPSServer> {
+    let createServerFn: (typeof createServer | typeof createHttpsServer) = createServer;
+
+    // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
+    if (Object.keys(serverOptions).filter(k => httpsOptionKeys.includes(k)).length > 0) {
+      createServerFn = createHttpsServer;
+    }
+
+    this.server = createServerFn(serverOptions, this.app);
+
     return new Promise((resolve, reject) => {
       try {
-        // TODO: what about other listener options?
         // TODO: what about asynchronous errors? should we attach a handler for this.server.on('error', ...)?
         // if so, how can we check for only errors related to listening, as opposed to later errors?
-        this.server.listen(port, () => {
+        this.server!.listen(portOrListenOptions, () => {
           resolve(this.server);
         });
       } catch (error) {
@@ -222,6 +231,9 @@ export default class ExpressReceiver implements Receiver {
   // generic types
   public stop(): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (this.server === undefined) {
+        return reject(new Error('The receiver was not started.'));
+      }
       // TODO: what about synchronous errors?
       this.server.close((error) => {
         if (error !== undefined) {
@@ -366,3 +378,13 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
   return JSON.parse(stringBody);
 }
+
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols', 'clientCertEngine', 'enableTrace', 'handshakeTimeout', 'rejectUnauthorized', 'requestCert',
+  'sessionTimeout', 'SNICallback', 'ticketKeys', 'pskCallback', 'pskIdentityHint',
+
+  'ca', 'cert', 'sigalgs', 'ciphers', 'clientCertEngine', 'crl', 'dhparam', 'ecdhCurve', 'honorCipherOrder', 'key',
+  'privateKeyEngine', 'privateKeyIdentifier', 'maxVersion', 'minVersion', 'passphrase', 'pfx', 'secureOptions',
+  'secureProtocol', 'sessionIdContext',
+]
