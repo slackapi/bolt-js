@@ -11,7 +11,7 @@ import tsscmp from 'tsscmp';
 import { Logger, ConsoleLogger } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
 import App from './App';
-import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
+import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from './errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
@@ -213,24 +213,19 @@ export default class ExpressReceiver implements Receiver {
     }
 
     if (this.server !== undefined) {
-      // TODO: CodedError
-      return Promise.reject(new Error('The receiver cannot be started because it was already started.'));
+      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be started because it was already started.'));
     }
 
     this.server = createServerFn(serverOptions, this.app);
 
     return new Promise((resolve, reject) => {
       if (this.server === undefined) {
-        // TODO: CodedError
-        throw new Error('The receiver cannot be started because private state was mutated. Please report this to ' +
-          'the maintainers.');
+        throw new ReceiverInconsistentStateError(missingServerErrorDescription);
       }
 
       this.server.on('error', (error) => {
         if (this.server === undefined) {
-          // TODO: CodedError
-          throw new Error('The receiver cannot be started because private state was mutated. Please report this ' +
-            'to the maintainers.');
+          throw new ReceiverInconsistentStateError(missingServerErrorDescription);
         }
 
         this.server.close();
@@ -252,9 +247,7 @@ export default class ExpressReceiver implements Receiver {
 
       this.server.listen(portOrListenOptions, () => {
         if (this.server === undefined) {
-          // TODO: CodedError
-          return reject(new Error('The receiver cannot be started because private state was mutated. Please report ' +
-            'this to the maintainers.'));
+          return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
 
         resolve(this.server);
@@ -267,8 +260,7 @@ export default class ExpressReceiver implements Receiver {
   public stop(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.server === undefined) {
-        // TODO: CodedError
-        return reject(new Error('The receiver cannot be stopped because it was not started.'));
+        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
       }
       this.server.close((error) => {
         // NOTE: close listener added in start() is responsible for unsetting this.server
@@ -422,4 +414,7 @@ const httpsOptionKeys = [
   'ca', 'cert', 'sigalgs', 'ciphers', 'clientCertEngine', 'crl', 'dhparam', 'ecdhCurve', 'honorCipherOrder', 'key',
   'privateKeyEngine', 'privateKeyIdentifier', 'maxVersion', 'minVersion', 'passphrase', 'pfx', 'secureOptions',
   'secureProtocol', 'sessionIdContext',
-]
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please ' +
+  'report this to the maintainers.';
