@@ -201,6 +201,7 @@ export default class ExpressReceiver implements Receiver {
     this.bolt = bolt;
   }
 
+  // TODO: can this method be defined as generic instead of using overloads?
   public start(port: number): Promise<Server>;
   public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
   public start(portOrListenOptions: number | ListenOptions, httpsServerOptions?: HTTPSServerOptions): Promise<HTTPSServer>;
