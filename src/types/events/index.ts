@@ -32,10 +32,10 @@ interface EnvelopedEvent<Event = BasicSlackEvent> extends StringIndexed {
   authed_users?: string[];
   authed_teams?: string[];
   is_ext_shared_channel?: boolean;
-  authorizations?: Authorizations[];
+  authorizations?: Authorization[];
 }
 
-interface Authorizations {
+interface Authorization {
   enterprise_id: string | null;
   team_id: string | null;
   user_id: string;
