@@ -4,9 +4,9 @@ order: 0
 slug: heroku
 lang: en
 layout: tutorial
-permalink: /deploying/heroku
+permalink: /deployments/heroku
 redirect_from:
-  - /deploying
+  - /deployments
 ---
 # Deploying to Heroku
 

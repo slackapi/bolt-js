@@ -63,12 +63,12 @@
   </ul>
 
   <ul class="sidebar-section">
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/deploying">
-      <li class="title">{{ site.t[page.lang].deploying }}</li>
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/deployments">
+      <li class="title">{{ site.t[page.lang].deployments }}</li>
     </a>
-    {% assign deploying_sections = site.deploying | sort: "order" | where: "lang", page.lang %}
-    {% for section in deploying_sections %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/deploying/{{ section.slug }}">
+    {% assign deployments_sections = site.deployments | sort: "order" | where: "lang", page.lang %}
+    {% for section in deployments_sections %}
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/deployments/{{ section.slug }}">
         <li>{{section.title}}</li>
       </a>
     {% endfor %}
