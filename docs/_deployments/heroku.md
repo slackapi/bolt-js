@@ -20,7 +20,7 @@ When you’re finished, you’ll have this ⚡️[Getting Started with Heroku ap
 
 ### Get a Bolt Slack app
 
-We'll continue from [Getting Started with Bolt for JavaScript][getting-started-guide] to learn how to prepare and deploy a Slack app to Heroku.
+If you haven't already built your own Bolt app, you can use our [getting started guide][getting-started-guide] or clone the template app below.
 
 Download the Getting Started app and change into its directory:
 
