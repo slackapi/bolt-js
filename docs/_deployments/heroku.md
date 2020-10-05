@@ -32,8 +32,6 @@ After you have a Bolt app, navigate to its directory:
 cd bolt-js-getting-started-app/
 ```
 
-> 💡 You also can follow along with an existing Bolt app and we'll mention any extra steps that are needed.
-
 Now that you have the app, let's prepare it for Heroku.
 
 ---
