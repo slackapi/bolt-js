@@ -90,12 +90,17 @@ This project is versioned using [Semantic Versioning](http://semver.org/), parti
 [npm flavor](https://docs.npmjs.com/getting-started/semantic-versioning). Each release is tagged
 using git.
 
+### Fork
+
+As a maintainer, the development you do will be almost entirely off of your forked version of this repository. The exception to this rule pertains to multiple collaborators working on the same feature, which is detailed in the **Branches** section below.
+
 ### Branches
 
-`master` is where active development occurs. Long running named feature branches are occasionally
-created for collaboration on a feature that has a large scope (because everyone cannot push commits
-to another person's open Pull Request). At some point in the future after a major version increment,
-there may be maintenance branches for older major versions.
+`main` is where active development occurs. 
+
+When developing, branches should be created off of your fork and not directly off of this repository. If working on a long-running feature and in collaboration with others, a corresponding branch of the same name is permitted. This makes collaboration on a single branch possible, as contributors working on the same feature cannot push commits to others' open Pull Requests.
+
+After a major version increment, there also may be maintenance branches created specifically for supporting older major versions.
 
 ### Issue Management
 
