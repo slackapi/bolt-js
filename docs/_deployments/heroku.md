@@ -23,7 +23,7 @@ When you’re finished, you’ll have this ⚡️[Getting Started with Heroku ap
 If you haven't already built your own Bolt app, you can use our [getting started guide][getting-started-guide] or clone the template app below:
 
 ```shell
-git clone https://github.com/mwbrooks/bolt-js-getting-started-app.git
+git clone https://github.com/slackapi/bolt-js-getting-started-app.git
 ```
 
 After you have a Bolt app, navigate to its directory:
