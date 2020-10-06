@@ -38,7 +38,7 @@ Now that you have an app, let's prepare it for Heroku.
 
 ### Prepare the app for Heroku
 
-Heroku is a flexible platform that uses a few conventions to understand how to host your app. In this section, we'll update your app to use those conventions.
+Heroku is a flexible platform that requires some configuration to host your app. In this section, we'll update your Bolt app to supprot Heroku.
 
 **1. Use a Git repository**
 
@@ -85,7 +85,7 @@ Once the install is complete, we can test the Heroku CLI by displaying all of th
 heroku help
 ```
 
-> 💡 If the `heroku` command is not found, you can refresh your path by opening a new terminal session/tab.
+> 💡 If the `heroku` command is not found, refresh your path by opening a new terminal session/tab.
 
 **2. Log into the Heroku CLI**
 
@@ -98,7 +98,7 @@ heroku login
 
 **3. Confirm you're logged into the Heroku CLI**
 
-Let's check that you're logged in by displaying the account currently connected to your Heroku CLI:
+Check that you're logged in by displaying the account currently connected to your Heroku CLI:
 
 ```shell
 heroku auth:whoami
@@ -130,7 +130,7 @@ heroku create
 # https://sharp-rain-871.herokuapp.com/ | https://git.heroku.com/sharp-rain-871.git
 ```
 
-After your app is created, there are a few things worth your attention:
+After your app is created, you'll be given some information that we'll use in the upcoming sections. In the example above:
 
 - App name is `sharp-rain-871`
 - Web address is `https://sharp-rain-871.herokuapp.com/`
@@ -175,7 +175,7 @@ You can now deploy your app with the command:
 git push heroku main
 ```
 
-> 💡 Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches does nothing.
+> 💡 Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches will not trigger a deployment.
 
 Now that your code is deployed, we need to start a web server instance using the Heroku CLI:
 
@@ -197,7 +197,7 @@ heroku info
 
 In our example, the web address is `https://sharp-rain-871.herokuapp.com/`.
 
-Now browse to the [Slack App page](https://api.slack.com/apps) and select your app name. Next, we'll update your **Request URL** in two locations to be your web address.
+Head over to the [Slack App page](https://api.slack.com/apps) and select your app name. Next, we'll update your **Request URL** in two locations to be your web address.
 
 > 💡 Your **Request URL** ends with `/slack/events`, such as `https://sharp-rain-871.herokuapp.com/slack/events`.
 
@@ -215,7 +215,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 Your app is now deployed and Slack is updated, so let's try it out!
 
-Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](/bolt-js/tutorial/getting-started#sending-and-responding-to-actions), your app should respond back.
+Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](/bolt-js/tutorial/getting-started#sending-and-responding-to-actions), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
 
 ---
 
