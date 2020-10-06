@@ -32,7 +32,7 @@ After you have a Bolt app, navigate to its directory:
 cd bolt-js-getting-started-app/
 ```
 
-Now that you have the app, let's prepare it for Heroku.
+Now that you have an app, let's prepare it for Heroku.
 
 ---
 
@@ -42,28 +42,15 @@ Heroku is a flexible platform that uses a few conventions to understand how to h
 
 **1. Use a Git repository**
 
-Before you can deploy your app to Heroku, you need to [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), initialize a local Git repository, and commit your code to it.
+Before you can deploy your app to Heroku, you'll need a git repository. If you aren't already using Git, you'll need to [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [create a Git repository](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository).
 
 > 💡 Skip this step if you used `git clone` in the previous section because you already have a Git repository.
-
-To initialize a local Git repository and run the command:
-
-```shell
-git init
-```
-
-Now add your code and commit it to the repository:
-
-```shell
-git add .
-git commit -m "Initial commit"
-```
 
 **2. Add a Procfile**
 
 Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. A Bolt Slack app will be started as a web server with a public web address.
 
-Create a new file called `Procfile` (without any extension) in your app's root directory with the following content:
+Create a new file called `Procfile` (without any extension) in your app's root directory anad paste the following:
 
 ```yaml
 web: node app.js
@@ -76,9 +63,7 @@ git add Procfile
 git commit -m "Add Procfile"
 ```
 
-**3. Extra steps for existing apps**
-
-Are you following this guide with an existing app that you created? If so, please review [preparing a codebase for Heroku](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port) to listen on the correct port and think about data storage provisioning.
+> 💡 Are you following this guide with an existing Bolt app? If so, please review the guide on [preparing a codebase for Heroku](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port) to listen on the correct port.
 
 ---
 
@@ -119,7 +104,7 @@ Let's check that you're logged in by displaying the account currently connected 
 heroku auth:whoami
 ```
 
-You're all setup with the Heroku tools! Now let's move onto the exciting step of creating an app on Heroku.
+You should now be all setup with the Heroku tools! Let's move onto the exciting step of creating an app on Heroku.
 
 ---
 
@@ -163,12 +148,14 @@ git remote -v
 
 **3. Set environment variables on Heroku**
 
-In the Getting Started guide, you [exported your signing secret and token](http://localhost:4000/bolt-js/tutorial/getting-started#tokens-and-installing-apps) as environment variables. Now we need to set the same environment variables in your Heroku app:
+Now you'll need to add your Slack app credentials to your Heroku app: 
 
 ```shell
 heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
 heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
+
+> 💡 If you don't know where to find your credentials, please read about [exporting your signing secret and token](https://slack.dev/bolt-js/tutorial/getting-started#tokens-and-installing-apps) in the Getting Started guide.
 
 Now that we have prepared your local app and created a Heroku app, the next step is to deploy it!
 
@@ -198,7 +185,7 @@ heroku ps:scale web=1
 
 **2. Update your Slack app's setting**
 
-In the [Getting Started guide][getting-started-guide], we used ngrok as your **Request URL** for actions and events. Now we need to use your Heroku web address.
+Now we need to use your Heroku web address as your **Request URL**, which is where Slack will send events and actions.
 
 Get your Heroku web address with the following command:
 
@@ -269,12 +256,9 @@ You just deployed your first ⚡️[Bolt for JavaScript app to Heroku](https://g
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
-- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works).
-- Understand the [limitations of a free Heroku app](https://devcenter.heroku.com/articles/free-dyno-hours).
-- Learn how to [view your log messages](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
-- Browse through [add-ons to extend your app](https://elements.heroku.com/addons).
-- Get ready to primetime with [how to scale the app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
-
-<!-- Add deploying Heroku with OAuth -->
+- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works) and understand the [limitations of a free Heroku app](https://devcenter.heroku.com/articles/free-dyno-hours).
+- Browse through [Bolt's Basic Concepts](https://slack.dev/bolt-js/concepts#basic) and [Heroku's Add-ons](https://elements.heroku.com/addons) to extend your app.
+- Learn about logging in [Bolt's Advanced Concepts](https://slack.dev/bolt-js/concepts#logging) and how to [view your log messages in Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
+- Get ready to primetime with [how to scale your Heroku app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
 
 [getting-started-guide]: /bolt-js/tutorial/getting-started
