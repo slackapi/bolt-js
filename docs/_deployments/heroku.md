@@ -14,7 +14,7 @@ redirect_from:
 This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 </div>
 
-When you’re finished, you’ll have this ⚡️[Getting Started with Heroku app](https://github.com/mwbrooks/bolt-js-getting-started-with-heroku-app) to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Getting Started with Heroku app][getting-started-with-heroku-app] to run, modify, and make your own.
 
 ---
 
@@ -223,8 +223,7 @@ Open a Slack channel that your app has joined and say "hello" (lower-case). Just
 
 As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
-<!-- TODO - Update GitHub link -->
-Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com/mwbrooks/bolt-js-getting-started-app/blob/master/app.js)):
+Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.js` ([source code on GitHub](https://github.com/slackapi/bolt-js/blob/main/examples/getting-started-with-heroku/app.js)):
 
 ```javascript
 // Listens to incoming messages that contain "goodbye"
@@ -252,7 +251,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ### Next steps
 
-You just deployed your first ⚡️[Bolt for JavaScript app to Heroku](https://github.com/mwbrooks/bolt-js-getting-started-with-heroku-app)! 🚀
+You just deployed your first ⚡️[Bolt for JavaScript app to Heroku][getting-started-with-heroku-app]! 🚀
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
@@ -262,3 +261,5 @@ Now that you've deployed a basic app, you can start exploring how to customize a
 - Get ready to primetime with [how to scale your Heroku app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
 
 [getting-started-guide]: /bolt-js/tutorial/getting-started
+[getting-started-with-heroku-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-heroku
+[getting-started-with-heroku-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-heroku
