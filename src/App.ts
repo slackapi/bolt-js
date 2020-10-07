@@ -211,8 +211,11 @@ export default class App {
       tls: clientTls,
       slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
     };
-    // the public WebClient instance (app.client) - this one doesn't have a token
-    this.client = new WebClient(undefined, this.clientOptions);
+    /*
+        @christiaankruger
+        FORK ALERT! Token wasn't passed through here, but this lead to some client calls breaking.
+    */
+    this.client = new WebClient(token, this.clientOptions);
 
     this.axios = axios.create({
       httpAgent: agent,
