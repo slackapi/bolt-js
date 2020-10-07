@@ -14,13 +14,14 @@ Happy linting! 💖
 {
 	"editor.rulers": [120],
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"editor.formatOnSave": false,
-	"[javascript]": {
-		"editor.formatOnSave": true
-	},
-	"[typescript]": {
-		"editor.formatOnSave": true
-  },
-  "prettier.configPath": ".prettierrc.json",
-  "editor.tabSize": 2,
+	// TODO: re-enable format on save once ESLint rules are more stable
+	// "editor.formatOnSave": false,
+	// "[javascript]": {
+	// 	"editor.formatOnSave": true
+	// },
+	// "[typescript]": {
+	// 	"editor.formatOnSave": true
+  // },
+	"editor.tabSize": 2,
+	"eslint.enable": true,
 }

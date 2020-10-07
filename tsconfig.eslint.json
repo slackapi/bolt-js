@@ -2,7 +2,25 @@
   // extend your base config to share compilerOptions, etc
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    // ensure that this config cannot be used for a build
+    // This config is only used to allow ESLint to use a different include / exclude setting than the actual build
+    // Setting it to "noEmit" as well prevents misuses such as using this config to produce a build
     "noEmit": true
   },
+  "include": [
+    // Since extending a config overwrites the entire value for "include", those value are copied here
+    "src/**/*",
+
+    // List files that should be linted by ESLint, but are not part of the tsconfig used for the actual build
+    ".eslintrc.js",
+    "docs/**/*",
+    "examples/**/*",
+  ],
+  "exclude": [
+    // Overwrite exclude from the base config to clear the value
+
+    // Contains external module type definitions, which are not subject to this project's style rules
+    "types/**/*",
+    // Contain intentional type checking issues for the purpose of testing the typechecker's output
+    "types-tests/**/*"
+  ]
 }
