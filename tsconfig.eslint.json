@@ -1,9 +1,9 @@
+// This config is only used to allow ESLint to use a different include / exclude setting than the actual build
 {
-  // extend your base config to share compilerOptions, etc
+  // extend the build config to share compilerOptions
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    // This config is only used to allow ESLint to use a different include / exclude setting than the actual build
-    // Setting it to "noEmit" as well prevents misuses such as using this config to produce a build
+    // Setting "noEmit" prevents misuses of this config such as using it to produce a build
     "noEmit": true
   },
   "include": [
