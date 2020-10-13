@@ -550,11 +550,14 @@ export default class App {
 
     let authorizeResult;
     let source;
+    // Check if type event with the authorizations object or if it has a top level is_enterprise_install property
     if (
-      type === IncomingEventType.Event &&
-      (bodyArg as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
-      (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0] !== undefined &&
-      (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0].is_enterprise_install
+      (type === IncomingEventType.Event &&
+        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0] !== undefined &&
+        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0].is_enterprise_install) ||
+      bodyArg.is_enterprise_install === true ||
+      bodyArg.is_enterprise_install === 'true' // command payloads have this as a string
     ) {
       // This is an org app
       // Initialize context (shallow copy to enforce object identity separation)
@@ -567,6 +570,7 @@ export default class App {
         return this.handleError(error);
       }
     } else {
+      // This is not an org app
       // Initialize context (shallow copy to enforce object identity separation)
       source = buildSource(type, conversationId, bodyArg);
 

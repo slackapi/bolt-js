@@ -33,4 +33,6 @@ export interface SlashCommand extends StringIndexed {
   api_app_id: string;
   enterprise_id?: string;
   enterprise_name?: string;
+  // exists for enterprise installs
+  is_enterprise_install?: string; // This should be a boolean, but payload for commands gives string 'true'
 }
