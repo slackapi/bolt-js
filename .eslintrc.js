@@ -8,6 +8,12 @@
 // the better.
 //
 
+const jsDocPlugin = require('eslint-plugin-jsdoc');
+
+const jsDocRecommendedRulesOff = Object.assign(
+  ...Object.keys(jsDocPlugin.configs.recommended.rules).map((rule) => ({ [rule]: 'off' })),
+);
+
 module.exports = {
   // This is a root of the project, ESLint should not look through parent directories to find more config
   root: true,
@@ -53,6 +59,13 @@ module.exports = {
 
     // Bans use of comma as an operator because it can obscure side effects and is often an accident.
     'no-sequences': 'error',
+
+    // Disallow the use of process.exit()
+    'node/no-process-exit': 'error',
+
+    // Allow safe references to functions before the declaration. Overrides AirBnB config. Not located in the override
+    // section below because a distinct override is necessary in TypeScript files.
+    'no-use-before-define': ['error', 'nofunc'],
   },
 
   overrides: [
@@ -86,7 +99,7 @@ module.exports = {
         // no reason we cannot adopt this syntax now.
         // NOTE: The `@typescript-eslint/no-require-imports` rule can also achieve the same effect, but it is less
         // configurable and only built to provide a migration path from TSLint.
-        'import/no-common-js': ['error', {
+        'import/no-commonjs': ['error', {
           allowConditionalRequire: false,
         }],
 
@@ -94,6 +107,7 @@ module.exports = {
         // TypeScript compiler will already perform this check, so it is redundant.
         // NOTE: Consider contributing this to the `airbnb-typescript` config.
         'import/named': 'off',
+        'node/no-missing-import': 'off',
 
         // Prevent using non-boolean types as conditions. This ensures we're not relying on implicit type coercions in
         // conditionals, which can lead to unintended behavior.
@@ -124,9 +138,27 @@ module.exports = {
           allowArgumentsExplicitlyTypedAsAny: true,
         }],
 
+        // Turns off all JSDoc plugin rules because they don't work consistently in TypeScript contexts. For example,
+        // it's not an error to export interfaces and types that don't have JSDoc on them without these contexts. Also,
+        // satisfying some of these rules would require redundant type information in the JSDoc comments, so its in
+        // conflict with the next rule.
+        // TODO: track progress on this issue https://github.com/gajus/eslint-plugin-jsdoc/issues/615
+        ...jsDocRecommendedRulesOff,
+
         // No types in JSDoc for @param or @returns. TypeScript will provide this type information, so it would be
         // redundant, and possibly conflicting.
         'jsdoc/no-types': 'error',
+
+        // Allow use of import and export syntax, despite it not being supported in the node versions. Since this
+        // project is transpiled, the ignore option is used. Overrides node/recommended.
+        // 'node/no-unsupported-features/es-syntax': ['error', { ignores: ['modules'] }],
+        // TODO: The node plugin's ignore option doesn't work in order to suppress this error.
+        'node/no-unsupported-features/es-syntax': 'off',
+
+        // Allow safe references to functions before the declaration. Overrides AirBnB config. Not located in the
+        // override section below because a distinct override is necessary in JavaScript files.
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
       },
     },
     {
@@ -188,9 +220,18 @@ module.exports = {
         // Prevent importing submodules of other modules. Using the internal structure of a module exposes
         // implementation details that can potentially change in breaking ways. Overrides AirBnB styles.
         'import/no-internal-modules': ['error', {
-          // If necessary, use this option to set a list of allowable globs in this project.
-          allow: [],
+          // Use the following option to set a list of allowable globs in this project.
+          allow: [
+            '**/middleware/*', // the src/middleware directory doesn't export a module, it's just a namespace.
+          ],
         }],
+
+        // Remove the minProperties option for enforcing line breaks between braces. The AirBnB config sets this to 4,
+        // which is arbitrary and not backed by anything specific in the style guide. If we just remove it, we can
+        // rely on the max-len rule to determine if the line is too long and then enforce line breaks. Overrides AirBnB
+        // styles.
+        'object-curly-newline': ['error', { multiline: true, consistent: true }],
+
       },
     },
   ],
