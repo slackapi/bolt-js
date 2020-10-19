@@ -20,10 +20,10 @@ export interface ExpressReceiverOptions {
   signingSecret: string;
   logger?: Logger;
   endpoints?:
-  | string
-  | {
-    [endpointType: string]: string;
-  };
+    | string
+    | {
+        [endpointType: string]: string;
+      };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -145,8 +145,7 @@ export default class ExpressReceiver implements Receiver {
     setTimeout(() => {
       if (!isAcknowledged) {
         this.logger.error(
-          'An incoming event was not acknowledged within 3 seconds. ' +
-          'Ensure that the ack() argument is called in a listener.',
+          'An incoming event was not acknowledged within 3 seconds. Ensure that the ack() argument is called in a listener.',
         );
       }
       // tslint:disable-next-line: align
@@ -204,17 +203,25 @@ export default class ExpressReceiver implements Receiver {
   // TODO: can this method be defined as generic instead of using overloads?
   public start(port: number): Promise<Server>;
   public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
-  public start(portOrListenOptions: number | ListenOptions, httpsServerOptions?: HTTPSServerOptions): Promise<HTTPSServer>;
-  public start(portOrListenOptions: number | ListenOptions, serverOptions: ServerOptions | HTTPSServerOptions = {}): Promise<Server | HTTPSServer> {
-    let createServerFn: (typeof createServer | typeof createHttpsServer) = createServer;
+  public start(
+    portOrListenOptions: number | ListenOptions,
+    httpsServerOptions?: HTTPSServerOptions,
+  ): Promise<HTTPSServer>;
+  public start(
+    portOrListenOptions: number | ListenOptions,
+    serverOptions: ServerOptions | HTTPSServerOptions = {},
+  ): Promise<Server | HTTPSServer> {
+    let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
 
     // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
-    if (Object.keys(serverOptions).filter(k => httpsOptionKeys.includes(k)).length > 0) {
+    if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
       createServerFn = createHttpsServer;
     }
 
     if (this.server !== undefined) {
-      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be started because it was already started.'));
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be started because it was already started.'),
+      );
     }
 
     this.server = createServerFn(serverOptions, this.app);
@@ -409,13 +416,38 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
-  'ALPNProtocols', 'clientCertEngine', 'enableTrace', 'handshakeTimeout', 'rejectUnauthorized', 'requestCert',
-  'sessionTimeout', 'SNICallback', 'ticketKeys', 'pskCallback', 'pskIdentityHint',
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
 
-  'ca', 'cert', 'sigalgs', 'ciphers', 'clientCertEngine', 'crl', 'dhparam', 'ecdhCurve', 'honorCipherOrder', 'key',
-  'privateKeyEngine', 'privateKeyIdentifier', 'maxVersion', 'minVersion', 'passphrase', 'pfx', 'secureOptions',
-  'secureProtocol', 'sessionIdContext',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
 ];
 
-const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please ' +
-  'report this to the maintainers.';
+const missingServerErrorDescription =
+  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
