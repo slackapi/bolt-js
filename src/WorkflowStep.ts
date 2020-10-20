@@ -11,7 +11,7 @@ import {
   ViewWorkflowStepSubmitAction,
   WorkflowStepExecuteEvent,
 } from './types';
-import { processMiddleware } from './middleware/process';
+import processMiddleware from './middleware/process';
 import { WorkflowStepInitializationError } from './errors';
 
 /** Interfaces */

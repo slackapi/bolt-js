@@ -26,7 +26,6 @@ import { WorkflowStep } from './WorkflowStep';
 import WebClientPool from './WebClientPool';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError } from './errors';
-import packageJson from '../package.json';
 
 import {
   Middleware,
@@ -51,6 +50,9 @@ import {
   ReceiverEvent,
   RespondArguments,
 } from './types';
+
+// eslint-disable-next-line import/no-commonjs, @typescript-eslint/no-var-requires
+const packageJson = require('../package.json');
 
 /** App initialization options */
 export interface AppOptions {
