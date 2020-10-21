@@ -5,6 +5,7 @@ import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions }
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance } from 'axios';
 import allSettled from 'promise.allsettled';
+import readPkgUp from 'read-pkg-up';
 
 import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
 import {
@@ -50,9 +51,6 @@ import {
   ReceiverEvent,
   RespondArguments,
 } from './types';
-
-// eslint-disable-next-line import/no-commonjs, @typescript-eslint/no-var-requires
-const packageJson = require('../package.json');
 
 /** App initialization options */
 export interface AppOptions {
@@ -838,4 +836,7 @@ function selectToken(context: Context): string | undefined {
 }
 
 /* Instrumentation */
-addAppMetadata({ name: packageJson.name, version: packageJson.version });
+const packageJson = readPkgUp.sync()?.packageJson;
+if (packageJson !== undefined) {
+  addAppMetadata({ name: packageJson.name, version: packageJson.version });
+}
