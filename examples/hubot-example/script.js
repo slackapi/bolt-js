@@ -47,7 +47,7 @@ const app = new App({
 
 (async () => {
   //Start up the app
-  const server = await app.start(process.env.PORT || 4000);
+  const server = await app.start(process.env.PORT || 3000);
   console.log('⚡️ Bolt app is running!', server.address());
 })();
 
@@ -56,7 +56,7 @@ const app = new App({
   // })
 
 // If someone says badgers the bot respondes with Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS
-app.message('badger', async ({ say }) => await { say('Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS'); });
+app.message('badger', async ({ say }) => { await say('Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS'); });
 
   // robot.respond(/open the (.*) doors/i, (res) => {
   //   const doorType = res.match[1]
@@ -149,7 +149,7 @@ app.event('member_left_channel', async ({ say }) => { await say(randomLeaveReply
 app.message(
     directMention(),
     'what is the answer to the ultimate question of life',
-    async ({ message, context }) => {
+    async ({ say }) => {
       if (answer) { await say(`${answer}, but what is the question?`); }
     });
 
@@ -159,7 +159,7 @@ app.message(
 
 // If you are a little slow it will respond in 60 * 1000 seconds with Who you calling "slow"?
 app.message('you are a little slow', async ({ say, context }) => {
-    setTimeout(() => say('Who you calling "slow"?'), 60 * 1000);
+    setTimeout(() => await say('Who you calling "slow"?'), 60 * 1000);
 });
 
   // robot.respond(/annoy me/, (res) => {
@@ -235,7 +235,8 @@ app.message(directMention(), 'unannoy me', async ({ say }) => {
 
 app.error(async (error) => {
     // Check the details of the error to handle cases where you should retry sending a message or stop the app
-    console.error(error);
+    const message = `DOES NOT COMPUTE: ${error.toString()}`;
+    console.error(message);
 });
 
   // 🚫 no reply handling from global error handler
