@@ -1,10 +1,13 @@
 // tslint:disable:no-implicit-dependencies
 import 'mocha';
-import { Logger, LogLevel } from '@slack/logger';
+import sinon, { SinonFakeTimers, SinonSpy } from 'sinon';
 import { assert } from 'chai';
+import { Override, mergeOverrides } from './test-helpers';
+import rewiremock from 'rewiremock';
+import { Logger, LogLevel } from '@slack/logger';
 import { Request, Response } from 'express';
-import sinon, { SinonFakeTimers } from 'sinon';
 import { Readable } from 'stream';
+import { EventEmitter } from 'events';
 
 import ExpressReceiver, {
   respondToSslCheck,
@@ -51,6 +54,7 @@ describe('ExpressReceiver', () => {
   }
 
   describe('constructor', () => {
+    // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments', async () => {
       const receiver = new ExpressReceiver({
         signingSecret: 'my-secret',
@@ -70,16 +74,67 @@ describe('ExpressReceiver', () => {
     });
   });
 
-  describe('start/stop', () => {
-    it('should be available', async () => {
-      const receiver = new ExpressReceiver({
-        signingSecret: 'my-secret',
-        logger: noopLogger,
-      });
-
-      await receiver.start(9999);
-      await receiver.stop();
+  describe('#start()', () => {
+    beforeEach(function () {
+      this.fakeServer = new FakeServer();
+      this.fakeCreateServer = sinon.fake.returns(this.fakeServer);
     });
+
+    it('should start listening for requests using the built-in HTTP server', async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const ExpressReceiver = await importExpressReceiver(overrides);
+      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const port = 12345;
+
+      // Act
+      const server = await receiver.start(port);
+
+      // Assert
+      assert(this.fakeCreateServer.calledOnce);
+      assert.strictEqual(server, this.fakeServer);
+      assert(this.fakeServer.listen.calledWith(port));
+    });
+    it('should start listening for requests using the built-in HTTPS (TLS) server when given TLS server options', async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(sinon.fake.throws('Should not be used.')),
+        withHttpsCreateServer(this.fakeCreateServer),
+      );
+      const ExpressReceiver = await importExpressReceiver(overrides);
+      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const port = 12345;
+      const tlsOptions = { key: '', cert: '' };
+
+      // Act
+      const server = await receiver.start(port, tlsOptions);
+
+      // Assert
+      assert(this.fakeCreateServer.calledOnceWith(tlsOptions));
+      assert.strictEqual(server, this.fakeServer);
+      assert(this.fakeServer.listen.calledWith(port));
+    });
+
+    it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async function () {
+      // Arrange
+      this.
+    });
+    it('should reject with an error when starting and the server was already previously started');
+  });
+
+  describe('#stop', () => {
+    it('should stop listening for requests when a built-in HTTP server is already started');
+    it('should reject when a built-in HTTP server is not started');
+  });
+
+  describe('state management for built-in server', () => {
+    it('should be able to start after it was stopped', () => {
+      // TODO: assert that listeners on the 'close' event still get called
+    })
+
   });
 
   describe('built-in middleware', () => {
@@ -487,3 +542,36 @@ describe('ExpressReceiver', () => {
     });
   });
 });
+
+/* Testing Harness */
+
+// Loading the system under test using overrides
+async function importExpressReceiver(
+  overrides: Override = {},
+): Promise<typeof import('./ExpressReceiver').default> {
+  return (await rewiremock.module(() => import('./ExpressReceiver'), overrides)).default;
+}
+
+// Composable overrides
+function withHttpCreateServer(spy: SinonSpy): Override {
+  return {
+    http: {
+      createServer: spy,
+    },
+  };
+}
+
+function withHttpsCreateServer(spy: SinonSpy): Override {
+  return {
+    https: {
+      createServer: spy,
+    },
+  };
+}
+
+// Fakes
+class FakeServer extends EventEmitter {
+  public on = sinon.fake();
+  public listen = sinon.fake((...args: any[]) => { setImmediate(() => { args[1](); }); });
+  public close = sinon.fake();
+}
