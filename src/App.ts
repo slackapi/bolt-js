@@ -680,12 +680,14 @@ export default class App {
     const token = selectToken(context);
     if (token !== undefined) {
       let pool;
+      const clientOptionsCopy = { ...this.clientOptions };
       if (source.teamId !== undefined) {
         pool = this.clients[source.teamId];
         if (pool === undefined) {
           // eslint-disable-next-line no-multi-assign
           pool = this.clients[source.teamId] = new WebClientPool();
         }
+        clientOptionsCopy.teamId = source.teamId;
       } else if (source.enterpriseId !== undefined) {
         pool = this.clients[source.enterpriseId];
         if (pool === undefined) {
@@ -694,7 +696,8 @@ export default class App {
         }
       }
       if (pool !== undefined) {
-        client = pool.getOrCreate(token, this.clientOptions);
+        // Question: should teamId from source or authResult be passed in via clientOptionsCopy
+        client = pool.getOrCreate(token, clientOptionsCopy);
       }
     }
 
