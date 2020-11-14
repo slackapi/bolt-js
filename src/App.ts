@@ -156,6 +156,7 @@ export default class App {
 
   private clientOptions: WebClientOptions;
 
+  // Some payloads don't have teamId anymore. So we use EnterpriseId in those scenarios
   private clients: { [teamOrEnterpriseId: string]: WebClientPool } = {};
 
   /** Receiver - ingests events from the Slack platform */
@@ -567,6 +568,7 @@ export default class App {
         authorizeResult = await this.orgAuthorize(source, bodyArg);
       } catch (error) {
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+        error.code = 'slack_bolt_authorization_error';
         return this.handleError(error);
       }
     } else {
@@ -578,6 +580,7 @@ export default class App {
         authorizeResult = await this.authorize(source, bodyArg);
       } catch (error) {
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+        error.code = 'slack_bolt_authorization_error';
         return this.handleError(error);
       }
     }
