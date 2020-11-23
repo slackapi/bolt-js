@@ -91,6 +91,7 @@ export interface AuthorizeSourceData {
   enterpriseId?: string;
   userId?: string;
   conversationId?: string;
+  isEnterpriseInstall?: boolean;
 }
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
@@ -99,6 +100,7 @@ export interface OrgAuthorizeSourceData {
   teamId?: string;
   userId?: string;
   conversationId?: string;
+  isEnterpriseInstall?: boolean;
 }
 
 /** Authorization function outputs - data that will be available as part of event processing */
@@ -109,6 +111,7 @@ export interface AuthorizeResult {
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
   teamId?: string;
+  enterpriseId?: string;
   [key: string]: any;
 }
 
@@ -296,7 +299,7 @@ export default class App {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
     } else if (authorize === undefined && orgAuthorize === undefined && usingOauth) {
       this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
-      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.orgAuthorize as Authorize;
+      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
     } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
       // only supporting org installs
       this.orgAuthorize = orgAuthorize;
@@ -845,6 +848,7 @@ function buildSource(
           ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
           : undefined,
       conversationId: channelId,
+      isEnterpriseInstall: body.is_enterprise_install,
     };
   } else {
     source = {
@@ -911,6 +915,7 @@ function buildSource(
           ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
           : undefined,
       conversationId: channelId,
+      isEnterpriseInstall: false,
     };
   }
   // tslint:enable:max-line-length
