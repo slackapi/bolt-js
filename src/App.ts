@@ -565,7 +565,7 @@ export default class App {
     ) {
       // This is an org app
       // Initialize context (shallow copy to enforce object identity separation)
-      source = buildSource(type, conversationId, bodyArg);
+      source = buildSource(type, conversationId, bodyArg, true);
 
       try {
         authorizeResult = await this.orgAuthorize(source, bodyArg);
@@ -577,7 +577,7 @@ export default class App {
     } else {
       // This is not an org app
       // Initialize context (shallow copy to enforce object identity separation)
-      source = buildSource(type, conversationId, bodyArg);
+      source = buildSource(type, conversationId, bodyArg, false);
 
       try {
         authorizeResult = await this.authorize(source, bodyArg);
@@ -776,16 +776,21 @@ function buildSource(
   type: IncomingEventType,
   channelId: string | undefined,
   body: AnyMiddlewareArgs['body'],
+  orgInstall: boolean,
 ): AuthorizeSourceData | OrgAuthorizeSourceData {
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
-
   let source: AuthorizeSourceData | OrgAuthorizeSourceData;
   // tslint:disable:max-line-length
-  if (body.is_enterprise_install) {
+  if (orgInstall) {
     source = {
       teamId:
-        type === IncomingEventType.Event || type === IncomingEventType.Command
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
           ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
           : (type === IncomingEventType.Action ||
               type === IncomingEventType.Options ||
@@ -812,7 +817,12 @@ function buildSource(
           : undefined,
       // TODO: double check payloads for event and command below
       enterpriseId:
-        type === IncomingEventType.Event || type === IncomingEventType.Command
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
           ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
           : type === IncomingEventType.Action ||
             type === IncomingEventType.Options ||
@@ -848,12 +858,17 @@ function buildSource(
           ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
           : undefined,
       conversationId: channelId,
-      isEnterpriseInstall: body.is_enterprise_install,
+      isEnterpriseInstall: true,
     };
   } else {
     source = {
       teamId:
-        type === IncomingEventType.Event || type === IncomingEventType.Command
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
           ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
           : type === IncomingEventType.Action ||
             type === IncomingEventType.Options ||
@@ -867,7 +882,12 @@ function buildSource(
             )['body']).team!.id as string)
           : assertNever(type),
       enterpriseId:
-        type === IncomingEventType.Event || type === IncomingEventType.Command
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
           ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
           : (type === IncomingEventType.Action ||
               type === IncomingEventType.Options ||
