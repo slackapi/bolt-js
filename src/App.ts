@@ -684,25 +684,42 @@ export default class App {
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
+    let teamId;
+    let enterpriseId;
+
+    // Try to set teamId from AuthorizeResult before using one from source
+    if (authorizeResult.teamId !== undefined) {
+      teamId = authorizeResult.teamId;
+    } else if (source.teamId !== undefined) {
+      teamId = source.teamId;
+    }
+
+    // Try to set enterpriseId from AuthorizeResult before using one from source
+    if (authorizeResult.enterpriseId !== undefined) {
+      enterpriseId = authorizeResult.enterpriseId;
+    } else if (source.enterpriseId !== undefined) {
+      enterpriseId = source.enterpriseId;
+    }
+
     if (token !== undefined) {
       let pool;
       const clientOptionsCopy = { ...this.clientOptions };
-      if (source.teamId !== undefined) {
-        pool = this.clients[source.teamId];
+      if (teamId !== undefined) {
+        pool = this.clients[teamId];
         if (pool === undefined) {
           // eslint-disable-next-line no-multi-assign
-          pool = this.clients[source.teamId] = new WebClientPool();
+          pool = this.clients[teamId] = new WebClientPool();
         }
-        clientOptionsCopy.teamId = source.teamId;
-      } else if (source.enterpriseId !== undefined) {
-        pool = this.clients[source.enterpriseId];
+        // Add teamId to clientOptions so it can be automatically added to web-api calls
+        clientOptionsCopy.teamId = teamId;
+      } else if (enterpriseId !== undefined) {
+        pool = this.clients[enterpriseId];
         if (pool === undefined) {
           // eslint-disable-next-line no-multi-assign
-          pool = this.clients[source.enterpriseId] = new WebClientPool();
+          pool = this.clients[enterpriseId] = new WebClientPool();
         }
       }
       if (pool !== undefined) {
-        // Question: should teamId from source or authResult be passed in via clientOptionsCopy
         client = pool.getOrCreate(token, clientOptionsCopy);
       }
     }
