@@ -13,7 +13,7 @@ export interface DialogSubmitAction {
     domain: string;
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
-  };
+  } | null;
   user: {
     id: string;
     name: string;
@@ -26,6 +26,13 @@ export interface DialogSubmitAction {
   action_ts: string;
   token: string;
   response_url: string;
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
 
 /**
