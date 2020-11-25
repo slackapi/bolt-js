@@ -70,6 +70,7 @@ export interface AppOptions {
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
   authorize?: Authorize; // either token or authorize
+  orgAuthorize?: Authorize;
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
@@ -81,7 +82,7 @@ export { LogLevel, Logger } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
 export interface Authorize {
-  (source: AuthorizeSourceData, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
+  (source: AuthorizeSourceData | OrgAuthorizeSourceData, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
 }
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
@@ -90,6 +91,16 @@ export interface AuthorizeSourceData {
   enterpriseId?: string;
   userId?: string;
   conversationId?: string;
+  isEnterpriseInstall?: boolean;
+}
+
+/** Authorization function inputs - authenticated data about an event for the authorization function */
+export interface OrgAuthorizeSourceData {
+  enterpriseId: string;
+  teamId?: string;
+  userId?: string;
+  conversationId?: string;
+  isEnterpriseInstall?: boolean;
 }
 
 /** Authorization function outputs - data that will be available as part of event processing */
@@ -99,6 +110,8 @@ export interface AuthorizeResult {
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
+  teamId?: string;
+  enterpriseId?: string;
   [key: string]: any;
 }
 
@@ -146,7 +159,8 @@ export default class App {
 
   private clientOptions: WebClientOptions;
 
-  private clients: { [teamId: string]: WebClientPool } = {};
+  // Some payloads don't have teamId anymore. So we use EnterpriseId in those scenarios
+  private clients: { [teamOrEnterpriseId: string]: WebClientPool } = {};
 
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
@@ -156,6 +170,9 @@ export default class App {
 
   /** Authorize */
   private authorize!: Authorize;
+
+  /** Org Authorize */
+  private orgAuthorize!: Authorize;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -180,6 +197,7 @@ export default class App {
     botId = undefined,
     botUserId = undefined,
     authorize = undefined,
+    orgAuthorize = undefined,
     logger = undefined,
     logLevel = undefined,
     ignoreSelf = true,
@@ -265,22 +283,33 @@ export default class App {
     }
 
     if (token !== undefined) {
-      if (authorize !== undefined || usingOauth) {
+      if (authorize !== undefined || orgAuthorize !== undefined || usingOauth) {
         throw new AppInitializationError(
-          `token as well as authorize options or oauth installer options were provided. ${tokenUsage}`,
+          `token as well as authorize, orgAuthorize, or oauth installer options were provided. ${tokenUsage}`,
         );
       }
       this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined && !usingOauth) {
+      // Todo: what should we do with orgAuthorize in a singeTeamAuthorize/token provided world?
+      this.orgAuthorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
+    } else if (authorize === undefined && orgAuthorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `No token, no authorize options, and no oauth installer options provided. ${tokenUsage}`,
+        `No token, no authorize, no orgAuthorize, and no oauth installer options provided. ${tokenUsage}`,
       );
-    } else if (authorize !== undefined && usingOauth) {
+    } else if ((authorize !== undefined || orgAuthorize !== undefined) && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
-    } else if (authorize === undefined && usingOauth) {
+    } else if (authorize === undefined && orgAuthorize === undefined && usingOauth) {
       this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
-    } else if (authorize !== undefined && !usingOauth) {
+      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
+    } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
+      // only supporting org installs
+      this.orgAuthorize = orgAuthorize;
+    } else if (authorize !== undefined && orgAuthorize === undefined && !usingOauth) {
+      // only supporting non org installs
       this.authorize = authorize;
+    } else if (authorize !== undefined && orgAuthorize !== undefined && !usingOauth) {
+      // supporting both org installs and non org installs
+      this.authorize = authorize;
+      this.orgAuthorize = orgAuthorize;
     } else {
       this.logger.error('Never should have reached this point, please report to the team');
       assertNever();
@@ -523,15 +552,40 @@ export default class App {
     // From this point on, we assume that body is not just a key-value map, but one of the types of bodies we expect
     const bodyArg = body as AnyMiddlewareArgs['body'];
 
-    // Initialize context (shallow copy to enforce object identity separation)
-    const source = buildSource(type, conversationId, bodyArg);
     let authorizeResult;
+    let source;
+    // Check if type event with the authorizations object or if it has a top level is_enterprise_install property
+    if (
+      (type === IncomingEventType.Event &&
+        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0] !== undefined &&
+        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0].is_enterprise_install) ||
+      bodyArg.is_enterprise_install === true ||
+      bodyArg.is_enterprise_install === 'true' // command payloads have this as a string
+    ) {
+      // This is an org app
+      // Initialize context (shallow copy to enforce object identity separation)
+      source = buildSource(type, conversationId, bodyArg, true);
 
-    try {
-      authorizeResult = await this.authorize(source, bodyArg);
-    } catch (error) {
-      this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      return this.handleError(error);
+      try {
+        authorizeResult = await this.orgAuthorize(source, bodyArg);
+      } catch (error) {
+        this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+        error.code = 'slack_bolt_authorization_error';
+        return this.handleError(error);
+      }
+    } else {
+      // This is not an org app
+      // Initialize context (shallow copy to enforce object identity separation)
+      source = buildSource(type, conversationId, bodyArg, false);
+
+      try {
+        authorizeResult = await this.authorize(source, bodyArg);
+      } catch (error) {
+        this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+        error.code = 'slack_bolt_authorization_error';
+        return this.handleError(error);
+      }
     }
 
     const context: Context = { ...authorizeResult };
@@ -630,13 +684,44 @@ export default class App {
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
+    let teamId;
+    let enterpriseId;
+
+    // Try to set teamId from AuthorizeResult before using one from source
+    if (authorizeResult.teamId !== undefined) {
+      teamId = authorizeResult.teamId;
+    } else if (source.teamId !== undefined) {
+      teamId = source.teamId;
+    }
+
+    // Try to set enterpriseId from AuthorizeResult before using one from source
+    if (authorizeResult.enterpriseId !== undefined) {
+      enterpriseId = authorizeResult.enterpriseId;
+    } else if (source.enterpriseId !== undefined) {
+      enterpriseId = source.enterpriseId;
+    }
+
     if (token !== undefined) {
-      let pool = this.clients[source.teamId];
-      if (pool === undefined) {
-        // eslint-disable-next-line no-multi-assign
-        pool = this.clients[source.teamId] = new WebClientPool();
+      let pool;
+      const clientOptionsCopy = { ...this.clientOptions };
+      if (teamId !== undefined) {
+        pool = this.clients[teamId];
+        if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
+          pool = this.clients[teamId] = new WebClientPool();
+        }
+        // Add teamId to clientOptions so it can be automatically added to web-api calls
+        clientOptionsCopy.teamId = teamId;
+      } else if (enterpriseId !== undefined) {
+        pool = this.clients[enterpriseId];
+        if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
+          pool = this.clients[enterpriseId] = new WebClientPool();
+        }
       }
-      client = pool.getOrCreate(token, this.clientOptions);
+      if (pool !== undefined) {
+        client = pool.getOrCreate(token, clientOptionsCopy);
+      }
     }
 
     // Dispatch event through the global middleware chain
@@ -708,66 +793,169 @@ function buildSource(
   type: IncomingEventType,
   channelId: string | undefined,
   body: AnyMiddlewareArgs['body'],
-): AuthorizeSourceData {
+  orgInstall: boolean,
+): AuthorizeSourceData | OrgAuthorizeSourceData {
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
-
+  let source: AuthorizeSourceData | OrgAuthorizeSourceData;
   // tslint:disable:max-line-length
-  const source: AuthorizeSourceData = {
-    teamId:
-      type === IncomingEventType.Event || type === IncomingEventType.Command
-        ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
-        : type === IncomingEventType.Action ||
-          type === IncomingEventType.Options ||
-          type === IncomingEventType.ViewAction ||
-          type === IncomingEventType.Shortcut
-        ? ((body as (
-            | SlackActionMiddlewareArgs
-            | SlackOptionsMiddlewareArgs
-            | SlackViewMiddlewareArgs
-            | SlackShortcutMiddlewareArgs
-          )['body']).team.id as string)
-        : assertNever(type),
-    enterpriseId:
-      type === IncomingEventType.Event || type === IncomingEventType.Command
-        ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
-        : type === IncomingEventType.Action ||
-          type === IncomingEventType.Options ||
-          type === IncomingEventType.ViewAction ||
-          type === IncomingEventType.Shortcut
-        ? ((body as (
-            | SlackActionMiddlewareArgs
-            | SlackOptionsMiddlewareArgs
-            | SlackViewMiddlewareArgs
-            | SlackShortcutMiddlewareArgs
-          )['body']).team.enterprise_id as string)
-        : undefined,
-    userId:
-      type === IncomingEventType.Event
-        ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
-          ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
-          : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
-          ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
-          : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
-            (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
-          ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
-          : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
-            (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
-          ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
-          : undefined
-        : type === IncomingEventType.Action ||
-          type === IncomingEventType.Options ||
-          type === IncomingEventType.ViewAction ||
-          type === IncomingEventType.Shortcut
-        ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
-            .id as string)
-        : type === IncomingEventType.Command
-        ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
-        : undefined,
-    conversationId: channelId,
-  };
+  if (orgInstall) {
+    source = {
+      teamId:
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
+          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
+          : (type === IncomingEventType.Action ||
+              type === IncomingEventType.Options ||
+              type === IncomingEventType.ViewAction ||
+              type === IncomingEventType.Shortcut) &&
+            body.team !== null
+          ? ((body as (
+              | SlackActionMiddlewareArgs
+              | SlackOptionsMiddlewareArgs
+              | SlackViewMiddlewareArgs
+              | SlackShortcutMiddlewareArgs
+            )['body']).team!.id as string)
+          : (type === IncomingEventType.Action ||
+              type === IncomingEventType.Options ||
+              type === IncomingEventType.ViewAction ||
+              type === IncomingEventType.Shortcut) &&
+            body.user !== undefined
+          ? ((body as (
+              | SlackActionMiddlewareArgs
+              | SlackOptionsMiddlewareArgs
+              | SlackViewMiddlewareArgs
+              | SlackShortcutMiddlewareArgs
+            )['body']).user.team_id as string)
+          : undefined,
+      // TODO: double check payloads for event and command below
+      enterpriseId:
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
+          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
+          : type === IncomingEventType.Action ||
+            type === IncomingEventType.Options ||
+            type === IncomingEventType.ViewAction ||
+            type === IncomingEventType.Shortcut
+          ? ((body as (
+              | SlackActionMiddlewareArgs
+              | SlackOptionsMiddlewareArgs
+              | SlackViewMiddlewareArgs
+              | SlackShortcutMiddlewareArgs
+            )['body']).enterprise!.id as string)
+          : assertNever(type),
+      userId:
+        type === IncomingEventType.Event
+          ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
+            ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
+            : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
+            ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
+            : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
+              (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
+            ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
+            : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
+              (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
+            ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
+            : undefined
+          : type === IncomingEventType.Action ||
+            type === IncomingEventType.Options ||
+            type === IncomingEventType.ViewAction ||
+            type === IncomingEventType.Shortcut
+          ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
+              .id as string)
+          : type === IncomingEventType.Command
+          ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
+          : undefined,
+      conversationId: channelId,
+      isEnterpriseInstall: true,
+    };
+  } else {
+    source = {
+      teamId:
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
+          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
+          : type === IncomingEventType.Action ||
+            type === IncomingEventType.Options ||
+            type === IncomingEventType.ViewAction ||
+            type === IncomingEventType.Shortcut
+          ? ((body as (
+              | SlackActionMiddlewareArgs
+              | SlackOptionsMiddlewareArgs
+              | SlackViewMiddlewareArgs
+              | SlackShortcutMiddlewareArgs
+            )['body']).team!.id as string)
+          : assertNever(type),
+      enterpriseId:
+        type === IncomingEventType.Event &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
+        (body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id !== null
+          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id as string)
+          : type === IncomingEventType.Event || type === IncomingEventType.Command
+          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
+          : (type === IncomingEventType.Action ||
+              type === IncomingEventType.Options ||
+              type === IncomingEventType.ViewAction ||
+              type === IncomingEventType.Shortcut) &&
+            body.team !== null
+          ? ((body as (
+              | SlackActionMiddlewareArgs
+              | SlackOptionsMiddlewareArgs
+              | SlackViewMiddlewareArgs
+              | SlackShortcutMiddlewareArgs
+            )['body']).team!.enterprise_id as string)
+          : (type === IncomingEventType.Action ||
+              type === IncomingEventType.Options ||
+              type === IncomingEventType.ViewAction ||
+              type === IncomingEventType.Shortcut) &&
+            body.enterprise !== undefined
+          ? ((body as (
+              | SlackActionMiddlewareArgs
+              | SlackOptionsMiddlewareArgs
+              | SlackViewMiddlewareArgs
+              | SlackShortcutMiddlewareArgs
+            )['body']).enterprise!.id as string)
+          : undefined,
+      userId:
+        type === IncomingEventType.Event
+          ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
+            ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
+            : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
+            ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
+            : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
+              (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
+            ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
+            : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
+              (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
+            ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
+            : undefined
+          : type === IncomingEventType.Action ||
+            type === IncomingEventType.Options ||
+            type === IncomingEventType.ViewAction ||
+            type === IncomingEventType.Shortcut
+          ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
+              .id as string)
+          : type === IncomingEventType.Command
+          ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
+          : undefined,
+      conversationId: channelId,
+      isEnterpriseInstall: false,
+    };
+  }
   // tslint:enable:max-line-length
-
   return source;
 }
 

@@ -14,6 +14,8 @@ redirect_from:
 This guide is meant to walk you through getting up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 </div> 
 
+When you’re finished, you’ll have this ⚡️[Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own.
+
 ---
 
 ### Create an app
@@ -311,7 +313,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 ---
 
 ### Next steps
-You just built your first Bolt for JavaScript app! 🎉
+You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app)! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
