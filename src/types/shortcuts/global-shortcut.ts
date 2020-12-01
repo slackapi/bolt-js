@@ -12,12 +12,20 @@ export interface GlobalShortcut {
     username: string;
     team_id: string;
   };
+  // team is null for org apps shortcut payload
   team: {
     id: string;
     domain: string;
     enterprise_id?: string;
     enterprise_name?: string;
-  };
+  } | null;
   token: string;
   action_ts: string;
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
