@@ -159,9 +159,10 @@ app.message(
 
 // If you are a little slow it will respond in 60 * 1000 seconds with Who you calling "slow"?
 app.message('you are a little slow', async ({ say, context }) => {
-    setTimeout(() => await say('Who you calling "slow"?'), 60 * 1000);
+      setTimeout(async function() { await say(`Who you calling "_slow_"`) }, 60 * 1000);
 });
 
+//end listening for someone to say the bot is slow
   // robot.respond(/annoy me/, (res) => {
   //   if (annoyIntervalId) {
   //     res.send('AAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEIIIIIIIIHHHHHHHHHH')
