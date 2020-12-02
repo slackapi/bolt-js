@@ -14,6 +14,8 @@ Bolt for JavaScript は、アプリのインストールフローを完了した
 Bolt for JavaScript は `slack/install` というパスも生成します。これは、Slack アプリのダイレクトインストールのために `Add to Slack` ボタンを置く場合に指定できる URL です。アプリはすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳細は [OAuth ライブラリのドキュメント](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
 Slack の OAuth インストールフローについてもっと知りたい場合は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
+
+[Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 2.5.0 以上を利用してください。また、`installationStore` に `storeOrgInstallation`、`fetchOrgInstallation` というメソッドを追加する必要があります。そして、最後に Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを忘れずに確認するようにしてください。
 </div>
 
 ```javascript
@@ -25,12 +27,22 @@ const app = new App({
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
     storeInstallation: async (installation) => {
-      // TODO: 実際のデータベースに保存するために、ここのコードを変更
+      // 実際のデータベースに保存するために、ここのコードを変更
       return await database.set(installation.team.id, installation);
     },
     fetchInstallation: async (InstallQuery) => {
-      // TODO: 実際のデータベースから取得するために、ここのコードを変更
+      // 実際のデータベースから取得するために、ここのコードを変更
       return await database.get(InstallQuery.teamId);
+    },
+    storeOrgInstallation: async (installation) => {
+      // OrG 全体へのインストールに対応する場合はこのメソッドも追加
+      // 実際のデータベースから取得するために、ここのコードを変更
+      return await database.set(installation.enterprise.id, installation);
+    },
+    fetchOrgInstallation: async (InstallQuery) => {
+      // OrG 全体へのインストールに対応する場合はこのメソッドも追加
+      // 実際のデータベースから取得するために、ここのコードを変更
+      return await database.get(InstallQuery.enterpriseId);
     },
   },
 });
