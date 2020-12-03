@@ -20,7 +20,7 @@ When you’re finished, you’ll have this ⚡️[Getting Started with Serverles
 
 ### Set up AWS Lambda
 
-[AWS Lambda][aws-lambda] is a serverless, function-as-a-service (FaaS) platform that allows you to run code without managing servers. In this section, we'll configure your local machine to access AWS Lambda.
+[AWS Lambda][aws-lambda] is a serverless, Function-as-a-Service (FaaS) platform that allows you to run code without managing servers. In this section, we'll configure your local machine to access AWS Lambda.
 
 > 💡 Skip this section if you have [configured a profile][aws-profiles] on your local machine with access to AWS Lambda.
 
