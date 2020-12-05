@@ -12,9 +12,8 @@ All listeners have access to a `context` object, which can be used to enrich eve
 </div>
 
 ```javascript
-async function addTimezoneContext({ payload, context, next }) {
-  const user = await app.client.users.info({
-    token: context.botToken,
+async function addTimezoneContext({ payload, client, context, next }) {
+  const user = await client.users.info({
     user: payload.user_id,
     include_locale: true
   });
@@ -26,7 +25,7 @@ async function addTimezoneContext({ payload, context, next }) {
   await next();
 }
 
-app.command('request', addTimezoneContext, async ({ command, ack, context }) => {
+app.command('request', addTimezoneContext, async ({ command, ack, client, context }) => {
   // Acknowledge command request
   await ack();
   // Get local hour of request
@@ -44,8 +43,7 @@ app.command('request', addTimezoneContext, async ({ command, ack, context }) => 
 
     try {
       // Schedule message
-      const result = await app.client.chat.scheduleMessage({
-        token: context.botToken,
+      const result = await client.chat.scheduleMessage({
         channel: requestChannel,
         text: requestText,
         post_at: local_tomorrow
@@ -57,8 +55,7 @@ app.command('request', addTimezoneContext, async ({ command, ack, context }) => 
   } else {
     try {
       // Post now
-      const result = app.client.chat.postMessage({
-        token: context.botToken,
+      const result = client.chat.postMessage({
         channel: requestChannel,
         text: requestText
       });
