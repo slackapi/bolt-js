@@ -237,9 +237,9 @@ describe('WorkflowStep', () => {
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const editStepArgs = prepareStepArgs(fakeEditArgs) as AllWorkflowStepMiddlewareArgs<
-        WorkflowStepEditMiddlewareArgs
-      >;
+      const editStepArgs = prepareStepArgs(
+        fakeEditArgs,
+      ) as AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>;
 
       await editStepArgs.configure({ blocks: [] });
 
@@ -254,9 +254,9 @@ describe('WorkflowStep', () => {
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const saveStepArgs = prepareStepArgs(fakeSaveArgs) as AllWorkflowStepMiddlewareArgs<
-        WorkflowStepSaveMiddlewareArgs
-      >;
+      const saveStepArgs = prepareStepArgs(
+        fakeSaveArgs,
+      ) as AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>;
 
       await saveStepArgs.update();
 
@@ -272,9 +272,9 @@ describe('WorkflowStep', () => {
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const executeStepArgs = prepareStepArgs(fakeExecuteArgs) as AllWorkflowStepMiddlewareArgs<
-        WorkflowStepExecuteMiddlewareArgs
-      >;
+      const executeStepArgs = prepareStepArgs(
+        fakeExecuteArgs,
+      ) as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>;
 
       await executeStepArgs.complete();
 
@@ -290,9 +290,9 @@ describe('WorkflowStep', () => {
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const executeStepArgs = prepareStepArgs(fakeExecuteArgs) as AllWorkflowStepMiddlewareArgs<
-        WorkflowStepExecuteMiddlewareArgs
-      >;
+      const executeStepArgs = prepareStepArgs(
+        fakeExecuteArgs,
+      ) as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>;
 
       await executeStepArgs.fail({ error: { message: 'Failed' } });
 
