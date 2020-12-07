@@ -386,9 +386,11 @@ export default class App {
       return patternOrMiddleware;
     });
 
-    this.listeners.push([onlyEvents, matchEventType('message'), ...messageMiddleware] as Middleware<
-      AnyMiddlewareArgs
-    >[]);
+    this.listeners.push([
+      onlyEvents,
+      matchEventType('message'),
+      ...messageMiddleware,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
@@ -423,9 +425,11 @@ export default class App {
       return;
     }
 
-    this.listeners.push([onlyShortcuts, matchConstraints(constraints), ...listeners] as Middleware<
-      AnyMiddlewareArgs
-    >[]);
+    this.listeners.push([
+      onlyShortcuts,
+      matchConstraints(constraints),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
@@ -524,9 +528,11 @@ export default class App {
       return;
     }
 
-    this.listeners.push([onlyViewActions, matchConstraints(constraints), ...listeners] as Middleware<
-      AnyMiddlewareArgs
-    >[]);
+    this.listeners.push([
+      onlyViewActions,
+      matchConstraints(constraints),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public error(errorHandler: ErrorHandler): void {

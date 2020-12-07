@@ -1,7 +1,7 @@
 # Bolt ![Bolt logo](docs/assets/bolt-logo.svg) for JavaScript
 
-[![Build Status](https://travis-ci.org/slackapi/bolt-js.svg?branch=master)](https://travis-ci.org/slackapi/bolt-js)
 [![codecov](https://codecov.io/gh/slackapi/bolt/branch/master/graph/badge.svg)](https://codecov.io/gh/slackapi/bolt-js)
+[![build-ci](https://github.com/slackapi/bolt-js/workflows/CI%20Build/badge.svg)](https://github.com/slackapi/bolt-js/actions?query=workflow%3A%22CI+Build%22)
 
 A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-js/tutorial/getting-started) to set-up and run your first Bolt app.
 
@@ -11,9 +11,6 @@ Read [the documentation](https://slack.dev/bolt-js) to explore the basic and adv
 
 ```bash
 npm install @slack/bolt
-
-# Or with yarn
-yarn add @slack/bolt
 ```
 
 ## Initialization
