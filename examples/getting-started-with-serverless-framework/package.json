@@ -4,7 +4,6 @@
   "description": "Getting Started with Serverless Framework ⚡️ Bolt for JavaScript",
   "main": "app.js",
   "scripts": {
-    "ngrok": "ngrok http 3000",
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
