@@ -11,7 +11,7 @@ const expressReceiver = new ExpressReceiver({
   processBeforeResponse: true
 });
 
-// Initializes your app with your bot token and signing secret
+// Initializes your app with your bot token and the AWS Lambda ready receiver
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: expressReceiver
