@@ -22,13 +22,11 @@ When you’re finished, you’ll have this ⚡️[Getting Started with Serverles
 
 [AWS Lambda][aws-lambda] is a serverless, Function-as-a-Service (FaaS) platform that allows you to run code without managing servers. In this section, we'll configure your local machine to access AWS Lambda.
 
-> 💡 Skip this section if you have already [configured a profile][aws-profiles] on your local machine with access to AWS Lambda.
+> 💡 Skip this section if you have already [configured a profile][aws-profiles] on your local machine to access AWS Lambda.
 
 **1. Sign up for an AWS account**
 
-First off, you'll need an AWS account. If you already an account, then you can go to the next step.
-
-To create an account, [sign up for AWS](https://aws.amazon.com/) and follow the steps.
+If you don't already have an account, you should [sign up for AWS][aws-sign-up] and follow the on-screen instructions.
 
 > 💡 You may be asked for payment information during the sign up. Don't worry, this guide only uses the [free tier][aws-pricing].
 
@@ -38,7 +36,7 @@ Next, you'll need programmatic access to your AWS account to deploy onto AWS Lam
 
 We recommend watching this short, step-by-step video to 🍿 [create an IAM user and download the access keys](https://www.youtube.com/watch?v=KngM5bfpttA).
 
-> 💡 **Do you already have an IAM user?** Follow this official guide to [create access keys for an existing IAM user][aws-iam-user].
+> 💡 **Do you already have an IAM user?** Follow the official AWS guide to [create access keys for existing IAM users][aws-iam-user].
 
 **3. Install the AWS CLI**
 
@@ -223,7 +221,7 @@ Next, use ngrok to forward Slack events to your local machine:
 ngrok http 3000
 ```
 
-> 💡 [Learn how to install ngrok](https://api.slack.com/tutorials/tunneling-with-ngrok) to create a public URL and forward requests to your local machine.
+> 💡 [Learn how to use ngrok][getting-started-guide-setting-up-events] to create a public URL and forward requests to your local machine.
 
 **2. Update your Request URL**
 
@@ -336,10 +334,12 @@ Now that you've built and deployed a basic app, here are some ideas you can expl
 [aws-cli-output-format]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format 
 [aws-cli-region]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region
 [aws-iam-user]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds
-[aws-profiles]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles
 [aws-lambda]: https://aws.amazon.com/lambda/
 [aws-pricing]: https://aws.amazon.com/lambda/pricing/
+[aws-profiles]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles
+[aws-sign-up]: https://aws.amazon.com/
 [bolt-js]: /bolt-js
+[getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
 [getting-started-guide]: /bolt-js/tutorial/getting-started
 [getting-started-with-serverless-framework-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework
 [getting-started-with-serverless-framework-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework/app.js

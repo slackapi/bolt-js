@@ -20,13 +20,11 @@ Before you begin, you may want to follow our [Getting Started guide][bolt-guide]
 
 ## 1. Set up AWS credentials
 
-### Install AWS CLI
+### Install and configure AWS CLI
 
-Follow the guide to [install the AWS CLI v2 for macOS, Windows, or Linux][aws-cli-install].
+Follow Amazon's guides to [install the AWS CLI v2 for macOS, Windows, or Linux][aws-cli-install] and [create a new IAM User][aws-cli-configure-user].
 
-### Configure AWS CLI
-
-Follow the guide to [create a new IAM User][aws-cli-configure-user] then configure your local machine with the command:
+When you have the AWS CLI and user credentials, then configure your local machine with the command:
 
 ```zsh
 aws configure
