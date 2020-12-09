@@ -22,7 +22,8 @@ export type BlockElementAction =
   | OverflowAction
   | DatepickerAction
   | RadioButtonsAction
-  | CheckboxesAction;
+  | CheckboxesAction
+  | PlainTextInputAction;
 
 /**
  * Any action from Slack's interactive elements
@@ -197,6 +198,13 @@ export interface CheckboxesAction extends BasicElementAction<'checkboxes'> {
 }
 
 /**
+ *  An action from a plain_text_input element (must use dispatch_action: true)
+ */
+export interface PlainTextInputAction extends BasicElementAction<'plain_text_input'> {
+  value: string;
+}
+
+/**
  * A Slack Block Kit element action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack's Block Kit interactive components.
@@ -259,3 +267,4 @@ export type BlockOverflowAction = BlockAction<OverflowAction>;
 export type BlockDatepickerAction = BlockAction<DatepickerAction>;
 export type BlockRadioButtonsAction = BlockAction<RadioButtonsAction>;
 export type BlockCheckboxesAction = BlockAction<CheckboxesAction>;
+export type BlockPlainTextInputAction = BlockAction<PlainTextInputAction>;
