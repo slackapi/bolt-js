@@ -16,7 +16,7 @@ Before you begin, you may want to follow our [Getting Started guide][bolt-guide]
 1. [Deploy to AWS Lambda](#4-deploy-to-aws-lambda)
 1. [Update Slack app settings](#5-update-slack-app-settings)
 1. [Test your Slack app](#6-test-your-slack-app)
-1. [Run on local machine](#7-develop-on-local-machine)
+1. [Develop on local machine](#7-develop-on-local-machine)
 
 ## 1. Set up AWS credentials
 
