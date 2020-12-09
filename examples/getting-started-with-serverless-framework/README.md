@@ -1,4 +1,4 @@
-# AWS Lambda and Serverless Framework ⚡️ Bolt for JavaScript
+# Getting Started with AWS Lambda ⚡️ Bolt for JavaScript
 
 > Slack app example for deploying to AWS Lambda using the Serverless Framework with Bolt for JavaScript
 

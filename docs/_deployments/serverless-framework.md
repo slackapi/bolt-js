@@ -1,20 +1,20 @@
 ---
-title: Serverless Framework
+title: AWS Lambda
 order: 0
-slug: serverless-framework
+slug: aws-lambda
 lang: en
 layout: tutorial
-permalink: /deployments/serverless-framework
+permalink: /deployments/aws-lambda
 redirect_from:
   - /deployments
 ---
-# Deploying with the Serverless Framework
+# Deploying to AWS Lambda
 
 <div class="section-content">
 This guide walks you through preparing and deploying a Slack app using [Bolt for JavaScript][bolt-js], the [Serverless Framework][serverless-framework], and [AWS Lambda][aws-lambda].
 </div>
 
-When you’re finished, you’ll have this ⚡️[Getting Started with Serverless framework app][getting-started-with-serverless-framework-app] to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Getting Started with AWS Lambda app][getting-started-with-aws-lambda-app] to run, modify, and make your own.
 
 ---
 
@@ -158,7 +158,7 @@ module.exports.handler = (event, context) => {
 };
 ```
 
-When you're done, your app should look similar to the ⚡️[Getting Started with Serverless Framework app][getting-started-with-serverless-framework-app/app.js].
+When you're done, your app should look similar to the ⚡️[Getting Started with AWS Lambda app][getting-started-with-aws-lambda-app/app.js].
 
 **2. Add a serverless.yml**
 
@@ -298,7 +298,7 @@ Just like the [running the app locally](#run-the-app-locally) section, open a Sl
 
 As you continue to build your Slack app, you'll need to deploy the updates. Let's get a feel for this by updating your app to respond to a "goodbye" message.
 
-Add the following code to `app.js` ([source code on GitHub][getting-started-with-serverless-framework-app/app.js]):
+Add the following code to `app.js` ([source code on GitHub][getting-started-with-aws-lambda-app/app.js]):
 
 ```javascript
 // Listens to incoming messages that contain "goodbye"
@@ -320,7 +320,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ### Next steps
 
-You just deployed your first ⚡️[Bolt for JavaScript app with Serverless to AWS Lambda][getting-started-with-serverless-framework-app]! 🚀
+You just deployed your first ⚡️[Bolt for JavaScript app to AWS Lambda][getting-started-with-aws-lambda-app]! 🚀
 
 Now that you've built and deployed a basic app, here are some ideas you can explore to extend, customize, and monitor it:
 
@@ -341,6 +341,6 @@ Now that you've built and deployed a basic app, here are some ideas you can expl
 [bolt-js]: /bolt-js
 [getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
 [getting-started-guide]: /bolt-js/tutorial/getting-started
-[getting-started-with-serverless-framework-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework
-[getting-started-with-serverless-framework-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework/app.js
+[getting-started-with-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework
+[getting-started-with-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework/app.js
 [serverless-framework]: https://serverless.com/
