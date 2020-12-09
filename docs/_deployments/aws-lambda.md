@@ -341,6 +341,6 @@ Now that you've built and deployed a basic app, here are some ideas you can expl
 [bolt-js]: /bolt-js
 [getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
 [getting-started-guide]: /bolt-js/tutorial/getting-started
-[getting-started-with-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework
-[getting-started-with-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-serverless-framework/app.js
+[getting-started-with-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-aws-lambda
+[getting-started-with-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-aws-lambda/app.js
 [serverless-framework]: https://serverless.com/
