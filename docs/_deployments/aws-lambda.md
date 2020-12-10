@@ -205,7 +205,7 @@ Congratulations, you've just prepared your Bolt app for AWS Lambda and Serverles
 
 ### Run the app locally
 
-Let's learn how to run your Bolt app on your local machine, now that it's configured to respond to an AWS Lambda function.
+Now that your app is configured to respond to an AWS Lambda function, we'll set up your environment to run the app locally.
 
 **1. Start your local servers**
 
