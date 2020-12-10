@@ -1,0 +1,2 @@
+ignore:
+  - "examples/"  # ignore examples folder and all its contents

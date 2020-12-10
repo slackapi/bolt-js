@@ -1,5 +1,5 @@
 ---
-title: Deploying to Heroku
+title: Heroku Platform
 order: 0
 slug: heroku
 lang: en
@@ -67,7 +67,7 @@ git commit -m "Add Procfile"
 
 ---
 
-### Setup the Heroku tools
+### Set up the Heroku tools
 
 Now we can set up the Heroku tools on your local machine. These tools will help you manage, deploy, and debug your app on Heroku's platform.
 
@@ -261,5 +261,4 @@ Now that you've deployed a basic app, you can start exploring how to customize a
 - Get ready for primetime with [how to scale your Heroku app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
 
 [getting-started-guide]: /bolt-js/tutorial/getting-started
-[getting-started-with-heroku-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-heroku
 [getting-started-with-heroku-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-heroku
