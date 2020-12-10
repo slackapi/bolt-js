@@ -5,6 +5,7 @@
 ## Overview
 
 This is an example app that updates the [Getting Started ⚡️ Bolt for JavaScript app][bolt-app] to be deployed to [AWS Lambda][aws-lambda] using the [Serverless Framework][serverless-framework].
+You can learn how to build this example app by following our 📚 [Getting Started with AWS Lambda guide][bolt-guide-aws-lambda].
 
 Before you begin, you may want to follow our [Getting Started guide][bolt-guide] to learn how to build your first Slack app using the [Bolt for JavaScript framework][bolt-website].
 
@@ -135,6 +136,7 @@ Follow the steps to [test your app](#6-test-your-slack-app).
 [aws-lambda]: https://aws.amazon.com/lambda/
 [bolt-app]: https://github.com/slackapi/bolt-js-getting-started-app
 [bolt-guide]: https://slack.dev/bolt-js/tutorial/getting-started
+[bolt-guide-aws-lambda]: https://slack.dev/bolt-js/deployments/aws-lambda
 [bolt-website]: https://slack.dev/bolt-js/
 [ngrok-install]: https://api.slack.com/tutorials/tunneling-with-ngrok
 [serverless-framework]: https://serverless.com/

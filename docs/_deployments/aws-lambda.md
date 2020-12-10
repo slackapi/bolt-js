@@ -32,7 +32,7 @@ If you don't already have an account, you should [sign up for AWS][aws-sign-up] 
 
 **2. Create an AWS access key**
 
-Next, you'll need programmatic access to your AWS account to deploy onto AWS Lambda. In the world of AWS, this requires an **Access Key ID** and **Secret Access Key**.
+Next, you'll need programmatic access to your AWS account to deploy onto Lambda. In the world of AWS, this requires an **Access Key ID** and **Secret Access Key**.
 
 We recommend watching this short, step-by-step video to 🍿 [create an IAM user and download the access keys](https://www.youtube.com/watch?v=KngM5bfpttA).
 
