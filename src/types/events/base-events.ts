@@ -1,5 +1,5 @@
-import { MessageAttachment, KnownBlock, Block, View } from '@slack/types';
-import { StringIndexed } from '../helpers';
+import { View } from '@slack/types';
+import { MessageEvent as AllMessageEvents } from './message-events';
 
 /**
  * All known event types in Slack's Events API
@@ -76,16 +76,13 @@ export type SlackEvent =
  * this interface. That condition isn't enforced, since we're not interested in factoring out common properties from the
  * known event types.
  */
-export interface BasicSlackEvent<Type extends string = string> extends StringIndexed {
+export interface BasicSlackEvent<Type extends string = string> {
   type: Type;
 }
 
 /* ------- TODO: Generate these interfaces ------- */
 
-// TODO: why are these all StringIndexed? who does that really help when going more than one level deep means you have
-// to start coercing types anyway?
-
-export interface AppRequestedEvent extends StringIndexed {
+export interface AppRequestedEvent {
   type: 'app_requested';
   app_request: {
     id: string;
@@ -131,7 +128,7 @@ export interface AppRequestedEvent extends StringIndexed {
   date_created: number;
 }
 
-export interface AppHomeOpenedEvent extends StringIndexed {
+export interface AppHomeOpenedEvent {
   type: 'app_home_opened';
   user: string;
   channel: string;
@@ -142,7 +139,7 @@ export interface AppHomeOpenedEvent extends StringIndexed {
 
 // NOTE: this is essentially the same as the `message` event, except for the type and that this uses `event_ts` instead
 // of `ts`
-export interface AppMentionEvent extends StringIndexed {
+export interface AppMentionEvent {
   type: 'app_mention';
   user: string;
   text: string;
@@ -154,14 +151,14 @@ export interface AppMentionEvent extends StringIndexed {
 // TODO: this event doesn't use the envelope. write test cases to make sure its works without breaking, and figure out
 // what exceptions need to be made to the related types to make this work
 // https://api.slack.com/events/app_rate_limited
-// export interface AppRateLimitedEvent extends StringIndexed {
+// export interface AppRateLimitedEvent {
 // }
 
-export interface AppUninstalledEvent extends StringIndexed {
+export interface AppUninstalledEvent {
   type: 'app_uninstalled';
 }
 
-export interface CallRejectedEvent extends StringIndexed {
+export interface CallRejectedEvent {
   type: 'call_rejected';
   call_id: string;
   user_id: string;
@@ -169,13 +166,13 @@ export interface CallRejectedEvent extends StringIndexed {
   external_unique_id: string;
 }
 
-export interface ChannelArchiveEvent extends StringIndexed {
+export interface ChannelArchiveEvent {
   type: 'channel_archive';
   channel: string;
   user: string;
 }
 
-export interface ChannelCreatedEvent extends StringIndexed {
+export interface ChannelCreatedEvent {
   type: 'channel_created';
   channel: {
     id: string;
@@ -185,24 +182,24 @@ export interface ChannelCreatedEvent extends StringIndexed {
   };
 }
 
-export interface ChannelDeletedEvent extends StringIndexed {
+export interface ChannelDeletedEvent {
   type: 'channel_deleted';
   channel: string;
 }
 
-export interface ChannelHistoryChangedEvent extends StringIndexed {
+export interface ChannelHistoryChangedEvent {
   type: 'channel_history_changed';
   latest: string;
   ts: string;
   event_ts: string;
 }
 
-export interface ChannelLeftEvent extends StringIndexed {
+export interface ChannelLeftEvent {
   type: 'channel_left';
   channel: string;
 }
 
-export interface ChannelRenameEvent extends StringIndexed {
+export interface ChannelRenameEvent {
   type: 'channel_rename';
   channel: {
     id: string;
@@ -211,20 +208,20 @@ export interface ChannelRenameEvent extends StringIndexed {
   };
 }
 
-export interface ChannelSharedEvent extends StringIndexed {
+export interface ChannelSharedEvent {
   type: 'channel_shared';
   connected_team_id: string;
   channel: string;
   event_ts: string;
 }
 
-export interface ChannelUnarchiveEvent extends StringIndexed {
+export interface ChannelUnarchiveEvent {
   type: 'channel_unarchive';
   channel: string;
   user: string;
 }
 
-export interface ChannelUnsharedEvent extends StringIndexed {
+export interface ChannelUnsharedEvent {
   type: 'channel_unshared';
   previously_connected_team_id: string;
   channel: string;
@@ -232,7 +229,7 @@ export interface ChannelUnsharedEvent extends StringIndexed {
   event_ts: string;
 }
 
-export interface DNDUpdatedEvent extends StringIndexed {
+export interface DNDUpdatedEvent {
   type: 'dnd_updated';
   user: string;
   dnd_status: {
@@ -245,7 +242,7 @@ export interface DNDUpdatedEvent extends StringIndexed {
   };
 }
 
-export interface DNDUpdatedUserEvent extends StringIndexed {
+export interface DNDUpdatedUserEvent {
   type: 'dnd_updated_user';
   user: string;
   dnd_status: {
@@ -255,14 +252,14 @@ export interface DNDUpdatedUserEvent extends StringIndexed {
   };
 }
 
-export interface EmailDomainChangedEvent extends StringIndexed {
+export interface EmailDomainChangedEvent {
   type: 'email_domain_changed';
   email_domain: string;
   event_ts: string;
 }
 
 // NOTE: this should probably be broken into its two subtypes
-export interface EmojiChangedEvent extends StringIndexed {
+export interface EmojiChangedEvent {
   type: 'emoji_changed';
   subtype: 'add' | 'remove';
   names?: string[]; // only for remove
@@ -271,7 +268,7 @@ export interface EmojiChangedEvent extends StringIndexed {
   event_ts: string;
 }
 
-export interface FileChangeEvent extends StringIndexed {
+export interface FileChangeEvent {
   type: 'file_change';
   file_id: string;
   // TODO: incomplete, this should be a reference to a File shape from @slack/types
@@ -283,7 +280,7 @@ export interface FileChangeEvent extends StringIndexed {
 
 // NOTE: `file_comment_added` and `file_comment_edited` are left out because they are discontinued
 
-export interface FileCommentDeletedEvent extends StringIndexed {
+export interface FileCommentDeletedEvent {
   type: 'file_comment_deleted';
   comment: string; // this is an ID
   file_id: string;
@@ -294,7 +291,7 @@ export interface FileCommentDeletedEvent extends StringIndexed {
   };
 }
 
-export interface FileCreatedEvent extends StringIndexed {
+export interface FileCreatedEvent {
   type: 'file_created';
   file_id: string;
   // TODO: incomplete, this should be a reference to a File shape from @slack/types
@@ -304,13 +301,13 @@ export interface FileCreatedEvent extends StringIndexed {
   };
 }
 
-export interface FileDeletedEvent extends StringIndexed {
+export interface FileDeletedEvent {
   type: 'file_deleted';
   file_id: string;
   event_ts: string;
 }
 
-export interface FilePublicEvent extends StringIndexed {
+export interface FilePublicEvent {
   type: 'file_public';
   file_id: string;
   // TODO: incomplete, this should be a reference to a File shape from @slack/types
@@ -320,7 +317,7 @@ export interface FilePublicEvent extends StringIndexed {
   };
 }
 
-export interface FileSharedEvent extends StringIndexed {
+export interface FileSharedEvent {
   type: 'file_shared';
   file_id: string;
   // TODO: incomplete, this should be a reference to a File shape from @slack/types
@@ -330,7 +327,7 @@ export interface FileSharedEvent extends StringIndexed {
   };
 }
 
-export interface FileUnsharedEvent extends StringIndexed {
+export interface FileUnsharedEvent {
   type: 'file_unshared';
   file_id: string;
   // TODO: incomplete, this should be a reference to a File shape from @slack/types
@@ -340,51 +337,51 @@ export interface FileUnsharedEvent extends StringIndexed {
   };
 }
 
-export interface GridMigrationFinishedEvent extends StringIndexed {
+export interface GridMigrationFinishedEvent {
   type: 'grid_migration_finished';
   enterprise_id: string;
 }
 
-export interface GridMigrationStartedEvent extends StringIndexed {
+export interface GridMigrationStartedEvent {
   type: 'grid_migration_started';
   enterprise_id: string;
 }
 
-export interface GroupArchiveEvent extends StringIndexed {
+export interface GroupArchiveEvent {
   type: 'group_archive';
   channel: string;
 }
 
-export interface GroupCloseEvent extends StringIndexed {
+export interface GroupCloseEvent {
   type: 'group_close';
   user: string;
   channel: string;
 }
 
-export interface GroupDeletedEvent extends StringIndexed {
+export interface GroupDeletedEvent {
   type: 'group_deleted';
   channel: string;
 }
 
-export interface GroupHistoryChangedEvent extends StringIndexed {
+export interface GroupHistoryChangedEvent {
   type: 'group_history_changed';
   latest: string;
   ts: string;
   event_ts: string;
 }
 
-export interface GroupLeftEvent extends StringIndexed {
+export interface GroupLeftEvent {
   type: 'group_left';
   channel: string;
 }
 
-export interface GroupOpenEvent extends StringIndexed {
+export interface GroupOpenEvent {
   type: 'group_open';
   user: string;
   channel: string;
 }
 
-export interface GroupRenameEvent extends StringIndexed {
+export interface GroupRenameEvent {
   type: 'group_rename';
   channel: {
     id: string;
@@ -393,18 +390,18 @@ export interface GroupRenameEvent extends StringIndexed {
   };
 }
 
-export interface GroupUnarchiveEvent extends StringIndexed {
+export interface GroupUnarchiveEvent {
   type: 'group_unarchive';
   channel: string;
 }
 
-export interface IMCloseEvent extends StringIndexed {
+export interface IMCloseEvent {
   type: 'im_close';
   user: string;
   channel: string;
 }
 
-export interface IMCreatedEvent extends StringIndexed {
+export interface IMCreatedEvent {
   type: 'im_created';
   user: string;
   // TODO: incomplete, this should probably be a reference to a IM shape from @slack/types. can it just be a
@@ -415,20 +412,20 @@ export interface IMCreatedEvent extends StringIndexed {
   };
 }
 
-export interface IMHistoryChangedEvent extends StringIndexed {
+export interface IMHistoryChangedEvent {
   type: 'im_history_changed';
   latest: string;
   ts: string;
   event_ts: string;
 }
 
-export interface IMOpenEvent extends StringIndexed {
+export interface IMOpenEvent {
   type: 'im_open';
   user: string;
   channel: string;
 }
 
-export interface InviteRequestedEvent extends StringIndexed {
+export interface InviteRequestedEvent {
   type: 'invite_requested';
   invite_request: {
     id: string;
@@ -448,7 +445,7 @@ export interface InviteRequestedEvent extends StringIndexed {
   };
 }
 
-export interface LinkSharedEvent extends StringIndexed {
+export interface LinkSharedEvent {
   type: 'link_shared';
   channel: string;
   user: string;
@@ -460,7 +457,7 @@ export interface LinkSharedEvent extends StringIndexed {
   }[];
 }
 
-export interface MemberJoinedChannelEvent extends StringIndexed {
+export interface MemberJoinedChannelEvent {
   type: 'member_joined_channel';
   user: string;
   channel: string;
@@ -469,7 +466,7 @@ export interface MemberJoinedChannelEvent extends StringIndexed {
   inviter?: string;
 }
 
-export interface MemberLeftChannelEvent extends StringIndexed {
+export interface MemberLeftChannelEvent {
   type: 'member_left_channel';
   user: string;
   channel: string;
@@ -477,124 +474,9 @@ export interface MemberLeftChannelEvent extends StringIndexed {
   team: string;
 }
 
-// TODO: this is just a draft of the actual message event
-export interface MessageEvent extends StringIndexed {
-  type: 'message';
-  channel: string;
-  user: string;
-  text?: string;
-  ts: string;
-  attachments?: MessageAttachment[];
-  blocks?: (KnownBlock | Block)[];
-  edited?: {
-    user: string;
-    ts: string;
-  };
+export type MessageEvent = AllMessageEvents;
 
-  // TODO: optional types that maybe should flow into other subtypes?
-  is_starred?: boolean;
-  pinned_to?: string[];
-  reactions?: {
-    name: string;
-    count: number;
-    users: string[];
-  }[];
-}
-
-export interface BotMessageEvent extends StringIndexed {
-  type: 'message';
-  subtype: 'bot_message';
-  ts: string;
-  text: string;
-  bot_id: string;
-  username?: string;
-  icons?: {
-    [size: string]: string;
-  };
-
-  // copied from MessageEvent
-  // TODO: is a user really optional? likely for things like IncomingWebhook authored messages
-  user?: string;
-  attachments?: MessageAttachment[];
-  blocks?: (KnownBlock | Block)[];
-  edited?: {
-    user: string;
-    ts: string;
-  };
-}
-
-export interface EKMAccessDeniedMessageEvent extends StringIndexed {
-  type: 'message';
-  subtype: 'ekm_access_denied';
-  ts: string;
-  text: string; // This will not have any meaningful content within
-  user: 'UREVOKEDU';
-}
-
-export interface MeMessageEvent extends StringIndexed {
-  type: 'message';
-  subtype: 'me_message';
-  channel: string;
-  user: string;
-  text: string;
-  ts: string;
-}
-
-export interface MessageChangedEvent extends StringIndexed {
-  type: 'message';
-  subtype: 'message_changed';
-  hidden: true;
-  channel: string;
-  ts: string;
-  message: MessageEvent; // TODO: should this be the union of all message events with type 'message'?
-}
-
-export interface MessageDeletedEvent extends StringIndexed {
-  type: 'message';
-  subtype: 'message_deleted';
-  hidden: true;
-  channel: string;
-  ts: string;
-  deleted_ts: string;
-}
-
-export interface MessageRepliedEvent extends StringIndexed {
-  type: 'message';
-  subtype: 'message_replied';
-  hidden: true;
-  channel: string;
-  event_ts: string;
-  ts: string;
-  message: MessageEvent & {
-    // TODO: should this be the union of all message events with type 'message'?
-    thread_ts: string;
-    reply_count: number;
-    replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?
-  };
-}
-
-// the `reply_broadcast` message subtype is omitted because it is discontinued
-
-export interface ThreadBroadcastMessageEvent extends StringIndexed {
-  type: 'message';
-  message: {
-    type: 'message';
-    subtype: 'thread_broadcast';
-    thread_ts: string;
-    user: string;
-    ts: string;
-    root: MessageEvent & {
-      // TODO: should this be the union of all message events with type 'message'?
-      thread_ts: string;
-      reply_count: number;
-      replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?
-      // TODO: unread_count doesn't appear in any other message event types, is this really the only place its included?
-      unread_count?: number;
-    };
-  };
-}
-
-export interface PinAddedEvent extends StringIndexed {
+export interface PinAddedEvent {
   type: 'pin_added';
   user: string;
   channel_id: string;
@@ -602,7 +484,7 @@ export interface PinAddedEvent extends StringIndexed {
   item: {};
 }
 
-export interface PinRemovedEvent extends StringIndexed {
+export interface PinRemovedEvent {
   type: 'pin_removed';
   user: string;
   channel_id: string;
@@ -631,7 +513,7 @@ interface ReactionFileCommentItem {
   file: string;
 }
 
-export interface ReactionAddedEvent extends StringIndexed {
+export interface ReactionAddedEvent {
   type: 'reaction_added';
   user: string;
   reaction: string;
@@ -640,7 +522,7 @@ export interface ReactionAddedEvent extends StringIndexed {
   event_ts: string;
 }
 
-export interface ReactionRemovedEvent extends StringIndexed {
+export interface ReactionRemovedEvent {
   type: 'reaction_removed';
   user: string;
   reaction: string;
@@ -654,7 +536,7 @@ export interface ReactionRemovedEvent extends StringIndexed {
 // NOTE: `resources_added`, `resources_removed`, `scope_denied`, `scope_granted`, are left out because they are
 // deprecated as part of the Workspace Apps Developer Preview
 
-export interface StarAddedEvent extends StringIndexed {
+export interface StarAddedEvent {
   type: 'star_added';
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
@@ -663,7 +545,7 @@ export interface StarAddedEvent extends StringIndexed {
   event_ts: string;
 }
 
-export interface StarRemovedEvent extends StringIndexed {
+export interface StarRemovedEvent {
   type: 'star_removed';
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
@@ -672,7 +554,7 @@ export interface StarRemovedEvent extends StringIndexed {
   event_ts: string;
 }
 
-export interface SubteamCreated extends StringIndexed {
+export interface SubteamCreated {
   type: 'subteam_created';
   // TODO: incomplete, this should probably be a reference to a Usergroup shape from @slack/types.
   // https://api.slack.com/types/usergroup
@@ -681,7 +563,7 @@ export interface SubteamCreated extends StringIndexed {
   };
 }
 
-export interface SubteamMembersChanged extends StringIndexed {
+export interface SubteamMembersChanged {
   type: 'subteam_members_changed';
   subteam_id: string;
   team_id: string;
@@ -693,17 +575,17 @@ export interface SubteamMembersChanged extends StringIndexed {
   removed_users_count: number;
 }
 
-export interface SubteamSelfAddedEvent extends StringIndexed {
+export interface SubteamSelfAddedEvent {
   type: 'subteam_self_added';
   subteam_id: string;
 }
 
-export interface SubteamSelfRemovedEvent extends StringIndexed {
+export interface SubteamSelfRemovedEvent {
   type: 'subteam_self_removed';
   subteam_id: string;
 }
 
-export interface SubteamUpdatedEvent extends StringIndexed {
+export interface SubteamUpdatedEvent {
   type: 'subteam_updated';
   // TODO: incomplete, this should probably be a reference to a Usergroup shape from @slack/types.
   // https://api.slack.com/types/usergroup
@@ -712,25 +594,25 @@ export interface SubteamUpdatedEvent extends StringIndexed {
   };
 }
 
-export interface TeamDomainChangedEvent extends StringIndexed {
+export interface TeamDomainChangedEvent {
   type: 'team_domain_changed';
   url: string;
   domain: string;
 }
 
-export interface TeamJoinEvent extends StringIndexed {
+export interface TeamJoinEvent {
   type: 'team_join';
   // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
   // https://api.slack.com/types/user
   user: {};
 }
 
-export interface TeamRenameEvent extends StringIndexed {
+export interface TeamRenameEvent {
   type: 'team_rename';
   name: string;
 }
 
-export interface TokensRevokedEvent extends StringIndexed {
+export interface TokensRevokedEvent {
   type: 'tokens_revoked';
   tokens: {
     // TODO: are either or both of these optional?
@@ -741,14 +623,14 @@ export interface TokensRevokedEvent extends StringIndexed {
 
 // NOTE: url_verification does not use the envelope, but its also not interesting for an app developer. its omitted.
 
-export interface UserChangeEvent extends StringIndexed {
+export interface UserChangeEvent {
   type: 'user_change';
   // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
   // https://api.slack.com/types/user
   user: {};
 }
 
-export interface WorkflowStepExecuteEvent extends StringIndexed {
+export interface WorkflowStepExecuteEvent {
   type: 'workflow_step_execute';
   callback_id: string;
   workflow_step: {
