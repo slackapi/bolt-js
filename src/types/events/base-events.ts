@@ -560,6 +560,7 @@ export interface SubteamCreated {
   // https://api.slack.com/types/usergroup
   subteam: {
     id: string;
+    created_by: string;
   };
 }
 
@@ -591,6 +592,7 @@ export interface SubteamUpdatedEvent {
   // https://api.slack.com/types/usergroup
   subteam: {
     id: string;
+    created_by: string;
   };
 }
 
@@ -604,7 +606,9 @@ export interface TeamJoinEvent {
   type: 'team_join';
   // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
   // https://api.slack.com/types/user
-  user: {};
+  user: {
+    id: string;
+  };
 }
 
 export interface TeamRenameEvent {
@@ -627,7 +631,9 @@ export interface UserChangeEvent {
   type: 'user_change';
   // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
   // https://api.slack.com/types/user
-  user: {};
+  user: {
+    id: string;
+  };
 }
 
 export interface WorkflowStepExecuteEvent {

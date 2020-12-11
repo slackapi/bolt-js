@@ -794,6 +794,7 @@ const validViewTypes = ['view_closed', 'view_submission'];
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
+ * TODO: update signature for being able to return OrgAuthorizeSourceData as well
  */
 function buildSource(
   type: IncomingEventType,
@@ -803,166 +804,145 @@ function buildSource(
 ): AuthorizeSourceData | OrgAuthorizeSourceData {
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
-  let source: AuthorizeSourceData | OrgAuthorizeSourceData;
-  // tslint:disable:max-line-length
-  if (orgInstall) {
-    source = {
-      teamId:
-        type === IncomingEventType.Event &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id !== null
-          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id as string)
-          : type === IncomingEventType.Event || type === IncomingEventType.Command
-          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
-          : (type === IncomingEventType.Action ||
-              type === IncomingEventType.Options ||
-              type === IncomingEventType.ViewAction ||
-              type === IncomingEventType.Shortcut) &&
-            body.team !== null
-          ? ((body as (
-              | SlackActionMiddlewareArgs
-              | SlackOptionsMiddlewareArgs
-              | SlackViewMiddlewareArgs
-              | SlackShortcutMiddlewareArgs
-            )['body']).team!.id as string)
-          : (type === IncomingEventType.Action ||
-              type === IncomingEventType.Options ||
-              type === IncomingEventType.ViewAction ||
-              type === IncomingEventType.Shortcut) &&
-            body.user !== undefined
-          ? ((body as (
-              | SlackActionMiddlewareArgs
-              | SlackOptionsMiddlewareArgs
-              | SlackViewMiddlewareArgs
-              | SlackShortcutMiddlewareArgs
-            )['body']).user.team_id as string)
-          : undefined,
-      // TODO: double check payloads for event and command below
-      enterpriseId:
-        type === IncomingEventType.Event &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id !== null
-          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id as string)
-          : type === IncomingEventType.Event || type === IncomingEventType.Command
-          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
-          : type === IncomingEventType.Action ||
-            type === IncomingEventType.Options ||
-            type === IncomingEventType.ViewAction ||
-            type === IncomingEventType.Shortcut
-          ? ((body as (
-              | SlackActionMiddlewareArgs
-              | SlackOptionsMiddlewareArgs
-              | SlackViewMiddlewareArgs
-              | SlackShortcutMiddlewareArgs
-            )['body']).enterprise!.id as string)
-          : assertNever(type),
-      userId:
-        type === IncomingEventType.Event
-          ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
-            ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
-            : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
-            ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
-            : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
-              (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
-            ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
-            : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
-              (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
-            ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
-            : undefined
-          : type === IncomingEventType.Action ||
-            type === IncomingEventType.Options ||
-            type === IncomingEventType.ViewAction ||
-            type === IncomingEventType.Shortcut
-          ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
-              .id as string)
-          : type === IncomingEventType.Command
-          ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
-          : undefined,
-      conversationId: channelId,
-      isEnterpriseInstall: true,
-    };
-  } else {
-    source = {
-      teamId:
-        type === IncomingEventType.Event &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id !== null
-          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].team_id as string)
-          : type === IncomingEventType.Event || type === IncomingEventType.Command
-          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
-          : type === IncomingEventType.Action ||
-            type === IncomingEventType.Options ||
-            type === IncomingEventType.ViewAction ||
-            type === IncomingEventType.Shortcut
-          ? ((body as (
-              | SlackActionMiddlewareArgs
-              | SlackOptionsMiddlewareArgs
-              | SlackViewMiddlewareArgs
-              | SlackShortcutMiddlewareArgs
-            )['body']).team!.id as string)
-          : assertNever(type),
-      enterpriseId:
-        type === IncomingEventType.Event &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations!.length > 0 &&
-        (body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id !== null
-          ? ((body as SlackEventMiddlewareArgs['body']).authorizations![0].enterprise_id as string)
-          : type === IncomingEventType.Event || type === IncomingEventType.Command
-          ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
-          : (type === IncomingEventType.Action ||
-              type === IncomingEventType.Options ||
-              type === IncomingEventType.ViewAction ||
-              type === IncomingEventType.Shortcut) &&
-            body.team !== null
-          ? ((body as (
-              | SlackActionMiddlewareArgs
-              | SlackOptionsMiddlewareArgs
-              | SlackViewMiddlewareArgs
-              | SlackShortcutMiddlewareArgs
-            )['body']).team!.enterprise_id as string)
-          : (type === IncomingEventType.Action ||
-              type === IncomingEventType.Options ||
-              type === IncomingEventType.ViewAction ||
-              type === IncomingEventType.Shortcut) &&
-            body.enterprise !== undefined
-          ? ((body as (
-              | SlackActionMiddlewareArgs
-              | SlackOptionsMiddlewareArgs
-              | SlackViewMiddlewareArgs
-              | SlackShortcutMiddlewareArgs
-            )['body']).enterprise!.id as string)
-          : undefined,
-      userId:
-        type === IncomingEventType.Event
-          ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
-            ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
-            : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
-            ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
-            : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
-              (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
-            ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
-            : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
-              (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
-            ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
-            : undefined
-          : type === IncomingEventType.Action ||
-            type === IncomingEventType.Options ||
-            type === IncomingEventType.ViewAction ||
-            type === IncomingEventType.Shortcut
-          ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
-              .id as string)
-          : type === IncomingEventType.Command
-          ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
-          : undefined,
-      conversationId: channelId,
-      isEnterpriseInstall: false,
-    };
-  }
-  // tslint:enable:max-line-length
-  return source;
+
+  const teamId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      if (Array.isArray(bodyAsEvent.authorizations)
+        && bodyAsEvent.authorizations[0] !== undefined
+        && bodyAsEvent.authorizations[0].team_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].team_id;
+      }
+      return bodyAsEvent.team_id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).team_id;
+    }
+
+    if (type === IncomingEventType.Action
+      || type === IncomingEventType.Options
+      || type === IncomingEventType.ViewAction
+      || type === IncomingEventType.Shortcut
+    ) {
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+
+      // When the app is installed using org-wide deployment, team property will be null
+      // TODO: is the orgInstall property necessary?
+      if (bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.id;
+      }
+
+      // This is the only place where this function might return undefined
+      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.team_id;
+    }
+
+    return assertNever(type);
+  })();
+
+
+  const enterpriseId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      if (Array.isArray(bodyAsEvent.authorizations)
+        && bodyAsEvent.authorizations[0] !== undefined
+        && bodyAsEvent.authorizations[0].enterprise_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].enterprise_id;
+      }
+      return bodyAsEvent.team_id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).enterprise_id;
+    }
+
+    if (type === IncomingEventType.Action
+      || type === IncomingEventType.Options
+      || type === IncomingEventType.ViewAction
+      || type === IncomingEventType.Shortcut
+    ) {
+      // NOTE: no type system backed exhaustiveness check within this group of incoming event types
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+
+      // When the app is installed using org-wide deployment, team property will be null
+      // TODO: is the orgInstall property necessary?
+      if (bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
+      }
+
+      if (bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== undefined) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise.id;
+      }
+
+      return undefined;
+    }
+
+    return assertNever(type);
+  })();
+
+
+  const userId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      // NOTE: no type system backed exhaustiveness check within this incoming event type
+      const { event } = (body as SlackEventMiddlewareArgs['body']);
+      if ('user' in event) {
+        if (typeof event.user === 'string') {
+          return event.user;
+        }
+        if (typeof event.user === 'object') {
+          return event.user.id;
+        }
+      }
+      if ('channel' in event && typeof event.channel !== 'string' && 'creator' in event.channel) {
+        return event.channel.creator;
+      }
+      if ('subteam' in event && event.subteam.created_by !== undefined) {
+        return event.subteam.created_by;
+      }
+      return undefined;
+    }
+
+    if (type === IncomingEventType.Action
+      || type === IncomingEventType.Options
+      || type === IncomingEventType.ViewAction
+      || type === IncomingEventType.Shortcut
+    ) {
+      // NOTE: no type system backed exhaustiveness check within this incoming event type
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).user_id;
+    }
+
+    return assertNever(type);
+  })();
+
+  return {
+    teamId,
+    enterpriseId,
+    userId,
+    conversationId: channelId,
+    isEnterpriseInstall: orgInstall,
+  };
 }
 
 function isBlockActionOrInteractiveMessageBody(
