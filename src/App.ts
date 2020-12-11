@@ -69,8 +69,8 @@ export interface AppOptions {
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
-  authorize?: Authorize; // either token or authorize
-  orgAuthorize?: Authorize;
+  authorize?: Authorize<false>; // either token or authorize
+  orgAuthorize?: Authorize<true>; // either token or orgAuthorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
@@ -81,26 +81,17 @@ export interface AppOptions {
 export { LogLevel, Logger } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
-export interface Authorize {
-  (source: AuthorizeSourceData | OrgAuthorizeSourceData, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
+export interface Authorize<IsEnterpriseInstall extends boolean = false> {
+  (source: AuthorizeSourceData<IsEnterpriseInstall>, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
 }
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
-export interface AuthorizeSourceData {
-  teamId: string;
-  enterpriseId?: string;
+export interface AuthorizeSourceData<IsEnterpriseInstall extends boolean = false> {
+  teamId: IsEnterpriseInstall extends true ? (string | undefined) : string;
+  enterpriseId: IsEnterpriseInstall extends true ? string : (string | undefined);
   userId?: string;
   conversationId?: string;
-  isEnterpriseInstall?: boolean;
-}
-
-/** Authorization function inputs - authenticated data about an event for the authorization function */
-export interface OrgAuthorizeSourceData {
-  enterpriseId: string;
-  teamId?: string;
-  userId?: string;
-  conversationId?: string;
-  isEnterpriseInstall?: boolean;
+  isEnterpriseInstall: IsEnterpriseInstall;
 }
 
 /** Authorization function outputs - data that will be available as part of event processing */
@@ -169,10 +160,10 @@ export default class App {
   private logger: Logger;
 
   /** Authorize */
-  private authorize!: Authorize;
+  private authorize!: Authorize<false>;
 
   /** Org Authorize */
-  private orgAuthorize!: Authorize;
+  private orgAuthorize!: Authorize<true>;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -298,8 +289,8 @@ export default class App {
     } else if ((authorize !== undefined || orgAuthorize !== undefined) && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
     } else if (authorize === undefined && orgAuthorize === undefined && usingOauth) {
-      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
-      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
+      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize;
+      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize;
     } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
       // only supporting org installs
       this.orgAuthorize = orgAuthorize;
@@ -794,14 +785,13 @@ const validViewTypes = ['view_closed', 'view_submission'];
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
- * TODO: update signature for being able to return OrgAuthorizeSourceData as well
  */
-function buildSource(
+function buildSource<IsEnterpriseInstall extends boolean>(
   type: IncomingEventType,
   channelId: string | undefined,
   body: AnyMiddlewareArgs['body'],
-  orgInstall: boolean,
-): AuthorizeSourceData | OrgAuthorizeSourceData {
+  isEnterpriseInstall: IsEnterpriseInstall,
+): AuthorizeSourceData<IsEnterpriseInstall> {
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
 
@@ -834,7 +824,6 @@ function buildSource(
       )['body'];
 
       // When the app is installed using org-wide deployment, team property will be null
-      // TODO: is the orgInstall property necessary?
       if (bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null) {
         return bodyAsActionOrOptionsOrViewActionOrShortcut.team.id;
       }
@@ -877,7 +866,6 @@ function buildSource(
       )['body'];
 
       // When the app is installed using org-wide deployment, team property will be null
-      // TODO: is the orgInstall property necessary?
       if (bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null) {
         return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
       }
@@ -937,11 +925,11 @@ function buildSource(
   })();
 
   return {
-    teamId,
-    enterpriseId,
     userId,
+    isEnterpriseInstall,
+    teamId: teamId as (IsEnterpriseInstall extends true ? (string | undefined) : string),
+    enterpriseId: enterpriseId as (IsEnterpriseInstall extends true ? string : (string | undefined)),
     conversationId: channelId,
-    isEnterpriseInstall: orgInstall,
   };
 }
 
