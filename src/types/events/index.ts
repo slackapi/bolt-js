@@ -1,5 +1,5 @@
 export * from './base-events';
-export { BotMessageEvent } from './message-events';
+export { BotMessageEvent, GenericMessageEvent } from './message-events';
 import { SlackEvent, BasicSlackEvent } from './base-events';
 import { StringIndexed } from '../helpers';
 import { SayFn } from '../utilities';

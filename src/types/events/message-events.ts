@@ -79,7 +79,7 @@ export interface MessageChangedEvent {
   hidden: true;
   channel: string;
   ts: string;
-  message: MessageEvent; // TODO: should this be the union of all message events with type 'message'?
+  message: MessageEvent;
 }
 
 export interface MessageDeletedEvent {
