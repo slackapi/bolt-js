@@ -555,9 +555,9 @@ export default class App {
     let authorizeResult: AuthorizeResult;
     try {
       if (source.isEnterpriseInstall) {
-        authorizeResult = this.orgAuthorize(source as AuthorizeSourceData<true>, bodyArg);
+        authorizeResult = await this.orgAuthorize(source as AuthorizeSourceData<true>, bodyArg);
       } else {
-        authorizeResult = this.authorize(source as AuthorizeSourceData<false>, bodyArg);
+        authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
     } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
