@@ -279,9 +279,8 @@ export default class App {
           `token as well as authorize, orgAuthorize, or oauth installer options were provided. ${tokenUsage}`,
         );
       }
-      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-      // Todo: what should we do with orgAuthorize in a singeTeamAuthorize/token provided world?
-      this.orgAuthorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.orgAuthorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
     } else if (authorize === undefined && orgAuthorize === undefined && !usingOauth) {
       throw new AppInitializationError(
         `No token, no authorize, no orgAuthorize, and no oauth installer options provided. ${tokenUsage}`,
@@ -549,40 +548,31 @@ export default class App {
     // From this point on, we assume that body is not just a key-value map, but one of the types of bodies we expect
     const bodyArg = body as AnyMiddlewareArgs['body'];
 
-    let authorizeResult;
-    let source;
     // Check if type event with the authorizations object or if it has a top level is_enterprise_install property
-    if (
-      (type === IncomingEventType.Event &&
-        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations !== undefined &&
-        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0] !== undefined &&
-        (bodyArg as SlackEventMiddlewareArgs['body']).authorizations![0].is_enterprise_install) ||
-      bodyArg.is_enterprise_install === true ||
-      bodyArg.is_enterprise_install === 'true' // command payloads have this as a string
-    ) {
-      // This is an org app
-      // Initialize context (shallow copy to enforce object identity separation)
-      source = buildSource(type, conversationId, bodyArg, true);
+    const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(bodyArg, type);
+    const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
-      try {
-        authorizeResult = await this.orgAuthorize(source, bodyArg);
-      } catch (error) {
-        this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-        error.code = 'slack_bolt_authorization_error';
-        return this.handleError(error);
+    let authorizeResult: AuthorizeResult;
+    try {
+      if (source.isEnterpriseInstall) {
+        authorizeResult = this.orgAuthorize(source as AuthorizeSourceData<true>, bodyArg);
+      } else {
+        authorizeResult = this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
-    } else {
-      // This is not an org app
-      // Initialize context (shallow copy to enforce object identity separation)
-      source = buildSource(type, conversationId, bodyArg, false);
+    } catch (error) {
+      this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+      error.code = 'slack_bolt_authorization_error';
+      return this.handleError(error);
+    }
 
-      try {
-        authorizeResult = await this.authorize(source, bodyArg);
-      } catch (error) {
-        this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-        error.code = 'slack_bolt_authorization_error';
-        return this.handleError(error);
-      }
+    // Try to set teamId from AuthorizeResult before using one from source
+    if (authorizeResult.teamId === undefined && source.teamId !== undefined) {
+      authorizeResult.teamId = source.teamId;
+    }
+
+    // Try to set enterpriseId from AuthorizeResult before using one from source
+    if (authorizeResult.enterpriseId === undefined && source.enterpriseId !== undefined) {
+      authorizeResult.enterpriseId = source.enterpriseId;
     }
 
     const context: Context = { ...authorizeResult };
@@ -681,39 +671,23 @@ export default class App {
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
-    let teamId;
-    let enterpriseId;
-
-    // Try to set teamId from AuthorizeResult before using one from source
-    if (authorizeResult.teamId !== undefined) {
-      teamId = authorizeResult.teamId;
-    } else if (source.teamId !== undefined) {
-      teamId = source.teamId;
-    }
-
-    // Try to set enterpriseId from AuthorizeResult before using one from source
-    if (authorizeResult.enterpriseId !== undefined) {
-      enterpriseId = authorizeResult.enterpriseId;
-    } else if (source.enterpriseId !== undefined) {
-      enterpriseId = source.enterpriseId;
-    }
 
     if (token !== undefined) {
       let pool;
       const clientOptionsCopy = { ...this.clientOptions };
-      if (teamId !== undefined) {
-        pool = this.clients[teamId];
+      if (authorizeResult.teamId !== undefined) {
+        pool = this.clients[authorizeResult.teamId];
         if (pool === undefined) {
           // eslint-disable-next-line no-multi-assign
-          pool = this.clients[teamId] = new WebClientPool();
+          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
         }
         // Add teamId to clientOptions so it can be automatically added to web-api calls
-        clientOptionsCopy.teamId = teamId;
-      } else if (enterpriseId !== undefined) {
-        pool = this.clients[enterpriseId];
+        clientOptionsCopy.teamId = authorizeResult.teamId;
+      } else if (authorizeResult.enterpriseId !== undefined) {
+        pool = this.clients[authorizeResult.enterpriseId];
         if (pool === undefined) {
           // eslint-disable-next-line no-multi-assign
-          pool = this.clients[enterpriseId] = new WebClientPool();
+          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
         }
       }
       if (pool !== undefined) {
@@ -933,6 +907,25 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   };
 }
 
+function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: IncomingEventType): boolean {
+  if (type === IncomingEventType.Event) {
+    const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+    if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
+      return !!bodyAsEvent.authorizations[0].is_enterprise_install;
+    }
+  }
+  // command payloads have this property set as a string
+  if (body.is_enterprise_install === 'true') {
+    return true;
+  }
+  // all remaining types have a boolean property
+  if (body.is_enterprise_install !== undefined) {
+    return body.is_enterprise_install;
+  }
+  // as a fallback we assume it's a single team installation (but this should never happen)
+  return false;
+}
+
 function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
@@ -947,23 +940,23 @@ function defaultErrorHandler(logger: Logger): ErrorHandler {
   };
 }
 
-function singleTeamAuthorization(
+function singleAuthorization(
   client: WebClient,
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
-): Authorize {
+): Authorize<boolean> {
   // TODO: warn when something needed isn't found
   const identifiers: Promise<{ botUserId: string; botId: string }> =
     authorization.botUserId !== undefined && authorization.botId !== undefined
       ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
       : client.auth.test({ token: authorization.botToken }).then((result) => {
-          return {
-            botUserId: result.user_id as string,
-            botId: result.bot_id as string,
-          };
-        });
+        return {
+          botUserId: result.user_id as string,
+          botId: result.bot_id as string,
+        };
+      });
 
-  return async () => {
-    return { botToken: authorization.botToken, ...(await identifiers) };
+  return async ({ isEnterpriseInstall }) => {
+    return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };
   };
 }
 

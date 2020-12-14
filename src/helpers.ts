@@ -29,15 +29,34 @@ export enum IncomingEventType {
  */
 export function getTypeAndConversation(body: any): { type?: IncomingEventType; conversationId?: string } {
   if (body.event !== undefined) {
-    const eventBody = body as SlackEventMiddlewareArgs<string>['body'];
+    const { event } = body as SlackEventMiddlewareArgs<string>['body'];
+
+    // Find conversationId
+    const conversationId: string | undefined = (() => {
+      let foundConversationId: string;
+      if ('channel' in event) {
+        if (typeof event.channel === 'string') {
+          foundConversationId = event.channel;
+        } else if ('id' in event.channel) {
+          foundConversationId = event.channel.id;
+        }
+      }
+      if ('channel_id' in event) {
+        foundConversationId = event.channel_id;
+      }
+      if ('item' in event && 'channel' in event.item) {
+        // no channel for reaction_added, reaction_removed, star_added, or star_removed with file or file_comment items
+        foundConversationId = event.item.channel;
+      }
+      // Using non-null assertion (!) because the alternative is to use `foundConversation: (string | undefined)`, which
+      // impedes the very useful type checker help above that ensures the value is only defined to strings, not
+      // undefined. This is safe when used in combination with the || operator with a default value.
+      return foundConversationId! || undefined;
+    })();
+
     return {
+      conversationId,
       type: IncomingEventType.Event,
-      conversationId:
-        eventBody.event.channel !== undefined
-          ? eventBody.event.channel
-          : eventBody.event.item !== undefined
-          ? eventBody.event.item.channel
-          : undefined,
     };
   }
   if (body.command !== undefined) {
