@@ -87,8 +87,8 @@ export interface Authorize<IsEnterpriseInstall extends boolean = false> {
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
 export interface AuthorizeSourceData<IsEnterpriseInstall extends boolean = false> {
-  teamId: IsEnterpriseInstall extends true ? (string | undefined) : string;
-  enterpriseId: IsEnterpriseInstall extends true ? string : (string | undefined);
+  teamId: IsEnterpriseInstall extends true ? string | undefined : string;
+  enterpriseId: IsEnterpriseInstall extends true ? string : string | undefined;
   userId?: string;
   conversationId?: string;
   isEnterpriseInstall: IsEnterpriseInstall;
@@ -772,9 +772,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   const teamId: string | undefined = (() => {
     if (type === IncomingEventType.Event) {
       const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
-      if (Array.isArray(bodyAsEvent.authorizations)
-        && bodyAsEvent.authorizations[0] !== undefined
-        && bodyAsEvent.authorizations[0].team_id !== null
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].team_id !== null
       ) {
         return bodyAsEvent.authorizations[0].team_id;
       }
@@ -785,10 +786,11 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       return (body as SlackCommandMiddlewareArgs['body']).team_id;
     }
 
-    if (type === IncomingEventType.Action
-      || type === IncomingEventType.Options
-      || type === IncomingEventType.ViewAction
-      || type === IncomingEventType.Shortcut
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
     ) {
       const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
         | SlackActionMiddlewareArgs
@@ -809,13 +811,13 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     return assertNever(type);
   })();
 
-
   const enterpriseId: string | undefined = (() => {
     if (type === IncomingEventType.Event) {
       const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
-      if (Array.isArray(bodyAsEvent.authorizations)
-        && bodyAsEvent.authorizations[0] !== undefined
-        && bodyAsEvent.authorizations[0].enterprise_id !== null
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].enterprise_id !== null
       ) {
         return bodyAsEvent.authorizations[0].enterprise_id;
       }
@@ -826,10 +828,11 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       return (body as SlackCommandMiddlewareArgs['body']).enterprise_id;
     }
 
-    if (type === IncomingEventType.Action
-      || type === IncomingEventType.Options
-      || type === IncomingEventType.ViewAction
-      || type === IncomingEventType.Shortcut
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
     ) {
       // NOTE: no type system backed exhaustiveness check within this group of incoming event types
       const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
@@ -854,11 +857,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     return assertNever(type);
   })();
 
-
   const userId: string | undefined = (() => {
     if (type === IncomingEventType.Event) {
       // NOTE: no type system backed exhaustiveness check within this incoming event type
-      const { event } = (body as SlackEventMiddlewareArgs['body']);
+      const { event } = body as SlackEventMiddlewareArgs['body'];
       if ('user' in event) {
         if (typeof event.user === 'string') {
           return event.user;
@@ -876,10 +878,11 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       return undefined;
     }
 
-    if (type === IncomingEventType.Action
-      || type === IncomingEventType.Options
-      || type === IncomingEventType.ViewAction
-      || type === IncomingEventType.Shortcut
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
     ) {
       // NOTE: no type system backed exhaustiveness check within this incoming event type
       const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
@@ -901,8 +904,8 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   return {
     userId,
     isEnterpriseInstall,
-    teamId: teamId as (IsEnterpriseInstall extends true ? (string | undefined) : string),
-    enterpriseId: enterpriseId as (IsEnterpriseInstall extends true ? string : (string | undefined)),
+    teamId: teamId as IsEnterpriseInstall extends true ? string | undefined : string,
+    enterpriseId: enterpriseId as IsEnterpriseInstall extends true ? string : string | undefined,
     conversationId: channelId,
   };
 }
@@ -949,11 +952,11 @@ function singleAuthorization(
     authorization.botUserId !== undefined && authorization.botId !== undefined
       ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
       : client.auth.test({ token: authorization.botToken }).then((result) => {
-        return {
-          botUserId: result.user_id as string,
-          botId: result.bot_id as string,
-        };
-      });
+          return {
+            botUserId: result.user_id as string,
+            botId: result.bot_id as string,
+          };
+        });
 
   return async ({ isEnterpriseInstall }) => {
     return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };

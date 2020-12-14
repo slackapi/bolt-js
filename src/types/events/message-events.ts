@@ -120,7 +120,7 @@ export interface ThreadBroadcastMessageEvent {
     root: (GenericMessageEvent | BotMessageEvent) & {
       thread_ts: string;
       reply_count: number;
-      replies: { user: string; ts: string; }[];
+      replies: { user: string; ts: string }[];
       // TODO: unread_count doesn't appear in any other message event types, is this really the only place its included?
       unread_count?: number;
     };
