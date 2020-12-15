@@ -1,6 +1,6 @@
 ---
 title: Migrating to V2
-order: 1
+order: 2
 slug: migration-v2
 lang: en
 layout: tutorial

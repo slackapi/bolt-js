@@ -215,14 +215,14 @@ span.beta {
   line-height: 1.75em;
 }
 
-.tutorial img {
+.tutorial img, .reference img {
   width: 85%;
   margin: 0.2em auto;
   display: block;
   box-shadow: 0 0 15px #DDDDDD;
 }
 
-.tutorial blockquote {
+.tutorial blockquote, .reference blockquote {
   margin: 0 0 0 1em;
   padding: 0 6em 0 1.5em;
   border-radius: 6px;
@@ -230,8 +230,16 @@ span.beta {
   font-size: 0.95em;
 }
 
-.tutorial h3 {
+.tutorial h3, .reference h3 {
   padding-bottom: 1em;
+}
+
+.reference {
+  width: 90%;
+  margin: 1em auto 3em auto;
+  padding-bottom: 2em;
+  font-size: 1em;
+  line-height: 1.75em;
 }
 
 .content .section-wrapper .language-javascript {

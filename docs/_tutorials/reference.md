@@ -1,12 +1,10 @@
 ---
-title: Bolt interface
+title: App reference and app configuration
 order: 1
-slug: interface
+slug: reference
 lang: en
-layout: tutorial
-permalink: /tutorial/interface
-redirect_from:
-  - /interface
+layout: fullpage
+permalink: /reference
 ---
 # Interface and initialization options
 
@@ -39,13 +37,12 @@ Below is the current list of methods that accept listener functions. These metho
 #### Constraint objects
 There are a collection of constraint objects that some methods have access to. These can be used to narrow the event your listener function handles, or to handle special cases. Constraint objects can be passed in lieu of the identifiers outlined above. Below is a collection of constraint objects and the methods they can be passed to. 
 
-| Method                          | Constraint object | Object keys
+| Method                          | Options | Details |
 |--------------------------------------------------------------------|
-| `app.action(legacyActions, fn);` | ```{ type: actionSource }``` | Used primarily to listen to legacy interactive message payloads. Type must be `block_actions` or `interactive_message` |
-| `app.action(blockConstraints, fn)` | ```{ block_id: blockId, actionId: actionId, callback_id: callbackId }``` | Listens for more than just the `action_id`. `block_id` is the ID for the block that contains the action element. `callback_id` is the `callback_id` of the parent view that is passed when instantiating it. `callback_id`s can only be passed when handling action elements within modals. |
-| `app.shortcut(typeConstraint, fn)` | ```{ type: shortcutSource, callback_id: callbackId }``` | Allows specification of the type of shortcut. `shorcutSource` must either be `shortcut` for **global shortcuts** or `message_action` for **message_shortcuts**. `callbackId` can be a `string` or `RegExp`. |
-| `app.view(typeConstraint, fn)` | ```{ type: viewType, callback_id: callbackId }``` | `viewType` must either be `view_closed` or `view_submission`, which determines what specific event your listener function is sent. `callback_id` is the `callback_id` of the view that is sent when your app opens the modal. |
-
+| `app.action(constraints, fn)` | `block_id`, `action_id`, `callback_id` | Listens for more than just the `action_id`. `block_id` is the ID for the block that contains the action element. `callback_id` is the `callback_id` of the parent view that is passed when instantiating it. `callback_id`s can only be passed when handling action elements within modals. |
+| `app.shortcut(constraints, fn)` | `type`, `callback_id` | Allows specification of the type of shortcut. `type` must either be `shortcut` for **global shortcuts** or `message_action` for **message_shortcuts**. `callbackId` can be a `string` or `RegExp`. |
+| `app.view(constraints, fn)` | `type`, `callback_id` | `type` must either be `view_closed` or `view_submission`, which determines what specific event your listener function is sent. `callback_id` is the `callback_id` of the view that is sent when your app opens the modal. |
+| `app.action(constraints, fn);` | `type` | Used primarily to listen to legacy interactive message payloads. Type must be `block_actions` or `interactive_message` |
 
 ### Listener function arguments
 Listener middleware functions have access to a set of arguments that may change based on the method which the function is passed to. Below is an explanation of the different arguments. The below table details the different arguments and the methods they'll be accessible in.
@@ -60,7 +57,7 @@ Listener middleware functions have access to a set of arguments that may change 
 | `context` | All listeners | Event context. This object contains data about the event and the app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
 | `body` | All listeners | Object that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`).
 
-#### `payload` and `body` references
+#### Body and payload references
 The structure of the `payload` and `body` is detailed on the API site:
 - `action`: [`body`](https://api.slack.com/reference/interaction-payloads/block-actions) and [`payload`s](https://api.slack.com/reference/block-kit/block-elements)
 - `event`: [`body`](https://api.slack.com/types/event) and [`payload`s](https://api.slack.com/events)
@@ -68,3 +65,41 @@ The structure of the `payload` and `body` is detailed on the API site:
 - `command`: [`body` ](https://api.slack.com/interactivity/slash-commands)
 - `view`: [`view_submission` `body` and `payload`](https://api.slack.com/reference/interaction-payloads/views#view_submission); [`view_closed` `body` and `payload`](https://api.slack.com/reference/interaction-payloads/views#view_closed)
 - `options`: [`body`] and [`payload`](https://api.slack.com/reference/block-kit/block-elements#external_select)
+
+## Initialization options
+Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `ExpressReceiver` (so they'll work as long as you aren't using a custom receiver).
+
+### Receiver options
+`ExpressReceiver` options can be passed into the app constructor, just like the Bolt app options.
+
+| Option  | Description  |
+| :---: | :--- |
+| `signingSecret` | A `string` from your app's configuration which verifies that incoming events are coming from Slack |
+| `endpoints` | A `string` or `object` that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. For `object`, the `key` is the type of events (ex: `events`), and the value is the endpoint (ex: `/myapp/events`). **By default, all events are sent to the `/slack/events` endpoint** |
+| `processBeforeResponse` | todo |
+| `clientId` | The client ID `string` from your app's configuration which is [required to implement OAuth](/concepts#authenticating-oauth). |
+| `clientSecret` | The client secret `string` from your app's configuration which is [required to implement OAuth](/concepts#authenticating-oauth). |
+| `stateSecret` | todo |
+| `installationStore` | todo |
+| `scopes` | todo |
+| `installerOptions` | todo |
+
+### App options
+
+| Option  | Description  |
+| :---: | :--- |
+| `agent` | todo |
+| `clientTls` |  todo |
+| `convoStore` | todo |
+| `token` | A `string` from your app's configuration required for calling the Web API. |
+| `botId` | todo |
+| `botUserId` | todo |
+| `authorize` | todo |
+| `orgAuthorize` | todo |
+| `receiver` | todo |
+| `logger` | todo |
+| `logLevel` | todo |
+| `ignoreSelf` | todo |
+| `clientOptions` | todo | 
+
+> Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://slack.dev/node-slack-sdk). The `clientOptions` object can use any options from the [`WebClient`'s documentation](https://slack.dev/node-slack-sdk/web-api).
