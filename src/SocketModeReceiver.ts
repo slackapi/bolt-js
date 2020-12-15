@@ -17,7 +17,7 @@ export interface SocketModeReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
-  token?: string; // App Level Token
+  appToken?: string; // App Level Token
 }
 
 // Additional Installer Options
@@ -41,14 +41,14 @@ export default class SocketModeReceiver implements Receiver {
   /* Express app */
   public client: SocketModeClient;
 
-  private bolt: App | undefined;
+  private app: App | undefined;
 
   private logger: Logger;
 
   public installer: InstallProvider | undefined = undefined;
 
   constructor({
-    token = undefined,
+    appToken = undefined,
     logger = undefined,
     logLevel = LogLevel.INFO,
     clientId = undefined,
@@ -59,7 +59,7 @@ export default class SocketModeReceiver implements Receiver {
     installerOptions = {},
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
-      token,
+      appToken,
       logLevel,
       clientOptions: installerOptions.clientOptions,
     });
@@ -143,12 +143,12 @@ export default class SocketModeReceiver implements Receiver {
         body,
         ack,
       };
-      await this.bolt?.processEvent(event);
+      await this.app?.processEvent(event);
     });
   }
 
-  public init(bolt: App): void {
-    this.bolt = bolt;
+  public init(app: App): void {
+    this.app = app;
   }
 
   public start(): Promise<void> {
