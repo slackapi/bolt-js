@@ -14,7 +14,7 @@ redirect_from:
 This guide walks you through preparing and deploying a Slack app using [Bolt for JavaScript][bolt-js], the [Serverless Framework][serverless-framework], and [AWS Lambda][aws-lambda].
 </div>
 
-When you’re finished, you’ll have this ⚡️[Getting Started with AWS Lambda app][getting-started-with-aws-lambda-app] to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Deploying to AWS Lambda app][deploy-aws-lambda-app] to run, modify, and make your own.
 
 ---
 
@@ -158,7 +158,7 @@ module.exports.handler = (event, context) => {
 };
 ```
 
-When you're done, your app should look similar to the ⚡️[Getting Started with AWS Lambda app][getting-started-with-aws-lambda-app/app.js].
+When you're done, your app should look similar to the ⚡️[Deploying to AWS Lambda app][deploy-aws-lambda-app/app.js].
 
 **2. Add a serverless.yml**
 
@@ -298,7 +298,7 @@ Just like the [running the app locally](#run-the-app-locally) section, open a Sl
 
 As you continue to build your Slack app, you'll need to deploy the updates. Let's get a feel for this by updating your app to respond to a "goodbye" message.
 
-Add the following code to `app.js` ([source code on GitHub][getting-started-with-aws-lambda-app/app.js]):
+Add the following code to `app.js` ([source code on GitHub][deploy-aws-lambda-app/app.js]):
 
 ```javascript
 // Listens to incoming messages that contain "goodbye"
@@ -320,7 +320,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ### Next steps
 
-You just deployed your first ⚡️[Bolt for JavaScript app to AWS Lambda][getting-started-with-aws-lambda-app]! 🚀
+You just deployed your first ⚡️[Bolt for JavaScript app to AWS Lambda][deploy-aws-lambda-app]! 🚀
 
 Now that you've built and deployed a basic app, here are some ideas you can explore to extend, customize, and monitor it:
 
@@ -339,8 +339,8 @@ Now that you've built and deployed a basic app, here are some ideas you can expl
 [aws-profiles]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles
 [aws-sign-up]: https://aws.amazon.com/
 [bolt-js]: /bolt-js
+[deploy-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
+[deploy-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js
 [getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
 [getting-started-guide]: /bolt-js/tutorial/getting-started
-[getting-started-with-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-aws-lambda
-[getting-started-with-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-with-aws-lambda/app.js
 [serverless-framework]: https://serverless.com/
