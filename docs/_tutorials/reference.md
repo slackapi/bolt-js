@@ -116,14 +116,14 @@ Bolt includes a set of error types to make errors easier to handle, with more sp
 
 | Error code                         | Details |
 |--------------------------------------------------------------------|
-| `AppInitializationError` | Invalid initialization options were passed. This could include not passing a signing secret, or passing in conflicting options (for example, you can't pass in both `token` and `authorize`). This error is only thrown during initialization (within the App's constructor). |
+| `AppInitializationError` | Invalid initialization options were passed. This could include not passing a signing secret, or passing in conflicting options (for example, you can't pass in both `token` and `authorize`). Includes an `original` property with more details. This error is only thrown during initialization (within the App's constructor). |
 | `AuthorizationError` | Error exclusively thrown when installation information can't be fetched or parsed. You may encounter this error when using the built-in OAuth support, or you may want to import and use this error when building your own `authorize` function. |
-| `ContextMissingPropertyError` | Error thrown when the `context` object is missing necessary information, such as not including `botUserId` or `botId` when `ignoreSelf` is set to `true`. |
+| `ContextMissingPropertyError` | Error thrown when the `context` object is missing necessary information, such as not including `botUserId` or `botId` when `ignoreSelf` is set to `true`. The missing property is available in the `missingProperty` property. |
 | `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `ExpressReceiver`. |
 | `ReceiverAuthenticityError` | Error thrown when your app's request signature could not be verified. The error includes information on why it failed, such as an invalid timestamp, missing headers, or invalid signing secret.
 | `MultipleListenerError` | Thrown when multiple errors occur when processing multiple listeners for a single event. Includes an `originals` property with an array of the individual errors. |
 | `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep`. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on Workflow Steps [can be found in the documentation](/concepts#steps).  |
-| `UnknownError` | An error that was thrown inside the framework but does not have a specified error code. |
+| `UnknownError` | An error that was thrown inside the framework but does not have a specified error code. Contains an `original` property with more details. |
 
 > You can read the code for error definition and construction [in errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts).
 
