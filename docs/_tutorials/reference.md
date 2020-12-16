@@ -1,18 +1,26 @@
 ---
-title: App reference and app configuration
+title: Reference
 order: 1
 slug: reference
 lang: en
 layout: fullpage
 permalink: /reference
 ---
-# Interface and initialization options
+# App interface and configuration
 
 <div class="section-content">
 This guide is intended to list and explain the Bolt interface–including listeners and their arguments, initialization options, and frequently asked questions.
 </div> 
 
-It may be helpful to go through the ⚡️[Getting Started guide](/getting-started) to learn the basics of building and instantiating Bolt for JavaScript apps.
+It may be helpful to first go through the ⚡️[Getting Started guide](/getting-started) to learn the basics of building Bolt for JavaScript apps.
+
+- [Listener middleware](#listener-middleware)
+  - [Methods](#methods)
+  - [Function arguments](#listener-function-arguments)
+- [Initialization options](#initialization-options)
+  - [Receiver options](#receiver-options)
+  - [App options](#app-options)
+- [Error types](#error-types)
 
 ---
 
@@ -32,7 +40,7 @@ Below is the current list of methods that accept listener functions. These metho
 | `app.view(callbackId, fn);`     | Listens for `view_submission` and `view_closed` events. `view_submission` events are sent when a user submits a modal that your app opened. `view_closed` events are sent when a user closes the modal rather than submits it.
 | `app.options(actionId, fn);`    | Listens for options requests (from select menus with an external data source). This isn't often used, and shouldn't be mistaken with `app.action`. The `actionId` identifier is a `string` that matches the unique `action_id` included when you app sends a [select with an external data source](https://api.slack.com/reference/block-kit/block-elements#external_select).
 
-⚙️ There are also **[globally-scoped middleware functions](/concepts#global-middleware)** that will be run for all incoming events.
+⚙️ There are also **[globally-scoped middleware functions](/concepts#global-middleware)** that will be run for all incoming events. These can be passed into the `use(fn)` method.
 
 #### Constraint objects
 There are a collection of constraint objects that some methods have access to. These can be used to narrow the event your listener function handles, or to handle special cases. Constraint objects can be passed in lieu of the identifiers outlined above. Below is a collection of constraint objects and the methods they can be passed to. 
@@ -74,32 +82,35 @@ Bolt includes a collection of initialization options to customize apps. There ar
 
 | Option  | Description  |
 | :---: | :--- |
-| `signingSecret` | A `string` from your app's configuration which verifies that incoming events are coming from Slack |
+| `signingSecret` | A `string` from your app's configuration (under "Basic Information") which verifies that incoming events are coming from Slack |
 | `endpoints` | A `string` or `object` that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. For `object`, the `key` is the type of events (ex: `events`), and the value is the endpoint (ex: `/myapp/events`). **By default, all events are sent to the `/slack/events` endpoint** |
 | `processBeforeResponse` | todo |
-| `clientId` | The client ID `string` from your app's configuration which is [required to implement OAuth](/concepts#authenticating-oauth). |
-| `clientSecret` | The client secret `string` from your app's configuration which is [required to implement OAuth](/concepts#authenticating-oauth). |
-| `stateSecret` | todo |
-| `installationStore` | todo |
-| `scopes` | todo |
-| `installerOptions` | todo |
+| `clientId` | The client ID `string` from your app's configuration which is [required to configure OAuth](/concepts#authenticating-oauth). |
+| `clientSecret` | The client secret `string` from your app's configuration which is [required to configure OAuth](/concepts#authenticating-oauth). |
+| `stateSecret` | Optional, yet recommended parameter (`string`) that's passed when [configuring OAuth](/concepts#authenticating-oauth) to prevent CSRF attacks |
+| `installationStore` | Defines how to save and fetch installation data when [configuring OAuth](/concepts#authenticating-oauth). Contains two methods: `fetchInstallation` and `storeInstallation`. If you want org-app support, you should also add `fetchOrgInstallation` and `storeOrgInstallation`. The default `installationStore` is |
+| `scopes` | Required array of scopes that your app will request [within the OAuth process](/concepts#authenticating-oauth). |
+| `installerOptions` | Optional object that can be used to customize [the default OAuth support](/concepts#authenticating-oauth). Read more in the OAuth documentation. |
 
 ### App options
 
 | Option  | Description  |
 | :---: | :--- |
-| `agent` | todo |
-| `clientTls` |  todo |
-| `convoStore` | todo |
-| `token` | A `string` from your app's configuration required for calling the Web API. |
-| `botId` | todo |
-| `botUserId` | todo |
-| `authorize` | todo |
-| `orgAuthorize` | todo |
+| `agent` | Optional HTTP `Agent` used to set up proxy support. Read more about custom agents in the [Node Slack SDK documentation](https://slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent). |
+| `clientTls` |  Optional `string` to set a custom TLS configuration for HTTP client requests. Must be one of: `"pfx"`, `"key"`, `"passphrase"`, `"cert"`, or `"ca"`. |
+| `convoStore` | A store to set and retrieve state-related conversation information. `set()` sets conversation state and `get()` fetches it. By default, apps have access to a `MemoryStore`. More information and an example can be found [in the documentation](/concepts#conversation-store). |
+| `token` | A `string` from your app's configuration (under "Basic Information") required for calling the Web API. |
+| `botId` | Can only be used when `authorize` is not defined. The optional `botId` is the ID for your bot token (ex: `B12345`) which can be used to ignore messages sent by your app. If a `xoxb-` token is passed to your app, this value will automatically be retrieved by your app calling the [`auth.test` method](https://api.slack.com/methods/auth.test). |
+| `botUserId` | Can only be used wihen `authorize` is not defined. The optional `botUserId` is distinct from the `botId`, as it's the user ID associated with your bot user. If a `xoxb-` token is passed to your app, this value will automatically be retrieved by your app calling the [`auth.test` method](https://api.slack.com/methods/auth.test). |
+| `authorize` | Function for multi-team installations that determines which token is associated with the incoming event. The `authorize` function is passed source data that always contains a `teamId`, and sometimes contains a `userId`, `conversationId`, `enterpriseId`, and `isEnterpriseInstall` (depending which information the incoming event contains). An `authorize` function should either return a `botToken`, `botId`, and `botUserId`, or could return a `userToken`. If using [built-in OAuth support](/concepts#authenticating-oauth), an `authorize` function will automatically be created so you do not need to pass one in. More information about `authorization` functions can be found on   |
+| `orgAuthorize` | Function similar to `authorize`, but used for apps installed to an entire enterprise organization. The `orgAuthorize` function is passed source data that always contains an `enterpriseId`, and sometimes contains a `teamId`, `userId`, `conversationId`, and `isEnterpriseInstall` (depending which information the incoming event contains). The `orgAuthorize` function should return the same information as the `authorize` function, with the addition of a `teamId` and `enterpriseId`.
 | `receiver` | todo |
-| `logger` | todo |
-| `logLevel` | todo |
-| `ignoreSelf` | todo |
-| `clientOptions` | todo | 
+| `logger` | Option that allows you to pass a custom logger rather than using the built-in one. Loggers must implement specific methods ([the `Logger` interface](https://github.com/slackapi/node-slack-sdk/blob/main/packages/logger/src/index.ts)), which includes `setLevel(level: LogLevel)`, `getLevel()`, `setName(name: string)`, `debug(...msgs: any[])`, `info(...msgs: any[])`, `warn(...msgs: any[])`, and `error(...msgs: any[])`. More information about logging are [in the documentation](https://slack.dev/bolt-js/concepts#logging)  |
+| `logLevel` | Option to control how much or what kind of information is logged. The `LogLevel` export contains the possible levels–in order of most to least information: `DEBUG`, `INFO`, `WARN`, and `ERROR`. More information on logging can be found [in the documentation](https://slack.dev/bolt-js/concepts#logging). |
+| `ignoreSelf` | `boolean` to enable a middleware function that ignores any messages coming from your app. Requires a `botId`. Defaults to `true`.  |
+| `clientOptions.slackApiUrl` | Allows setting a custom endpoint for the Slack API. Used most often for testing.  | 
 
 > Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://slack.dev/node-slack-sdk). The `clientOptions` object can use any options from the [`WebClient`'s documentation](https://slack.dev/node-slack-sdk/web-api).
+
+## Error types
+TODO
