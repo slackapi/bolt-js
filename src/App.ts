@@ -821,7 +821,7 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       ) {
         return bodyAsEvent.authorizations[0].enterprise_id;
       }
-      return bodyAsEvent.team_id;
+      return bodyAsEvent.enterprise_id;
     }
 
     if (type === IncomingEventType.Command) {
