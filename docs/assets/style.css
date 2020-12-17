@@ -230,16 +230,20 @@ span.beta {
   font-size: 0.95em;
 }
 
-.tutorial h3, .reference h3 {
+.tutorial h3 {
   padding-bottom: 1em;
 }
 
 .reference {
-  width: 90%;
+  width: 80%;
   margin: 1em auto 3em auto;
   padding-bottom: 2em;
   font-size: 1em;
   line-height: 1.75em;
+}
+
+.reference h3 {
+  padding-top: 1em;
 }
 
 .content .section-wrapper .language-javascript {
