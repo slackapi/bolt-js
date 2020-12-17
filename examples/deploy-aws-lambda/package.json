@@ -1,7 +1,7 @@
 {
-  "name": "bolt-js-getting-started-with-aws-lambda",
+  "name": "bolt-js-aws-lambda",
   "version": "1.0.0",
-  "description": "Getting Started with AWS Lambda ⚡️ Bolt for JavaScript",
+  "description": "Deploying to AWS Lambda ⚡️ Bolt for JavaScript",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
