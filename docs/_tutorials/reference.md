@@ -12,9 +12,10 @@ permalink: /reference
 This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️[Getting Started guide](/getting-started) to learn the basics of building Bolt for JavaScript apps.
 </div> 
 
-- [Listener middleware](#listener-middleware)
+- [Listener functions](#listener-functions)
   - [Methods](#methods)
   - [Function arguments](#listener-function-arguments)
+  - [Difference from listener middleware](#difference-from-listener-middleware)
 - [Initialization options](#initialization-options)
   - [Receiver options](#receiver-options)
   - [App options](#app-options)
@@ -26,6 +27,7 @@ This guide is intended to detail the Bolt interface–including listeners and th
 ## Listener functions
 Slack apps typically receive and/or respond to one to many incoming events from Slack. This can be something like listening to an Events API event (like when a link associated with your app is shared) or a user invoking one of your app's shortcuts. For each type of incoming request from Slack, there are distinct methods that you can pass **listener functions** to handle and respond to the event.
 
+<div class="method-content">
 ### Methods
 Below is the current list of methods that accept listener functions. These methods handle specific event types coming from Slack, and typically include an identifing parameter before the listener function. The identifying parameter (included below) narrows the events to specific interactions that your listener function is intended to handle, such as a specific `callback_id`, or a certain substring within a message.
 
@@ -43,13 +45,14 @@ Below is the current list of methods that accept listener functions. These metho
 #### Constraint objects
 There are a collection of constraint objects that some methods have access to. These can be used to narrow the event your listener function handles, or to handle special cases. Constraint objects can be passed in lieu of the identifiers outlined above. Below is a collection of constraint objects and the methods they can be passed to. 
 
-| Method                          | Options | Details |
+| Method                                         | Options | Details |
 |--------------------------------------------------------------------|
-| `app.action(constraints, fn)` | `block_id`, `action_id`, `callback_id` | Optionally listens for `block_id` and `callback_id` in addition to `action_id`. `callback_id` can only be passed when handling action elements within modals. |
-| `app.action(constraints, fn);` | `type` | Used primarily to listen to legacy interactive message payloads. Type must be `block_actions` or `interactive_message` |
+| `app.action(constraints, fn)` | `block_id`, `action_id`, `callback_id`, (,`type`) | Listens for more than just the `action_id`. `block_id` is the ID for the element's parent block. `callback_id` is the ID of the view that is passed when instantiating it (only used when action elements are in modals). To specifically handle only either an action in blocks or in attachments, you can `type`–`block_actions` for action elements in blocks, or `interactive_message` for interactivity in legacy attachments. |
 | `app.shortcut(constraints, fn)` | `type`, `callback_id` | Allows specification of the type of shortcut. `type` must either be `shortcut` for **global shortcuts** or `message_action` for **message_shortcuts**. `callbackId` can be a `string` or `RegExp`. |
 | `app.view(constraints, fn)` | `type`, `callback_id` | `type` must either be `view_closed` or `view_submission`, which determines what specific event your listener function is sent. `callback_id` is the `callback_id` of the view that is sent when your app opens the modal. |
 | `app.options(constraints, fn)` | `block_id`, `action_id`, `callback_id` | Optionally listens for `block_id` and `callback_id` in addition to `action_id`. `callback_id` can only be passed when handling options elements within modals. |
+
+</div>
 
 ### Listener function arguments
 Listener functions have access to a set of arguments that may change based on the method which the function is passed to. Below is an explanation of the different arguments. The below table details the different arguments and the methods they'll be accessible in.
@@ -80,12 +83,12 @@ Listener middleware is used to implement logic across many listener functions (t
 Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `ExpressReceiver` (so they'll work as long as you aren't using a custom receiver).
 
 ### Receiver options
-`ExpressReceiver` options can be passed into the app constructor, just like the Bolt app options. They'll be passed to the `ExpressReceiver` instance upon initialization.
+`ExpressReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `ExpressReceiver` instance upon initialization.
 
 | Option  | Description  |
 | :---: | :--- |
 | `signingSecret` | A `string` from your app's configuration (under "Basic Information") which verifies that incoming events are coming from Slack |
-| `endpoints` | A `string` or `object` that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. For `object`, the `key` is the type of events (ex: `events`), and the value is the endpoint (ex: `/myapp/events`). **By default, all events are sent to the `/slack/events` endpoint** |
+| `endpoints` | A `string` or `object` that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. Currently, the only key for the object is `key`, the value of which is the customizable endpoint (ex: `/myapp/events`). **By default, all events are sent to the `/slack/events` endpoint** |
 | `processBeforeResponse` | `boolean` that determines whether Events API events should be automatically acknowledged. This is primarily useful when running apps on FaaS to ensure events listeners don't unexpectedly terminate. Defaults to `true`.  |
 | `clientId` | The client ID `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `clientSecret` | The client secret `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
@@ -95,6 +98,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `installerOptions` | Optional object that can be used to customize [the default OAuth support](/bolt-js/concepts#authenticating-oauth). Read more in the OAuth documentation. |
 
 ### App options
+App options are passed into the `App` constructor.
 
 | Option  | Description  |
 | :---: | :--- |
