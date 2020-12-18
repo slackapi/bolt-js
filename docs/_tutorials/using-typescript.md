@@ -1,6 +1,6 @@
 ---
 title: Using TypeScript
-order: 3
+order: 4
 slug: using-typescript
 lang: en
 layout: tutorial
