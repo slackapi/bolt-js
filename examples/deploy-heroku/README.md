@@ -1,4 +1,4 @@
-# Getting Started with Heroku ⚡️ Bolt for JavaScript
+# Deploying to Heroku ⚡️ Bolt for JavaScript
 
 > Slack app example from 📚 [Deploying to Heroku with Bolt for JavaScript][1]
 

@@ -1,6 +1,6 @@
 ---
 title: 2.x マイグレーションガイド
-order: 1
+order: 2
 slug: migration-v2
 lang: ja-jp
 layout: tutorial
