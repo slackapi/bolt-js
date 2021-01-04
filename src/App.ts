@@ -842,13 +842,13 @@ function buildSource<IsEnterpriseInstall extends boolean>(
         | SlackShortcutMiddlewareArgs
       )['body'];
 
+      if (bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== undefined) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise.id;
+      }
+
       // When the app is installed using org-wide deployment, team property will be null
       if (bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null) {
         return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
-      }
-
-      if (bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== undefined) {
-        return bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise.id;
       }
 
       return undefined;
