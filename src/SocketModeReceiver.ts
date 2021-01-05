@@ -17,7 +17,7 @@ export interface SocketModeReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
-  appToken?: string; // App Level Token
+  appToken: string; // App Level Token
 }
 
 // Additional Installer Options
@@ -48,7 +48,7 @@ export default class SocketModeReceiver implements Receiver {
   public installer: InstallProvider | undefined = undefined;
 
   constructor({
-    appToken = undefined,
+    appToken,
     logger = undefined,
     logLevel = LogLevel.INFO,
     clientId = undefined,
@@ -65,7 +65,6 @@ export default class SocketModeReceiver implements Receiver {
     });
 
     // const expressMiddleware: RequestHandler[] = [
-    // TODO: Should we still be verifying Signature?
     //   verifySignatureAndParseRawBody(logger, signingSecret),
     //   respondToSslCheck,
     //   respondToUrlVerification,
