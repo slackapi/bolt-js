@@ -243,7 +243,7 @@ export default class App {
       this.receiver = receiver;
     } else if (socketMode) {
       if (appToken === undefined) {
-        throw new AppInitializationError('You must provide an appToken when using socketMode');
+        throw new AppInitializationError('You must provide an appToken when using Socket Mode');
       }
       this.logger.debug('Initializing SocketModeReceiver');
       // Create default SocketModeReceiver
