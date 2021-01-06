@@ -807,6 +807,47 @@ describe('App', () => {
             {
               ...baseEvent,
               body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                team: null,
+                enterprise: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                enterprise: {},
+                // Although {team: undefined} pattern does not exist as of Jan 2021,
+                // this test verifies if App works even if the field is missing.
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                team: {},
+                // Although {enterprise: undefined} pattern does not exist as of Jan 2021,
+                // this test verifies if App works even if the field is missing.
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
                 type: 'view_closed',
                 channel: {},
                 user: {},
@@ -1155,7 +1196,7 @@ describe('App', () => {
           // Assert
           assert.equal(actionFn.callCount, 3);
           assert.equal(shortcutFn.callCount, 4);
-          assert.equal(viewFn.callCount, 2);
+          assert.equal(viewFn.callCount, 5);
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
