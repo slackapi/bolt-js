@@ -69,8 +69,7 @@ export interface AppOptions {
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
-  authorize?: Authorize<false>; // either token or authorize
-  orgAuthorize?: Authorize<true>; // either token or orgAuthorize
+  authorize?: Authorize<boolean>; // either token or authorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
@@ -160,10 +159,7 @@ export default class App {
   private logger: Logger;
 
   /** Authorize */
-  private authorize!: Authorize<false>;
-
-  /** Org Authorize */
-  private orgAuthorize!: Authorize<true>;
+  private authorize!: Authorize<boolean>;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -188,7 +184,6 @@ export default class App {
     botId = undefined,
     botUserId = undefined,
     authorize = undefined,
-    orgAuthorize = undefined,
     logger = undefined,
     logLevel = undefined,
     ignoreSelf = true,
@@ -274,32 +269,22 @@ export default class App {
     }
 
     if (token !== undefined) {
-      if (authorize !== undefined || orgAuthorize !== undefined || usingOauth) {
+      if (authorize !== undefined || usingOauth) {
         throw new AppInitializationError(
-          `token as well as authorize, orgAuthorize, or oauth installer options were provided. ${tokenUsage}`,
+          `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
         );
       }
       this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
-      this.orgAuthorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined && orgAuthorize === undefined && !usingOauth) {
+    } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `No token, no authorize, no orgAuthorize, and no oauth installer options provided. ${tokenUsage}`,
+        `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
       );
-    } else if ((authorize !== undefined || orgAuthorize !== undefined) && usingOauth) {
+    } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
-    } else if (authorize === undefined && orgAuthorize === undefined && usingOauth) {
+    } else if (authorize === undefined && usingOauth) {
       this.authorize = (this.receiver as ExpressReceiver).installer!.authorize;
-      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize;
-    } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
-      // only supporting org installs
-      this.orgAuthorize = orgAuthorize;
-    } else if (authorize !== undefined && orgAuthorize === undefined && !usingOauth) {
-      // only supporting non org installs
+    } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
-    } else if (authorize !== undefined && orgAuthorize !== undefined && !usingOauth) {
-      // supporting both org installs and non org installs
-      this.authorize = authorize;
-      this.orgAuthorize = orgAuthorize;
     } else {
       this.logger.error('Never should have reached this point, please report to the team');
       assertNever();
@@ -555,7 +540,7 @@ export default class App {
     let authorizeResult: AuthorizeResult;
     try {
       if (source.isEnterpriseInstall) {
-        authorizeResult = await this.orgAuthorize(source as AuthorizeSourceData<true>, bodyArg);
+        authorizeResult = await this.authorize(source as AuthorizeSourceData<true>, bodyArg);
       } else {
         authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
