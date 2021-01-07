@@ -259,8 +259,9 @@ export default class App {
         stateSecret,
         installationStore,
         scopes,
+        logger,
+        logLevel,
         installerOptions: this.installerOptions,
-        logger: this.logger,
       });
     } else if (signingSecret === undefined) {
       // No custom receiver
@@ -280,8 +281,9 @@ export default class App {
         stateSecret,
         installationStore,
         scopes,
+        logger,
+        logLevel,
         installerOptions: this.installerOptions,
-        logger: this.logger,
       });
     }
 
