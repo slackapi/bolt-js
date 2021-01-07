@@ -61,6 +61,7 @@ export default class SocketModeReceiver implements Receiver {
     this.client = new SocketModeClient({
       appToken,
       logLevel,
+      logger,
       clientOptions: installerOptions.clientOptions,
     });
 
