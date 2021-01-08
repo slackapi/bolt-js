@@ -927,8 +927,8 @@ function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: 
     }
   }
   // command payloads have this property set as a string
-  if (body.is_enterprise_install === 'true') {
-    return true;
+  if (typeof body.is_enterprise_install === 'string') {
+    return body.is_enterprise_install === 'true';
   }
   // all remaining types have a boolean property
   if (body.is_enterprise_install !== undefined) {

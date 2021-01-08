@@ -683,6 +683,7 @@ describe('App', () => {
               ...baseEvent,
               body: {
                 command: '/COMMAND_NAME',
+                is_enterprise_install: 'false',
               },
             },
             {
