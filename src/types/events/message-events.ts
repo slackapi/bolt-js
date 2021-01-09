@@ -37,6 +37,7 @@ export interface GenericMessageEvent {
 export interface BotMessageEvent {
   type: 'message';
   subtype: 'bot_message';
+  channel: string;
   ts: string;
   text: string;
   bot_id: string;
@@ -59,6 +60,7 @@ export interface BotMessageEvent {
 export interface EKMAccessDeniedMessageEvent {
   type: 'message';
   subtype: 'ekm_access_denied';
+  channel: string;
   ts: string;
   text: string; // This will not have any meaningful content within
   user: 'UREVOKEDU';
@@ -111,6 +113,7 @@ export interface MessageRepliedEvent {
 export interface ThreadBroadcastMessageEvent {
   type: 'message';
   subtype: undefined;
+  channel: string;
   message: {
     type: 'message';
     subtype: 'thread_broadcast';

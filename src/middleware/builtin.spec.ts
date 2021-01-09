@@ -750,6 +750,7 @@ const appMentionEvent: AppMentionEvent = {
 const botMessageEvent: MessageEvent = {
   type: 'message',
   subtype: 'bot_message',
+  channel: 'CHANNEL_ID',
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',
