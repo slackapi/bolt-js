@@ -15,7 +15,7 @@ Bolt for JavaScript は `slack/install` というパスも生成します。こ�
 
 Slack の OAuth インストールフローについてもっと知りたい場合は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
 
-[Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。そして、最後に Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを忘れずに確認するようにしてください。
+[Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
 </div>
 
 ```javascript
@@ -29,10 +29,10 @@ const app = new App({
     storeInstallation: async (installation) => {
       // 実際のデータベースに保存するために、ここのコードを変更
       if (installation.isEnterpriseInstall) {
-        // support for org wide app installation
+        // OrG 全体へのインストールに対応する場合
         return await database.set(installation.enterprise.id, installation);
       } else {
-        // single team app installation
+        // 単独のワークスペースへのインストールの場合
         return await database.set(installation.team.id, installation);
       }
       throw new Error('Failed saving installation data to installationStore');
@@ -40,11 +40,11 @@ const app = new App({
     fetchInstallation: async (InstallQuery) => {
       // 実際のデータベースから取得するために、ここのコードを変更
       if (InstallQuery.isEnterpriseInstall && InstallQuery.enterpriseId !== undefined) {
-        // org wide app installation lookup
+        // OrG 全体へのインストール情報の参照
         return await database.get(InstallQuery.enterpriseId);
       }
       if (InstallQuery.teamId !== undefined) {
-        // single team app installation lookup
+        // 単独のワークスペースへのインストール情報の参照
         return await database.get(InstallQuery.teamId);
       }
       throw new Error('Failed fetching installation');
