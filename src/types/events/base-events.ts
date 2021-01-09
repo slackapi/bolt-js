@@ -146,6 +146,7 @@ export interface AppMentionEvent {
   ts: string;
   channel: string;
   event_ts: string;
+  thread_ts: string;
 }
 
 // TODO: this event doesn't use the envelope. write test cases to make sure its works without breaking, and figure out

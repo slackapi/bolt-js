@@ -745,6 +745,7 @@ const appMentionEvent: AppMentionEvent = {
   ts: '123.123',
   channel: 'C1234567',
   event_ts: '123.123',
+  thread_ts: '123.123',
 };
 
 const botMessageEvent: MessageEvent = {
