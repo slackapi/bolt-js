@@ -65,13 +65,6 @@ export default class SocketModeReceiver implements Receiver {
       clientOptions: installerOptions.clientOptions,
     });
 
-    // const expressMiddleware: RequestHandler[] = [
-    //   verifySignatureAndParseRawBody(logger, signingSecret),
-    //   respondToSslCheck,
-    //   respondToUrlVerification,
-    //   this.requestHandler.bind(this),
-    // ];
-
     if (typeof logger !== 'undefined') {
       this.logger = logger;
     } else {
@@ -108,12 +101,10 @@ export default class SocketModeReceiver implements Receiver {
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
 
       const server = createServer(async (req, res) => {
-        if (req.url === redirectUriPath) {
+        if (req.url !== undefined && req.url.startsWith(redirectUriPath)) {
           // call installer.handleCallback to wrap up the install flow
-          await this.installer!.handleCallback(req, res);
-        }
-
-        if (req.url === installPath) {
+          await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
+        } else if (req.url !== undefined && req.url.startsWith(installPath)) {
           try {
             const url = await this.installer!.generateInstallUrl({
               metadata: installerOptions.metadata,
@@ -128,12 +119,17 @@ export default class SocketModeReceiver implements Receiver {
           } catch (err) {
             throw new Error(err);
           }
+        } else {
+          this.logger.error(`Tried to reach ${req.url} which isn't a`);
+          // Return 404 because we don't support route
+          res.writeHead(404, {});
+          res.end(`route ${req.url} doesn't exist!`);
         }
       });
 
       const port = installerOptions.port === undefined ? 3000 : installerOptions.port;
-      this.logger.info(`listening on port ${port} for OAuth`);
-      this.logger.info(`Go to http://localhost:${port}/slack/install to initiate OAuth flow`);
+      this.logger.debug(`listening on port ${port} for OAuth`);
+      this.logger.debug(`Go to http://localhost:${port}${installPath} to initiate OAuth flow`);
       // use port 3000 by default
       server.listen(port);
     }
