@@ -141,7 +141,10 @@ export interface AppHomeOpenedEvent {
 // of `ts`
 export interface AppMentionEvent {
   type: 'app_mention';
-  user: string;
+  subtype?: string;
+  bot_id?: string;
+  username: string;
+  user?: string;
   text: string;
   ts: string;
   channel: string;
