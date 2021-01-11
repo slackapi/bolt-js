@@ -78,6 +78,7 @@ export interface AppOptions {
   ignoreSelf?: boolean;
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
   socketMode?: boolean;
+  developerMode?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -161,6 +162,9 @@ export default class App {
   /** Logger */
   private logger: Logger;
 
+  /** Log Level */
+  private logLevel: LogLevel;
+
   /** Authorize */
   private authorize!: Authorize<boolean>;
 
@@ -175,6 +179,10 @@ export default class App {
   private axios: AxiosInstance;
 
   private installerOptions: ExpressReceiverOptions['installerOptions'];
+
+  private socketMode: boolean;
+
+  private developerMode: boolean;
 
   constructor({
     signingSecret = undefined,
@@ -199,8 +207,23 @@ export default class App {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = undefined,
-    socketMode = false,
+    socketMode = undefined,
+    developerMode = false,
   }: AppOptions = {}) {
+    // this.logLevel = logLevel;
+    this.developerMode = developerMode;
+    if (developerMode) {
+      // Set logLevel to Debug in Developer Mode if one wasn't passed in
+      this.logLevel = logLevel ?? LogLevel.DEBUG;
+      // Set SocketMode to true if one wasn't passed in
+      this.socketMode = socketMode ?? true;
+    } else {
+      // If devs aren't using Developer Mode or Socket Mode, set it to false
+      this.socketMode = socketMode ?? false;
+      // Set logLevel to Info if one wasn't passed in
+      this.logLevel = logLevel ?? LogLevel.INFO;
+    }
+
     if (typeof logger === 'undefined') {
       // Initialize with the default logger
       const consoleLogger = new ConsoleLogger();
@@ -209,8 +232,8 @@ export default class App {
     } else {
       this.logger = logger;
     }
-    if (typeof logLevel !== 'undefined' && this.logger.getLevel() !== logLevel) {
-      this.logger.setLevel(logLevel);
+    if (typeof this.logLevel !== 'undefined' && this.logger.getLevel() !== this.logLevel) {
+      this.logger.setLevel(this.logLevel);
     }
     this.errorHandler = defaultErrorHandler(this.logger);
     this.clientOptions = {
@@ -238,10 +261,28 @@ export default class App {
       ...installerOptions,
     };
 
+    if (
+      this.developerMode &&
+      this.installerOptions &&
+      (typeof this.installerOptions.callbackOptions === 'undefined' ||
+        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+    ) {
+      // add a custom failure callback for Developer Mode in case they are using OAuth
+      this.logger.debug('adding Developer Mode custom OAuth failure handler');
+      this.installerOptions.callbackOptions = {
+        failure: (error, _installOptions, _req, res) => {
+          this.logger.debug(error);
+          res.writeHead(500, { 'Content-Type': 'text/html' });
+          res.end(`<html><body><h1>OAuth failed!</h1><div>${error}</div></body></html>`);
+        },
+      };
+    }
+
     // Check for required arguments of ExpressReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
-    } else if (socketMode) {
+    } else if (this.socketMode) {
       if (appToken === undefined) {
         throw new AppInitializationError('You must provide an appToken when using Socket Mode');
       }
@@ -255,7 +296,7 @@ export default class App {
         installationStore,
         scopes,
         logger,
-        logLevel,
+        logLevel: this.logLevel,
         installerOptions: this.installerOptions,
       });
     } else if (signingSecret === undefined) {
@@ -277,7 +318,7 @@ export default class App {
         installationStore,
         scopes,
         logger,
-        logLevel,
+        logLevel: this.logLevel,
         installerOptions: this.installerOptions,
       });
     }
@@ -543,6 +584,13 @@ export default class App {
    */
   public async processEvent(event: ReceiverEvent): Promise<void> {
     const { body, ack } = event;
+
+    if (this.developerMode) {
+      // log the body of the event
+      // this may contain sensitive info like tokens
+      this.logger.debug(JSON.stringify(body));
+    }
+
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
