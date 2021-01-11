@@ -209,7 +209,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     domain: string;
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
-  };
+  } | null;
   user: {
     id: string;
     name: string;
@@ -237,6 +237,13 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
 
   // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
   app_unfurl?: any;
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
 
 /*

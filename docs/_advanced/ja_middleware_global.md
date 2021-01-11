@@ -17,7 +17,7 @@ order: 4
 
 ```javascript
 //  Acme ID情報管理プロバイダ上のユーザからの着信イベントと紐つけた認証ミドルウェア
-async function authWithAcme({ payload, context, next }) {
+async function authWithAcme({ payload, client, context, next }) {
   const slackUserId = payload.user;
   const helpChannelId = 'C12345';
 
@@ -30,8 +30,7 @@ async function authWithAcme({ payload, context, next }) {
   } catch (error) {
       // Acme システム上にユーザが存在しないのでエラーをわたし、イベントプロセスを終了
       if (error.message === 'Not Found') {
-        await app.client.chat.postEphemeral({
-          token: context.botToken,
+        await client.chat.postEphemeral({
           channel: payload.channel,
           user: slackUserId,
           text: `Sorry <@${slackUserId}>, you aren't registered in Acme. Please post in <#${helpChannelId}> for assistance.`

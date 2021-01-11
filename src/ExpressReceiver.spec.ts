@@ -120,7 +120,7 @@ describe('ExpressReceiver', () => {
 
     it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async function () {
       // Arrange
-      this.
+      // this.
     });
     it('should reject with an error when starting and the server was already previously started');
   });
@@ -133,8 +133,7 @@ describe('ExpressReceiver', () => {
   describe('state management for built-in server', () => {
     it('should be able to start after it was stopped', () => {
       // TODO: assert that listeners on the 'close' event still get called
-    })
-
+    });
   });
 
   describe('built-in middleware', () => {
@@ -297,6 +296,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
     }
 
@@ -349,6 +349,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -393,6 +394,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -448,6 +450,7 @@ describe('ExpressReceiver', () => {
       // Act
 
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -481,6 +484,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -508,6 +512,7 @@ describe('ExpressReceiver', () => {
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       verifier(req, resp, next);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -546,9 +551,7 @@ describe('ExpressReceiver', () => {
 /* Testing Harness */
 
 // Loading the system under test using overrides
-async function importExpressReceiver(
-  overrides: Override = {},
-): Promise<typeof import('./ExpressReceiver').default> {
+async function importExpressReceiver(overrides: Override = {}): Promise<typeof import('./ExpressReceiver').default> {
   return (await rewiremock.module(() => import('./ExpressReceiver'), overrides)).default;
 }
 
@@ -572,6 +575,10 @@ function withHttpsCreateServer(spy: SinonSpy): Override {
 // Fakes
 class FakeServer extends EventEmitter {
   public on = sinon.fake();
-  public listen = sinon.fake((...args: any[]) => { setImmediate(() => { args[1](); }); });
+  public listen = sinon.fake((...args: any[]) => {
+    setImmediate(() => {
+      args[1]();
+    });
+  });
   public close = sinon.fake();
 }

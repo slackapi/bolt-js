@@ -69,7 +69,8 @@ export interface AppOptions {
   token?: AuthorizeResult['botToken']; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
-  authorize?: Authorize; // either token or authorize
+  authorize?: Authorize<false>; // either token or authorize
+  orgAuthorize?: Authorize<true>; // either token or orgAuthorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
@@ -80,16 +81,17 @@ export interface AppOptions {
 export { LogLevel, Logger } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
-export interface Authorize {
-  (source: AuthorizeSourceData, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
+export interface Authorize<IsEnterpriseInstall extends boolean = false> {
+  (source: AuthorizeSourceData<IsEnterpriseInstall>, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
 }
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
-export interface AuthorizeSourceData {
-  teamId: string;
-  enterpriseId?: string;
+export interface AuthorizeSourceData<IsEnterpriseInstall extends boolean = false> {
+  teamId: IsEnterpriseInstall extends true ? string | undefined : string;
+  enterpriseId: IsEnterpriseInstall extends true ? string : string | undefined;
   userId?: string;
   conversationId?: string;
+  isEnterpriseInstall: IsEnterpriseInstall;
 }
 
 /** Authorization function outputs - data that will be available as part of event processing */
@@ -99,6 +101,8 @@ export interface AuthorizeResult {
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
+  teamId?: string;
+  enterpriseId?: string;
   [key: string]: any;
 }
 
@@ -146,7 +150,8 @@ export default class App {
 
   private clientOptions: WebClientOptions;
 
-  private clients: { [teamId: string]: WebClientPool } = {};
+  // Some payloads don't have teamId anymore. So we use EnterpriseId in those scenarios
+  private clients: { [teamOrEnterpriseId: string]: WebClientPool } = {};
 
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
@@ -155,7 +160,10 @@ export default class App {
   private logger: Logger;
 
   /** Authorize */
-  private authorize!: Authorize;
+  private authorize!: Authorize<false>;
+
+  /** Org Authorize */
+  private orgAuthorize!: Authorize<true>;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -180,6 +188,7 @@ export default class App {
     botId = undefined,
     botUserId = undefined,
     authorize = undefined,
+    orgAuthorize = undefined,
     logger = undefined,
     logLevel = undefined,
     ignoreSelf = true,
@@ -265,22 +274,32 @@ export default class App {
     }
 
     if (token !== undefined) {
-      if (authorize !== undefined || usingOauth) {
+      if (authorize !== undefined || orgAuthorize !== undefined || usingOauth) {
         throw new AppInitializationError(
-          `token as well as authorize options or oauth installer options were provided. ${tokenUsage}`,
+          `token as well as authorize, orgAuthorize, or oauth installer options were provided. ${tokenUsage}`,
         );
       }
-      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined && !usingOauth) {
+      this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.orgAuthorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
+    } else if (authorize === undefined && orgAuthorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `No token, no authorize options, and no oauth installer options provided. ${tokenUsage}`,
+        `No token, no authorize, no orgAuthorize, and no oauth installer options provided. ${tokenUsage}`,
       );
-    } else if (authorize !== undefined && usingOauth) {
+    } else if ((authorize !== undefined || orgAuthorize !== undefined) && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
-    } else if (authorize === undefined && usingOauth) {
-      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
-    } else if (authorize !== undefined && !usingOauth) {
+    } else if (authorize === undefined && orgAuthorize === undefined && usingOauth) {
+      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize;
+      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize;
+    } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
+      // only supporting org installs
+      this.orgAuthorize = orgAuthorize;
+    } else if (authorize !== undefined && orgAuthorize === undefined && !usingOauth) {
+      // only supporting non org installs
       this.authorize = authorize;
+    } else if (authorize !== undefined && orgAuthorize !== undefined && !usingOauth) {
+      // supporting both org installs and non org installs
+      this.authorize = authorize;
+      this.orgAuthorize = orgAuthorize;
     } else {
       this.logger.error('Never should have reached this point, please report to the team');
       assertNever();
@@ -357,9 +376,11 @@ export default class App {
       return patternOrMiddleware;
     });
 
-    this.listeners.push([onlyEvents, matchEventType('message'), ...messageMiddleware] as Middleware<
-      AnyMiddlewareArgs
-    >[]);
+    this.listeners.push([
+      onlyEvents,
+      matchEventType('message'),
+      ...messageMiddleware,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
@@ -394,9 +415,11 @@ export default class App {
       return;
     }
 
-    this.listeners.push([onlyShortcuts, matchConstraints(constraints), ...listeners] as Middleware<
-      AnyMiddlewareArgs
-    >[]);
+    this.listeners.push([
+      onlyShortcuts,
+      matchConstraints(constraints),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
@@ -495,9 +518,11 @@ export default class App {
       return;
     }
 
-    this.listeners.push([onlyViewActions, matchConstraints(constraints), ...listeners] as Middleware<
-      AnyMiddlewareArgs
-    >[]);
+    this.listeners.push([
+      onlyViewActions,
+      matchConstraints(constraints),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public error(errorHandler: ErrorHandler): void {
@@ -523,15 +548,31 @@ export default class App {
     // From this point on, we assume that body is not just a key-value map, but one of the types of bodies we expect
     const bodyArg = body as AnyMiddlewareArgs['body'];
 
-    // Initialize context (shallow copy to enforce object identity separation)
-    const source = buildSource(type, conversationId, bodyArg);
-    let authorizeResult;
+    // Check if type event with the authorizations object or if it has a top level is_enterprise_install property
+    const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(bodyArg, type);
+    const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
+    let authorizeResult: AuthorizeResult;
     try {
-      authorizeResult = await this.authorize(source, bodyArg);
+      if (source.isEnterpriseInstall) {
+        authorizeResult = await this.orgAuthorize(source as AuthorizeSourceData<true>, bodyArg);
+      } else {
+        authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
+      }
     } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+      error.code = 'slack_bolt_authorization_error';
       return this.handleError(error);
+    }
+
+    // Try to set teamId from AuthorizeResult before using one from source
+    if (authorizeResult.teamId === undefined && source.teamId !== undefined) {
+      authorizeResult.teamId = source.teamId;
+    }
+
+    // Try to set enterpriseId from AuthorizeResult before using one from source
+    if (authorizeResult.enterpriseId === undefined && source.enterpriseId !== undefined) {
+      authorizeResult.enterpriseId = source.enterpriseId;
     }
 
     const context: Context = { ...authorizeResult };
@@ -630,13 +671,28 @@ export default class App {
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
+
     if (token !== undefined) {
-      let pool = this.clients[source.teamId];
-      if (pool === undefined) {
-        // eslint-disable-next-line no-multi-assign
-        pool = this.clients[source.teamId] = new WebClientPool();
+      let pool;
+      const clientOptionsCopy = { ...this.clientOptions };
+      if (authorizeResult.teamId !== undefined) {
+        pool = this.clients[authorizeResult.teamId];
+        if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
+          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
+        }
+        // Add teamId to clientOptions so it can be automatically added to web-api calls
+        clientOptionsCopy.teamId = authorizeResult.teamId;
+      } else if (authorizeResult.enterpriseId !== undefined) {
+        pool = this.clients[authorizeResult.enterpriseId];
+        if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
+          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
+        }
       }
-      client = pool.getOrCreate(token, this.clientOptions);
+      if (pool !== undefined) {
+        client = pool.getOrCreate(token, clientOptionsCopy);
+      }
     }
 
     // Dispatch event through the global middleware chain
@@ -704,71 +760,182 @@ const validViewTypes = ['view_closed', 'view_submission'];
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
  */
-function buildSource(
+function buildSource<IsEnterpriseInstall extends boolean>(
   type: IncomingEventType,
   channelId: string | undefined,
   body: AnyMiddlewareArgs['body'],
-): AuthorizeSourceData {
+  isEnterpriseInstall: IsEnterpriseInstall,
+): AuthorizeSourceData<IsEnterpriseInstall> {
   // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
   // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
 
-  // tslint:disable:max-line-length
-  const source: AuthorizeSourceData = {
-    teamId:
-      type === IncomingEventType.Event || type === IncomingEventType.Command
-        ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string)
-        : type === IncomingEventType.Action ||
-          type === IncomingEventType.Options ||
-          type === IncomingEventType.ViewAction ||
-          type === IncomingEventType.Shortcut
-        ? ((body as (
-            | SlackActionMiddlewareArgs
-            | SlackOptionsMiddlewareArgs
-            | SlackViewMiddlewareArgs
-            | SlackShortcutMiddlewareArgs
-          )['body']).team.id as string)
-        : assertNever(type),
-    enterpriseId:
-      type === IncomingEventType.Event || type === IncomingEventType.Command
-        ? ((body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string)
-        : type === IncomingEventType.Action ||
-          type === IncomingEventType.Options ||
-          type === IncomingEventType.ViewAction ||
-          type === IncomingEventType.Shortcut
-        ? ((body as (
-            | SlackActionMiddlewareArgs
-            | SlackOptionsMiddlewareArgs
-            | SlackViewMiddlewareArgs
-            | SlackShortcutMiddlewareArgs
-          )['body']).team.enterprise_id as string)
-        : undefined,
-    userId:
-      type === IncomingEventType.Event
-        ? typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string'
-          ? ((body as SlackEventMiddlewareArgs['body']).event.user as string)
-          : typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object'
-          ? ((body as SlackEventMiddlewareArgs['body']).event.user.id as string)
-          : (body as SlackEventMiddlewareArgs['body']).event.channel !== undefined &&
-            (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined
-          ? ((body as SlackEventMiddlewareArgs['body']).event.channel.creator as string)
-          : (body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined &&
-            (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined
-          ? ((body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string)
-          : undefined
-        : type === IncomingEventType.Action ||
-          type === IncomingEventType.Options ||
-          type === IncomingEventType.ViewAction ||
-          type === IncomingEventType.Shortcut
-        ? ((body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user
-            .id as string)
-        : type === IncomingEventType.Command
-        ? ((body as SlackCommandMiddlewareArgs['body']).user_id as string)
-        : undefined,
+  const teamId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].team_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].team_id;
+      }
+      return bodyAsEvent.team_id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).team_id;
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
+    ) {
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+
+      // When the app is installed using org-wide deployment, team property will be null
+      if (
+        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
+        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
+      ) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.id;
+      }
+
+      // This is the only place where this function might return undefined
+      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.team_id;
+    }
+
+    return assertNever(type);
+  })();
+
+  const enterpriseId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].enterprise_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].enterprise_id;
+      }
+      return bodyAsEvent.enterprise_id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).enterprise_id;
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
+    ) {
+      // NOTE: no type system backed exhaustiveness check within this group of incoming event types
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+
+      if (
+        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== 'undefined' &&
+        bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== null
+      ) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise.id;
+      }
+
+      // When the app is installed using org-wide deployment, team property will be null
+      if (
+        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
+        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
+      ) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
+      }
+
+      return undefined;
+    }
+
+    return assertNever(type);
+  })();
+
+  const userId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      // NOTE: no type system backed exhaustiveness check within this incoming event type
+      const { event } = body as SlackEventMiddlewareArgs['body'];
+      if ('user' in event) {
+        if (typeof event.user === 'string') {
+          return event.user;
+        }
+        if (typeof event.user === 'object') {
+          return event.user.id;
+        }
+      }
+      if ('channel' in event && typeof event.channel !== 'string' && 'creator' in event.channel) {
+        return event.channel.creator;
+      }
+      if ('subteam' in event && event.subteam.created_by !== undefined) {
+        return event.subteam.created_by;
+      }
+      return undefined;
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
+    ) {
+      // NOTE: no type system backed exhaustiveness check within this incoming event type
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).user_id;
+    }
+
+    return assertNever(type);
+  })();
+
+  return {
+    userId,
+    isEnterpriseInstall,
+    teamId: teamId as IsEnterpriseInstall extends true ? string | undefined : string,
+    enterpriseId: enterpriseId as IsEnterpriseInstall extends true ? string : string | undefined,
     conversationId: channelId,
   };
-  // tslint:enable:max-line-length
+}
 
-  return source;
+function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: IncomingEventType): boolean {
+  if (type === IncomingEventType.Event) {
+    const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+    if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
+      return !!bodyAsEvent.authorizations[0].is_enterprise_install;
+    }
+  }
+  // command payloads have this property set as a string
+  if (typeof body.is_enterprise_install === 'string') {
+    return body.is_enterprise_install === 'true';
+  }
+  // all remaining types have a boolean property
+  if (body.is_enterprise_install !== undefined) {
+    return body.is_enterprise_install;
+  }
+  // as a fallback we assume it's a single team installation (but this should never happen)
+  return false;
 }
 
 function isBlockActionOrInteractiveMessageBody(
@@ -785,10 +952,10 @@ function defaultErrorHandler(logger: Logger): ErrorHandler {
   };
 }
 
-function singleTeamAuthorization(
+function singleAuthorization(
   client: WebClient,
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
-): Authorize {
+): Authorize<boolean> {
   // TODO: warn when something needed isn't found
   const identifiers: Promise<{ botUserId: string; botId: string }> =
     authorization.botUserId !== undefined && authorization.botId !== undefined
@@ -800,8 +967,8 @@ function singleTeamAuthorization(
           };
         });
 
-  return async () => {
-    return { botToken: authorization.botToken, ...(await identifiers) };
+  return async ({ isEnterpriseInstall }) => {
+    return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };
   };
 }
 

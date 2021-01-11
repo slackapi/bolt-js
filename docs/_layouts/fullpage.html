@@ -1,0 +1,30 @@
+---
+sidebar_style: main
+---
+<!DOCTYPE html>
+<html>
+
+{% include head.html %}
+
+<body>
+  {% include tag_manager.html %}
+  <div class="wrapper">
+    <div class="panel">
+      {% include sidebar.html %}
+    </div>
+
+    <div class="content">
+        <div class="mainheader">
+          {% include header.html %}
+        </div>
+
+        <div class="reference">
+          {{ content | markdownify }}
+        </div>
+    </div>
+
+  </div>
+
+  {% include analytics.html %}
+</body>
+</html>

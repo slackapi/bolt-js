@@ -7,6 +7,7 @@ Describe your issue here.
 - [ ] enhancement (feature request)
 - [ ] question
 - [ ] documentation related
+- [ ] example code related
 - [ ] testing related
 - [ ] discussion
 
