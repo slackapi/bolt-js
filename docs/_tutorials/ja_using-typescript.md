@@ -1,6 +1,6 @@
 ---
 title: TypeScript での利用ガイド
-order: 3
+order: 4
 slug: using-typescript
 lang: ja-jp
 layout: tutorial

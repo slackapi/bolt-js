@@ -297,6 +297,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
     }
 
@@ -349,6 +350,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -393,6 +395,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -448,6 +451,7 @@ describe('ExpressReceiver', () => {
       // Act
 
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -481,6 +485,7 @@ describe('ExpressReceiver', () => {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -508,6 +513,7 @@ describe('ExpressReceiver', () => {
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       verifier(req, resp, next);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert

@@ -38,7 +38,7 @@ export interface InteractiveMessage<Action extends InteractiveAction = Interacti
     domain: string;
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
-  };
+  } | null;
   user: {
     id: string;
     name: string;
@@ -59,6 +59,13 @@ export interface InteractiveMessage<Action extends InteractiveAction = Interacti
   message_ts?: string;
   // NOTE: the original_message is not available from ephemeral messages
   original_message?: { [key: string]: string };
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
 
 /*

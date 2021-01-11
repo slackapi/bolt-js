@@ -17,7 +17,7 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 
 ```javascript
 // Handle a view_submission event
-app.view('view_b', async ({ ack, body, view, context }) => {
+app.view('view_b', async ({ ack, body, view, client }) => {
   // Acknowledge the view_submission event
   await ack();
 
@@ -41,8 +41,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
 
   // Message the user
   try {
-    await app.client.chat.postMessage({
-      token: context.botToken,
+    await client.chat.postMessage({
       channel: user,
       text: msg
     });

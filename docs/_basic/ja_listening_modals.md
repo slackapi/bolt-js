@@ -17,7 +17,7 @@ order: 12
 
 ```javascript
 // モーダルでのデータ送信イベントを処理します
-app.view('view_b', async ({ ack, body, view, context }) => {
+app.view('view_b', async ({ ack, body, view, client }) => {
   // モーダルでのデータ送信イベントを確認
   await ack();
 
@@ -41,8 +41,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
 
   // ユーザーにメッセージを送信
   try {
-    await app.client.chat.postMessage({
-      token: context.botToken,
+    await client.chat.postMessage({
       channel: user,
       text: msg
     });

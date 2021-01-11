@@ -215,7 +215,7 @@ export function matchMessage(
   return async ({ event, context, next }) => {
     let tempMatches: RegExpMatchArray | null;
 
-    if (event.text === undefined) {
+    if (!('text' in event) || event.text === undefined) {
       return;
     }
 
@@ -301,7 +301,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
       const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
       const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
 
-      if (botUserId !== undefined && args.event.user === botUserId && !isEventShouldBeKept) {
+      if (botUserId !== undefined && 'user' in args.event && args.event.user === botUserId && !isEventShouldBeKept) {
         return;
       }
     }
@@ -334,7 +334,7 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       );
     }
 
-    if (message.text === undefined) {
+    if (!('text' in message) || message.text === undefined) {
       return;
     }
 

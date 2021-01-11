@@ -6,13 +6,17 @@ order: 15
 ---
 
 <div class="section-content">
-Slack apps installed on multiple workspaces will need to implement OAuth, then store installation information (like access tokens) securely. By providing `clientId`, `clientSecret`, `stateSecret` and `scopes` when initializing `App`, Bolt for JavaScript will handle the work of setting up OAuth routes and verifying state. Your app only has built-in OAuth support when using the built-in ExpressReceiver. If you're implementing a custom receiver, you can make use of our [OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.
+Slack apps that are installed on multiple workspaces will need to implement OAuth and store installation information (i.e. access tokens) securely. Bolt supports OAuth and will handle most of the work for you by setting up OAuth routes and verifying state. All you need to do is provide your `clientId`, `clientSecret`, `stateSecret` and `scopes` when initializing `App`.
 
 Bolt for JavaScript will create a **Redirect URL** `slack/oauth_redirect`, which Slack uses to redirect users after they complete your app's installation flow. You will need to add this **Redirect URL** in your app configuration settings under **OAuth and Permissions**. This path can be configured in the `installerOptions` argument described below.
 
 Bolt for JavaScript will also create a `slack/install` route, where you can find an `Add to Slack` button for your app to perform direct installs of your app. If you need any additional authorizations (user tokens) from users inside a team when your app is already installed or a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
+Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you're implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.
+
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
+
+To add support for [org wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `2.5.0` or newer. You will have to update your `installationStore` to include `storeOrgInstallation` and `fetchOrgInstallation` methods. Lastly, make sure you have enabled org wide installations in your app configuration settings under **Org Level Apps**.
 </div>
 
 ```javascript
@@ -30,6 +34,16 @@ const app = new App({
     fetchInstallation: async (InstallQuery) => {
       // change the line below so it fetches from your database
       return await database.get(InstallQuery.teamId);
+    },
+    storeOrgInstallation: async (installation) => {
+      // include this method if you want your app to support org wide installations
+      // change the line below so it saves to your database
+      return await database.set(installation.enterprise.id, installation);
+    },
+    fetchOrgInstallation: async (InstallQuery) => {
+      // include this method if you want your app to support org wide installations
+      // change the line below so it fetches from your database
+      return await database.get(InstallQuery.enterpriseId);
     },
   },
 });

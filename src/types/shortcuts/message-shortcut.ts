@@ -21,6 +21,7 @@ export interface MessageShortcut {
     id: string;
     name: string;
     team_id?: string; // undocumented
+    username?: string; // shows up on org app msg actions
   };
   channel: {
     id: string;
@@ -31,7 +32,14 @@ export interface MessageShortcut {
     domain: string;
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
-  };
+  } | null;
   token: string;
   action_ts: string; // undocumented
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }

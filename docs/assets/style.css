@@ -3,12 +3,13 @@
   --light-grey: #F8F8F8;
   --grey: #868686;
   --dark-grey: #616061;
-  --soft-grey: #DDDDDD;
+  --soft-grey: #ECECEC;
   --blue: #1264A3;
   --green: #00B073;
   --light-blue: #B8D1E3;
   --white: #FFFFFF;
   --black: #1D1C1D;
+  --yellowish: #FF9E00; 
 }
 
 body {
@@ -215,14 +216,14 @@ span.beta {
   line-height: 1.75em;
 }
 
-.tutorial img {
+.tutorial img, .reference img {
   width: 85%;
   margin: 0.2em auto;
   display: block;
   box-shadow: 0 0 15px #DDDDDD;
 }
 
-.tutorial blockquote {
+.tutorial blockquote, .reference blockquote {
   margin: 0 0 0 1em;
   padding: 0 6em 0 1.5em;
   border-radius: 6px;
@@ -234,6 +235,18 @@ span.beta {
   padding-bottom: 1em;
 }
 
+.reference {
+  width: 80%;
+  margin: 1em auto 3em auto;
+  padding-bottom: 2em;
+  font-size: 1em;
+  line-height: 1.75em;
+}
+
+.reference h3 {
+  padding-top: 1em;
+}
+
 .content .section-wrapper .language-javascript {
   grid-area: code;
 }
@@ -242,11 +255,31 @@ pre {
   background-color: var(--light-grey) !important;
   background-image: none;
   padding: 2em;
-  border: 1px solid #DDDDDD;
+  border: 1px solid var(--soft-grey);
+  border-radius: 1em;
+}
+
+code {
+  border-radius: 8px;
+  background-color: var(--light-grey);
+  padding: 2px 7px;
+  border: 1px solid var(--soft-grey);
 }
 
 pre code {
   font-size: 0.85em !important;
+}
+
+a code {
+  color: var(--blue);
+}
+
+.reference .method-content table {
+  table-layout: auto;
+}
+
+.reference .method-content table td:first-child {
+  width: 30%;
 }
 
 .content .section-wrapper .section-content {

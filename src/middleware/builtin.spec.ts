@@ -5,10 +5,18 @@ import sinon from 'sinon';
 import { ErrorCode, ContextMissingPropertyError } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
-import { SlackEventMiddlewareArgs, NextFn, Context, MessageEvent, SlackCommandMiddlewareArgs } from '../types';
+import {
+  SlackEventMiddlewareArgs,
+  NextFn,
+  Context,
+  SlackEvent,
+  MessageEvent,
+  SlackCommandMiddlewareArgs,
+} from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
-import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events';
+import { AppMentionEvent } from '../types/events';
+import { GenericMessageEvent } from '../types/events/message-events';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
@@ -688,8 +696,8 @@ async function importBuiltin(overrides: Override = {}): Promise<typeof import('.
   return rewiremock.module(() => import('./builtin'), overrides);
 }
 
-function createFakeMessageEvent(content: string | MessageEvent['blocks'] = ''): MessageEvent {
-  const event: Partial<MessageEvent> = {
+function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] = ''): MessageEvent {
+  const event: Partial<GenericMessageEvent> = {
     type: 'message',
     channel: 'CHANNEL_ID',
     user: 'USER_ID',
@@ -739,10 +747,9 @@ const appMentionEvent: AppMentionEvent = {
   event_ts: '123.123',
 };
 
-const botMessageEvent: BotMessageEvent & MessageEvent = {
+const botMessageEvent: MessageEvent = {
   type: 'message',
   subtype: 'bot_message',
-  channel: 'C1234567',
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',

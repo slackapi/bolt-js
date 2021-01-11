@@ -67,6 +67,32 @@ describe('App', () => {
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
       assert.instanceOf(app, App);
     });
+    it('should succeed with an orgAuthorize callback', async () => {
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+      // Act
+      const app = new App({ orgAuthorize: authorizeCallback, signingSecret: '' });
+
+      // Assert
+      assert(authorizeCallback.notCalled, 'Should not call the orgAuthorize callback on instantiation');
+      assert.instanceOf(app, App);
+    });
+    it('should succeed with an authorize and orgAuthorize callback', async () => {
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const orgAuthorizeCallback = sinon.fake();
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+      // Act
+      const app = new App({ orgAuthorize: orgAuthorizeCallback, authorize: authorizeCallback, signingSecret: '' });
+
+      // Assert
+      assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
+      assert(orgAuthorizeCallback.notCalled, 'Should not call the orgAuthorize callback on instantiation');
+      assert.instanceOf(app, App);
+    });
     it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
       // Arrange
       const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
@@ -89,6 +115,22 @@ describe('App', () => {
       try {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert(authorizeCallback.notCalled);
+      }
+    });
+    it('should fail when both a token and orgAuthorize callback are specified', async () => {
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+      // Act
+      try {
+        // eslint-disable-line @typescript-eslint/no-unused-expressions
+        new App({ token: '', orgAuthorize: authorizeCallback, signingSecret: '' });
         assert.fail();
       } catch (error) {
         // Assert
@@ -121,6 +163,28 @@ describe('App', () => {
       try {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert(authorizeCallback.notCalled);
+      }
+    });
+    it('should fail when both a orgAuthorize callback is specified and OAuthInstaller is initialized', async () => {
+      // Arrange
+      const authorizeCallback = sinon.fake();
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+      // Act
+      try {
+        // eslint-disable-line @typescript-eslint/no-unused-expressions
+        new App({
+          orgAuthorize: authorizeCallback,
+          clientId: '',
+          clientSecret: '',
+          stateSecret: '',
+          signingSecret: '',
+        });
         assert.fail();
       } catch (error) {
         // Assert
@@ -624,6 +688,7 @@ describe('App', () => {
               ...baseEvent,
               body: {
                 command: '/COMMAND_NAME',
+                is_enterprise_install: 'false',
               },
             },
             {
@@ -748,6 +813,47 @@ describe('App', () => {
             {
               ...baseEvent,
               body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                team: null,
+                enterprise: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                enterprise: {},
+                // Although {team: undefined} pattern does not exist as of Jan 2021,
+                // this test verifies if App works even if the field is missing.
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                team: {},
+                // Although {enterprise: undefined} pattern does not exist as of Jan 2021,
+                // this test verifies if App works even if the field is missing.
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
                 type: 'view_closed',
                 channel: {},
                 user: {},
@@ -769,6 +875,225 @@ describe('App', () => {
                   event_ts: '1234567890.123456',
                   user: 'UXXXXXXX1',
                   text: 'hello friends!',
+                },
+              },
+            },
+          ];
+        }
+
+        function createOrgAppReceiverEvents(): ReceiverEvent[] {
+          return [
+            {
+              // IncomingEventType.Event (app.event)
+              ...baseEvent,
+              body: {
+                event: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Command (app.command)
+              ...baseEvent,
+              body: {
+                command: '/COMMAND_NAME',
+                is_enterprise_install: 'true',
+                enterprise_id: 'E12345678',
+              },
+            },
+            {
+              // IncomingEventType.Action (app.action)
+              ...baseEvent,
+              body: {
+                type: 'block_actions',
+                actions: [
+                  {
+                    action_id: 'block_action_id',
+                  },
+                ],
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Shortcut (app.shortcut)
+              ...baseEvent,
+              body: {
+                type: 'message_action',
+                callback_id: 'message_action_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Shortcut (app.shortcut)
+              ...baseEvent,
+              body: {
+                type: 'message_action',
+                callback_id: 'another_message_action_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Shortcut (app.shortcut)
+              ...baseEvent,
+              body: {
+                type: 'shortcut',
+                callback_id: 'shortcut_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Shortcut (app.shortcut)
+              ...baseEvent,
+              body: {
+                type: 'shortcut',
+                callback_id: 'another_shortcut_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Action (app.action)
+              ...baseEvent,
+              body: {
+                type: 'interactive_message',
+                callback_id: 'interactive_message_callback_id',
+                actions: [{}],
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Action with dialog submission (app.action)
+              ...baseEvent,
+              body: {
+                type: 'dialog_submission',
+                callback_id: 'dialog_submission_callback_id',
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Action for an external_select block (app.options)
+              ...baseEvent,
+              body: {
+                type: 'block_suggestion',
+                action_id: 'external_select_action_id',
+                channel: {},
+                user: {},
+                team: {},
+                actions: [],
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.Action for "data_source": "external" in dialogs (app.options)
+              ...baseEvent,
+              body: {
+                type: 'dialog_suggestion',
+                callback_id: 'dialog_suggestion_callback_id',
+                name: 'the name',
+                channel: {},
+                user: {},
+                team: {},
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              // IncomingEventType.ViewSubmitAction (app.view)
+              ...baseEvent,
+              body: {
+                type: 'view_submission',
+                channel: {},
+                user: {},
+                team: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
+                type: 'view_closed',
+                channel: {},
+                user: {},
+                team: {},
+                view: {
+                  callback_id: 'view_callback_id',
+                },
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
+                },
+              },
+            },
+            {
+              ...baseEvent,
+              body: {
+                type: 'event_callback',
+                token: 'XXYYZZ',
+                team_id: 'TXXXXXXXX',
+                api_app_id: 'AXXXXXXXXX',
+                event: {
+                  type: 'message',
+                  event_ts: '1234567890.123456',
+                  user: 'UXXXXXXX1',
+                  text: 'hello friends!',
+                },
+                is_enterprise_install: true,
+                enterprise: {
+                  id: 'E12345678',
                 },
               },
             },
@@ -877,10 +1202,155 @@ describe('App', () => {
           // Assert
           assert.equal(actionFn.callCount, 3);
           assert.equal(shortcutFn.callCount, 4);
+          assert.equal(viewFn.callCount, 5);
+          assert.equal(optionsFn.callCount, 2);
+          assert.equal(ackFn.callCount, dummyReceiverEvents.length);
+          assert(fakeErrorHandler.notCalled);
+        });
+
+        // This test confirms orgAuthorize is being used for org events
+        it('should acknowledge any of possible org events', async () => {
+          // Arrange
+          const ackFn = sinon.fake.resolves({});
+          const actionFn = sinon.fake.resolves({});
+          const shortcutFn = sinon.fake.resolves({});
+          const viewFn = sinon.fake.resolves({});
+          const optionsFn = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          const dummyReceiverEvents = createOrgAppReceiverEvents();
+
+          // Act
+          const fakeLogger = createFakeLogger();
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            orgAuthorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+
+          app.use(async ({ next }) => {
+            await ackFn();
+            await next!();
+          });
+          app.shortcut({ callback_id: 'message_action_callback_id' }, async ({ }) => {
+            await shortcutFn();
+          });
+          app.shortcut({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, async ({ }) => {
+            await shortcutFn();
+          });
+          app.shortcut({ type: 'message_action', callback_id: 'does_not_exist' }, async ({ }) => {
+            await shortcutFn();
+          });
+          app.shortcut({ callback_id: 'shortcut_callback_id' }, async ({ }) => {
+            await shortcutFn();
+          });
+          app.shortcut({ type: 'shortcut', callback_id: 'another_shortcut_callback_id' }, async ({ }) => {
+            await shortcutFn();
+          });
+          app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async ({ }) => {
+            await shortcutFn();
+          });
+          app.action('block_action_id', async ({ }) => {
+            await actionFn();
+          });
+          app.action({ callback_id: 'interactive_message_callback_id' }, async ({ }) => {
+            await actionFn();
+          });
+          app.action({ callback_id: 'dialog_submission_callback_id' }, async ({ }) => {
+            await actionFn();
+          });
+          app.view('view_callback_id', async ({ }) => {
+            await viewFn();
+          });
+          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async ({ }) => {
+            await viewFn();
+          });
+          app.options('external_select_action_id', async ({ }) => {
+            await optionsFn();
+          });
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, async ({ }) => {
+            await optionsFn();
+          });
+
+          app.event('app_home_opened', async ({ }) => {
+            /* noop */
+          });
+          app.message('hello', async ({ }) => {
+            /* noop */
+          });
+          app.command('/echo', async ({ }) => {
+            /* noop */
+          });
+
+          // invalid view constraints
+          const invalidViewConstraints1 = ({
+            callback_id: 'foo',
+            type: 'view_submission',
+            unknown_key: 'should be detected',
+          } as any) as ViewConstraints;
+          app.view(invalidViewConstraints1, async ({ }) => {
+            /* noop */
+          });
+          assert.isTrue(fakeLogger.error.called);
+
+          fakeLogger.error = sinon.fake();
+
+          const invalidViewConstraints2 = ({
+            callback_id: 'foo',
+            type: undefined,
+            unknown_key: 'should be detected',
+          } as any) as ViewConstraints;
+          app.view(invalidViewConstraints2, async ({ }) => {
+            /* noop */
+          });
+          assert.isTrue(fakeLogger.error.called);
+
+          app.error(fakeErrorHandler);
+          await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
+
+          // Assert
+          assert.equal(actionFn.callCount, 3);
+          assert.equal(shortcutFn.callCount, 4);
           assert.equal(viewFn.callCount, 2);
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
+        });
+
+        it('should fail because no orgAuthorize was defined to handle org install events', async () => {
+          // Arrange
+          const ackFn = sinon.fake.resolves({});
+          const actionFn = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          const dummyReceiverEvents = createOrgAppReceiverEvents();
+
+          // Act
+          const fakeLogger = createFakeLogger();
+          // only passed in authorize and not orgAuthorize
+          const app = new App({
+            logger: fakeLogger,
+            receiver: fakeReceiver,
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
+          });
+
+          app.use(async ({ next }) => {
+            await ackFn();
+            await next!();
+          });
+          app.action('block_action_id', async ({ }) => {
+            await actionFn();
+          });
+
+          app.error(fakeErrorHandler);
+          await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
+
+          // Assert
+          assert.equal(actionFn.callCount, 0);
+          assert.equal(ackFn.callCount, 0);
+          assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
+          assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+          assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
         });
       });
 
