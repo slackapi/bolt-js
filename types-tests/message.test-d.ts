@@ -7,7 +7,7 @@ expectType<void>(app.message(async ({ message }) => {
   expectType<MessageEvent>(message);
 
   if (message.subtype === undefined) {
-    expectError(message.user);
+    expectError(message.channel_type);
   } else if (message.subtype === 'bot_message') {
     expectType<BotMessageEvent>(message);
   }
