@@ -106,7 +106,7 @@ In `@slack/bolt@3.x`, we have introduced a new default [`HTTPReceiver`](https://
 
 ### @slack/bolt@2.x support schedule
 
-`@slack/bolt@2.x` will be deprecated on **January 12th, 2020**. We will only implement **critical bug fixes** until the official end of life date and close non critical issues and pull requests, which is slated for **May 31st, 2021**. At this time, development will fully stop for `@slack/bolt@2.x` and all remaining open issues and pull requests will be closed. 
+`@slack/bolt@2.x` will be deprecated on **January 12th, 2021**. We will only implement **critical bug fixes** until the official end of life date and close non critical issues and pull requests, which is slated for **May 31st, 2021**. At this time, development will fully stop for `@slack/bolt@2.x` and all remaining open issues and pull requests will be closed. 
 
 ### Minimum Node Version
 
