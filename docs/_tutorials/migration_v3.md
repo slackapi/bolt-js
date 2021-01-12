@@ -18,7 +18,7 @@ This guide will walk you through the process of updating your app from using `@s
 
 ### Org Wide App Installation Changes to InstallationStore & orgAuthorize
 
-In [Bolt for JavaScript 2.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0), we introduced support for [org wide app installations](https://api.slack.com/enterprise/apps). To add support to your applications, two new methods were introduced to the Installation Store used during OAuth, `fetchOrgInstallation` & `storeOrgInstallation`. With `@slack/bolt@3.x`, we have dropped support for these two new methods to better align with Bolt for Python and Bolt for Java. See the code samples below for the recommended changes to migrate.
+In [Bolt for JavaScript 2.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0), we introduced support for [org wide app installations](https://api.slack.com/enterprise/apps). To add support to your applications, two new methods were introduced to the Installation Store used during OAuth, `fetchOrgInstallation` & `storeOrgInstallation`. With `@slack/bolt@3.x`, we have dropped support for these two new methods for a simpler interface and to be better aligned with Bolt for Python and Bolt for Java. See the code samples below for the recommended changes to migrate.
 
 Before:
 
