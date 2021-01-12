@@ -1,4 +1,4 @@
-# Bolt-js Socket Mode Test App
+# Bolt for JavaScript Socket Mode Test App
 
 This is a quick example app to test [Socket Mode](https://api.slack.com/socket-mode) with bolt-js.
 
@@ -14,19 +14,19 @@ npm install
 
 ## Install app to workspace
 
-In your [**App Config** Page](https://api.slack.com/apps), go to **OAuth & Permissions** and add the `channels:read`, `app_mentions:read`, `commands` and `chat:write` permissions. Click **install App** to install the app to your workspace and generate a bot token.
+In your [app configuration](https://api.slack.com/apps), go to **OAuth & Permissions** and add the `channels:read`, `app_mentions:read`, `commands`, and `chat:write` permissions. Click **Install App** to install the app to your workspace and generate a bot token.
 
-Then go to the **Socket Mode** section in App Config to enable it.
+Next, navigate to the **Socket Mode** section and toggle the **Enable Socket Mode** button to start receiving events over a WebSocket connection.
 
-Go to **Basic Information** section in App Config and generate a `App Level Token` with the `connections:write` scope.
+Next, click on **Basic Information** and generate a `App Level Token` with the `connections:write` scope.
 
-Navigate to the **App Home** page in your app config and enable it.
+Then navigate to **App Home**. Under **Show tabs**, toggle the **Home tab** option.
 
-Lastly, in the **Events Subscription** page, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`.
+Lastly, in **Events Subscription**, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`.
 
 ## Setup Environment Variables
 
-This app requires you setup a few environment variables. You can get these values by navigating to your [**App Config** Page](https://api.slack.com/apps). 
+This app requires you setup a few environment variables. You can find these values in your [app configuration](https://api.slack.com/apps). 
 
 ```
 // can get this from OAuth & Permission page in app config
@@ -57,13 +57,13 @@ Start `ngrok` so we can access the app on an external network and create a `redi
 ngrok http 3000
 ```
 
-This should output a forwarding address for `http` and `https`. Take note of the `https` one. It should look something like the following:
+This output should include a forwarding address for `http` and `https` (we'll use the `https` one). It should look something like the following:
 
 ```
 Forwarding   https://3cb89939.ngrok.io -> http://localhost:3000
 ```
 
-Then navigate to **OAuth & Permissions** in your App Config and add a Redirect Url. The redirect URL should be set to your `ngrok` forwarding address with the `slack/oauth_redirect` path appended. ex:
+Then navigate to **OAuth & Permissions** in your app configuration and click **Add a Redirect URL**. The redirect URL should be set to your `ngrok` forwarding address with the `slack/oauth_redirect` path appended. ex:
 
 ```
 https://3cb89939.ngrok.io/slack/oauth_redirect
