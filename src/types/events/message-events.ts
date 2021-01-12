@@ -38,6 +38,7 @@ export interface BotMessageEvent {
   type: 'message';
   subtype: 'bot_message';
   channel: string;
+  channel_type: string;
   ts: string;
   text: string;
   bot_id: string;
@@ -55,12 +56,14 @@ export interface BotMessageEvent {
     user: string;
     ts: string;
   };
+  thread_ts?: string;
 }
 
 export interface EKMAccessDeniedMessageEvent {
   type: 'message';
   subtype: 'ekm_access_denied';
   channel: string;
+  channel_type: string;
   ts: string;
   text: string; // This will not have any meaningful content within
   user: 'UREVOKEDU';
@@ -70,6 +73,7 @@ export interface MeMessageEvent {
   type: 'message';
   subtype: 'me_message';
   channel: string;
+  channel_type: string;
   user: string;
   text: string;
   ts: string;
@@ -80,6 +84,7 @@ export interface MessageChangedEvent {
   subtype: 'message_changed';
   hidden: true;
   channel: string;
+  channel_type: string;
   ts: string;
   message: MessageEvent;
 }
@@ -112,20 +117,20 @@ export interface MessageRepliedEvent {
 
 export interface ThreadBroadcastMessageEvent {
   type: 'message';
-  subtype: undefined;
-  channel: string;
-  message: {
-    type: 'message';
-    subtype: 'thread_broadcast';
+  subtype: 'thread_broadcast';
+  text: string;
+  user: string;
+  ts: string;
+  thread_ts?: string;
+  root: (GenericMessageEvent | BotMessageEvent) & {
     thread_ts: string;
-    user: string;
-    ts: string;
-    root: (GenericMessageEvent | BotMessageEvent) & {
-      thread_ts: string;
-      reply_count: number;
-      replies: { user: string; ts: string }[];
-      // TODO: unread_count doesn't appear in any other message event types, is this really the only place its included?
-      unread_count?: number;
-    };
+    reply_count: number;
+    reply_users_count: number;
+    latest_reply: string;
+    reply_users: string[];
   };
+  client_msg_id: string;
+  channel: string;
+  event_ts: string;
+  channel_type: string;
 }

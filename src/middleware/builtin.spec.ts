@@ -755,6 +755,7 @@ const botMessageEvent: MessageEvent = {
   ts: '123.123',
   text: 'this is my message',
   bot_id: 'B1234567',
+  channel_type: 'channel',
 };
 
 const noop = () => Promise.resolve(undefined);
