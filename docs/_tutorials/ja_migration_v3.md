@@ -103,7 +103,7 @@ const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => {
 
 ### Bolt 2.x のサポートスケジュール
 
-`@slack/bolt@2.x` は **2021 年 1 月 12 日** より非推奨となります。それまでの期間はケースバイケースでバグ修正や新機能のバックポートを対応を継続します。`@slack/bolt@1.x` が非推奨となった後は、End of life（正式サポートの終了日）まで **クリティカルなバグ修正のみ** を実装し、クリティカルではない issue や pull request はクローズします。End of life は **2021 年 5 月 31 日** の予定です。この日からは `@slack/bolt@2.x` の開発は完全に終了となり、残っている open issue や pull request もクローズされます。
+`@slack/bolt@2.x` は **2021 年 1 月 12 日** より非推奨となります。それまでの期間はケースバイケースでバグ修正や新機能のバックポートを対応を継続します。`@slack/bolt@2.x` が非推奨となった後は、End of life（正式サポートの終了日）まで **クリティカルなバグ修正のみ** を実装し、クリティカルではない issue や pull request はクローズします。End of life は **2021 年 5 月 31 日** の予定です。この日からは `@slack/bolt@2.x` の開発は完全に終了となり、残っている open issue や pull request もクローズされます。
 
 ### Node の最低必須バージョン
 
