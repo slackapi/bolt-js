@@ -6,9 +6,9 @@ order: 16
 ---
 
 <div class="section-content">
-With the introduction of [Socket Mode](https://api.slack.com/socket-mode), Bolt for JavaScript introduced a new `SocketModeReceiver` in `@slack/bolt@3.0.0`. With Socket Mode, instead of creating a server with endpoints that Slack sends payloads too, the app will instead connect to Slack via a WebSocket connection and receive data from Slack over the socket connection. Make sure to enable Socket Mode in your app configuration settings. 
+[Socket Mode](https://api.slack.com/socket-mode) allows your app to connect and receive data from Slack via a WebSocket connection. To handle the connection, Bolt for JavaScript includes a `SocketModeReceiver` (in `@slack/bolt@3.0.0` and higher). Before using Socket Mode, be sure to enable it within your app configuration. 
 
-To use the new `SocketModeReceiver`, just pass in `socketMode:true` and `appToken:YOUR_APP_TOKEN` when initializing App. You can get your App Token in your app configuration settings under the **Basic Information** section.
+To use the `SocketModeReceiver`, just pass in `socketMode:true` and `appToken:YOUR_APP_TOKEN` when initializing `App`. You can get your App Token in your app configuration under the **Basic Information** section.
 </div>
 
 ```javascript
