@@ -72,7 +72,7 @@ export class ReceiverAuthenticityError extends Error implements CodedError {
 }
 
 export class ReceiverInconsistentStateError extends Error implements CodedError {
-  public code = ErrorCode.ReceiverAuthenticityError;
+  public code = ErrorCode.ReceiverInconsistentStateError;
 }
 
 export class MultipleListenerError extends Error implements CodedError {

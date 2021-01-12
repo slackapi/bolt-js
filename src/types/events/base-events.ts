@@ -141,11 +141,15 @@ export interface AppHomeOpenedEvent {
 // of `ts`
 export interface AppMentionEvent {
   type: 'app_mention';
-  user: string;
+  subtype?: string;
+  bot_id?: string;
+  username: string;
+  user?: string;
   text: string;
   ts: string;
   channel: string;
   event_ts: string;
+  thread_ts: string;
 }
 
 // TODO: this event doesn't use the envelope. write test cases to make sure its works without breaking, and figure out

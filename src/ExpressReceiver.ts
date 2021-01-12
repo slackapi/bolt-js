@@ -271,11 +271,11 @@ export default class ExpressReceiver implements Receiver {
         return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
       }
       this.server.close((error) => {
-        // NOTE: close listener added in start() is responsible for unsetting this.server
         if (error !== undefined) {
           return reject(error);
         }
 
+        this.server = undefined;
         resolve();
       });
     });
