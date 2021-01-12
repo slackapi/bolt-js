@@ -8,7 +8,7 @@ import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
-import { Logger, ConsoleLogger } from '@slack/logger';
+import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
 import App from './App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from './errors';
@@ -19,6 +19,7 @@ import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
 export interface ExpressReceiverOptions {
   signingSecret: string;
   logger?: Logger;
+  logLevel?: LogLevel;
   endpoints?:
     | string
     | {
@@ -67,7 +68,8 @@ export default class ExpressReceiver implements Receiver {
 
   constructor({
     signingSecret = '',
-    logger = new ConsoleLogger(),
+    logger = undefined,
+    logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
     processBeforeResponse = false,
     clientId = undefined,
@@ -79,15 +81,22 @@ export default class ExpressReceiver implements Receiver {
   }: ExpressReceiverOptions) {
     this.app = express();
 
+    if (typeof logger !== 'undefined') {
+      this.logger = logger;
+    } else {
+      this.logger = new ConsoleLogger();
+      this.logger.setLevel(logLevel);
+    }
+
     const expressMiddleware: RequestHandler[] = [
-      verifySignatureAndParseRawBody(logger, signingSecret),
+      verifySignatureAndParseRawBody(this.logger, signingSecret),
       respondToSslCheck,
       respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
 
     this.processBeforeResponse = processBeforeResponse;
-    this.logger = logger;
+
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     this.router = Router();
     endpointList.forEach((endpoint) => {
@@ -104,6 +113,8 @@ export default class ExpressReceiver implements Receiver {
         clientSecret,
         stateSecret,
         installationStore,
+        logLevel,
+        logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
         authVersion: installerOptions.authVersion!,
         clientOptions: installerOptions.clientOptions,

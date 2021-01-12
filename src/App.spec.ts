@@ -122,22 +122,6 @@ describe('App', () => {
         assert(authorizeCallback.notCalled);
       }
     });
-    it('should fail when both a token and orgAuthorize callback are specified', async () => {
-      // Arrange
-      const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-
-      // Act
-      try {
-        // eslint-disable-line @typescript-eslint/no-unused-expressions
-        new App({ token: '', orgAuthorize: authorizeCallback, signingSecret: '' });
-        assert.fail();
-      } catch (error) {
-        // Assert
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
-        assert(authorizeCallback.notCalled);
-      }
-    });
     it('should fail when both a token is specified and OAuthInstaller is initialized', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
@@ -163,28 +147,6 @@ describe('App', () => {
       try {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
-        assert.fail();
-      } catch (error) {
-        // Assert
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
-        assert(authorizeCallback.notCalled);
-      }
-    });
-    it('should fail when both a orgAuthorize callback is specified and OAuthInstaller is initialized', async () => {
-      // Arrange
-      const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-
-      // Act
-      try {
-        // eslint-disable-line @typescript-eslint/no-unused-expressions
-        new App({
-          orgAuthorize: authorizeCallback,
-          clientId: '',
-          clientSecret: '',
-          stateSecret: '',
-          signingSecret: '',
-        });
         assert.fail();
       } catch (error) {
         // Assert
@@ -1205,8 +1167,8 @@ describe('App', () => {
           assert(fakeErrorHandler.notCalled);
         });
 
-        // This test confirms orgAuthorize is being used for org events
-        it('should acknowledge any of possible org events', async () => {
+        // This test confirms authorize is being used for org events
+        it('should acknowledge any possible org events', async () => {
           // Arrange
           const ackFn = sinon.fake.resolves({});
           const actionFn = sinon.fake.resolves({});
@@ -1222,7 +1184,7 @@ describe('App', () => {
           const app = new App({
             logger: fakeLogger,
             receiver: fakeReceiver,
-            orgAuthorize: sinon.fake.resolves(dummyAuthorizationResult),
+            authorize: sinon.fake.resolves(dummyAuthorizationResult),
           });
 
           app.use(async ({ next }) => {
@@ -1312,42 +1274,6 @@ describe('App', () => {
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
-        });
-
-        it('should fail because no orgAuthorize was defined to handle org install events', async () => {
-          // Arrange
-          const ackFn = sinon.fake.resolves({});
-          const actionFn = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-          const dummyReceiverEvents = createOrgAppReceiverEvents();
-
-          // Act
-          const fakeLogger = createFakeLogger();
-          // only passed in authorize and not orgAuthorize
-          const app = new App({
-            logger: fakeLogger,
-            receiver: fakeReceiver,
-            authorize: sinon.fake.resolves(dummyAuthorizationResult),
-          });
-
-          app.use(async ({ next }) => {
-            await ackFn();
-            await next!();
-          });
-          app.action('block_action_id', async ({}) => {
-            await actionFn();
-          });
-
-          app.error(fakeErrorHandler);
-          await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
-
-          // Assert
-          assert.equal(actionFn.callCount, 0);
-          assert.equal(ackFn.callCount, 0);
-          assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
-          assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
-          assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
         });
       });
 

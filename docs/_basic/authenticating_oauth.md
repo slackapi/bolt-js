@@ -16,7 +16,7 @@ Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If
 
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
 
-To add support for [org wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `2.5.0` or newer. You will have to update your `installationStore` to include `storeOrgInstallation` and `fetchOrgInstallation` methods. Lastly, make sure you have enabled org wide installations in your app configuration settings under **Org Level Apps**.
+To add support for [org wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or newer. Make sure you have enabled org wide installations in your app configuration settings under **Org Level Apps**.
 </div>
 
 ```javascript
@@ -29,21 +29,26 @@ const app = new App({
   installationStore: {
     storeInstallation: async (installation) => {
       // change the line below so it saves to your database
-      return await database.set(installation.team.id, installation);
+      if (installation.isEnterpriseInstall) {
+        // support for org wide app installation
+        return await database.set(installation.enterprise.id, installation);
+      } else {
+        // single team app installation
+        return await database.set(installation.team.id, installation);
+      }
+      throw new Error('Failed saving installation data to installationStore');
     },
     fetchInstallation: async (InstallQuery) => {
       // change the line below so it fetches from your database
-      return await database.get(InstallQuery.teamId);
-    },
-    storeOrgInstallation: async (installation) => {
-      // include this method if you want your app to support org wide installations
-      // change the line below so it saves to your database
-      return await database.set(installation.enterprise.id, installation);
-    },
-    fetchOrgInstallation: async (InstallQuery) => {
-      // include this method if you want your app to support org wide installations
-      // change the line below so it fetches from your database
-      return await database.get(InstallQuery.enterpriseId);
+      if (InstallQuery.isEnterpriseInstall && InstallQuery.enterpriseId !== undefined) {
+        // org wide app installation lookup
+        return await database.get(InstallQuery.enterpriseId);
+      }
+      if (InstallQuery.teamId !== undefined) {
+        // single team app installation lookup
+        return await database.get(InstallQuery.teamId);
+      }
+      throw new Error('Failed fetching installation');
     },
   },
 });
