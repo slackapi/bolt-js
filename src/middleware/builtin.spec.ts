@@ -740,20 +740,24 @@ const validCommandPayload: SlashCommand = {
 
 const appMentionEvent: AppMentionEvent = {
   type: 'app_mention',
+  username: 'USERNAME',
   user: 'U1234567',
   text: 'this is my message',
   ts: '123.123',
   channel: 'C1234567',
   event_ts: '123.123',
+  thread_ts: '123.123',
 };
 
 const botMessageEvent: MessageEvent = {
   type: 'message',
   subtype: 'bot_message',
+  channel: 'CHANNEL_ID',
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',
   bot_id: 'B1234567',
+  channel_type: 'channel',
 };
 
 const noop = () => Promise.resolve(undefined);
