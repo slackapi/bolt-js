@@ -365,9 +365,7 @@ export default class HTTPReceiver implements Receiver {
         }
       } catch (err) {
         this.logger.error('An unhandled error occurred while Bolt processed an event');
-        this.logger.debug(
-          `Error details: ${err}, event: ${JSON.stringify(event.body)}, storedResponse: ${storedResponse}`,
-        );
+        this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         res.writeHead(500);
         res.end();
       }
