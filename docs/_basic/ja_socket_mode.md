@@ -1,6 +1,6 @@
 ---
 title: ソケットモードの使用
-lang: ja
+lang: ja-jp
 slug: socket-mode
 order: 16
 ---

@@ -2,7 +2,7 @@
 title: 3.x マイグレーションガイド
 order: 2
 slug: migration-v3
-lang: ja
+lang: ja-jp
 layout: tutorial
 permalink: /tutorial/migration-v3
 ---
