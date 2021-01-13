@@ -8,7 +8,12 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import { ReceiverMultipleAckError, ReceiverInconsistentStateError, HTTPReceiverDeferredRequestError } from '../errors';
+import {
+  ReceiverMultipleAckError,
+  ReceiverInconsistentStateError,
+  HTTPReceiverDeferredRequestError,
+  ErrorCode,
+} from '../errors';
 
 export interface HTTPReceiverOptions {
   signingSecret: string;
@@ -151,7 +156,22 @@ export default class HTTPReceiver implements Receiver {
       );
     }
 
-    this.server = createServerFn(serverOptions, this.requestListener);
+    this.server = createServerFn(serverOptions, (req, res) => {
+      try {
+        this.requestListener(req, res);
+      } catch (error) {
+        if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
+          this.logger.info('An unhandled request was ignored');
+          res.writeHead(404);
+          res.end();
+        } else {
+          this.logger.error('An unexpected error was encountered');
+          this.logger.debug(`Error details: ${error}`);
+          res.writeHead(500);
+          res.end();
+        }
+      }
+    });
 
     return new Promise((resolve, reject) => {
       if (this.server === undefined) {
@@ -225,11 +245,11 @@ export default class HTTPReceiver implements Receiver {
       // When installer is defined then installPath and installRedirectUriPath are always defined
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
 
-      if (path.startsWith(installPath)) {
+      if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);
       }
-      if (path.startsWith(installRedirectUriPath)) {
+      if (path === installRedirectUriPath) {
         // Handle OAuth callback request (to exchange authorization grant for a new access token)
         return this.handleInstallRedirectRequest(req, res);
       }
