@@ -67,32 +67,6 @@ describe('App', () => {
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
       assert.instanceOf(app, App);
     });
-    it('should succeed with an orgAuthorize callback', async () => {
-      // Arrange
-      const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-
-      // Act
-      const app = new App({ orgAuthorize: authorizeCallback, signingSecret: '' });
-
-      // Assert
-      assert(authorizeCallback.notCalled, 'Should not call the orgAuthorize callback on instantiation');
-      assert.instanceOf(app, App);
-    });
-    it('should succeed with an authorize and orgAuthorize callback', async () => {
-      // Arrange
-      const authorizeCallback = sinon.fake();
-      const orgAuthorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-
-      // Act
-      const app = new App({ orgAuthorize: orgAuthorizeCallback, authorize: authorizeCallback, signingSecret: '' });
-
-      // Assert
-      assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
-      assert(orgAuthorizeCallback.notCalled, 'Should not call the orgAuthorize callback on instantiation');
-      assert.instanceOf(app, App);
-    });
     it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
       // Arrange
       const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
