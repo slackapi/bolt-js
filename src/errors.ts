@@ -11,6 +11,7 @@ export enum ErrorCode {
 
   ReceiverMultipleAckError = 'slack_bolt_receiver_ack_multiple_error',
   ReceiverAuthenticityError = 'slack_bolt_receiver_authenticity_error',
+  ReceiverInconsistentStateError = 'slack_bolt_receiver_inconsistent_state_error',
 
   MultipleListenerError = 'slack_bolt_multiple_listener_error',
 
@@ -68,6 +69,10 @@ export class ReceiverMultipleAckError extends Error implements CodedError {
 
 export class ReceiverAuthenticityError extends Error implements CodedError {
   public code = ErrorCode.ReceiverAuthenticityError;
+}
+
+export class ReceiverInconsistentStateError extends Error implements CodedError {
+  public code = ErrorCode.ReceiverInconsistentStateError;
 }
 
 export class MultipleListenerError extends Error implements CodedError {

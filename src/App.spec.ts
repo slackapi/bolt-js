@@ -11,7 +11,6 @@ import App, { ViewConstraints } from './App';
 import { WebClientOptions, WebClient } from '@slack/web-api';
 import { WorkflowStep } from './WorkflowStep';
 
-// TODO: swap out rewiremock for proxyquire to see if it saves execution time
 // Utility functions
 const noop = () => Promise.resolve(undefined);
 const noopMiddleware = async ({ next }: { next: NextFn }) => {
@@ -68,7 +67,7 @@ describe('App', () => {
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
       assert.instanceOf(app, App);
     });
-    it('should fail without a token for single team authorization or authorize callback or oauth installer', async () => {
+    it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
       // Arrange
       const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
@@ -243,22 +242,25 @@ describe('App', () => {
   });
 
   describe('#start', () => {
-    it('should pass calls through to receiver', async () => {
-      // Arrange
-      const dummyReturn = Symbol();
-      const dummyParams = [Symbol(), Symbol()];
-      const fakeReceiver = new FakeReceiver();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
-      fakeReceiver.start = sinon.fake.returns(dummyReturn);
-
-      // Act
-      const actualReturn = await app.start(...dummyParams);
-
-      // Assert
-      assert.deepEqual(actualReturn, dummyReturn);
-      assert.deepEqual(dummyParams, fakeReceiver.start.firstCall.args);
-    });
+    // The following test case depends on a definition of App that is generic on its Receiver type. This will be
+    // addressed in the future. It cannot even be left uncommented with the `it.skip()` global because it will fail
+    // TypeScript compilation as written.
+    // it('should pass calls through to receiver', async () => {
+    //   // Arrange
+    //   const dummyReturn = Symbol();
+    //   const dummyParams = [Symbol(), Symbol()];
+    //   const fakeReceiver = new FakeReceiver();
+    //   const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+    //   const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+    //   fakeReceiver.start = sinon.fake.returns(dummyReturn);
+    //   // Act
+    //   const actualReturn = await app.start(...dummyParams);
+    //   // Assert
+    //   assert.deepEqual(actualReturn, dummyReturn);
+    //   assert.deepEqual(dummyParams, fakeReceiver.start.firstCall.args);
+    // });
+    // TODO: another test case to take the place of the one above (for coverage until the definition of App is made
+    // generic).
   });
 
   describe('#stop', () => {
