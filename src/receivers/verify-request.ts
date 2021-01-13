@@ -57,13 +57,15 @@ export async function verify(
   const signature = getHeader(req, 'x-slack-signature');
   const requestTimestampSec = Number(getHeader(req, 'x-slack-request-timestamp'));
   if (Number.isNaN(requestTimestampSec)) {
-    throw new Error(`${verifyErrorPrefix}: header x-slack-request-timestamp did not have the expected type (${requestTimestampSec})`);
+    throw new Error(
+      `${verifyErrorPrefix}: header x-slack-request-timestamp did not have the expected type (${requestTimestampSec})`,
+    );
   }
 
   // Calculate time-dependent values
   const nowMsFn = options.nowMs ?? (() => Date.now());
   const nowMs = nowMsFn();
-  const fiveMinutesAgoSec = Math.floor(nowMs / 1000) - (60 * 5);
+  const fiveMinutesAgoSec = Math.floor(nowMs / 1000) - 60 * 5;
 
   // Enforce verification rules
 
@@ -91,12 +93,11 @@ export async function verify(
   return bufferedReq;
 }
 
-
 async function bufferIncomingMessage(req: IncomingMessage): Promise<BufferedIncomingMessage> {
   if (isBufferedIncomingMessage(req)) {
     return req;
   }
-  const bufferedRequest = req as BufferedIncomingMessage
+  const bufferedRequest = req as BufferedIncomingMessage;
   bufferedRequest.rawBody = await rawBody(req);
   return bufferedRequest;
 }

@@ -6,7 +6,7 @@ import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions }
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance } from 'axios';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
-import ExpressReceiver, { ExpressReceiverOptions } from './receivers/ExpressReceiver';
+import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -55,15 +55,15 @@ const packageJson = require('../package.json'); // eslint-disable-line @typescri
 
 /** App initialization options */
 export interface AppOptions {
-  signingSecret?: ExpressReceiverOptions['signingSecret'];
-  endpoints?: ExpressReceiverOptions['endpoints'];
-  processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
-  clientId?: ExpressReceiverOptions['clientId'];
-  clientSecret?: ExpressReceiverOptions['clientSecret'];
-  stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
-  installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
-  scopes?: ExpressReceiverOptions['scopes'];
-  installerOptions?: ExpressReceiverOptions['installerOptions'];
+  signingSecret?: HTTPReceiverOptions['signingSecret'];
+  endpoints?: HTTPReceiverOptions['endpoints'];
+  processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
+  clientId?: HTTPReceiverOptions['clientId'];
+  clientSecret?: HTTPReceiverOptions['clientSecret'];
+  stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
+  installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
+  scopes?: HTTPReceiverOptions['scopes'];
+  installerOptions?: HTTPReceiverOptions['installerOptions'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -178,7 +178,7 @@ export default class App {
 
   private axios: AxiosInstance;
 
-  private installerOptions: ExpressReceiverOptions['installerOptions'];
+  private installerOptions: HTTPReceiverOptions['installerOptions'];
 
   private socketMode: boolean;
 
@@ -279,7 +279,7 @@ export default class App {
       };
     }
 
-    // Check for required arguments of ExpressReceiver
+    // Check for required arguments of HTTPReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
     } else if (this.socketMode) {
@@ -303,12 +303,27 @@ export default class App {
       // No custom receiver
       throw new AppInitializationError(
         'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-        'custom receiver.',
+          'custom receiver.',
       );
     } else {
-      this.logger.debug('Initializing ExpressReceiver');
-      // Create default ExpressReceiver
-      this.receiver = new ExpressReceiver({
+      // this.logger.debug('Initializing ExpressReceiver');
+      // // Create default ExpressReceiver
+      // this.receiver = new ExpressReceiver({
+      //   signingSecret,
+      //   endpoints,
+      //   processBeforeResponse,
+      //   clientId,
+      //   clientSecret,
+      //   stateSecret,
+      //   installationStore,
+      //   scopes,
+      //   logger,
+      //   logLevel: this.logLevel,
+      //   installerOptions: this.installerOptions,
+      // });
+      this.logger.debug('Initializing HTTPReceiver');
+      // Create default HTTPReceiver
+      this.receiver = new HTTPReceiver({
         signingSecret,
         endpoints,
         processBeforeResponse,
@@ -325,10 +340,10 @@ export default class App {
 
     let usingOauth = false;
     if (
-      (this.receiver as ExpressReceiver).installer !== undefined &&
-      (this.receiver as ExpressReceiver).installer!.authorize !== undefined
+      (this.receiver as HTTPReceiver).installer !== undefined &&
+      (this.receiver as HTTPReceiver).installer!.authorize !== undefined
     ) {
-      // This supports using the built in ExpressReceiver, declaring your own ExpressReceiver
+      // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
       // and theoretically, doing a fully custom (non express) receiver that implements OAuth
       usingOauth = true;
     }
@@ -347,7 +362,7 @@ export default class App {
     } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
     } else if (authorize === undefined && usingOauth) {
-      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize;
+      this.authorize = (this.receiver as HTTPReceiver).installer!.authorize;
     } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
     } else {
@@ -395,12 +410,12 @@ export default class App {
   /**
    * Convenience method to call start on the receiver
    *
-   * TODO: should replace ExpressReceiver in type definition with a generic that is constrained to Receiver
+   * TODO: should replace HTTPReceiver in type definition with a generic that is constrained to Receiver
    *
    * @param args receiver-specific start arguments
    */
-  public start(...args: Parameters<ExpressReceiver['start']>): ReturnType<ExpressReceiver['start']> {
-    return this.receiver.start(...args) as ReturnType<ExpressReceiver['start']>;
+  public start(...args: Parameters<HTTPReceiver['start']>): ReturnType<HTTPReceiver['start']> {
+    return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
   public stop(...args: any[]): Promise<unknown> {
@@ -663,19 +678,19 @@ export default class App {
         type === IncomingEventType.Event
           ? (bodyArg as SlackEventMiddlewareArgs['body']).event
           : type === IncomingEventType.ViewAction
-            ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-            : type === IncomingEventType.Shortcut
-              ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
-              : type === IncomingEventType.Action &&
-                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
-                ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
-                : (bodyArg as (
-                  | Exclude<
-                    AnyMiddlewareArgs,
-                    SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-                  >
-                  | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-                )['body']),
+          ? (bodyArg as SlackViewMiddlewareArgs['body']).view
+          : type === IncomingEventType.Shortcut
+          ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
+          : type === IncomingEventType.Action &&
+            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
+          ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
+          : (bodyArg as (
+              | Exclude<
+                  AnyMiddlewareArgs,
+                  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+                >
+              | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+            )['body']),
     };
 
     // Set aliases
@@ -1018,11 +1033,11 @@ function singleAuthorization(
     authorization.botUserId !== undefined && authorization.botId !== undefined
       ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
       : client.auth.test({ token: authorization.botToken }).then((result) => {
-        return {
-          botUserId: result.user_id as string,
-          botId: result.bot_id as string,
-        };
-      });
+          return {
+            botUserId: result.user_id as string,
+            botId: result.bot_id as string,
+          };
+        });
 
   return async ({ isEnterpriseInstall }) => {
     return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };

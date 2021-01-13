@@ -8,7 +8,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
+import { ReceiverMultipleAckError, ReceiverInconsistentStateError, HTTPReceiverDeferredRequestError } from '../errors';
 
 export interface HTTPReceiverOptions {
   signingSecret: string;
@@ -40,7 +40,6 @@ export interface HTTPReceiverInstallerOptions {
  * Receives HTTP requests with Events, Slash Commands, and Actions
  */
 export default class HTTPReceiver implements Receiver {
-
   private endpoints: string[];
 
   private signingSecret: string;
@@ -81,11 +80,13 @@ export default class HTTPReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
-    this.logger = logger ?? (() => {
-      const defaultLogger = new ConsoleLogger();
-      defaultLogger.setLevel(logLevel);
-      return defaultLogger;
-    })();
+    this.logger =
+      logger ??
+      (() => {
+        const defaultLogger = new ConsoleLogger();
+        defaultLogger.setLevel(logLevel);
+        return defaultLogger;
+      })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
 
     // Initialize InstallProvider when it's required options are provided
@@ -212,7 +213,7 @@ export default class HTTPReceiver implements Receiver {
 
     // NOTE: the domain and scheme of the following URL object are not necessarily accurate. The URL object is only
     // meant to be used to parse the path and query
-    const { pathname: path } = (new URL(req.url as string, `http://${req.headers.host}`));
+    const { pathname: path } = new URL(req.url as string, `http://${req.headers.host}`);
     const method = req.method!.toUpperCase();
 
     if (this.endpoints.includes(path) && method === 'POST') {
@@ -236,8 +237,7 @@ export default class HTTPReceiver implements Receiver {
 
     // If the request did not match the previous conditions, an error is thrown. The error can be caught by the
     // the caller in order to defer to other routing logic (similar to calling `next()` in connect middleware).
-    // TODO: CodedError, include `req` and `res` as properties.
-    throw new Error('Unhandled HTTP request');
+    throw new HTTPReceiverDeferredRequestError('Unhandled HTTP request', req, res);
   }
 
   private handleIncomingEvent(req: IncomingMessage, res: ServerResponse) {
@@ -253,8 +253,7 @@ export default class HTTPReceiver implements Receiver {
         this.logger.warn(`Request verification failed: ${err.message}`);
         res.writeHead(401);
         res.end();
-        // TODO: send this to app's error handler, include `req` and `res` as properties.
-        throw new ReceiverAuthenticityError('Slack request signing verification failed. Signature mismatch.');
+        return;
       }
 
       // Parse request body
@@ -267,11 +266,11 @@ export default class HTTPReceiver implements Receiver {
         this.logger.warn(`Malformed request body: ${err.message}`);
         res.writeHead(400);
         res.end();
-        // TODO: send this to app's error handler, CodedError, include `req` and `res` as properties.
-        throw new Error('Slack request signing verification failed. Signature mismatch.');
+        return;
       }
 
       // Handle SSL checks
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (body.ssl_check) {
         res.writeHead(200);
         res.end();
@@ -291,7 +290,7 @@ export default class HTTPReceiver implements Receiver {
         if (!isAcknowledged) {
           this.logger.error(
             'An incoming event was not acknowledged within 3 seconds. ' +
-            'Ensure that the ack() argument is called in a listener.',
+              'Ensure that the ack() argument is called in a listener.',
           );
         }
       }, 3001);
@@ -307,6 +306,7 @@ export default class HTTPReceiver implements Receiver {
           }
           isAcknowledged = true;
           if (this.processBeforeResponse) {
+            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               storedResponse = '';
             } else {
@@ -314,6 +314,7 @@ export default class HTTPReceiver implements Receiver {
             }
             this.logger.debug('ack() response stored');
           } else {
+            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               res.writeHead(200);
               res.end();
@@ -343,12 +344,13 @@ export default class HTTPReceiver implements Receiver {
           this.logger.debug('stored response sent');
         }
       } catch (err) {
+        this.logger.error('An unhandled error occurred while Bolt processed an event');
+        this.logger.debug(
+          `Error details: ${err}, event: ${JSON.stringify(event.body)}, storedResponse: ${storedResponse}`,
+        );
         res.writeHead(500);
         res.end();
-        // TODO: send this to app's error handler, CodedError, include `req` and `res` as properties.
-        throw err;
       }
-
     })();
   }
 
@@ -368,7 +370,7 @@ export default class HTTPReceiver implements Receiver {
         const url = await installer.generateInstallUrl(installUrlOptions);
 
         // Generate HTML response body
-        const body = htmlForInstallPath(url)
+        const body = htmlForInstallPath(url);
 
         // Serve a basic HTML page including the "Add to Slack" button.
         // Regarding headers:
@@ -377,8 +379,8 @@ export default class HTTPReceiver implements Receiver {
         res.writeHead(200);
         res.end(body);
       } catch (err) {
-        // TODO: send this to app's error handler, CodedError, include `req` and `res` as properties.
-        throw new Error(err);
+        this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
+        this.logger.debug(`Error details: ${err}`);
       }
     })();
   }
@@ -388,11 +390,12 @@ export default class HTTPReceiver implements Receiver {
     // when installer is defined then installCallbackOptions is always defined too.
     const [installer, installCallbackOptions] = [this.installer!, this.installCallbackOptions!];
 
-    installer.handleCallback(req, res, installCallbackOptions)
-      .catch((err) => {
-        // TODO: send this to app's error handler, CodedError, include `req` and `res` as properties.
-        throw new Error(err);
-      });
+    installer.handleCallback(req, res, installCallbackOptions).catch((err) => {
+      this.logger.error(
+        'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',
+      );
+      this.logger.debug(`Error details: ${err}`);
+    });
   }
 }
 
@@ -403,7 +406,7 @@ function parseBody(req: BufferedIncomingMessage) {
   const contentType = req.headers['content-type'];
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedQs = qsParse(bodyAsString);
-    const payload = parsedQs.payload
+    const { payload } = parsedQs;
     if (typeof payload === 'string') {
       return JSON.parse(payload);
     }
@@ -413,8 +416,7 @@ function parseBody(req: BufferedIncomingMessage) {
 }
 
 function htmlForInstallPath(addToSlackUrl: string) {
-  return (
-    `<html>
+  return `<html>
       <body>
         <a href=${addToSlackUrl}>
           <img
@@ -426,8 +428,7 @@ function htmlForInstallPath(addToSlackUrl: string) {
           />
         </a>
       </body>
-    </html>`
-  );
+    </html>`;
 }
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()

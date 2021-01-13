@@ -10,9 +10,9 @@ import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
-import App from './App';
-import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from './errors';
-import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
+import App from '../App';
+import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
+import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -21,10 +21,10 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-  | string
-  | {
-    [endpointType: string]: string;
-  };
+    | string
+    | {
+        [endpointType: string]: string;
+      };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
