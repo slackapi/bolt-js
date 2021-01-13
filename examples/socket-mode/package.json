@@ -1,0 +1,15 @@
+{
+  "name": "bolt-socket-mode-example",
+  "version": "1.0.0",
+  "description": "Example app using socket mode",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Slack Technologies, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "3.0.0"
+  }
+}
