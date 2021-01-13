@@ -51,7 +51,7 @@ When documentation is in a beta state, it requires a new, distinct collection of
 
 2.  Merge into main repository
     *  Create a pull request with the commit that was just made. Be certain to include the tag. For
-       example: `git push username main:rel-v1.0.8 && git push --tags username`.
+       example: `git push username main --tags`.
     *  Once tests pass and a reviewer has approved, merge the pull request. You will also want to
        update your local `main` branch.
     *  Push the new tag up to origin `git push --tags origin`.
