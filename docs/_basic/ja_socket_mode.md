@@ -15,7 +15,7 @@ order: 16
 const { App } = require('@slack/bolt');
 
 const app = new App({
-  token: process.env.BOT_TOKEN
+  token: process.env.BOT_TOKEN,
   socketMode: true,
   appToken: process.env.APP_TOKEN,
 });
