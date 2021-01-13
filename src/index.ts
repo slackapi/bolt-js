@@ -15,9 +15,8 @@ export {
   Logger,
 } from './App';
 
-export { default as ExpressReceiver, ExpressReceiverOptions } from './ExpressReceiver';
-
-export { default as SocketModeReceiver } from './SocketModeReceiver';
+export { default as ExpressReceiver, ExpressReceiverOptions } from './receivers/ExpressReceiver';
+export { default as SocketModeReceiver } from './receivers/SocketModeReceiver';
 
 export * from './errors';
 export * from './middleware/builtin';

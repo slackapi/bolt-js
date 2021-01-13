@@ -19,10 +19,10 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-    | string
-    | {
-        [endpointType: string]: string;
-      };
+  | string
+  | {
+    [endpointType: string]: string;
+  };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -157,7 +157,7 @@ export default class ExpressReceiver implements Receiver {
       if (!isAcknowledged) {
         this.logger.error(
           'An incoming event was not acknowledged within 3 seconds. ' +
-            'Ensure that the ack() argument is called in a listener.',
+          'Ensure that the ack() argument is called in a listener.',
         );
       }
       // tslint:disable-next-line: align
