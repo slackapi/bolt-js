@@ -306,21 +306,6 @@ export default class App {
           'custom receiver.',
       );
     } else {
-      // this.logger.debug('Initializing ExpressReceiver');
-      // // Create default ExpressReceiver
-      // this.receiver = new ExpressReceiver({
-      //   signingSecret,
-      //   endpoints,
-      //   processBeforeResponse,
-      //   clientId,
-      //   clientSecret,
-      //   stateSecret,
-      //   installationStore,
-      //   scopes,
-      //   logger,
-      //   logLevel: this.logLevel,
-      //   installerOptions: this.installerOptions,
-      // });
       this.logger.debug('Initializing HTTPReceiver');
       // Create default HTTPReceiver
       this.receiver = new HTTPReceiver({
