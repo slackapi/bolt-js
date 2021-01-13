@@ -395,12 +395,12 @@ export default class App {
   /**
    * Convenience method to call start on the receiver
    *
-   * TODO: args could be defined using a generic constraint from the receiver type
+   * TODO: should replace ExpressReceiver in type definition with a generic that is constrained to Receiver
    *
    * @param args receiver-specific start arguments
    */
-  public start(...args: any[]): Promise<unknown> {
-    return this.receiver.start(...args);
+  public start(...args: Parameters<ExpressReceiver['start']>): ReturnType<ExpressReceiver['start']> {
+    return this.receiver.start(...args) as ReturnType<ExpressReceiver['start']>;
   }
 
   public stop(...args: any[]): Promise<unknown> {
