@@ -4,7 +4,7 @@ order: 2
 slug: migration-v3
 lang: ja-jp
 layout: tutorial
-permalink: /tutorial/migration-v3
+permalink: /ja-jp/tutorial/migration-v3
 ---
 # 3.x マイグレーションガイド
 
