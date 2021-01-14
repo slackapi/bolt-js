@@ -5,7 +5,8 @@ import util from 'util';
 import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance } from 'axios';
-import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
+import SocketModeReceiver from './receivers/SocketModeReceiver';
+import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -54,28 +55,30 @@ const packageJson = require('../package.json'); // eslint-disable-line @typescri
 
 /** App initialization options */
 export interface AppOptions {
-  signingSecret?: ExpressReceiverOptions['signingSecret'];
-  endpoints?: ExpressReceiverOptions['endpoints'];
-  processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
-  clientId?: ExpressReceiverOptions['clientId'];
-  clientSecret?: ExpressReceiverOptions['clientSecret'];
-  stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
-  installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
-  scopes?: ExpressReceiverOptions['scopes'];
-  installerOptions?: ExpressReceiverOptions['installerOptions'];
+  signingSecret?: HTTPReceiverOptions['signingSecret'];
+  endpoints?: HTTPReceiverOptions['endpoints'];
+  processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
+  clientId?: HTTPReceiverOptions['clientId'];
+  clientSecret?: HTTPReceiverOptions['clientSecret'];
+  stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
+  installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
+  scopes?: HTTPReceiverOptions['scopes'];
+  installerOptions?: HTTPReceiverOptions['installerOptions'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
+  appToken?: string; // TODO should this be included in AuthorizeResult
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
-  authorize?: Authorize<false>; // either token or authorize
-  orgAuthorize?: Authorize<true>; // either token or orgAuthorize
+  authorize?: Authorize<boolean>; // either token or authorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
+  socketMode?: boolean;
+  developerMode?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -159,11 +162,11 @@ export default class App {
   /** Logger */
   private logger: Logger;
 
-  /** Authorize */
-  private authorize!: Authorize<false>;
+  /** Log Level */
+  private logLevel: LogLevel;
 
-  /** Org Authorize */
-  private orgAuthorize!: Authorize<true>;
+  /** Authorize */
+  private authorize!: Authorize<boolean>;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -175,7 +178,11 @@ export default class App {
 
   private axios: AxiosInstance;
 
-  private installerOptions: ExpressReceiverOptions['installerOptions'];
+  private installerOptions: HTTPReceiverOptions['installerOptions'];
+
+  private socketMode: boolean;
+
+  private developerMode: boolean;
 
   constructor({
     signingSecret = undefined,
@@ -185,10 +192,10 @@ export default class App {
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
+    appToken = undefined,
     botId = undefined,
     botUserId = undefined,
     authorize = undefined,
-    orgAuthorize = undefined,
     logger = undefined,
     logLevel = undefined,
     ignoreSelf = true,
@@ -200,7 +207,23 @@ export default class App {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = undefined,
+    socketMode = undefined,
+    developerMode = false,
   }: AppOptions = {}) {
+    // this.logLevel = logLevel;
+    this.developerMode = developerMode;
+    if (developerMode) {
+      // Set logLevel to Debug in Developer Mode if one wasn't passed in
+      this.logLevel = logLevel ?? LogLevel.DEBUG;
+      // Set SocketMode to true if one wasn't passed in
+      this.socketMode = socketMode ?? true;
+    } else {
+      // If devs aren't using Developer Mode or Socket Mode, set it to false
+      this.socketMode = socketMode ?? false;
+      // Set logLevel to Info if one wasn't passed in
+      this.logLevel = logLevel ?? LogLevel.INFO;
+    }
+
     if (typeof logger === 'undefined') {
       // Initialize with the default logger
       const consoleLogger = new ConsoleLogger();
@@ -209,8 +232,8 @@ export default class App {
     } else {
       this.logger = logger;
     }
-    if (typeof logLevel !== 'undefined' && this.logger.getLevel() !== logLevel) {
-      this.logger.setLevel(logLevel);
+    if (typeof this.logLevel !== 'undefined' && this.logger.getLevel() !== this.logLevel) {
+      this.logger.setLevel(this.logLevel);
     }
     this.errorHandler = defaultErrorHandler(this.logger);
     this.clientOptions = {
@@ -238,9 +261,44 @@ export default class App {
       ...installerOptions,
     };
 
-    // Check for required arguments of ExpressReceiver
+    if (
+      this.developerMode &&
+      this.installerOptions &&
+      (typeof this.installerOptions.callbackOptions === 'undefined' ||
+        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+    ) {
+      // add a custom failure callback for Developer Mode in case they are using OAuth
+      this.logger.debug('adding Developer Mode custom OAuth failure handler');
+      this.installerOptions.callbackOptions = {
+        failure: (error, _installOptions, _req, res) => {
+          this.logger.debug(error);
+          res.writeHead(500, { 'Content-Type': 'text/html' });
+          res.end(`<html><body><h1>OAuth failed!</h1><div>${error}</div></body></html>`);
+        },
+      };
+    }
+
+    // Check for required arguments of HTTPReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
+    } else if (this.socketMode) {
+      if (appToken === undefined) {
+        throw new AppInitializationError('You must provide an appToken when using Socket Mode');
+      }
+      this.logger.debug('Initializing SocketModeReceiver');
+      // Create default SocketModeReceiver
+      this.receiver = new SocketModeReceiver({
+        appToken,
+        clientId,
+        clientSecret,
+        stateSecret,
+        installationStore,
+        scopes,
+        logger,
+        logLevel: this.logLevel,
+        installerOptions: this.installerOptions,
+      });
     } else if (signingSecret === undefined) {
       // No custom receiver
       throw new AppInitializationError(
@@ -248,8 +306,9 @@ export default class App {
           'custom receiver.',
       );
     } else {
-      // Create default ExpressReceiver
-      this.receiver = new ExpressReceiver({
+      this.logger.debug('Initializing HTTPReceiver');
+      // Create default HTTPReceiver
+      this.receiver = new HTTPReceiver({
         signingSecret,
         endpoints,
         processBeforeResponse,
@@ -258,48 +317,39 @@ export default class App {
         stateSecret,
         installationStore,
         scopes,
+        logger,
+        logLevel: this.logLevel,
         installerOptions: this.installerOptions,
-        logger: this.logger,
       });
     }
 
     let usingOauth = false;
     if (
-      (this.receiver as ExpressReceiver).installer !== undefined &&
-      (this.receiver as ExpressReceiver).installer!.authorize !== undefined
+      (this.receiver as HTTPReceiver).installer !== undefined &&
+      (this.receiver as HTTPReceiver).installer!.authorize !== undefined
     ) {
-      // This supports using the built in ExpressReceiver, declaring your own ExpressReceiver
+      // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
       // and theoretically, doing a fully custom (non express) receiver that implements OAuth
       usingOauth = true;
     }
 
     if (token !== undefined) {
-      if (authorize !== undefined || orgAuthorize !== undefined || usingOauth) {
+      if (authorize !== undefined || usingOauth) {
         throw new AppInitializationError(
-          `token as well as authorize, orgAuthorize, or oauth installer options were provided. ${tokenUsage}`,
+          `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
         );
       }
       this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
-      this.orgAuthorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
-    } else if (authorize === undefined && orgAuthorize === undefined && !usingOauth) {
+    } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `No token, no authorize, no orgAuthorize, and no oauth installer options provided. ${tokenUsage}`,
+        `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
       );
-    } else if ((authorize !== undefined || orgAuthorize !== undefined) && usingOauth) {
+    } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
-    } else if (authorize === undefined && orgAuthorize === undefined && usingOauth) {
-      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize;
-      this.orgAuthorize = (this.receiver as ExpressReceiver).installer!.authorize;
-    } else if (authorize === undefined && orgAuthorize !== undefined && !usingOauth) {
-      // only supporting org installs
-      this.orgAuthorize = orgAuthorize;
-    } else if (authorize !== undefined && orgAuthorize === undefined && !usingOauth) {
-      // only supporting non org installs
+    } else if (authorize === undefined && usingOauth) {
+      this.authorize = (this.receiver as HTTPReceiver).installer!.authorize;
+    } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
-    } else if (authorize !== undefined && orgAuthorize !== undefined && !usingOauth) {
-      // supporting both org installs and non org installs
-      this.authorize = authorize;
-      this.orgAuthorize = orgAuthorize;
     } else {
       this.logger.error('Never should have reached this point, please report to the team');
       assertNever();
@@ -345,12 +395,12 @@ export default class App {
   /**
    * Convenience method to call start on the receiver
    *
-   * TODO: args could be defined using a generic constraint from the receiver type
+   * TODO: should replace HTTPReceiver in type definition with a generic that is constrained to Receiver
    *
    * @param args receiver-specific start arguments
    */
-  public start(...args: any[]): Promise<unknown> {
-    return this.receiver.start(...args);
+  public start(...args: Parameters<HTTPReceiver['start']>): ReturnType<HTTPReceiver['start']> {
+    return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
   public stop(...args: any[]): Promise<unknown> {
@@ -534,6 +584,13 @@ export default class App {
    */
   public async processEvent(event: ReceiverEvent): Promise<void> {
     const { body, ack } = event;
+
+    if (this.developerMode) {
+      // log the body of the event
+      // this may contain sensitive info like tokens
+      this.logger.debug(JSON.stringify(body));
+    }
+
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
@@ -555,7 +612,7 @@ export default class App {
     let authorizeResult: AuthorizeResult;
     try {
       if (source.isEnterpriseInstall) {
-        authorizeResult = await this.orgAuthorize(source as AuthorizeSourceData<true>, bodyArg);
+        authorizeResult = await this.authorize(source as AuthorizeSourceData<true>, bodyArg);
       } else {
         authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
@@ -927,8 +984,8 @@ function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: 
     }
   }
   // command payloads have this property set as a string
-  if (body.is_enterprise_install === 'true') {
-    return true;
+  if (typeof body.is_enterprise_install === 'string') {
+    return body.is_enterprise_install === 'true';
   }
   // all remaining types have a boolean property
   if (body.is_enterprise_install !== undefined) {

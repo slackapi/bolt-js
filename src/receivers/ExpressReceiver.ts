@@ -1,22 +1,25 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 
-import { createServer, Server } from 'http';
+import { createServer, Server, ServerOptions } from 'http';
+import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
+import { ListenOptions } from 'net';
 import express, { Request, Response, Application, RequestHandler, Router } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
-import { Logger, ConsoleLogger } from '@slack/logger';
+import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
-import App from './App';
-import { ReceiverAuthenticityError, ReceiverMultipleAckError } from './errors';
-import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from './types';
+import App from '../App';
+import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
+import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
 export interface ExpressReceiverOptions {
   signingSecret: string;
   logger?: Logger;
+  logLevel?: LogLevel;
   endpoints?:
     | string
     | {
@@ -51,7 +54,7 @@ export default class ExpressReceiver implements Receiver {
   /* Express app */
   public app: Application;
 
-  private server: Server;
+  private server?: Server;
 
   private bolt: App | undefined;
 
@@ -65,7 +68,8 @@ export default class ExpressReceiver implements Receiver {
 
   constructor({
     signingSecret = '',
-    logger = new ConsoleLogger(),
+    logger = undefined,
+    logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
     processBeforeResponse = false,
     clientId = undefined,
@@ -76,18 +80,30 @@ export default class ExpressReceiver implements Receiver {
     installerOptions = {},
   }: ExpressReceiverOptions) {
     this.app = express();
-    // TODO: what about starting an https server instead of http? what about other options to create the server?
-    this.server = createServer(this.app);
+
+    if (typeof logger !== 'undefined') {
+      this.logger = logger;
+    } else {
+      this.logger = new ConsoleLogger();
+      this.logger.setLevel(logLevel);
+    }
+
+    if (typeof logger !== 'undefined') {
+      this.logger = logger;
+    } else {
+      this.logger = new ConsoleLogger();
+      this.logger.setLevel(logLevel);
+    }
 
     const expressMiddleware: RequestHandler[] = [
-      verifySignatureAndParseRawBody(logger, signingSecret),
+      verifySignatureAndParseRawBody(this.logger, signingSecret),
       respondToSslCheck,
       respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
 
     this.processBeforeResponse = processBeforeResponse;
-    this.logger = logger;
+
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     this.router = Router();
     endpointList.forEach((endpoint) => {
@@ -104,6 +120,8 @@ export default class ExpressReceiver implements Receiver {
         clientSecret,
         stateSecret,
         installationStore,
+        logLevel,
+        logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
         authVersion: installerOptions.authVersion!,
         clientOptions: installerOptions.clientOptions,
@@ -145,8 +163,7 @@ export default class ExpressReceiver implements Receiver {
     setTimeout(() => {
       if (!isAcknowledged) {
         this.logger.error(
-          'An incoming event was not acknowledged within 3 seconds. ' +
-            'Ensure that the ack() argument is called in a listener.',
+          'An incoming event was not acknowledged within 3 seconds. Ensure that the ack() argument is called in a listener.',
         );
       }
       // tslint:disable-next-line: align
@@ -201,20 +218,66 @@ export default class ExpressReceiver implements Receiver {
     this.bolt = bolt;
   }
 
-  // TODO: the arguments should be defined as the arguments of Server#listen()
-  // TODO: the return value should be defined as a type that both http and https servers inherit from, or a union
-  public start(port: number): Promise<Server> {
+  // TODO: can this method be defined as generic instead of using overloads?
+  public start(port: number): Promise<Server>;
+  public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
+  public start(
+    portOrListenOptions: number | ListenOptions,
+    httpsServerOptions?: HTTPSServerOptions,
+  ): Promise<HTTPSServer>;
+  public start(
+    portOrListenOptions: number | ListenOptions,
+    serverOptions: ServerOptions | HTTPSServerOptions = {},
+  ): Promise<Server | HTTPSServer> {
+    let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
+
+    // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
+    if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
+      createServerFn = createHttpsServer;
+    }
+
+    if (this.server !== undefined) {
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be started because it was already started.'),
+      );
+    }
+
+    this.server = createServerFn(serverOptions, this.app);
+
     return new Promise((resolve, reject) => {
-      try {
-        // TODO: what about other listener options?
-        // TODO: what about asynchronous errors? should we attach a handler for this.server.on('error', ...)?
-        // if so, how can we check for only errors related to listening, as opposed to later errors?
-        this.server.listen(port, () => {
-          resolve(this.server);
-        });
-      } catch (error) {
-        reject(error);
+      if (this.server === undefined) {
+        throw new ReceiverInconsistentStateError(missingServerErrorDescription);
       }
+
+      this.server.on('error', (error) => {
+        if (this.server === undefined) {
+          throw new ReceiverInconsistentStateError(missingServerErrorDescription);
+        }
+
+        this.server.close();
+
+        // If the error event occurs before listening completes (like EADDRINUSE), this works well. However, if the
+        // error event happens some after the Promise is already resolved, the error would be silently swallowed up.
+        // The documentation doesn't describe any specific errors that can occur after listening has started, so this
+        // feels safe.
+        reject(error);
+      });
+
+      this.server.on('close', () => {
+        // Not removing all listeners because consumers could have added their own `close` event listener, and those
+        // should be called. If the consumer doesn't dispose of any references to the server properly, this would be
+        // a memory leak.
+        // this.server?.removeAllListeners();
+        this.server = undefined;
+      });
+
+      this.server.listen(portOrListenOptions, () => {
+        if (this.server === undefined) {
+          return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
+        }
+
+        resolve(this.server);
+      });
     });
   }
 
@@ -222,13 +285,15 @@ export default class ExpressReceiver implements Receiver {
   // generic types
   public stop(): Promise<void> {
     return new Promise((resolve, reject) => {
-      // TODO: what about synchronous errors?
+      if (this.server === undefined) {
+        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+      }
       this.server.close((error) => {
         if (error !== undefined) {
-          reject(error);
-          return;
+          return reject(error);
         }
 
+        this.server = undefined;
         resolve();
       });
     });
@@ -366,3 +431,41 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
   return JSON.parse(stringBody);
 }
+
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription =
+  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
