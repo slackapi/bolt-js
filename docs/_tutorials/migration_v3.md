@@ -11,7 +11,7 @@ permalink: /tutorial/migration-v3
 <div class="section-content">
 This guide will walk you through the process of updating your app from using `@slack/bolt@2.x` to `@slack/bolt@3.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes.
 
-*Note: Make sure to checkout our [support schedule](#slackbolt1x-support-schedule) for `@slack/bolt@2.x` if you don't plan on upgrading right away*
+*Note: Make sure to checkout our [support schedule](#slackbolt2x-support-schedule) for `@slack/bolt@2.x` if you don't plan on upgrading right away*
 </div> 
 
 ---
