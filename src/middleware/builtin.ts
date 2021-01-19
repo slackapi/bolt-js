@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 import util from 'util';
+
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -241,6 +242,21 @@ export function matchMessage(
     if (matched === false) {
       return;
     }
+    // TODO: remove the non-null assertion operator
+    await next!();
+  };
+}
+
+/**
+ * Middleware that filters out any command that doesn't match name
+ */
+export function matchCommandName(name: string): Middleware<SlackCommandMiddlewareArgs> {
+  return async ({ command, next }) => {
+    // Filter out any commands that are not the correct command name
+    if (name !== command.command) {
+      return;
+    }
+
     // TODO: remove the non-null assertion operator
     await next!();
   };
