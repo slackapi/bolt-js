@@ -21,7 +21,7 @@ import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
 describe('matchMessage()', () => {
-  function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+  function initializeTestCase(pattern: string | RegExp | (string | RegExp)[]): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const { matchMessage } = await importBuiltin();
@@ -35,7 +35,7 @@ describe('matchMessage()', () => {
   }
 
   function matchesPatternTestCase(
-    pattern: string | RegExp,
+    pattern: string | RegExp | (string | RegExp)[],
     matchingText: string,
     buildFakeEvent: (content: string) => SlackEvent,
   ): Mocha.AsyncFunc {
@@ -68,7 +68,7 @@ describe('matchMessage()', () => {
   }
 
   function notMatchesPatternTestCase(
-    pattern: string | RegExp,
+    pattern: string | RegExp | (string | RegExp)[],
     nonMatchingText: string,
     buildFakeEvent: (content: string) => SlackEvent,
   ): Mocha.AsyncFunc {
@@ -93,7 +93,7 @@ describe('matchMessage()', () => {
     };
   }
 
-  function noTextMessageTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+  function noTextMessageTestCase(pattern: string | RegExp | (string | RegExp)[]): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const dummyContext = {};

@@ -303,7 +303,7 @@ export default class App {
       // No custom receiver
       throw new AppInitializationError(
         'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-        'custom receiver.',
+          'custom receiver.',
       );
     } else {
       this.logger.debug('Initializing HTTPReceiver');
@@ -418,9 +418,15 @@ export default class App {
   // TODO: maybe remove the first two overloads
   public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
   public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(...patternsOrMiddleware: (string | RegExp | (string | RegExp)[] | Middleware<SlackEventMiddlewareArgs<'message'>>)[]): void {
+  public message(
+    ...patternsOrMiddleware: (string | RegExp | (string | RegExp)[] | Middleware<SlackEventMiddlewareArgs<'message'>>)[]
+  ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
-      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware) || Array.isArray(patternOrMiddleware)) {
+      if (
+        typeof patternOrMiddleware === 'string' ||
+        util.types.isRegExp(patternOrMiddleware) ||
+        Array.isArray(patternOrMiddleware)
+      ) {
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;
@@ -663,19 +669,19 @@ export default class App {
         type === IncomingEventType.Event
           ? (bodyArg as SlackEventMiddlewareArgs['body']).event
           : type === IncomingEventType.ViewAction
-            ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-            : type === IncomingEventType.Shortcut
-              ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
-              : type === IncomingEventType.Action &&
-                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
-                ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
-                : (bodyArg as (
-                  | Exclude<
-                    AnyMiddlewareArgs,
-                    SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-                  >
-                  | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-                )['body']),
+          ? (bodyArg as SlackViewMiddlewareArgs['body']).view
+          : type === IncomingEventType.Shortcut
+          ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
+          : type === IncomingEventType.Action &&
+            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
+          ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
+          : (bodyArg as (
+              | Exclude<
+                  AnyMiddlewareArgs,
+                  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+                >
+              | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+            )['body']),
     };
 
     // Set aliases
@@ -1018,11 +1024,11 @@ function singleAuthorization(
     authorization.botUserId !== undefined && authorization.botId !== undefined
       ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
       : client.auth.test({ token: authorization.botToken }).then((result) => {
-        return {
-          botUserId: result.user_id as string,
-          botId: result.bot_id as string,
-        };
-      });
+          return {
+            botUserId: result.user_id as string,
+            botId: result.bot_id as string,
+          };
+        });
 
   return async ({ isEnterpriseInstall }) => {
     return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };

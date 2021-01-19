@@ -226,7 +226,10 @@ export function matchMessage(
       pattArray = pattern;
     }
     let matched = false;
-    for (let word of pattArray) {
+    pattArray.forEach((word) => {
+      if (event === undefined || event.text === undefined) {
+        return;
+      }
       if (typeof word === 'string') {
         if (event.text.includes(word)) {
           matched = true;
@@ -238,7 +241,7 @@ export function matchMessage(
           context['matches'] = tempMatches;
         }
       }
-    }
+    });
     if (matched === false) {
       return;
     }
