@@ -162,6 +162,30 @@ describe('matchMessage()', () => {
     );
     it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
   });
+
+  describe('using an array pattern', () => {
+    const pattern = ['foobar', /foo/];
+    const matchingText = 'foobar';
+    const nonMatchingText = 'bar';
+    it('should initialize', initializeTestCase(pattern));
+    it(
+      'should match message events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeMessageEvent),
+    );
+    it(
+      'should match app_mention events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeAppMentionEvent),
+    );
+    it(
+      'should filter out message events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeMessageEvent),
+    );
+    it(
+      'should filter out app_mention events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeAppMentionEvent),
+    );
+    it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
+  });
 });
 
 describe('directMention()', () => {
