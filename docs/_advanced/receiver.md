@@ -19,7 +19,7 @@ A receiver is responsible for handling and parsing any incoming events from Slac
 
 To use a custom receiver, you can pass it into the constructor when initializing your Bolt for JavaScript app. Here is what a basic custom receiver might look like.
 
-For a more in-depth look at a receiver, [read the source code for the built-in `ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/master/src/ExpressReceiver.ts)
+For a more in-depth look at a receiver, [read the source code for the built-in `ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/master/src/receivers/ExpressReceiver.ts)
 </div>
 
 ```javascript
