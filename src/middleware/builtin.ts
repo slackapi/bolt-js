@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/dot-notation */
-
+import util from 'util';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -210,45 +210,37 @@ export function matchConstraints(
  * Middleware that filters out messages that don't match pattern
  */
 export function matchMessage(
-  pattern: string | RegExp,
+  pattern: string | RegExp | (string | RegExp)[],
 ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
   return async ({ event, context, next }) => {
-    let tempMatches: RegExpMatchArray | null;
-
+    let tempMatches: RegExpMatchArray | null = null;
+    let pattArray: (string | RegExp)[] = [];
     if (!('text' in event) || event.text === undefined) {
       return;
     }
-
-    // Filter out messages or app mentions that don't contain the pattern
-    if (typeof pattern === 'string') {
-      if (!event.text.includes(pattern)) {
-        return;
-      }
+    // Filter out messages or app mentions that don't contain the pattern]
+    if (typeof pattern === 'string' || util.types.isRegExp(pattern)) {
+      pattArray = [pattern];
     } else {
-      tempMatches = event.text.match(pattern);
-
-      if (tempMatches !== null) {
-        context['matches'] = tempMatches;
+      pattArray = pattern;
+    }
+    let matched = false;
+    for (let word of pattArray) {
+      if (typeof word === 'string') {
+        if (event.text.includes(word)) {
+          matched = true;
+        }
       } else {
-        return;
+        tempMatches = event.text.match(word);
+        if (tempMatches !== null) {
+          matched = true;
+          context['matches'] = tempMatches;
+        }
       }
     }
-
-    // TODO: remove the non-null assertion operator
-    await next!();
-  };
-}
-
-/**
- * Middleware that filters out any command that doesn't match name
- */
-export function matchCommandName(name: string): Middleware<SlackCommandMiddlewareArgs> {
-  return async ({ command, next }) => {
-    // Filter out any commands that are not the correct command name
-    if (name !== command.command) {
+    if (matched === false) {
       return;
     }
-
     // TODO: remove the non-null assertion operator
     await next!();
   };
