@@ -5,8 +5,6 @@ slug: heroku
 lang: en
 layout: tutorial
 permalink: /deployments/heroku
-redirect_from:
-  - /deployments
 ---
 # Deploying to Heroku
 
