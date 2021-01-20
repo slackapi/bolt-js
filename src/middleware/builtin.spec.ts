@@ -57,7 +57,7 @@ describe('matchMessage()', () => {
       // Assert
       assert(fakeNext.called);
       // The following assertion(s) check behavior that is only targeted at RegExp patterns
-      if (typeof pattern !== 'string') {
+      if (typeof pattern !== 'string' && !Array.isArray(pattern)) {
         if (dummyContext.matches !== undefined) {
           assert.lengthOf(dummyContext.matches, 1);
         } else {
@@ -164,9 +164,9 @@ describe('matchMessage()', () => {
   });
 
   describe('using an array pattern', () => {
-    const pattern = ['foobar', /foo/];
-    const matchingText = 'foobar';
-    const nonMatchingText = 'bar';
+    const pattern = ['foo', /bar/];
+    const matchingText = 'foo';
+    const nonMatchingText = 'apple';
     it('should initialize', initializeTestCase(pattern));
     it(
       'should match message events with a pattern that matches',

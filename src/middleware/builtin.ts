@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/dot-notation */
-import util from 'util';
 
+import util from 'util';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -215,27 +215,27 @@ export function matchMessage(
 ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
   return async ({ event, context, next }) => {
     let tempMatches: RegExpMatchArray | null = null;
-    let pattArray: (string | RegExp)[] = [];
+    let patternArray: (string | RegExp)[] = [];
     if (!('text' in event) || event.text === undefined) {
       return;
     }
     // Filter out messages or app mentions that don't contain the pattern]
     if (typeof pattern === 'string' || util.types.isRegExp(pattern)) {
-      pattArray = [pattern];
+      patternArray = [pattern];
     } else {
-      pattArray = pattern;
+      patternArray = pattern;
     }
     let matched = false;
-    pattArray.forEach((word) => {
+    patternArray.forEach((patternArrayItem) => {
       if (event === undefined || event.text === undefined) {
         return;
       }
-      if (typeof word === 'string') {
-        if (event.text.includes(word)) {
+      if (typeof patternArrayItem === 'string') {
+        if (event.text.includes(patternArrayItem)) {
           matched = true;
         }
       } else {
-        tempMatches = event.text.match(word);
+        tempMatches = event.text.match(patternArrayItem);
         if (tempMatches !== null) {
           matched = true;
           context['matches'] = tempMatches;
