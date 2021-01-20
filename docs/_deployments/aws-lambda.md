@@ -5,8 +5,6 @@ slug: aws-lambda
 lang: en
 layout: tutorial
 permalink: /deployments/aws-lambda
-redirect_from:
-  - /deployments
 ---
 # Deploying to AWS Lambda
 
