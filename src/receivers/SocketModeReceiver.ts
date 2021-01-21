@@ -3,6 +3,7 @@ import { SocketModeClient } from '@slack/socket-mode';
 import { createServer } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
+import { WebAPICallResult } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 
@@ -147,16 +148,9 @@ export default class SocketModeReceiver implements Receiver {
     this.app = app;
   }
 
-  public start(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        // start socket mode client
-        this.client.start();
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    });
+  public start(): Promise<void | WebAPICallResult> {
+    // start socket mode client
+    return this.client.start();
   }
 
   public stop(): Promise<void> {
