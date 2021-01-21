@@ -226,26 +226,26 @@ export function matchMessage(
       patternArray = pattern;
     }
     let matched = false;
-    patternArray.forEach((patternArrayItem) => {
-      if (event === undefined || event.text === undefined) {
-        return;
-      }
+    for (let i = 0; i < patternArray.length; i += 1) {
+      const patternArrayItem = patternArray[i];
       if (typeof patternArrayItem === 'string') {
         if (event.text.includes(patternArrayItem)) {
           matched = true;
+          break;
         }
       } else {
         tempMatches = event.text.match(patternArrayItem);
         if (tempMatches !== null) {
-          matched = true;
           context['matches'] = tempMatches;
+          matched = true;
+          break;
         }
       }
-    });
+    }
     if (matched === false) {
       return;
     }
-    // TODO: remove the non-null assertion operator
+    // TODO: remove the non-null asseration operator
     await next!();
   };
 }
