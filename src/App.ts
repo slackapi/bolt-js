@@ -33,6 +33,7 @@ import {
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackAction,
+  EventTypePattern,
   SlackShortcut,
   Context,
   SayFn,
@@ -303,7 +304,7 @@ export default class App {
       // No custom receiver
       throw new AppInitializationError(
         'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-          'custom receiver.',
+        'custom receiver.',
       );
     } else {
       this.logger.debug('Initializing HTTPReceiver');
@@ -410,8 +411,22 @@ export default class App {
   public event<EventType extends string = string>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+  ): void;
+  public event<EventType extends RegExp = RegExp>(
+    eventName: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
+  ): void;
+  public event<EventType extends EventTypePattern = EventTypePattern>(
+    ...patternsOrMiddleware: (EventType | Middleware<SlackEventMiddlewareArgs<string>>)[]
   ): void {
-    this.listeners.push([onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    const eventMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
+      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
+        return matchEventType(patternOrMiddleware);
+      }
+      return patternOrMiddleware;
+    });
+
+    this.listeners.push([onlyEvents, ...eventMiddleware] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
@@ -663,19 +678,19 @@ export default class App {
         type === IncomingEventType.Event
           ? (bodyArg as SlackEventMiddlewareArgs['body']).event
           : type === IncomingEventType.ViewAction
-          ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-          : type === IncomingEventType.Shortcut
-          ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
-          : type === IncomingEventType.Action &&
-            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
-          ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
-          : (bodyArg as (
-              | Exclude<
-                  AnyMiddlewareArgs,
-                  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-                >
-              | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-            )['body']),
+            ? (bodyArg as SlackViewMiddlewareArgs['body']).view
+            : type === IncomingEventType.Shortcut
+              ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
+              : type === IncomingEventType.Action &&
+                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
+                ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
+                : (bodyArg as (
+                  | Exclude<
+                    AnyMiddlewareArgs,
+                    SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+                  >
+                  | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+                )['body']),
     };
 
     // Set aliases
@@ -1018,11 +1033,11 @@ function singleAuthorization(
     authorization.botUserId !== undefined && authorization.botId !== undefined
       ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
       : client.auth.test({ token: authorization.botToken }).then((result) => {
-          return {
-            botUserId: result.user_id as string,
-            botId: result.bot_id as string,
-          };
-        });
+        return {
+          botUserId: result.user_id as string,
+          botId: result.bot_id as string,
+        };
+      });
 
   return async ({ isEnterpriseInstall }) => {
     return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };

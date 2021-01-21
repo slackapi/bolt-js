@@ -69,6 +69,8 @@ export type SlackEvent =
   | UserChangeEvent
   | WorkflowStepExecuteEvent;
 
+export type EventTypePattern = string | RegExp;
+
 /**
  * Any event in Slack's Events API
  *
