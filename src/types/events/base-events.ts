@@ -657,6 +657,7 @@ export interface WorkflowDeletedEvent {
   };
   event_ts: string;
 }
+
 export interface WorkflowPublishedEvent {
   type: 'workflow_published';
   workflow_id: string;
@@ -684,6 +685,7 @@ export interface WorkflowUnpublishedEvent {
   };
   event_ts: string;
 }
+
 export interface WorkflowStepDeletedEvent {
   type: 'workflow_step_deleted';
   workflow_id: string;
