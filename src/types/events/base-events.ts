@@ -67,6 +67,10 @@ export type SlackEvent =
   | TeamRenameEvent
   | TokensRevokedEvent
   | UserChangeEvent
+  | WorkflowDeletedEvent
+  | WorkflowPublishedEvent
+  | WorkflowUnpublishedEvent
+  | WorkflowStepDeletedEvent
   | WorkflowStepExecuteEvent;
 
 /**
@@ -638,6 +642,70 @@ export interface UserChangeEvent {
   user: {
     id: string;
   };
+}
+
+export interface WorkflowDeletedEvent {
+  type: 'workflow_deleted';
+  workflow_id: string;
+  workflow_draft_configuration: {
+    version_id: string;
+    app_steps: {
+      app_id: string;
+      workflow_step_id: string;
+      callback_id: string;
+    }[];
+  };
+  event_ts: string;
+}
+
+export interface WorkflowPublishedEvent {
+  type: 'workflow_published';
+  workflow_id: string;
+  workflow_published_configuration: {
+    version_id: string;
+    app_steps: {
+      app_id: string;
+      workflow_step_id: string;
+      callback_id: string;
+    }[];
+  };
+  event_ts: string;
+}
+
+export interface WorkflowUnpublishedEvent {
+  type: 'workflow_unpublished';
+  workflow_id: string;
+  workflow_draft_configuration: {
+    version_id: string;
+    app_steps: {
+      app_id: string;
+      workflow_step_id: string;
+      callback_id: string;
+    }[];
+  };
+  event_ts: string;
+}
+
+export interface WorkflowStepDeletedEvent {
+  type: 'workflow_step_deleted';
+  workflow_id: string;
+  workflow_draft_configuration: {
+    version_id: string;
+    app_steps: {
+      app_id: string;
+      workflow_step_id: string;
+      callback_id: string;
+    }[];
+  };
+  workflow_published_configuration?: {
+    version_id: string;
+    app_steps: {
+      app_id: string;
+      workflow_step_id: string;
+      callback_id: string;
+    }[];
+  };
+  event_ts: string;
 }
 
 export interface WorkflowStepExecuteEvent {
