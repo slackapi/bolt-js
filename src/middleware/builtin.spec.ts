@@ -532,7 +532,7 @@ describe('onlyEvents', () => {
     const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
       payload: appMentionEvent,
       event: appMentionEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',
@@ -582,7 +582,7 @@ describe('matchEventType', () => {
     return {
       payload: appMentionEvent,
       event: appMentionEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',
@@ -603,7 +603,7 @@ describe('matchEventType', () => {
     return {
       payload: appHomeOpenedEvent,
       event: appHomeOpenedEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',

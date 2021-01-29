@@ -417,16 +417,14 @@ export default class App {
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void;
   public event<EventType extends EventTypePattern = EventTypePattern>(
-    ...patternsOrMiddleware: (EventType | Middleware<SlackEventMiddlewareArgs<string>>)[]
+    eventNameOrPattern: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
-    const eventMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
-      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
-        return matchEventType(patternOrMiddleware);
-      }
-      return patternOrMiddleware;
-    });
-
-    this.listeners.push([onlyEvents, ...eventMiddleware] as Middleware<AnyMiddlewareArgs>[]);
+    this.listeners.push([
+      onlyEvents,
+      matchEventType(eventNameOrPattern),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
