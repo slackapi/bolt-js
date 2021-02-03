@@ -38,15 +38,15 @@ const app = new App({
       }
       throw new Error('Failed saving installation data to installationStore');
     },
-    fetchInstallation: async (InstallQuery) => {
+    fetchInstallation: async (installQuery) => {
       // change the line below so it fetches from your database
-      if (InstallQuery.isEnterpriseInstall && InstallQuery.enterpriseId !== undefined) {
+      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // org wide app installation lookup
-        return await database.get(InstallQuery.enterpriseId);
+        return await database.get(installQuery.enterpriseId);
       }
-      if (InstallQuery.teamId !== undefined) {
+      if (installQuery.teamId !== undefined) {
         // single team app installation lookup
-        return await database.get(InstallQuery.teamId);
+        return await database.get(installQuery.teamId);
       }
       throw new Error('Failed fetching installation');
     },
