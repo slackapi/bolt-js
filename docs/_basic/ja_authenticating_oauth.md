@@ -37,15 +37,15 @@ const app = new App({
       }
       throw new Error('Failed saving installation data to installationStore');
     },
-    fetchInstallation: async (InstallQuery) => {
+    fetchInstallation: async (installQuery) => {
       // 実際のデータベースから取得するために、ここのコードを変更
-      if (InstallQuery.isEnterpriseInstall && InstallQuery.enterpriseId !== undefined) {
+      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // OrG 全体へのインストール情報の参照
-        return await database.get(InstallQuery.enterpriseId);
+        return await database.get(installQuery.enterpriseId);
       }
-      if (InstallQuery.teamId !== undefined) {
+      if (installQuery.teamId !== undefined) {
         // 単独のワークスペースへのインストール情報の参照
-        return await database.get(InstallQuery.teamId);
+        return await database.get(installQuery.teamId);
       }
       throw new Error('Failed fetching installation');
     },
