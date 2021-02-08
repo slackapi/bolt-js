@@ -23,6 +23,7 @@ export interface GenericMessageEvent {
   channel_type: channelTypes;
   attachments?: MessageAttachment[];
   blocks?: (KnownBlock | Block)[];
+  files?: File[];
   edited?: {
     user: string;
     ts: string;
@@ -153,3 +154,71 @@ export interface ThreadBroadcastMessageEvent {
 
 // Include string in channel_type to prevent future backwards-incompatible changes
 export type channelTypes = 'channel' | 'group' | 'im' | 'mpim' | 'app_home' | string;
+
+interface File {
+  id: string;
+  created: number;
+  name: string | null;
+  title: string | null;
+  mimetype: string;
+  filetype: string;
+  pretty_type: string;
+  user?: string;
+  editable: boolean;
+  size: number;
+  mode: 'hosted' | 'external' | 'snippet' | 'post';
+  is_external: boolean;
+  external_type: string | null;
+  is_public: boolean;
+  public_url_shared: boolean;
+  display_as_bot: boolean;
+  username: string | null;
+
+  // Authentication required
+  url_private?: string;
+  url_private_download?: string;
+
+  // Thumbnails (authentication still required)
+  thumb_64?: string;
+  thumb_80?: string;
+  thumb_160?: string;
+  thumb_360?: string;
+  thumb_360_w?: number;
+  thumb_360_h?: number;
+  thumb_360_gif?: string;
+  thumb_480?: string;
+  thumb_720?: string;
+  thumb_960?: string;
+  thumb_1024?: string;
+  permalink: string;
+  permalink_public?: string;
+  edit_link?: string;
+  image_exif_rotation?: number;
+  original_w?: number;
+  original_h?: number;
+  deanimate_gif?: string;
+
+  // Posts
+  preview?: string;
+  preview_highlight?: string;
+  lines?: string;
+  lines_more?: string;
+  preview_is_truncated?: boolean;
+  has_rich_preview?: boolean;
+
+  shares?: {
+    [key: string]: any;
+  };
+  channels: string[] | null;
+  groups: string[] | null;
+  users?: string[];
+  pinned_to?: string[];
+  reactions?: {
+    [key: string]: any;
+  }[];
+  is_starred?: boolean;
+  num_stars?: number;
+
+  initial_comment?: string;
+  comments_count?: string;
+}
