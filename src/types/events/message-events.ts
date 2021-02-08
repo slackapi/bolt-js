@@ -152,8 +152,7 @@ export interface ThreadBroadcastMessageEvent {
   channel_type: channelTypes;
 }
 
-// Include string in channel_type to prevent future backwards-incompatible changes
-export type channelTypes = 'channel' | 'group' | 'im' | 'mpim' | 'app_home' | string;
+export type channelTypes = 'channel' | 'group' | 'im' | 'mpim' | 'app_home';
 
 interface File {
   id: string;
