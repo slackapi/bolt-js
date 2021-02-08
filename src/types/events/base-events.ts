@@ -504,20 +504,20 @@ export interface PinRemovedEvent {
   event_ts: string;
 }
 
-interface ReactionMessageItem {
+export interface ReactionMessageItem {
   type: 'message';
   channel: string;
   ts: string;
 }
 
-interface ReactionFileItem {
+export interface ReactionFileItem {
   type: 'file';
   file: string;
 }
 
 // This type is deprecated.
 // See https://api.slack.com/changelog/2018-05-file-threads-soon-tread
-interface ReactionFileCommentItem {
+export interface ReactionFileCommentItem {
   type: 'file_comment';
   file_comment: string;
   file: string;
