@@ -202,6 +202,13 @@ export interface ChannelHistoryChangedEvent {
   event_ts: string;
 }
 
+export interface ChannelIDChangedEvent {
+  type: 'channel_id_changed';
+  old_channel_id: string;
+  new_channel_id: string;
+  event_ts: string;
+}
+
 export interface ChannelLeftEvent {
   type: 'channel_left';
   channel: string;
