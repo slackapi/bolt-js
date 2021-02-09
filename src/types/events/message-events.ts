@@ -14,7 +14,7 @@ export interface GenericMessageEvent {
   type: 'message';
   subtype: undefined;
   event_ts: string;
-  team: string;
+  team?: string;
   channel: string;
   user: string;
   text?: string;
@@ -136,6 +136,7 @@ export interface ThreadBroadcastMessageEvent {
   subtype: 'thread_broadcast';
   event_ts: string;
   text: string;
+  attachments?: MessageAttachment[];
   blocks?: (KnownBlock | Block)[];
   user: string;
   ts: string;
@@ -147,7 +148,7 @@ export interface ThreadBroadcastMessageEvent {
     latest_reply: string;
     reply_users: string[];
   };
-  client_msg_id?: string;
+  client_msg_id: string;
   channel: string;
   channel_type: channelTypes;
 }
