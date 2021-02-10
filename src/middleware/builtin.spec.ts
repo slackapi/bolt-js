@@ -753,7 +753,7 @@ const botMessageEvent: MessageEvent = {
   type: 'message',
   subtype: 'bot_message',
   channel: 'CHANNEL_ID',
-  event_ts: "123.123",
+  event_ts: '123.123',
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',
