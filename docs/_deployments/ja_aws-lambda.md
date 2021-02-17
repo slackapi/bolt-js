@@ -111,17 +111,17 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 デフォルトでは、Bolt アプリがリッスンするのは HTTP リクエストです。このセクションでは Bolt アプリの[`レシーバー`](https://slack.dev/bolt-js/concepts#receiver)に手を加えて、Lambda 関数のイベントをリッスンするように変更します。
 
 
-まず、公式の [AWS Serverless Express](https://github.com/awslabs/aws-serverless-express) モジュールをインストールします。このモジュールを使って Express HTTP リクエストを Lambda 関数のイベントに変換します。
+まず、[Serverless Express](https://github.com/vendia/serverless-express) モジュールをインストールします。このモジュールを使って Express HTTP リクエストを Lambda 関数のイベントに変換します。
 
 ```bash
-npm install aws-serverless-express
+npm install @vendia/serverless-express
 ```
 
 次に、`app.js` のソースコードのなかで[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の Express レシーバーと AWS Serverless Express モジュールを require します。
 
 ```javascript
 const { App, ExpressReceiver } = require('@slack/bolt');
-const awsServerlessExpress = require('aws-serverless-express');
+const serverlessExpress = require('@vendia/serverless-express');
 ```
 
 その後、[ソースコードのなかで Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7)を編集して、AWS Serverless Express を使ったカスタムのレシーバーを作成します。
@@ -142,19 +142,15 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: expressReceiver
 });
-
-// Bolt の ExpressReceiver を使って AWSServerlessExpress のサーバーを初期化します。
-const server = awsServerlessExpress.createServer(expressReceiver.app);
 ```
 
 最後に、アプリのソースコードの末尾にある [HTTP サーバーを起動する部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L40-L45)を編集して、AWS Lambda 関数のイベントに応答するようにします。
 
 ```javascript
 // Lambda 関数のイベントを処理します
-module.exports.handler = (event, context) => {
-  console.log('⚡️ Bolt app is running!');
-  awsServerlessExpress.proxy(server, event, context);
-};
+module.exports.handler = serverlessExpress({
+  app: expressReceiver.app
+});
 ```
 
 完成したアプリのソースコードは、⚡️[deploy-aws-lambda][deploy-aws-lambda-app/app.js] のサンプルのようになります。
