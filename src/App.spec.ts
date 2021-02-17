@@ -1099,6 +1099,11 @@ describe('App', () => {
           app.event('app_home_opened', async ({}) => {
             /* noop */
           });
+
+          app.event(/app_home_opened|app_mention/, async ({}) => {
+            /* noop */
+          });
+
           app.message('hello', async ({}) => {
             /* noop */
           });
