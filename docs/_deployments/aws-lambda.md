@@ -113,8 +113,10 @@ By default, Bolt listens for HTTP requests. In this section, we'll customize you
 First, install the [Serverless Express](https://github.com/vendia/serverless-express) module to transform Express HTTP requests to Lambda function events:
 
 ```bash
-npm install @vendia/serverless-express
+npm install --save @vendia/serverless-express
 ```
+
+> 💡 This guide requires version `4.x.x` or later.
 
 Next, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's Express receiver and the AWS Serverless Express module:
 

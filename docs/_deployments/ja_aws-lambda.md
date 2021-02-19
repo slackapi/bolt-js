@@ -114,8 +114,10 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 まず、[Serverless Express](https://github.com/vendia/serverless-express) モジュールをインストールします。このモジュールを使って Express HTTP リクエストを Lambda 関数のイベントに変換します。
 
 ```bash
-npm install @vendia/serverless-express
+npm install --save @vendia/serverless-express
 ```
+
+> 💡 このガイドはバージョン 4.x.x 以上を必要とします
 
 次に、`app.js` のソースコードのなかで[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の Express レシーバーと AWS Serverless Express モジュールを require します。
 
@@ -323,7 +325,7 @@ npx serverless deploy
 
 [aws-cli-configure]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config
 [aws-cli-install]: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
-[aws-cli-output-format]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format 
+[aws-cli-output-format]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format
 [aws-cli-region]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region
 [aws-iam-user]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds
 [aws-lambda]: https://aws.amazon.com/lambda/

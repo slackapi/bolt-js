@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@slack/bolt": "^3.2.0",
-    "aws-serverless-express": "^3.3.8"
+    "@vendia/serverless-express": "^4.3.2"
   },
   "devDependencies": {
     "serverless": "^2.13.0",
