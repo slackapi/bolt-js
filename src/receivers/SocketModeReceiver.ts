@@ -121,7 +121,7 @@ export default class SocketModeReceiver implements Receiver {
             throw new Error(err);
           }
         } else {
-          this.logger.error(`Tried to reach ${req.url} which isn't a`);
+          this.logger.error(`Tried to reach ${req.url} which isn't a valid route.`);
           // Return 404 because we don't support route
           res.writeHead(404, {});
           res.end(`route ${req.url} doesn't exist!`);
