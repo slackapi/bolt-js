@@ -13,6 +13,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import App from '../App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
+import { renderHtmlForInstallPath } from './render-html-for-install-path';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -145,10 +146,7 @@ export default class ExpressReceiver implements Receiver {
             scopes: scopes!,
             userScopes: installerOptions.userScopes,
           });
-          res.send(`<a href=${url}><img alt=""Add to Slack"" height="40" width="139"
-              src="https://platform.slack-edge.com/img/add_to_slack.png"
-              srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x,
-              https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>`);
+          res.send(renderHtmlForInstallPath(url));
         } catch (error) {
           next(error);
         }

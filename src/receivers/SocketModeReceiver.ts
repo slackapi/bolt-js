@@ -6,6 +6,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import { WebAPICallResult } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
+import { renderHtmlForInstallPath } from './render-html-for-install-path';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -113,10 +114,7 @@ export default class SocketModeReceiver implements Receiver {
               userScopes: installerOptions.userScopes,
             });
             res.writeHead(200, {});
-            res.end(`<html><body><a href=${url}><img alt=""Add to Slack"" height="40" width="139"
-                src="https://platform.slack-edge.com/img/add_to_slack.png"
-                srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x,
-                https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a></body></html>`);
+            res.end(renderHtmlForInstallPath(url));
           } catch (err) {
             throw new Error(err);
           }

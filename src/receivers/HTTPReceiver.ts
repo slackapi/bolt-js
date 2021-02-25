@@ -8,6 +8,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
+import { renderHtmlForInstallPath } from './render-html-for-install-path';
 import {
   ReceiverMultipleAckError,
   ReceiverInconsistentStateError,
@@ -388,7 +389,7 @@ export default class HTTPReceiver implements Receiver {
         const url = await installer.generateInstallUrl(installUrlOptions);
 
         // Generate HTML response body
-        const body = htmlForInstallPath(url);
+        const body = renderHtmlForInstallPath(url);
 
         // Serve a basic HTML page including the "Add to Slack" button.
         // Regarding headers:
@@ -431,22 +432,6 @@ function parseBody(req: BufferedIncomingMessage) {
     return parsedQs;
   }
   return JSON.parse(bodyAsString);
-}
-
-function htmlForInstallPath(addToSlackUrl: string) {
-  return `<html>
-      <body>
-        <a href=${addToSlackUrl}>
-          <img
-            alt="Add to Slack"
-            height="40"
-            width="139"
-            src="https://platform.slack-edge.com/img/add_to_slack.png"
-            srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"
-          />
-        </a>
-      </body>
-    </html>`;
 }
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
