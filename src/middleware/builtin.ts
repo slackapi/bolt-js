@@ -251,6 +251,21 @@ function matchesPattern(pattern: string | RegExp, candidate: string): boolean {
   return pattern.test(candidate);
 }
 
+/**
+ * Middleware that filters out any Function that doesn't match callback_id
+ */
+export function matchFunctionCallback(callback_id: string): Middleware<SlackEventMiddlewareArgs> {
+  return async ({ event, next }) => {
+    // Filter out any functions that are not the correct function name
+    if (!event || 'function_executed' !== event.type || !event.function || callback_id !== event.function.callback_id) {
+      return;
+    }
+
+    // TODO: remove the non-null assertion operator
+    await next!();
+  };
+}
+
 /*
  * Middleware that filters out events that don't match pattern
  */
