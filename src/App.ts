@@ -12,6 +12,7 @@ import {
   matchConstraints,
   onlyCommands,
   matchCommandName,
+  matchFunctionCallback,
   onlyOptions,
   onlyShortcuts,
   onlyEvents,
@@ -769,6 +770,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       matchCommandName(commandName),
       ..._listeners,
     ] as Middleware<AnyMiddlewareArgs>[]);
+  }
+
+  // matches a Slack function callback specifically
+  public function(callbackID: string, ...listeners: Middleware<SlackEventMiddlewareArgs>[]): void {
+    this.listeners.push([matchFunctionCallback(callbackID), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public options<
