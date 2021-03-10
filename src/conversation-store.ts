@@ -64,7 +64,7 @@ export function conversationContext<ConversationState = any>(
         context.conversation = await store.get(conversationId);
         logger.debug(`Conversation context loaded for ID: ${conversationId}`);
       } catch (error) {
-        if (error.messsage !== 'undefined' && error.message !== 'Conversation not found') {
+        if (error.messsage !== undefined && error.message !== 'Conversation not found') {
           // The conversation data can be expired - error: Conversation expired
           logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${error.message}`);
         }
