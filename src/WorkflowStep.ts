@@ -33,13 +33,11 @@ export interface StepUpdateArguments {
       };
     };
   };
-  outputs?: [
-    {
-      name: string;
-      type: string;
-      label: string;
-    },
-  ];
+  outputs?: {
+    name: string;
+    type: string;
+    label: string;
+  }[];
   step_name?: string;
   step_image_url?: string;
 }
