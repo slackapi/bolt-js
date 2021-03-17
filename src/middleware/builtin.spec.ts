@@ -5,10 +5,18 @@ import sinon from 'sinon';
 import { ErrorCode, ContextMissingPropertyError } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
-import { SlackEventMiddlewareArgs, NextFn, Context, MessageEvent, SlackCommandMiddlewareArgs } from '../types';
+import {
+  SlackEventMiddlewareArgs,
+  NextFn,
+  Context,
+  SlackEvent,
+  MessageEvent,
+  SlackCommandMiddlewareArgs,
+} from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
-import { SlackEvent, AppMentionEvent, BotMessageEvent } from '../types/events';
+import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
+import { GenericMessageEvent } from '../types/events/message-events';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
@@ -524,7 +532,7 @@ describe('onlyEvents', () => {
     const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
       payload: appMentionEvent,
       event: appMentionEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',
@@ -574,12 +582,33 @@ describe('matchEventType', () => {
     return {
       payload: appMentionEvent,
       event: appMentionEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',
         api_app_id: 'A1234567',
         event: appMentionEvent,
+        type: 'event_callback',
+        event_id: 'event-id-value',
+        event_time: 123,
+        authed_users: [],
+      },
+      say: sayNoop,
+    };
+  }
+
+  function buildArgsAppHomeOpened(): SlackEventMiddlewareArgs<'app_home_opened'> & {
+    event?: SlackEvent;
+  } {
+    return {
+      payload: appHomeOpenedEvent,
+      event: appHomeOpenedEvent,
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
+      body: {
+        token: 'token-value',
+        team_id: 'T1234567',
+        api_app_id: 'A1234567',
+        event: appHomeOpenedEvent,
         type: 'event_callback',
         event_id: 'event-id-value',
         event_time: 123,
@@ -601,9 +630,45 @@ describe('matchEventType', () => {
     assert.isTrue(fakeNext.called);
   });
 
+  it('should detect valid RegExp requests with app_mention', async () => {
+    const fakeNext = sinon.fake();
+    await matchEventType(/app_mention|app_home_opened/)({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should detect valid RegExp requests with app_home_opened', async () => {
+    const fakeNext = sinon.fake();
+    await matchEventType(/app_mention|app_home_opened/)({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgsAppHomeOpened(),
+    });
+    assert.isTrue(fakeNext.called);
+  });
+
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
     await matchEventType('app_home_opened')({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
+    assert.isFalse(fakeNext.called);
+  });
+
+  it('should skip other requests for RegExp', async () => {
+    const fakeNext = sinon.fake();
+    await matchEventType(/foo/)({
       logger,
       client,
       next: fakeNext,
@@ -688,8 +753,8 @@ async function importBuiltin(overrides: Override = {}): Promise<typeof import('.
   return rewiremock.module(() => import('./builtin'), overrides);
 }
 
-function createFakeMessageEvent(content: string | MessageEvent['blocks'] = ''): MessageEvent {
-  const event: Partial<MessageEvent> = {
+function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] = ''): MessageEvent {
+  const event: Partial<GenericMessageEvent> = {
     type: 'message',
     channel: 'CHANNEL_ID',
     user: 'USER_ID',
@@ -732,21 +797,40 @@ const validCommandPayload: SlashCommand = {
 
 const appMentionEvent: AppMentionEvent = {
   type: 'app_mention',
+  username: 'USERNAME',
   user: 'U1234567',
   text: 'this is my message',
   ts: '123.123',
   channel: 'C1234567',
   event_ts: '123.123',
+  thread_ts: '123.123',
 };
 
-const botMessageEvent: BotMessageEvent & MessageEvent = {
+const appHomeOpenedEvent: AppHomeOpenedEvent = {
+  type: 'app_home_opened',
+  user: 'USERNAME',
+  channel: 'U1234567',
+  tab: 'home',
+  view: {
+    type: 'home',
+    blocks: [],
+    clear_on_close: false,
+    notify_on_close: false,
+    external_id: '',
+  },
+  event_ts: '123.123',
+};
+
+const botMessageEvent: MessageEvent = {
   type: 'message',
   subtype: 'bot_message',
-  channel: 'C1234567',
+  channel: 'CHANNEL_ID',
+  event_ts: '123.123',
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',
   bot_id: 'B1234567',
+  channel_type: 'channel',
 };
 
 const noop = () => Promise.resolve(undefined);

@@ -22,6 +22,7 @@ import {
   MessageShortcut,
   BlockElementAction,
   SlackViewAction,
+  EventTypePattern,
 } from '../types';
 import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
@@ -215,7 +216,7 @@ export function matchMessage(
   return async ({ event, context, next }) => {
     let tempMatches: RegExpMatchArray | null;
 
-    if (event.text === undefined) {
+    if (!('text' in event) || event.text === undefined) {
       return;
     }
 
@@ -254,14 +255,29 @@ export function matchCommandName(name: string): Middleware<SlackCommandMiddlewar
   };
 }
 
-/**
- * Middleware that filters out any event that isn't of given type
+/*
+ * Middleware that filters out events that don't match pattern
  */
-export function matchEventType(type: string): Middleware<SlackEventMiddlewareArgs> {
-  return async ({ event, next }) => {
-    // Filter out any events that are not the correct type
-    if (type !== event.type) {
+export function matchEventType(pattern: EventTypePattern): Middleware<SlackEventMiddlewareArgs> {
+  return async ({ event, context, next }) => {
+    let tempMatches: RegExpMatchArray | null;
+    if (!('type' in event) || event.type === undefined) {
       return;
+    }
+
+    // Filter out events that don't contain the pattern
+    if (typeof pattern === 'string') {
+      if (event.type !== pattern) {
+        return;
+      }
+    } else {
+      tempMatches = event.type.match(pattern);
+
+      if (tempMatches !== null) {
+        context['matches'] = tempMatches;
+      } else {
+        return;
+      }
     }
 
     // TODO: remove the non-null assertion operator
@@ -287,7 +303,6 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
       // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
       if (args.message !== undefined) {
         const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
-
         // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
         // type narrowing
         // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
@@ -301,7 +316,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
       const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
       const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
 
-      if (botUserId !== undefined && args.event.user === botUserId && !isEventShouldBeKept) {
+      if (botUserId !== undefined && 'user' in args.event && args.event.user === botUserId && !isEventShouldBeKept) {
         return;
       }
     }
@@ -334,7 +349,7 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       );
     }
 
-    if (message.text === undefined) {
+    if (!('text' in message) || message.text === undefined) {
       return;
     }
 

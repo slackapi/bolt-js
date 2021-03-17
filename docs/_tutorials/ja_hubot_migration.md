@@ -1,6 +1,6 @@
 ---
 title: Hubot から Bolt に移行する方法
-order: 2
+order: 3
 slug: hubot-migration
 lang: ja-jp
 layout: tutorial

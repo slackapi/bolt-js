@@ -1,7 +1,7 @@
 {
-  "name": "bolt-js-getting-started-with-heroku-app",
+  "name": "bolt-js-heroku-app",
   "version": "1.0.0",
-  "description": "Getting Started with Heroku ⚡️ Bolt for JavaScript",
+  "description": "Deploying to Heroku ⚡️ Bolt for JavaScript",
   "main": "app.js",
   "scripts": {
     "ngrok": "ngrok http 3000",
@@ -10,6 +10,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^2.3.0"
+    "@slack/bolt": "^3.2.0"
   }
 }

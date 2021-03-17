@@ -1,6 +1,6 @@
 ---
 title: Migrating Hubot apps
-order: 2
+order: 3
 slug: hubot-migration
 lang: en
 layout: tutorial

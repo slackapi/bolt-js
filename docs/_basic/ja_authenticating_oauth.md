@@ -15,7 +15,7 @@ Bolt for JavaScript は `slack/install` というパスも生成します。こ�
 
 Slack の OAuth インストールフローについてもっと知りたい場合は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
 
-[Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 2.5.0 以上を利用してください。また、`installationStore` に `storeOrgInstallation`、`fetchOrgInstallation` というメソッドを追加する必要があります。そして、最後に Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを忘れずに確認するようにしてください。
+[Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
 </div>
 
 ```javascript
@@ -28,21 +28,26 @@ const app = new App({
   installationStore: {
     storeInstallation: async (installation) => {
       // 実際のデータベースに保存するために、ここのコードを変更
-      return await database.set(installation.team.id, installation);
+      if (installation.isEnterpriseInstall) {
+        // OrG 全体へのインストールに対応する場合
+        return await database.set(installation.enterprise.id, installation);
+      } else {
+        // 単独のワークスペースへのインストールの場合
+        return await database.set(installation.team.id, installation);
+      }
+      throw new Error('Failed saving installation data to installationStore');
     },
-    fetchInstallation: async (InstallQuery) => {
+    fetchInstallation: async (installQuery) => {
       // 実際のデータベースから取得するために、ここのコードを変更
-      return await database.get(InstallQuery.teamId);
-    },
-    storeOrgInstallation: async (installation) => {
-      // OrG 全体へのインストールに対応する場合はこのメソッドも追加
-      // 実際のデータベースから取得するために、ここのコードを変更
-      return await database.set(installation.enterprise.id, installation);
-    },
-    fetchOrgInstallation: async (InstallQuery) => {
-      // OrG 全体へのインストールに対応する場合はこのメソッドも追加
-      // 実際のデータベースから取得するために、ここのコードを変更
-      return await database.get(InstallQuery.enterpriseId);
+      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
+        // OrG 全体へのインストール情報の参照
+        return await database.get(installQuery.enterpriseId);
+      }
+      if (installQuery.teamId !== undefined) {
+        // 単独のワークスペースへのインストール情報の参照
+        return await database.get(installQuery.teamId);
+      }
+      throw new Error('Failed fetching installation');
     },
   },
 });
