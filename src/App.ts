@@ -33,6 +33,7 @@ import {
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackAction,
+  EventTypePattern,
   SlackShortcut,
   Context,
   SayFn,
@@ -399,7 +400,9 @@ export default class App {
    *
    * @param args receiver-specific start arguments
    */
-  public start(...args: Parameters<HTTPReceiver['start']>): ReturnType<HTTPReceiver['start']> {
+  public start(
+    ...args: Parameters<HTTPReceiver['start'] | SocketModeReceiver['start']>
+  ): ReturnType<HTTPReceiver['start']> {
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
@@ -410,8 +413,20 @@ export default class App {
   public event<EventType extends string = string>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+  ): void;
+  public event<EventType extends RegExp = RegExp>(
+    eventName: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
+  ): void;
+  public event<EventType extends EventTypePattern = EventTypePattern>(
+    eventNameOrPattern: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
-    this.listeners.push([onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    this.listeners.push([
+      onlyEvents,
+      matchEventType(eventNameOrPattern),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>

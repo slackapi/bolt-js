@@ -110,17 +110,19 @@ Now that you have an app, let's prepare it for AWS Lambda and the Serverless Fra
 
 By default, Bolt listens for HTTP requests. In this section, we'll customize your Bolt app's [`receiver`](https://slack.dev/bolt-js/concepts#receiver) to respond to Lambda function events instead.
 
-First, install the official [AWS Serverless Express](https://github.com/awslabs/aws-serverless-express) module to transform Express HTTP requests to Lambda function events:
+First, install the [Serverless Express](https://github.com/vendia/serverless-express) module to transform Express HTTP requests to Lambda function events:
 
 ```bash
-npm install aws-serverless-express
+npm install --save @vendia/serverless-express
 ```
+
+> 💡 This guide requires version `4.x.x` or later.
 
 Next, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's Express receiver and the AWS Serverless Express module:
 
 ```javascript
 const { App, ExpressReceiver } = require('@slack/bolt');
-const awsServerlessExpress = require('aws-serverless-express');
+const serverlessExpress = require('@vendia/serverless-express');
 ```
 
 Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7) to create a custom receiver using AWS Serverless Express:
@@ -141,19 +143,15 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: expressReceiver
 });
-
-// Initialize your AWSServerlessExpress server using Bolt's ExpressReceiver
-const server = awsServerlessExpress.createServer(expressReceiver.app);
 ```
 
 Finally, at the bottom of your app, update the [source code that starts the HTTP server](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L40-L45) to now respond to an AWS Lambda function event:
 
 ```javascript
 // Handle the Lambda function event
-module.exports.handler = (event, context) => {
-  console.log('⚡️ Bolt app is running!');
-  awsServerlessExpress.proxy(server, event, context);
-};
+module.exports.handler = serverlessExpress({
+  app: expressReceiver.app
+});
 ```
 
 When you're done, your app should look similar to the ⚡️[Deploying to AWS Lambda app][deploy-aws-lambda-app/app.js].
@@ -187,7 +185,7 @@ plugins:
 > 💡 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be enviornment variables on your local machine.
 > You can [learn how to export Slack environment variables](/bolt-js/tutorial/getting-started#setting-up-your-local-project) in our Getting Started guide.
 
-**3. Install Serverless Offline** 
+**3. Install Serverless Offline**
 
 To make local development a breeze, we'll use the `serverless-offline` module to emulate a deployed function.
 
@@ -329,7 +327,7 @@ Now that you've built and deployed a basic app, here are some ideas you can expl
 
 [aws-cli-configure]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config
 [aws-cli-install]: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
-[aws-cli-output-format]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format 
+[aws-cli-output-format]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format
 [aws-cli-region]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region
 [aws-iam-user]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds
 [aws-lambda]: https://aws.amazon.com/lambda/

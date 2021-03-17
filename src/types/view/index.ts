@@ -48,6 +48,7 @@ export interface ViewSubmitAction {
   view: ViewOutput;
   api_app_id: string;
   token: string;
+  trigger_id: string; // undocumented
   // exists for enterprise installs
   is_enterprise_install?: boolean;
   enterprise?: {

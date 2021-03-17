@@ -15,7 +15,7 @@ import {
 } from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
-import { AppMentionEvent } from '../types/events';
+import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
 import { GenericMessageEvent } from '../types/events/message-events';
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
@@ -556,7 +556,7 @@ describe('onlyEvents', () => {
     const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
       payload: appMentionEvent,
       event: appMentionEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',
@@ -606,12 +606,33 @@ describe('matchEventType', () => {
     return {
       payload: appMentionEvent,
       event: appMentionEvent,
-      message: null as never, // a bit hackey to sartisfy TS compiler
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
       body: {
         token: 'token-value',
         team_id: 'T1234567',
         api_app_id: 'A1234567',
         event: appMentionEvent,
+        type: 'event_callback',
+        event_id: 'event-id-value',
+        event_time: 123,
+        authed_users: [],
+      },
+      say: sayNoop,
+    };
+  }
+
+  function buildArgsAppHomeOpened(): SlackEventMiddlewareArgs<'app_home_opened'> & {
+    event?: SlackEvent;
+  } {
+    return {
+      payload: appHomeOpenedEvent,
+      event: appHomeOpenedEvent,
+      message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
+      body: {
+        token: 'token-value',
+        team_id: 'T1234567',
+        api_app_id: 'A1234567',
+        event: appHomeOpenedEvent,
         type: 'event_callback',
         event_id: 'event-id-value',
         event_time: 123,
@@ -633,9 +654,45 @@ describe('matchEventType', () => {
     assert.isTrue(fakeNext.called);
   });
 
+  it('should detect valid RegExp requests with app_mention', async () => {
+    const fakeNext = sinon.fake();
+    await matchEventType(/app_mention|app_home_opened/)({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should detect valid RegExp requests with app_home_opened', async () => {
+    const fakeNext = sinon.fake();
+    await matchEventType(/app_mention|app_home_opened/)({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgsAppHomeOpened(),
+    });
+    assert.isTrue(fakeNext.called);
+  });
+
   it('should skip other requests', async () => {
     const fakeNext = sinon.fake();
     await matchEventType('app_home_opened')({
+      logger,
+      client,
+      next: fakeNext,
+      context: {},
+      ...buildArgs(),
+    });
+    assert.isFalse(fakeNext.called);
+  });
+
+  it('should skip other requests for RegExp', async () => {
+    const fakeNext = sinon.fake();
+    await matchEventType(/foo/)({
       logger,
       client,
       next: fakeNext,
@@ -773,10 +830,26 @@ const appMentionEvent: AppMentionEvent = {
   thread_ts: '123.123',
 };
 
+const appHomeOpenedEvent: AppHomeOpenedEvent = {
+  type: 'app_home_opened',
+  user: 'USERNAME',
+  channel: 'U1234567',
+  tab: 'home',
+  view: {
+    type: 'home',
+    blocks: [],
+    clear_on_close: false,
+    notify_on_close: false,
+    external_id: '',
+  },
+  event_ts: '123.123',
+};
+
 const botMessageEvent: MessageEvent = {
   type: 'message',
   subtype: 'bot_message',
   channel: 'CHANNEL_ID',
+  event_ts: '123.123',
   user: 'U1234567',
   ts: '123.123',
   text: 'this is my message',

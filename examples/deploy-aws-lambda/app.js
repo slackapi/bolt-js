@@ -1,5 +1,5 @@
 const { App, ExpressReceiver } = require('@slack/bolt');
-const awsServerlessExpress = require('aws-serverless-express');
+const serverlessExpress = require('@vendia/serverless-express');
 
 // Initialize your custom receiver
 const expressReceiver = new ExpressReceiver({
@@ -16,9 +16,6 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: expressReceiver
 });
-
-// Initialize your AWSServerlessExpress server using Bolt's ExpressReceiver
-const server = awsServerlessExpress.createServer(expressReceiver.app);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({ message, say }) => {
@@ -52,7 +49,7 @@ app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action after say() to exit the Lambda process
   await ack();
 });
- 
+
 // Listens to incoming messages that contain "goodbye"
 app.message('goodbye', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
@@ -60,7 +57,6 @@ app.message('goodbye', async ({ message, say }) => {
 });
 
 // Handle the Lambda function event
-module.exports.handler = (event, context) => {
-  console.log('⚡️ Bolt app is running!');
-  awsServerlessExpress.proxy(server, event, context);
-};
+module.exports.handler = serverlessExpress({
+  app: expressReceiver.app
+});
