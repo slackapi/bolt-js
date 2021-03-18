@@ -80,10 +80,10 @@ The structure of the `payload` and `body` is detailed on the API site:
 Listener middleware is used to implement logic across many listener functions (though usually not all of them). Listener middleware has the same arguments as the above listener functions, with one distinction: they also have a `next()` function that **must** be called in order to pass the chain of execution. Learn more about listener middleware [in the documentation](/bolt-js/concepts#listener-middleware).
 
 ## Initialization options
-Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `ExpressReceiver` (so they'll work as long as you aren't using a custom receiver).
+Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `HTTPReceiver` (so they'll work as long as you aren't using a custom receiver).
 
 ### Receiver options
-`ExpressReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `ExpressReceiver` instance upon initialization.
+`HTTPReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `HTTPReceiver` instance upon initialization.
 
 | Option  | Description  |
 | :---: | :--- |
@@ -125,7 +125,7 @@ Bolt includes a set of error types to make errors easier to handle, with more sp
 | `AppInitializationError` | Invalid initialization options were passed. This could include not passing a signing secret, or passing in conflicting options (for example, you can't pass in both `token` and `authorize`). Includes an `original` property with more details. This error is only thrown during initialization (within the App's constructor). |
 | `AuthorizationError` | Error exclusively thrown when installation information can't be fetched or parsed. You may encounter this error when using the built-in OAuth support, or you may want to import and use this error when building your own `authorize` function. |
 | `ContextMissingPropertyError` | Error thrown when the `context` object is missing necessary information, such as not including `botUserId` or `botId` when `ignoreSelf` is set to `true`. The missing property is available in the `missingProperty` property. |
-| `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `ExpressReceiver`. |
+| `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `HTTPReceiver`. |
 | `ReceiverAuthenticityError` | Error thrown when your app's request signature could not be verified. The error includes information on why it failed, such as an invalid timestamp, missing headers, or invalid signing secret.
 | `MultipleListenerError` | Thrown when multiple errors occur when processing multiple listeners for a single event. Includes an `originals` property with an array of the individual errors. |
 | `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep` instance. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on Workflow Steps [can be found in the documentation](/concepts#steps).  |
