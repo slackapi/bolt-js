@@ -1057,18 +1057,22 @@ function singleAuthorization(
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Authorize<boolean> {
   // TODO: warn when something needed isn't found
-  const identifiers: Promise<{ botUserId: string; botId: string }> =
-    authorization.botUserId !== undefined && authorization.botId !== undefined
-      ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
-      : client.auth.test({ token: authorization.botToken }).then((result) => {
-          return {
-            botUserId: result.user_id as string,
-            botId: result.bot_id as string,
-          };
-        });
+  let identifiers: { botUserId: string; botId: string };
 
   return async ({ isEnterpriseInstall }) => {
-    return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };
+    if (identifiers === undefined) {
+      identifiers =
+        authorization.botUserId !== undefined && authorization.botId !== undefined
+          ? { botUserId: authorization.botUserId, botId: authorization.botId }
+          : await client.auth.test({ token: authorization.botToken }).then((result) => {
+              return {
+                botUserId: result.user_id as string,
+                botId: result.bot_id as string,
+              };
+            });
+    }
+
+    return { isEnterpriseInstall, botToken: authorization.botToken, ...identifiers };
   };
 }
 
