@@ -55,6 +55,31 @@ describe('App', () => {
         assert.instanceOf(app, App);
       });
     });
+
+    describe('with unsuccessful single team authorization results', () => {
+      it.only('should throws', async () => {
+        // Arrange
+        const error = new Error("An API error occurred: something's wrong");
+        const overrides = mergeOverrides(withNoopAppMetadata(), withUnsuccessfulBotUserFetchingWebClient(error));
+        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        const event: ReceiverEvent = {
+          ack: async () => {},
+          body: {
+            type: 'shortcut',
+            team: { id: '' },
+            enterprise: { id: '' },
+            user: { id: '' },
+          },
+        };
+
+        // Act
+        const app = new App({ token: '', signingSecret: '' });
+
+        // Assert
+        assert.equal(await app.processEvent(event).catch((e) => e as Error), error);
+        assert.equal(await app.processEvent(event).catch((e) => e as Error), error); // retry
+      });
+    });
     it('should succeed with an authorize callback', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
@@ -1909,6 +1934,18 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
               },
             },
           }),
+        };
+      },
+    },
+  };
+}
+
+function withUnsuccessfulBotUserFetchingWebClient(error: Error): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {
+        public auth = {
+          test: sinon.fake.rejects(error),
         };
       },
     },

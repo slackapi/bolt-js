@@ -1064,7 +1064,8 @@ function singleAuthorization(
       identifiers =
         authorization.botUserId !== undefined && authorization.botId !== undefined
           ? { botUserId: authorization.botUserId, botId: authorization.botId }
-          : await client.auth.test({ token: authorization.botToken }).then((result) => {
+          : // While test is failing, the identifiers will not be assigned
+            await client.auth.test({ token: authorization.botToken }).then((result) => {
               return {
                 botUserId: result.user_id as string,
                 botId: result.bot_id as string,
