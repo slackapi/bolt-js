@@ -60,6 +60,7 @@ describe('App', () => {
       it.only('should throws', async () => {
         // Arrange
         const error = new Error("An API error occurred: something's wrong");
+        const fakeLogger = createFakeLogger();
         const overrides = mergeOverrides(withNoopAppMetadata(), withUnsuccessfulBotUserFetchingWebClient(error));
         const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
         const event: ReceiverEvent = {
@@ -73,11 +74,13 @@ describe('App', () => {
         };
 
         // Act
-        const app = new App({ token: '', signingSecret: '' });
+        const app = new App({ token: '', signingSecret: '', logger: fakeLogger });
 
         // Assert
         assert.equal(await app.processEvent(event).catch((e) => e as Error), error);
         assert.equal(await app.processEvent(event).catch((e) => e as Error), error); // retry
+        assert.equal(fakeLogger.warn.callCount, 2);
+        assert.equal(fakeLogger.error.callCount, 2);
       });
     });
     it('should succeed with an authorize callback', async () => {
