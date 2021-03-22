@@ -9,10 +9,10 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say, next }) => {
+app.message('hello', async ({ message, say }) => {
   // Filter out message events with subtypes (see https://api.slack.com/events/message)
   // Is there a way to do this in listener middleware with current type system?
-  if (!isGenericMessageEvent(message)) return next!();
+  if (!isGenericMessageEvent(message)) return;
   // say() sends a message to the channel where the event was triggered
 
   await say({
@@ -42,8 +42,6 @@ app.action('button_click', async ({ body, ack, say }) => {
   await ack();
   await say(`<@${body.user.id}> clicked the button`);
 });
-
-
 
 (async () => {
   // Start your app
