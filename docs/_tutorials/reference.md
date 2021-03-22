@@ -47,7 +47,7 @@ There are a collection of constraint objects that some methods have access to. T
 
 | Method                                         | Options | Details |
 |--------------------------------------------------------------------|
-| `app.action(constraints, fn)` | `block_id`, `action_id`, `callback_id`, (,`type`) | Listens for more than just the `action_id`. `block_id` is the ID for the element's parent block. `callback_id` is the ID of the view that is passed when instantiating it (only used when action elements are in modals). To specifically handle only either an action in blocks or in attachments, you can `type`–`block_actions` for action elements in blocks, or `interactive_message` for interactivity in legacy attachments. |
+| `app.action(constraints, fn)` | `block_id`, `action_id`, `callback_id`, (,`type`) | Listens for more than just the `action_id`. `block_id` is the ID for the element's parent block. `callback_id` is the ID of the view that is passed when instantiating it (only used when action elements are in modals). To specifically handle an action element in blocks or in legacy attachments, you can use `type` with the value of `block_actions` or `interactive_message` respectively. |
 | `app.shortcut(constraints, fn)` | `type`, `callback_id` | Allows specification of the type of shortcut. `type` must either be `shortcut` for **global shortcuts** or `message_action` for **message_shortcuts**. `callbackId` can be a `string` or `RegExp`. |
 | `app.view(constraints, fn)` | `type`, `callback_id` | `type` must either be `view_closed` or `view_submission`, which determines what specific event your listener function is sent. `callback_id` is the `callback_id` of the view that is sent when your app opens the modal. |
 | `app.options(constraints, fn)` | `block_id`, `action_id`, `callback_id` | Optionally listens for `block_id` and `callback_id` in addition to `action_id`. `callback_id` can only be passed when handling options elements within modals. |
@@ -80,16 +80,16 @@ The structure of the `payload` and `body` is detailed on the API site:
 Listener middleware is used to implement logic across many listener functions (though usually not all of them). Listener middleware has the same arguments as the above listener functions, with one distinction: they also have a `next()` function that **must** be called in order to pass the chain of execution. Learn more about listener middleware [in the documentation](/bolt-js/concepts#listener-middleware).
 
 ## Initialization options
-Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `ExpressReceiver` (so they'll work as long as you aren't using a custom receiver).
+Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `HTTPReceiver` (so they'll work as long as you aren't using a custom receiver).
 
 ### Receiver options
-`ExpressReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `ExpressReceiver` instance upon initialization.
+`HTTPReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `HTTPReceiver` instance upon initialization.
 
 | Option  | Description  |
 | :---: | :--- |
 | `signingSecret` | A `string` from your app's configuration (under "Basic Information") which verifies that incoming events are coming from Slack |
 | `endpoints` | A `string` or `object` that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. Currently, the only key for the object is `key`, the value of which is the customizable endpoint (ex: `/myapp/events`). **By default, all events are sent to the `/slack/events` endpoint** |
-| `processBeforeResponse` | `boolean` that determines whether Events API events should be automatically acknowledged. This is primarily useful when running apps on FaaS to ensure events listeners don't unexpectedly terminate. Defaults to `true`.  |
+| `processBeforeResponse` | `boolean` that determines whether events should be immediately acknowledged. This is primarily useful when running apps on FaaS to ensure events listeners don't unexpectedly terminate by setting it to `false`. Defaults to `true`.  |
 | `clientId` | The client ID `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `clientSecret` | The client secret `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `stateSecret` | Recommended parameter (`string`) that's passed when [configuring OAuth](/bolt-js/concepts#authenticating-oauth) to prevent CSRF attacks |
@@ -125,7 +125,7 @@ Bolt includes a set of error types to make errors easier to handle, with more sp
 | `AppInitializationError` | Invalid initialization options were passed. This could include not passing a signing secret, or passing in conflicting options (for example, you can't pass in both `token` and `authorize`). Includes an `original` property with more details. This error is only thrown during initialization (within the App's constructor). |
 | `AuthorizationError` | Error exclusively thrown when installation information can't be fetched or parsed. You may encounter this error when using the built-in OAuth support, or you may want to import and use this error when building your own `authorize` function. |
 | `ContextMissingPropertyError` | Error thrown when the `context` object is missing necessary information, such as not including `botUserId` or `botId` when `ignoreSelf` is set to `true`. The missing property is available in the `missingProperty` property. |
-| `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `ExpressReceiver`. |
+| `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `HTTPReceiver`. |
 | `ReceiverAuthenticityError` | Error thrown when your app's request signature could not be verified. The error includes information on why it failed, such as an invalid timestamp, missing headers, or invalid signing secret.
 | `MultipleListenerError` | Thrown when multiple errors occur when processing multiple listeners for a single event. Includes an `originals` property with an array of the individual errors. |
 | `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep` instance. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on Workflow Steps [can be found in the documentation](/concepts#steps).  |
