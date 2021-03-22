@@ -4,13 +4,13 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "allowJs": true,
     "sourceMap": true,
-    "outDir": "dist",
     "rootDir": "src",
-    "baseUrl": ".",
+    "outDir": "dist"
   },
   "include": [
     "src/**/*"
