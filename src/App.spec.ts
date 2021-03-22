@@ -1110,6 +1110,9 @@ describe('App', () => {
           app.command('/echo', async ({}) => {
             /* noop */
           });
+          app.command(/\/e.*/, async ({}) => {
+            /* noop */
+          });
 
           // invalid view constraints
           const invalidViewConstraints1 = ({

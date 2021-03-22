@@ -528,8 +528,7 @@ export default class App {
     this.listeners.push([onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // TODO: should command names also be regex?
-  public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
+  public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
     this.listeners.push([onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
