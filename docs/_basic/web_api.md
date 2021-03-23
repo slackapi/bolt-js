@@ -17,7 +17,7 @@ Since the introduction of [org wide app installations](https://api.slack.com/ent
 
 ```javascript
 // Unix Epoch time for September 30, 2019 11:59:59 PM
-const whenSeptemberEnds = 1569887999;
+const whenSeptemberEnds = '1569887999';
 
 app.message('wake me up', async ({ message, client }) => {
   try {
