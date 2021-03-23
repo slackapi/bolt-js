@@ -48,7 +48,7 @@ t:
     steps: ワークフローステップ
     # TODO: translate these title
     deployments: Deployments
-    reference: Reference
+    reference: リファレンス
     contribute: 貢献
 
 # Metadata
