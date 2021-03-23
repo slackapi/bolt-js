@@ -21,7 +21,7 @@ import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 
 describe('matchMessage()', () => {
-  function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+  function initializeTestCase(pattern: string | RegExp | (string | RegExp)[]): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const { matchMessage } = await importBuiltin();
@@ -35,7 +35,7 @@ describe('matchMessage()', () => {
   }
 
   function matchesPatternTestCase(
-    pattern: string | RegExp,
+    pattern: string | RegExp | (string | RegExp)[],
     matchingText: string,
     buildFakeEvent: (content: string) => SlackEvent,
   ): Mocha.AsyncFunc {
@@ -57,7 +57,7 @@ describe('matchMessage()', () => {
       // Assert
       assert(fakeNext.called);
       // The following assertion(s) check behavior that is only targeted at RegExp patterns
-      if (typeof pattern !== 'string') {
+      if (typeof pattern !== 'string' && !Array.isArray(pattern)) {
         if (dummyContext.matches !== undefined) {
           assert.lengthOf(dummyContext.matches, 1);
         } else {
@@ -68,7 +68,7 @@ describe('matchMessage()', () => {
   }
 
   function notMatchesPatternTestCase(
-    pattern: string | RegExp,
+    pattern: string | RegExp | (string | RegExp)[],
     nonMatchingText: string,
     buildFakeEvent: (content: string) => SlackEvent,
   ): Mocha.AsyncFunc {
@@ -93,7 +93,7 @@ describe('matchMessage()', () => {
     };
   }
 
-  function noTextMessageTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
+  function noTextMessageTestCase(pattern: string | RegExp | (string | RegExp)[]): Mocha.AsyncFunc {
     return async () => {
       // Arrange
       const dummyContext = {};
@@ -143,6 +143,30 @@ describe('matchMessage()', () => {
     const pattern = /foo/;
     const matchingText = 'foobar';
     const nonMatchingText = 'bar';
+    it('should initialize', initializeTestCase(pattern));
+    it(
+      'should match message events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeMessageEvent),
+    );
+    it(
+      'should match app_mention events with a pattern that matches',
+      matchesPatternTestCase(pattern, matchingText, createFakeAppMentionEvent),
+    );
+    it(
+      'should filter out message events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeMessageEvent),
+    );
+    it(
+      'should filter out app_mention events with a pattern that does not match',
+      notMatchesPatternTestCase(pattern, nonMatchingText, createFakeAppMentionEvent),
+    );
+    it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
+  });
+
+  describe('using an array pattern', () => {
+    const pattern = ['foo', /bar/];
+    const matchingText = 'foo';
+    const nonMatchingText = 'apple';
     it('should initialize', initializeTestCase(pattern));
     it(
       'should match message events with a pattern that matches',
