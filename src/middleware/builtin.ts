@@ -241,18 +241,25 @@ export function matchMessage(
 }
 
 /**
- * Middleware that filters out any command that doesn't match name
+ * Middleware that filters out any command that doesn't match the pattern
  */
-export function matchCommandName(name: string): Middleware<SlackCommandMiddlewareArgs> {
+export function matchCommandName(pattern: string | RegExp): Middleware<SlackCommandMiddlewareArgs> {
   return async ({ command, next }) => {
-    // Filter out any commands that are not the correct command name
-    if (name !== command.command) {
+    // Filter out any commands that do not match the correct command name or pattern
+    if (!matchesPattern(pattern, command.command)) {
       return;
     }
 
     // TODO: remove the non-null assertion operator
     await next!();
   };
+}
+
+function matchesPattern(pattern: string | RegExp, candidate: string): boolean {
+  if (typeof pattern === 'string') {
+    return pattern === candidate;
+  }
+  return pattern.test(candidate);
 }
 
 /*

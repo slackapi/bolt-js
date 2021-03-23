@@ -510,9 +510,15 @@ describe('matchCommandName', () => {
     };
   }
 
-  it('should detect valid requests', async () => {
+  it('should detect requests that match exactly', async () => {
     const fakeNext = sinon.fake();
     await matchCommandName('/hi')(buildArgs(fakeNext));
+    assert.isTrue(fakeNext.called);
+  });
+
+  it('should detect requests that match a pattern', async () => {
+    const fakeNext = sinon.fake();
+    await matchCommandName(/h/)(buildArgs(fakeNext));
     assert.isTrue(fakeNext.called);
   });
 

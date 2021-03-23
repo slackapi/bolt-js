@@ -1110,6 +1110,9 @@ describe('App', () => {
           app.command('/echo', async ({}) => {
             /* noop */
           });
+          app.command(/\/e.*/, async ({}) => {
+            /* noop */
+          });
 
           // invalid view constraints
           const invalidViewConstraints1 = ({
@@ -1253,6 +1256,110 @@ describe('App', () => {
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
+        });
+      });
+
+      describe('command()', () => {
+        it('should respond to exact name matches', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let matchCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command('/hello', async () => {
+            ++matchCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(matchCount, 1);
+        });
+
+        it('should respond to pattern matches', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let matchCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command(/h.*/, async () => {
+            ++matchCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(matchCount, 1);
+        });
+
+        it('should run all matching listeners', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let firstCount = 0;
+          let secondCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command(/h.*/, async () => {
+            ++firstCount;
+          });
+          app.command(/he.*/, async () => {
+            ++secondCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(firstCount, 1);
+          assert.equal(secondCount, 1);
+        });
+
+        it('should not stop at an unsuccessful match', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let firstCount = 0;
+          let secondCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command(/x.*/, async () => {
+            ++firstCount;
+          });
+          app.command(/h.*/, async () => {
+            ++secondCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(firstCount, 0);
+          assert.equal(secondCount, 1);
         });
       });
 
