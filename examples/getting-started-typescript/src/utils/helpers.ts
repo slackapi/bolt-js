@@ -11,5 +11,5 @@ export const isGenericMessageEvent = (msg: MessageEvent): msg is GenericMessageE
 }
 
 export const isMessageItem = (item: ReactionAddedEvent["item"]): item is ReactionMessageItem => {
-  return (item as ReactionMessageItem).channel !== undefined;
+  return (item as ReactionMessageItem).type === 'message';
 }

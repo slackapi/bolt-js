@@ -8,8 +8,7 @@
     "build:watch": "tsc -w -p ./src",
     "start": "npm run build && node dist/app.js"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@slack/bolt": "^3.3.0",
     "dotenv": "^8.2.0"

@@ -1,5 +1,5 @@
 import "./utils/env";
-import { App, LogLevel, subtype, BotMessageEvent, UsersSelectAction } from '@slack/bolt';
+import { App, LogLevel, subtype, BotMessageEvent, UsersSelectAction, BlockAction } from '@slack/bolt';
 import {
   isGenericMessageEvent,
   isMessageItem
@@ -111,17 +111,19 @@ app.action('approve_button', async ({ ack }) => {
 
 // Your listener function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, action, ack, context }) => {
+  async ({ body, client, ack }) => {
     await ack();
     // TODO
-    action = action as UsersSelectAction;
+    body = body as BlockAction;
     try {
-      const result = await app.client.reactions.add({
-        token: context.botToken,
-        name: 'white_check_mark',
-        timestamp: action.action_ts,
-        channel: body.channel?.id
-      });
+      // Make sure the event is not in a view
+      if (body.message) {
+        await client.reactions.add({
+          name: 'white_check_mark',
+          timestamp: body.message?.ts,
+          channel: body.channel?.id
+        });
+      }
     }
     catch (error) {
       console.error(error);
