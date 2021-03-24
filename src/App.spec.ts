@@ -560,6 +560,13 @@ describe('App', () => {
         assert(error.code === ErrorCode.MultipleListenerError);
         assert.sameMembers(error.originals, errorsToThrow);
       });
+
+      it('should detect invalid event names', async () => {
+        app.event('app_mention', async () => {});
+        app.event('message', async () => {});
+        assert.throws(() => app.event('message.channels', async () => {}), 'Although the document mentions');
+        assert.throws(() => app.event(/message\..+/, async () => {}), 'Although the document mentions');
+      });
     });
 
     describe('WorkflowStep middleware', () => {
