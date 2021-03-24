@@ -9,7 +9,7 @@ permalink: /reference
 # App interface and configuration
 
 <div class="section-content">
-This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️[Getting Started guide](/getting-started) to learn the basics of building Bolt for JavaScript apps.
+This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️[Getting Started guide](/bolt-js/tutorial/getting-started) to learn the basics of building Bolt for JavaScript apps.
 </div> 
 
 - [Listener functions](#listener-functions)

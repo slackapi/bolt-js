@@ -9,7 +9,7 @@ permalink: /ja-jp/reference
 # リファレンス（Appインターフェイスと設定）
 
 <div class="section-content">
-このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
+このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/bolt-js/ja-jp/tutorial/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
 </div>
 
 - [リスナー関数](#listener-functions)
