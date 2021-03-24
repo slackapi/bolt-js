@@ -2,7 +2,7 @@
 title: OAuth フローの実装
 lang: ja-jp
 slug: authenticating-oauth
-order: 14
+order: 15
 ---
 
 <div class="section-content">

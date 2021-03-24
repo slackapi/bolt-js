@@ -2,7 +2,7 @@
 title: オプションのリスニングと応答
 lang: ja-jp
 slug: options
-order: 13
+order: 14
 ---
 
 <div class="section-content">
