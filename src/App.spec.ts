@@ -57,7 +57,7 @@ describe('App', () => {
     });
 
     describe('with unsuccessful single team authorization results', () => {
-      it.only('should throws', async () => {
+      it('should throws', async () => {
         // Arrange
         const error = new Error("An API error occurred: something's wrong");
         const fakeLogger = createFakeLogger();
