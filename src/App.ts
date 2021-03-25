@@ -436,6 +436,21 @@ export default class App {
     eventNameOrPattern: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
+    let invalidEventName = false;
+    if (typeof eventNameOrPattern === 'string') {
+      const name = eventNameOrPattern as string;
+      invalidEventName = name.startsWith('message.');
+    } else if (eventNameOrPattern instanceof RegExp) {
+      const name = (eventNameOrPattern as RegExp).source;
+      invalidEventName = name.startsWith('message\\.');
+    }
+    if (invalidEventName) {
+      throw new AppInitializationError(
+        `Although the document mentions "${eventNameOrPattern}",` +
+          'it is not a valid event type. Use "message" instead. ' +
+          'If you want to filter message events, you can use event.channel_type for it.',
+      );
+    }
     this.listeners.push([
       onlyEvents,
       matchEventType(eventNameOrPattern),
