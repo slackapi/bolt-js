@@ -237,13 +237,27 @@ export default class App {
       this.logger.setLevel(this.logLevel);
     }
     this.errorHandler = defaultErrorHandler(this.logger);
-    this.clientOptions = {
-      agent,
-      // App propagates only the log level to WebClient as WebClient has its own logger
-      logLevel: this.logger.getLevel(),
-      tls: clientTls,
-      slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
-    };
+
+    this.clientOptions = clientOptions !== undefined ? clientOptions : {};
+    if (agent !== undefined && this.clientOptions.agent === undefined) {
+      this.clientOptions.agent = agent;
+    }
+    if (clientTls !== undefined && this.clientOptions.tls === undefined) {
+      this.clientOptions.tls = clientTls;
+    }
+    if (logLevel !== undefined && logger === undefined) {
+      // only logLevel is passed
+      this.clientOptions.logLevel = logLevel;
+    } else {
+      if (logLevel !== undefined) {
+        // If the constructor has both, logLevel is ignored
+        this.logger.warn(
+          "As `logger` is passed as well, `logLevel` argument won't be used. Set the log level to the `logger` instance instead.",
+        );
+      }
+      // Since v3.4, WebClient starts sharing loggger with App
+      this.clientOptions.logger = this.logger;
+    }
     // the public WebClient instance (app.client) - this one doesn't have a token
     this.client = new WebClient(undefined, this.clientOptions);
 
