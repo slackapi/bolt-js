@@ -80,6 +80,7 @@ export interface AppOptions {
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
   socketMode?: boolean;
   developerMode?: boolean;
+  tokenVerificationEnabled?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -210,6 +211,7 @@ export default class App {
     installerOptions = undefined,
     socketMode = undefined,
     developerMode = false,
+    tokenVerificationEnabled = true,
   }: AppOptions = {}) {
     // this.logLevel = logLevel;
     this.developerMode = developerMode;
@@ -354,7 +356,21 @@ export default class App {
           `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
         );
       }
-      this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
+
+      if (botUserId !== undefined && botId !== undefined) {
+        this.authorize = ({ isEnterpriseInstall }) =>
+          Promise.resolve({
+            isEnterpriseInstall,
+            botId,
+            botUserId,
+          });
+      } else {
+        this.authorize = singleAuthorizeFactory({
+          client: this.client,
+          botToken: token,
+          tokenVerificationEnabled,
+        });
+      }
     } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
         `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
@@ -1052,28 +1068,42 @@ function defaultErrorHandler(logger: Logger): ErrorHandler {
   };
 }
 
-function singleAuthorization(
-  client: WebClient,
-  authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
-): Authorize<boolean> {
-  // TODO: warn when something needed isn't found
+function authTest(client: WebClient, token: string) {
+  return client.auth.test({ token }).then(({ user_id, bot_id }) => ({
+    botUserId: user_id as string,
+    botId: bot_id as string,
+  }));
+}
+
+interface SingleAuthorizeFactoryArgs {
+  client: WebClient;
+  tokenVerificationEnabled: boolean;
+  botToken: string;
+}
+
+function singleAuthorizeFactory({
+  client,
+  botToken,
+  tokenVerificationEnabled,
+}: SingleAuthorizeFactoryArgs): App['authorize'] {
   let identifiers: { botUserId: string; botId: string };
 
+  const authPromise = tokenVerificationEnabled ? authTest(client, botToken) : undefined;
+
   return async ({ isEnterpriseInstall }) => {
-    if (identifiers === undefined) {
-      identifiers =
-        authorization.botUserId !== undefined && authorization.botId !== undefined
-          ? { botUserId: authorization.botUserId, botId: authorization.botId }
-          : // While test is failing, the identifiers will not be assigned
-            await client.auth.test({ token: authorization.botToken }).then((result) => {
-              return {
-                botUserId: result.user_id as string,
-                botId: result.bot_id as string,
-              };
-            });
+    if (!identifiers) {
+      if (authPromise) {
+        identifiers = await authPromise;
+      } else {
+        identifiers = await authTest(client, botToken);
+      }
     }
 
-    return { isEnterpriseInstall, botToken: authorization.botToken, ...identifiers };
+    return {
+      isEnterpriseInstall,
+      botToken,
+      ...identifiers,
+    };
   };
 }
 
