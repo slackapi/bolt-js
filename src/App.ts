@@ -80,6 +80,7 @@ export interface AppOptions {
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
   socketMode?: boolean;
   developerMode?: boolean;
+  tokenVerificationEnabled?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -210,6 +211,7 @@ export default class App {
     installerOptions = undefined,
     socketMode = undefined,
     developerMode = false,
+    tokenVerificationEnabled = true,
   }: AppOptions = {}) {
     // this.logLevel = logLevel;
     this.developerMode = developerMode;
@@ -354,7 +356,15 @@ export default class App {
           `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
         );
       }
-      this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.authorize = singleAuthorization(
+        this.client,
+        {
+          botId,
+          botUserId,
+          botToken: token,
+        },
+        tokenVerificationEnabled,
+      );
     } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
         `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
@@ -851,11 +861,74 @@ export default class App {
   }
 }
 
+// ----------------------------
+// For the constructor
+
 const tokenUsage =
   'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
   'should be initialized with oauth installer or authorize.';
 
-const validViewTypes = ['view_closed', 'view_submission'];
+function defaultErrorHandler(logger: Logger): ErrorHandler {
+  return (error) => {
+    logger.error(error);
+
+    return Promise.reject(error);
+  };
+}
+
+// -----------
+// singleAuthorization
+
+function runAuthTestForBotToken(
+  client: WebClient,
+  authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
+): Promise<{ botUserId: string; botId: string }> {
+  // TODO: warn when something needed isn't found
+  return authorization.botUserId !== undefined && authorization.botId !== undefined
+    ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
+    : client.auth.test({ token: authorization.botToken }).then((result) => {
+        return {
+          botUserId: result.user_id as string,
+          botId: result.bot_id as string,
+        };
+      });
+}
+
+// the shortened type, which is supposed to be used only in this source file
+type Authorization = Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] };
+
+async function buildAuthorizeResult(
+  isEnterpriseInstall: boolean,
+  authTestResult: Promise<{ botUserId: string; botId: string }>,
+  authorization: Authorization,
+): Promise<AuthorizeResult> {
+  return { isEnterpriseInstall, botToken: authorization.botToken, ...(await authTestResult) };
+}
+
+function singleAuthorization(
+  client: WebClient,
+  authorization: Authorization,
+  tokenVerificationEnabled: boolean,
+): Authorize<boolean> {
+  // As Authorize function has a reference to this local variable,
+  // this local variable can behave as auth.test call result cache for the function
+  let cachedAuthTestResult: Promise<{ botUserId: string; botId: string }>;
+  if (tokenVerificationEnabled) {
+    // call auth.test immediately
+    cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
+    return async ({ isEnterpriseInstall }) => {
+      return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
+    };
+  }
+  return async ({ isEnterpriseInstall }) => {
+    // hold off calling auth.test API until the first access to authorize function
+    cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
+    return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
+  };
+}
+
+// ----------------------------
+// For processEvent method
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
@@ -1044,37 +1117,17 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-function defaultErrorHandler(logger: Logger): ErrorHandler {
-  return (error) => {
-    logger.error(error);
-
-    return Promise.reject(error);
-  };
-}
-
-function singleAuthorization(
-  client: WebClient,
-  authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
-): Authorize<boolean> {
-  // TODO: warn when something needed isn't found
-  const identifiers: Promise<{ botUserId: string; botId: string }> =
-    authorization.botUserId !== undefined && authorization.botId !== undefined
-      ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
-      : client.auth.test({ token: authorization.botToken }).then((result) => {
-          return {
-            botUserId: result.user_id as string,
-            botId: result.bot_id as string,
-          };
-        });
-
-  return async ({ isEnterpriseInstall }) => {
-    return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };
-  };
-}
-
+// Returns either a bot token or a user token for client, say()
 function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
-/* Instrumentation */
+// ----------------------------
+// For listener registration methods
+
+const validViewTypes = ['view_closed', 'view_submission'];
+
+// ----------------------------
+// Instrumentation
+// Don't change the position of the following code
 addAppMetadata({ name: packageJson.name, version: packageJson.version });

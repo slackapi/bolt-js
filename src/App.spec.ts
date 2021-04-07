@@ -235,6 +235,33 @@ describe('App', () => {
       assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
       assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
     });
+    it('should not perform auth.test API call if tokenVerificationEnabled is false', async () => {
+      // Arrange
+      const fakeConstructor = sinon.fake();
+      const overrides = mergeOverrides(withNoopAppMetadata(), {
+        '@slack/web-api': {
+          WebClient: class {
+            constructor() {
+              fakeConstructor(...arguments);
+            }
+            public auth = {
+              test: () => {
+                throw new Error('This API method call should not be performed');
+              },
+            };
+          },
+        },
+      });
+
+      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention,
+      const app = new App({
+        token: 'xoxb-completely-invalid-token',
+        signingSecret: 'invalid-one',
+        tokenVerificationEnabled: false,
+      });
+      // Assert
+      assert.instanceOf(app, App);
+    });
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
     // TODO: tests for providing botId and botUserId options
