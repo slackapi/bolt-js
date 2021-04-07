@@ -4,6 +4,7 @@ import { createServer, Server, ServerOptions } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
 import express, { Request, Response, Application, RequestHandler, Router } from 'express';
+import * as core from 'express-serve-static-core';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
@@ -33,6 +34,8 @@ export interface ExpressReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
+  expressApp?: Application;
+  router?: core.Router;
 }
 
 // Additional Installer Options
@@ -79,8 +82,10 @@ export default class ExpressReceiver implements Receiver {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
+    expressApp = undefined,
+    router = undefined,
   }: ExpressReceiverOptions) {
-    this.app = express();
+    this.app = expressApp ?? express();
 
     if (typeof logger !== 'undefined') {
       this.logger = logger;
@@ -106,7 +111,7 @@ export default class ExpressReceiver implements Receiver {
     this.processBeforeResponse = processBeforeResponse;
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
-    this.router = Router();
+    this.router = router ?? Router();
     endpointList.forEach((endpoint) => {
       this.router.post(endpoint, ...expressMiddleware);
     });
