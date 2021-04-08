@@ -181,7 +181,11 @@ describe('ExpressReceiver', function () {
         router: Router(),
       });
 
-      assert.doesNotThrow(async () => await receiver.start(3000));
+      try {
+        await receiver.start(3000);
+      } catch (e) {
+        assert.fail();
+      }
     });
   });
 
@@ -233,7 +237,11 @@ describe('ExpressReceiver', function () {
         router: Router(),
       });
 
-      assert.doesNotThrow(async () => await receiver.stop());
+      try {
+        await receiver.start(3000);
+      } catch (e) {
+        assert.fail();
+      }
     });
   });
 
