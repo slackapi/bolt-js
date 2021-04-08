@@ -83,10 +83,10 @@ describe('ExpressReceiver', function () {
     it('should not make an express app if provided a router', () => {
       const receiver = new ExpressReceiver({
         signingSecret: 'my-secret',
-        router: Router()
-      })
+        router: Router(),
+      });
 
-      assert.isUndefined(receiver.app)
+      assert.isUndefined(receiver.app);
     });
   });
 
@@ -178,8 +178,8 @@ describe('ExpressReceiver', function () {
     it('should be no-op when provided with a router', async () => {
       const receiver = new ExpressReceiver({
         signingSecret: 'my-secret',
-        router: Router()
-      })
+        router: Router(),
+      });
 
       assert.doesNotThrow(async () => await receiver.start(3000));
     });
@@ -230,8 +230,8 @@ describe('ExpressReceiver', function () {
     it('should be no-op when provided with a router', async () => {
       const receiver = new ExpressReceiver({
         signingSecret: 'my-secret',
-        router: Router()
-      })
+        router: Router(),
+      });
 
       assert.doesNotThrow(async () => await receiver.stop());
     });
