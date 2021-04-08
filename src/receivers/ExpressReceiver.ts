@@ -220,6 +220,7 @@ export default class ExpressReceiver implements Receiver {
   }
 
   // TODO: can this method be defined as generic instead of using overloads?
+  // TODO: if a router is provided, this is no-op, and so the parameters are useless. How to resolve this?
   public start(port: number): Promise<Server | void>;
   public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server | void>;
   public start(
