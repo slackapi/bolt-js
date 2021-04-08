@@ -34,7 +34,6 @@ export interface ExpressReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
-  expressApp?: Application;
   router?: core.Router;
 }
 
@@ -56,7 +55,7 @@ interface InstallerOptions {
  */
 export default class ExpressReceiver implements Receiver {
   /* Express app */
-  public app: Application;
+  public app: Application | undefined;
 
   private server?: Server;
 
@@ -82,10 +81,9 @@ export default class ExpressReceiver implements Receiver {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
-    expressApp = undefined,
     router = undefined,
   }: ExpressReceiverOptions) {
-    this.app = expressApp ?? express();
+    this.app = router ? undefined : express();
 
     if (typeof logger !== 'undefined') {
       this.logger = logger;
@@ -158,7 +156,7 @@ export default class ExpressReceiver implements Receiver {
       });
     }
 
-    this.app.use(this.router);
+    this.app?.use(this.router);
   }
 
   private async requestHandler(req: Request, res: Response): Promise<void> {
@@ -222,16 +220,20 @@ export default class ExpressReceiver implements Receiver {
   }
 
   // TODO: can this method be defined as generic instead of using overloads?
-  public start(port: number): Promise<Server>;
-  public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
+  public start(port: number): Promise<Server | void>;
+  public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server | void>;
   public start(
     portOrListenOptions: number | ListenOptions,
     httpsServerOptions?: HTTPSServerOptions,
-  ): Promise<HTTPSServer>;
+  ): Promise<HTTPSServer | void>;
   public start(
     portOrListenOptions: number | ListenOptions,
     serverOptions: ServerOptions | HTTPSServerOptions = {},
-  ): Promise<Server | HTTPSServer> {
+  ): Promise<Server | HTTPSServer | void> {
+    if (!this.app) {
+      return Promise.resolve();
+    }
+
     let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
 
     // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
@@ -287,6 +289,10 @@ export default class ExpressReceiver implements Receiver {
   // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
   // generic types
   public stop(): Promise<void> {
+    if (!this.app) {
+      return Promise.resolve();
+    }
+
     return new Promise((resolve, reject) => {
       if (this.server === undefined) {
         return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
