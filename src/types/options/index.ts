@@ -70,28 +70,28 @@ export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block
  * Type function which given an options source `Source` returns a corresponding type for the `ack()` function. The
  * function is used to fulfill the options request from a listener or middleware.
  */
-type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggestion'
+export type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggestion'
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
   ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
   : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
 
-interface BlockOptions {
+export interface BlockOptions {
   options: Option[];
 }
-interface MessageOptions {
+export interface MessageOptions {
   options: {
     text: string;
     value: string;
   }[];
 }
-interface DialogOptions {
+export interface DialogOptions {
   options: {
     label: string;
     value: string;
   }[];
 }
-interface OptionGroups<Options> {
+export interface OptionGroups<Options> {
   option_groups: ({
     label: string;
   } & Options)[];
