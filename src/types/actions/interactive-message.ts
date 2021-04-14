@@ -32,7 +32,7 @@ export interface MenuSelect {
 export interface InteractiveMessage<Action extends InteractiveAction = InteractiveAction> {
   type: 'interactive_message';
   callback_id: string;
-  actions: [Action];
+  actions: Action[];
   team: {
     id: string;
     domain: string;

@@ -76,22 +76,22 @@ type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggesti
   ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
   : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
 
-interface BlockOptions {
+export interface BlockOptions {
   options: Option[];
 }
-interface MessageOptions {
+export interface MessageOptions {
   options: {
     text: string;
     value: string;
   }[];
 }
-interface DialogOptions {
+export interface DialogOptions {
   options: {
     label: string;
     value: string;
   }[];
 }
-interface OptionGroups<Options> {
+export interface OptionGroups<Options> {
   option_groups: ({
     label: string;
   } & Options)[];
