@@ -571,14 +571,16 @@ export default class App {
     this.listeners.push([onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public options<Source extends OptionsSource = OptionsSource>(
+  public options<Source extends OptionsSource = 'block_suggestion'>(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+  // TODO: reflect the type in constraits to Source
   public options<Source extends OptionsSource = OptionsSource>(
     constraints: ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+  // TODO: reflect the type in constraits to Source
   public options<Source extends OptionsSource = OptionsSource>(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
