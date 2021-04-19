@@ -1474,6 +1474,51 @@ describe('App', () => {
           // Assert that each call to fakeAxiosPost had the right arguments
           assert(fakeAxiosPost.calledWith(responseUrl, responseObject));
         });
+        it('should be able to use respond for view_submission payloads', async () => {
+          // Arrange
+          const responseObject = { text: 'response' };
+          const responseUrl = 'https://fake.slack/response_url';
+          const fakeAxiosPost = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.view('view-id', async ({ respond }) => {
+            await respond(responseObject);
+          });
+          app.error(fakeErrorHandler);
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              type: 'view_submission',
+              team: {},
+              user: {},
+              view: {
+                id: 'V111',
+                type: 'modal',
+                callback_id: 'view-id',
+                state: {},
+                title: {},
+                close: {},
+                submit: {},
+              },
+              response_urls: [
+                {
+                  block_id: 'b',
+                  action_id: 'a',
+                  channel_id: 'C111',
+                  response_url: 'https://fake.slack/response_url',
+                },
+              ],
+            },
+          });
+
+          // Assert
+          assert.equal(fakeAxiosPost.callCount, 1);
+          // Assert that each call to fakeAxiosPost had the right arguments
+          assert(fakeAxiosPost.calledWith(responseUrl, responseObject));
+        });
       });
 
       describe('logger', () => {

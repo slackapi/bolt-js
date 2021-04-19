@@ -4,7 +4,7 @@ import { SecureContextOptions } from 'tls';
 import util from 'util';
 import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
 import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
 import {
@@ -765,11 +765,10 @@ export default class App {
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = (response: string | RespondArguments): Promise<any> => {
-        const validResponse: RespondArguments = typeof response === 'string' ? { text: response } : response;
-
-        return this.axios.post(body.response_url, validResponse);
-      };
+      listenerArgs.respond = buildRespondFn(this.axios, body.response_url);
+    } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
+      // This can exist only when view_submission payloads - response_url_enabled: true
+      listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
@@ -1122,6 +1121,16 @@ function isBlockActionOrInteractiveMessageBody(
 // Returns either a bot token or a user token for client, say()
 function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
+}
+
+function buildRespondFn(
+  axiosInstance: AxiosInstance,
+  response_url: string,
+): (response: string | RespondArguments) => Promise<AxiosResponse> {
+  return async (message: string | RespondArguments) => {
+    const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
+    return axiosInstance.post(response_url, normalizedArgs);
+  };
 }
 
 // ----------------------------
