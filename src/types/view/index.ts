@@ -1,6 +1,6 @@
 import { View, PlainTextElement } from '@slack/types';
 import { StringIndexed } from '../helpers';
-import { AckFn } from '../utilities';
+import { AckFn, RespondFn } from '../utilities';
 
 /**
  * Known view action types
@@ -19,6 +19,7 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
   view: this['payload'];
   body: ViewActionType;
   ack: ViewAckFn<ViewActionType>;
+  respond: RespondFn;
 }
 
 interface PlainTextElementOutput {
