@@ -6,16 +6,18 @@ import { assert } from 'chai';
 import { Override, mergeOverrides } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import { Readable } from 'stream';
 import { EventEmitter } from 'events';
 import { ErrorCode, CodedError, ReceiverInconsistentStateError } from '../errors';
 
-import ExpressReceiver, {
+import ExpressReceiver from './ExpressReceiver';
+
+import {
   respondToSslCheck,
   respondToUrlVerification,
   verifySignatureAndParseRawBody,
-} from './ExpressReceiver';
+} from './ExpressMiddleware';
 
 describe('ExpressReceiver', function () {
   beforeEach(function () {
@@ -78,15 +80,6 @@ describe('ExpressReceiver', function () {
         },
       });
       assert.isNotNull(receiver);
-    });
-
-    it('should not make an express app if provided a router', () => {
-      const receiver = new ExpressReceiver({
-        signingSecret: 'my-secret',
-        router: Router(),
-      });
-
-      assert.isUndefined(receiver.app);
     });
   });
 
@@ -174,19 +167,6 @@ describe('ExpressReceiver', function () {
       assert.instanceOf(caughtError, ReceiverInconsistentStateError);
       assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
     });
-
-    it('should be no-op when provided with a router', async () => {
-      const receiver = new ExpressReceiver({
-        signingSecret: 'my-secret',
-        router: Router(),
-      });
-
-      try {
-        await receiver.start(3000);
-      } catch (e) {
-        assert.fail();
-      }
-    });
   });
 
   describe('#stop', function () {
@@ -229,19 +209,6 @@ describe('ExpressReceiver', function () {
       // As long as control reaches this point, the test passes
       assert.instanceOf(caughtError, ReceiverInconsistentStateError);
       assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
-    });
-
-    it('should be no-op when provided with a router', async () => {
-      const receiver = new ExpressReceiver({
-        signingSecret: 'my-secret',
-        router: Router(),
-      });
-
-      try {
-        await receiver.start(3000);
-      } catch (e) {
-        assert.fail();
-      }
     });
   });
 
