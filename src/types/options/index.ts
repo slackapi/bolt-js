@@ -54,17 +54,17 @@ export interface BlockOptionsRequest extends OptionsRequest<'block_suggestion'> 
   block_id: string;
   container: StringIndexed;
 }
-export interface DialogOptionsRequest extends OptionsRequest<'dialog_suggestion'> {
-  name: string;
-  callback_id: string;
-  action_ts: string;
-}
 export interface MessageOptionsRequest extends OptionsRequest<'interactive_message'> {
   name: string;
   callback_id: string;
   action_ts: string;
   message_ts: string;
   attachment_id: string;
+}
+export interface DialogOptionsRequest extends OptionsRequest<'dialog_suggestion'> {
+  name: string;
+  callback_id: string;
+  action_ts: string;
 }
 
 /**
