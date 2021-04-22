@@ -38,18 +38,6 @@ export interface OptionsRequest<Source extends OptionsSource = OptionsSource> ex
   };
   token: string;
 
-  name: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-  callback_id: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-  action_ts: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-
-  message_ts: Source extends 'interactive_message' ? string : never;
-  attachment_id: Source extends 'interactive_message' ? string : never;
-
-  api_app_id: Source extends 'block_suggestion' ? string : never;
-  action_id: Source extends 'block_suggestion' ? string : never;
-  block_id: Source extends 'block_suggestion' ? string : never;
-  container: Source extends 'block_suggestion' ? StringIndexed : never;
-
   // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
   app_unfurl?: any;
 
@@ -59,6 +47,24 @@ export interface OptionsRequest<Source extends OptionsSource = OptionsSource> ex
     id: string;
     name: string;
   };
+}
+export interface BlockOptionsRequest extends OptionsRequest<'block_suggestion'> {
+  api_app_id: string;
+  action_id: string;
+  block_id: string;
+  container: StringIndexed;
+}
+export interface DialogOptionsRequest extends OptionsRequest<'dialog_suggestion'> {
+  name: string;
+  callback_id: string;
+  action_ts: string;
+}
+export interface MessageOptionsRequest extends OptionsRequest<'interactive_message'> {
+  name: string;
+  callback_id: string;
+  action_ts: string;
+  message_ts: string;
+  attachment_id: string;
 }
 
 /**
