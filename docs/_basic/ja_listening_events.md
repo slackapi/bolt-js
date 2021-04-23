@@ -15,10 +15,9 @@ order: 3
 const welcomeChannelId = 'C12345';
 
 // 新しいユーザーがワークスペースに加入したタイミングで、指定のチャンネルにメッセージを送信して自己紹介を促す
-app.event('team_join', async ({ event, context }) => {
+app.event('team_join', async ({ event, client }) => {
   try {
-    const result = await app.client.chat.postMessage({
-      token: context.botToken,
+    const result = await client.chat.postMessage({
       channel: welcomeChannelId,
       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
@@ -38,7 +37,7 @@ app.event('team_join', async ({ event, context }) => {
 <div class="secondary-content" markdown="0">
 `message()` リスナーは `event('message')` と等価の機能を提供します。
 
-イベントのサブタイプをフィルタリングしたい場合、組み込みの `matchEventSubtype()` ミドルウェアを使用できます。 `bot_message` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
+イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `bot_message` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
 </div>
 
 ```javascript

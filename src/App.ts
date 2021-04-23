@@ -1,15 +1,12 @@
+/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 import { Agent } from 'http';
 import { SecureContextOptions } from 'tls';
 import util from 'util';
-import {
-  WebClient,
-  ChatPostMessageArguments,
-  addAppMetadata,
-  WebClientOptions,
-} from '@slack/web-api';
+import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
-import axios, { AxiosInstance } from 'axios';
-import ExpressReceiver, { ExpressReceiverOptions } from './ExpressReceiver';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import SocketModeReceiver from './receivers/SocketModeReceiver';
+import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -25,6 +22,7 @@ import {
 } from './middleware/builtin';
 import { processMiddleware } from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
+import { WorkflowStep } from './WorkflowStep';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -35,6 +33,7 @@ import {
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackAction,
+  EventTypePattern,
   SlackShortcut,
   Context,
   SayFn,
@@ -49,56 +48,55 @@ import {
   RespondArguments,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
-import {
-  CodedError,
-  asCodedError,
-  AppInitializationError,
-  MultipleListenerError,
-} from './errors';
-import allSettled = require('promise.allsettled'); // tslint:disable-line:no-require-imports import-name
-const packageJson = require('../package.json'); // tslint:disable-line:no-require-imports no-var-requires
+import { CodedError, asCodedError, AppInitializationError, MultipleListenerError } from './errors';
+// eslint-disable-next-line import/order
+import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 /** App initialization options */
 export interface AppOptions {
-  signingSecret?: ExpressReceiverOptions['signingSecret'];
-  endpoints?: ExpressReceiverOptions['endpoints'];
-  processBeforeResponse?: ExpressReceiverOptions['processBeforeResponse'];
-  clientId?: ExpressReceiverOptions['clientId'];
-  clientSecret?: ExpressReceiverOptions['clientSecret'];
-  stateSecret?: ExpressReceiverOptions['stateSecret']; // required when using default stateStore
-  installationStore?: ExpressReceiverOptions['installationStore']; // default MemoryInstallationStore
-  scopes?: ExpressReceiverOptions['scopes'];
-  installerOptions?: ExpressReceiverOptions['installerOptions'];
+  signingSecret?: HTTPReceiverOptions['signingSecret'];
+  endpoints?: HTTPReceiverOptions['endpoints'];
+  processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
+  clientId?: HTTPReceiverOptions['clientId'];
+  clientSecret?: HTTPReceiverOptions['clientSecret'];
+  stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
+  installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
+  scopes?: HTTPReceiverOptions['scopes'];
+  installerOptions?: HTTPReceiverOptions['installerOptions'];
   agent?: Agent;
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
+  appToken?: string; // TODO should this be included in AuthorizeResult
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
-  authorize?: Authorize; // either token or authorize
+  authorize?: Authorize<boolean>; // either token or authorize
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
+  socketMode?: boolean;
+  developerMode?: boolean;
+  tokenVerificationEnabled?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
-export interface Authorize {
-  (
-    source: AuthorizeSourceData,
-    body?: AnyMiddlewareArgs['body'],
-  ): Promise<AuthorizeResult>;
+export interface Authorize<IsEnterpriseInstall extends boolean = false> {
+  (source: AuthorizeSourceData<IsEnterpriseInstall>, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
 }
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
-export interface AuthorizeSourceData {
-  teamId: string;
-  enterpriseId?: string;
+export interface AuthorizeSourceData<IsEnterpriseInstall extends boolean = false> {
+  teamId: IsEnterpriseInstall extends true ? string | undefined : string;
+  enterpriseId: IsEnterpriseInstall extends true ? string : string | undefined;
   userId?: string;
   conversationId?: string;
+  isEnterpriseInstall: IsEnterpriseInstall;
 }
 
 /** Authorization function outputs - data that will be available as part of event processing */
@@ -108,14 +106,16 @@ export interface AuthorizeResult {
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
+  teamId?: string;
+  enterpriseId?: string;
   [key: string]: any;
 }
 
 export interface ActionConstraints<A extends SlackAction = SlackAction> {
   type?: A['type'];
-  block_id?: A extends BlockAction ? (string | RegExp) : never;
-  action_id?: A extends BlockAction ? (string | RegExp) : never;
-  callback_id?: Extract<A, { callback_id?: string }> extends any ? (string | RegExp) : never;
+  block_id?: A extends BlockAction ? string | RegExp : never;
+  action_id?: A extends BlockAction ? string | RegExp : never;
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
 
 export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
@@ -134,6 +134,7 @@ export interface ErrorHandler {
 
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
+
   public getOrCreate(token: string, clientOptions: WebClientOptions): WebClient {
     const cachedClient = this.pool[token];
     if (typeof cachedClient !== 'undefined') {
@@ -149,13 +150,13 @@ class WebClientPool {
  * A Slack App
  */
 export default class App {
-
   /** Slack Web API client */
   public client: WebClient;
 
   private clientOptions: WebClientOptions;
 
-  private clients: { [teamId: string]: WebClientPool } = {};
+  // Some payloads don't have teamId anymore. So we use EnterpriseId in those scenarios
+  private clients: { [teamOrEnterpriseId: string]: WebClientPool } = {};
 
   /** Receiver - ingests events from the Slack platform */
   private receiver: Receiver;
@@ -163,8 +164,11 @@ export default class App {
   /** Logger */
   private logger: Logger;
 
+  /** Log Level */
+  private logLevel: LogLevel;
+
   /** Authorize */
-  private authorize!: Authorize;
+  private authorize!: Authorize<boolean>;
 
   /** Global middleware chain */
   private middleware: Middleware<AnyMiddlewareArgs>[];
@@ -176,6 +180,12 @@ export default class App {
 
   private axios: AxiosInstance;
 
+  private installerOptions: HTTPReceiverOptions['installerOptions'];
+
+  private socketMode: boolean;
+
+  private developerMode: boolean;
+
   constructor({
     signingSecret = undefined,
     endpoints = undefined,
@@ -184,6 +194,7 @@ export default class App {
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
+    appToken = undefined,
     botId = undefined,
     botUserId = undefined,
     authorize = undefined,
@@ -198,7 +209,23 @@ export default class App {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = undefined,
+    socketMode = undefined,
+    developerMode = false,
+    tokenVerificationEnabled = true,
   }: AppOptions = {}) {
+    // this.logLevel = logLevel;
+    this.developerMode = developerMode;
+    if (developerMode) {
+      // Set logLevel to Debug in Developer Mode if one wasn't passed in
+      this.logLevel = logLevel ?? LogLevel.DEBUG;
+      // Set SocketMode to true if one wasn't passed in
+      this.socketMode = socketMode ?? true;
+    } else {
+      // If devs aren't using Developer Mode or Socket Mode, set it to false
+      this.socketMode = socketMode ?? false;
+      // Set logLevel to Info if one wasn't passed in
+      this.logLevel = logLevel ?? LogLevel.INFO;
+    }
 
     if (typeof logger === 'undefined') {
       // Initialize with the default logger
@@ -208,62 +235,117 @@ export default class App {
     } else {
       this.logger = logger;
     }
-    if (typeof logLevel !== 'undefined' && this.logger.getLevel() !== logLevel) {
-      this.logger.setLevel(logLevel);
+    if (typeof this.logLevel !== 'undefined' && this.logger.getLevel() !== this.logLevel) {
+      this.logger.setLevel(this.logLevel);
     }
     this.errorHandler = defaultErrorHandler(this.logger);
-    this.clientOptions = {
-      agent,
-      // App propagates only the log level to WebClient as WebClient has its own logger
-      logLevel: this.logger.getLevel(),
-      tls: clientTls,
-      slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
-    };
+
+    this.clientOptions = clientOptions !== undefined ? clientOptions : {};
+    if (agent !== undefined && this.clientOptions.agent === undefined) {
+      this.clientOptions.agent = agent;
+    }
+    if (clientTls !== undefined && this.clientOptions.tls === undefined) {
+      this.clientOptions.tls = clientTls;
+    }
+    if (logLevel !== undefined && logger === undefined) {
+      // only logLevel is passed
+      this.clientOptions.logLevel = logLevel;
+    } else {
+      if (logLevel !== undefined) {
+        // If the constructor has both, logLevel is ignored
+        this.logger.warn(
+          "As `logger` is passed as well, `logLevel` argument won't be used. Set the log level to the `logger` instance instead.",
+        );
+      }
+      // Since v3.4, WebClient starts sharing loggger with App
+      this.clientOptions.logger = this.logger;
+    }
     // the public WebClient instance (app.client) - this one doesn't have a token
     this.client = new WebClient(undefined, this.clientOptions);
 
-    this.axios = axios.create(Object.assign(
-      {
-        httpAgent: agent,
-        httpsAgent: agent,
-      },
-      clientTls,
-    ));
+    this.axios = axios.create({
+      httpAgent: agent,
+      httpsAgent: agent,
+      ...clientTls,
+    });
 
     this.middleware = [];
     this.listeners = [];
 
-    // Check for required arguments of ExpressReceiver
+    // Add clientOptions to InstallerOptions to pass them to @slack/oauth
+    this.installerOptions = {
+      clientOptions: this.clientOptions,
+      ...installerOptions,
+    };
+
+    if (
+      this.developerMode &&
+      this.installerOptions &&
+      (typeof this.installerOptions.callbackOptions === 'undefined' ||
+        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+    ) {
+      // add a custom failure callback for Developer Mode in case they are using OAuth
+      this.logger.debug('adding Developer Mode custom OAuth failure handler');
+      this.installerOptions.callbackOptions = {
+        failure: (error, _installOptions, _req, res) => {
+          this.logger.debug(error);
+          res.writeHead(500, { 'Content-Type': 'text/html' });
+          res.end(`<html><body><h1>OAuth failed!</h1><div>${error}</div></body></html>`);
+        },
+      };
+    }
+
+    // Check for required arguments of HTTPReceiver
     if (receiver !== undefined) {
       this.receiver = receiver;
-    } else {
-      // No custom receiver
-      if (signingSecret === undefined) {
-        throw new AppInitializationError(
-            'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-            'custom receiver.',
-        );
-      } else {
-        // Create default ExpressReceiver
-        this.receiver = new ExpressReceiver({
-          signingSecret,
-          endpoints,
-          processBeforeResponse,
-          clientId,
-          clientSecret,
-          stateSecret,
-          installationStore,
-          installerOptions,
-          scopes,
-          logger: this.logger,
-        });
+    } else if (this.socketMode) {
+      if (appToken === undefined) {
+        throw new AppInitializationError('You must provide an appToken when using Socket Mode');
       }
+      this.logger.debug('Initializing SocketModeReceiver');
+      // Create default SocketModeReceiver
+      this.receiver = new SocketModeReceiver({
+        appToken,
+        clientId,
+        clientSecret,
+        stateSecret,
+        installationStore,
+        scopes,
+        logger,
+        logLevel: this.logLevel,
+        installerOptions: this.installerOptions,
+      });
+    } else if (signingSecret === undefined) {
+      // No custom receiver
+      throw new AppInitializationError(
+        'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
+          'custom receiver.',
+      );
+    } else {
+      this.logger.debug('Initializing HTTPReceiver');
+      // Create default HTTPReceiver
+      this.receiver = new HTTPReceiver({
+        signingSecret,
+        endpoints,
+        processBeforeResponse,
+        clientId,
+        clientSecret,
+        stateSecret,
+        installationStore,
+        scopes,
+        logger,
+        logLevel: this.logLevel,
+        installerOptions: this.installerOptions,
+      });
     }
 
     let usingOauth = false;
-    if ((this.receiver as ExpressReceiver).installer !== undefined
-        && (this.receiver as ExpressReceiver).installer!.authorize !== undefined) {
-      // This supports using the built in ExpressReceiver, declaring your own ExpressReceiver
+    if (
+      (this.receiver as HTTPReceiver).installer !== undefined &&
+      (this.receiver as HTTPReceiver).installer!.authorize !== undefined
+    ) {
+      // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
       // and theoretically, doing a fully custom (non express) receiver that implements OAuth
       usingOauth = true;
     }
@@ -271,20 +353,26 @@ export default class App {
     if (token !== undefined) {
       if (authorize !== undefined || usingOauth) {
         throw new AppInitializationError(
-          `token as well as authorize options or oauth installer options were provided. ${tokenUsage}`,
+          `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
         );
       }
-      this.authorize = singleTeamAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.authorize = singleAuthorization(
+        this.client,
+        {
+          botId,
+          botUserId,
+          botToken: token,
+        },
+        tokenVerificationEnabled,
+      );
     } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `No token, no authorize options, and no oauth installer options provided. ${tokenUsage}`,
+        `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
       );
     } else if (authorize !== undefined && usingOauth) {
-      throw new AppInitializationError(
-        `Both authorize options and oauth installer options provided. ${tokenUsage}`,
-      );
+      throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
     } else if (authorize === undefined && usingOauth) {
-      this.authorize = (this.receiver as ExpressReceiver).installer!.authorize as Authorize;
+      this.authorize = (this.receiver as HTTPReceiver).installer!.authorize;
     } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
     } else {
@@ -319,14 +407,27 @@ export default class App {
   }
 
   /**
+   * Register WorkflowStep middleware
+   *
+   * @param workflowStep global workflow step middleware function
+   */
+  public step(workflowStep: WorkflowStep): this {
+    const m = workflowStep.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+
+  /**
    * Convenience method to call start on the receiver
    *
-   * TODO: args could be defined using a generic constraint from the receiver type
+   * TODO: should replace HTTPReceiver in type definition with a generic that is constrained to Receiver
    *
    * @param args receiver-specific start arguments
    */
-  public start(...args: any[]): Promise<unknown> {
-    return this.receiver.start(...args);
+  public start(
+    ...args: Parameters<HTTPReceiver['start'] | SocketModeReceiver['start']>
+  ): ReturnType<HTTPReceiver['start']> {
+    return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
   public stop(...args: any[]): Promise<unknown> {
@@ -336,19 +437,42 @@ export default class App {
   public event<EventType extends string = string>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+  ): void;
+  public event<EventType extends RegExp = RegExp>(
+    eventName: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
+  ): void;
+  public event<EventType extends EventTypePattern = EventTypePattern>(
+    eventNameOrPattern: EventType,
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
-    this.listeners.push(
-      [onlyEvents, matchEventType(eventName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
+    let invalidEventName = false;
+    if (typeof eventNameOrPattern === 'string') {
+      const name = eventNameOrPattern as string;
+      invalidEventName = name.startsWith('message.');
+    } else if (eventNameOrPattern instanceof RegExp) {
+      const name = (eventNameOrPattern as RegExp).source;
+      invalidEventName = name.startsWith('message\\.');
+    }
+    if (invalidEventName) {
+      throw new AppInitializationError(
+        `Although the document mentions "${eventNameOrPattern}",` +
+          'it is not a valid event type. Use "message" instead. ' +
+          'If you want to filter message events, you can use event.channel_type for it.',
+      );
+    }
+    this.listeners.push([
+      onlyEvents,
+      matchEventType(eventNameOrPattern),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
   // TODO: maybe remove the first two overloads
   public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
   public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(
-    ...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]
-  ): void {
+  public message(...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
       if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
         return matchMessage(patternOrMiddleware);
@@ -356,32 +480,38 @@ export default class App {
       return patternOrMiddleware;
     });
 
-    this.listeners.push(
-      [onlyEvents, matchEventType('message'), ...messageMiddleware] as Middleware<AnyMiddlewareArgs>[],
-    );
+    this.listeners.push([
+      onlyEvents,
+      matchEventType('message'),
+      ...messageMiddleware,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
     callbackId: string | RegExp,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
   ): void;
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut,
-    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>>(
-      constraints: Constraints,
-      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+  public shortcut<
+    Shortcut extends SlackShortcut = SlackShortcut,
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>
+  >(
+    constraints: Constraints,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void;
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut,
-    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>>(
-      callbackIdOrConstraints: string | RegExp | Constraints,
-      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+  public shortcut<
+    Shortcut extends SlackShortcut = SlackShortcut,
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>
+  >(
+    callbackIdOrConstraints: string | RegExp | Constraints,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void {
     const constraints: ShortcutConstraints =
-      (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
-        { callback_id: callbackIdOrConstraints } : callbackIdOrConstraints;
+      typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)
+        ? { callback_id: callbackIdOrConstraints }
+        : callbackIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
-    const unknownConstraintKeys = Object.keys(constraints)
-      .filter(k => (k !== 'callback_id' && k !== 'type'));
+    const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
     if (unknownConstraintKeys.length > 0) {
       this.logger.error(
         `Slack listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
@@ -389,9 +519,11 @@ export default class App {
       return;
     }
 
-    this.listeners.push(
-      [onlyShortcuts, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
+    this.listeners.push([
+      onlyShortcuts,
+      matchConstraints(constraints),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
@@ -400,25 +532,31 @@ export default class App {
     actionId: string | RegExp,
     ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
   ): void;
-  public action<Action extends SlackAction = SlackAction,
-    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
-      constraints: Constraints,
-      // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
-      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
-    ): void;
-  public action<Action extends SlackAction = SlackAction,
-    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>>(
-      actionIdOrConstraints: string | RegExp | Constraints,
-      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
-    ): void {
+  public action<
+    Action extends SlackAction = SlackAction,
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>
+  >(
+    constraints: Constraints,
+    // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+  ): void;
+  public action<
+    Action extends SlackAction = SlackAction,
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>
+  >(
+    actionIdOrConstraints: string | RegExp | Constraints,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+  ): void {
     // Normalize Constraints
     const constraints: ActionConstraints =
-      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-        { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+      typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)
+        ? { action_id: actionIdOrConstraints }
+        : actionIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
-    const unknownConstraintKeys = Object.keys(constraints)
-      .filter(k => (k !== 'action_id' && k !== 'block_id' && k !== 'callback_id' && k !== 'type'));
+    const unknownConstraintKeys = Object.keys(constraints).filter(
+      (k) => k !== 'action_id' && k !== 'block_id' && k !== 'callback_id' && k !== 'type',
+    );
     if (unknownConstraintKeys.length > 0) {
       this.logger.error(
         `Action listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
@@ -426,37 +564,33 @@ export default class App {
       return;
     }
 
-    this.listeners.push(
-      [onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
+    this.listeners.push([onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // TODO: should command names also be regex?
-  public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
-    this.listeners.push(
-      [onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
+  public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
+    this.listeners.push([onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public options<Source extends OptionsSource = OptionsSource>(
+  public options<Source extends OptionsSource = 'block_suggestion'>(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+  // TODO: reflect the type in constraits to Source
   public options<Source extends OptionsSource = OptionsSource>(
     constraints: ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+  // TODO: reflect the type in constraits to Source
   public options<Source extends OptionsSource = OptionsSource>(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void {
     const constraints: ActionConstraints =
-      (typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)) ?
-        { action_id: actionIdOrConstraints } : actionIdOrConstraints;
+      typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)
+        ? { action_id: actionIdOrConstraints }
+        : actionIdOrConstraints;
 
-    this.listeners.push(
-      [onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
+    this.listeners.push([onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public view<ViewActionType extends SlackViewAction = SlackViewAction>(
@@ -469,13 +603,14 @@ export default class App {
   ): void;
   public view<ViewActionType extends SlackViewAction = SlackViewAction>(
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
-    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]): void {
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
+  ): void {
     const constraints: ViewConstraints =
-      (typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)) ?
-        { callback_id: callbackIdOrConstraints, type: 'view_submission' } : callbackIdOrConstraints;
+      typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)
+        ? { callback_id: callbackIdOrConstraints, type: 'view_submission' }
+        : callbackIdOrConstraints;
     // Fail early if the constraints contain invalid keys
-    const unknownConstraintKeys = Object.keys(constraints)
-      .filter(k => (k !== 'callback_id' && k !== 'type'));
+    const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
     if (unknownConstraintKeys.length > 0) {
       this.logger.error(
         `View listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
@@ -484,15 +619,15 @@ export default class App {
     }
 
     if (constraints.type !== undefined && !validViewTypes.includes(constraints.type)) {
-      this.logger.error(
-        `View listener cannot be attached using unknown view event type: ${constraints.type}`,
-      );
+      this.logger.error(`View listener cannot be attached using unknown view event type: ${constraints.type}`);
       return;
     }
 
-    this.listeners.push(
-      [onlyViewActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[],
-    );
+    this.listeners.push([
+      onlyViewActions,
+      matchConstraints(constraints),
+      ...listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public error(errorHandler: ErrorHandler): void {
@@ -504,6 +639,13 @@ export default class App {
    */
   public async processEvent(event: ReceiverEvent): Promise<void> {
     const { body, ack } = event;
+
+    if (this.developerMode) {
+      // log the body of the event
+      // this may contain sensitive info like tokens
+      this.logger.debug(JSON.stringify(body));
+    }
+
     // TODO: when generating errors (such as in the say utility) it may become useful to capture the current context,
     // or even all of the args, as properties of the error. This would give error handling code some ability to deal
     // with "finally" type error situations.
@@ -518,15 +660,31 @@ export default class App {
     // From this point on, we assume that body is not just a key-value map, but one of the types of bodies we expect
     const bodyArg = body as AnyMiddlewareArgs['body'];
 
-    // Initialize context (shallow copy to enforce object identity separation)
-    const source = buildSource(type, conversationId, bodyArg);
-    let authorizeResult;
+    // Check if type event with the authorizations object or if it has a top level is_enterprise_install property
+    const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(bodyArg, type);
+    const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
+    let authorizeResult: AuthorizeResult;
     try {
-      authorizeResult = await this.authorize(source, bodyArg);
+      if (source.isEnterpriseInstall) {
+        authorizeResult = await this.authorize(source as AuthorizeSourceData<true>, bodyArg);
+      } else {
+        authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
+      }
     } catch (error) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+      error.code = 'slack_bolt_authorization_error';
       return this.handleError(error);
+    }
+
+    // Try to set teamId from AuthorizeResult before using one from source
+    if (authorizeResult.teamId === undefined && source.teamId !== undefined) {
+      authorizeResult.teamId = source.teamId;
+    }
+
+    // Try to set enterpriseId from AuthorizeResult before using one from source
+    if (authorizeResult.enterpriseId === undefined && source.enterpriseId !== undefined) {
+      authorizeResult.enterpriseId = source.enterpriseId;
     }
 
     const context: Context = { ...authorizeResult };
@@ -535,8 +693,10 @@ export default class App {
     const createSay = (channelId: string): SayFn => {
       const token = selectToken(context);
       return (message: Parameters<SayFn>[0]) => {
-        const postMessageArguments: ChatPostMessageArguments = (typeof message === 'string') ?
-          { token, text: message, channel: channelId } : { ...message, token, channel: channelId };
+        const postMessageArguments: ChatPostMessageArguments =
+          typeof message === 'string'
+            ? { token, text: message, channel: channelId }
+            : { ...message, token, channel: channelId };
 
         return this.client.chat.postMessage(postMessageArguments);
       };
@@ -547,28 +707,30 @@ export default class App {
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
     const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
       /** Say function might be set below */
-      say?: SayFn
+      say?: SayFn;
       /** Respond function might be set below */
-      respond?: RespondFn,
+      respond?: RespondFn;
       /** Ack function might be set below */
-      ack?: AckFn<any>,
+      ack?: AckFn<any>;
     } = {
       body: bodyArg,
       payload:
-        (type === IncomingEventType.Event) ?
-          (bodyArg as SlackEventMiddlewareArgs['body']).event :
-          (type === IncomingEventType.ViewAction) ?
-            (bodyArg as SlackViewMiddlewareArgs['body']).view :
-            (type === IncomingEventType.Shortcut) ?
-              (bodyArg as SlackShortcutMiddlewareArgs['body']) :
-              (type === IncomingEventType.Action &&
-                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) ?
-                (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0] :
-                (bodyArg as (
-                  Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs |
-                    SlackViewMiddlewareArgs> | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction |
-                      InteractiveMessage>>
-              )['body']),
+        type === IncomingEventType.Event
+          ? (bodyArg as SlackEventMiddlewareArgs['body']).event
+          : type === IncomingEventType.ViewAction
+          ? (bodyArg as SlackViewMiddlewareArgs['body']).view
+          : type === IncomingEventType.Shortcut
+          ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
+          : type === IncomingEventType.Action &&
+            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
+          ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
+          : (bodyArg as (
+              | Exclude<
+                  AnyMiddlewareArgs,
+                  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+                >
+              | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+            )['body']),
     };
 
     // Set aliases
@@ -603,12 +765,10 @@ export default class App {
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = (response: string | RespondArguments): Promise<any> => {
-        const validResponse: RespondArguments =
-            (typeof response === 'string') ? { text: response } : response;
-
-        return this.axios.post(body.response_url, validResponse);
-      };
+      listenerArgs.respond = buildRespondFn(this.axios, body.response_url);
+    } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
+      // This can exist only when view_submission payloads - response_url_enabled: true
+      listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
@@ -620,14 +780,30 @@ export default class App {
     }
 
     // Get the client arg
-    let client = this.client;
+    let { client } = this;
     const token = selectToken(context);
+
     if (token !== undefined) {
-      let pool = this.clients[source.teamId];
-      if (pool === undefined) {
-        pool = this.clients[source.teamId] = new WebClientPool();
+      let pool;
+      const clientOptionsCopy = { ...this.clientOptions };
+      if (authorizeResult.teamId !== undefined) {
+        pool = this.clients[authorizeResult.teamId];
+        if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
+          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
+        }
+        // Add teamId to clientOptions so it can be automatically added to web-api calls
+        clientOptionsCopy.teamId = authorizeResult.teamId;
+      } else if (authorizeResult.enterpriseId !== undefined) {
+        pool = this.clients[authorizeResult.enterpriseId];
+        if (pool === undefined) {
+          // eslint-disable-next-line no-multi-assign
+          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
+        }
       }
-      client = pool.getOrCreate(token, this.clientOptions);
+      if (pool !== undefined) {
+        client = pool.getOrCreate(token, clientOptionsCopy);
+      }
     }
 
     // Dispatch event through the global middleware chain
@@ -657,18 +833,19 @@ export default class App {
                 this.logger,
                 async () =>
                   // When the listener middleware chain is done processing, call the listener without a next fn
-                  listener({ ...listenerArgs as AnyMiddlewareArgs, context, client, logger: this.logger }),
+                  listener({ ...(listenerArgs as AnyMiddlewareArgs), context, client, logger: this.logger }),
               );
             }
           });
 
           const settledListenerResults = await allSettled(listenerResults);
-          const rejectedListenerResults =
-            settledListenerResults.filter(lr => lr.status === 'rejected') as allSettled.PromiseRejection<Error>[];
+          const rejectedListenerResults = settledListenerResults.filter(
+            (lr) => lr.status === 'rejected',
+          ) as allSettled.PromiseRejection<Error>[];
           if (rejectedListenerResults.length === 1) {
             throw rejectedListenerResults[0].reason;
           } else if (rejectedListenerResults.length > 1) {
-            throw new MultipleListenerError(rejectedListenerResults.map(rlr => rlr.reason));
+            throw new MultipleListenerError(rejectedListenerResults.map((rlr) => rlr.reason));
           }
         },
       );
@@ -683,57 +860,14 @@ export default class App {
   private handleError(error: Error): Promise<void> {
     return this.errorHandler(asCodedError(error));
   }
-
 }
 
-const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
+// ----------------------------
+// For the constructor
+
+const tokenUsage =
+  'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
   'should be initialized with oauth installer or authorize.';
-
-const validViewTypes = ['view_closed', 'view_submission'];
-
-/**
- * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
- */
-function buildSource(
-  type: IncomingEventType,
-  channelId: string | undefined,
-  body: AnyMiddlewareArgs['body'],
-): AuthorizeSourceData {
-  // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
-  // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
-
-  // tslint:disable:max-line-length
-  const source: AuthorizeSourceData = {
-    teamId:
-      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).team_id as string :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team.id as string :
-          assertNever(type)),
-    enterpriseId:
-      ((type === IncomingEventType.Event || type === IncomingEventType.Command) ? (body as (SlackEventMiddlewareArgs | SlackCommandMiddlewareArgs)['body']).enterprise_id as string :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs | SlackShortcutMiddlewareArgs)['body']).team.enterprise_id as string :
-          undefined),
-    userId:
-      ((type === IncomingEventType.Event) ?
-        ((typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'string') ? (body as SlackEventMiddlewareArgs['body']).event.user as string :
-          (typeof (body as SlackEventMiddlewareArgs['body']).event.user === 'object') ? (body as SlackEventMiddlewareArgs['body']).event.user.id as string :
-            ((body as SlackEventMiddlewareArgs['body']).event.channel !== undefined && (body as SlackEventMiddlewareArgs['body']).event.channel.creator !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.channel.creator as string :
-              ((body as SlackEventMiddlewareArgs['body']).event.subteam !== undefined && (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by !== undefined) ? (body as SlackEventMiddlewareArgs['body']).event.subteam.created_by as string :
-                undefined) :
-        (type === IncomingEventType.Action || type === IncomingEventType.Options || type === IncomingEventType.ViewAction || type === IncomingEventType.Shortcut) ? (body as (SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs)['body']).user.id as string :
-          (type === IncomingEventType.Command) ? (body as SlackCommandMiddlewareArgs['body']).user_id as string :
-            undefined),
-    conversationId: channelId,
-  };
-  // tslint:enable:max-line-length
-
-  return source;
-}
-
-function isBlockActionOrInteractiveMessageBody(
-  body: SlackActionMiddlewareArgs['body'],
-): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
-  return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
-}
 
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error) => {
@@ -743,30 +877,268 @@ function defaultErrorHandler(logger: Logger): ErrorHandler {
   };
 }
 
-function singleTeamAuthorization(
+// -----------
+// singleAuthorization
+
+function runAuthTestForBotToken(
   client: WebClient,
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
-): Authorize {
+): Promise<{ botUserId: string; botId: string }> {
   // TODO: warn when something needed isn't found
-  const identifiers: Promise<{ botUserId: string, botId: string }> = authorization.botUserId !== undefined &&
-    authorization.botId !== undefined ?
-    Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
-    client.auth.test({ token: authorization.botToken })
-      .then((result) => {
+  return authorization.botUserId !== undefined && authorization.botId !== undefined
+    ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
+    : client.auth.test({ token: authorization.botToken }).then((result) => {
         return {
-          botUserId: (result.user_id as string),
-          botId: (result.bot_id as string),
+          botUserId: result.user_id as string,
+          botId: result.bot_id as string,
         };
       });
+}
 
-  return async () => {
-    return Object.assign({ botToken: authorization.botToken }, await identifiers);
+// the shortened type, which is supposed to be used only in this source file
+type Authorization = Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] };
+
+async function buildAuthorizeResult(
+  isEnterpriseInstall: boolean,
+  authTestResult: Promise<{ botUserId: string; botId: string }>,
+  authorization: Authorization,
+): Promise<AuthorizeResult> {
+  return { isEnterpriseInstall, botToken: authorization.botToken, ...(await authTestResult) };
+}
+
+function singleAuthorization(
+  client: WebClient,
+  authorization: Authorization,
+  tokenVerificationEnabled: boolean,
+): Authorize<boolean> {
+  // As Authorize function has a reference to this local variable,
+  // this local variable can behave as auth.test call result cache for the function
+  let cachedAuthTestResult: Promise<{ botUserId: string; botId: string }>;
+  if (tokenVerificationEnabled) {
+    // call auth.test immediately
+    cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
+    return async ({ isEnterpriseInstall }) => {
+      return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
+    };
+  }
+  return async ({ isEnterpriseInstall }) => {
+    // hold off calling auth.test API until the first access to authorize function
+    cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
+    return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
   };
 }
 
+// ----------------------------
+// For processEvent method
+
+/**
+ * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
+ */
+function buildSource<IsEnterpriseInstall extends boolean>(
+  type: IncomingEventType,
+  channelId: string | undefined,
+  body: AnyMiddlewareArgs['body'],
+  isEnterpriseInstall: IsEnterpriseInstall,
+): AuthorizeSourceData<IsEnterpriseInstall> {
+  // NOTE: potentially something that can be optimized, so that each of these conditions isn't evaluated more than once.
+  // if this makes it prettier, great! but we should probably check perf before committing to any specific optimization.
+
+  const teamId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].team_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].team_id;
+      }
+      return bodyAsEvent.team_id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).team_id;
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
+    ) {
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+
+      // When the app is installed using org-wide deployment, team property will be null
+      if (
+        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
+        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
+      ) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.id;
+      }
+
+      // This is the only place where this function might return undefined
+      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.team_id;
+    }
+
+    return assertNever(type);
+  })();
+
+  const enterpriseId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].enterprise_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].enterprise_id;
+      }
+      return bodyAsEvent.enterprise_id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).enterprise_id;
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
+    ) {
+      // NOTE: no type system backed exhaustiveness check within this group of incoming event types
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+
+      if (
+        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== 'undefined' &&
+        bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise !== null
+      ) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.enterprise.id;
+      }
+
+      // When the app is installed using org-wide deployment, team property will be null
+      if (
+        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
+        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
+      ) {
+        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
+      }
+
+      return undefined;
+    }
+
+    return assertNever(type);
+  })();
+
+  const userId: string | undefined = (() => {
+    if (type === IncomingEventType.Event) {
+      // NOTE: no type system backed exhaustiveness check within this incoming event type
+      const { event } = body as SlackEventMiddlewareArgs['body'];
+      if ('user' in event) {
+        if (typeof event.user === 'string') {
+          return event.user;
+        }
+        if (typeof event.user === 'object') {
+          return event.user.id;
+        }
+      }
+      if ('channel' in event && typeof event.channel !== 'string' && 'creator' in event.channel) {
+        return event.channel.creator;
+      }
+      if ('subteam' in event && event.subteam.created_by !== undefined) {
+        return event.subteam.created_by;
+      }
+      return undefined;
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.ViewAction ||
+      type === IncomingEventType.Shortcut
+    ) {
+      // NOTE: no type system backed exhaustiveness check within this incoming event type
+      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackViewMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.id;
+    }
+
+    if (type === IncomingEventType.Command) {
+      return (body as SlackCommandMiddlewareArgs['body']).user_id;
+    }
+
+    return assertNever(type);
+  })();
+
+  return {
+    userId,
+    isEnterpriseInstall,
+    teamId: teamId as IsEnterpriseInstall extends true ? string | undefined : string,
+    enterpriseId: enterpriseId as IsEnterpriseInstall extends true ? string : string | undefined,
+    conversationId: channelId,
+  };
+}
+
+function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: IncomingEventType): boolean {
+  if (type === IncomingEventType.Event) {
+    const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+    if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
+      return !!bodyAsEvent.authorizations[0].is_enterprise_install;
+    }
+  }
+  // command payloads have this property set as a string
+  if (typeof body.is_enterprise_install === 'string') {
+    return body.is_enterprise_install === 'true';
+  }
+  // all remaining types have a boolean property
+  if (body.is_enterprise_install !== undefined) {
+    return body.is_enterprise_install;
+  }
+  // as a fallback we assume it's a single team installation (but this should never happen)
+  return false;
+}
+
+function isBlockActionOrInteractiveMessageBody(
+  body: SlackActionMiddlewareArgs['body'],
+): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
+  return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
+}
+
+// Returns either a bot token or a user token for client, say()
 function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
-/* Instrumentation */
+function buildRespondFn(
+  axiosInstance: AxiosInstance,
+  response_url: string,
+): (response: string | RespondArguments) => Promise<AxiosResponse> {
+  return async (message: string | RespondArguments) => {
+    const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
+    return axiosInstance.post(response_url, normalizedArgs);
+  };
+}
+
+// ----------------------------
+// For listener registration methods
+
+const validViewTypes = ['view_closed', 'view_submission'];
+
+// ----------------------------
+// Instrumentation
+// Don't change the position of the following code
 addAppMetadata({ name: packageJson.name, version: packageJson.version });

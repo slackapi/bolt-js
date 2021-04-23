@@ -6,7 +6,7 @@ order: 5
 ---
 
 <div class="section-content">
-Bolt アプリは `action` メソッドを用いて、ボタンのクリック、メニューの選択、メッセージショートカットなどのユーザーのアクションをリスニングすることができます。
+Bolt アプリは `action` メソッドを用いて、ボタンのクリック、メニューの選択、メッセージショートカットなどのユーザーのアクションをリッスンすることができます。
 
 アクションは文字列型の `action_id` または RegExp オブジェクトでフィルタリングできます。 `action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントの一意の識別子として機能します。 
 
@@ -17,7 +17,7 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 ```javascript
 // action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される
-app.action('approve_button', async ({ ack, say }) => {
+app.action('approve_button', async ({ ack }) => {
   await ack();
   // アクションを反映してメッセージをアップデート
 });
@@ -29,21 +29,24 @@ app.action('approve_button', async ({ ack, say }) => {
 </summary>
 
 <div class="secondary-content" markdown="0">
-制約付きのオブジェクトを使って、 `callback_id` 、 `block_id` 、および `action_id` (またはそれらの組み合わせ) をリスニングすることができます。オブジェクト内の制約には、文字列型または RegExp オブジェクトを使用できます。
+制約付きのオブジェクトを使って、 `callback_id` 、 `block_id` 、および `action_id` (またはそれらの組み合わせ) をリッスンすることができます。オブジェクト内の制約には、文字列型または RegExp オブジェクトを使用できます。
 </div>
 
 ```javascript
 // action_id が 'select_user' と一致し、block_id が 'assign_ticket' と一致する場合のみミドルウェアが呼び出される
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ action, ack, context }) => {
+  async ({ body, client, ack }) => {
     await ack();
     try {
-      const result = await app.client.reactions.add({
-        token: context.botToken,
-        name: 'white_check_mark',
-        timestamp: action.ts,
-        channel: action.channel.id
-      });
+      if (body.message) {
+        const result = await client.reactions.add({
+          name: 'white_check_mark',
+          timestamp: body.message.ts,
+          channel: body.channel.id
+        });
+
+        console.log(result);
+      }
     }
     catch (error) {
       console.error(error);

@@ -15,10 +15,10 @@ The `event()` method requires an `eventType` of type string.
 const welcomeChannelId = 'C12345';
 
 // When a user joins the team, send a message in a predefined channel asking them to introduce themselves
-app.event('team_join', async ({ event, context }) => {
+app.event('team_join', async ({ event, client }) => {
   try {
-    const result = await app.client.chat.postMessage({
-      token: context.botToken,
+    // Call chat.postMessage with the built-in client
+    const result = await client.chat.postMessage({
       channel: welcomeChannelId,
       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
@@ -38,7 +38,7 @@ app.event('team_join', async ({ event, context }) => {
 <div class="secondary-content" markdown="0">
 A `message()` listener is equivalent to `event('message')`
 
-You can filter on subtypes of events by using the built-in `matchEventSubtype()` middleware. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
+You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
 </div>
 
 ```javascript

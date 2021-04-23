@@ -1,6 +1,6 @@
 ---
 title: Hubot から Bolt に移行する方法
-order: 2
+order: 3
 slug: hubot-migration
 lang: ja-jp
 layout: tutorial
@@ -55,21 +55,21 @@ Slack では、Hubot アプリはユーザーとの対話型のボットユー�
 > ⚠️ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-your-local-project) と [イベントの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events) を参考にしてください。
 
 #### メッセージのリスニング
-すべての Hubot アプリは、デフォルトでメッセージをリスニングできるので、ボットユーザーがそうするように設定する必要があります。
+すべての Hubot アプリは、デフォルトでメッセージをリッスンできるので、ボットユーザーがそうするように設定する必要があります。
 
-[イベントの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリスニング)、`message group` (プライベートチャンネルのメッセージをリスニング)、`message.im` (アプリのホーム/DM スペースのメッセージをリスニング)、`message.mpim` (マルチパーソン DM のメッセージをリスニング）。
+[イベントの設定](https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリッスン)、`message group` (プライベートチャンネルのメッセージをリッスン)、`message.im` (アプリのホーム/DM スペースのメッセージをリッスン)、`message.mpim` (マルチパーソン DM のメッセージをリッスン）。
 
-ボットがチャンネルのメッセージをリスニングするだけでよい場合は、`message.channels` と`message.groups` をリッスンできます。または、ボットがすべての場所のメッセージをリスニングするようにするには、4 つのメッセージイベントすべてを選択します。
+ボットがチャンネルのメッセージをリッスンするだけでよい場合は、`message.channels` と`message.groups` をリッスンできます。または、ボットがすべての場所のメッセージをリッスンするようにするには、4 つのメッセージイベントすべてを選択します。
 
-ボットにリスニングさせるメッセージイベントの種類を追加して、**Save Changes** をクリックします。
+ボットにリッスンさせるメッセージイベントの種類を追加して、**Save Changes** をクリックします。
 
 #### その他のイベントのリッスン
 使用していた機能に応じて、Hubot アプリはほかのイベントにも応答していたかもしれません。スクリプトを調べて、`react`、`respond`、`presenceChange` が使用されている箇所を特定してください。
-- アプリで `respond` が使用されている場合、`app_mention` イベントをサブスクライブします。これで、ボットユーザーがメンションされる時をリスニングします。
-- アプリで `react` が使用されている場合、`reaction_added` イベントをサブスクライブします。これにより、ボットユーザーがいるチャンネルのメッセージにリアクションが追加される時をリスニングします。
+- アプリで `respond` が使用されている場合、`app_mention` イベントをサブスクライブします。これで、ボットユーザーがメンションされる時をリッスンします。
+- アプリで `react` が使用されている場合、`reaction_added` イベントをサブスクライブします。これにより、ボットユーザーがいるチャンネルのメッセージにリアクションが追加される時をリッスンします。
 - アプリで `presenceChange` が使用されている場合、対応するイベントはありません。このイベントがあなたのボットの機能上重要な場合は、Hubot の使用を継続するか、アプリのロジックを変更する必要があるかもしれません。
 
-> 💡Bolt に追加された利点として、どの [Events API イベント](https://api.slack.com/events) でもリスニングできることが挙げられます。移行が完了すれば、[ユーザーがワークスペースに参加したとき](https://api.slack.com/events/team_join) や [ユーザーがアプリで DM を開いたとき](https://api.slack.com/events/app_home_opened) など、より多くのイベントをリッスンできます。
+> 💡Bolt に追加された利点として、どの [Events API イベント](https://api.slack.com/events) でもリッスンできることが挙げられます。移行が完了すれば、[ユーザーがワークスペースに参加したとき](https://api.slack.com/events/team_join) や [ユーザーがアプリで DM を開いたとき](https://api.slack.com/events/app_home_opened) など、より多くのイベントをリッスンできます。
 
 アプリの機能に対応するイベントを追加 し終えたら、**Save Changes** をクリックします。
 
@@ -81,7 +81,7 @@ Bolt は、`res` を使用せず、Slack からの raw リクエストを公開�
 > ⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、[Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています。](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js)
 
 #### `message()` を使用したパターンのリスニング
-Hubot スクリプトは、`hear()` を使用して、一致するパターンを持つメッセージをリスニングします。代わりに、 Bolt は `message()` を使用して、そのパターンの `string` または `RegExp` を受け入れます。
+Hubot スクリプトは、`hear()` を使用して、一致するパターンを持つメッセージをリッスンします。代わりに、 Bolt は `message()` を使用して、そのパターンの `string` または `RegExp` を受け入れます。
 
 > 👨‍💻👩‍💻コードで `hear()` を使用している箇所はすべて、`message()` を使用するように変更してください。
 
@@ -101,7 +101,7 @@ Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()`
 #### `respond` と `react`
 前のセクションで、Hubot スクリプトで `respond()` が使用されている場合は `app_mention` イベントを、`react()` が使用されている場合は `reaction_added` をサブスクライブするようにアプリを設定しました。
 
-Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリスニングできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
+Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリッスンできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
 
 > 👨‍💻👩‍💻コードで `respond()` が使用されている箇所はすべて、app.event ('app_mention') を使用するように変更してください。`react` が使用されている箇所はすべて `app.event('reaction_added')` に変更してください。
 

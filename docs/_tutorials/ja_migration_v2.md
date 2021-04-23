@@ -1,6 +1,6 @@
 ---
 title: 2.x マイグレーションガイド
-order: 1
+order: 2
 slug: migration-v2
 lang: ja-jp
 layout: tutorial
@@ -60,7 +60,7 @@ app.action('some-action-id', async ({action, ack, say, logger}) => {
 ### グローバルエラーハンドラーによるエラーハンドリング
 
 ```javascript
-app.error((error) => {
+app.error(async (error) => {
   // エラーの詳細をチェックして、メッセージ送信のリトライやアプリの停止などの対処を行う
   console.error(error);
 });

@@ -6,7 +6,7 @@ order: 12
 ---
 
 <div class="section-content">
-<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために <code>view_submission</code> のイベントをリスニングする必要があります。<code>view_submission</code> イベントをリスニングするためには、組み込みの <code>view()</code> メソッドを使用します。
+<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために <code>view_submission</code> のイベントをリッスンする必要があります。<code>view_submission</code> イベントをリッスンするためには、組み込みの <code>view()</code> メソッドを使用します。
 
 <code>view()</code> メソッドは、文字列型または <code>RegeExp</code>型 の <code>callback_id</code> を必要とします。
 
@@ -17,7 +17,7 @@ order: 12
 
 ```javascript
 // モーダルでのデータ送信イベントを処理します
-app.view('view_b', async ({ ack, body, view, context }) => {
+app.view('view_b', async ({ ack, body, view, client }) => {
   // モーダルでのデータ送信イベントを確認
   await ack();
 
@@ -41,8 +41,7 @@ app.view('view_b', async ({ ack, body, view, context }) => {
 
   // ユーザーにメッセージを送信
   try {
-    await app.client.chat.postMessage({
-      token: context.botToken,
+    await client.chat.postMessage({
       channel: user,
       text: msg
     });

@@ -2,8 +2,8 @@
 # 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 title: Bolt
 description: >-
-  A framework that makes Slack app development fast and straight-forward. 
-  With a single interface for Slack’s Web API, Events API, and interactive features, 
+  A framework that makes Slack app development fast and straight-forward.
+  With a single interface for Slack’s Web API, Events API, and interactive features,
   Bolt gives you the full power of the Slack platform out of the box.
 baseurl: /bolt-js
 url: https://slack.dev
@@ -13,9 +13,15 @@ collections:
     output: false
   advanced:
     output: false
+  steps:
+    output: false
+  deployments:
+    output: true
   tutorials:
     output: true
     permalink: /tutorials/:slug
+  reference:
+    output: true
 
 defaults:
   -
@@ -31,15 +37,22 @@ t:
     basic: Basic concepts
     advanced: Advanced concepts
     start: Getting started
+    reference: Reference
+    steps: Workflow steps
+    deployments: Deployments
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念
     advanced: 応用コンセプト
     start: Bolt 入門ガイド
+    steps: ワークフローステップ
+    # TODO: translate these title
+    deployments: Deployments
+    reference: リファレンス
     contribute: 貢献
 
 # Metadata
-repo_name: bolt
+repo_name: bolt-js
 github_username: SlackAPI
 
 code_of_conduct_url: https://slackhq.github.io/code-of-conduct

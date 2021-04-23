@@ -8,7 +8,7 @@ order: 2
 <div class="section-content">
 Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming event.
 
-Custom apps installed on a single workspace can simply use the `token` option at the time of `App` initialization. However, when your app needs to handle several tokens, such as cases where it will be installed on multiple workspaces or needs access to more than one user token, the `authorize` option should be used instead.
+Custom apps installed on a single workspace can simply use the `token` option at the time of `App` initialization. However, when your app needs to handle several tokens, such as cases where it will be installed on multiple workspaces or needs access to more than one user token, the `authorize` option should be used instead. <b>If you're using the [built-in OAuth support](#authenticating-oauth) authorization is handled by default, so you do not need to pass in an `authorize` option.</b>
 
 The `authorize` option can be set to a function that takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who and where the event is coming from by using properties like `teamId` (always available), `userId`, `conversationId`, and `enterpriseId`.
 

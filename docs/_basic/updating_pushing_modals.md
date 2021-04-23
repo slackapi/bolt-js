@@ -19,15 +19,17 @@ Learn more about updating and pushing views in our <a href="https://api.slack.co
 
 ```javascript
 // Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)
-app.action('button_abc', async ({ ack, body, context }) => {
+app.action('button_abc', async ({ ack, body, client }) => {
   // Acknowledge the button request
   await ack();
 
   try {
-    const result = await app.client.views.update({
-      token: context.botToken,
+    // Call views.update with the built-in client
+    const result = await client.views.update({
       // Pass the view_id
       view_id: body.view.id,
+      // Pass the current hash to avoid race conditions
+      hash: body.view.hash,
       // View payload with updated blocks
       view: {
         type: 'modal',

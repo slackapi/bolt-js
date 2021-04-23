@@ -1,6 +1,6 @@
 ---
 title: Migrating to V2
-order: 1
+order: 2
 slug: migration-v2
 lang: en
 layout: tutorial
@@ -60,7 +60,7 @@ app.action('some-action-id', async ({action, ack, say, logger}) => {
 #### Handling Errors with the Global Error Handler
 
 ```javascript
-app.error((error) => {
+app.error(async (error) => {
   // Check the details of the error to handle cases where you should retry sending a message or stop the app
   console.error(error);
 });

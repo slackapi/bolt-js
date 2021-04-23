@@ -1,0 +1,15 @@
+{
+  "name": "bolt-js-heroku-app",
+  "version": "1.0.0",
+  "description": "Deploying to Heroku ⚡️ Bolt for JavaScript",
+  "main": "app.js",
+  "scripts": {
+    "ngrok": "ngrok http 3000",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.2.0"
+  }
+}
