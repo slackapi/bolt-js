@@ -32,13 +32,13 @@ export interface MenuSelect {
 export interface InteractiveMessage<Action extends InteractiveAction = InteractiveAction> {
   type: 'interactive_message';
   callback_id: string;
-  actions: [Action];
+  actions: Action[];
   team: {
     id: string;
     domain: string;
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
-  };
+  } | null;
   user: {
     id: string;
     name: string;
@@ -58,7 +58,14 @@ export interface InteractiveMessage<Action extends InteractiveAction = Interacti
   // system express that?
   message_ts?: string;
   // NOTE: the original_message is not available from ephemeral messages
-  original_message?: { [key: string]: string; };
+  original_message?: { [key: string]: string };
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
 
 /*

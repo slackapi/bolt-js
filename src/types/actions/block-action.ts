@@ -22,7 +22,8 @@ export type BlockElementAction =
   | OverflowAction
   | DatepickerAction
   | RadioButtonsAction
-  | CheckboxesAction;
+  | CheckboxesAction
+  | PlainTextInputAction;
 
 /**
  * Any action from Slack's interactive elements
@@ -52,7 +53,7 @@ export interface ButtonAction extends BasicElementAction<'button'> {
  */
 export interface StaticSelectAction extends BasicElementAction<'static_select'> {
   selected_option: {
-    text: PlainTextElement,
+    text: PlainTextElement;
     value: string;
   };
   initial_option?: Option;
@@ -64,13 +65,11 @@ export interface StaticSelectAction extends BasicElementAction<'static_select'> 
  * An action from a multi select menu with static options
  */
 export interface MultiStaticSelectAction extends BasicElementAction<'multi_static_select'> {
-  selected_options: [
-    {
-      text: PlainTextElement,
-      value: string;
-    }
-  ];
-  initial_options?: [Option];
+  selected_options: {
+    text: PlainTextElement;
+    value: string;
+  }[];
+  initial_options?: Option[];
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
 }
@@ -89,8 +88,8 @@ export interface UsersSelectAction extends BasicElementAction<'users_select'> {
  * An action from a multi select menu with user list
  */
 export interface MultiUsersSelectAction extends BasicElementAction<'multi_users_select'> {
-  selected_users: [string];
-  initial_users?: [string];
+  selected_users: string[];
+  initial_users?: string[];
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
 }
@@ -109,8 +108,8 @@ export interface ConversationsSelectAction extends BasicElementAction<'conversat
  * An action from a multi select menu with conversations list
  */
 export interface MultiConversationsSelectAction extends BasicElementAction<'multi_conversations_select'> {
-  selected_conversations: [string];
-  initial_conversations?: [string];
+  selected_conversations: string[];
+  initial_conversations?: string[];
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
 }
@@ -129,8 +128,8 @@ export interface ChannelsSelectAction extends BasicElementAction<'channels_selec
  * An action from a multi select menu with channels list
  */
 export interface MultiChannelsSelectAction extends BasicElementAction<'multi_channels_select'> {
-  selected_channels: [string];
-  initial_channels?: [string];
+  selected_channels: string[];
+  initial_channels?: string[];
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
 }
@@ -150,8 +149,8 @@ export interface ExternalSelectAction extends BasicElementAction<'external_selec
  * An action from a multi select menu with external data source
  */
 export interface MultiExternalSelectAction extends BasicElementAction<'multi_external_select'> {
-  selected_options?: [Option];
-  initial_options?: [Option];
+  selected_options?: Option[];
+  initial_options?: Option[];
   placeholder?: PlainTextElement;
   min_query_length?: number;
   confirm?: Confirmation;
@@ -162,7 +161,7 @@ export interface MultiExternalSelectAction extends BasicElementAction<'multi_ext
  */
 export interface OverflowAction extends BasicElementAction<'overflow'> {
   selected_option: {
-    text: PlainTextElement,
+    text: PlainTextElement;
     value: string;
   };
   confirm?: Confirmation;
@@ -172,7 +171,7 @@ export interface OverflowAction extends BasicElementAction<'overflow'> {
  * An action from a date picker element
  */
 export interface DatepickerAction extends BasicElementAction<'datepicker'> {
-  selected_date: string;
+  selected_date: string | null;
   initial_date?: string;
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
@@ -182,7 +181,7 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
  * An action from a radio button element
  */
 export interface RadioButtonsAction extends BasicElementAction<'radio_buttons'> {
-  selected_option: Option;
+  selected_option: Option | null;
   initial_option?: Option;
   confirm?: Confirmation;
 }
@@ -197,19 +196,26 @@ export interface CheckboxesAction extends BasicElementAction<'checkboxes'> {
 }
 
 /**
+ *  An action from a plain_text_input element (must use dispatch_action: true)
+ */
+export interface PlainTextInputAction extends BasicElementAction<'plain_text_input'> {
+  value: string;
+}
+
+/**
  * A Slack Block Kit element action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack's Block Kit interactive components.
  */
 export interface BlockAction<ElementAction extends BasicElementAction = BlockElementAction> {
   type: 'block_actions';
-  actions: [ElementAction];
+  actions: ElementAction[];
   team: {
     id: string;
     domain: string;
     enterprise_id?: string; // undocumented
     enterprise_name?: string; // undocumented
-  };
+  } | null;
   user: {
     id: string;
     name: string;
@@ -237,6 +243,13 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
 
   // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
   app_unfurl?: any;
+
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
 
 /*
@@ -252,3 +265,4 @@ export type BlockOverflowAction = BlockAction<OverflowAction>;
 export type BlockDatepickerAction = BlockAction<DatepickerAction>;
 export type BlockRadioButtonsAction = BlockAction<RadioButtonsAction>;
 export type BlockCheckboxesAction = BlockAction<CheckboxesAction>;
+export type BlockPlainTextInputAction = BlockAction<PlainTextInputAction>;

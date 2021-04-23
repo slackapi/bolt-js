@@ -1,0 +1,10 @@
+ignore:
+  - "examples/"  # ignore examples folder and all its contents
+coverage:
+  status:
+    project:
+      default:
+        threshold: 2.0%
+    patch:
+      default:
+        target: 50%

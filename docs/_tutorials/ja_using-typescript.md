@@ -1,6 +1,6 @@
 ---
 title: TypeScript での利用ガイド
-order: 3
+order: 4
 slug: using-typescript
 lang: ja-jp
 layout: tutorial
@@ -15,4 +15,4 @@ permalink: /ja-jp/tutorial/using-typescript
 
 ### 最低必須バージョン
 
-`@slack/bolt` の最新のメジャーバージョンは TypeScript 3.7 以上での利用をサポートしています。
+`@slack/bolt` の最新のメジャーバージョンは TypeScript 4.1 以上での利用をサポートしています。

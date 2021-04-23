@@ -7,11 +7,12 @@ Describe your issue here.
 - [ ] enhancement (feature request)
 - [ ] question
 - [ ] documentation related
+- [ ] example code related
 - [ ] testing related
 - [ ] discussion
 
 ### Requirements (place an `x` in each of the `[ ]`)
-* [ ] I've read and understood the [Contributing guidelines](https://github.com/slackapi/bolt/blob/master/.github/contributing.md) and have done my best effort to follow them.
+* [ ] I've read and understood the [Contributing guidelines](https://github.com/slackapi/bolt/blob/main/.github/contributing.md) and have done my best effort to follow them.
 * [ ] I've read and agree to the [Code of Conduct](https://slackhq.github.io/code-of-conduct).
 * [ ] I've searched for any related issues and avoided creating a duplicate issue.
 

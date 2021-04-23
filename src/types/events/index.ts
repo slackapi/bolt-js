@@ -1,4 +1,14 @@
 export * from './base-events';
+export {
+  BotMessageEvent,
+  GenericMessageEvent,
+  MessageRepliedEvent,
+  MeMessageEvent,
+  MessageDeletedEvent,
+  ThreadBroadcastMessageEvent,
+  MessageChangedEvent,
+  EKMAccessDeniedMessageEvent,
+} from './message-events';
 import { SlackEvent, BasicSlackEvent } from './base-events';
 import { StringIndexed } from '../helpers';
 import { SayFn } from '../utilities';
@@ -28,8 +38,19 @@ interface EnvelopedEvent<Event = BasicSlackEvent> extends StringIndexed {
   type: 'event_callback';
   event_id: string;
   event_time: number;
-  // TODO: is this optional?
-  authed_users: string[];
+  // TODO: the two properties below are being deprecated on Feb 24, 2021
+  authed_users?: string[];
+  authed_teams?: string[];
+  is_ext_shared_channel?: boolean;
+  authorizations?: Authorization[];
+}
+
+interface Authorization {
+  enterprise_id: string | null;
+  team_id: string | null;
+  user_id: string;
+  is_bot: boolean;
+  is_enterprise_install?: boolean;
 }
 
 /**
@@ -45,5 +66,6 @@ type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
  * Type function which tests whether or not the given `Event` contains a channel ID context for where the event
  * occurred, and returns `Type` when the test passes. Otherwise this returns `never`.
  */
-type WhenEventHasChannelContext<Event, Type> =
-  Event extends ({ channel: string; } | { item: { channel: string; }; }) ? Type : never;
+type WhenEventHasChannelContext<Event, Type> = Event extends { channel: string } | { item: { channel: string } }
+  ? Type
+  : never;

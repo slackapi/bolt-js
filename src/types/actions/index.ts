@@ -1,9 +1,11 @@
 export * from './block-action';
 export * from './interactive-message';
 export * from './dialog-action';
+export * from './workflow-step-edit';
 
 import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';
+import { WorkflowStepEdit } from './workflow-step-edit';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
 
@@ -21,7 +23,7 @@ import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
  * offered when no generic parameter is bound would be limited to BasicElementAction rather than the union of known
  * actions - ElementAction.
  */
-export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction;
+export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | WorkflowStepEdit;
 
 /**
  * Arguments which listeners and middleware receive to process an action from Slack's Block Kit interactive components,
@@ -32,15 +34,15 @@ export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction;
  * this case `ElementAction` must extend `BasicElementAction`.
  */
 export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> {
-  payload: (
-    Action extends BlockAction<infer ElementAction> ? ElementAction :
-    Action extends InteractiveMessage<infer InteractiveAction> ? InteractiveAction :
-    Action
-  );
+  payload: Action extends BlockAction<infer ElementAction>
+    ? ElementAction
+    : Action extends InteractiveMessage<infer InteractiveAction>
+    ? InteractiveAction
+    : Action;
   action: this['payload'];
   body: Action;
   // all action types except dialog submission have a channel context
-  say: Action extends Exclude<SlackAction, DialogSubmitAction> ? SayFn : never;
+  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : never;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
 }
@@ -49,8 +51,8 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
  * Type function which given an action `A` returns a corresponding type for the `ack()` function. The function is used
  * to acknowledge the receipt (and possibly signal failure) of an action from a listener or middleware.
  */
-type ActionAckFn<A extends SlackAction> =
-  A extends InteractiveMessage ? AckFn<string | SayArguments> :
-  A extends DialogSubmitAction ? AckFn<DialogValidation> :
-  // message action and block actions don't accept any value in the ack response
-  AckFn<void>;
+type ActionAckFn<A extends SlackAction> = A extends InteractiveMessage
+  ? AckFn<string | SayArguments>
+  : A extends DialogSubmitAction
+  ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
+  : AckFn<void>;

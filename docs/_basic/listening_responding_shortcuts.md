@@ -9,7 +9,7 @@ order: 8
 
 The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
-Shortcuts are invokable UI elements within Slack clients. For global shortcuts, they are available in the composer and search menus. For message shortcuts, they are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
+Shortcuts are invokable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
 
@@ -23,7 +23,7 @@ When configuring shortcuts within your app configuration, you'll continue to app
 
 ```javascript
 // The open_modal shortcut opens a plain old modal
-app.shortcut('open_modal', async ({ shortcut, ack, context, client }) => {
+app.shortcut('open_modal', async ({ shortcut, ack, client }) => {
 
   try {
     // Acknowledge shortcut request
@@ -31,8 +31,6 @@ app.shortcut('open_modal', async ({ shortcut, ack, context, client }) => {
 
     // Call the views.open method using one of the built-in WebClients
     const result = await client.views.open({
-      // The token you used to initialize your app is stored in the `context` object
-      token: context.botToken,
       trigger_id: shortcut.trigger_id,
       view: {
         type: "modal",
@@ -84,15 +82,13 @@ app.shortcut('open_modal', async ({ shortcut, ack, context, client }) => {
 
   ```javascript
   // Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
-  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, context, client }) => {
+  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, client }) => {
     try {
       // Acknowledge shortcut request
       await ack();
 
       // Call the views.open method using one of the built-in WebClients
       const result = await client.views.open({
-        // The token you used to initialize your app is stored in the `context` object
-        token: context.botToken,
         trigger_id: shortcut.trigger_id,
         view: {
           type: "modal",

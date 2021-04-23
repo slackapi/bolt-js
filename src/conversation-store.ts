@@ -18,12 +18,14 @@ export interface ConversationStore<ConversationState = any> {
  */
 export class MemoryStore<ConversationState = any> implements ConversationStore<ConversationState> {
   private state: Map<string, { value: ConversationState; expiresAt?: number }> = new Map();
+
   public set(conversationId: string, value: ConversationState, expiresAt?: number): Promise<void> {
     return new Promise((resolve) => {
       this.state.set(conversationId, { value, expiresAt });
       resolve();
     });
   }
+
   public get(conversationId: string): Promise<ConversationState> {
     return new Promise((resolve, reject) => {
       const entry = this.state.get(conversationId);
@@ -60,9 +62,12 @@ export function conversationContext<ConversationState = any>(
       context.updateConversation = (conversation: ConversationState) => store.set(conversationId, conversation);
       try {
         context.conversation = await store.get(conversationId);
-        logger.debug(`Conversation context loaded for ID ${conversationId}`);
+        logger.debug(`Conversation context loaded for ID: ${conversationId}`);
       } catch (error) {
-        logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${error.message}`);
+        if (error.messsage !== undefined && error.message !== 'Conversation not found') {
+          // The conversation data can be expired - error: Conversation expired
+          logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${error.message}`);
+        }
       }
     } else {
       logger.debug('No conversation ID for incoming event');
