@@ -40,7 +40,7 @@ export interface Context extends StringIndexed {
    * A bot token, which starts with `xoxb-`.
    * This value can be used by `say` (preferred over userToken),
    */
-  botToken?: string; // used by `say` (preferred over userToken)
+  botToken?: string;
   /**
    * A bot token, which starts with `xoxp-`.
    * This value can be used by `say` (overridden by botToken),
