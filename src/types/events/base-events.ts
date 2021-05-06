@@ -1,4 +1,4 @@
-import { View } from '@slack/types';
+import { View, MessageAttachment, KnownBlock, Block } from '@slack/types';
 import { MessageEvent as AllMessageEvents } from './message-events';
 
 /**
@@ -152,6 +152,8 @@ export interface AppMentionEvent {
   username: string;
   user?: string;
   text: string;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
   ts: string;
   channel: string;
   event_ts: string;
