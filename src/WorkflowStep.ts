@@ -108,9 +108,8 @@ export type WorkflowStepMiddleware =
   | WorkflowStepSaveMiddleware[]
   | WorkflowStepExecuteMiddleware[];
 
-export type AllWorkflowStepMiddlewareArgs<
-  T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs
-> = T & AllMiddlewareArgs;
+export type AllWorkflowStepMiddlewareArgs<T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs> =
+  T & AllMiddlewareArgs;
 
 /** Constants */
 

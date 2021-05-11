@@ -54,8 +54,7 @@ describe('WorkflowStep', () => {
     it('should not call next if a workflow step event', async () => {
       const ws = new WorkflowStep('test_edit_callback_id', MOCK_CONFIG_SINGLE);
       const middleware = ws.getMiddleware();
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
 
       const fakeNext = sinon.spy();
       fakeEditArgs.next = fakeNext;
@@ -68,8 +67,7 @@ describe('WorkflowStep', () => {
     it('should call next if valid workflow step with mismatched callback_id', async () => {
       const ws = new WorkflowStep('bad_callback_id', MOCK_CONFIG_SINGLE);
       const middleware = ws.getMiddleware();
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
 
       const fakeNext = sinon.spy();
       fakeEditArgs.next = fakeNext;
@@ -82,7 +80,7 @@ describe('WorkflowStep', () => {
     it('should call next if not a workflow step event', async () => {
       const ws = new WorkflowStep('test_view_callback_id', MOCK_CONFIG_SINGLE);
       const middleware = ws.getMiddleware();
-      const fakeViewArgs = (createFakeViewEvent() as unknown) as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeViewArgs = createFakeViewEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
 
       const fakeNext = sinon.spy();
       fakeViewArgs.next = fakeNext;
@@ -109,7 +107,7 @@ describe('WorkflowStep', () => {
       const { validate } = await importWorkflowStep();
 
       // intentionally casting to WorkflowStepConfig to trigger failure
-      const badConfig = ('' as unknown) as WorkflowStepConfig;
+      const badConfig = '' as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'WorkflowStep expects a configuration object as the second argument';
@@ -120,9 +118,9 @@ describe('WorkflowStep', () => {
       const { validate } = await importWorkflowStep();
 
       // intentionally casting to WorkflowStepConfig to trigger failure
-      const badConfig = ({
+      const badConfig = {
         edit: async () => {},
-      } as unknown) as WorkflowStepConfig;
+      } as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'WorkflowStep is missing required keys: save, execute';
@@ -133,11 +131,11 @@ describe('WorkflowStep', () => {
       const { validate } = await importWorkflowStep();
 
       // intentionally casting to WorkflowStepConfig to trigger failure
-      const badConfig = ({
+      const badConfig = {
         edit: async () => {},
         save: {},
         execute: async () => {},
-      } as unknown) as WorkflowStepConfig;
+      } as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'WorkflowStep save property must be a function or an array of functions';
@@ -147,11 +145,9 @@ describe('WorkflowStep', () => {
 
   describe('isStepEvent', () => {
     it('should return true if recognized workflow step payload type', async () => {
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
-      const fakeSaveArgs = (createFakeStepSaveEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
-      const fakeExecuteArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+      const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
         AllMiddlewareArgs;
 
       const { isStepEvent } = await importWorkflowStep();
@@ -166,7 +162,7 @@ describe('WorkflowStep', () => {
     });
 
     it('should return false if not a recognized workflow step payload type', async () => {
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as AnyMiddlewareArgs;
+      const fakeEditArgs = createFakeStepEditAction() as unknown as AnyMiddlewareArgs;
       fakeEditArgs.payload.type = 'invalid_type';
 
       const { isStepEvent } = await importWorkflowStep();
@@ -178,11 +174,9 @@ describe('WorkflowStep', () => {
 
   describe('prepareStepArgs', () => {
     it('should remove next() from all original event args', async () => {
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
-      const fakeSaveArgs = (createFakeStepSaveEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
-      const fakeExecuteArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+      const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
         AllMiddlewareArgs;
 
       const { prepareStepArgs } = await importWorkflowStep();
@@ -230,10 +224,10 @@ describe('WorkflowStep', () => {
 
   describe('step utility functions', () => {
     it('configure should call views.open', async () => {
-      const fakeEditArgs = (createFakeStepEditAction() as unknown) as AllWorkflowStepMiddlewareArgs;
+      const fakeEditArgs = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
 
       const fakeClient = { views: { open: sinon.spy() } };
-      fakeEditArgs.client = (fakeClient as unknown) as WebClient;
+      fakeEditArgs.client = fakeClient as unknown as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
@@ -247,10 +241,10 @@ describe('WorkflowStep', () => {
     });
 
     it('update should call workflows.updateStep', async () => {
-      const fakeSaveArgs = (createFakeStepSaveEvent() as unknown) as AllWorkflowStepMiddlewareArgs;
+      const fakeSaveArgs = createFakeStepSaveEvent() as unknown as AllWorkflowStepMiddlewareArgs;
 
       const fakeClient = { workflows: { updateStep: sinon.spy() } };
-      fakeSaveArgs.client = (fakeClient as unknown) as WebClient;
+      fakeSaveArgs.client = fakeClient as unknown as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
@@ -264,11 +258,11 @@ describe('WorkflowStep', () => {
     });
 
     it('complete should call workflows.stepCompleted', async () => {
-      const fakeExecuteArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
         AllMiddlewareArgs;
 
       const fakeClient = { workflows: { stepCompleted: sinon.spy() } };
-      fakeExecuteArgs.client = (fakeClient as unknown) as WebClient;
+      fakeExecuteArgs.client = fakeClient as unknown as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
@@ -282,11 +276,11 @@ describe('WorkflowStep', () => {
     });
 
     it('fail should call workflows.stepFailed', async () => {
-      const fakeExecuteArgs = (createFakeStepExecuteEvent() as unknown) as SlackWorkflowStepMiddlewareArgs &
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
         AllMiddlewareArgs;
 
       const fakeClient = { workflows: { stepFailed: sinon.spy() } };
-      fakeExecuteArgs.client = (fakeClient as unknown) as WebClient;
+      fakeExecuteArgs.client = fakeClient as unknown as WebClient;
 
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
@@ -302,7 +296,7 @@ describe('WorkflowStep', () => {
 
   describe('processStepMiddleware', () => {
     it('should call each callback in user-provided middleware', async () => {
-      const { next, ...fakeArgs } = (createFakeStepEditAction() as unknown) as AllWorkflowStepMiddlewareArgs;
+      const { next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
       const { processStepMiddleware } = await importWorkflowStep();
 
       const fn1 = sinon.spy((async ({ next }) => {
