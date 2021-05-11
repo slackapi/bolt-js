@@ -53,9 +53,9 @@ export function createFakeLogger(): FakeLogger {
     //   Property '0' is missing in type 'any[]' but required in type '[LogLevel]'.
     // 49     setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
     //                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    setLevel: (sinon.fake() as unknown) as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
-    getLevel: (sinon.fake() as unknown) as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
-    setName: (sinon.fake() as unknown) as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
+    setLevel: sinon.fake() as unknown as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
+    getLevel: sinon.fake() as unknown as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
+    setName: sinon.fake() as unknown as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
     debug: sinon.fake(),
     info: sinon.fake(),
     warn: sinon.fake(),

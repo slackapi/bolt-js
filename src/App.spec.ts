@@ -199,7 +199,7 @@ describe('App', () => {
           withNoopWebClient(),
           withConversationContext(fakeConversationContext),
         );
-        const dummyConvoStore = (Symbol() as unknown) as ConversationStore;
+        const dummyConvoStore = Symbol() as unknown as ConversationStore;
         const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
         // Act
@@ -470,16 +470,18 @@ describe('App', () => {
          * @param orderDown The order it should be called when processing middleware down the chain
          * @param orderUp The order it should be called when processing middleware up the chain
          */
-        const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
-          await delay(100);
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderDown);
-          if (next !== undefined) {
-            await next();
-          }
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderUp);
-        };
+        const assertOrderMiddleware =
+          (orderDown: number, orderUp: number) =>
+          async ({ next }: { next?: NextFn }) => {
+            await delay(100);
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderDown);
+            if (next !== undefined) {
+              await next();
+            }
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderUp);
+          };
 
         app.use(assertOrderMiddleware(1, 8));
         app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -1149,11 +1151,11 @@ describe('App', () => {
           });
 
           // invalid view constraints
-          const invalidViewConstraints1 = ({
+          const invalidViewConstraints1 = {
             callback_id: 'foo',
             type: 'view_submission',
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints1, async ({}) => {
             /* noop */
           });
@@ -1161,11 +1163,11 @@ describe('App', () => {
 
           fakeLogger.error = sinon.fake();
 
-          const invalidViewConstraints2 = ({
+          const invalidViewConstraints2 = {
             callback_id: 'foo',
             type: undefined,
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints2, async ({}) => {
             /* noop */
           });
@@ -1258,11 +1260,11 @@ describe('App', () => {
           });
 
           // invalid view constraints
-          const invalidViewConstraints1 = ({
+          const invalidViewConstraints1 = {
             callback_id: 'foo',
             type: 'view_submission',
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints1, async ({}) => {
             /* noop */
           });
@@ -1270,11 +1272,11 @@ describe('App', () => {
 
           fakeLogger.error = sinon.fake();
 
-          const invalidViewConstraints2 = ({
+          const invalidViewConstraints2 = {
             callback_id: 'foo',
             type: undefined,
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints2, async ({}) => {
             /* noop */
           });
@@ -2033,17 +2035,13 @@ class FakeReceiver implements Receiver {
     this.bolt = bolt;
   };
 
-  public start = sinon.fake(
-    (...params: any[]): Promise<unknown> => {
-      return Promise.resolve([...params]);
-    },
-  );
+  public start = sinon.fake((...params: any[]): Promise<unknown> => {
+    return Promise.resolve([...params]);
+  });
 
-  public stop = sinon.fake(
-    (...params: any[]): Promise<unknown> => {
-      return Promise.resolve([...params]);
-    },
-  );
+  public stop = sinon.fake((...params: any[]): Promise<unknown> => {
+    return Promise.resolve([...params]);
+  });
 
   public async sendEvent(event: ReceiverEvent): Promise<void> {
     return this.bolt?.processEvent(event);
