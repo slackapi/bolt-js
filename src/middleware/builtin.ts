@@ -13,8 +13,6 @@ import {
   SlackAction,
   SlackShortcut,
   SlashCommand,
-  ViewSubmitAction,
-  ViewClosedAction,
   SlackOptions,
   BlockSuggestion,
   InteractiveMessageSuggestion,
@@ -26,6 +24,7 @@ import {
   BlockElementAction,
   SlackViewAction,
   EventTypePattern,
+  ViewOutput,
 } from '../types';
 import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
@@ -107,10 +106,7 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction | ViewClosedAction }> = async ({
-  view,
-  next,
-}) => {
+export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async ({ view, next }) => {
   // Filter out anything that doesn't have a view
   if (view === undefined) {
     return;
