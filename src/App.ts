@@ -493,14 +493,14 @@ export default class App {
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
-    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
   >(
     constraints: Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
-    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
   >(
     callbackIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
@@ -534,7 +534,7 @@ export default class App {
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
-    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
   >(
     constraints: Constraints,
     // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
@@ -542,7 +542,7 @@ export default class App {
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
-    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
   >(
     actionIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]

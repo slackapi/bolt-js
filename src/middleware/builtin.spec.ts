@@ -43,11 +43,11 @@ describe('matchMessage()', () => {
       // Arrange
       const dummyContext: DummyContext = {};
       const fakeNext = sinon.fake();
-      const fakeArgs = ({
+      const fakeArgs = {
         next: fakeNext,
         event: buildFakeEvent(matchingText),
         context: dummyContext,
-      } as unknown) as MessageMiddlewareArgs;
+      } as unknown as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
 
       // Act
@@ -76,11 +76,11 @@ describe('matchMessage()', () => {
       // Arrange
       const dummyContext = {};
       const fakeNext = sinon.fake();
-      const fakeArgs = ({
+      const fakeArgs = {
         event: buildFakeEvent(nonMatchingText),
         context: dummyContext,
         next: fakeNext,
-      } as unknown) as MessageMiddlewareArgs;
+      } as unknown as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
 
       // Act
@@ -98,11 +98,11 @@ describe('matchMessage()', () => {
       // Arrange
       const dummyContext = {};
       const fakeNext = sinon.fake();
-      const fakeArgs = ({
+      const fakeArgs = {
         event: createFakeMessageEvent([{ type: 'divider' }]),
         context: dummyContext,
         next: fakeNext,
-      } as unknown) as MessageMiddlewareArgs;
+      } as unknown as MessageMiddlewareArgs;
       const { matchMessage } = await importBuiltin();
 
       // Act
@@ -167,11 +167,11 @@ describe('matchMessage()', () => {
 describe('directMention()', () => {
   it('should bail when the context does not provide a bot user ID', async () => {
     // Arrange
-    const fakeArgs = ({
+    const fakeArgs = {
       next: () => Promise.resolve(),
       message: createFakeMessageEvent(),
       context: {},
-    } as unknown) as MessageMiddlewareArgs;
+    } as unknown as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -195,11 +195,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = `<@${fakeBotUserId}> hi`;
     const fakeNext = sinon.fake();
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown) as MessageMiddlewareArgs;
+    } as unknown as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -215,11 +215,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = 'hi';
     const fakeNext = sinon.fake();
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown) as MessageMiddlewareArgs;
+    } as unknown as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -235,11 +235,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = `hello <@${fakeBotUserId}>`;
     const fakeNext = sinon.fake();
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown) as MessageMiddlewareArgs;
+    } as unknown as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -254,11 +254,11 @@ describe('directMention()', () => {
     // Arrange
     const fakeBotUserId = 'B123456';
     const fakeNext = sinon.fake();
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       message: createFakeMessageEvent([{ type: 'divider' }]),
       context: { botUserId: fakeBotUserId },
-    } as unknown) as MessageMiddlewareArgs;
+    } as unknown as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -274,11 +274,11 @@ describe('directMention()', () => {
     const fakeBotUserId = 'B123456';
     const messageText = '<#C12345> hi';
     const fakeNext = sinon.fake();
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       message: createFakeMessageEvent(messageText),
       context: { botUserId: fakeBotUserId },
-    } as unknown) as MessageMiddlewareArgs;
+    } as unknown as MessageMiddlewareArgs;
     const { directMention } = await importBuiltin();
 
     // Act
@@ -295,10 +295,10 @@ describe('ignoreSelf()', () => {
     // Arrange
     const fakeNext = sinon.fake.resolves(null);
     const fakeBotUserId = undefined;
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-    } as unknown) as MemberJoinedOrLeftChannelMiddlewareArgs;
+    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -326,13 +326,13 @@ describe('ignoreSelf()', () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       command: {
         command: '/fakeCommand',
       },
-    } as unknown) as CommandMiddlewareArgs;
+    } as unknown as CommandMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -378,14 +378,14 @@ describe('ignoreSelf()', () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       event: {
         type: 'tokens_revoked',
         user: fakeBotUserId,
       },
-    } as unknown) as TokensRevokedMiddlewareArgs;
+    } as unknown as TokensRevokedMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -401,14 +401,14 @@ describe('ignoreSelf()', () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
-    const fakeArgs = ({
+    const fakeArgs = {
       next: fakeNext,
       context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
       event: {
         type: 'tokens_revoked',
         user: fakeBotUserId,
       },
-    } as unknown) as TokensRevokedMiddlewareArgs;
+    } as unknown as TokensRevokedMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -427,14 +427,14 @@ describe('ignoreSelf()', () => {
     const eventsWhichShouldNotBeFilteredOut = ['member_joined_channel', 'member_left_channel'];
 
     const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => {
-      return ({
+      return {
         next: fakeNext,
         context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
         event: {
           type: eventType,
           user: fakeBotUserId,
         },
-      } as unknown) as MemberJoinedOrLeftChannelMiddlewareArgs;
+      } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
     });
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
