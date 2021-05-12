@@ -148,6 +148,8 @@ export default class SocketModeReceiver implements Receiver {
 
   public start(): Promise<void | WebAPICallResult> {
     // start socket mode client
+    // TODO: We can update the returned type from WebAPICallResult to AppsConnectionsOpenResponse
+    // once we release a newer version of @slack/socket-mode relying on @slack/web-api 6.2
     return this.client.start();
   }
 
