@@ -546,9 +546,7 @@ export interface ReactionRemovedEvent {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  // https://api.slack.com/events/reaction_removed
-  item: {};
+  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
   event_ts: string;
 }
 
