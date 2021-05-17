@@ -75,3 +75,38 @@ expectType<void>(
   }),
 );
 // FIXME: app.options({ type: 'dialog_suggestion', callback_id: 'a' } does not work
+
+const db = {
+  get: (_teamId: String) => { return [{ label: 'l', value: 'v' }]; },
+};
+
+expectType<void>(
+  // Take from https://slack.dev/bolt-js/concepts#options
+  // Example of responding to an external_select options request
+  app.options('external_action', async ({ options, ack }) => {
+    // Get information specific to a team or channel
+    // (modified to satisfy TS compiler)
+    const results = options.team != null ? await db.get(options.team.id) : [];
+
+    if (results) {
+      // (modified to satisfy TS compiler)
+      let options: Option[] = [];
+      // Collect information in options array to send in Slack ack response
+      for (const result of results) {
+        options.push({
+          "text": {
+            "type": "plain_text",
+            "text": result.label
+          },
+          "value": result.value
+        });
+      }
+
+      await ack({
+        "options": options
+      });
+    } else {
+      await ack();
+    }
+  })
+);

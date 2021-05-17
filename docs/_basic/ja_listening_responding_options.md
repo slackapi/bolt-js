@@ -22,7 +22,7 @@ app.options('external_action', async ({ options, ack }) => {
   if (results) {
     let options = [];
     // ack 応答 するために options 配列に情報をプッシュ
-    for (const result in results) {
+    for (const result of results) {
       options.push({
         "text": {
           "type": "plain_text",
