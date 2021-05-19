@@ -81,7 +81,7 @@ const db = {
 };
 
 expectType<void>(
-  // Take from https://slack.dev/bolt-js/concepts#options
+  // Taken from https://slack.dev/bolt-js/concepts#options
   // Example of responding to an external_select options request
   app.options('external_action', async ({ options, ack }) => {
     // Get information specific to a team or channel
