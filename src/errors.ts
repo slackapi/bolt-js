@@ -4,6 +4,11 @@ import type { BufferedIncomingMessage } from './receivers/verify-request';
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
 export interface CodedError extends Error {
   code: string; // This can be a value from ErrorCode, or WebClient's ErrorCode, or a NodeJS error code
+  original?: Error; // AuthorizationError, UnknownError
+  originals?: Error[]; // MultipleListenerError
+  missingProperty?: string; // ContextMissingPropertyError
+  req?: IncomingMessage | BufferedIncomingMessage; // HTTPReceiverDeferredRequestError
+  res?: ServerResponse; // HTTPReceiverDeferredRequestError
 }
 
 export enum ErrorCode {
