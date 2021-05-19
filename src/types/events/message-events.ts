@@ -76,7 +76,7 @@ export interface BotMessageEvent {
   thread_ts?: string;
 }
 
-interface ChannelArchiveMessageEvent {
+export interface ChannelArchiveMessageEvent {
   type: 'message';
   subtype: 'channel_archive';
   team: string;
@@ -88,7 +88,7 @@ interface ChannelArchiveMessageEvent {
   event_ts: string;
 }
 
-interface ChannelJoinMessageEvent {
+export interface ChannelJoinMessageEvent {
   type: 'message';
   subtype: 'channel_join';
   team: string;
@@ -101,7 +101,7 @@ interface ChannelJoinMessageEvent {
   event_ts: string;
 }
 
-interface ChannelLeaveMessageEvent {
+export interface ChannelLeaveMessageEvent {
   type: 'message';
   subtype: 'channel_leave';
   team: string;
@@ -113,7 +113,7 @@ interface ChannelLeaveMessageEvent {
   event_ts: string;
 }
 
-interface ChannelNameMessageEvent {
+export interface ChannelNameMessageEvent {
   type: 'message';
   subtype: 'channel_name';
   team: string;
@@ -127,7 +127,7 @@ interface ChannelNameMessageEvent {
   event_ts: string;
 }
 
-interface ChannelPostingPermissionsMessageEvent {
+export interface ChannelPostingPermissionsMessageEvent {
   type: 'message';
   subtype: 'channel_posting_permissions';
   user: string;
@@ -138,7 +138,7 @@ interface ChannelPostingPermissionsMessageEvent {
   event_ts: string;
 }
 
-interface ChannelPurposeMessageEvent {
+export interface ChannelPurposeMessageEvent {
   type: 'message';
   subtype: 'channel_purpose';
   user: string;
@@ -150,7 +150,7 @@ interface ChannelPurposeMessageEvent {
   event_ts: string;
 }
 
-interface ChannelTopicMessageEvent {
+export interface ChannelTopicMessageEvent {
   type: 'message';
   subtype: 'channel_topic';
   user: string;
@@ -162,7 +162,7 @@ interface ChannelTopicMessageEvent {
   event_ts: string;
 }
 
-interface ChannelUnarchiveMessageEvent {
+export interface ChannelUnarchiveMessageEvent {
   type: 'message';
   subtype: 'channel_unarchive';
   team: string;
@@ -185,7 +185,7 @@ export interface EKMAccessDeniedMessageEvent {
   user: 'UREVOKEDU';
 }
 
-interface FileShareMessageEvent {
+export interface FileShareMessageEvent {
   type: 'message';
   subtype: 'file_share';
   text: string;
