@@ -3,7 +3,16 @@ import { MessageAttachment, KnownBlock, Block } from '@slack/types';
 export type MessageEvent =
   | GenericMessageEvent
   | BotMessageEvent
+  | ChannelArchiveMessageEvent
+  | ChannelJoinMessageEvent
+  | ChannelLeaveMessageEvent
+  | ChannelNameMessageEvent
+  | ChannelPostingPermissionsMessageEvent
+  | ChannelPurposeMessageEvent
+  | ChannelTopicMessageEvent
+  | ChannelUnarchiveMessageEvent
   | EKMAccessDeniedMessageEvent
+  | FileShareMessageEvent
   | MeMessageEvent
   | MessageChangedEvent
   | MessageDeletedEvent
@@ -67,6 +76,104 @@ export interface BotMessageEvent {
   thread_ts?: string;
 }
 
+interface ChannelArchiveMessageEvent {
+  type: 'message';
+  subtype: 'channel_archive';
+  team: string;
+  user: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelJoinMessageEvent {
+  type: 'message';
+  subtype: 'channel_join';
+  team: string;
+  user: string;
+  inviter: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelLeaveMessageEvent {
+  type: 'message';
+  subtype: 'channel_leave';
+  team: string;
+  user: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelNameMessageEvent {
+  type: 'message';
+  subtype: 'channel_name';
+  team: string;
+  user: string;
+  name: string;
+  old_name: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelPostingPermissionsMessageEvent {
+  type: 'message';
+  subtype: 'channel_posting_permissions';
+  user: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelPurposeMessageEvent {
+  type: 'message';
+  subtype: 'channel_purpose';
+  user: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  purpose: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelTopicMessageEvent {
+  type: 'message';
+  subtype: 'channel_topic';
+  user: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  topic: string;
+  ts: string;
+  event_ts: string;
+}
+
+interface ChannelUnarchiveMessageEvent {
+  type: 'message';
+  subtype: 'channel_unarchive';
+  team: string;
+  user: string;
+  channel: string;
+  channel_type: channelTypes;
+  text: string;
+  ts: string;
+  event_ts: string;
+}
+
 export interface EKMAccessDeniedMessageEvent {
   type: 'message';
   subtype: 'ekm_access_denied';
@@ -76,6 +183,25 @@ export interface EKMAccessDeniedMessageEvent {
   ts: string;
   text: string; // This will not have any meaningful content within
   user: 'UREVOKEDU';
+}
+
+interface FileShareMessageEvent {
+  type: 'message';
+  subtype: 'file_share';
+  text: string;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
+  files?: File[];
+  upload?: boolean;
+  display_as_bot?: boolean;
+  x_files?: string[];
+  user: string;
+  parent_user_id?: string;
+  ts: string;
+  thread_ts?: string;
+  channel: string;
+  channel_type: channelTypes;
+  event_ts: string;
 }
 
 export interface MeMessageEvent {
