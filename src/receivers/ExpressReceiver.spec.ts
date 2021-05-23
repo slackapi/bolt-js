@@ -48,16 +48,16 @@ describe('ExpressReceiver', function () {
   };
 
   function buildResponseToVerify(result: any): Response {
-    return ({
+    return {
       status: (code: number) => {
         result.code = code;
-        return ({
+        return {
           send: () => {
             result.sent = true;
           },
-        } as any) as Response;
+        } as any as Response;
       },
-    } as any) as Response;
+    } as any as Response;
   }
 
   describe('constructor', () => {

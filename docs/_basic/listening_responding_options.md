@@ -24,7 +24,7 @@ app.options('external_action', async ({ options, ack }) => {
   if (results) {
     let options = [];
     // Collect information in options array to send in Slack ack response
-    for (const result in results) {
+    for (const result of results) {
       options.push({
         "text": {
           "type": "plain_text",

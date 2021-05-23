@@ -1,4 +1,4 @@
-import { View } from '@slack/types';
+import { View, MessageAttachment, KnownBlock, Block } from '@slack/types';
 import { MessageEvent as AllMessageEvents } from './message-events';
 
 /**
@@ -152,6 +152,8 @@ export interface AppMentionEvent {
   username: string;
   user?: string;
   text: string;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
   ts: string;
   channel: string;
   event_ts: string;
@@ -544,9 +546,7 @@ export interface ReactionRemovedEvent {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  // https://api.slack.com/events/reaction_removed
-  item: {};
+  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
   event_ts: string;
 }
 

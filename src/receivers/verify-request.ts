@@ -9,12 +9,11 @@
  * can be reduced by implementing the equivalent functionality in terms of the functions in this file.
  */
 
-import type { IncomingMessage, ServerResponse } from 'http';
-import type { Logger } from '@slack/logger';
-
 import { createHmac } from 'crypto';
 import rawBody from 'raw-body';
 import tsscmp from 'tsscmp';
+import type { Logger } from '@slack/logger';
+import type { IncomingMessage, ServerResponse } from 'http';
 
 export interface VerifyOptions {
   signingSecret: string;

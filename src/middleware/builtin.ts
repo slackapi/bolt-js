@@ -13,9 +13,10 @@ import {
   SlackAction,
   SlackShortcut,
   SlashCommand,
-  ViewSubmitAction,
-  ViewClosedAction,
-  OptionsRequest,
+  SlackOptions,
+  BlockSuggestion,
+  InteractiveMessageSuggestion,
+  DialogSuggestion,
   InteractiveMessage,
   DialogSubmitAction,
   GlobalShortcut,
@@ -23,6 +24,7 @@ import {
   BlockElementAction,
   SlackViewAction,
   EventTypePattern,
+  ViewOutput,
 } from '../types';
 import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
@@ -76,7 +78,7 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequest }> = async ({ options, next }) => {
+export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOptions }> = async ({ options, next }) => {
   // Filter out any non-options requests
   if (options === undefined) {
     return;
@@ -104,10 +106,7 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction | ViewClosedAction }> = async ({
-  view,
-  next,
-}) => {
+export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async ({ view, next }) => {
   // Filter out anything that doesn't have a view
   if (view === undefined) {
     return;
@@ -385,8 +384,8 @@ function isBlockPayload(
     | SlackActionMiddlewareArgs['payload']
     | SlackOptionsMiddlewareArgs['payload']
     | SlackViewMiddlewareArgs['payload'],
-): payload is BlockElementAction | OptionsRequest<'block_suggestion'> {
-  return (payload as BlockElementAction | OptionsRequest<'block_suggestion'>).action_id !== undefined;
+): payload is BlockElementAction | BlockSuggestion {
+  return (payload as BlockElementAction | BlockSuggestion).action_id !== undefined;
 }
 
 type CallbackIdentifiedBody =
@@ -394,7 +393,8 @@ type CallbackIdentifiedBody =
   | DialogSubmitAction
   | MessageShortcut
   | GlobalShortcut
-  | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
+  | InteractiveMessageSuggestion
+  | DialogSuggestion;
 
 function isCallbackIdentifiedBody(
   body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],

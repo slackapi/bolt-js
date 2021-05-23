@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc -p .",
-    "build:watch": "tsc -w -p ./src",
+    "build:watch": "tsc -w -p .",
     "start": "npm run build && node dist/app.js"
   },
   "license": "MIT",

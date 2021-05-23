@@ -4,6 +4,7 @@ import { ListenOptions } from 'net';
 import { parse as qsParse } from 'querystring';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
+import { URL } from 'url';
 
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
