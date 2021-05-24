@@ -46,12 +46,20 @@ Before you can deploy your app to Heroku, you'll need a Git repository. If you a
 
 **2. Add a Procfile**
 
-Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. A Bolt Slack app will be started as a web server with a public web address.
+Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. The contents of the file will depend on whether or not you are using Socket Mode. 
 
-Create a new file called `Procfile` (without any extension) in your app's root directory anad paste the following:
+Create a new file called `Procfile` (without any extension) in your app's root directory and paste in one of the following, depending on how you're running your app.
+
+By default, a Bolt Slack app will be started as a web server with a public web address:
 
 ```yaml
 web: node app.js
+```
+
+Apps using Socket Mode are started as workers that do not listen to a port:
+
+```yaml
+worker: node app.js
 ```
 
 Once you've saved the file, let's commit it to your Git repository:
