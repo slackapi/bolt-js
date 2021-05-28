@@ -109,7 +109,11 @@ export default class AwsLambdaReceiver implements Receiver {
 
       const rawBody: string = typeof awsEvent.body === 'undefined' || awsEvent.body == null ? '' : awsEvent.body;
 
-      const body: any = this.parseRequestBody(rawBody, awsEvent.headers['Content-Type'], this.logger);
+      const body: any = this.parseRequestBody(
+        rawBody,
+        this.getHeaderValue(awsEvent.headers, 'Content-Type'),
+        this.logger,
+      );
 
       // ssl_check (for Slash Commands)
       if (
@@ -122,8 +126,8 @@ export default class AwsLambdaReceiver implements Receiver {
       }
 
       // request signature verification
-      const signature = awsEvent.headers['X-Slack-Signature'] as string;
-      const ts = Number(awsEvent.headers['X-Slack-Request-Timestamp']);
+      const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
+      const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
       if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
         return Promise.resolve({ statusCode: 401, body: '' });
       }
@@ -242,5 +246,11 @@ export default class AwsLambdaReceiver implements Receiver {
     }
 
     return true;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private getHeaderValue(headers: Record<string, any>, key: string): string | undefined {
+    const caseInsensitivKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
+    return caseInsensitivKey !== undefined ? headers[caseInsensitivKey] : undefined;
   }
 }
