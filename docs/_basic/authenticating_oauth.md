@@ -29,10 +29,11 @@ const app = new App({
   installationStore: {
     storeInstallation: async (installation) => {
       // change the line below so it saves to your database
-      if (installation.isEnterpriseInstall) {
+      if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
         // support for org wide app installation
         return await database.set(installation.enterprise.id, installation);
-      } else {
+      }
+      if (installation.team.id !== undefined) {
         // single team app installation
         return await database.set(installation.team.id, installation);
       }

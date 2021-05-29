@@ -28,10 +28,11 @@ const app = new App({
   installationStore: {
     storeInstallation: async (installation) => {
       // 実際のデータベースに保存するために、ここのコードを変更
-      if (installation.isEnterpriseInstall) {
+      if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
         // OrG 全体へのインストールに対応する場合
         return await database.set(installation.enterprise.id, installation);
-      } else {
+      }
+      if (installation.team.id !== undefined) {
         // 単独のワークスペースへのインストールの場合
         return await database.set(installation.team.id, installation);
       }
