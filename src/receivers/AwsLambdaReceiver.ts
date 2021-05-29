@@ -251,6 +251,6 @@ export default class AwsLambdaReceiver implements Receiver {
   // eslint-disable-next-line class-methods-use-this
   private getHeaderValue(headers: Record<string, any>, key: string): string | undefined {
     const caseInsensitiveKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
-    return caseInsensitivKey !== undefined ? headers[caseInsensitivKey] : undefined;
+    return caseInsensitiveKey !== undefined ? headers[caseInsensitiveKey] : undefined;
   }
 }
