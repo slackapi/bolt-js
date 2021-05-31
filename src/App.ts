@@ -260,8 +260,9 @@ export default class App {
       // Since v3.4, WebClient starts sharing loggger with App
       this.clientOptions.logger = this.logger;
     }
-    // the public WebClient instance (app.client) - this one doesn't have a token
-    this.client = new WebClient(undefined, this.clientOptions);
+    // The public WebClient instance (app.client)
+    // Since v3.4, it can have the passed token in the case of single workspace installation.
+    this.client = new WebClient(token, this.clientOptions);
 
     this.axios = axios.create({
       httpAgent: agent,
