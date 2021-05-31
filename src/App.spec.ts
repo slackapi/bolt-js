@@ -642,6 +642,62 @@ describe('App', () => {
         return overrides;
       }
 
+      describe('authorize', () => {
+        it('should extract valid enterprise_id in a shared channel #935', async () => {
+          // Arrange
+          const fakeAxiosPost = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+          // Act
+          let workedAsExpected = false;
+          const app = new App({
+            receiver: fakeReceiver,
+            authorize: async ({ enterpriseId }) => {
+              if (enterpriseId !== undefined) {
+                throw new Error('the enterprise_id must be undefined in this scenario');
+              }
+              return dummyAuthorizationResult;
+            },
+          });
+          app.event('message', async () => {
+            workedAsExpected = true;
+          });
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              team_id: 'T_connected_grid_workspace',
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'message',
+                text: ':wave: Hi, this is my first message in a Slack Connect channel!',
+                user: 'U111',
+                ts: '1622099033.001500',
+                team: 'T_this_non_grid_workspace',
+                channel: 'C111',
+                channel_type: 'channel',
+              },
+              type: 'event_callback',
+              authorizations: [
+                {
+                  enterprise_id: null,
+                  team_id: 'T_this_non_grid_workspace',
+                  user_id: 'U_authed_user',
+                  is_bot: true,
+                  is_enterprise_install: false,
+                },
+              ],
+              is_ext_shared_channel: true,
+              event_context: '2-message-T_connected_grid_workspace-A111-C111',
+            },
+          });
+
+          // Assert
+          assert.isTrue(workedAsExpected);
+        });
+      });
+
       describe('routing', () => {
         function createReceiverEvents(): ReceiverEvent[] {
           return [
