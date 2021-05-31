@@ -32,7 +32,7 @@ const app = new App({
         // OrG 全体へのインストールに対応する場合
         return await database.set(installation.enterprise.id, installation);
       }
-      if (installation.team.id !== undefined) {
+      if (installation.team !== undefined) {
         // 単独のワークスペースへのインストールの場合
         return await database.set(installation.team.id, installation);
       }

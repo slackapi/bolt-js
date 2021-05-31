@@ -54,7 +54,7 @@ installationStore: {
         // support for org wide app installation
         return await database.set(installation.enterprise.id, installation);
       }
-      if (installation.team.id !== undefined) {
+      if (installation.team !== undefined) {
         // single team app installation
         return await database.set(installation.team.id, installation);
       }
