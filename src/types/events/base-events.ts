@@ -471,6 +471,7 @@ export interface LinkSharedEvent {
   user: string;
   message_ts: string;
   thread_ts?: string;
+  event_ts: string;
   links: {
     domain: string;
     url: string;
