@@ -684,13 +684,16 @@ export interface UserChangeEvent {
       image_512: string;
       image_1024?: string;
       team: string;
-      fields: {
-        [key: string]: {
-          value: string;
-          alt: string;
-        }
-      } | [] | null
-    },
+      fields:
+        | {
+            [key: string]: {
+              value: string;
+              alt: string;
+            };
+          }
+        | []
+        | null;
+    };
     is_admin: boolean;
     is_owner: boolean;
     is_primary_owner: boolean;
@@ -710,7 +713,7 @@ export interface UserChangeEvent {
       enterprise_name: string;
       is_admin: boolean;
       is_owner: boolean;
-      teams: string[];    
+      teams: string[];
     };
   };
 }
