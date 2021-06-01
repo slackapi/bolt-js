@@ -992,12 +992,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   const enterpriseId: string | undefined = (() => {
     if (type === IncomingEventType.Event) {
       const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
-      if (
-        Array.isArray(bodyAsEvent.authorizations) &&
-        bodyAsEvent.authorizations[0] !== undefined &&
-        bodyAsEvent.authorizations[0].enterprise_id !== null
-      ) {
-        return bodyAsEvent.authorizations[0].enterprise_id;
+      if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
+        // The enteprise_id here can be null when the workspace is not in an Enterprise Grid
+        const theId = bodyAsEvent.authorizations[0].enterprise_id;
+        return theId !== null ? theId : undefined;
       }
       return bodyAsEvent.enterprise_id;
     }
