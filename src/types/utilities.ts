@@ -1,9 +1,27 @@
 import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
-import { KnownKeys } from './helpers';
+
+// (issue#951) KnownKeys<ChatPostMessageArguments> no longer works in TypeScript 4.3
+type ChatPostMessageArgumentsKnownKeys =
+  | 'token'
+  | 'channel'
+  | 'text'
+  | 'as_user'
+  | 'attachments'
+  | 'blocks'
+  | 'icon_emoji'
+  | 'icon_url'
+  | 'link_names'
+  | 'mrkdwn'
+  | 'parse'
+  | 'reply_broadcast'
+  | 'thread_ts'
+  | 'unfurl_links'
+  | 'unfurl_media'
+  | 'username';
 
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
 // listener. Therefore, specifying the `channel` argument is not required.
-export type SayArguments = Pick<ChatPostMessageArguments, Exclude<KnownKeys<ChatPostMessageArguments>, 'channel'>> & {
+export type SayArguments = Pick<ChatPostMessageArguments, Exclude<ChatPostMessageArgumentsKnownKeys, 'channel'>> & {
   channel?: string;
 };
 
@@ -13,7 +31,7 @@ export interface SayFn {
 
 export type RespondArguments = Pick<
   ChatPostMessageArguments,
-  Exclude<KnownKeys<ChatPostMessageArguments>, 'channel' | 'text'>
+  Exclude<ChatPostMessageArgumentsKnownKeys, 'channel' | 'text'>
 > & {
   /** Response URLs can be used to send ephemeral messages or in-channel messages using this argument */
   response_type?: 'in_channel' | 'ephemeral';
