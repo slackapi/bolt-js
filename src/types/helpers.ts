@@ -4,13 +4,10 @@
 export type StringIndexed = Record<string, any>;
 
 /**
- * Type function which removes the index signature for the type `T`
+ * @deprecated No longer works in TypeScript 4.3
  */
-export type KnownKeys<T> = {
-  [K in keyof T]: string extends K ? never : number extends K ? never : K;
-} extends { [_ in keyof T]: infer U }
-  ? U
-  : never;
+// @ts-ignore -- ignore unused type parameter warning
+export type KnownKeys<T> = never;
 
 /**
  * Type function which allows either types `T` or `U`, but not both.
