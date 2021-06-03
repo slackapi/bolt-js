@@ -1,4 +1,4 @@
-import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
+import { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
 
 // (issue#951) KnownKeys<ChatPostMessageArguments> no longer works in TypeScript 4.3
 type ChatPostMessageArgumentsKnownKeys =
@@ -26,7 +26,7 @@ export type SayArguments = Pick<ChatPostMessageArguments, Exclude<ChatPostMessag
 };
 
 export interface SayFn {
-  (message: string | SayArguments): Promise<WebAPICallResult>;
+  (message: string | SayArguments): Promise<ChatPostMessageResponse>;
 }
 
 export type RespondArguments = Pick<
