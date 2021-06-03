@@ -3,7 +3,7 @@ import { SocketModeClient } from '@slack/socket-mode';
 import { createServer } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
-import { WebAPICallResult } from '@slack/web-api';
+import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import { renderHtmlForInstallPath } from './render-html-for-install-path';
@@ -146,10 +146,8 @@ export default class SocketModeReceiver implements Receiver {
     this.app = app;
   }
 
-  public start(): Promise<void | WebAPICallResult> {
+  public start(): Promise<AppsConnectionsOpenResponse> {
     // start socket mode client
-    // TODO: We can update the returned type from WebAPICallResult to AppsConnectionsOpenResponse
-    // once we release a newer version of @slack/socket-mode relying on @slack/web-api 6.2
     return this.client.start();
   }
 
