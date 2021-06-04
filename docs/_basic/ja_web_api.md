@@ -17,7 +17,7 @@ Bolt アプリケーションは、トップレベルに `app.client` も持っ�
 
 ```javascript
 // September 30, 2019 11:59:59 PM を Unix エポックタイムで表示
-const whenSeptemberEnds = 1569887999;
+const whenSeptemberEnds = '1569887999';
 
 app.message('wake me up', async ({ message, context }) => {
   try {

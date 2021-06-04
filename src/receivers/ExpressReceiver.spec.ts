@@ -48,16 +48,16 @@ describe('ExpressReceiver', function () {
   };
 
   function buildResponseToVerify(result: any): Response {
-    return ({
+    return {
       status: (code: number) => {
         result.code = code;
-        return ({
+        return {
           send: () => {
             result.sent = true;
           },
-        } as any) as Response;
+        } as any as Response;
       },
-    } as any) as Response;
+    } as any as Response;
   }
 
   describe('constructor', () => {
@@ -383,7 +383,11 @@ describe('ExpressReceiver', function () {
     // ----------------------------
     // runWithValidRequest
 
-    async function runWithValidRequest(req: Request, state: any): Promise<void> {
+    async function runWithValidRequest(
+      req: Request,
+      state: any,
+      signingSecretFn?: () => PromiseLike<string>,
+    ): Promise<void> {
       // Arrange
       const resp = buildResponseToVerify(state);
       const next = (error: any) => {
@@ -391,7 +395,7 @@ describe('ExpressReceiver', function () {
       };
 
       // Act
-      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecretFn || signingSecret);
       // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
     }
@@ -406,6 +410,13 @@ describe('ExpressReceiver', function () {
     it('should verify requests on GCP', async () => {
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state);
+      // Assert
+      assert.isUndefined(state.error);
+    });
+
+    it('should verify requests on GCP using async signingSecret', async () => {
+      const state: any = {};
+      await runWithValidRequest(buildGCPRequest(), state, () => Promise.resolve(signingSecret));
       // Assert
       assert.isUndefined(state.error);
     });

@@ -17,7 +17,7 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 ```javascript
 // action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される
-app.action('approve_button', async ({ ack, say }) => {
+app.action('approve_button', async ({ ack }) => {
   await ack();
   // アクションを反映してメッセージをアップデート
 });
@@ -35,15 +35,18 @@ app.action('approve_button', async ({ ack, say }) => {
 ```javascript
 // action_id が 'select_user' と一致し、block_id が 'assign_ticket' と一致する場合のみミドルウェアが呼び出される
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, action, ack, context }) => {
+  async ({ body, client, ack }) => {
     await ack();
     try {
-      const result = await app.client.reactions.add({
-        token: context.botToken,
-        name: 'white_check_mark',
-        timestamp: action.ts,
-        channel: body.channel.id
-      });
+      if (body.message) {
+        const result = await client.reactions.add({
+          name: 'white_check_mark',
+          timestamp: body.message.ts,
+          channel: body.channel.id
+        });
+
+        console.log(result);
+      }
     }
     catch (error) {
       console.error(error);

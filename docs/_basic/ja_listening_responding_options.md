@@ -2,7 +2,7 @@
 title: オプションのリスニングと応答
 lang: ja-jp
 slug: options
-order: 13
+order: 14
 ---
 
 <div class="section-content">
@@ -22,7 +22,7 @@ app.options('external_action', async ({ options, ack }) => {
   if (results) {
     let options = [];
     // ack 応答 するために options 配列に情報をプッシュ
-    for (const result in results) {
+    for (const result of results) {
       options.push({
         "text": {
           "type": "plain_text",

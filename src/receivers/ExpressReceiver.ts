@@ -18,7 +18,7 @@ import { renderHtmlForInstallPath } from './render-html-for-install-path';
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
 export interface ExpressReceiverOptions {
-  signingSecret: string;
+  signingSecret: string | (() => PromiseLike<string>);
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
@@ -319,7 +319,10 @@ export const respondToUrlVerification: RequestHandler = (req, res, next) => {
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-export function verifySignatureAndParseRawBody(logger: Logger, signingSecret: string): RequestHandler {
+export function verifySignatureAndParseRawBody(
+  logger: Logger,
+  signingSecret: string | (() => PromiseLike<string>),
+): RequestHandler {
   return async (req, res, next) => {
     let stringBody: string;
     // On some environments like GCP (Google Cloud Platform),
@@ -338,7 +341,11 @@ export function verifySignatureAndParseRawBody(logger: Logger, signingSecret: st
     try {
       // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
       // and overwrites `req.body` with the parsed JS object.
-      req.body = verifySignatureAndParseBody(signingSecret, stringBody, req.headers);
+      req.body = verifySignatureAndParseBody(
+        typeof signingSecret === 'string' ? signingSecret : await signingSecret(),
+        stringBody,
+        req.headers,
+      );
     } catch (error) {
       if (error) {
         if (error instanceof ReceiverAuthenticityError) {

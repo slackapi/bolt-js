@@ -16,8 +16,8 @@ You’ll notice in all `action()` examples, `ack()` is used. It is required to c
 </div>
 
 ```javascript
-// Your middleware will be called every time an interactive component with the action_id "approve_button" is triggered
-app.action('approve_button', async ({ ack, say }) => {
+// Your listener function will be called every time an interactive component with the action_id "approve_button" is triggered
+app.action('approve_button', async ({ ack }) => {
   await ack();
   // Update the message to reflect the action
 });
@@ -33,17 +33,21 @@ You can use a constraints object to listen to `callback_id`s, `block_id`s, and `
 </div>
 
 ```javascript
-// Your middleware will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
+// Your listener function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, action, ack, context }) => {
+  async ({ body, client, ack }) => {
     await ack();
     try {
-      const result = await app.client.reactions.add({
-        token: context.botToken,
-        name: 'white_check_mark',
-        timestamp: action.ts,
-        channel: body.channel.id
-      });
+      // Make sure the action isn't from a view (modal or app home)
+      if (body.message) {
+        const result = await client.reactions.add({
+          name: 'white_check_mark',
+          timestamp: body.message.ts,
+          channel: body.channel.id
+        });
+
+        console.log(result);
+      }
     }
     catch (error) {
       console.error(error);

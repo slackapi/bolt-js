@@ -4,7 +4,7 @@ import { SecureContextOptions } from 'tls';
 import util from 'util';
 import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
 import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
 import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
 import {
@@ -80,6 +80,7 @@ export interface AppOptions {
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
   socketMode?: boolean;
   developerMode?: boolean;
+  tokenVerificationEnabled?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -210,6 +211,7 @@ export default class App {
     installerOptions = undefined,
     socketMode = undefined,
     developerMode = false,
+    tokenVerificationEnabled = true,
   }: AppOptions = {}) {
     // this.logLevel = logLevel;
     this.developerMode = developerMode;
@@ -237,15 +239,30 @@ export default class App {
       this.logger.setLevel(this.logLevel);
     }
     this.errorHandler = defaultErrorHandler(this.logger);
-    this.clientOptions = {
-      agent,
-      // App propagates only the log level to WebClient as WebClient has its own logger
-      logLevel: this.logger.getLevel(),
-      tls: clientTls,
-      slackApiUrl: clientOptions !== undefined ? clientOptions.slackApiUrl : undefined,
-    };
-    // the public WebClient instance (app.client) - this one doesn't have a token
-    this.client = new WebClient(undefined, this.clientOptions);
+
+    this.clientOptions = clientOptions !== undefined ? clientOptions : {};
+    if (agent !== undefined && this.clientOptions.agent === undefined) {
+      this.clientOptions.agent = agent;
+    }
+    if (clientTls !== undefined && this.clientOptions.tls === undefined) {
+      this.clientOptions.tls = clientTls;
+    }
+    if (logLevel !== undefined && logger === undefined) {
+      // only logLevel is passed
+      this.clientOptions.logLevel = logLevel;
+    } else {
+      if (logLevel !== undefined) {
+        // If the constructor has both, logLevel is ignored
+        this.logger.warn(
+          "As `logger` is passed as well, `logLevel` argument won't be used. Set the log level to the `logger` instance instead.",
+        );
+      }
+      // Since v3.4, WebClient starts sharing loggger with App
+      this.clientOptions.logger = this.logger;
+    }
+    // The public WebClient instance (app.client)
+    // Since v3.4, it can have the passed token in the case of single workspace installation.
+    this.client = new WebClient(token, this.clientOptions);
 
     this.axios = axios.create({
       httpAgent: agent,
@@ -340,7 +357,15 @@ export default class App {
           `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
         );
       }
-      this.authorize = singleAuthorization(this.client, { botId, botUserId, botToken: token });
+      this.authorize = singleAuthorization(
+        this.client,
+        {
+          botId,
+          botUserId,
+          botToken: token,
+        },
+        tokenVerificationEnabled,
+      );
     } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
         `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
@@ -422,6 +447,21 @@ export default class App {
     eventNameOrPattern: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
   ): void {
+    let invalidEventName = false;
+    if (typeof eventNameOrPattern === 'string') {
+      const name = eventNameOrPattern as string;
+      invalidEventName = name.startsWith('message.');
+    } else if (eventNameOrPattern instanceof RegExp) {
+      const name = (eventNameOrPattern as RegExp).source;
+      invalidEventName = name.startsWith('message\\.');
+    }
+    if (invalidEventName) {
+      throw new AppInitializationError(
+        `Although the document mentions "${eventNameOrPattern}",` +
+          'it is not a valid event type. Use "message" instead. ' +
+          'If you want to filter message events, you can use event.channel_type for it.',
+      );
+    }
     this.listeners.push([
       onlyEvents,
       matchEventType(eventNameOrPattern),
@@ -454,14 +494,14 @@ export default class App {
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
-    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
   >(
     constraints: Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
-    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>
+    Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
   >(
     callbackIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
@@ -495,7 +535,7 @@ export default class App {
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
-    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
   >(
     constraints: Constraints,
     // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
@@ -503,7 +543,7 @@ export default class App {
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
-    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>
+    Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
   >(
     actionIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
@@ -528,19 +568,20 @@ export default class App {
     this.listeners.push([onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // TODO: should command names also be regex?
-  public command(commandName: string, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
+  public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
     this.listeners.push([onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public options<Source extends OptionsSource = OptionsSource>(
+  public options<Source extends OptionsSource = 'block_suggestion'>(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+  // TODO: reflect the type in constraits to Source
   public options<Source extends OptionsSource = OptionsSource>(
     constraints: ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void;
+  // TODO: reflect the type in constraits to Source
   public options<Source extends OptionsSource = OptionsSource>(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
@@ -725,11 +766,10 @@ export default class App {
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = (response: string | RespondArguments): Promise<any> => {
-        const validResponse: RespondArguments = typeof response === 'string' ? { text: response } : response;
-
-        return this.axios.post(body.response_url, validResponse);
-      };
+      listenerArgs.respond = buildRespondFn(this.axios, body.response_url);
+    } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
+      // This can exist only when view_submission payloads - response_url_enabled: true
+      listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
@@ -823,11 +863,74 @@ export default class App {
   }
 }
 
+// ----------------------------
+// For the constructor
+
 const tokenUsage =
   'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
   'should be initialized with oauth installer or authorize.';
 
-const validViewTypes = ['view_closed', 'view_submission'];
+function defaultErrorHandler(logger: Logger): ErrorHandler {
+  return (error) => {
+    logger.error(error);
+
+    return Promise.reject(error);
+  };
+}
+
+// -----------
+// singleAuthorization
+
+function runAuthTestForBotToken(
+  client: WebClient,
+  authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
+): Promise<{ botUserId: string; botId: string }> {
+  // TODO: warn when something needed isn't found
+  return authorization.botUserId !== undefined && authorization.botId !== undefined
+    ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
+    : client.auth.test({ token: authorization.botToken }).then((result) => {
+        return {
+          botUserId: result.user_id as string,
+          botId: result.bot_id as string,
+        };
+      });
+}
+
+// the shortened type, which is supposed to be used only in this source file
+type Authorization = Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] };
+
+async function buildAuthorizeResult(
+  isEnterpriseInstall: boolean,
+  authTestResult: Promise<{ botUserId: string; botId: string }>,
+  authorization: Authorization,
+): Promise<AuthorizeResult> {
+  return { isEnterpriseInstall, botToken: authorization.botToken, ...(await authTestResult) };
+}
+
+function singleAuthorization(
+  client: WebClient,
+  authorization: Authorization,
+  tokenVerificationEnabled: boolean,
+): Authorize<boolean> {
+  // As Authorize function has a reference to this local variable,
+  // this local variable can behave as auth.test call result cache for the function
+  let cachedAuthTestResult: Promise<{ botUserId: string; botId: string }>;
+  if (tokenVerificationEnabled) {
+    // call auth.test immediately
+    cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
+    return async ({ isEnterpriseInstall }) => {
+      return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
+    };
+  }
+  return async ({ isEnterpriseInstall }) => {
+    // hold off calling auth.test API until the first access to authorize function
+    cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
+    return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
+  };
+}
+
+// ----------------------------
+// For processEvent method
 
 /**
  * Helper which builds the data structure the authorize hook uses to provide tokens for the context.
@@ -889,12 +992,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   const enterpriseId: string | undefined = (() => {
     if (type === IncomingEventType.Event) {
       const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
-      if (
-        Array.isArray(bodyAsEvent.authorizations) &&
-        bodyAsEvent.authorizations[0] !== undefined &&
-        bodyAsEvent.authorizations[0].enterprise_id !== null
-      ) {
-        return bodyAsEvent.authorizations[0].enterprise_id;
+      if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
+        // The enteprise_id here can be null when the workspace is not in an Enterprise Grid
+        const theId = bodyAsEvent.authorizations[0].enterprise_id;
+        return theId !== null ? theId : undefined;
       }
       return bodyAsEvent.enterprise_id;
     }
@@ -1016,37 +1117,27 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-function defaultErrorHandler(logger: Logger): ErrorHandler {
-  return (error) => {
-    logger.error(error);
-
-    return Promise.reject(error);
-  };
-}
-
-function singleAuthorization(
-  client: WebClient,
-  authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
-): Authorize<boolean> {
-  // TODO: warn when something needed isn't found
-  const identifiers: Promise<{ botUserId: string; botId: string }> =
-    authorization.botUserId !== undefined && authorization.botId !== undefined
-      ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
-      : client.auth.test({ token: authorization.botToken }).then((result) => {
-          return {
-            botUserId: result.user_id as string,
-            botId: result.bot_id as string,
-          };
-        });
-
-  return async ({ isEnterpriseInstall }) => {
-    return { isEnterpriseInstall, botToken: authorization.botToken, ...(await identifiers) };
-  };
-}
-
+// Returns either a bot token or a user token for client, say()
 function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
-/* Instrumentation */
+function buildRespondFn(
+  axiosInstance: AxiosInstance,
+  response_url: string,
+): (response: string | RespondArguments) => Promise<AxiosResponse> {
+  return async (message: string | RespondArguments) => {
+    const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
+    return axiosInstance.post(response_url, normalizedArgs);
+  };
+}
+
+// ----------------------------
+// For listener registration methods
+
+const validViewTypes = ['view_closed', 'view_submission'];
+
+// ----------------------------
+// Instrumentation
+// Don't change the position of the following code
 addAppMetadata({ name: packageJson.name, version: packageJson.version });

@@ -54,6 +54,23 @@ describe('App', () => {
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
         assert.instanceOf(app, App);
       });
+      it('should pass the given token to app.client', async () => {
+        // Arrange
+        const fakeBotId = 'B_FAKE_BOT_ID';
+        const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+        );
+        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+        // Act
+        const app = new App({ token: 'xoxb-foo-bar', signingSecret: '' });
+
+        // Assert
+        assert.isDefined(app.client);
+        assert.equal(app.client.token, 'xoxb-foo-bar');
+      });
     });
     it('should succeed with an authorize callback', async () => {
       // Arrange
@@ -199,7 +216,7 @@ describe('App', () => {
           withNoopWebClient(),
           withConversationContext(fakeConversationContext),
         );
-        const dummyConvoStore = (Symbol() as unknown) as ConversationStore;
+        const dummyConvoStore = Symbol() as unknown as ConversationStore;
         const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 
         // Act
@@ -234,6 +251,33 @@ describe('App', () => {
       assert.strictEqual(undefined, token, 'token should be undefined');
       assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
       assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
+    });
+    it('should not perform auth.test API call if tokenVerificationEnabled is false', async () => {
+      // Arrange
+      const fakeConstructor = sinon.fake();
+      const overrides = mergeOverrides(withNoopAppMetadata(), {
+        '@slack/web-api': {
+          WebClient: class {
+            constructor() {
+              fakeConstructor(...arguments);
+            }
+            public auth = {
+              test: () => {
+                throw new Error('This API method call should not be performed');
+              },
+            };
+          },
+        },
+      });
+
+      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention,
+      const app = new App({
+        token: 'xoxb-completely-invalid-token',
+        signingSecret: 'invalid-one',
+        tokenVerificationEnabled: false,
+      });
+      // Assert
+      assert.instanceOf(app, App);
     });
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
@@ -443,16 +487,18 @@ describe('App', () => {
          * @param orderDown The order it should be called when processing middleware down the chain
          * @param orderUp The order it should be called when processing middleware up the chain
          */
-        const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
-          await delay(100);
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderDown);
-          if (next !== undefined) {
-            await next();
-          }
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderUp);
-        };
+        const assertOrderMiddleware =
+          (orderDown: number, orderUp: number) =>
+          async ({ next }: { next?: NextFn }) => {
+            await delay(100);
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderDown);
+            if (next !== undefined) {
+              await next();
+            }
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderUp);
+          };
 
         app.use(assertOrderMiddleware(1, 8));
         app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -560,6 +606,13 @@ describe('App', () => {
         assert(error.code === ErrorCode.MultipleListenerError);
         assert.sameMembers(error.originals, errorsToThrow);
       });
+
+      it('should detect invalid event names', async () => {
+        app.event('app_mention', async () => {});
+        app.event('message', async () => {});
+        assert.throws(() => app.event('message.channels', async () => {}), 'Although the document mentions');
+        assert.throws(() => app.event(/message\..+/, async () => {}), 'Although the document mentions');
+      });
     });
 
     describe('WorkflowStep middleware', () => {
@@ -605,6 +658,62 @@ describe('App', () => {
         );
         return overrides;
       }
+
+      describe('authorize', () => {
+        it('should extract valid enterprise_id in a shared channel #935', async () => {
+          // Arrange
+          const fakeAxiosPost = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+          // Act
+          let workedAsExpected = false;
+          const app = new App({
+            receiver: fakeReceiver,
+            authorize: async ({ enterpriseId }) => {
+              if (enterpriseId !== undefined) {
+                throw new Error('the enterprise_id must be undefined in this scenario');
+              }
+              return dummyAuthorizationResult;
+            },
+          });
+          app.event('message', async () => {
+            workedAsExpected = true;
+          });
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              team_id: 'T_connected_grid_workspace',
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'message',
+                text: ':wave: Hi, this is my first message in a Slack Connect channel!',
+                user: 'U111',
+                ts: '1622099033.001500',
+                team: 'T_this_non_grid_workspace',
+                channel: 'C111',
+                channel_type: 'channel',
+              },
+              type: 'event_callback',
+              authorizations: [
+                {
+                  enterprise_id: null,
+                  team_id: 'T_this_non_grid_workspace',
+                  user_id: 'U_authed_user',
+                  is_bot: true,
+                  is_enterprise_install: false,
+                },
+              ],
+              is_ext_shared_channel: true,
+              event_context: '2-message-T_connected_grid_workspace-A111-C111',
+            },
+          });
+
+          // Assert
+          assert.isTrue(workedAsExpected);
+        });
+      });
 
       describe('routing', () => {
         function createReceiverEvents(): ReceiverEvent[] {
@@ -1110,13 +1219,16 @@ describe('App', () => {
           app.command('/echo', async ({}) => {
             /* noop */
           });
+          app.command(/\/e.*/, async ({}) => {
+            /* noop */
+          });
 
           // invalid view constraints
-          const invalidViewConstraints1 = ({
+          const invalidViewConstraints1 = {
             callback_id: 'foo',
             type: 'view_submission',
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints1, async ({}) => {
             /* noop */
           });
@@ -1124,11 +1236,11 @@ describe('App', () => {
 
           fakeLogger.error = sinon.fake();
 
-          const invalidViewConstraints2 = ({
+          const invalidViewConstraints2 = {
             callback_id: 'foo',
             type: undefined,
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints2, async ({}) => {
             /* noop */
           });
@@ -1221,11 +1333,11 @@ describe('App', () => {
           });
 
           // invalid view constraints
-          const invalidViewConstraints1 = ({
+          const invalidViewConstraints1 = {
             callback_id: 'foo',
             type: 'view_submission',
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints1, async ({}) => {
             /* noop */
           });
@@ -1233,11 +1345,11 @@ describe('App', () => {
 
           fakeLogger.error = sinon.fake();
 
-          const invalidViewConstraints2 = ({
+          const invalidViewConstraints2 = {
             callback_id: 'foo',
             type: undefined,
             unknown_key: 'should be detected',
-          } as any) as ViewConstraints;
+          } as any as ViewConstraints;
           app.view(invalidViewConstraints2, async ({}) => {
             /* noop */
           });
@@ -1253,6 +1365,110 @@ describe('App', () => {
           assert.equal(optionsFn.callCount, 2);
           assert.equal(ackFn.callCount, dummyReceiverEvents.length);
           assert(fakeErrorHandler.notCalled);
+        });
+      });
+
+      describe('command()', () => {
+        it('should respond to exact name matches', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let matchCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command('/hello', async () => {
+            ++matchCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(matchCount, 1);
+        });
+
+        it('should respond to pattern matches', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let matchCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command(/h.*/, async () => {
+            ++matchCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(matchCount, 1);
+        });
+
+        it('should run all matching listeners', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let firstCount = 0;
+          let secondCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command(/h.*/, async () => {
+            ++firstCount;
+          });
+          app.command(/he.*/, async () => {
+            ++secondCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(firstCount, 1);
+          assert.equal(secondCount, 1);
+        });
+
+        it('should not stop at an unsuccessful match', async () => {
+          // Arrange
+          const overrides = buildOverrides([withNoopWebClient()]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          let firstCount = 0;
+          let secondCount = 0;
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.command(/x.*/, async () => {
+            ++firstCount;
+          });
+          app.command(/h.*/, async () => {
+            ++secondCount;
+          });
+          await fakeReceiver.sendEvent({
+            body: {
+              type: 'slash_command',
+              command: '/hello',
+            },
+            ack: noop,
+          });
+
+          // Assert
+          assert.equal(firstCount, 0);
+          assert.equal(secondCount, 1);
         });
       });
 
@@ -1326,6 +1542,51 @@ describe('App', () => {
               team: {},
             },
             ack: noop,
+          });
+
+          // Assert
+          assert.equal(fakeAxiosPost.callCount, 1);
+          // Assert that each call to fakeAxiosPost had the right arguments
+          assert(fakeAxiosPost.calledWith(responseUrl, responseObject));
+        });
+        it('should be able to use respond for view_submission payloads', async () => {
+          // Arrange
+          const responseObject = { text: 'response' };
+          const responseUrl = 'https://fake.slack/response_url';
+          const fakeAxiosPost = sinon.fake.resolves({});
+          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+          // Act
+          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          app.view('view-id', async ({ respond }) => {
+            await respond(responseObject);
+          });
+          app.error(fakeErrorHandler);
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              type: 'view_submission',
+              team: {},
+              user: {},
+              view: {
+                id: 'V111',
+                type: 'modal',
+                callback_id: 'view-id',
+                state: {},
+                title: {},
+                close: {},
+                submit: {},
+              },
+              response_urls: [
+                {
+                  block_id: 'b',
+                  action_id: 'a',
+                  channel_id: 'C111',
+                  response_url: 'https://fake.slack/response_url',
+                },
+              ],
+            },
           });
 
           // Assert
@@ -1847,17 +2108,13 @@ class FakeReceiver implements Receiver {
     this.bolt = bolt;
   };
 
-  public start = sinon.fake(
-    (...params: any[]): Promise<unknown> => {
-      return Promise.resolve([...params]);
-    },
-  );
+  public start = sinon.fake((...params: any[]): Promise<unknown> => {
+    return Promise.resolve([...params]);
+  });
 
-  public stop = sinon.fake(
-    (...params: any[]): Promise<unknown> => {
-      return Promise.resolve([...params]);
-    },
-  );
+  public stop = sinon.fake((...params: any[]): Promise<unknown> => {
+    return Promise.resolve([...params]);
+  });
 
   public async sendEvent(event: ReceiverEvent): Promise<void> {
     return this.bolt?.processEvent(event);

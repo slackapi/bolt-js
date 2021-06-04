@@ -1,6 +1,6 @@
-import { View } from '@slack/types';
+import { View, PlainTextElement } from '@slack/types';
 import { StringIndexed } from '../helpers';
-import { AckFn } from '../utilities';
+import { AckFn, RespondFn } from '../utilities';
 
 /**
  * Known view action types
@@ -19,12 +19,13 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
   view: this['payload'];
   body: ViewActionType;
   ack: ViewAckFn<ViewActionType>;
+  respond: RespondFn;
 }
 
 interface PlainTextElementOutput {
   type: 'plain_text';
   text: string;
-  emoji: boolean;
+  emoji?: boolean;
 }
 
 /**
@@ -116,10 +117,31 @@ export interface ViewWorkflowStepClosedAction extends ViewClosedAction {
   };
 }
 
+export interface ViewStateSelectedOption {
+  text: PlainTextElement;
+  value: string;
+}
+
+export interface ViewStateValue {
+  type: string;
+  value?: string | null;
+  selected_date?: string | null;
+  selected_time?: string | null;
+  selected_conversation?: string | null;
+  selected_channel?: string | null;
+  selected_user?: string | null;
+  selected_option?: ViewStateSelectedOption | null;
+  selected_conversations?: string[];
+  selected_channels?: string[];
+  selected_users?: string[];
+  selected_options?: ViewStateSelectedOption[];
+}
+
 export interface ViewOutput {
   id: string;
   callback_id: string;
   team_id: string;
+  app_installed_team_id?: string;
   app_id: string | null;
   bot_id: string;
   title: PlainTextElementOutput;
@@ -130,7 +152,7 @@ export interface ViewOutput {
   state: {
     values: {
       [blockId: string]: {
-        [actionId: string]: any; // TODO: a union of all the input elements' output payload
+        [actionId: string]: ViewStateValue;
       };
     };
   };

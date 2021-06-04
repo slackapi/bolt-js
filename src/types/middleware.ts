@@ -31,6 +31,40 @@ export interface Middleware<Args> {
   (args: Args & AllMiddlewareArgs): Promise<void>;
 }
 
-export interface Context extends StringIndexed {}
+/**
+ * Context object, which provides contextual information associated with an incoming requests.
+ * You can set any other custom attributes in global middleware as long as the key does not conflict with others.
+ */
+export interface Context extends StringIndexed {
+  /**
+   * A bot token, which starts with `xoxb-`.
+   * This value can be used by `say` (preferred over userToken),
+   */
+  botToken?: string;
+  /**
+   * A bot token, which starts with `xoxp-`.
+   * This value can be used by `say` (overridden by botToken),
+   */
+  userToken?: string;
+  /**
+   * This app's bot ID in the installed workspace.
+   * This is required for `ignoreSelf` global middleware.
+   * see also: https://github.com/slackapi/bolt-js/issues/874
+   */
+  botId?: string;
+  /**
+   * This app's bot user ID in the installed workspace.
+   * This value is optional but allows `ignoreSelf` global middleware be more filter more than just message events.
+   */
+  botUserId?: string;
+  /**
+   * Workspace ID.
+   */
+  teamId?: string;
+  /**
+   * Enterprise Grid Organization ID.
+   */
+  enterpriseId?: string;
+}
 
 export type NextFn = () => Promise<void>;

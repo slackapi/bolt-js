@@ -2,7 +2,7 @@
 title: OAuth フローの実装
 lang: ja-jp
 slug: authenticating-oauth
-order: 14
+order: 15
 ---
 
 <div class="section-content">
@@ -28,10 +28,11 @@ const app = new App({
   installationStore: {
     storeInstallation: async (installation) => {
       // 実際のデータベースに保存するために、ここのコードを変更
-      if (installation.isEnterpriseInstall) {
+      if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
         // OrG 全体へのインストールに対応する場合
         return await database.set(installation.enterprise.id, installation);
-      } else {
+      }
+      if (installation.team !== undefined) {
         // 単独のワークスペースへのインストールの場合
         return await database.set(installation.team.id, installation);
       }

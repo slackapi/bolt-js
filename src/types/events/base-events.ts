@@ -1,4 +1,4 @@
-import { View } from '@slack/types';
+import { View, MessageAttachment, KnownBlock, Block } from '@slack/types';
 import { MessageEvent as AllMessageEvents } from './message-events';
 
 /**
@@ -152,6 +152,8 @@ export interface AppMentionEvent {
   username: string;
   user?: string;
   text: string;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
   ts: string;
   channel: string;
   event_ts: string;
@@ -465,9 +467,11 @@ export interface InviteRequestedEvent {
 export interface LinkSharedEvent {
   type: 'link_shared';
   channel: string;
+  is_bot_user_member: boolean;
   user: string;
   message_ts: string;
   thread_ts?: string;
+  event_ts: string;
   links: {
     domain: string;
     url: string;
@@ -544,9 +548,7 @@ export interface ReactionRemovedEvent {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  // https://api.slack.com/events/reaction_removed
-  item: {};
+  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
   event_ts: string;
 }
 
@@ -646,10 +648,73 @@ export interface TokensRevokedEvent {
 
 export interface UserChangeEvent {
   type: 'user_change';
-  // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
-  // https://api.slack.com/types/user
   user: {
     id: string;
+    team_id: string;
+    name: string;
+    deleted: boolean;
+    color: string;
+    real_name: string;
+    tz: string;
+    tz_label: string;
+    tz_offset: number;
+    profile: {
+      title: string;
+      phone: string;
+      skype: string;
+      real_name: string;
+      real_name_normalized: string;
+      display_name: string;
+      display_name_normalized: string;
+      status_text: string;
+      status_text_canonical: string;
+      status_emoji: string;
+      status_expiration: number;
+      avatar_hash: string;
+      first_name: string;
+      last_name: string;
+      email: string;
+      image_original?: string;
+      is_custom_image?: boolean;
+      image_24: string;
+      image_32: string;
+      image_48: string;
+      image_72: string;
+      image_192: string;
+      image_512: string;
+      image_1024?: string;
+      team: string;
+      fields:
+        | {
+            [key: string]: {
+              value: string;
+              alt: string;
+            };
+          }
+        | []
+        | null;
+    };
+    is_admin: boolean;
+    is_owner: boolean;
+    is_primary_owner: boolean;
+    is_restricted: boolean;
+    is_ultra_restricted: boolean;
+    is_bot: boolean;
+    is_stranger?: boolean;
+    updated: string;
+    is_email_confirmed: boolean;
+    is_app_user: boolean;
+    is_invited_user?: boolean;
+    has_2fa?: boolean;
+    locale: string;
+    enterprise_user?: {
+      id: string;
+      enterprise_id: string;
+      enterprise_name: string;
+      is_admin: boolean;
+      is_owner: boolean;
+      teams: string[];
+    };
   };
 }
 
