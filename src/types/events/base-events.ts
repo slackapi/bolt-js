@@ -154,6 +154,10 @@ export interface AppMentionEvent {
   text: string;
   attachments?: MessageAttachment[];
   blocks?: (KnownBlock | Block)[];
+  edited?: {
+    user: string;
+    ts: string;
+  };
   ts: string;
   channel: string;
   event_ts: string;
