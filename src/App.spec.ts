@@ -54,6 +54,23 @@ describe('App', () => {
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
         assert.instanceOf(app, App);
       });
+      it('should pass the given token to app.client', async () => {
+        // Arrange
+        const fakeBotId = 'B_FAKE_BOT_ID';
+        const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+        );
+        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+        // Act
+        const app = new App({ token: 'xoxb-foo-bar', signingSecret: '' });
+
+        // Assert
+        assert.isDefined(app.client);
+        assert.equal(app.client.token, 'xoxb-foo-bar');
+      });
     });
     it('should succeed with an authorize callback', async () => {
       // Arrange

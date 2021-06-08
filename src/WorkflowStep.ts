@@ -1,4 +1,11 @@
-import { WebAPICallResult, KnownBlock, Block } from '@slack/web-api';
+import {
+  KnownBlock,
+  Block,
+  ViewsOpenResponse,
+  WorkflowsUpdateStepResponse,
+  WorkflowsStepCompletedResponse,
+  WorkflowsStepFailedResponse,
+} from '@slack/web-api';
 import {
   Middleware,
   AllMiddlewareArgs,
@@ -55,19 +62,19 @@ export interface StepFailArguments {
 }
 
 export interface StepConfigureFn {
-  (params: StepConfigureArguments): Promise<WebAPICallResult>;
+  (params: StepConfigureArguments): Promise<ViewsOpenResponse>;
 }
 
 export interface StepUpdateFn {
-  (params?: StepUpdateArguments): Promise<WebAPICallResult>;
+  (params?: StepUpdateArguments): Promise<WorkflowsUpdateStepResponse>;
 }
 
 export interface StepCompleteFn {
-  (params?: StepCompleteArguments): Promise<WebAPICallResult>;
+  (params?: StepCompleteArguments): Promise<WorkflowsStepCompletedResponse>;
 }
 
 export interface StepFailFn {
-  (params: StepFailArguments): Promise<WebAPICallResult>;
+  (params: StepFailArguments): Promise<WorkflowsStepFailedResponse>;
 }
 
 export interface WorkflowStepConfig {
