@@ -1,10 +1,10 @@
 # Deploying to AWS Lambda ⚡️ Bolt for JavaScript
 
-> Slack app example for using the AWSLambdaReceiver of Bolt for JavaScript
+> Slack app example for using the AwsLambdaReceiver of Bolt for JavaScript
 
 ## Overview
 
-This is an example app that updates the [Getting Started ⚡️ Bolt for JavaScript app][bolt-app] to use the AWSLambdaReceiver and be deployed to [AWS Lambda][aws-lambda] using the [Serverless Framework][serverless-framework].
+This is an example app that updates the [Getting Started ⚡️ Bolt for JavaScript app][bolt-app] to use the AwsLambdaReceiver and be deployed to [AWS Lambda][aws-lambda] using the [Serverless Framework][serverless-framework].
 You can learn how to build this example app by following our 📚 [Deploying to AWS Lambda guide][bolt-guide-aws-lambda].
 
 Before you begin, you may want to follow our [Getting Started guide][bolt-guide] to learn how to build your first Slack app using the [Bolt for JavaScript framework][bolt-website].

@@ -110,7 +110,7 @@ Now that you have an app, let's prepare it for AWS Lambda and the Serverless Fra
 
 By default, Bolt listens for HTTP requests. In this section, we'll customize your Bolt app's [`receiver`](https://slack.dev/bolt-js/concepts#receiver) to respond to Lambda function events instead.
 
-First, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's AwsLambda receiver:
+First, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
 ```javascript
 const { App, AwsLambdaReceiver } = require('@slack/bolt');

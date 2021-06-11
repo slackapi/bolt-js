@@ -1,4 +1,4 @@
-service: serverless-lambda-receiver-bolt-js
+service: serverless-aws-lambda-receiver-bolt-js
 frameworkVersion: '2'
 provider:
   name: aws
