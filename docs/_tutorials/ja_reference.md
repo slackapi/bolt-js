@@ -91,7 +91,7 @@ Bolt には、アプリをカスタマイズするためのさまざまな初期
 | :---: | :--- |
 | `signingSecret` | アプリの設定の「Basic Information」から取得した 文字列。受信イベントが Slack から送信されたものであることを検証するために使用されます。 |
 | `endpoints` | レシーバーが Slack からの受信リクエストをリッスンするエンドポイントを指定する文字列または `オブジェクト`。現在、オブジェクトに指定できるキーはラベルとしての任意の文字列のみで、値にはカスタムのエンドポイントを指定します（例 : `/myapp/events`）。**デフォルトでは `/slack/events` というエンドポイントにすべてのイベントが送信されます。** |
-| `processBeforeResponse` | イベントに対して即座に確認の応答を返すどうかを指定する真偽値。これは、主に FaaS プラットフォームでアプリを実行する場合に有用な設定です。Falseに設定することでイベントのリスナーが予期せず終了することを防ぎます。デフォルトは `true` です。  |
+| `processBeforeResponse` | イベントに対して即座に確認の応答を返すどうかを指定する真偽値。これは、主に FaaS プラットフォームでアプリを実行する場合に有用な設定です。 `true` に設定することでイベントのリスナーが予期せず終了することを防ぎます。デフォルトは `false` です。  |
 | `clientId` | アプリの設定で指定した、クライアントの ID を示す 文字列。[OAuth の設定を行うために必要です](/bolt-js/concepts#authenticating-oauth)。 |
 | `clientSecret` | アプリの設定で指定した、クライアントのシークレットキーを示す 文字列。[OAuth の設定を行うために必要です](/bolt-js/concepts#authenticating-oauth)。 |
 | `stateSecret` | CSRF 攻撃を防ぐために [OAuth の設定時](/bolt-js/concepts#authenticating-oauth)に渡すことができる、推奨のパラメーター（文字列）。 |
