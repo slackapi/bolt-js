@@ -89,7 +89,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | :---: | :--- |
 | `signingSecret` | A `string` from your app's configuration (under "Basic Information") which verifies that incoming events are coming from Slack |
 | `endpoints` | A `string` or `object` that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. Currently, the only key for the object is `key`, the value of which is the customizable endpoint (ex: `/myapp/events`). **By default, all events are sent to the `/slack/events` endpoint** |
-| `processBeforeResponse` | `boolean` that determines whether events should be immediately acknowledged. This is primarily useful when running apps on FaaS to ensure events listeners don't unexpectedly terminate by setting it to `false`. Defaults to `true`.  |
+| `processBeforeResponse` | `boolean` that determines whether events should be immediately acknowledged. This is primarily useful when running apps on FaaS to ensure events listeners don't unexpectedly terminate by setting it to `true`. Defaults to `false`.  |
 | `clientId` | The client ID `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `clientSecret` | The client secret `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `stateSecret` | Recommended parameter (`string`) that's passed when [configuring OAuth](/bolt-js/concepts#authenticating-oauth) to prevent CSRF attacks |
