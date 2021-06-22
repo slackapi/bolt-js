@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/naming-convention */
 
-import sinon from 'sinon';
 import { Logger, LogLevel } from '@slack/logger';
-import { assert } from 'chai';
-import 'mocha';
-import AwsLambdaReceiver from './AwsLambdaReceiver';
-import crypto from 'crypto';
-import rewiremock from 'rewiremock';
 import { WebClientOptions } from '@slack/web-api';
+import { Buffer } from 'buffer';
+import { assert } from 'chai';
+import crypto from 'crypto';
+import 'mocha';
+import rewiremock from 'rewiremock';
+import sinon from 'sinon';
+import AwsLambdaReceiver from './AwsLambdaReceiver';
 
 describe('AwsLambdaReceiver', function () {
   beforeEach(function () {});
@@ -322,6 +323,74 @@ describe('AwsLambdaReceiver', function () {
         (_error, _result) => {},
       );
       assert.equal(response2.statusCode, 200);
+    });
+
+    it('should accept an event containing a base64 encoded body', async () => {
+      const awsReceiver = new AwsLambdaReceiver({
+        signingSecret: 'my-secret',
+        logger: noopLogger,
+      });
+      const handler = awsReceiver.toHandler();
+      const timestamp = Math.floor(Date.now() / 1000);
+      const body = JSON.stringify({
+        token: 'fixed-value',
+        team_id: 'T111',
+        enterprise_id: 'E111',
+        api_app_id: 'A111',
+        event: {
+          client_msg_id: '977a7fa8-c9b3-4b51-a0b6-3b6c647e2165',
+          type: 'app_mention',
+          text: '<@U222> test',
+          user: 'W111',
+          ts: '1612879521.002100',
+          team: 'T111',
+          channel: 'C111',
+          event_ts: '1612879521.002100',
+        },
+        type: 'event_callback',
+        event_id: 'Ev111',
+        event_time: 1612879521,
+        authorizations: [
+          {
+            enterprise_id: 'E111',
+            team_id: 'T111',
+            user_id: 'W111',
+            is_bot: true,
+            is_enterprise_install: false,
+          },
+        ],
+        is_ext_shared_channel: false,
+        event_context: '1-app_mention-T111-C111',
+      });
+      const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
+      const awsEvent = {
+        resource: '/slack/events',
+        path: '/slack/events',
+        httpMethod: 'POST',
+        headers: {
+          Accept: 'application/json,*/*',
+          'Content-Type': 'application/json',
+          Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+          'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+          'X-Slack-Request-Timestamp': `${timestamp}`,
+          'X-Slack-Signature': `v0=${signature}`,
+        },
+        multiValueHeaders: {},
+        queryStringParameters: null,
+        multiValueQueryStringParameters: null,
+        pathParameters: null,
+        stageVariables: null,
+        requestContext: {},
+        body: Buffer.from(body).toString('base64'),
+        isBase64Encoded: true,
+      };
+      const response1 = await handler(
+          awsEvent,
+          {},
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          (_error, _result) => {},
+      );
+      assert.equal(response1.statusCode, 404);
     });
   });
 });
