@@ -26,6 +26,8 @@ export interface GenericMessageEvent {
   team?: string;
   channel: string;
   user: string;
+  bot_id?: string;
+  bot_profile?: BotProfile;
   text?: string;
   ts: string;
   thread_ts?: string;
@@ -280,6 +282,18 @@ export interface ThreadBroadcastMessageEvent {
 }
 
 export type channelTypes = 'channel' | 'group' | 'im' | 'mpim' | 'app_home';
+
+interface BotProfile {
+  id: string;
+  name: string;
+  app_id: string;
+  team_id: string;
+  icons: {
+    [size: string]: string;
+  };
+  updated: number;
+  deleted: boolean;
+}
 
 interface File {
   id: string;

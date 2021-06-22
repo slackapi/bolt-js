@@ -1,7 +1,7 @@
 {
-  "name": "bolt-js-aws-lambda",
+  "name": "bolt-js-aws-lambda-receiver",
   "version": "1.0.0",
-  "description": "Deploying to AWS Lambda ⚡️ Bolt for JavaScript",
+  "description": "Deploying to AWS Lambda ⚡️ Bolt for JavaScript using the AwsLambdaReceiver",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -9,8 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^3.2.0",
-    "@vendia/serverless-express": "^4.3.2"
+    "@slack/bolt": "^3.2.0"
   },
   "devDependencies": {
     "serverless": "^2.13.0",

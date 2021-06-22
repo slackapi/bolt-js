@@ -110,38 +110,29 @@ Now that you have an app, let's prepare it for AWS Lambda and the Serverless Fra
 
 By default, Bolt listens for HTTP requests. In this section, we'll customize your Bolt app's [`receiver`](https://slack.dev/bolt-js/concepts#receiver) to respond to Lambda function events instead.
 
-First, install the [Serverless Express](https://github.com/vendia/serverless-express) module to transform Express HTTP requests to Lambda function events:
-
-```bash
-npm install --save @vendia/serverless-express
-```
-
-> 💡 This guide requires version `4.x.x` or later.
-
-Next, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's Express receiver and the AWS Serverless Express module:
+First, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
 ```javascript
-const { App, ExpressReceiver } = require('@slack/bolt');
-const serverlessExpress = require('@vendia/serverless-express');
+const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7) to create a custom receiver using AWS Serverless Express:
+Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7) to create a custom receiver using AwsLambdaReceiver:
 
 ```javascript
 // Initialize your custom receiver
-const expressReceiver = new ExpressReceiver({
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-  // The `processBeforeResponse` option is required for all FaaS environments.
-  // It allows Bolt methods (e.g. `app.message`) to handle a Slack request
-  // before the Bolt framework responds to the request (e.g. `ack()`). This is
-  // important because FaaS immediately terminate handlers after the response.
-  processBeforeResponse: true
+const awsLambdaReceiver = new AwsLambdaReceiver({
+    signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // Initializes your app with your bot token and the AWS Lambda ready receiver
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  receiver: expressReceiver
+    token: process.env.SLACK_BOT_TOKEN,
+    receiver: awsLambdaReceiver,
+    // The `processBeforeResponse` option is required for all FaaS environments.
+    // It allows Bolt methods (e.g. `app.message`) to handle a Slack request
+    // before the Bolt framework responds to the request (e.g. `ack()`). This is
+    // important because FaaS immediately terminate handlers after the response.
+    processBeforeResponse: true
 });
 ```
 
@@ -149,9 +140,10 @@ Finally, at the bottom of your app, update the [source code that starts the HTTP
 
 ```javascript
 // Handle the Lambda function event
-module.exports.handler = serverlessExpress({
-  app: expressReceiver.app
-});
+module.exports.handler = async (event, context, callback) => {
+    const handler = await app.start();
+    return handler(event, context, callback);
+}
 ```
 
 When you're done, your app should look similar to the ⚡️[Deploying to AWS Lambda app][deploy-aws-lambda-app/app.js].

@@ -11,6 +11,8 @@ The `shortcut()` method supports both [global shortcuts](https://api.slack.com/i
 
 Shortcuts are invokable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
+⚠️ Note that if you use `shortcut()` multiple times with overlapping RegExp matches, _all_ matching listeners will run. Design your regular expressions to avoid this possibility.
+
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
 
 Shortcuts include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking. 
