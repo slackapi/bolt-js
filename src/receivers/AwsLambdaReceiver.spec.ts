@@ -384,10 +384,10 @@ describe('AwsLambdaReceiver', function () {
         isBase64Encoded: true,
       };
       const response1 = await handler(
-          awsEvent,
-          {},
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          (_error, _result) => {},
+        awsEvent,
+        {},
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_error, _result) => {},
       );
       assert.equal(response1.statusCode, 404);
     });
@@ -430,9 +430,11 @@ function withNoopWebClient(): Override {
     '@slack/web-api': {
       WebClient: class {
         public token?: string;
+
         constructor(token?: string, _options?: WebClientOptions) {
           this.token = token;
         }
+
         public auth = {
           test: sinon.fake.resolves({
             enterprise_id: 'E111',
