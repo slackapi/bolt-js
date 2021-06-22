@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/naming-convention */
 
-import { Logger, LogLevel } from '@slack/logger';
-import { WebClientOptions } from '@slack/web-api';
-import { Buffer } from 'buffer';
-import { assert } from 'chai';
-import crypto from 'crypto';
-import 'mocha';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
+import { Logger, LogLevel } from '@slack/logger';
+import { assert } from 'chai';
+import 'mocha';
 import AwsLambdaReceiver from './AwsLambdaReceiver';
+import crypto from 'crypto';
+import rewiremock from 'rewiremock';
+import { WebClientOptions } from '@slack/web-api';
 
 describe('AwsLambdaReceiver', function () {
   beforeEach(function () {});
