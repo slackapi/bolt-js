@@ -267,6 +267,11 @@ export default class App {
     this.axios = axios.create({
       httpAgent: agent,
       httpsAgent: agent,
+      // disabling axios' automatic proxy support:
+      // axios would read from envvars to configure a proxy automatically, but it doesn't support TLS destinations.
+      // for compatibility with https://api.slack.com, and for a larger set of possible proxies (SOCKS or other
+      // protocols), users of this package should use the `agent` option to configure a proxy.
+      proxy: false,
       ...clientTls,
     });
 
