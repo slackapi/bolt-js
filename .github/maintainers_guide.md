@@ -24,9 +24,9 @@ A useful trick for debugging inside tests is to use the Chrome Debugging Protoco
 The documentation is built using [Jekyll](https://jekyllrb.com/) and hosted with GitHub Pages.
 The source files are contained in the `docs` directory. They are broken up into the `_basic`, `_advanced`, and `_tutorials` directories depending on content's nature.
 
-All documentation contains [front matter](https://jekyllrb.com/docs/front-matter/) that indicates the section's title, slug (for header), respective language, and if it's not a tutorial it contains the order it should appear within it's respective section (basic or advanced).
+All documentation contains [front matter](https://jekyllrb.com/docs/front-matter/) that indicates the section's title, slug (for header), respective language, and if it's not a tutorial it contains the order it should appear within its respective section (basic or advanced).
 
-To build the docs locally, you can run `bundle exec jekyll serve`.
+To build the docs locally, navigate to the `docs` folder and run `bundle exec jekyll serve`. Make sure you have run `bundle install` to install necessary gems.
 
 #### Adding beta documentation
 When documentation is in a beta state, it requires a new, distinct collection of docs. The process is a little nuanced, so make sure to build the documentation locally to make sure it appears how you expect. To create a new collection:
