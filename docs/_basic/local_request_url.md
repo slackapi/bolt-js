@@ -12,7 +12,7 @@ A development proxy like [ngrok](https://ngrok.com/) will create a public URL an
 
 Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we use port `3000` by default, but if you customized the port used to initialize your app, use that port instead):
 
-![Running ngrok](../assets/ngrok.gif "Running ngrok")
+![Running ngrok](assets/ngrok.gif "Running ngrok")
 
 The output should show a generated URL that you can use (we recommend the one that starts with `https://`). This URL will be the base of your Request URL, in this case: `https://8e8ec2d7.ngrok.io`
 
