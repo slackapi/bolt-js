@@ -204,7 +204,7 @@ To use features like buttons, select menus, datepickers, modals, and shortcuts, 
 When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events. 
 
 Now, let’s go back to your app’s code and add logic to handle those events:
-- First, we'll send a message that contains an interactive component, a button.
+- First, we'll send a message that contains an interactive component (in this case a button).
 - Next, listen for the action of a user clicking the button and respond
 
 Below, the code from the last section is modified to send a message containing a button rather than just a string:
