@@ -139,7 +139,7 @@ When an event occurs, Slack will send your app some information about the event,
 Scroll down to **Subscribe to Bot Events**. There are four events related to messages:
 - [`message.channels`](https://api.slack.com/events/message.channels) listens for messages in public channels that your app is added to
 - `message.groups` listens for messages in private channels that your app is added to
-- `message.im` listens for messages in your app's DMs with users
+- [`message.im`](https://api.slack.com/events/message.im) listens for messages in your app's DMs with users
 - `message.mpim` listens for messages in multi-person DMs that your app is added to
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
