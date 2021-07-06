@@ -134,7 +134,7 @@ Okay, let's enable Socket Mode:
 
 Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**. 
 
-When an event occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
+When an event occurs, Slack will send your app information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
 
 Scroll down to **Subscribe to Bot Events**. There are four events related to messages:
 - [`message.channels`](https://api.slack.com/events/message.channels) listens for messages in public channels that your app is added to
