@@ -107,7 +107,7 @@ export default class AwsLambdaReceiver implements Receiver {
     ): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
-      const rawBody: string = typeof awsEvent.body === 'undefined' || awsEvent.body == null ? '' : awsEvent.body;
+      const rawBody = this.getRawBody(awsEvent);
 
       const body: any = this.parseRequestBody(
         rawBody,
@@ -195,6 +195,17 @@ export default class AwsLambdaReceiver implements Receiver {
       }
       return { statusCode: 404, body: '' };
     };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private getRawBody(awsEvent: AwsEvent): string {
+    if (typeof awsEvent.body === 'undefined' || awsEvent.body == null) {
+      return '';
+    }
+    if (awsEvent.isBase64Encoded) {
+      return Buffer.from(awsEvent.body, 'base64').toString('ascii');
+    }
+    return awsEvent.body;
   }
 
   // eslint-disable-next-line class-methods-use-this
