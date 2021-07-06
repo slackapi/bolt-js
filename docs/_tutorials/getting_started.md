@@ -124,7 +124,7 @@ Your app behaves similarly to people on your team — it can post messages, add 
 
 To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team. 
 
-> 💡 Socket Mode allows your app to use the Events API and interactive components of the platform—without exposing a public HTTP Request URL. This mode is helpful for  development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to a hosting environment, or apps intended for distribution via the Slack App Directory. You can easily switch between Socket Mode and a direct HTTP endpoint and at any time in the app config. 
+> 💡 Socket Mode allows apps to use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution. You can easily toggle between Socket Mode and HTTP connections at any time in the app config. 
 
 Okay, let's enable Socket Mode:
 
