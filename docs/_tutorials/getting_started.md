@@ -29,24 +29,26 @@ This page contains an overview of your app in addition to important credentials 
 
 ![Basic Information page](../assets/basic-information-page.png "Basic Information page")
 
-Look around, add an app icon and description, and then let's start configuring your app 🔩
+Look around, add an app icon and description, and then let's start configuring your app. 🔩
 
 ---
 
 ### Tokens and installing apps
 Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods. 
 
-There are two token types available to a Slack app: user (`xoxp`) and bot (`xoxb`) tokens. User tokens allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. Bot tokens are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
+There are two main token types available to a Slack app: user (`xoxp`) and bot (`xoxb`) tokens. 
+- User tokens allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. 
+- Bot tokens are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
 
 For brevity, we're going to use bot tokens for this guide.
 
-Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
+1. Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
 
-For now, we'll just add one scope: [`chat:write`](https://api.slack.com/scopes/chat:write). This grants your app the permission to post messages in channels it's a member of.
+2. For now, we'll just add one scope: [`chat:write`](https://api.slack.com/scopes/chat:write). This grants your app the permission to post messages in channels it's a member of.
 
-Scroll up to the top of the OAuth & Permissions page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
+3. Scroll up to the top of the OAuth & Permissions page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
 
-Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
+4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
 ![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
@@ -54,7 +56,7 @@ Once you authorize the installation, you'll land on the **OAuth & Permissions** 
 
 ---
 
-### Setting up your local project
+### Setting up your project
 With the initial configuration handled, it's time to set up a new Bolt project. This is where you'll write the code that handles the logic for your app.
 
 If you don’t already have a project, let’s create a new one. Create an empty directory and initialize a new project:
@@ -67,7 +69,7 @@ npm init
 
 You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
 
-Before we install the Bolt for JavaScript package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
+Before we install the Bolt for JavaScript package to your new project, let's save the **bot token** and **Signing Secret** that were generated when you configured your app. These should be stored as local environment variables and should *not* be saved in version control.
 
 1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
 ```shell
@@ -79,13 +81,13 @@ export SLACK_SIGNING_SECRET=<your-signing-secret>
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-Now, lets create your app. Install the `@slack/bolt` package and save it to your `package.json` dependencies using the following command:
+Now, let's create your app. Install the `@slack/bolt` package and save it to your `package.json` dependencies using the following command:
 
 ```shell
 npm install @slack/bolt
 ```
 
-Create a new file called `app.js` in this directory and add the following code:
+Create a new entrypoint file called `app.js` in this directory and add the following code:
 
 ```javascript
 const { App } = require('@slack/bolt');
@@ -104,24 +106,28 @@ const app = new App({
 })();
 ```
 
-Your token and signing secret are enough to create your first Bolt app. Save your `app.js` file then on the command line run the following:
+Save your `app.js` file, then on the command line run the following:
 
 ```script
 node app.js
 ```
 
-Your app should let you know that it's up and running.
+Your app should let you know that it's up and running. 🎉 
 
 ---
 
 ### Setting up events
-Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). 
+Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events. 
 
-For this guide, we are going to enable events for your app via Socket Mode, our recommended option for apps in development. You can toggle Socket Mode off anytime you're ready to distribute your app. 
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team. 
 
-Head to your app's configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable. 
+> 💡 Socket Mode allows your app to use the Events API and interactive components of the platform—without exposing a public HTTP Request URL. This mode is helpful for  development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to a hosting environment, or apps intended for distribution via the Slack App Directory. You can easily switch between Socket Mode and a direct HTTP endpoint and at any time in the app config. 
 
-Then head over to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use that in just a moment. 
+Okay, let's enable Socket Mode:
+
+1. Head to your app's configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable. 
+
+2. Go to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use that in just a moment. 
 
 Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**. 
 
@@ -135,21 +141,21 @@ Scroll down to **Subscribe to Bot Events**. There are four events related to mes
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
-Back in your project, make sure to include your saved `xapp` in your environment.
+Back in your project, make sure to store the `xapp` token you saved earlier in your environment.
 
 ```shell
 export SLACK_APP_TOKEN=xapp-<your-app-token>
 ```
 
-And in `app.js`, add ` socketMode: true` and `appToken: YOUR_APP_TOKEN` as options to initialize our app with Socket Mode. Restart the app.
+Make a simple change to your basic Bolt initialization code and restart the app.
 
 ```javascript
 // Initializes your app with your bot token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  socketMode: true, 
-  appToken: process.env.SLACK_APP_TOKEN
+  socketMode: true, // add this
+  appToken: process.env.SLACK_APP_TOKEN // add this
 });
 ```
 
@@ -165,7 +171,8 @@ const { App } = require('@slack/bolt');
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  socketMode: true
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN
 });
 
 // Listens to incoming messages that contain "hello"
@@ -190,17 +197,15 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ### Sending and responding to actions
 
-To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
+To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration. 
 
-Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
+> 💡 You'll notice that with Socket Mode on, basic interactivity is enabled for us by default, so no further action here is needed. If you're using HTTP, you'll need to supply a [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) for Slack to send events to.
 
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
+When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events. 
 
-![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
-
-Now, let's go back to your app's code and add interactivity. This will consist of two steps:
-- First, your app will send a message that contains a button.
-- Next, your app will listen to the action of a user clicking the button and respond
+Now, let’s go back to your app’s code and add logic to handle those events:
+- First, we'll send a message that contains an interactive component, a button.
+- Next, listen for the action of a user clicking the button and respond
 
 Below, the code from the last section is modified to send a message containing a button rather than just a string:
 
@@ -209,7 +214,9 @@ const { App } = require('@slack/bolt');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN
 });
 
 // Listens to incoming messages that contain "hello"
@@ -249,7 +256,7 @@ The value inside of `say()` is now an object that contains an array of `blocks`.
 
 You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
-> 💡 The [Block Kit Builder](https://app.slack.com/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+> 💡 The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
 
 Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (*yet!*).
 
@@ -260,7 +267,9 @@ const { App } = require('@slack/bolt');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN
 });
 
 // Listens to incoming messages that contain "hello"
@@ -307,7 +316,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 ---
 
 ### Next steps
-You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app)! 🎉
+You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app) with Socket Mode! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
