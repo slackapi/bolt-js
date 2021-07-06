@@ -147,7 +147,7 @@ Back in your project, make sure to store the `xapp` token you saved earlier in y
 export SLACK_APP_TOKEN=xapp-<your-app-token>
 ```
 
-Make a simple change to your basic Bolt initialization code and restart the app.
+Make a simple change to your Bolt initialization code and restart the app.
 
 ```javascript
 // Initializes your app with your bot token and signing secret
