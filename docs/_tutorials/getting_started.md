@@ -154,11 +154,7 @@ export SLACK_APP_TOKEN=xapp-<your-app-token>
 Make a simple change to your Bolt initialization code and restart the app.
 
 ```javascript
-<<<<<<< HEAD
-// Initializes your socket mode app with your app token and signing secret
-=======
-// Initializes your app with your app token and signing secret
->>>>>>> 20d54aea861f525fa2145e10d6168b3286153f62
+// Initializes your app in socket mode with your app token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
