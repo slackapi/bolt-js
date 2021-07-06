@@ -205,7 +205,7 @@ When interactivity is enabled, interactions with shortcuts, modals, or interacti
 
 Now, let’s go back to your app’s code and add logic to handle those events:
 - First, we'll send a message that contains an interactive component (in this case a button).
-- Next, listen for the action of a user clicking the button and respond
+- Next, we'll listen for the action of a user clicking the button before responding
 
 Below, the code from the last section is modified to send a message containing a button rather than just a string:
 
