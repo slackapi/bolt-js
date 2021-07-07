@@ -299,7 +299,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 ---
 
 ### Next steps
-You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app) with Socket Mode! 🎉
+You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app)! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
