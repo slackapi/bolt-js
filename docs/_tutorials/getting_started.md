@@ -82,7 +82,7 @@ export SLACK_SIGNING_SECRET=<your-signing-secret>
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-> 🔒 Remember to keep your token and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Checkout the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
+> 🔒 Remember to keep your tokens and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Checkout the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
 
 
 Now, let's create your app. Install the `@slack/bolt` package and save it to your `package.json` dependencies using the following command:
