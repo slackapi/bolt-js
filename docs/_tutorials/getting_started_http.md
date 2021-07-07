@@ -309,4 +309,4 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Bolt allows you to [call Web API methods](/bolt-js/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. If you are using Socket Mode instead of HTTP, an additional (`xapp`) token with `connections:write` scopes is required. 
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. If you are using [Socket Mode](/bolt-js/tutorial/getting-started) instead of HTTP, an additional (`xapp`) token with `connections:write` scopes is required. 
