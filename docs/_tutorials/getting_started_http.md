@@ -120,7 +120,7 @@ Your app should let you know that it's up and running. 🎉
 
 ---
 
-### Setting up events
+### Setting up events with http
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events. 
 
 To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). 
