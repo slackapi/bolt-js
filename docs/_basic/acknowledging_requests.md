@@ -15,7 +15,7 @@ We recommend calling `ack()` right away before sending a new message or fetching
 // Regex to determine if this is a valid email
 let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 // This uses a constraint object to listen for modal submissions with a callback_id of ticket_submit 
-app.view({ callback_id: 'ticket_submit' }, async ({ ack, view }) => {
+app.view('ticket_submit', async ({ ack, view }) => {
   // get the email value from the input block with `email_address` as the block_id
   const email = view.state.values['email_address']['input_a'].value;
 
