@@ -15,7 +15,7 @@ app.action<InteractiveButtonClick>('my_callback_id', async ({ respond, say }) =>
   const response = await say({ text: 'Some more text' });
   expectType<ChatPostMessageResponse>(response);
 
-  // sicne web-api v6.2, this is not an error anymore
+  // since web-api v6.2, this is not an error anymore
   // Expect an error when calling say without text
   // expectError(await say({ blocks: [] }));
 });
