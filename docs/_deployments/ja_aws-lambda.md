@@ -110,39 +110,31 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 
 デフォルトでは、Bolt アプリがリッスンするのは HTTP リクエストです。このセクションでは Bolt アプリの[`レシーバー`](https://slack.dev/bolt-js/concepts#receiver)に手を加えて、Lambda 関数のイベントをリッスンするように変更します。
 
-
-まず、[Serverless Express](https://github.com/vendia/serverless-express) モジュールをインストールします。このモジュールを使って Express HTTP リクエストを Lambda 関数のイベントに変換します。
-
-```bash
-npm install --save @vendia/serverless-express
-```
-
 > 💡 このガイドはバージョン 4.x.x 以上を必要とします
 
-次に、`app.js` のソースコードのなかで[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の Express レシーバーと AWS Serverless Express モジュールを require します。
+まず、`app.js` のソースコードのなかで[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の AwsLambdaReceiver モジュールを require します。
 
 ```javascript
-const { App, ExpressReceiver } = require('@slack/bolt');
-const serverlessExpress = require('@vendia/serverless-express');
+const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-その後、[ソースコードのなかで Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7)を編集して、AWS Serverless Express を使ったカスタムのレシーバーを作成します。
+その後、[ソースコードのなかで Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7)を編集して、AwsLambdaReceiver を使ったカスタムのレシーバーを作成します。
 
 ```javascript
 // カスタムのレシーバーを初期化します
-const expressReceiver = new ExpressReceiver({
+const awsLambdaReceiver = new AwsLambdaReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  // `processBeforeResponse` オプションは、あらゆる FaaS 環境で必須です。
-  // このオプションにより、Bolt フレームワークが `ack()` などでリクエストへの応答を返す前に
-  // `app.message` などのメソッドが Slack からのリクエストを処理できるようになります。FaaS では
-  // 応答を返した後にハンドラーがただちに終了してしまうため、このオプションの指定が重要になります。
-  processBeforeResponse: true
 });
 
 // ボットトークンと、AWS Lambda に対応させたレシーバーを使ってアプリを初期化します。
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  receiver: expressReceiver
+  receiver: awsLambdaReceiver,
+  // `processBeforeResponse` オプションは、あらゆる FaaS 環境で必須です。
+  // このオプションにより、Bolt フレームワークが `ack()` などでリクエストへの応答を返す前に
+  // `app.message` などのメソッドが Slack からのリクエストを処理できるようになります。FaaS では
+  // 応答を返した後にハンドラーがただちに終了してしまうため、このオプションの指定が重要になります。
+  processBeforeResponse: true
 });
 ```
 
@@ -150,9 +142,10 @@ const app = new App({
 
 ```javascript
 // Lambda 関数のイベントを処理します
-module.exports.handler = serverlessExpress({
-  app: expressReceiver.app
-});
+module.exports.handler = async (event, context, callback) => {
+  const handler = await app.start();
+  return handler(event, context, callback);
+}
 ```
 
 完成したアプリのソースコードは、⚡️[deploy-aws-lambda][deploy-aws-lambda-app/app.js] のサンプルのようになります。
