@@ -563,7 +563,7 @@ export interface ReactionRemovedEvent {
 // NOTE: `resources_added`, `resources_removed`, `scope_denied`, `scope_granted`, are left out because they are
 // deprecated as part of the Workspace Apps Developer Preview
 
-export interface InviteItem {
+export interface SharedChannelInviteItem {
   id: string,
   date_created: number,
   date_invalid: number,
@@ -597,14 +597,14 @@ export interface SharedChannelItem {
 export interface SharedChannelInviteAccepted {
   type: 'shared_channel_invite_accepted',
   approval_required: boolean,
-  invite: InviteItem,
+  invite: SharedChannelInviteItem,
   channel: SharedChannelItem,
   event_ts: string
 }
 
 export interface SharedChannelInviteApproved {
   type: 'shared_channel_invite_approved',
-  invite: InviteItem,
+  invite: SharedChannelInviteItem,
   channel: SharedChannelItem,
   teams_in_channel: {},
   approving_user: string
@@ -612,7 +612,7 @@ export interface SharedChannelInviteApproved {
 
 export interface SharedChannelInviteDeclined {
   type: 'shared_channel_invite_declined',
-  invite: InviteItem,
+  invite: SharedChannelInviteItem,
   channel: SharedChannelItem,
   teams_in_channel: {},
   declining_user: string
@@ -620,7 +620,7 @@ export interface SharedChannelInviteDeclined {
 
 export interface SharedChannelInviteReceived {
   type: 'shared_channel_invite_received',
-  invite: InviteItem,
+  invite: SharedChannelInviteItem,
   recipient_email: string,
   message: string,
   recipient_user_id: string,
