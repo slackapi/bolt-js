@@ -55,6 +55,10 @@ export type SlackEvent =
   | PinRemovedEvent
   | ReactionAddedEvent
   | ReactionRemovedEvent
+  | SharedChannelInviteReceived
+  | SharedChannelInviteAccepted
+  | SharedChannelInviteApproved
+  | SharedChannelInviteDeclined
   | StarAddedEvent
   | StarRemovedEvent
   | SubteamCreated
@@ -558,6 +562,71 @@ export interface ReactionRemovedEvent {
 
 // NOTE: `resources_added`, `resources_removed`, `scope_denied`, `scope_granted`, are left out because they are
 // deprecated as part of the Workspace Apps Developer Preview
+
+export interface InviteItem {
+  id: string,
+  date_created: number,
+  date_invalid: number,
+  inviting_team: {
+    id: string,
+    name: string,
+    icon: object,
+    is_verified: boolean,
+    domain: string
+  },
+  inviting_user: {
+    id: string,
+    team_id: string,
+    name: string,
+    updated: number,
+    profile: {
+      real_name: string,
+      display_name: string,
+      team: string,
+      email: string
+    }
+  }
+}
+
+export interface SharedChannelItem {
+  id: string,
+  is_private: boolean,
+  is_im: boolean,
+  name: string
+}
+export interface SharedChannelInviteAccepted {
+  type: 'shared_channel_invite_accepted',
+  approval_required: boolean,
+  invite: InviteItem,
+  channel: SharedChannelItem,
+  event_ts: string
+}
+
+export interface SharedChannelInviteApproved {
+  type: 'shared_channel_invite_approved',
+  invite: InviteItem,
+  channel: SharedChannelItem,
+  teams_in_channel: {},
+  approving_user: string
+}
+
+export interface SharedChannelInviteDeclined {
+  type: 'shared_channel_invite_declined',
+  invite: InviteItem,
+  channel: SharedChannelItem,
+  teams_in_channel: {},
+  declining_user: string
+}
+
+export interface SharedChannelInviteReceived {
+  type: 'shared_channel_invite_received',
+  invite: InviteItem,
+  recipient_email: string,
+  message: string,
+  recipient_user_id: string,
+  channel: SharedChannelItem,
+  event_ts: string
+}
 
 export interface StarAddedEvent {
   type: 'star_added';
