@@ -51,18 +51,6 @@ const app = new App({
       }
       throw new Error('Failed fetching installation');
     },
-    deleteInstallation: async (installQuery) => {
-      // change the line below so it deletes from your database
-      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
-        // org wide app installation deletion
-        return await myDB.delete(installQuery.enterpriseId);
-      }
-      if (installQuery.teamId !== undefined) {
-        // single team app installation deletion
-        return await myDB.delete(installQuery.teamId);
-      }
-      throw new Error('Failed to delete installation');
-    },
   },
 });
 ```
