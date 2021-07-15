@@ -51,13 +51,13 @@ const app = new App({
       throw new Error('Failed fetching installation');
     },
     deleteInstallation: async (installQuery) => {
-      // change the line below so it deletes from your database
+      // 実際のデータベースから削除するために、ここのコードを変更
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
-        // org wide app installation deletion
+        // OrG 全体へのインストール情報の削除
         return await myDB.delete(installQuery.enterpriseId);
       }
       if (installQuery.teamId !== undefined) {
-        // single team app installation deletion
+        // 単独のワークスペースへのインストール情報の削除
         return await myDB.delete(installQuery.teamId);
       }
       throw new Error('Failed to delete installation');
