@@ -6,7 +6,7 @@ order: 3
 ---
 
 <div class="section-content">
-Token rotation provides an extra layer of security for your access tokens and is defined by the [OAuth V2 RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4). 
+Supported in Bolt for JavaScript as of v3.5.0, token rotation provides an extra layer of security for your access tokens and is defined by the [OAuth V2 RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4). 
 
 Instead of an access token representing an existing installation of your Slack app indefinitely, with token rotation enabled, access tokens expire. A refresh token acts as a long-lived way to refresh your access tokens.
 
