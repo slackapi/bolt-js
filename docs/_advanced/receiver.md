@@ -2,7 +2,7 @@
 title: Customizing a receiver
 lang: en
 slug: receiver
-order: 8
+order: 9
 ---
 
 <div class="section-content">
