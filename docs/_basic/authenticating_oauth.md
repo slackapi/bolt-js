@@ -12,6 +12,8 @@ Bolt for JavaScript will create a **Redirect URL** `slack/oauth_redirect`, which
 
 Bolt for JavaScript will also create a `slack/install` route, where you can find an `Add to Slack` button for your app to perform direct installs of your app. If you need any additional authorizations (user tokens) from users inside a team when your app is already installed or a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
+**NOTE: The `Add to Slack` button on your app's app configuration page will not work with Bolt's built-in OAuth support. The app configuration `Add to Slack` button does not include a `state` value. You must use the `slack/install` route created by your Bolt application to install the app.**
+
 Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you're implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.
 
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
@@ -55,11 +57,11 @@ const app = new App({
       // change the line below so it deletes from your database
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // org wide app installation deletion
-        return await myDB.delete(installQuery.enterpriseId);
+        return await database.delete(installQuery.enterpriseId);
       }
       if (installQuery.teamId !== undefined) {
         // single team app installation deletion
-        return await myDB.delete(installQuery.teamId);
+        return await database.delete(installQuery.teamId);
       }
       throw new Error('Failed to delete installation');
     },
