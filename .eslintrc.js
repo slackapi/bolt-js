@@ -234,6 +234,22 @@ module.exports = {
 
       },
     },
+    {
+      files: ['src/types/**/*.ts'],
+      rules: {
+        // Type-specific rules
+        // ---
+        // Rules that only apply to Typescript source files under src/types
+
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'typeProperty',
+            format: ['snake_case'],
+          },
+        ],
+      },
+    },
   ],
 };
 
