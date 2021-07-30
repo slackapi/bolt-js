@@ -2,9 +2,11 @@
 import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import rewiremock from 'rewiremock';
+import { Logger } from '@slack/logger';
+import { WebClient } from '@slack/web-api';
 import { ErrorCode, ContextMissingPropertyError } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
-import rewiremock from 'rewiremock';
 import {
   SlackEventMiddlewareArgs,
   NextFn,
@@ -17,8 +19,6 @@ import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } f
 import { SlashCommand } from '../types/command';
 import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
 import { GenericMessageEvent } from '../types/events/message-events';
-import { WebClient } from '@slack/web-api';
-import { Logger } from '@slack/logger';
 
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {

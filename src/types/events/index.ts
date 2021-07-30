@@ -1,3 +1,7 @@
+import { SlackEvent, BasicSlackEvent } from './base-events';
+import { StringIndexed } from '../helpers';
+import { SayFn } from '../utilities';
+
 export * from './base-events';
 export {
   BotMessageEvent,
@@ -9,9 +13,6 @@ export {
   MessageChangedEvent,
   EKMAccessDeniedMessageEvent,
 } from './message-events';
-import { SlackEvent, BasicSlackEvent } from './base-events';
-import { StringIndexed } from '../helpers';
-import { SayFn } from '../utilities';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.

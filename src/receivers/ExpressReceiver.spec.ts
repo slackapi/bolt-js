@@ -3,12 +3,12 @@
 import 'mocha';
 import sinon, { SinonFakeTimers, SinonSpy } from 'sinon';
 import { assert } from 'chai';
-import { Override, mergeOverrides } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
 import { Request, Response } from 'express';
 import { Readable } from 'stream';
 import { EventEmitter } from 'events';
+import { Override, mergeOverrides } from '../test-helpers';
 import { ErrorCode, CodedError, ReceiverInconsistentStateError } from '../errors';
 
 import ExpressReceiver, {

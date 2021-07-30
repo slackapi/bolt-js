@@ -4,10 +4,10 @@ import sinon from 'sinon';
 import { Logger, LogLevel } from '@slack/logger';
 import { assert } from 'chai';
 import 'mocha';
-import AwsLambdaReceiver from './AwsLambdaReceiver';
 import crypto from 'crypto';
 import rewiremock from 'rewiremock';
 import { WebClientOptions } from '@slack/web-api';
+import AwsLambdaReceiver from './AwsLambdaReceiver';
 
 describe('AwsLambdaReceiver', function () {
   beforeEach(function () {});

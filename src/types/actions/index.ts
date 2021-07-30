@@ -1,13 +1,13 @@
-export * from './block-action';
-export * from './interactive-message';
-export * from './dialog-action';
-export * from './workflow-step-edit';
-
 import { BlockAction } from './block-action';
 import { InteractiveMessage } from './interactive-message';
 import { WorkflowStepEdit } from './workflow-step-edit';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
+
+export * from './block-action';
+export * from './interactive-message';
+export * from './dialog-action';
+export * from './workflow-step-edit';
 
 /**
  * All known actions from Slack's Block Kit interactive components, message actions, dialogs, and legacy interactive

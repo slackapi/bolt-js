@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import rewiremock from 'rewiremock';
+import { WebClient } from '@slack/web-api';
 import {
   WorkflowStep,
   SlackWorkflowStepMiddlewareArgs,
@@ -15,7 +16,6 @@ import {
 import { Override } from './test-helpers';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, WorkflowStepEdit, Middleware } from './types';
 import { WorkflowStepInitializationError } from './errors';
-import { WebClient } from '@slack/web-api';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('./WorkflowStep')> {
   return rewiremock.module(() => import('./WorkflowStep'), overrides);
