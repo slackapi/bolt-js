@@ -245,7 +245,7 @@ module.exports = {
           'error',
           {
             selector: 'typeProperty',
-            format: ['snake_case'],
+            format: ['snake_case', 'camelCase'],
           },
         ],
       },
