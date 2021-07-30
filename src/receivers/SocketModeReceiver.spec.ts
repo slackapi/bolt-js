@@ -3,13 +3,13 @@
 import 'mocha';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
-import { Override, mergeOverrides } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
 import { EventEmitter } from 'events';
 import { IncomingMessage, ServerResponse } from 'http';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
+import { Override, mergeOverrides } from '../test-helpers';
 
 describe('SocketModeReceiver', function () {
   beforeEach(function () {
