@@ -13,7 +13,7 @@ All you need to work with this project is a supported version of [Node.js](https
 
 ### Testing
 
-This package has unit tests for most files in the same directory the code is in with the suffix `.spec` (i.e. `exampleFile.spec.ts`). You can run the entire test suite using the npm script `npm test`. This command is also executed by Travis, the continuous integration service, for every Pull Request and branch. The coverage is computed with the `codecode` package. The tests themselves are run using the `mocha` test runner.
+This package has unit tests for most files in the same directory the code is in with the suffix `.spec` (i.e. `exampleFile.spec.ts`). You can run the entire test suite using the npm script `npm test`. This command is also executed by GitHub Actions, the continuous integration service, for every Pull Request and branch. The coverage is computed with the `codecov` package. The tests themselves are run using the `mocha` test runner.
 
 Test code should be written in syntax that runs on the oldest supported Node.js version. This ensures that backwards compatibility is tested and the APIs look reasonable in versions of Node.js that do not support the most modern syntax.
 
@@ -26,7 +26,9 @@ The source files are contained in the `docs` directory. They are broken up into 
 
 All documentation contains [front matter](https://jekyllrb.com/docs/front-matter/) that indicates the section's title, slug (for header), respective language, and if it's not a tutorial it contains the order it should appear within its respective section (basic or advanced).
 
-To build the docs locally, navigate to the `docs` folder and run `bundle exec jekyll serve`. Make sure you have run `bundle install` to install necessary gems.
+To build the docs locally, you must have [Ruby](https://www.ruby-lang.org/en/) installed. To easily install and manage different Ruby versions, you can use [`rbenv`](https://github.com/rbenv/rbenv). If you use macOS, you can install it via `brew install rbenv`. Hook it up to your shell by running `rbenv init` and following the instructions. Finally, install the required version for building the docs (this version is stored in the `.ruby-version` file) via `rbenv install <version>`.
+
+To build the docs, navigate to the `docs` folder and run `bundle install` to install necessary gems (Ruby dependencies). Run `bundle exec jekyll serve` to start up a local server which will compile documentation source and serve its contents.
 
 #### Adding beta documentation
 When documentation is in a beta state, it requires a new, distinct collection of docs. The process is a little nuanced, so make sure to build the documentation locally to make sure it appears how you expect. To create a new collection:
@@ -44,7 +46,7 @@ When documentation is in a beta state, it requires a new, distinct collection of
 
 1.  Create the commit for the release:
     *  Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`.
-    *  Update any dependency versions 
+    *  Update any dependency versions
     *  Confirm tests pass by running `npm test`
     *  Commit with a message including the new version number. For example `v2.2.0`.
     *  Tag the commit with the version number. For example `git tag @slack/bolt@2.2.0`.
@@ -96,7 +98,7 @@ As a maintainer, the development you do will be almost entirely off of your fork
 
 ### Branches
 
-`main` is where active development occurs. 
+`main` is where active development occurs.
 
 When developing, branches should be created off of your fork and not directly off of this repository. If working on a long-running feature and in collaboration with others, a corresponding branch of the same name is permitted. This makes collaboration on a single branch possible, as contributors working on the same feature cannot push commits to others' open Pull Requests.
 

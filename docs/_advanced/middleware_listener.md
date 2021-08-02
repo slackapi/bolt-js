@@ -2,7 +2,7 @@
 title: Listener middleware
 lang: en
 slug: listener-middleware
-order: 5
+order: 6
 ---
 
 <div class="section-content">
