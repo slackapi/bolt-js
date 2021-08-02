@@ -93,7 +93,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `clientId` | The client ID `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `clientSecret` | The client secret `string` from your app's configuration which is [required to configure OAuth](/bolt-js/concepts#authenticating-oauth). |
 | `stateSecret` | Recommended parameter (`string`) that's passed when [configuring OAuth](/bolt-js/concepts#authenticating-oauth) to prevent CSRF attacks |
-| `installationStore` | Defines how to save and fetch installation data when [configuring OAuth](/bolt-js/concepts#authenticating-oauth). Contains two methods: `fetchInstallation` and `storeInstallation`. The default `installationStore` is an in-memory store. |
+| `installationStore` | Defines how to save, fetch and delete installation data when [configuring OAuth](/bolt-js/concepts#authenticating-oauth). Contains three methods: `fetchInstallation`, `storeInstallation` and `deleteInstallation`. The default `installationStore` is an in-memory store. |
 | `scopes` | Array of scopes that your app will request [within the OAuth process](/bolt-js/concepts#authenticating-oauth). |
 | `installerOptions` | Optional object that can be used to customize [the default OAuth support](/bolt-js/concepts#authenticating-oauth). Read more in the OAuth documentation. |
 
@@ -128,7 +128,7 @@ Bolt includes a set of error types to make errors easier to handle, with more sp
 | `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `HTTPReceiver`. |
 | `ReceiverAuthenticityError` | Error thrown when your app's request signature could not be verified. The error includes information on why it failed, such as an invalid timestamp, missing headers, or invalid signing secret.
 | `MultipleListenerError` | Thrown when multiple errors occur when processing multiple listeners for a single event. Includes an `originals` property with an array of the individual errors. |
-| `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep` instance. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on Workflow Steps [can be found in the documentation](/concepts#steps).  |
+| `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep` instance. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on Workflow Steps [can be found in the documentation](concepts#steps).  |
 | `UnknownError` | An error that was thrown inside the framework but does not have a specified error code. Contains an `original` property with more details. |
 
 > You can read the code for error definition and construction [in errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts).
