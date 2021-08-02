@@ -564,83 +564,83 @@ export interface ReactionRemovedEvent {
 // deprecated as part of the Workspace Apps Developer Preview
 
 export interface SharedChannelTeamItem {
-  id: string,
-  name: string,
-  icon: object,
-  is_verified: boolean,
-  domain: string
+  id: string;
+  name: string;
+  icon: object;
+  is_verified: boolean;
+  domain: string;
 }
 export interface SharedChannelUserItem {
-  id: string,
-  team_id: string,
-  name: string,
-  updated: number,
+  id: string;
+  team_id: string;
+  name: string;
+  updated: number;
   profile: {
-    real_name: string,
-    display_name: string,
-    team: string,
-    email: string
-  }
-} 
+    real_name: string;
+    display_name: string;
+    team: string;
+    email: string;
+  };
+}
 export interface SharedChannelInviteItem {
-  id: string,
-  date_created: number,
-  date_invalid: number,
-  inviting_team: SharedChannelTeamItem,
-  inviting_user: SharedChannelUserItem,
-  recipient_email: string,
-  message: string,
-  recipient_user_id: string,
+  id: string;
+  date_created: number;
+  date_invalid: number;
+  inviting_team: SharedChannelTeamItem;
+  inviting_user: SharedChannelUserItem;
+  recipient_email: string;
+  message: string;
+  recipient_user_id: string;
 }
 
 export interface SharedChannelItem {
-  id: string,
-  is_private: boolean,
-  is_im: boolean,
-  name: string
+  id: string;
+  is_private: boolean;
+  is_im: boolean;
+  name: string;
 }
 export interface SharedChannelInviteAccepted {
-  type: 'shared_channel_invite_accepted',
-  approval_required: boolean,
-  invite: SharedChannelInviteItem,
-  channel: SharedChannelItem,
-  teams_in_channel: SharedChannelTeamItem[],
-  accepting_user: SharedChannelUserItem,
-  event_ts: string
+  type: 'shared_channel_invite_accepted';
+  approval_required: boolean;
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  teams_in_channel: SharedChannelTeamItem[];
+  accepting_user: SharedChannelUserItem;
+  event_ts: string;
 }
 
 export interface SharedChannelInviteApproved {
-  type: 'shared_channel_invite_approved',
-  invite: SharedChannelInviteItem,
-  channel: SharedChannelItem,
-  approving_team_id: string,
-  teams_in_channel: SharedChannelTeamItem[],
-  approving_user: SharedChannelUserItem,
-  event_ts: string,
+  type: 'shared_channel_invite_approved';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  approving_team_id: string;
+  teams_in_channel: SharedChannelTeamItem[];
+  approving_user: SharedChannelUserItem;
+  event_ts: string;
 }
 
 export interface SharedChannelInviteDeclined {
-  type: 'shared_channel_invite_declined',
-  invite: SharedChannelInviteItem,
-  channel: SharedChannelItem,
-  declining_team_id: string,
-  teams_in_channel: SharedChannelTeamItem[],
-  declining_user: SharedChannelUserItem
+  type: 'shared_channel_invite_declined';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  declining_team_id: string;
+  teams_in_channel: SharedChannelTeamItem[];
+  declining_user: SharedChannelUserItem;
 }
 
 export interface SharedChannelInviteReceived {
-  type: 'shared_channel_invite_received',
-  invite: SharedChannelInviteItem,
-  channel: SharedChannelItem,
-  event_ts: string,
-  app_id: string,
-  team_id: string,
+  type: 'shared_channel_invite_received';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  event_ts: string;
+  app_id: string;
+  team_id: string;
   authorizations: {
-    is_enterprise_install: boolean,
-    is_bot: boolean,
-    user_id: string,
-    team_id: string
-  }
+    is_enterprise_install: boolean;
+    is_bot: boolean;
+    user_id: string;
+    team_id: string;
+  };
 }
 
 export interface StarAddedEvent {
