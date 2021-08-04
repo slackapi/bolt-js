@@ -247,6 +247,9 @@ module.exports = {
           // Use the following option to set a list of allowable globs in this project.
           allow: [
             '**/middleware/*', // the src/middleware directory doesn't export a module, it's just a namespace.
+            '**/receivers/*', // the src/receivers directory doesn't export a module, it's just a namespace.
+            '**/types/**/*',
+            '**/types/*', // type heirarchies should be used however one wants
           ],
         }],
 
