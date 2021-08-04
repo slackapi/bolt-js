@@ -7,7 +7,7 @@ export type StringIndexed = Record<string, any>;
  * @deprecated No longer works in TypeScript 4.3
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type KnownKeys<T> = never;
+export type KnownKeys<_T> = never;
 
 /**
  * Type function which allows either types `T` or `U`, but not both.

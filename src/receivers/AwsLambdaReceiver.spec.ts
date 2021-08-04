@@ -395,12 +395,6 @@ describe('AwsLambdaReceiver', function () {
   });
 });
 
-export interface Override {
-  [packageName: string]: {
-    [exportName: string]: any;
-  };
-}
-
 // Composable overrides
 function withNoopWebClient(): Override {
   return {
