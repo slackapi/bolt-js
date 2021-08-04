@@ -6,11 +6,11 @@ export type StringIndexed = Record<string, any>;
 /**
  * @deprecated No longer works in TypeScript 4.3
  */
-// @ts-ignore -- ignore unused type parameter warning
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type KnownKeys<T> = never;
 
 /**
  * Type function which allows either types `T` or `U`, but not both.
  */
-export type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+export type XOR<T, U> = T | U extends Record<string, unknown> ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
