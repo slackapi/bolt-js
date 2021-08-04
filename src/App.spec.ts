@@ -489,16 +489,16 @@ describe('App', () => {
          */
         const assertOrderMiddleware =
           (orderDown: number, orderUp: number) =>
-          async ({ next }: { next?: NextFn }) => {
-            await delay(100);
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderDown);
-            if (next !== undefined) {
-              await next();
-            }
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderUp);
-          };
+            async ({ next }: { next?: NextFn }) => {
+              await delay(100);
+              middlewareCount += 1;
+              assert.equal(middlewareCount, orderDown);
+              if (next !== undefined) {
+                await next();
+              }
+              middlewareCount += 1;
+              assert.equal(middlewareCount, orderUp);
+            };
 
         app.use(assertOrderMiddleware(1, 8));
         app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));

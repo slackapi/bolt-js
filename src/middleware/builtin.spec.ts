@@ -748,10 +748,7 @@ interface MiddlewareCommonArgs {
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
-type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<
-  'member_joined_channel' | 'member_left_channel'
-> &
-  MiddlewareCommonArgs;
+type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'> & MiddlewareCommonArgs;
 
 type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & MiddlewareCommonArgs;
 

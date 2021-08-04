@@ -724,19 +724,19 @@ export default class App {
         type === IncomingEventType.Event
           ? (bodyArg as SlackEventMiddlewareArgs['body']).event
           : type === IncomingEventType.ViewAction
-          ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-          : type === IncomingEventType.Shortcut
-          ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
-          : type === IncomingEventType.Action &&
-            isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
-          ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
-          : (bodyArg as (
-              | Exclude<
+            ? (bodyArg as SlackViewMiddlewareArgs['body']).view
+            : type === IncomingEventType.Shortcut
+              ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
+              : type === IncomingEventType.Action &&
+                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
+                ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
+                : (bodyArg as (
+                  | Exclude<
                   AnyMiddlewareArgs,
                   SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-                >
-              | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-            )['body']),
+                  >
+                  | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+                )['body']),
     };
 
     // Set aliases
@@ -893,12 +893,10 @@ function runAuthTestForBotToken(
   // TODO: warn when something needed isn't found
   return authorization.botUserId !== undefined && authorization.botId !== undefined
     ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
-    : client.auth.test({ token: authorization.botToken }).then((result) => {
-        return {
-          botUserId: result.user_id as string,
-          botId: result.bot_id as string,
-        };
-      });
+    : client.auth.test({ token: authorization.botToken }).then((result) => ({
+      botUserId: result.user_id as string,
+      botId: result.bot_id as string,
+    }));
 }
 
 // the shortened type, which is supposed to be used only in this source file
