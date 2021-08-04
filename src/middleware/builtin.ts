@@ -381,9 +381,9 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
 
 function isBlockPayload(
   payload:
-    | SlackActionMiddlewareArgs['payload']
-    | SlackOptionsMiddlewareArgs['payload']
-    | SlackViewMiddlewareArgs['payload'],
+  | SlackActionMiddlewareArgs['payload']
+  | SlackOptionsMiddlewareArgs['payload']
+  | SlackViewMiddlewareArgs['payload'],
 ): payload is BlockElementAction | BlockSuggestion {
   return (payload as BlockElementAction | BlockSuggestion).action_id !== undefined;
 }
