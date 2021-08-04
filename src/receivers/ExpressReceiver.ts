@@ -22,10 +22,10 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-    | string
-    | {
-        [endpointType: string]: string;
-      };
+  | string
+  | {
+    [endpointType: string]: string;
+  };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;

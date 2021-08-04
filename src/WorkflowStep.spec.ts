@@ -147,8 +147,8 @@ describe('WorkflowStep', () => {
     it('should return true if recognized workflow step payload type', async () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs
+      & AllMiddlewareArgs;
 
       const { isStepEvent } = await importWorkflowStep();
 

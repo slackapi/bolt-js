@@ -37,8 +37,8 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
   payload: Action extends BlockAction<infer ElementAction>
     ? ElementAction
     : Action extends InteractiveMessage<infer InteractiveAction>
-    ? InteractiveAction
-    : Action;
+      ? InteractiveAction
+      : Action;
   action: this['payload'];
   body: Action;
   // all action types except dialog submission have a channel context
@@ -54,5 +54,5 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
 type ActionAckFn<A extends SlackAction> = A extends InteractiveMessage
   ? AckFn<string | SayArguments>
   : A extends DialogSubmitAction
-  ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
-  : AckFn<void>;
+    ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
+    : AckFn<void>;
