@@ -506,7 +506,7 @@ export interface PinAddedEvent {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {};
+  item: Record<string, unknown>;
 }
 
 export interface PinRemovedEvent {
@@ -514,7 +514,7 @@ export interface PinRemovedEvent {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {};
+  item: Record<string, unknown>;
   has_pins: boolean;
   event_ts: string;
 }
@@ -564,7 +564,7 @@ export interface StarAddedEvent {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_added, https://api.slack.com/methods/stars.list
-  item: {};
+  item: Record<string, unknown>;
   event_ts: string;
 }
 
@@ -573,7 +573,7 @@ export interface StarRemovedEvent {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_removed, https://api.slack.com/methods/stars.list
-  item: {};
+  item: Record<string, unknown>;
   event_ts: string;
 }
 
