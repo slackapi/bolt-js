@@ -29,9 +29,7 @@ export interface SayFn {
   (message: string | SayArguments): Promise<ChatPostMessageResponse>;
 }
 
-export type RespondArguments = Pick<
-  ChatPostMessageArguments,
-  Exclude<ChatPostMessageArgumentsKnownKeys, 'channel' | 'text'>
+export type RespondArguments = Pick<ChatPostMessageArguments, Exclude<ChatPostMessageArgumentsKnownKeys, 'channel' | 'text'>
 > & {
   /** Response URLs can be used to send ephemeral messages or in-channel messages using this argument */
   response_type?: 'in_channel' | 'ephemeral';

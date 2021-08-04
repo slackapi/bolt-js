@@ -689,14 +689,14 @@ export interface UserChangeEvent {
       image_1024?: string;
       team: string;
       fields:
-        | {
-            [key: string]: {
-              value: string;
-              alt: string;
-            };
-          }
-        | []
-        | null;
+      | {
+        [key: string]: {
+          value: string;
+          alt: string;
+        };
+      }
+      | []
+      | null;
     };
     is_admin: boolean;
     is_owner: boolean;
