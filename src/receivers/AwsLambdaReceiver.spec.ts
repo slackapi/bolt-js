@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import rewiremock from 'rewiremock';
 import { WebClientOptions } from '@slack/web-api';
 import AwsLambdaReceiver, { AwsHandler } from './AwsLambdaReceiver';
+import { Override, mergeOverrides } from '../test-helpers';
 
 describe('AwsLambdaReceiver', function () {
   beforeEach(function () {});
@@ -398,30 +399,6 @@ export interface Override {
   [packageName: string]: {
     [exportName: string]: any;
   };
-}
-
-export function mergeOverrides(...overrides: Override[]): Override {
-  let currentOverrides: Override = {};
-  for (const override of overrides) {
-    currentOverrides = mergeObjProperties(currentOverrides, override);
-  }
-  return currentOverrides;
-}
-
-function mergeObjProperties(first: Override, second: Override): Override {
-  const merged: Override = {};
-  const props = Object.keys(first).concat(Object.keys(second));
-  for (const prop of props) {
-    if (second[prop] === undefined && first[prop] !== undefined) {
-      merged[prop] = first[prop];
-    } else if (first[prop] === undefined && second[prop] !== undefined) {
-      merged[prop] = second[prop];
-    } else {
-      // second always overwrites the first
-      merged[prop] = { ...first[prop], ...second[prop] };
-    }
-  }
-  return merged;
 }
 
 // Composable overrides
