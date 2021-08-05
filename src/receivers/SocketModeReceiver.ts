@@ -97,8 +97,7 @@ export default class SocketModeReceiver implements Receiver {
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
       // use default or passed in redirect path
-      const redirectUriPath =
-        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
 
       // use default or passed in installPath
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
