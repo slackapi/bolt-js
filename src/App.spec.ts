@@ -18,6 +18,27 @@ const noopMiddleware = async ({ next }: { next: NextFn }) => {
 };
 const noopAuthorize = () => Promise.resolve({});
 
+// Fakes
+class FakeReceiver implements Receiver {
+  private bolt: App | undefined;
+
+  public init = (bolt: App) => {
+    this.bolt = bolt;
+  };
+
+  public start = sinon.fake((...params: any[]): Promise<unknown> => {
+    return Promise.resolve([...params]);
+  });
+
+  public stop = sinon.fake((...params: any[]): Promise<unknown> => {
+    return Promise.resolve([...params]);
+  });
+
+  public async sendEvent(event: ReceiverEvent): Promise<void> {
+    return this.bolt?.processEvent(event);
+  }
+}
+
 // Dummies (values that have no real behavior but pass through the system opaquely)
 function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEvent {
   // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
@@ -2115,23 +2136,3 @@ function withConversationContext(spy: SinonSpy): Override {
   };
 }
 
-// Fakes
-class FakeReceiver implements Receiver {
-  private bolt: App | undefined;
-
-  public init = (bolt: App) => {
-    this.bolt = bolt;
-  };
-
-  public start = sinon.fake((...params: any[]): Promise<unknown> => {
-    return Promise.resolve([...params]);
-  });
-
-  public stop = sinon.fake((...params: any[]): Promise<unknown> => {
-    return Promise.resolve([...params]);
-  });
-
-  public async sendEvent(event: ReceiverEvent): Promise<void> {
-    return this.bolt?.processEvent(event);
-  }
-}
