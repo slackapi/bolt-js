@@ -517,17 +517,16 @@ describe('App', () => {
          * @param orderDown The order it should be called when processing middleware down the chain
          * @param orderUp The order it should be called when processing middleware up the chain
          */
-        const assertOrderMiddleware =
-          (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
-            await delay(100);
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderDown);
-            if (next !== undefined) {
-              await next();
-            }
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderUp);
-          };
+        const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
+          await delay(100);
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderDown);
+          if (next !== undefined) {
+            await next();
+          }
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderUp);
+        };
 
         app.use(assertOrderMiddleware(1, 8));
         app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
