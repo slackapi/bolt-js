@@ -34,6 +34,18 @@ export enum ErrorCode {
   WorkflowStepInitializationError = 'slack_bolt_workflow_step_initialization_error',
 }
 
+export class UnknownError extends Error implements CodedError {
+  public code = ErrorCode.UnknownError;
+
+  public original: Error;
+
+  constructor(original: Error) {
+    super(original.message);
+
+    this.original = original;
+  }
+}
+
 export function asCodedError(error: CodedError | Error): CodedError {
   if ((error as CodedError).code !== undefined) {
     return error as CodedError;
@@ -110,18 +122,6 @@ export class MultipleListenerError extends Error implements CodedError {
     );
 
     this.originals = originals;
-  }
-}
-
-export class UnknownError extends Error implements CodedError {
-  public code = ErrorCode.UnknownError;
-
-  public original: Error;
-
-  constructor(original: Error) {
-    super(original.message);
-
-    this.original = original;
   }
 }
 

@@ -15,6 +15,58 @@ import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsiste
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import { renderHtmlForInstallPath } from './render-html-for-install-path';
 
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+
+export const respondToSslCheck: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.ssl_check) {
+    res.send();
+    return;
+  }
+  next();
+};
+
+export const respondToUrlVerification: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.type && req.body.type === 'url_verification') {
+    res.json({ challenge: req.body.challenge });
+    return;
+  }
+  next();
+};
+
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
 export interface ExpressReceiverOptions {
@@ -229,7 +281,7 @@ export default class ExpressReceiver implements Receiver {
   ): Promise<Server | HTTPSServer> {
     let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
 
-    // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
+    // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
       createServerFn = createHttpsServer;
     }
@@ -297,22 +349,6 @@ export default class ExpressReceiver implements Receiver {
     });
   }
 }
-
-export const respondToSslCheck: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.ssl_check) {
-    res.send();
-    return;
-  }
-  next();
-};
-
-export const respondToUrlVerification: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.type && req.body.type === 'url_verification') {
-    res.json({ challenge: req.body.challenge });
-    return;
-  }
-  next();
-};
 
 /**
  * This request handler has two responsibilities:
@@ -436,41 +472,3 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
   return JSON.parse(stringBody);
 }
-
-// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
-const httpsOptionKeys = [
-  'ALPNProtocols',
-  'clientCertEngine',
-  'enableTrace',
-  'handshakeTimeout',
-  'rejectUnauthorized',
-  'requestCert',
-  'sessionTimeout',
-  'SNICallback',
-  'ticketKeys',
-  'pskCallback',
-  'pskIdentityHint',
-
-  'ca',
-  'cert',
-  'sigalgs',
-  'ciphers',
-  'clientCertEngine',
-  'crl',
-  'dhparam',
-  'ecdhCurve',
-  'honorCipherOrder',
-  'key',
-  'privateKeyEngine',
-  'privateKeyIdentifier',
-  'maxVersion',
-  'minVersion',
-  'passphrase',
-  'pfx',
-  'secureOptions',
-  'secureProtocol',
-  'sessionIdContext',
-];
-
-const missingServerErrorDescription =
-  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
