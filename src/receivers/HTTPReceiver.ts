@@ -17,6 +17,42 @@ import {
   ErrorCode,
 } from '../errors';
 
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+
 export interface HTTPReceiverOptions {
   signingSecret: string;
   endpoints?: string | string[];
@@ -435,40 +471,3 @@ function parseBody(req: BufferedIncomingMessage) {
   return JSON.parse(bodyAsString);
 }
 
-// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
-const httpsOptionKeys = [
-  'ALPNProtocols',
-  'clientCertEngine',
-  'enableTrace',
-  'handshakeTimeout',
-  'rejectUnauthorized',
-  'requestCert',
-  'sessionTimeout',
-  'SNICallback',
-  'ticketKeys',
-  'pskCallback',
-  'pskIdentityHint',
-
-  'ca',
-  'cert',
-  'sigalgs',
-  'ciphers',
-  'clientCertEngine',
-  'crl',
-  'dhparam',
-  'ecdhCurve',
-  'honorCipherOrder',
-  'key',
-  'privateKeyEngine',
-  'privateKeyIdentifier',
-  'maxVersion',
-  'minVersion',
-  'passphrase',
-  'pfx',
-  'secureOptions',
-  'secureProtocol',
-  'sessionIdContext',
-];
-
-const missingServerErrorDescription =
-  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';

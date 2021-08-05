@@ -20,6 +20,63 @@ import { SlashCommand } from '../types/command';
 import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
 import { GenericMessageEvent } from '../types/events/message-events';
 
+// Test fixtures
+const validCommandPayload: SlashCommand = {
+  token: 'token-value',
+  command: '/hi',
+  text: 'Steve!',
+  response_url: 'https://hooks.slack.com/foo/bar',
+  trigger_id: 'trigger-id-value',
+  user_id: 'U1234567',
+  user_name: 'steve',
+  team_id: 'T1234567',
+  team_domain: 'awesome-eng-team',
+  channel_id: 'C1234567',
+  channel_name: 'random',
+  api_app_id: 'A123456',
+};
+
+const appMentionEvent: AppMentionEvent = {
+  type: 'app_mention',
+  username: 'USERNAME',
+  user: 'U1234567',
+  text: 'this is my message',
+  ts: '123.123',
+  channel: 'C1234567',
+  event_ts: '123.123',
+  thread_ts: '123.123',
+};
+
+const appHomeOpenedEvent: AppHomeOpenedEvent = {
+  type: 'app_home_opened',
+  user: 'USERNAME',
+  channel: 'U1234567',
+  tab: 'home',
+  view: {
+    type: 'home',
+    blocks: [],
+    clear_on_close: false,
+    notify_on_close: false,
+    external_id: '',
+  },
+  event_ts: '123.123',
+};
+
+const botMessageEvent: MessageEvent = {
+  type: 'message',
+  subtype: 'bot_message',
+  channel: 'CHANNEL_ID',
+  event_ts: '123.123',
+  user: 'U1234567',
+  ts: '123.123',
+  text: 'this is my message',
+  bot_id: 'B1234567',
+  channel_type: 'channel',
+};
+
+const noop = () => Promise.resolve(undefined);
+const sayNoop = () => Promise.resolve({ ok: true });
+
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
     return async () => {
@@ -782,59 +839,3 @@ function createFakeAppMentionEvent(text: string = ''): AppMentionEvent {
   };
   return event as AppMentionEvent;
 }
-
-const validCommandPayload: SlashCommand = {
-  token: 'token-value',
-  command: '/hi',
-  text: 'Steve!',
-  response_url: 'https://hooks.slack.com/foo/bar',
-  trigger_id: 'trigger-id-value',
-  user_id: 'U1234567',
-  user_name: 'steve',
-  team_id: 'T1234567',
-  team_domain: 'awesome-eng-team',
-  channel_id: 'C1234567',
-  channel_name: 'random',
-  api_app_id: 'A123456',
-};
-
-const appMentionEvent: AppMentionEvent = {
-  type: 'app_mention',
-  username: 'USERNAME',
-  user: 'U1234567',
-  text: 'this is my message',
-  ts: '123.123',
-  channel: 'C1234567',
-  event_ts: '123.123',
-  thread_ts: '123.123',
-};
-
-const appHomeOpenedEvent: AppHomeOpenedEvent = {
-  type: 'app_home_opened',
-  user: 'USERNAME',
-  channel: 'U1234567',
-  tab: 'home',
-  view: {
-    type: 'home',
-    blocks: [],
-    clear_on_close: false,
-    notify_on_close: false,
-    external_id: '',
-  },
-  event_ts: '123.123',
-};
-
-const botMessageEvent: MessageEvent = {
-  type: 'message',
-  subtype: 'bot_message',
-  channel: 'CHANNEL_ID',
-  event_ts: '123.123',
-  user: 'U1234567',
-  ts: '123.123',
-  text: 'this is my message',
-  bot_id: 'B1234567',
-  channel_type: 'channel',
-};
-
-const noop = () => Promise.resolve(undefined);
-const sayNoop = () => Promise.resolve({ ok: true });

@@ -15,6 +15,8 @@ import tsscmp from 'tsscmp';
 import type { Logger } from '@slack/logger';
 import type { IncomingMessage, ServerResponse } from 'http';
 
+const verifyErrorPrefix = 'Failed to verify authenticity';
+
 export interface VerifyOptions {
   signingSecret: string;
   nowMs?: () => number;
@@ -112,5 +114,3 @@ function getHeader(req: IncomingMessage, header: string): string {
   }
   return value;
 }
-
-const verifyErrorPrefix = 'Failed to verify authenticity';

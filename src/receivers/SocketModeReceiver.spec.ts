@@ -11,6 +11,30 @@ import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
 import { Override, mergeOverrides } from '../test-helpers';
 
+// Fakes
+class FakeServer extends EventEmitter {
+  public on = sinon.fake();
+
+  public listen = sinon.fake(() => {
+    if (this.listeningFailure !== undefined) {
+      this.emit('error', this.listeningFailure);
+    }
+  });
+
+  public close = sinon.fake((...args: any[]) => {
+    setImmediate(() => {
+      this.emit('close');
+      setImmediate(() => {
+        args[0]();
+      });
+    });
+  });
+
+  public constructor(private listeningFailure?: Error) {
+    super();
+  }
+}
+
 describe('SocketModeReceiver', function () {
   beforeEach(function () {
     this.listener = (_req: any, _res: any) => {};
@@ -307,25 +331,3 @@ function withHttpsCreateServer(spy: SinonSpy): Override {
   };
 }
 
-// Fakes
-class FakeServer extends EventEmitter {
-  public on = sinon.fake();
-  public listen = sinon.fake(() => {
-    if (this.listeningFailure !== undefined) {
-      this.emit('error', this.listeningFailure);
-      return;
-    }
-  });
-  public close = sinon.fake((...args: any[]) => {
-    setImmediate(() => {
-      this.emit('close');
-      setImmediate(() => {
-        args[0]();
-      });
-    });
-  });
-
-  constructor(private listeningFailure?: Error) {
-    super();
-  }
-}

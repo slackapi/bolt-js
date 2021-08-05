@@ -54,6 +54,17 @@ import allSettled = require('promise.allsettled'); // eslint-disable-line @types
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
+// ----------------------------
+// For listener registration methods
+
+const validViewTypes = ['view_closed', 'view_submission'];
+
+// ----------------------------
+// For the constructor
+
+const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
+  'should be initialized with oauth installer or authorize.';
+
 /** App initialization options */
 export interface AppOptions {
   signingSecret?: HTTPReceiverOptions['signingSecret'];
@@ -868,12 +879,6 @@ export default class App {
   }
 }
 
-// ----------------------------
-// For the constructor
-
-const tokenUsage =
-  'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
-  'should be initialized with oauth installer or authorize.';
 
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error) => {
@@ -1135,10 +1140,6 @@ function buildRespondFn(
   };
 }
 
-// ----------------------------
-// For listener registration methods
-
-const validViewTypes = ['view_closed', 'view_submission'];
 
 // ----------------------------
 // Instrumentation
