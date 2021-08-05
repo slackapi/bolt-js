@@ -184,8 +184,9 @@ export default class ExpressReceiver implements Receiver {
 
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
-      const redirectUriPath =
-        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
+        '/slack/oauth_redirect' :
+        installerOptions.redirectUriPath;
       this.router.use(redirectUriPath, async (req, res) => {
         await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
       });
@@ -399,8 +400,9 @@ export function verifySignatureAndParseRawBody(
 }
 
 function logError(logger: Logger, message: string, error: any): void {
-  const logMessage =
-    'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
+  const logMessage = 'code' in error ?
+    `${message} (code: ${error.code}, message: ${error.message})` :
+    `${message} (error: ${error})`;
   logger.warn(logMessage);
 }
 
