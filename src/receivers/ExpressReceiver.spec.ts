@@ -18,6 +18,34 @@ import ExpressReceiver, {
   verifySignatureAndParseRawBody,
 } from './ExpressReceiver';
 
+// Fakes
+class FakeServer extends EventEmitter {
+  public on = sinon.fake();
+
+  public listen = sinon.fake((...args: any[]) => {
+    if (this.listeningFailure !== undefined) {
+      this.emit('error', this.listeningFailure);
+      return;
+    }
+    setImmediate(() => {
+      args[1]();
+    });
+  });
+
+  public close = sinon.fake((...args: any[]) => {
+    setImmediate(() => {
+      this.emit('close');
+      setImmediate(() => {
+        args[0]();
+      });
+    });
+  });
+
+  public constructor(private listeningFailure?: Error) {
+    super();
+  }
+}
+
 describe('ExpressReceiver', function () {
   beforeEach(function () {
     this.fakeServer = new FakeServer();
@@ -710,28 +738,3 @@ function withHttpsCreateServer(spy: SinonSpy): Override {
   };
 }
 
-// Fakes
-class FakeServer extends EventEmitter {
-  public on = sinon.fake();
-  public listen = sinon.fake((...args: any[]) => {
-    if (this.listeningFailure !== undefined) {
-      this.emit('error', this.listeningFailure);
-      return;
-    }
-    setImmediate(() => {
-      args[1]();
-    });
-  });
-  public close = sinon.fake((...args: any[]) => {
-    setImmediate(() => {
-      this.emit('close');
-      setImmediate(() => {
-        args[0]();
-      });
-    });
-  });
-
-  constructor(private listeningFailure?: Error) {
-    super();
-  }
-}
