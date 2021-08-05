@@ -530,10 +530,9 @@ export default class App {
     callbackIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void {
-    const constraints: ShortcutConstraints =
-      typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)
-        ? { callback_id: callbackIdOrConstraints }
-        : callbackIdOrConstraints;
+    const constraints: ShortcutConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
+      { callback_id: callbackIdOrConstraints } :
+      callbackIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
@@ -573,10 +572,9 @@ export default class App {
     ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
   ): void {
     // Normalize Constraints
-    const constraints: ActionConstraints =
-      typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)
-        ? { action_id: actionIdOrConstraints }
-        : actionIdOrConstraints;
+    const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
+      { action_id: actionIdOrConstraints } :
+      actionIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter(
@@ -610,10 +608,9 @@ export default class App {
     actionIdOrConstraints: string | RegExp | ActionConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
   ): void {
-    const constraints: ActionConstraints =
-      typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)
-        ? { action_id: actionIdOrConstraints }
-        : actionIdOrConstraints;
+    const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
+      { action_id: actionIdOrConstraints } :
+      actionIdOrConstraints;
 
     this.listeners.push([onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
@@ -630,10 +627,9 @@ export default class App {
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
   ): void {
-    const constraints: ViewConstraints =
-      typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)
-        ? { callback_id: callbackIdOrConstraints, type: 'view_submission' }
-        : callbackIdOrConstraints;
+    const constraints: ViewConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
+      { callback_id: callbackIdOrConstraints, type: 'view_submission' } :
+      callbackIdOrConstraints;
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
     if (unknownConstraintKeys.length > 0) {
@@ -923,9 +919,9 @@ function runAuthTestForBotToken(
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Promise<{ botUserId: string; botId: string }> {
   // TODO: warn when something needed isn't found
-  return authorization.botUserId !== undefined && authorization.botId !== undefined
-    ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
-    : client.auth.test({ token: authorization.botToken }).then((result) => ({
+  return authorization.botUserId !== undefined && authorization.botId !== undefined ?
+    Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
+    client.auth.test({ token: authorization.botToken }).then((result) => ({
       botUserId: result.user_id as string,
       botId: result.bot_id as string,
     }));
