@@ -13,7 +13,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import App from '../App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import renderHtmlForInstallPath from './render-html-for-install-path';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
