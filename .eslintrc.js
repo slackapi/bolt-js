@@ -115,9 +115,10 @@ module.exports = {
         // Require class properties and methods to explicitly use accessibility modifiers (public, private, protected)
         '@typescript-eslint/explicit-member-accessibility': 'error',
 
-        // Forbids an object literal to appear in a type assertion expression unless its used as a parameter. This
-        // allows the typechecker to perform validation on the value as an assignment, instead of allowing the type
-        // assertion to always win.
+        // Forbids an object literal to appear in a type assertion expression unless its used as a parameter (we violate
+        // this rule for test code, to allow for looser property matching for objects - more in the test-specific rules
+        // section below). This allows the typechecker to perform validation on the value as an assignment, instead of
+        // allowing the type assertion to always win.
         // Requires use of `as Type` instead of `<Type>` for type assertion. Consistency.
         '@typescript-eslint/consistent-type-assertions': ['error', {
           assertionStyle: 'as',
@@ -224,7 +225,7 @@ module.exports = {
           },
           {
             'selector': 'objectLiteralProperty',
-            format: ['camelCase', 'snake_case', 'PascalCase'] 
+            format: ['camelCase', 'snake_case', 'PascalCase'],
           },
           {
             selector: ['enumMember'],
@@ -254,6 +255,36 @@ module.exports = {
         // styles.
         'object-curly-newline': ['error', { multiline: true, consistent: true }],
 
+      },
+    },
+    {
+      files: ['src/**/*.spec.ts'],
+      rules: {
+        // Test-specific rules
+        // ---
+        // Rules that only apply to Typescript _test_ source files
+
+        // With Mocha as a test framework, it is sometimes helpful to assign
+        // shared state to Mocha's Context object, for example in setup and
+        // teardown test methods. Assigning stub/mock objects to the Context
+        // object via `this` is a common pattern in Mocha. As such, using
+        // `function` over the the arrow notation binds `this` appropriately and
+        // should be used in tests. So: we turn off the prefer-arrow-callback
+        // rule.
+        // See https://github.com/slackapi/bolt-js/pull/1012#pullrequestreview-711232738
+        // for a case of arrow-vs-function syntax coming up for the team
+        'prefer-arrow-callback': 'off',
+
+        // Unlike non-test-code, where we require use of `as Type` instead of `<Type>` for type assertion,
+        // in test code using the looser `as Type` syntax leads to easier test writing, since only required
+        // properties must be adhered to using the `as Type` syntax.
+        '@typescript-eslint/consistent-type-assertions': ['error', {
+          assertionStyle: 'as',
+          objectLiteralTypeAssertions: 'allow',
+        }],
+        // In tests, don't force constructing a Symbol with a descriptor, as
+        // it's probably just for tests
+        'symbol-description': 'off',
       },
     },
   ],
