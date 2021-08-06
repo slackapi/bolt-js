@@ -347,7 +347,7 @@ function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteM
  * */
 // TODO :: refactor to incorporate a generic parameter
 export function prepareStepArgs(args: any): AllWorkflowStepMiddlewareArgs {
-  const { next, ...stepArgs } = args;
+  const { next: _next, ...stepArgs } = args;
   const preparedArgs: any = { ...stepArgs };
 
   switch (preparedArgs.payload.type) {
