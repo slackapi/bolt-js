@@ -470,4 +470,3 @@ function parseBody(req: BufferedIncomingMessage) {
   }
   return JSON.parse(bodyAsString);
 }
-

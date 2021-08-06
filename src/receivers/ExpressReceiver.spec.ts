@@ -706,4 +706,3 @@ function withHttpsCreateServer(spy: SinonSpy): Override {
     },
   };
 }
-

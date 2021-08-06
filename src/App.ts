@@ -879,7 +879,6 @@ export default class App {
   }
 }
 
-
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error) => {
     logger.error(error);
@@ -1139,7 +1138,6 @@ function buildRespondFn(
     return axiosInstance.post(response_url, normalizedArgs);
   };
 }
-
 
 // ----------------------------
 // Instrumentation
