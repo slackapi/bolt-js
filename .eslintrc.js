@@ -190,21 +190,26 @@ module.exports = {
         // both purposes, and it works fine on non-TypeScript code.
         camelcase: 'off',
         'no-underscore-dangle': 'off',
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            varsIgnorePattern: '^_',
+            argsIgnorePattern: '^_'
+          }
+        ],
         '@typescript-eslint/naming-convention': [
           'error',
           {
             selector: 'default',
             format: ['camelCase'],
-            filter: {
-              regex: '^_',
-              match: false
-            },
+            leadingUnderscore: 'allow',
           },
           {
             selector: 'variable',
             // PascalCase for variables is added to allow exporting a singleton, function library, or bare object as in
             // section 23.8 of the AirBnB style guide
             format: ['camelCase', 'PascalCase', 'UPPER_CASE', 'snake_case'],
+            leadingUnderscore: 'allow',
           },
           {
             selector: 'parameter',
@@ -214,10 +219,7 @@ module.exports = {
           {
             selector: 'typeLike',
             format: ['PascalCase', 'camelCase'],
-            filter: {
-              regex: '^_',
-              match: false
-            },
+            leadingUnderscore: 'allow',
           },
           {
             selector: 'typeProperty',
