@@ -159,6 +159,9 @@ module.exports = {
         // override section below because a distinct override is necessary in JavaScript files.
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
+        // Turn off no-inferrable-types. While it may be obvious what the type of something is by its default
+        // value, being explicit is good, especially for newcomers.
+        '@typescript-eslint/no-inferrable-types': 'off'
       },
     },
     {
