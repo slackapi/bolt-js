@@ -20,7 +20,7 @@ import {
   matchMessage,
   onlyViewActions,
 } from './middleware/builtin';
-import { processMiddleware } from './middleware/process';
+import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
 import {

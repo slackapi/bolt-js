@@ -9,7 +9,7 @@ import { URL } from 'url';
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import renderHtmlForInstallPath from './render-html-for-install-path';
 import {
   ReceiverMultipleAckError,
   ReceiverInconsistentStateError,
