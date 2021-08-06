@@ -291,7 +291,7 @@ describe('WorkflowStep', () => {
 
   describe('processStepMiddleware', () => {
     it('should call each callback in user-provided middleware', async () => {
-      const { next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
+      const { next: _next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
       const { processStepMiddleware } = await importWorkflowStep();
 
       const fn1 = sinon.spy((async ({ next: continuation }) => {
