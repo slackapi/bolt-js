@@ -166,7 +166,7 @@ export default class HTTPReceiver implements Receiver {
     this.requestListener = this.unboundRequestListener.bind(this);
   }
 
-  public init(app: App) {
+  public init(app: App): void {
     this.app = app;
   }
 
