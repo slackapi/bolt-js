@@ -92,6 +92,7 @@ module.exports = {
         // This level of this configuration contains rules which apply only to TypeScript. It also contains rules that
         // are meant to override options or disable rules in the base configurations (there are no more base
         // configurations in the subsequent overrides).
+        'max-classes-per-file': 'off',
 
         // Disallow invocations of require(). This will help make imports more consistent and ensures a smoother
         // transition to the best future syntax. And since this rule affects TypeScript, which is compiled, there's
