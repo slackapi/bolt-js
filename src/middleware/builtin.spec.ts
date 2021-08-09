@@ -483,16 +483,14 @@ describe('ignoreSelf()', () => {
     const fakeBotUserId = 'BUSER1';
     const eventsWhichShouldNotBeFilteredOut = ['member_joined_channel', 'member_left_channel'];
 
-    const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => {
-      return {
-        next: fakeNext,
-        context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-        event: {
-          type: eventType,
-          user: fakeBotUserId,
-        },
-      } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
-    });
+    const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => ({
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+      event: {
+        type: eventType,
+        user: fakeBotUserId,
+      },
+    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs));
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
