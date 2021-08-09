@@ -299,8 +299,8 @@ describe('WorkflowStep', () => {
       const { next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
       const { processStepMiddleware } = await importWorkflowStep();
 
-      const fn1 = sinon.spy((async ({ next }) => {
-        await next!();
+      const fn1 = sinon.spy((async ({ next: continuation }) => {
+        await continuation!();
       }) as Middleware<WorkflowStepEdit>);
       const fn2 = sinon.spy(async () => {});
       const fakeMiddleware = [fn1, fn2] as WorkflowStepMiddleware;

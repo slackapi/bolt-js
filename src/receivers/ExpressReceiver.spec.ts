@@ -149,8 +149,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(this.fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
       // Act
@@ -167,8 +167,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(sinon.fake.throws('Should not be used.')),
         withHttpsCreateServer(this.fakeCreateServer),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       const tlsOptions = { key: '', cert: '' };
 
@@ -188,8 +188,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(fakeCreateFailingServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
       // Act
@@ -209,8 +209,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(this.fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
       // Act
@@ -235,8 +235,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(this.fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       await receiver.start(port);
 
@@ -253,8 +253,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(this.fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
 
       // Act
       let caughtError: Error | undefined;
@@ -278,8 +278,8 @@ describe('ExpressReceiver', function () {
         withHttpCreateServer(this.fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ExpressReceiver = await importExpressReceiver(overrides);
-      const receiver = new ExpressReceiver({ signingSecret: '' });
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       await receiver.start(port);
       await receiver.stop();

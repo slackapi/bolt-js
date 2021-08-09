@@ -66,14 +66,14 @@ describe('App', () => {
           withNoopAppMetadata(),
           withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
         );
-        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        const MockApp = await importApp(overrides);
 
         // Act
-        const app = new App({ token: '', signingSecret: '' });
+        const app = new MockApp({ token: '', signingSecret: '' });
 
         // Assert
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
-        assert.instanceOf(app, App);
+        assert.instanceOf(app, MockApp);
       });
       it('should pass the given token to app.client', async () => {
         // Arrange
@@ -83,10 +83,10 @@ describe('App', () => {
           withNoopAppMetadata(),
           withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
         );
-        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        const MockApp = await importApp(overrides);
 
         // Act
-        const app = new App({ token: 'xoxb-foo-bar', signingSecret: '' });
+        const app = new MockApp({ token: 'xoxb-foo-bar', signingSecret: '' });
 
         // Assert
         assert.isDefined(app.client);
@@ -96,22 +96,22 @@ describe('App', () => {
     it('should succeed with an authorize callback', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
-      const app = new App({ authorize: authorizeCallback, signingSecret: '' });
+      const app = new MockApp({ authorize: authorizeCallback, signingSecret: '' });
 
       // Assert
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
-      assert.instanceOf(app, App);
+      assert.instanceOf(app, MockApp);
     });
     it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
       // Arrange
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
       try {
-        new App({ signingSecret: '' }); // eslint-disable-line @typescript-eslint/no-unused-expressions
+        new MockApp({ signingSecret: '' }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
@@ -121,12 +121,11 @@ describe('App', () => {
     it('should fail when both a token and authorize callback are specified', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
       try {
-        // eslint-disable-line @typescript-eslint/no-unused-expressions
-        new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
+        new MockApp({ token: '', authorize: authorizeCallback, signingSecret: '' }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
@@ -137,12 +136,11 @@ describe('App', () => {
     it('should fail when both a token is specified and OAuthInstaller is initialized', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
       try {
-        // eslint-disable-line @typescript-eslint/no-unused-expressions
-        new App({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
+        new MockApp({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
@@ -153,12 +151,11 @@ describe('App', () => {
     it('should fail when both a authorize callback is specified and OAuthInstaller is initialized', async () => {
       // Arrange
       const authorizeCallback = sinon.fake();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
       try {
-        // eslint-disable-line @typescript-eslint/no-unused-expressions
-        new App({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
+        new MockApp({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
@@ -169,22 +166,22 @@ describe('App', () => {
     describe('with a custom receiver', () => {
       it('should succeed with no signing secret', async () => {
         // Arrange
-        const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        const MockApp = await importApp();
 
         // Act
-        const app = new App({ receiver: new FakeReceiver(), authorize: noopAuthorize });
+        const app = new MockApp({ receiver: new FakeReceiver(), authorize: noopAuthorize });
 
         // Assert
-        assert.instanceOf(app, App);
+        assert.instanceOf(app, MockApp);
       });
     });
     it('should fail when no signing secret for the default receiver is specified', async () => {
       // Arrange
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
       try {
-        new App({ authorize: noopAuthorize }); // eslint-disable-line @typescript-eslint/no-unused-expressions
+        new MockApp({ authorize: noopAuthorize }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
@@ -216,13 +213,13 @@ describe('App', () => {
         withMemoryStore(fakeMemoryStore),
         withConversationContext(fakeConversationContext),
       );
-      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp(overrides);
 
       // Act
-      const app = new App({ authorize: noopAuthorize, signingSecret: '' });
+      const app = new MockApp({ authorize: noopAuthorize, signingSecret: '' });
 
       // Assert
-      assert.instanceOf(app, App);
+      assert.instanceOf(app, MockApp);
       assert(fakeMemoryStore.calledWithNew);
       assert(fakeConversationContext.called);
     });
@@ -234,13 +231,13 @@ describe('App', () => {
         withNoopWebClient(),
         withConversationContext(fakeConversationContext),
       );
-      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp(overrides);
 
       // Act
-      const app = new App({ convoStore: false, authorize: noopAuthorize, signingSecret: '' });
+      const app = new MockApp({ convoStore: false, authorize: noopAuthorize, signingSecret: '' });
 
       // Assert
-      assert.instanceOf(app, App);
+      assert.instanceOf(app, MockApp);
       assert(fakeConversationContext.notCalled);
     });
     describe('with a custom conversation store', () => {
@@ -253,13 +250,13 @@ describe('App', () => {
           withConversationContext(fakeConversationContext),
         );
         const dummyConvoStore = Symbol() as unknown as ConversationStore;
-        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        const MockApp = await importApp(overrides);
 
         // Act
-        const app = new App({ convoStore: dummyConvoStore, authorize: noopAuthorize, signingSecret: '' });
+        const app = new MockApp({ convoStore: dummyConvoStore, authorize: noopAuthorize, signingSecret: '' });
 
         // Assert
-        assert.instanceOf(app, App);
+        assert.instanceOf(app, MockApp);
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
@@ -275,11 +272,11 @@ describe('App', () => {
         },
       });
 
-      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp(overrides);
 
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
 
-      new App({ clientOptions, authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR }); // eslint-disable-line @typescript-eslint/no-unused-expressions
+      new MockApp({ clientOptions, authorize: noopAuthorize, signingSecret: '', logLevel: LogLevel.ERROR }); // eslint-disable-line no-new
 
       assert.ok(fakeConstructor.called);
 
@@ -306,14 +303,14 @@ describe('App', () => {
         },
       });
 
-      const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention,
-      const app = new App({
+      const MockApp = await importApp(overrides);
+      const app = new MockApp({
         token: 'xoxb-completely-invalid-token',
         signingSecret: 'invalid-one',
         tokenVerificationEnabled: false,
       });
       // Assert
-      assert.instanceOf(app, App);
+      assert.instanceOf(app, MockApp);
     });
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
@@ -330,8 +327,8 @@ describe('App', () => {
     //   const dummyReturn = Symbol();
     //   const dummyParams = [Symbol(), Symbol()];
     //   const fakeReceiver = new FakeReceiver();
-    //   const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-    //   const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize });
+    //   const MockApp = await importApp();
+    //   const app = new MockApp({ receiver: fakeReceiver, authorize: noopAuthorize });
     //   fakeReceiver.start = sinon.fake.returns(dummyReturn);
     //   // Act
     //   const actualReturn = await app.start(...dummyParams);
@@ -349,11 +346,11 @@ describe('App', () => {
       const dummyReturn = Symbol();
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
       fakeReceiver.stop = sinon.fake.returns(dummyReturn);
 
       // Act
-      const app = new App({ receiver: fakeReceiver, authorize: noopAuthorize }); // eslint-disable-line @typescript-eslint/no-unused-expressions
+      const app = new MockApp({ receiver: fakeReceiver, authorize: noopAuthorize });
       const actualReturn = await app.stop(...dummyParams);
 
       // Assert
@@ -391,10 +388,10 @@ describe('App', () => {
       const fakeLogger = createFakeLogger();
       const fakeMiddleware = sinon.fake(noopMiddleware);
       const invalidReceiverEvents = createInvalidReceiverEvents();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
-      const app = new App({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
+      const app = new MockApp({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
       app.use(fakeMiddleware);
       await Promise.all(invalidReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
@@ -411,10 +408,10 @@ describe('App', () => {
       const dummyOrigError = new Error('auth failed');
       const dummyAuthorizationError = new AuthorizationError('auth failed', dummyOrigError);
       const dummyReceiverEvent = createDummyReceiverEvent();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
-      const app = new App({
+      const app = new MockApp({
         receiver: fakeReceiver,
         logger: fakeLogger,
         authorize: sinon.fake.rejects(dummyAuthorizationError),
@@ -445,13 +442,13 @@ describe('App', () => {
           withMemoryStore(sinon.fake()),
           withConversationContext(fakeConversationContext),
         );
-        const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+        const MockApp = await importApp(overrides);
 
         dummyReceiverEvent = createDummyReceiverEvent();
         fakeFirstMiddleware = sinon.fake(noopMiddleware);
         fakeSecondMiddleware = sinon.fake(noopMiddleware);
 
-        app = new App({
+        app = new MockApp({
           logger: createFakeLogger(),
           receiver: fakeReceiver,
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
@@ -596,8 +593,8 @@ describe('App', () => {
       const dummyReceiverEvent = createDummyReceiverEvent(eventType);
 
       beforeEach(async () => {
-        const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-        app = new App({
+        const MockAppNoOverrides = await importApp();
+        app = new MockAppNoOverrides({
           receiver: fakeReceiver,
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
@@ -655,8 +652,8 @@ describe('App', () => {
       let app: App;
 
       beforeEach(async () => {
-        const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-        app = new App({
+        const MockAppNoOverrides = await importApp();
+        app = new MockAppNoOverrides({
           receiver: fakeReceiver,
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
@@ -679,13 +676,11 @@ describe('App', () => {
     });
 
     describe('middleware and listener arguments', () => {
-      let fakeErrorHandler: SinonSpy;
       const dummyChannelId = 'CHANNEL_ID';
       let overrides: Override;
       const baseEvent = createDummyReceiverEvent();
 
       function buildOverrides(secondOverrides: Override[]): Override {
-        fakeErrorHandler = sinon.fake();
         overrides = mergeOverrides(
           withNoopAppMetadata(),
           ...secondOverrides,
@@ -699,12 +694,12 @@ describe('App', () => {
         it('should extract valid enterprise_id in a shared channel #935', async () => {
           // Arrange
           const fakeAxiosPost = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
 
           // Act
           let workedAsExpected = false;
-          const app = new App({
+          const app = new MockApp({
             receiver: fakeReceiver,
             authorize: async ({ enterpriseId }) => {
               if (enterpriseId !== undefined) {
@@ -1185,13 +1180,13 @@ describe('App', () => {
           const shortcutFn = sinon.fake.resolves({});
           const viewFn = sinon.fake.resolves({});
           const optionsFn = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
           const dummyReceiverEvents = createReceiverEvents();
 
           // Act
           const fakeLogger = createFakeLogger();
-          const app = new App({
+          const app = new MockApp({
             logger: fakeLogger,
             receiver: fakeReceiver,
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
@@ -1302,13 +1297,13 @@ describe('App', () => {
           const shortcutFn = sinon.fake.resolves({});
           const viewFn = sinon.fake.resolves({});
           const optionsFn = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
           const dummyReceiverEvents = createOrgAppReceiverEvents();
 
           // Act
           const fakeLogger = createFakeLogger();
-          const app = new App({
+          const app = new MockApp({
             logger: fakeLogger,
             receiver: fakeReceiver,
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
@@ -1407,12 +1402,12 @@ describe('App', () => {
       describe('command()', () => {
         it('should respond to exact name matches', async () => {
           // Arrange
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
           let matchCount = 0;
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command('/hello', async () => {
             ++matchCount;
           });
@@ -1430,12 +1425,12 @@ describe('App', () => {
 
         it('should respond to pattern matches', async () => {
           // Arrange
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
           let matchCount = 0;
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command(/h.*/, async () => {
             ++matchCount;
           });
@@ -1453,13 +1448,13 @@ describe('App', () => {
 
         it('should run all matching listeners', async () => {
           // Arrange
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
           let firstCount = 0;
           let secondCount = 0;
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command(/h.*/, async () => {
             ++firstCount;
           });
@@ -1481,13 +1476,13 @@ describe('App', () => {
 
         it('should not stop at an unsuccessful match', async () => {
           // Arrange
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
           let firstCount = 0;
           let secondCount = 0;
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command(/x.*/, async () => {
             ++firstCount;
           });
@@ -1515,11 +1510,11 @@ describe('App', () => {
           const responseUrl = 'https://fake.slack/response_url';
           const actionId = 'block_action_id';
           const fakeAxiosPost = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.action(actionId, async ({ respond }) => {
             await respond(responseText);
           });
@@ -1554,11 +1549,11 @@ describe('App', () => {
           const responseUrl = 'https://fake.slack/response_url';
           const actionId = 'block_action_id';
           const fakeAxiosPost = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.action(actionId, async ({ respond }) => {
             await respond(responseObject);
           });
@@ -1590,11 +1585,11 @@ describe('App', () => {
           const responseObject = { text: 'response' };
           const responseUrl = 'https://fake.slack/response_url';
           const fakeAxiosPost = sinon.fake.resolves({});
-          const overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.view('view-id', async ({ respond }) => {
             await respond(responseObject);
           });
@@ -1635,9 +1630,9 @@ describe('App', () => {
       describe('logger', () => {
         it('should be available in middleware/listener args', async () => {
           // Arrange
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          const MockApp = await importApp(overrides);
           const fakeLogger = createFakeLogger();
-          const app = new App({
+          const app = new MockApp({
             logger: fakeLogger,
             receiver: fakeReceiver,
             authorize: sinon.fake.resolves(dummyAuthorizationResult),
@@ -1682,9 +1677,9 @@ describe('App', () => {
 
         it('should work in the case both logger and logLevel are given', async () => {
           // Arrange
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          const MockApp = await importApp(overrides);
           const fakeLogger = createFakeLogger();
-          const app = new App({
+          const app = new MockApp({
             logger: fakeLogger,
             logLevel: LogLevel.DEBUG,
             receiver: fakeReceiver,
@@ -1734,15 +1729,14 @@ describe('App', () => {
         it('should be available in middleware/listener args', async () => {
           // Arrange
           // eslint-disable-next-line  @typescript-eslint/naming-convention
-          const App = await importApp(
+          const MockApp = await importApp(
             mergeOverrides(
-              // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
               withNoopAppMetadata(),
               withSuccessfulBotUserFetchingWebClient('B123', 'U123'),
             ),
           );
           const tokens = ['xoxb-123', 'xoxp-456', 'xoxb-123'];
-          const app = new App({
+          const app = new MockApp({
             receiver: fakeReceiver,
             authorize: () => {
               const token = tokens.pop();
@@ -1786,7 +1780,7 @@ describe('App', () => {
           const receiverEvents = [event, event, event];
 
           // Act
-          await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
+          await Promise.all(receiverEvents.map((evt) => fakeReceiver.sendEvent(evt)));
 
           // Assert
           assert.isUndefined(app.client.token);
@@ -1801,8 +1795,8 @@ describe('App', () => {
 
         it("should be to the global app client when authorization doesn't produce a token", async () => {
           // Arrange
-          const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-          const app = new App({
+          const MockApp = await importApp();
+          const app = new MockApp({
             receiver: fakeReceiver,
             authorize: noopAuthorize,
             ignoreSelf: false,
@@ -1893,14 +1887,14 @@ describe('App', () => {
         it('should send a simple message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
-          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withPostMessage(fakePostMessage)]);
+          const MockApp = await importApp(overrides);
 
           const dummyMessage = 'test';
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
@@ -1923,14 +1917,14 @@ describe('App', () => {
         it('should send a complex message to a channel where the incoming event originates', async () => {
           // Arrange
           const fakePostMessage = sinon.fake.resolves({});
-          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withPostMessage(fakePostMessage)]);
+          const MockApp = await importApp(overrides);
 
           const dummyMessage = { text: 'test' };
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
@@ -1999,14 +1993,14 @@ describe('App', () => {
 
         it("should not exist in the arguments on incoming events that don't support say", async () => {
           // Arrange
-          const overrides = buildOverrides([withNoopWebClient()]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withNoopWebClient()]);
+          const MockApp = await importApp(overrides);
 
           const assertionAggregator = sinon.fake();
           const dummyReceiverEvents = createReceiverEventsWithoutSay(dummyChannelId);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use(async (args) => {
             assert.isUndefined((args as any).say);
             // If the above assertion fails, then it would throw an AssertionError and the following line will not be
@@ -2023,14 +2017,14 @@ describe('App', () => {
         it("should handle failures through the App's global error handler", async () => {
           // Arrange
           const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
-          const overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-          const App = await importApp(overrides); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+          overrides = buildOverrides([withPostMessage(fakePostMessage)]);
+          const MockApp = await importApp(overrides);
 
           const dummyMessage = { text: 'test' };
           const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
           // Act
-          const app = new App({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.use(async (args) => {
             // By definition, these events should all produce a say function, so we cast args.say into a SayFn
             const say = (args as any).say as SayFn;
