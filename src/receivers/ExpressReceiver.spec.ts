@@ -78,9 +78,11 @@ describe('ExpressReceiver', function () {
   function buildResponseToVerify(result: any): Response {
     return {
       status: (code: number) => {
+        // eslint-disable-next-line no-param-reassign
         result.code = code;
         return {
           send: () => {
+            // eslint-disable-next-line no-param-reassign
             result.sent = true;
           },
         } as any as Response;
@@ -419,6 +421,7 @@ describe('ExpressReceiver', function () {
       // Arrange
       const resp = buildResponseToVerify(state);
       const next = (error: any) => {
+        // eslint-disable-next-line no-param-reassign
         state.error = error;
       };
 
