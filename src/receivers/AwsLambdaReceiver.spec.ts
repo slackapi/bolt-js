@@ -109,7 +109,7 @@ describe('AwsLambdaReceiver', function () {
         pathParameters: null,
         stageVariables: null,
         requestContext: {},
-        body: body,
+        body,
         isBase64Encoded: false,
       };
       const response1 = await handler(
@@ -190,7 +190,7 @@ describe('AwsLambdaReceiver', function () {
         pathParameters: null,
         stageVariables: null,
         requestContext: {},
-        body: body,
+        body,
         isBase64Encoded: false,
       };
       const response1 = await handler(
@@ -243,7 +243,7 @@ describe('AwsLambdaReceiver', function () {
         pathParameters: null,
         stageVariables: null,
         requestContext: {},
-        body: body,
+        body,
         isBase64Encoded: false,
       };
       const response1 = await handler(
@@ -298,7 +298,7 @@ describe('AwsLambdaReceiver', function () {
         pathParameters: null,
         stageVariables: null,
         requestContext: {},
-        body: body,
+        body,
         isBase64Encoded: false,
       };
       const response1 = await handler(
