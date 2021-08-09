@@ -847,9 +847,13 @@ export default class App {
                 context,
                 client,
                 this.logger,
-                async () =>
-                  // When the listener middleware chain is done processing, call the listener without a next fn
-                  listener({ ...(listenerArgs as AnyMiddlewareArgs), context, client, logger: this.logger }),
+                // When the listener middleware chain is done processing, call the listener without a next fn
+                async () => listener({
+                  ...(listenerArgs as AnyMiddlewareArgs),
+                  context,
+                  client,
+                  logger: this.logger,
+                }),
               );
             }
           });
@@ -1131,11 +1135,11 @@ function selectToken(context: Context): string | undefined {
 
 function buildRespondFn(
   axiosInstance: AxiosInstance,
-  response_url: string,
+  responseUrl: string,
 ): (response: string | RespondArguments) => Promise<AxiosResponse> {
   return async (message: string | RespondArguments) => {
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
-    return axiosInstance.post(response_url, normalizedArgs);
+    return axiosInstance.post(responseUrl, normalizedArgs);
   };
 }
 
