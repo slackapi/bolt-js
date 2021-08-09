@@ -29,9 +29,8 @@
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "eslint --ext .ts src",
-    "test-lint": "eslint --no-eslintrc -c .eslintrc.test.js \"src/**/*.spec.ts\" --fix && eslint --no-eslintrc -c .eslintrc.test.js \"src/test-helpers.ts\"",
     "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run lint && npm run test-lint && npm run mocha && npm run test:types",
+    "test": "npm run lint && npm run mocha && npm run test:types",
     "test:types": "tsd",
     "coverage": "codecov",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
