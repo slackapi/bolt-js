@@ -226,6 +226,10 @@ module.exports = {
             'selector': 'objectLiteralProperty',
             format: ['camelCase', 'snake_case', 'PascalCase'] 
           },
+          {
+            selector: ['enumMember'],
+            format: ['PascalCase'],
+          },
         ],
 
         // Allow cyclical imports. Turning this rule on is mainly a way to manage the performance concern for linting
