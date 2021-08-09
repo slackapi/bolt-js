@@ -433,6 +433,7 @@ export default class App {
   public start(
     ...args: Parameters<HTTPReceiver['start'] | SocketModeReceiver['start']>
   ): ReturnType<HTTPReceiver['start']> {
+    // TODO: HTTPReceiver['start'] should be the actual receiver's return type
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 

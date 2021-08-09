@@ -57,6 +57,6 @@ app.message('goodbye', async ({ message, say }) => {
 
 // Handle the Lambda function event
 module.exports.handler = async (event, context, callback) => {
-  const handler = await app.start();
+  const handler = await awsLambdaReceiver.start();
   return handler(event, context, callback);
 }
