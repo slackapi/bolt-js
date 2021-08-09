@@ -262,7 +262,7 @@ describe('App', () => {
         '@slack/web-api': {
           WebClient: class {
             constructor() {
-              fakeConstructor(...arguments);
+              fakeConstructor(...arguments); // eslint-disable-line prefer-rest-params
             }
           },
         },
@@ -288,8 +288,9 @@ describe('App', () => {
         '@slack/web-api': {
           WebClient: class {
             constructor() {
-              fakeConstructor(...arguments);
+              fakeConstructor(...arguments); // eslint-disable-line prefer-rest-params
             }
+
             public auth = {
               test: () => {
                 throw new Error('This API method call should not be performed');
@@ -517,17 +518,16 @@ describe('App', () => {
          * @param orderUp The order it should be called when processing middleware up the chain
          */
         const assertOrderMiddleware =
-          (orderDown: number, orderUp: number) =>
-            async ({ next }: { next?: NextFn }) => {
-              await delay(100);
-              middlewareCount += 1;
-              assert.equal(middlewareCount, orderDown);
-              if (next !== undefined) {
-                await next();
-              }
-              middlewareCount += 1;
-              assert.equal(middlewareCount, orderUp);
-            };
+          (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
+            await delay(100);
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderDown);
+            if (next !== undefined) {
+              await next();
+            }
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderUp);
+          };
 
         app.use(assertOrderMiddleware(1, 8));
         app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -661,7 +661,7 @@ describe('App', () => {
         /* middleware is a private property on App. Since app.step relies on app.use,
         and app.use is fully tested above, we're opting just to ensure that the step listener
         is added to the global middleware array, rather than repeating the same tests. */
-        const middleware = (app as any).middleware;
+        const { middleware } = (app as any);
 
         assert.equal(middleware.length, 2);
 
@@ -1379,7 +1379,7 @@ describe('App', () => {
           // Act
           const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command('/hello', async () => {
-            ++matchCount;
+            matchCount += 1;
           });
           await fakeReceiver.sendEvent({
             body: {
@@ -1402,7 +1402,7 @@ describe('App', () => {
           // Act
           const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command(/h.*/, async () => {
-            ++matchCount;
+            matchCount += 1;
           });
           await fakeReceiver.sendEvent({
             body: {
@@ -1426,10 +1426,10 @@ describe('App', () => {
           // Act
           const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command(/h.*/, async () => {
-            ++firstCount;
+            firstCount += 1;
           });
           app.command(/he.*/, async () => {
-            ++secondCount;
+            secondCount += 1;
           });
           await fakeReceiver.sendEvent({
             body: {
@@ -1454,10 +1454,10 @@ describe('App', () => {
           // Act
           const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
           app.command(/x.*/, async () => {
-            ++firstCount;
+            firstCount += 1;
           });
           app.command(/h.*/, async () => {
-            ++secondCount;
+            secondCount += 1;
           });
           await fakeReceiver.sendEvent({
             body: {
@@ -1909,9 +1909,9 @@ describe('App', () => {
           fakePostMessage.getCalls().forEach((call) => {
             const firstArg = call.args[0];
             assert.propertyVal(firstArg, 'channel', dummyChannelId);
-            for (const prop in dummyMessage) {
+            Object.keys(dummyMessage).forEach((prop) => {
               assert.propertyVal(firstArg, prop, (dummyMessage as any)[prop]);
-            }
+            });
           });
           assert(fakeErrorHandler.notCalled);
         });
@@ -2042,12 +2042,15 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
     '@slack/web-api': {
       WebClient: class {
         public token?: string;
+
         constructor(token?: string, _options?: WebClientOptions) {
           this.token = token;
         }
+
         public auth = {
           test: sinon.fake.resolves({ user_id: botUserId }),
         };
+
         public users = {
           info: sinon.fake.resolves({
             user: {
