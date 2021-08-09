@@ -555,7 +555,7 @@ describe('ExpressReceiver', function () {
       reqAsStream.push(null); // indicate EOF
       (reqAsStream as { [key: string]: any }).headers = {
         'x-slack-signature': signature,
-        /*'x-slack-request-timestamp': requestTimestamp, */
+        /* 'x-slack-request-timestamp': requestTimestamp, */
         'content-type': 'application/x-www-form-urlencoded',
       };
       await verifyMissingHeaderDetection(reqAsStream as Request);
@@ -566,7 +566,7 @@ describe('ExpressReceiver', function () {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
-          /*'x-slack-request-timestamp': requestTimestamp, */
+          /* 'x-slack-request-timestamp': requestTimestamp, */
           'content-type': 'application/x-www-form-urlencoded',
         },
       };
