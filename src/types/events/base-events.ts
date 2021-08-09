@@ -608,7 +608,6 @@ export interface SharedChannelItem {
   is_im: boolean;
   name: string;
 }
-
 export interface SharedChannelInviteAccepted {
   type: 'shared_channel_invite_accepted';
   approval_required: boolean;
