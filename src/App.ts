@@ -925,9 +925,9 @@ function singleAuthorization(
   if (tokenVerificationEnabled) {
     // call auth.test immediately
     cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
-    return async ({ isEnterpriseInstall }) => {
-      return buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
-    };
+    return async ({ isEnterpriseInstall }) => buildAuthorizeResult(
+      isEnterpriseInstall, cachedAuthTestResult, authorization,
+    );
   }
   return async ({ isEnterpriseInstall }) => {
     // hold off calling auth.test API until the first access to authorize function

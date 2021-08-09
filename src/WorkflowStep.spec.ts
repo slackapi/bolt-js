@@ -21,9 +21,7 @@ async function importWorkflowStep(overrides: Override = {}): Promise<typeof impo
   return rewiremock.module(() => import('./WorkflowStep'), overrides);
 }
 
-const MOCK_FN = async () => {
-  return;
-};
+const MOCK_FN = async () => {};
 
 const MOCK_CONFIG_SINGLE = {
   edit: MOCK_FN,

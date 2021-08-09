@@ -26,13 +26,9 @@ class FakeReceiver implements Receiver {
     this.bolt = bolt;
   };
 
-  public start = sinon.fake((...params: any[]): Promise<unknown> => {
-    return Promise.resolve([...params]);
-  });
+  public start = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
 
-  public stop = sinon.fake((...params: any[]): Promise<unknown> => {
-    return Promise.resolve([...params]);
-  });
+  public stop = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
 
   public async sendEvent(event: ReceiverEvent): Promise<void> {
     return this.bolt?.processEvent(event);
