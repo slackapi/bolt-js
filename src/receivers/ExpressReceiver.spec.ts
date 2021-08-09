@@ -318,7 +318,7 @@ describe('ExpressReceiver', function () {
         // Arrange
         // tslint:disable-next-line: no-object-literal-type-assertion
         const req = { body: { type: 'url_verification', challenge: 'this is it' } } as Request;
-        let sentBody = undefined;
+        let sentBody;
         // tslint:disable-next-line: no-object-literal-type-assertion
         const resp = {
           json: (body) => {
@@ -342,7 +342,7 @@ describe('ExpressReceiver', function () {
         // Arrange
         // tslint:disable-next-line: no-object-literal-type-assertion
         const req = { body: { ssl_check: 1 } } as Request;
-        let sentBody = undefined;
+        let sentBody;
         // tslint:disable-next-line: no-object-literal-type-assertion
         const resp = {
           json: (body) => {
