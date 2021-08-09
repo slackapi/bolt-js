@@ -731,11 +731,11 @@ export default class App {
     } = {
       body: bodyArg,
       payload:
-        type === IncomingEventType.Event
+        type === IncomingEventType.Event // eslint-disable-line no-nested-ternary
           ? (bodyArg as SlackEventMiddlewareArgs['body']).event
-          : type === IncomingEventType.ViewAction
+          : type === IncomingEventType.ViewAction // eslint-disable-line no-nested-ternary
             ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-            : type === IncomingEventType.Shortcut
+            : type === IncomingEventType.Shortcut // eslint-disable-line no-nested-ternary
               ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
               : type === IncomingEventType.Action &&
                 isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
