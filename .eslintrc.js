@@ -182,7 +182,8 @@ module.exports = {
         // template string contains placeholders. The rest of this setting is copied from the AirBnb config.
         quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
 
-        // TODO: not sure if this will work because of plugin loading on .js files
+        // the server side Slack API uses snake_case for parameters often
+        // for mocking and override support, we need to allow snake_case
         // Allow leading underscores for parameter names, which is used to acknowledge unused variables in TypeScript.
         // Also, enforce camelCase naming for variables. Ideally, the leading underscore could be restricted to only
         // unused parameter names, but this rule isn't capable of knowing when a variable is unused. The camelcase and
@@ -195,12 +196,16 @@ module.exports = {
           {
             selector: 'default',
             format: ['camelCase'],
+            filter: {
+              regex: '^_',
+              match: false
+            },
           },
           {
             selector: 'variable',
             // PascalCase for variables is added to allow exporting a singleton, function library, or bare object as in
             // section 23.8 of the AirBnB style guide
-            format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+            format: ['camelCase', 'PascalCase', 'UPPER_CASE', 'snake_case'],
           },
           {
             selector: 'parameter',
@@ -209,7 +214,19 @@ module.exports = {
           },
           {
             selector: 'typeLike',
-            format: ['PascalCase'],
+            format: ['PascalCase', 'camelCase'],
+            filter: {
+              regex: '^_',
+              match: false
+            },
+          },
+          {
+            selector: 'typeProperty',
+            format: ['snake_case', 'camelCase'],
+          },
+          {
+            'selector': 'objectLiteralProperty',
+            format: ['camelCase', 'snake_case', 'PascalCase'] 
           },
         ],
 
@@ -232,22 +249,6 @@ module.exports = {
         // styles.
         'object-curly-newline': ['error', { multiline: true, consistent: true }],
 
-      },
-    },
-    {
-      files: ['src/types/**/*.ts'],
-      rules: {
-        // Type-specific rules
-        // ---
-        // Rules that only apply to Typescript source files under src/types
-
-        '@typescript-eslint/naming-convention': [
-          'error',
-          {
-            selector: 'typeProperty',
-            format: ['snake_case', 'camelCase'],
-          },
-        ],
       },
     },
   ],
