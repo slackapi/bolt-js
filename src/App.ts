@@ -59,8 +59,7 @@ import { IncomingEventType, getTypeAndConversation, assertNever } from './helper
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError } from './errors';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
+import packageJson from '../package.json';
 
 // ----------------------------
 // For listener registration methods
