@@ -202,6 +202,16 @@ module.exports = {
             },
           },
           {
+            // When defining properties on an object...
+            selector: 'objectLiteralProperty',
+            // ... do not enforce any particular format...
+            format: null,
+            // ... when the property name is enclosed in quotes
+            modifiers: ['requiresQuotes'],
+            // The above is useful for things like quoting HTTP header names
+            // i.e. { 'Content-Type': 'application/json' }
+          },
+          {
             selector: 'variable',
             // PascalCase for variables is added to allow exporting a singleton, function library, or bare object as in
             // section 23.8 of the AirBnB style guide
