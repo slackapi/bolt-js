@@ -10,6 +10,8 @@ import { WebClientOptions } from '@slack/web-api';
 import AwsLambdaReceiver from './AwsLambdaReceiver';
 import { Override, mergeOverrides } from '../test-helpers';
 
+const noop = () => Promise.resolve(undefined);
+
 describe('AwsLambdaReceiver', function () {
   beforeEach(function () {});
 
@@ -124,7 +126,7 @@ describe('AwsLambdaReceiver', function () {
         token: 'xoxb-',
         receiver: awsReceiver,
       });
-      app.event('app_mention', async ({}) => {});
+      app.event('app_mention', noop);
       const response2 = await handler(
         awsEvent,
         {},
@@ -205,7 +207,7 @@ describe('AwsLambdaReceiver', function () {
         token: 'xoxb-',
         receiver: awsReceiver,
       });
-      app.event('app_mention', async ({}) => {});
+      app.event('app_mention', noop);
       const response2 = await handler(
         awsEvent,
         {},
