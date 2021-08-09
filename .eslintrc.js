@@ -6,7 +6,6 @@
 // the communities' recommended styles for the technologies used as we can. When, and only when, we have a stated need
 // to differentiate, we add more rules (or modify options). Therefore, the fewer rules directly defined in this file,
 // the better.
-//
 
 const jsDocPlugin = require('eslint-plugin-jsdoc');
 
@@ -159,6 +158,10 @@ module.exports = {
         // override section below because a distinct override is necessary in JavaScript files.
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
+        
+        // In mixed async + Promise code, consistent-return can be a pain to
+        // adhere to
+        'consistent-return': 'off',
       },
     },
     {
