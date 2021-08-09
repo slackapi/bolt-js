@@ -6,7 +6,6 @@
 // the communities' recommended styles for the technologies used as we can. When, and only when, we have a stated need
 // to differentiate, we add more rules (or modify options). Therefore, the fewer rules directly defined in this file,
 // the better.
-//
 
 const jsDocPlugin = require('eslint-plugin-jsdoc');
 
@@ -108,15 +107,6 @@ module.exports = {
         // NOTE: Consider contributing this to the `airbnb-typescript` config.
         'import/named': 'off',
         'node/no-missing-import': 'off',
-
-        // Prevent using non-boolean types as conditions. This ensures we're not relying on implicit type coercions in
-        // conditionals, which can lead to unintended behavior.
-        // NOTE: Consider contributing this to the `airbnb-typescript` config. https://github.com/airbnb/javascript#comparison--shortcuts
-        '@typescript-eslint/strict-boolean-expressions': ['error', {
-          allowString: false,
-          allowNumber: false,
-          allowNullableObject: false,
-        }],
 
         // Prefer an interface declaration over a type alias because interfaces can be extended, implemented, and merged
         '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
