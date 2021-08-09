@@ -1196,63 +1196,51 @@ describe('App', () => {
             await ackFn();
             await next!();
           });
-          app.shortcut({ callback_id: 'message_action_callback_id' }, async ({}) => {
+          app.shortcut({ callback_id: 'message_action_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, async ({}) => {
+          app.shortcut({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'message_action', callback_id: 'does_not_exist' }, async ({}) => {
+          app.shortcut({ type: 'message_action', callback_id: 'does_not_exist' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ callback_id: 'shortcut_callback_id' }, async ({}) => {
+          app.shortcut({ callback_id: 'shortcut_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'shortcut', callback_id: 'another_shortcut_callback_id' }, async ({}) => {
+          app.shortcut({ type: 'shortcut', callback_id: 'another_shortcut_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async ({}) => {
+          app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async () => {
             await shortcutFn();
           });
-          app.action('block_action_id', async ({}) => {
+          app.action('block_action_id', async () => {
             await actionFn();
           });
-          app.action({ callback_id: 'interactive_message_callback_id' }, async ({}) => {
+          app.action({ callback_id: 'interactive_message_callback_id' }, async () => {
             await actionFn();
           });
-          app.action({ callback_id: 'dialog_submission_callback_id' }, async ({}) => {
+          app.action({ callback_id: 'dialog_submission_callback_id' }, async () => {
             await actionFn();
           });
-          app.view('view_callback_id', async ({}) => {
+          app.view('view_callback_id', async () => {
             await viewFn();
           });
-          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async ({}) => {
+          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async () => {
             await viewFn();
           });
-          app.options('external_select_action_id', async ({}) => {
+          app.options('external_select_action_id', async () => {
             await optionsFn();
           });
-          app.options({ callback_id: 'dialog_suggestion_callback_id' }, async ({}) => {
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, async () => {
             await optionsFn();
           });
 
-          app.event('app_home_opened', async ({}) => {
-            /* noop */
-          });
-
-          app.event(/app_home_opened|app_mention/, async ({}) => {
-            /* noop */
-          });
-
-          app.message('hello', async ({}) => {
-            /* noop */
-          });
-          app.command('/echo', async ({}) => {
-            /* noop */
-          });
-          app.command(/\/e.*/, async ({}) => {
-            /* noop */
-          });
+          app.event('app_home_opened', noop);
+          app.event(/app_home_opened|app_mention/, noop);
+          app.message('hello', noop);
+          app.command('/echo', noop);
+          app.command(/\/e.*/, noop);
 
           // invalid view constraints
           const invalidViewConstraints1 = {
@@ -1260,9 +1248,7 @@ describe('App', () => {
             type: 'view_submission',
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints1, async ({}) => {
-            /* noop */
-          });
+          app.view(invalidViewConstraints1, noop);
           assert.isTrue(fakeLogger.error.called);
 
           fakeLogger.error = sinon.fake();
@@ -1272,9 +1258,7 @@ describe('App', () => {
             type: undefined,
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints2, async ({}) => {
-            /* noop */
-          });
+          app.view(invalidViewConstraints2, noop);
           assert.isTrue(fakeLogger.error.called);
 
           app.error(fakeErrorHandler);
@@ -1313,55 +1297,49 @@ describe('App', () => {
             await ackFn();
             await next!();
           });
-          app.shortcut({ callback_id: 'message_action_callback_id' }, async ({}) => {
+          app.shortcut({ callback_id: 'message_action_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, async ({}) => {
+          app.shortcut({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'message_action', callback_id: 'does_not_exist' }, async ({}) => {
+          app.shortcut({ type: 'message_action', callback_id: 'does_not_exist' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ callback_id: 'shortcut_callback_id' }, async ({}) => {
+          app.shortcut({ callback_id: 'shortcut_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'shortcut', callback_id: 'another_shortcut_callback_id' }, async ({}) => {
+          app.shortcut({ type: 'shortcut', callback_id: 'another_shortcut_callback_id' }, async () => {
             await shortcutFn();
           });
-          app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async ({}) => {
+          app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async () => {
             await shortcutFn();
           });
-          app.action('block_action_id', async ({}) => {
+          app.action('block_action_id', async () => {
             await actionFn();
           });
-          app.action({ callback_id: 'interactive_message_callback_id' }, async ({}) => {
+          app.action({ callback_id: 'interactive_message_callback_id' }, async () => {
             await actionFn();
           });
-          app.action({ callback_id: 'dialog_submission_callback_id' }, async ({}) => {
+          app.action({ callback_id: 'dialog_submission_callback_id' }, async () => {
             await actionFn();
           });
-          app.view('view_callback_id', async ({}) => {
+          app.view('view_callback_id', async () => {
             await viewFn();
           });
-          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async ({}) => {
+          app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async () => {
             await viewFn();
           });
-          app.options('external_select_action_id', async ({}) => {
+          app.options('external_select_action_id', async () => {
             await optionsFn();
           });
-          app.options({ callback_id: 'dialog_suggestion_callback_id' }, async ({}) => {
+          app.options({ callback_id: 'dialog_suggestion_callback_id' }, async () => {
             await optionsFn();
           });
 
-          app.event('app_home_opened', async ({}) => {
-            /* noop */
-          });
-          app.message('hello', async ({}) => {
-            /* noop */
-          });
-          app.command('/echo', async ({}) => {
-            /* noop */
-          });
+          app.event('app_home_opened', noop);
+          app.message('hello', noop);
+          app.command('/echo', noop);
 
           // invalid view constraints
           const invalidViewConstraints1 = {
@@ -1369,9 +1347,7 @@ describe('App', () => {
             type: 'view_submission',
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints1, async ({}) => {
-            /* noop */
-          });
+          app.view(invalidViewConstraints1, noop);
           assert.isTrue(fakeLogger.error.called);
 
           fakeLogger.error = sinon.fake();
@@ -1381,9 +1357,7 @@ describe('App', () => {
             type: undefined,
             unknown_key: 'should be detected',
           } as any as ViewConstraints;
-          app.view(invalidViewConstraints2, async ({}) => {
-            /* noop */
-          });
+          app.view(invalidViewConstraints2, noop);
           assert.isTrue(fakeLogger.error.called);
 
           app.error(fakeErrorHandler);
