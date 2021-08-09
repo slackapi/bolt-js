@@ -174,8 +174,7 @@ describe('WorkflowStep', () => {
     it('should remove next() from all original event args', async () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
 
       const { prepareStepArgs } = await importWorkflowStep();
 
@@ -256,8 +255,7 @@ describe('WorkflowStep', () => {
     });
 
     it('complete should call workflows.stepCompleted', async () => {
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
 
       const fakeClient = { workflows: { stepCompleted: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
@@ -274,8 +272,7 @@ describe('WorkflowStep', () => {
     });
 
     it('fail should call workflows.stepFailed', async () => {
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
 
       const fakeClient = { workflows: { stepFailed: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
