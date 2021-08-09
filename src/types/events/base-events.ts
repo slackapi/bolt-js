@@ -569,6 +569,7 @@ export interface SharedChannelTeamItem {
   icon: object;
   is_verified: boolean;
   domain: string;
+  date_created: number;
 }
 export interface SharedChannelUserItem {
   id: string;
@@ -578,8 +579,17 @@ export interface SharedChannelUserItem {
   profile: {
     real_name: string;
     display_name: string;
+    real_name_normalized: string;
+    display_name_normalized: string;
     team: string;
+    avatar_hash: string;
     email: string;
+    image_24: string;
+    image_32: string;
+    image_48: string;
+    image_72: string;
+    image_192: string;
+    image_512: string;
   };
 }
 export interface SharedChannelInviteItem {
@@ -588,9 +598,8 @@ export interface SharedChannelInviteItem {
   date_invalid: number;
   inviting_team: SharedChannelTeamItem;
   inviting_user: SharedChannelUserItem;
-  recipient_email: string;
-  message: string;
-  recipient_user_id: string;
+  recipient_email?: string;
+  recipient_user_id?: string;
 }
 
 export interface SharedChannelItem {
@@ -599,6 +608,7 @@ export interface SharedChannelItem {
   is_im: boolean;
   name: string;
 }
+
 export interface SharedChannelInviteAccepted {
   type: 'shared_channel_invite_accepted';
   approval_required: boolean;
@@ -626,6 +636,7 @@ export interface SharedChannelInviteDeclined {
   declining_team_id: string;
   teams_in_channel: SharedChannelTeamItem[];
   declining_user: SharedChannelUserItem;
+  event_ts: string;
 }
 
 export interface SharedChannelInviteReceived {
@@ -633,14 +644,6 @@ export interface SharedChannelInviteReceived {
   invite: SharedChannelInviteItem;
   channel: SharedChannelItem;
   event_ts: string;
-  app_id: string;
-  team_id: string;
-  authorizations: {
-    is_enterprise_install: boolean;
-    is_bot: boolean;
-    user_id: string;
-    team_id: string;
-  };
 }
 
 export interface StarAddedEvent {
