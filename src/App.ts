@@ -718,7 +718,38 @@ export default class App {
       };
     };
 
-    // Set body and payload (this value will eventually conform to AnyMiddlewareArgs)
+    // Set body and payload
+    // TODO: this value should eventually conform to AnyMiddlewareArgs
+    let payload: any = {};
+    switch (type) {
+      case IncomingEventType.Event:
+        payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
+        break;
+      case IncomingEventType.ViewAction:
+        payload = (bodyArg as SlackViewMiddlewareArgs['body']).view;
+        break;
+      case IncomingEventType.Shortcut:
+        payload = (bodyArg as SlackShortcutMiddlewareArgs['body']);
+        break;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore: Fallthrough case in switch
+      case IncomingEventType.Action:
+        if (isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) {
+          const { actions } = (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']);
+          [payload] = actions;
+          break;
+        }
+        // If above conditional does not hit, fall through to fallback payload in default block below
+      default:
+        payload = (bodyArg as (
+          | Exclude<
+          AnyMiddlewareArgs,
+          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+          >
+          | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
+        )['body']);
+        break;
+    }
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
     const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
@@ -730,23 +761,7 @@ export default class App {
       ack?: AckFn<any>;
     } = {
       body: bodyArg,
-      payload:
-        type === IncomingEventType.Event // eslint-disable-line no-nested-ternary
-          ? (bodyArg as SlackEventMiddlewareArgs['body']).event
-          : type === IncomingEventType.ViewAction // eslint-disable-line no-nested-ternary
-            ? (bodyArg as SlackViewMiddlewareArgs['body']).view
-            : type === IncomingEventType.Shortcut // eslint-disable-line no-nested-ternary
-              ? (bodyArg as SlackShortcutMiddlewareArgs['body'])
-              : type === IncomingEventType.Action &&
-                isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])
-                ? (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions[0]
-                : (bodyArg as (
-                  | Exclude<
-                  AnyMiddlewareArgs,
-                  SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-                  >
-                  | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-                )['body']),
+      payload,
     };
 
     // Set aliases
