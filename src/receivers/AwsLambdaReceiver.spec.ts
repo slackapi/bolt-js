@@ -8,6 +8,7 @@ import AwsLambdaReceiver from './AwsLambdaReceiver';
 import crypto from 'crypto';
 import rewiremock from 'rewiremock';
 import { WebClientOptions } from '@slack/web-api';
+import { AwsHandler } from './AwsLambdaReceiver';
 
 describe('AwsLambdaReceiver', function () {
   beforeEach(function () {});
@@ -48,7 +49,7 @@ describe('AwsLambdaReceiver', function () {
       const awsReceiver = new AwsLambdaReceiver({
         signingSecret: 'my-secret',
       });
-      const handler = await awsReceiver.start();
+      const handler: AwsHandler = await awsReceiver.start();
       assert.isNotNull(handler);
     });
 
