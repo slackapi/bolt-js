@@ -55,6 +55,10 @@ export type SlackEvent =
   | PinRemovedEvent
   | ReactionAddedEvent
   | ReactionRemovedEvent
+  | SharedChannelInviteReceived
+  | SharedChannelInviteAccepted
+  | SharedChannelInviteApproved
+  | SharedChannelInviteDeclined
   | StarAddedEvent
   | StarRemovedEvent
   | SubteamCreated
@@ -558,6 +562,88 @@ export interface ReactionRemovedEvent {
 
 // NOTE: `resources_added`, `resources_removed`, `scope_denied`, `scope_granted`, are left out because they are
 // deprecated as part of the Workspace Apps Developer Preview
+
+export interface SharedChannelTeamItem {
+  id: string;
+  name: string;
+  icon: object;
+  is_verified: boolean;
+  domain: string;
+  date_created: number;
+}
+export interface SharedChannelUserItem {
+  id: string;
+  team_id: string;
+  name: string;
+  updated: number;
+  profile: {
+    real_name: string;
+    display_name: string;
+    real_name_normalized: string;
+    display_name_normalized: string;
+    team: string;
+    avatar_hash: string;
+    email: string;
+    image_24: string;
+    image_32: string;
+    image_48: string;
+    image_72: string;
+    image_192: string;
+    image_512: string;
+  };
+}
+export interface SharedChannelInviteItem {
+  id: string;
+  date_created: number;
+  date_invalid: number;
+  inviting_team: SharedChannelTeamItem;
+  inviting_user: SharedChannelUserItem;
+  recipient_email?: string;
+  recipient_user_id?: string;
+}
+
+export interface SharedChannelItem {
+  id: string;
+  is_private: boolean;
+  is_im: boolean;
+  name: string;
+}
+export interface SharedChannelInviteAccepted {
+  type: 'shared_channel_invite_accepted';
+  approval_required: boolean;
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  teams_in_channel: SharedChannelTeamItem[];
+  accepting_user: SharedChannelUserItem;
+  event_ts: string;
+}
+
+export interface SharedChannelInviteApproved {
+  type: 'shared_channel_invite_approved';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  approving_team_id: string;
+  teams_in_channel: SharedChannelTeamItem[];
+  approving_user: SharedChannelUserItem;
+  event_ts: string;
+}
+
+export interface SharedChannelInviteDeclined {
+  type: 'shared_channel_invite_declined';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  declining_team_id: string;
+  teams_in_channel: SharedChannelTeamItem[];
+  declining_user: SharedChannelUserItem;
+  event_ts: string;
+}
+
+export interface SharedChannelInviteReceived {
+  type: 'shared_channel_invite_received';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  event_ts: string;
+}
 
 export interface StarAddedEvent {
   type: 'star_added';
