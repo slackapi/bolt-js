@@ -16,7 +16,7 @@ As an example, let's say your app should only respond to users identified with a
 </div>
 
 ```javascript
-// Authentication middleware that associates incoming event with user in Acme identity provider
+// Authentication middleware that associates incoming request with user in Acme identity provider
 async function authWithAcme({ payload, client, context, next }) {
   const slackUserId = payload.user;
   const helpChannelId = 'C12345';
@@ -29,7 +29,7 @@ async function authWithAcme({ payload, client, context, next }) {
     // When the user lookup is successful, add the user details to the context
     context.user = user;
   } catch (error) {
-    // This user wasn't found in Acme. Send them an error and don't continue processing event
+    // This user wasn't found in Acme. Send them an error and don't continue processing request
     if (error.message === 'Not Found') {
         await client.chat.postEphemeral({
           channel: payload.channel,
