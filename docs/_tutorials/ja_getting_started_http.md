@@ -78,7 +78,7 @@ Bolt パッケージを新しいプロジェクトにインストールする前
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
-2. **OAuth & Permissions  ページからボット (xoxb) トークンをコピー**し、それを別の環境変数に格納します。
+2. **OAuth & Permissions ページからボット (xoxb) トークンをコピー**し、それを別の環境変数に格納します。
 ```shell
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
