@@ -19,10 +19,10 @@ Slack アプリの管理画面でスラッシュコマンドを設定すると�
 
 ```javascript
 // この echo コマンドは ただ、その引数を（やまびこのように）おうむ返しする
-app.command('/echo', async ({ command, ack, say }) => {
+app.command('/echo', async ({ command, ack, respond }) => {
   // コマンドリクエストを確認
   await ack();
 
-  await say(`${command.text}`);
+  await respond(`${command.text}`);
 });
 ```

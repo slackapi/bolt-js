@@ -19,10 +19,10 @@ When configuring commands within your app configuration, you'll continue to appe
 
 ```javascript
 // The echo command simply echoes on command
-app.command('/echo', async ({ command, ack, say }) => {
+app.command('/echo', async ({ command, ack, respond }) => {
   // Acknowledge command request
   await ack();
 
-  await say(`${command.text}`);
+  await respond(`${command.text}`);
 });
 ```
