@@ -25,7 +25,7 @@ async function addTimezoneContext({ payload, client, context, next }) {
   await next();
 }
 
-app.command('request', addTimezoneContext, async ({ command, ack, client, context }) => {
+app.command('/request', addTimezoneContext, async ({ command, ack, client, context }) => {
   // コマンドリクエストの確認
   await ack();
   // リクエスト時のローカル時間を取得
