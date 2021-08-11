@@ -46,6 +46,14 @@ import {
   Receiver,
   ReceiverEvent,
   RespondArguments,
+  DialogSubmitAction,
+  BlockElementAction,
+  InteractiveAction,
+  ViewOutput,
+  KnownOptionsPayloadFromType,
+  KnownEventFromType,
+  SlashCommand,
+  WorkflowStepEdit,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError } from './errors';
@@ -720,7 +728,8 @@ export default class App {
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    let payload: any = {};
+    let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
+    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
