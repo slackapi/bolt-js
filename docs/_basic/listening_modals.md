@@ -6,7 +6,7 @@ order: 12
 ---
 
 <div class="section-content">
-If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to <code>view_submission</code> events to receive their values. To listen to <code>view_submission</code> events, you can use the built-in <code>view()</code> method.
+If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to <code>view_submission</code> requests to receive their values. To listen to <code>view_submission</code> requests, you can use the built-in <code>view()</code> method.
 
 <code>view()</code> requires a <code>callback_id</code> of type <code>string</code> or <code>RegExp</code>.
 
@@ -16,9 +16,9 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 </div>
 
 ```javascript
-// Handle a view_submission event
+// Handle a view_submission request
 app.view('view_b', async ({ ack, body, view, client }) => {
-  // Acknowledge the view_submission event
+  // Acknowledge the view_submission request
   await ack();
 
   // Do whatever you want with the input data - here we're saving it to a DB then sending the user a verifcation of their submission
