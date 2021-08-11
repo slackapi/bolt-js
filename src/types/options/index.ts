@@ -25,11 +25,11 @@ export interface BasicOptionsPayload<Type extends string = string> {
   value: string;
 }
 
-type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
+export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
   ? BasicOptionsPayload<T>
   : KnownOptionsPayloadFromType<T>;
 
-type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
+export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
 
 /**
  * external data source in blocks
