@@ -108,15 +108,26 @@ Now that you have an app, let's prepare it for AWS Lambda and the Serverless Fra
 
 **1. Prepare the app for AWS Lambda**
 
-By default, Bolt listens for HTTP requests. In this section, we'll customize your Bolt app's [`receiver`](https://slack.dev/bolt-js/concepts#receiver) to respond to Lambda function events instead.
+By default, our Bolt Getting Started app sample is configured to use SocketMode. Let's update the setup in `app.js` to have our app listen for HTTP requests instead.
 
-First, update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
+```javascript
+// Initializes your app with your bot token
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  socketMode: true, // delete this line
+  appToken: process.env.SLACK_APP_TOKEN, // delete this line
+});
+```
+
+Next, we'll customize your Bolt app's [`receiver`](https://slack.dev/bolt-js/concepts#receiver) to respond to Lambda function events.
+
+Update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
 ```javascript
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7) to create a custom receiver using AwsLambdaReceiver:
+Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
 
 ```javascript
 // Initialize your custom receiver
