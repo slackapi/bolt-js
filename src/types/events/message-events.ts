@@ -1,4 +1,4 @@
-import { MessageAttachment, KnownBlock, Block } from '@slack/types';
+import { MessageAttachment, KnownBlock, Block, Metadata } from '@slack/types';
 
 export type MessageEvent =
   | GenericMessageEvent
@@ -41,7 +41,8 @@ export interface GenericMessageEvent {
   };
   client_msg_id?: string;
   parent_user_id?: string;
-
+  app_id?: string;
+  metadata?: Metadata;
   // TODO: optional types that maybe should flow into other subtypes?
   is_starred?: boolean;
   pinned_to?: string[];
