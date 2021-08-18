@@ -121,13 +121,15 @@ const app = new App({
 
 Next, we'll customize your Bolt app's [`receiver`](https://slack.dev/bolt-js/concepts#receiver) to respond to Lambda function events.
 
-Update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
+Update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
 ```javascript
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
+> 💡  If you are planning on implementing authentication with OAuth, as of today you need to use the [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts). 
+
+Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
 
 ```javascript
 // Initialize your custom receiver
