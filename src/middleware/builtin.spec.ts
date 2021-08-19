@@ -820,8 +820,6 @@ const appHomeOpenedEvent: AppHomeOpenedEvent = {
   view: {
     type: 'home',
     blocks: [],
-    clear_on_close: false,
-    notify_on_close: false,
     external_id: '',
   },
   event_ts: '123.123',
