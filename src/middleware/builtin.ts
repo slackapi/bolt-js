@@ -267,7 +267,8 @@ function matchesPattern(pattern: string | RegExp, candidate: string): boolean {
 export function matchFunctionCallback(callback_id: string): Middleware<SlackEventMiddlewareArgs> {
   return async ({ event, next }) => {
     // Filter out any functions that are not the correct function name
-    if (!event || 'function_executed' !== event.type || !event.function || callback_id !== event.function.callback_id) {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (!event || event.type !== 'function_executed' || !event.function || callback_id !== event.function.callback_id) {
       return;
     }
 
