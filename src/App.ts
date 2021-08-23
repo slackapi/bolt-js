@@ -694,6 +694,8 @@ export default class App {
       const e = error as any;
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
       e.code = 'slack_bolt_authorization_error';
+      // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
+      // eslint-disable-next-line consistent-return
       return this.handleError(e);
     }
 
@@ -859,22 +861,23 @@ export default class App {
             // Don't process the last item in the listenerMiddleware array - it shouldn't get a next fn
             const listener = listenerMiddleware.pop();
 
-            if (listener !== undefined) {
-              return processMiddleware(
-                listenerMiddleware,
-                listenerArgs as AnyMiddlewareArgs,
+            if (listener === undefined) {
+              return undefined;
+            }
+            return processMiddleware(
+              listenerMiddleware,
+              listenerArgs as AnyMiddlewareArgs,
+              context,
+              client,
+              this.logger,
+              // When the listener middleware chain is done processing, call the listener without a next fn
+              async () => listener({
+                ...(listenerArgs as AnyMiddlewareArgs),
                 context,
                 client,
-                this.logger,
-                // When the listener middleware chain is done processing, call the listener without a next fn
-                async () => listener({
-                  ...(listenerArgs as AnyMiddlewareArgs),
-                  context,
-                  client,
-                  logger: this.logger,
-                }),
-              );
-            }
+                logger: this.logger,
+              }),
+            );
           });
 
           const settledListenerResults = await allSettled(listenerResults);
@@ -890,6 +893,8 @@ export default class App {
       );
     } catch (error) {
       const e = error as any;
+      // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
+      // eslint-disable-next-line consistent-return
       return this.handleError(e);
     }
   }
