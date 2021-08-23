@@ -137,7 +137,7 @@ export class WorkflowStep {
   /** Step Executed/Run :: 'workflow_step_execute' event */
   private execute: WorkflowStepExecuteMiddleware[];
 
-  constructor(callbackId: string, config: WorkflowStepConfig) {
+  public constructor(callbackId: string, config: WorkflowStepConfig) {
     validate(callbackId, config);
 
     const { save, edit, execute } = config;

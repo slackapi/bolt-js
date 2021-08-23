@@ -402,7 +402,7 @@ function withNoopWebClient(): Override {
       WebClient: class {
         public token?: string;
 
-        constructor(token?: string, _options?: WebClientOptions) {
+        public constructor(token?: string, _options?: WebClientOptions) {
           this.token = token;
         }
 
