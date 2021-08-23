@@ -327,7 +327,7 @@ export default class ExpressReceiver implements Receiver {
           return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
 
-        resolve(this.server);
+        return resolve(this.server);
       });
     });
   }
@@ -335,17 +335,17 @@ export default class ExpressReceiver implements Receiver {
   // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
   // generic types
   public stop(): Promise<void> {
+    if (this.server === undefined) {
+      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+    }
     return new Promise((resolve, reject) => {
-      if (this.server === undefined) {
-        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
-      }
-      this.server.close((error) => {
+      this.server?.close((error) => {
         if (error !== undefined) {
           return reject(error);
         }
 
         this.server = undefined;
-        resolve();
+        return resolve();
       });
     });
   }
