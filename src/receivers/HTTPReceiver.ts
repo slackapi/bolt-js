@@ -110,7 +110,7 @@ export default class HTTPReceiver implements Receiver {
 
   private logger: Logger;
 
-  constructor({
+  public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
     logger = undefined,
