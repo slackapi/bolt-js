@@ -246,7 +246,7 @@ describe('App', () => {
       const overrides = mergeOverrides(withNoopAppMetadata(), {
         '@slack/web-api': {
           WebClient: class {
-            constructor() {
+            public constructor() {
               fakeConstructor(...arguments); // eslint-disable-line prefer-rest-params
             }
           },
@@ -272,7 +272,7 @@ describe('App', () => {
       const overrides = mergeOverrides(withNoopAppMetadata(), {
         '@slack/web-api': {
           WebClient: class {
-            constructor() {
+            public constructor() {
               fakeConstructor(...arguments); // eslint-disable-line prefer-rest-params
             }
 
@@ -2027,7 +2027,7 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
       WebClient: class {
         public token?: string;
 
-        constructor(token?: string, _options?: WebClientOptions) {
+        public constructor(token?: string, _options?: WebClientOptions) {
           this.token = token;
         }
 

@@ -56,7 +56,7 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private logger: Logger;
 
-  constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
+  public constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.logger = logger ??
