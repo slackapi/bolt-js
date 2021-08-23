@@ -714,10 +714,9 @@ export default class App {
     const createSay = (channelId: string): SayFn => {
       const token = selectToken(context);
       return (message: Parameters<SayFn>[0]) => {
-        const postMessageArguments: ChatPostMessageArguments =
-          typeof message === 'string'
-            ? { token, text: message, channel: channelId }
-            : { ...message, token, channel: channelId };
+        const postMessageArguments: ChatPostMessageArguments = typeof message === 'string' ?
+          { token, text: message, channel: channelId } :
+          { ...message, token, channel: channelId };
 
         return this.client.chat.postMessage(postMessageArguments);
       };
