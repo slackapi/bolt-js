@@ -17,9 +17,9 @@ npm install
 This app requires you setup a few environment variables. You can find these values in your [app configuration](https://api.slack.com/apps).
 
 ```bash
-export CLIENT_ID=YOUR_SLACK_CLIENT_ID
-export CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
-export SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
+export SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
+export SLACK_CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
+export SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
 ```
 
 ## Run the App
