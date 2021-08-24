@@ -33,7 +33,7 @@ export interface HTTPReceiverOptions {
 
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
-  directInstallUrlEnabled?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
@@ -64,7 +64,7 @@ export default class HTTPReceiver implements Receiver {
 
   private installPath?: string; // always defined when installer is defined
 
-  private directInstallUrlEnabled?: boolean; // always defined when installer is defined
+  private directInstall?: boolean; // always defined when installer is defined
 
   private installRedirectUriPath?: string; // always defined when installer is defined
 
@@ -120,8 +120,7 @@ export default class HTTPReceiver implements Receiver {
 
       // Store the remaining instance variables that are related to using the InstallProvider
       this.installPath = installerOptions.installPath ?? '/slack/install';
-      this.directInstallUrlEnabled =
-        installerOptions.directInstallUrlEnabled !== undefined && installerOptions.directInstallUrlEnabled;
+      this.directInstall = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
       this.installUrlOptions = {
         scopes: scopes ?? [],
@@ -394,7 +393,7 @@ export default class HTTPReceiver implements Receiver {
         // Generate the URL for the "Add to Slack" button.
         const url = await installer.generateInstallUrl(installUrlOptions);
 
-        if (this.directInstallUrlEnabled !== undefined && this.directInstallUrlEnabled) {
+        if (this.directInstall !== undefined && this.directInstall) {
           // If a Slack app sets "Direct Install URL" in the Slack app configruation,
           // the installation flow of the app should start with the Slack authorize URL.
           // See https://api.slack.com/start/distributing/directory#direct_install for more details.

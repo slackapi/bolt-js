@@ -135,7 +135,7 @@ describe('HTTPReceiver', function () {
         installerOptions: {
           authVersion: 'v2',
           installPath: '/hiya',
-          directInstallUrlEnabled: true,
+          directInstall: true,
           metadata,
           userScopes,
         },

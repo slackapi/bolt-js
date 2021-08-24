@@ -28,7 +28,7 @@ interface InstallerOptions {
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
-  directInstallUrlEnabled?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
@@ -102,8 +102,7 @@ export default class SocketModeReceiver implements Receiver {
 
       // use default or passed in installPath
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
-      const directInstallEnabled =
-        installerOptions.directInstallUrlEnabled !== undefined && installerOptions.directInstallUrlEnabled;
+      const directInstallEnabled = installerOptions.directInstall !== undefined && installerOptions.directInstall;
 
       const server = createServer(async (req, res) => {
         if (req.url !== undefined && req.url.startsWith(redirectUriPath)) {
