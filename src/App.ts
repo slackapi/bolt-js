@@ -305,7 +305,7 @@ export default class App {
     // Check for required arguments of HTTPReceiver
     if (receiver !== undefined) {
       if (this.socketMode) {
-        throw new AppInitializationError('You cannot pass receiver when socketMode is set to true');
+        throw new AppInitializationError('receiver cannot be passed when socketMode is set to true');
       }
       this.receiver = receiver;
     } else if (this.socketMode) {
