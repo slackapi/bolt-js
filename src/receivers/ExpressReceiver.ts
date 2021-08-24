@@ -89,13 +89,6 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
-    if (typeof logger !== 'undefined') {
-      this.logger = logger;
-    } else {
-      this.logger = new ConsoleLogger();
-      this.logger.setLevel(logLevel);
-    }
-
     const expressMiddleware: RequestHandler[] = [
       verifySignatureAndParseRawBody(this.logger, signingSecret),
       respondToSslCheck,
