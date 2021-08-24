@@ -33,6 +33,7 @@ export interface HTTPReceiverOptions {
 
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
+  directInstallUrlEnabled?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
@@ -62,6 +63,8 @@ export default class HTTPReceiver implements Receiver {
   public installer?: InstallProvider;
 
   private installPath?: string; // always defined when installer is defined
+
+  private directInstallUrlEnabled?: boolean; // always defined when installer is defined
 
   private installRedirectUriPath?: string; // always defined when installer is defined
 
@@ -117,6 +120,8 @@ export default class HTTPReceiver implements Receiver {
 
       // Store the remaining instance variables that are related to using the InstallProvider
       this.installPath = installerOptions.installPath ?? '/slack/install';
+      this.directInstallUrlEnabled =
+        installerOptions.directInstallUrlEnabled !== undefined && installerOptions.directInstallUrlEnabled;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
       this.installUrlOptions = {
         scopes: scopes ?? [],
@@ -389,15 +394,24 @@ export default class HTTPReceiver implements Receiver {
         // Generate the URL for the "Add to Slack" button.
         const url = await installer.generateInstallUrl(installUrlOptions);
 
-        // Generate HTML response body
-        const body = renderHtmlForInstallPath(url);
+        if (this.directInstallUrlEnabled !== undefined && this.directInstallUrlEnabled) {
+          // If a Slack app sets "Direct Install URL" in the Slack app configruation,
+          // the installation flow of the app should start with the Slack authorize URL.
+          // See https://api.slack.com/start/distributing/directory#direct_install for more details.
+          res.writeHead(302, { Location: url });
+          res.end('');
+        } else {
+          // The installation starts from a landing page served by this app.
+          // Generate HTML response body
+          const body = renderHtmlForInstallPath(url);
 
-        // Serve a basic HTML page including the "Add to Slack" button.
-        // Regarding headers:
-        // - Content-Type is usually automatically detected by browsers
-        // - Content-Length is not used because Transfer-Encoding='chunked' is automatically used.
-        res.writeHead(200);
-        res.end(body);
+          // Serve a basic HTML page including the "Add to Slack" button.
+          // Regarding headers:
+          // - Content-Type is usually automatically detected by browsers
+          // - Content-Length is not used because Transfer-Encoding='chunked' is automatically used.
+          res.writeHead(200);
+          res.end(body);
+        }
       } catch (err) {
         this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
         this.logger.debug(`Error details: ${err}`);
