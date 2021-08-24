@@ -58,7 +58,8 @@ const app = new App({
   installerOptions: {
     // If this is true, /slack/install redirects installers to the Slack authorize URL
     // without rendering the web page with "Add to Slack" button.
-    directInstallUrlEnabled: true,
+    // This flag is available in @slack/bolt v3.7 or higher
+    // directInstallUrlEnabled: true,
   }
 });
 
