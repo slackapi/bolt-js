@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/naming-convention */
-
 import 'mocha';
 import sinon, { SinonFakeTimers, SinonSpy } from 'sinon';
 import { assert } from 'chai';
@@ -457,7 +455,6 @@ describe('ExpressReceiver', function () {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecretFn || signingSecret);
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
     }
 
@@ -517,7 +514,6 @@ describe('ExpressReceiver', function () {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -562,7 +558,6 @@ describe('ExpressReceiver', function () {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -618,7 +613,6 @@ describe('ExpressReceiver', function () {
       // Act
 
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -652,7 +646,6 @@ describe('ExpressReceiver', function () {
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert
@@ -680,7 +673,6 @@ describe('ExpressReceiver', function () {
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       verifier(req, resp, next);
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await verifier(req, resp, next);
 
       // Assert

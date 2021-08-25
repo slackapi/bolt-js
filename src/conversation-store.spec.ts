@@ -1,4 +1,3 @@
-// eslint-disable import/no-extraneous-dependencies
 import 'mocha';
 import { assert, AssertionError } from 'chai';
 import sinon, { SinonSpy } from 'sinon';

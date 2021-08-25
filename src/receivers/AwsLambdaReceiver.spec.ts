@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/naming-convention */
-
 import sinon from 'sinon';
 import { Logger, LogLevel } from '@slack/logger';
 import { assert } from 'chai';
@@ -117,7 +115,6 @@ describe('AwsLambdaReceiver', function () {
       const response1 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response1.statusCode, 404);
@@ -130,7 +127,6 @@ describe('AwsLambdaReceiver', function () {
       const response2 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response2.statusCode, 200);
@@ -198,7 +194,6 @@ describe('AwsLambdaReceiver', function () {
       const response1 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response1.statusCode, 404);
@@ -211,7 +206,6 @@ describe('AwsLambdaReceiver', function () {
       const response2 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response2.statusCode, 200);
@@ -250,7 +244,6 @@ describe('AwsLambdaReceiver', function () {
       const response1 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response1.statusCode, 404);
@@ -265,7 +258,6 @@ describe('AwsLambdaReceiver', function () {
       const response2 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response2.statusCode, 200);
@@ -304,7 +296,6 @@ describe('AwsLambdaReceiver', function () {
       const response1 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response1.statusCode, 404);
@@ -319,7 +310,6 @@ describe('AwsLambdaReceiver', function () {
       const response2 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response2.statusCode, 200);
@@ -387,7 +377,6 @@ describe('AwsLambdaReceiver', function () {
       const response1 = await handler(
         awsEvent,
         {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_error, _result) => {},
       );
       assert.equal(response1.statusCode, 404);

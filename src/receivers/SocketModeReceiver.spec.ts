@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/naming-convention */
-
 import 'mocha';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
@@ -154,7 +152,6 @@ describe('SocketModeReceiver', function () {
         url: '/heyo',
       };
       const fakeRes = null;
-      /* eslint-disable-next-line @typescript-eslint/await-thenable */
       await this.listener(fakeReq, fakeRes);
       assert(
         installProviderStub.handleCallback.calledWith(
@@ -199,7 +196,6 @@ describe('SocketModeReceiver', function () {
         writeHead: sinon.fake(),
         end: sinon.fake(),
       };
-      /* eslint-disable-next-line @typescript-eslint/await-thenable */
       await this.listener(fakeReq, fakeRes);
       assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
       assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
@@ -283,7 +279,6 @@ describe('SocketModeReceiver', function () {
         writeHead: sinon.fake(),
         end: sinon.fake(),
       };
-      /* eslint-disable-next-line @typescript-eslint/await-thenable */
       await this.listener(fakeReq, fakeRes);
       assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
       assert(fakeRes.end.calledWith(sinon.match("route /nope doesn't exist!")));

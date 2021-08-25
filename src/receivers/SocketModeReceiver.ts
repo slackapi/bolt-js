@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 import { SocketModeClient } from '@slack/socket-mode';
 import { createServer } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
@@ -50,7 +49,7 @@ export default class SocketModeReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
-  constructor({
+  public constructor({
     appToken,
     logger = undefined,
     logLevel = LogLevel.INFO,

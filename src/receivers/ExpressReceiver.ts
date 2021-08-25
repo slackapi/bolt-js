@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
-
 import { createServer, Server, ServerOptions } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
@@ -122,7 +120,7 @@ export default class ExpressReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
-  constructor({
+  public constructor({
     signingSecret = '',
     logger = undefined,
     logLevel = LogLevel.INFO,

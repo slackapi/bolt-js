@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import type { BufferedIncomingMessage } from './receivers/verify-request';
 
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 export interface CodedError extends Error {
   code: string; // This can be a value from ErrorCode, or WebClient's ErrorCode, or a NodeJS error code
   original?: Error; // AuthorizationError, UnknownError
@@ -39,7 +38,7 @@ export class UnknownError extends Error implements CodedError {
 
   public original: Error;
 
-  constructor(original: Error) {
+  public constructor(original: Error) {
     super(original.message);
 
     this.original = original;
@@ -63,7 +62,7 @@ export class AuthorizationError extends Error implements CodedError {
 
   public original: Error;
 
-  constructor(message: string, original: Error) {
+  public constructor(message: string, original: Error) {
     super(message);
 
     this.original = original;
@@ -75,7 +74,7 @@ export class ContextMissingPropertyError extends Error implements CodedError {
 
   public missingProperty: string;
 
-  constructor(missingProperty: string, message: string) {
+  public constructor(missingProperty: string, message: string) {
     super(message);
     this.missingProperty = missingProperty;
   }
@@ -84,7 +83,7 @@ export class ContextMissingPropertyError extends Error implements CodedError {
 export class ReceiverMultipleAckError extends Error implements CodedError {
   public code = ErrorCode.ReceiverMultipleAckError;
 
-  constructor() {
+  public constructor() {
     super("The receiver's `ack` function was called multiple times.");
   }
 }
@@ -104,7 +103,7 @@ export class HTTPReceiverDeferredRequestError extends Error implements CodedErro
 
   public res: ServerResponse;
 
-  constructor(message: string, req: IncomingMessage | BufferedIncomingMessage, res: ServerResponse) {
+  public constructor(message: string, req: IncomingMessage | BufferedIncomingMessage, res: ServerResponse) {
     super(message);
     this.req = req;
     this.res = res;
@@ -116,7 +115,7 @@ export class MultipleListenerError extends Error implements CodedError {
 
   public originals: Error[];
 
-  constructor(originals: Error[]) {
+  public constructor(originals: Error[]) {
     super(
       'Multiple errors occurred while handling several listeners. The `originals` property contains an array of each error.',
     );

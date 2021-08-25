@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 import { Agent } from 'http';
 import { SecureContextOptions } from 'tls';
 import util from 'util';
@@ -205,7 +204,7 @@ export default class App {
 
   private developerMode: boolean;
 
-  constructor({
+  public constructor({
     signingSecret = undefined,
     endpoints = undefined,
     agent = undefined,

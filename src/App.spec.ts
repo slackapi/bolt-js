@@ -1697,7 +1697,6 @@ describe('App', () => {
       describe('client', () => {
         it('should be available in middleware/listener args', async () => {
           // Arrange
-          // eslint-disable-next-line  @typescript-eslint/naming-convention
           const MockApp = await importApp(
             mergeOverrides(
               withNoopAppMetadata(),

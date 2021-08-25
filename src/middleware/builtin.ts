@@ -334,7 +334,6 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
 }
 
 export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
-  // eslint-disable-line no-shadow
   return async ({ message, next }) => {
     if (message.subtype === subtype1) {
       // TODO: remove the non-null assertion operator
