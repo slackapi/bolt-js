@@ -566,7 +566,7 @@ export interface ReactionRemovedEvent {
 export interface SharedChannelTeamItem {
   id: string;
   name: string;
-  icon: object;
+  icon: Record<string, unknown>;
   is_verified: boolean;
   domain: string;
   date_created: number;
