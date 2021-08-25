@@ -221,7 +221,6 @@ export default class ExpressReceiver implements Receiver {
           'An incoming event was not acknowledged within 3 seconds. Ensure that the ack() argument is called in a listener.',
         );
       }
-      // tslint:disable-next-line: align
     }, 3001);
 
     let storedResponse;

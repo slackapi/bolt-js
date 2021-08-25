@@ -295,10 +295,8 @@ describe('ExpressReceiver', function () {
     describe('ssl_check request handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const req = { body: { ssl_check: 1 } } as Request;
         let sent = false;
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const resp = {
           send: () => {
             sent = true;
@@ -319,10 +317,8 @@ describe('ExpressReceiver', function () {
 
       it('should work with other requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const req = { body: { type: 'block_actions' } } as Request;
         let sent = false;
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const resp = {
           send: () => {
             sent = true;
@@ -345,10 +341,8 @@ describe('ExpressReceiver', function () {
     describe('url_verification request handler', () => {
       it('should handle valid requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const req = { body: { type: 'url_verification', challenge: 'this is it' } } as Request;
         let sentBody;
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const resp = {
           json: (body) => {
             sentBody = body;
@@ -369,10 +363,8 @@ describe('ExpressReceiver', function () {
 
       it('should work with other requests', async () => {
         // Arrange
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const req = { body: { ssl_check: 1 } } as Request;
         let sentBody;
-        // tslint:disable-next-line: no-object-literal-type-assertion
         const resp = {
           json: (body) => {
             sentBody = body;
