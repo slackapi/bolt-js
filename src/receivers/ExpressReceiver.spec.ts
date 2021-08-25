@@ -10,6 +10,7 @@ import { Request, Response } from 'express';
 import { Readable } from 'stream';
 import { EventEmitter } from 'events';
 import { ErrorCode, CodedError, ReceiverInconsistentStateError } from '../errors';
+import { Application, IRouter } from 'express';
 
 import ExpressReceiver, {
   respondToSslCheck,
@@ -78,6 +79,36 @@ describe('ExpressReceiver', function () {
         },
       });
       assert.isNotNull(receiver);
+    });
+    it('should accept custom Express app / router', async () => {
+      const app: Application = {
+        use: sinon.fake(),
+      } as unknown as Application;
+      const router: IRouter = {
+        get: sinon.fake(),
+        post: sinon.fake(),
+        use: sinon.fake(),
+      } as unknown as IRouter;
+      const receiver = new ExpressReceiver({
+        signingSecret: 'my-secret',
+        logger: noopLogger,
+        endpoints: { events: '/custom-endpoint' },
+        processBeforeResponse: true,
+        clientId: 'my-clientId',
+        clientSecret: 'my-client-secret',
+        stateSecret: 'state-secret',
+        scopes: ['channels:read'],
+        installerOptions: {
+          authVersion: 'v2',
+          userScopes: ['chat:write'],
+        },
+        app: app,
+        router: router,
+      });
+      assert.isNotNull(receiver);
+      assert((app.use as any).calledOnce);
+      assert((router.get as any).called);
+      assert((router.post as any).calledOnce);
     });
   });
 

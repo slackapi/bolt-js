@@ -3,7 +3,7 @@
 import { createServer, Server, ServerOptions } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
-import express, { Request, Response, Application, RequestHandler, Router } from 'express';
+import express, { Request, Response, Application, RequestHandler, Router, IRouter } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
@@ -33,6 +33,8 @@ export interface ExpressReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
+  app?: Application;
+  router?: IRouter;
 }
 
 // Additional Installer Options
@@ -63,7 +65,7 @@ export default class ExpressReceiver implements Receiver {
 
   private processBeforeResponse: boolean;
 
-  public router: Router;
+  public router: IRouter;
 
   public installer: InstallProvider | undefined = undefined;
 
@@ -79,8 +81,10 @@ export default class ExpressReceiver implements Receiver {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
+    app = undefined,
+    router = undefined,
   }: ExpressReceiverOptions) {
-    this.app = express();
+    this.app = app !== undefined ? app : express();
 
     if (typeof logger !== 'undefined') {
       this.logger = logger;
@@ -99,7 +103,7 @@ export default class ExpressReceiver implements Receiver {
     this.processBeforeResponse = processBeforeResponse;
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
-    this.router = Router();
+    this.router = router !== undefined ? router : Router();
     endpointList.forEach((endpoint) => {
       this.router.post(endpoint, ...expressMiddleware);
     });
