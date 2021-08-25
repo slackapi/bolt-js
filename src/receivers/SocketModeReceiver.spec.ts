@@ -181,6 +181,48 @@ describe('SocketModeReceiver', function () {
       assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
       assert(fakeRes.end.called);
     });
+    it('should redirect installers if directInstall is true', async function () {
+      // Arrange
+      const installProviderStub = sinon.createStubInstance(InstallProvider);
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+
+      const metadata = 'this is bat country';
+      const scopes = ['channels:read'];
+      const userScopes = ['chat:write'];
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        clientId: 'my-clientId',
+        clientSecret: 'my-client-secret',
+        stateSecret: 'state-secret',
+        scopes,
+        installerOptions: {
+          authVersion: 'v2',
+          installPath: '/hiya',
+          directInstall: true,
+          metadata,
+          userScopes,
+        },
+      });
+      assert.isNotNull(receiver);
+      receiver.installer = installProviderStub as unknown as InstallProvider;
+      const fakeReq = {
+        url: '/hiya',
+      };
+      const fakeRes = {
+        writeHead: sinon.fake(),
+        end: sinon.fake(),
+      };
+      /* eslint-disable-next-line @typescript-eslint/await-thenable */
+      await this.listener(fakeReq, fakeRes);
+      assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
+      assert(fakeRes.writeHead.calledWith(302, sinon.match.object));
+      assert(fakeRes.end.called);
+    });
     it('should return a 404 if a request comes into neither the install path nor the redirect URI path', async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);

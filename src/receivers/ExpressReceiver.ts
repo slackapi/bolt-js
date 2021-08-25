@@ -43,6 +43,7 @@ interface InstallerOptions {
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
+  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
@@ -143,7 +144,15 @@ export default class ExpressReceiver implements Receiver {
             scopes: scopes!,
             userScopes: installerOptions.userScopes,
           });
-          res.send(renderHtmlForInstallPath(url));
+          if (installerOptions.directInstall) {
+            // If a Slack app sets "Direct Install URL" in the Slack app configuration,
+            // the installation flow of the app should start with the Slack authorize URL.
+            // See https://api.slack.com/start/distributing/directory#direct_install for more details.
+            res.redirect(url);
+          } else {
+            // The installation starts from a landing page served by this app.
+            res.send(renderHtmlForInstallPath(url));
+          }
         } catch (error) {
           next(error);
         }
