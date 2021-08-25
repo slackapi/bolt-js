@@ -46,7 +46,6 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-// tslint:disable-next-line: max-line-length
 export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({
   shortcut,
   next,
