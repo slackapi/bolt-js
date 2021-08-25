@@ -170,6 +170,21 @@ describe('App', () => {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
     });
+    it('should fail when both socketMode and receiver are specified', async () => {
+      // Arrange
+      const fakeReceiver = new FakeReceiver();
+      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+
+      // Act
+      try {
+        // eslint-disable-line @typescript-eslint/no-unused-expressions
+        new App({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver });
+        assert.fail();
+      } catch (error) {
+        // Assert
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+      }
+    });
     it('should initialize MemoryStore conversation store by default', async () => {
       // Arrange
       const fakeMemoryStore = sinon.fake();
