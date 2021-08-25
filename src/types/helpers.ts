@@ -6,7 +6,6 @@ export type StringIndexed = Record<string, any>;
 /**
  * @deprecated No longer works in TypeScript 4.3
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type KnownKeys<_T> = never;
 
 /**

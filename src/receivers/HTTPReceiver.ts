@@ -334,7 +334,6 @@ export default class HTTPReceiver implements Receiver {
       }
 
       // Handle SSL checks
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (body.ssl_check) {
         res.writeHead(200);
         res.end();
@@ -370,7 +369,6 @@ export default class HTTPReceiver implements Receiver {
           }
           isAcknowledged = true;
           if (this.processBeforeResponse) {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               storedResponse = '';
             } else {
@@ -378,7 +376,6 @@ export default class HTTPReceiver implements Receiver {
             }
             this.logger.debug('ack() response stored');
           } else {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               res.writeHead(200);
               res.end();

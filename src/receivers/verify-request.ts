@@ -47,7 +47,7 @@ export interface BufferedIncomingMessage extends IncomingMessage {
 export async function verify(
   options: VerifyOptions,
   req: IncomingMessage,
-  _res?: ServerResponse, // eslint-disable-line @typescript-eslint/no-unused-vars
+  _res?: ServerResponse,
 ): Promise<BufferedIncomingMessage> {
   const { signingSecret } = options;
 
