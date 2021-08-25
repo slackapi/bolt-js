@@ -1,4 +1,4 @@
-export default function renderHtmlForInstallPath(addToSlackUrl: string): string {
+export default function defaultRenderHtmlForInstallPath(addToSlackUrl: string): string {
   return `<html>
       <body>
         <a href=${addToSlackUrl}>
@@ -12,4 +12,9 @@ export default function renderHtmlForInstallPath(addToSlackUrl: string): string 
         </a>
       </body>
     </html>`;
+}
+
+// For backward-compatibility
+export function renderHtmlForInstallPath(addToSlackUrl: string): string {
+  return defaultRenderHtmlForInstallPath(addToSlackUrl);
 }

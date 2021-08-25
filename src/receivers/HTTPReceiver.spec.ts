@@ -160,7 +160,51 @@ describe('HTTPReceiver', function () {
       assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
       assert.isTrue(writeHead.calledWith(200));
     });
-    it('should redirect installers if directInstallEnabled is true', async function () {
+    it('should use a custom HTML renderer for the install path webpage', async function () {
+      // Arrange
+      const installProviderStub = sinon.createStubInstance(InstallProvider);
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const HTTPReceiver = await importHTTPReceiver(overrides);
+
+      const metadata = 'this is bat country';
+      const scopes = ['channels:read'];
+      const userScopes = ['chat:write'];
+      const receiver = new HTTPReceiver({
+        logger: noopLogger,
+        clientId: 'my-clientId',
+        clientSecret: 'my-client-secret',
+        signingSecret: 'secret',
+        stateSecret: 'state-secret',
+        scopes,
+        installerOptions: {
+          authVersion: 'v2',
+          installPath: '/hiya',
+          renderHtmlForInstallPath: (_) => 'Hello world!',
+          metadata,
+          userScopes,
+        },
+      });
+      assert.isNotNull(receiver);
+      receiver.installer = installProviderStub as unknown as InstallProvider;
+      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      fakeReq.url = '/hiya';
+      fakeReq.headers = { host: 'localhost' };
+      fakeReq.method = 'GET';
+      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      const writeHead = sinon.fake();
+      const end = sinon.fake();
+      fakeRes.writeHead = writeHead;
+      fakeRes.end = end;
+      /* eslint-disable-next-line @typescript-eslint/await-thenable */
+      await receiver.requestListener(fakeReq, fakeRes);
+      assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
+      assert.isTrue(writeHead.calledWith(200));
+      assert.isTrue(end.calledWith('Hello world!'));
+    });
+    it('should rediect installers if directInstall is true', async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(
