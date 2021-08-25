@@ -181,7 +181,7 @@ describe('SocketModeReceiver', function () {
       assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
       assert(fakeRes.end.called);
     });
-    it('should rediect installers if directInstallEnabled is true', async function () {
+    it('should redirect installers if directInstall is true', async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(

@@ -141,7 +141,7 @@ export default class ExpressReceiver implements Receiver {
             userScopes: installerOptions.userScopes,
           });
           if (installerOptions.directInstall) {
-            // If a Slack app sets "Direct Install URL" in the Slack app configruation,
+            // If a Slack app sets "Direct Install URL" in the Slack app configuration,
             // the installation flow of the app should start with the Slack authorize URL.
             // See https://api.slack.com/start/distributing/directory#direct_install for more details.
             res.redirect(url);
