@@ -2,7 +2,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { ErrorCode, ContextMissingPropertyError } from '../errors';
+import { ErrorCode } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import {
@@ -291,37 +291,6 @@ describe('directMention()', () => {
 });
 
 describe('ignoreSelf()', () => {
-  it('should handle context missing error', async () => {
-    // Arrange
-    const fakeNext = sinon.fake.resolves(null);
-    const fakeBotUserId = undefined;
-    const fakeArgs = {
-      next: fakeNext,
-      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
-
-    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
-
-    // Act
-    const middleware = getIgnoreSelfMiddleware();
-
-    let error;
-    try {
-      await middleware(fakeArgs);
-    } catch (err) {
-      error = err;
-    }
-
-    // Assert
-    const expectedError = new ContextMissingPropertyError(
-      'botId',
-      'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
-    );
-
-    assert.equal(error.code, expectedError.code);
-    assert.equal(error.missingProperty, expectedError.missingProperty);
-  });
-
   it("should immediately call next(), because incoming middleware args don't contain event", async () => {
     // Arrange
     const fakeNext = sinon.fake();

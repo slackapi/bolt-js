@@ -293,14 +293,6 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
 
 export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return async (args) => {
-    // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
-    if (args.context.botId === undefined) {
-      throw new ContextMissingPropertyError(
-        'botId',
-        'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
-      );
-    }
-
     const botId = args.context.botId as string;
     const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
 
