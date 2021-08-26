@@ -187,12 +187,11 @@ describe('App', () => {
     it('should fail when both socketMode and receiver are specified', async () => {
       // Arrange
       const fakeReceiver = new FakeReceiver();
-      const App = await importApp(); // eslint-disable-line  @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
+      const MockApp = await importApp();
 
       // Act
       try {
-        // eslint-disable-line @typescript-eslint/no-unused-expressions
-        new App({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver });
+        new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
