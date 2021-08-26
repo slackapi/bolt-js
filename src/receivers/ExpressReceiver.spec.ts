@@ -3,12 +3,11 @@ import sinon, { SinonFakeTimers, SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
-import { Request, Response } from 'express';
+import { Application, IRouter, Request, Response } from 'express';
 import { Readable } from 'stream';
 import { EventEmitter } from 'events';
 import { Override, mergeOverrides } from '../test-helpers';
 import { ErrorCode, CodedError, ReceiverInconsistentStateError } from '../errors';
-import { Application, IRouter } from 'express';
 
 import ExpressReceiver, {
   respondToSslCheck,
@@ -130,8 +129,8 @@ describe('ExpressReceiver', function () {
           authVersion: 'v2',
           userScopes: ['chat:write'],
         },
-        app: app,
-        router: router,
+        app,
+        router,
       });
       assert.isNotNull(receiver);
       assert((app.use as any).calledOnce);
