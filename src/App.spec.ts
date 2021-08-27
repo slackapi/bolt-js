@@ -92,7 +92,7 @@ describe('App', () => {
       try {
         new App({ signingSecret: '' }); // eslint-disable-line @typescript-eslint/no-unused-expressions
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
@@ -107,7 +107,7 @@ describe('App', () => {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ token: '', authorize: authorizeCallback, signingSecret: '' });
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
@@ -123,7 +123,7 @@ describe('App', () => {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
@@ -139,7 +139,7 @@ describe('App', () => {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
@@ -165,7 +165,7 @@ describe('App', () => {
       try {
         new App({ authorize: noopAuthorize }); // eslint-disable-line @typescript-eslint/no-unused-expressions
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
@@ -180,7 +180,7 @@ describe('App', () => {
         // eslint-disable-line @typescript-eslint/no-unused-expressions
         new App({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver });
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
@@ -476,7 +476,7 @@ describe('App', () => {
         app.use(async ({ next }) => {
           try {
             await next!();
-          } catch (err: any) {
+          } catch (err) {
             caughtError = err;
           }
         });
@@ -560,7 +560,7 @@ describe('App', () => {
 
         try {
           await fakeReceiver.sendEvent(dummyReceiverEvent);
-        } catch (err: any) {
+        } catch (err) {
           actualError = err;
         }
 
