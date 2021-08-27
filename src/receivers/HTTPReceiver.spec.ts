@@ -238,7 +238,7 @@ describe('HTTPReceiver', function () {
       fakeReq.url = '/heyo';
       fakeReq.headers = { host: 'localhost' };
       fakeReq.method = 'GET';
-      const fakeRes: ServerResponse & {} = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
       const writeHead = sinon.fake();
       const end = sinon.fake();
       fakeRes.writeHead = writeHead;
