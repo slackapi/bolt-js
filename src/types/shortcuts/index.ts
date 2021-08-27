@@ -1,10 +1,10 @@
-// export * from './message-action';
-export * from './global-shortcut';
-export * from './message-shortcut';
-
 import { MessageShortcut } from './message-shortcut';
 import { GlobalShortcut } from './global-shortcut';
 import { SayFn, RespondFn, AckFn } from '../utilities';
+
+// export * from './message-action';
+export * from './global-shortcut';
+export * from './message-shortcut';
 
 /**
  * All known shortcuts from Slack.

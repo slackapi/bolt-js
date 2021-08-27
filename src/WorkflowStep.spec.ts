@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import rewiremock from 'rewiremock';
+import { WebClient } from '@slack/web-api';
 import {
   WorkflowStep,
   SlackWorkflowStepMiddlewareArgs,
@@ -15,15 +16,12 @@ import {
 import { Override } from './test-helpers';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, WorkflowStepEdit, Middleware } from './types';
 import { WorkflowStepInitializationError } from './errors';
-import { WebClient } from '@slack/web-api';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('./WorkflowStep')> {
   return rewiremock.module(() => import('./WorkflowStep'), overrides);
 }
 
-const MOCK_FN = async () => {
-  return;
-};
+const MOCK_FN = async () => {};
 
 const MOCK_CONFIG_SINGLE = {
   edit: MOCK_FN,
@@ -147,8 +145,8 @@ describe('WorkflowStep', () => {
     it('should return true if recognized workflow step payload type', async () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs
+      & AllMiddlewareArgs;
 
       const { isStepEvent } = await importWorkflowStep();
 
@@ -176,8 +174,7 @@ describe('WorkflowStep', () => {
     it('should remove next() from all original event args', async () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
 
       const { prepareStepArgs } = await importWorkflowStep();
 
@@ -258,8 +255,7 @@ describe('WorkflowStep', () => {
     });
 
     it('complete should call workflows.stepCompleted', async () => {
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
 
       const fakeClient = { workflows: { stepCompleted: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
@@ -276,8 +272,7 @@ describe('WorkflowStep', () => {
     });
 
     it('fail should call workflows.stepFailed', async () => {
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
 
       const fakeClient = { workflows: { stepFailed: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
@@ -296,11 +291,11 @@ describe('WorkflowStep', () => {
 
   describe('processStepMiddleware', () => {
     it('should call each callback in user-provided middleware', async () => {
-      const { next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
+      const { next: _next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
       const { processStepMiddleware } = await importWorkflowStep();
 
-      const fn1 = sinon.spy((async ({ next }) => {
-        await next!();
+      const fn1 = sinon.spy((async ({ next: continuation }) => {
+        await continuation!();
       }) as Middleware<WorkflowStepEdit>);
       const fn2 = sinon.spy(async () => {});
       const fakeMiddleware = [fn1, fn2] as WorkflowStepMiddleware;

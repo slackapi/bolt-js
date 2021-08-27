@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
-
 import { createServer, Server, ServerOptions } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
@@ -13,7 +11,59 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import App from '../App';
 import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import renderHtmlForInstallPath from './render-html-for-install-path';
+
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+
+export const respondToSslCheck: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.ssl_check) {
+    res.send();
+    return;
+  }
+  next();
+};
+
+export const respondToUrlVerification: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.type && req.body.type === 'url_verification') {
+    res.json({ challenge: req.body.challenge });
+    return;
+  }
+  next();
+};
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -22,10 +72,10 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-    | string
-    | {
-        [endpointType: string]: string;
-      };
+  | string
+  | {
+    [endpointType: string]: string;
+  };
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -70,7 +120,7 @@ export default class ExpressReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
-  constructor({
+  public constructor({
     signingSecret = '',
     logger = undefined,
     logLevel = LogLevel.INFO,
@@ -130,8 +180,9 @@ export default class ExpressReceiver implements Receiver {
 
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
-      const redirectUriPath =
-        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
+        '/slack/oauth_redirect' :
+        installerOptions.redirectUriPath;
       this.router.use(redirectUriPath, async (req, res) => {
         await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
       });
@@ -170,7 +221,6 @@ export default class ExpressReceiver implements Receiver {
           'An incoming event was not acknowledged within 3 seconds. Ensure that the ack() argument is called in a listener.',
         );
       }
-      // tslint:disable-next-line: align
     }, 3001);
 
     let storedResponse;
@@ -235,7 +285,7 @@ export default class ExpressReceiver implements Receiver {
   ): Promise<Server | HTTPSServer> {
     let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
 
-    // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
+    // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
       createServerFn = createHttpsServer;
     }
@@ -280,7 +330,7 @@ export default class ExpressReceiver implements Receiver {
           return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
 
-        resolve(this.server);
+        return resolve(this.server);
       });
     });
   }
@@ -288,37 +338,21 @@ export default class ExpressReceiver implements Receiver {
   // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
   // generic types
   public stop(): Promise<void> {
+    if (this.server === undefined) {
+      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+    }
     return new Promise((resolve, reject) => {
-      if (this.server === undefined) {
-        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
-      }
-      this.server.close((error) => {
+      this.server?.close((error) => {
         if (error !== undefined) {
           return reject(error);
         }
 
         this.server = undefined;
-        resolve();
+        return resolve();
       });
     });
   }
 }
-
-export const respondToSslCheck: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.ssl_check) {
-    res.send();
-    return;
-  }
-  next();
-};
-
-export const respondToUrlVerification: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.type && req.body.type === 'url_verification') {
-    res.json({ challenge: req.body.challenge });
-    return;
-  }
-  next();
-};
 
 /**
  * This request handler has two responsibilities:
@@ -369,8 +403,9 @@ export function verifySignatureAndParseRawBody(
 }
 
 function logError(logger: Logger, message: string, error: any): void {
-  const logMessage =
-    'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
+  const logMessage = 'code' in error ?
+    `${message} (code: ${error.code}, message: ${error.message})` :
+    `${message} (error: ${error})`;
   logger.warn(logMessage);
 }
 
@@ -442,41 +477,3 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
   return JSON.parse(stringBody);
 }
-
-// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
-const httpsOptionKeys = [
-  'ALPNProtocols',
-  'clientCertEngine',
-  'enableTrace',
-  'handshakeTimeout',
-  'rejectUnauthorized',
-  'requestCert',
-  'sessionTimeout',
-  'SNICallback',
-  'ticketKeys',
-  'pskCallback',
-  'pskIdentityHint',
-
-  'ca',
-  'cert',
-  'sigalgs',
-  'ciphers',
-  'clientCertEngine',
-  'crl',
-  'dhparam',
-  'ecdhCurve',
-  'honorCipherOrder',
-  'key',
-  'privateKeyEngine',
-  'privateKeyIdentifier',
-  'maxVersion',
-  'minVersion',
-  'passphrase',
-  'pfx',
-  'secureOptions',
-  'secureProtocol',
-  'sessionIdContext',
-];
-
-const missingServerErrorDescription =
-  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';

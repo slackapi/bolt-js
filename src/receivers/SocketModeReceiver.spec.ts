@@ -1,15 +1,37 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/naming-convention */
-
 import 'mocha';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
-import { Override, mergeOverrides } from '../test-helpers';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
 import { EventEmitter } from 'events';
 import { IncomingMessage, ServerResponse } from 'http';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
+import { Override, mergeOverrides } from '../test-helpers';
+
+// Fakes
+class FakeServer extends EventEmitter {
+  public on = sinon.fake();
+
+  public listen = sinon.fake(() => {
+    if (this.listeningFailure !== undefined) {
+      this.emit('error', this.listeningFailure);
+    }
+  });
+
+  public close = sinon.fake((...args: any[]) => {
+    setImmediate(() => {
+      this.emit('close');
+      setImmediate(() => {
+        args[0]();
+      });
+    });
+  });
+
+  public constructor(private listeningFailure?: Error) {
+    super();
+  }
+}
 
 describe('SocketModeReceiver', function () {
   beforeEach(function () {
@@ -130,7 +152,6 @@ describe('SocketModeReceiver', function () {
         url: '/heyo',
       };
       const fakeRes = null;
-      /* eslint-disable-next-line @typescript-eslint/await-thenable */
       await this.listener(fakeReq, fakeRes);
       assert(
         installProviderStub.handleCallback.calledWith(
@@ -175,7 +196,6 @@ describe('SocketModeReceiver', function () {
         writeHead: sinon.fake(),
         end: sinon.fake(),
       };
-      /* eslint-disable-next-line @typescript-eslint/await-thenable */
       await this.listener(fakeReq, fakeRes);
       assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
       assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
@@ -259,7 +279,6 @@ describe('SocketModeReceiver', function () {
         writeHead: sinon.fake(),
         end: sinon.fake(),
       };
-      /* eslint-disable-next-line @typescript-eslint/await-thenable */
       await this.listener(fakeReq, fakeRes);
       assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
       assert(fakeRes.end.calledWith(sinon.match("route /nope doesn't exist!")));
@@ -347,27 +366,4 @@ function withHttpsCreateServer(spy: SinonSpy): Override {
       createServer: spy,
     },
   };
-}
-
-// Fakes
-class FakeServer extends EventEmitter {
-  public on = sinon.fake();
-  public listen = sinon.fake(() => {
-    if (this.listeningFailure !== undefined) {
-      this.emit('error', this.listeningFailure);
-      return;
-    }
-  });
-  public close = sinon.fake((...args: any[]) => {
-    setImmediate(() => {
-      this.emit('close');
-      setImmediate(() => {
-        args[0]();
-      });
-    });
-  });
-
-  constructor(private listeningFailure?: Error) {
-    super();
-  }
 }

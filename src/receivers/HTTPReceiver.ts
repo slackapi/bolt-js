@@ -9,13 +9,49 @@ import { URL } from 'url';
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import renderHtmlForInstallPath from './render-html-for-install-path';
 import {
   ReceiverMultipleAckError,
   ReceiverInconsistentStateError,
   HTTPReceiverDeferredRequestError,
   ErrorCode,
 } from '../errors';
+
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 export interface HTTPReceiverOptions {
   signingSecret: string;
@@ -74,7 +110,7 @@ export default class HTTPReceiver implements Receiver {
 
   private logger: Logger;
 
-  constructor({
+  public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
     logger = undefined,
@@ -90,8 +126,7 @@ export default class HTTPReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
-    this.logger =
-      logger ??
+    this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -134,7 +169,7 @@ export default class HTTPReceiver implements Receiver {
     this.requestListener = this.unboundRequestListener.bind(this);
   }
 
-  public init(app: App) {
+  public init(app: App): void {
     this.app = app;
   }
 
@@ -166,13 +201,14 @@ export default class HTTPReceiver implements Receiver {
       try {
         this.requestListener(req, res);
       } catch (error) {
-        if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
+        const e = error as any;
+        if (e.code === ErrorCode.HTTPReceiverDeferredRequestError) {
           this.logger.info('An unhandled request was ignored');
           res.writeHead(404);
           res.end();
         } else {
           this.logger.error('An unexpected error was encountered');
-          this.logger.debug(`Error details: ${error}`);
+          this.logger.debug(`Error details: ${e}`);
           res.writeHead(500);
           res.end();
         }
@@ -211,7 +247,7 @@ export default class HTTPReceiver implements Receiver {
           return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
 
-        resolve(this.server);
+        return resolve(this.server);
       });
     });
   }
@@ -219,17 +255,17 @@ export default class HTTPReceiver implements Receiver {
   // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
   // generic types
   public stop(): Promise<void> {
+    if (this.server === undefined) {
+      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+    }
     return new Promise((resolve, reject) => {
-      if (this.server === undefined) {
-        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
-      }
-      this.server.close((error) => {
+      this.server?.close((error) => {
         if (error !== undefined) {
           return reject(error);
         }
 
         this.server = undefined;
-        resolve();
+        return resolve();
       });
     });
   }
@@ -276,7 +312,8 @@ export default class HTTPReceiver implements Receiver {
       try {
         bufferedReq = await verifySlackAuthenticity({ signingSecret: this.signingSecret }, req);
       } catch (err) {
-        this.logger.warn(`Request verification failed: ${err.message}`);
+        const e = err as any;
+        this.logger.warn(`Request verification failed: ${e.message}`);
         res.writeHead(401);
         res.end();
         return;
@@ -289,14 +326,14 @@ export default class HTTPReceiver implements Receiver {
       try {
         body = parseBody(bufferedReq);
       } catch (err) {
-        this.logger.warn(`Malformed request body: ${err.message}`);
+        const e = err as any;
+        this.logger.warn(`Malformed request body: ${e.message}`);
         res.writeHead(400);
         res.end();
         return;
       }
 
       // Handle SSL checks
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (body.ssl_check) {
         res.writeHead(200);
         res.end();
@@ -332,7 +369,6 @@ export default class HTTPReceiver implements Receiver {
           }
           isAcknowledged = true;
           if (this.processBeforeResponse) {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               storedResponse = '';
             } else {
@@ -340,7 +376,6 @@ export default class HTTPReceiver implements Receiver {
             }
             this.logger.debug('ack() response stored');
           } else {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               res.writeHead(200);
               res.end();
@@ -370,8 +405,9 @@ export default class HTTPReceiver implements Receiver {
           this.logger.debug('stored response sent');
         }
       } catch (err) {
+        const e = err as any;
         this.logger.error('An unhandled error occurred while Bolt processed an event');
-        this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
+        this.logger.debug(`Error details: ${e}, storedResponse: ${storedResponse}`);
         res.writeHead(500);
         res.end();
       }
@@ -412,8 +448,9 @@ export default class HTTPReceiver implements Receiver {
           res.end(body);
         }
       } catch (err) {
+        const e = err as any;
         this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
-        this.logger.debug(`Error details: ${err}`);
+        this.logger.debug(`Error details: ${e}`);
       }
     })();
   }
@@ -447,41 +484,3 @@ function parseBody(req: BufferedIncomingMessage) {
   }
   return JSON.parse(bodyAsString);
 }
-
-// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
-const httpsOptionKeys = [
-  'ALPNProtocols',
-  'clientCertEngine',
-  'enableTrace',
-  'handshakeTimeout',
-  'rejectUnauthorized',
-  'requestCert',
-  'sessionTimeout',
-  'SNICallback',
-  'ticketKeys',
-  'pskCallback',
-  'pskIdentityHint',
-
-  'ca',
-  'cert',
-  'sigalgs',
-  'ciphers',
-  'clientCertEngine',
-  'crl',
-  'dhparam',
-  'ecdhCurve',
-  'honorCipherOrder',
-  'key',
-  'privateKeyEngine',
-  'privateKeyIdentifier',
-  'maxVersion',
-  'minVersion',
-  'passphrase',
-  'pfx',
-  'secureOptions',
-  'secureProtocol',
-  'sessionIdContext',
-];
-
-const missingServerErrorDescription =
-  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
 import { SocketModeClient } from '@slack/socket-mode';
 import { createServer } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
@@ -6,7 +5,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import renderHtmlForInstallPath from './render-html-for-install-path';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -50,7 +49,7 @@ export default class SocketModeReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
-  constructor({
+  public constructor({
     appToken,
     logger = undefined,
     logLevel = LogLevel.INFO,
@@ -97,8 +96,7 @@ export default class SocketModeReceiver implements Receiver {
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
       // use default or passed in redirect path
-      const redirectUriPath =
-        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
 
       // use default or passed in installPath
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
@@ -123,7 +121,8 @@ export default class SocketModeReceiver implements Receiver {
               res.end(renderHtmlForInstallPath(url));
             }
           } catch (err) {
-            throw new Error(err);
+            const e = err as any;
+            throw new Error(e);
           }
         } else {
           this.logger.error(`Tried to reach ${req.url} which isn't a valid route.`);

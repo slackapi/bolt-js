@@ -1,4 +1,3 @@
-// tslint:disable:no-implicit-dependencies
 import { assert } from 'chai';
 import { BlockSuggestion, DialogSuggestion, InteractiveMessageSuggestion } from './index';
 

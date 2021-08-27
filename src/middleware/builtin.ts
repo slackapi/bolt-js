@@ -46,7 +46,6 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-// tslint:disable-next-line: max-line-length
 export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({
   shortcut,
   next,
@@ -326,7 +325,6 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
 }
 
 export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
-  // eslint-disable-line no-shadow
   return async ({ message, next }) => {
     if (message.subtype === subtype1) {
       // TODO: remove the non-null assertion operator
@@ -373,9 +371,9 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
 
 function isBlockPayload(
   payload:
-    | SlackActionMiddlewareArgs['payload']
-    | SlackOptionsMiddlewareArgs['payload']
-    | SlackViewMiddlewareArgs['payload'],
+  | SlackActionMiddlewareArgs['payload']
+  | SlackOptionsMiddlewareArgs['payload']
+  | SlackViewMiddlewareArgs['payload'],
 ): payload is BlockElementAction | BlockSuggestion {
   return (payload as BlockElementAction | BlockSuggestion).action_id !== undefined;
 }

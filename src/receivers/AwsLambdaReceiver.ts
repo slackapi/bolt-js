@@ -56,11 +56,10 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private logger: Logger;
 
-  constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
+  public constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
-    this.logger =
-      logger ??
+    this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -73,7 +72,6 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   public start(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ..._args: any[]
   ): Promise<AwsHandler> {
     return new Promise((resolve, reject) => {
@@ -88,10 +86,8 @@ export default class AwsLambdaReceiver implements Receiver {
 
   // eslint-disable-next-line class-methods-use-this
   public stop(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ..._args: any[]
   ): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return new Promise((resolve, _reject) => {
       resolve();
     });
@@ -100,9 +96,7 @@ export default class AwsLambdaReceiver implements Receiver {
   public toHandler(): AwsHandler {
     return async (
       awsEvent: AwsEvent,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _awsContext: any,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _awsCallback: AwsCallback,
     ): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);

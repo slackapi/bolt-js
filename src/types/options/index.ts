@@ -25,11 +25,11 @@ export interface BasicOptionsPayload<Type extends string = string> {
   value: string;
 }
 
-type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
+export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
   ? BasicOptionsPayload<T>
   : KnownOptionsPayloadFromType<T>;
 
-type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
+export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
 
 /**
  * external data source in blocks
@@ -145,8 +145,8 @@ export interface DialogSuggestion extends StringIndexed {
 type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggestion'
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
-  ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
-  : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
+    ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
+    : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
 
 export interface BlockOptions {
   options: Option[];

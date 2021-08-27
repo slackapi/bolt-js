@@ -18,7 +18,7 @@ import {
   ViewWorkflowStepSubmitAction,
   WorkflowStepExecuteEvent,
 } from './types';
-import { processMiddleware } from './middleware/process';
+import processMiddleware from './middleware/process';
 import { WorkflowStepInitializationError } from './errors';
 
 /** Interfaces */
@@ -137,7 +137,7 @@ export class WorkflowStep {
   /** Step Executed/Run :: 'workflow_step_execute' event */
   private execute: WorkflowStepExecuteMiddleware[];
 
-  constructor(callbackId: string, config: WorkflowStepConfig) {
+  public constructor(callbackId: string, config: WorkflowStepConfig) {
     validate(callbackId, config);
 
     const { save, edit, execute } = config;
@@ -235,8 +235,9 @@ export async function processStepMiddleware(
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
-    await processMiddleware(callbacks, args, context, client, logger, async () =>
-      lastCallback({ ...args, context, client, logger }),
+    await processMiddleware(
+      callbacks, args, context, client, logger,
+      async () => lastCallback({ ...args, context, client, logger }),
     );
   }
 }
@@ -261,17 +262,15 @@ function createStepConfigure(args: AllWorkflowStepMiddlewareArgs<WorkflowStepEdi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepConfigureFn>[0]) => {
-    return client.views.open({
-      token,
-      trigger_id,
-      view: {
-        callback_id,
-        type: 'workflow_step',
-        ...params,
-      },
-    });
-  };
+  return (params: Parameters<StepConfigureFn>[0]) => client.views.open({
+    token,
+    trigger_id,
+    view: {
+      callback_id,
+      type: 'workflow_step',
+      ...params,
+    },
+  });
 }
 
 /**
@@ -288,13 +287,11 @@ function createStepUpdate(args: AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepUpdateFn>[0] = {}) => {
-    return client.workflows.updateStep({
-      token,
-      workflow_step_edit_id,
-      ...params,
-    });
-  };
+  return (params: Parameters<StepUpdateFn>[0] = {}) => client.workflows.updateStep({
+    token,
+    workflow_step_edit_id,
+    ...params,
+  });
 }
 
 /**
@@ -311,13 +308,11 @@ function createStepComplete(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExec
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepCompleteFn>[0] = {}) => {
-    return client.workflows.stepCompleted({
-      token,
-      workflow_step_execute_id,
-      ...params,
-    });
-  };
+  return (params: Parameters<StepCompleteFn>[0] = {}) => client.workflows.stepCompleted({
+    token,
+    workflow_step_execute_id,
+    ...params,
+  });
 }
 
 /**
@@ -352,7 +347,7 @@ function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteM
  * */
 // TODO :: refactor to incorporate a generic parameter
 export function prepareStepArgs(args: any): AllWorkflowStepMiddlewareArgs {
-  const { next, ...stepArgs } = args;
+  const { next: _next, ...stepArgs } = args;
   const preparedArgs: any = { ...stepArgs };
 
   switch (preparedArgs.payload.type) {

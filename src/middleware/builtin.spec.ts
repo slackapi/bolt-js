@@ -1,10 +1,11 @@
-// tslint:disable:no-implicit-dependencies
 import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import rewiremock from 'rewiremock';
+import { Logger } from '@slack/logger';
+import { WebClient } from '@slack/web-api';
 import { ErrorCode } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
-import rewiremock from 'rewiremock';
 import {
   SlackEventMiddlewareArgs,
   NextFn,
@@ -17,8 +18,61 @@ import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } f
 import { SlashCommand } from '../types/command';
 import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
 import { GenericMessageEvent } from '../types/events/message-events';
-import { WebClient } from '@slack/web-api';
-import { Logger } from '@slack/logger';
+
+// Test fixtures
+const validCommandPayload: SlashCommand = {
+  token: 'token-value',
+  command: '/hi',
+  text: 'Steve!',
+  response_url: 'https://hooks.slack.com/foo/bar',
+  trigger_id: 'trigger-id-value',
+  user_id: 'U1234567',
+  user_name: 'steve',
+  team_id: 'T1234567',
+  team_domain: 'awesome-eng-team',
+  channel_id: 'C1234567',
+  channel_name: 'random',
+  api_app_id: 'A123456',
+};
+
+const appMentionEvent: AppMentionEvent = {
+  type: 'app_mention',
+  username: 'USERNAME',
+  user: 'U1234567',
+  text: 'this is my message',
+  ts: '123.123',
+  channel: 'C1234567',
+  event_ts: '123.123',
+  thread_ts: '123.123',
+};
+
+const appHomeOpenedEvent: AppHomeOpenedEvent = {
+  type: 'app_home_opened',
+  user: 'USERNAME',
+  channel: 'U1234567',
+  tab: 'home',
+  view: {
+    type: 'home',
+    blocks: [],
+    external_id: '',
+  },
+  event_ts: '123.123',
+};
+
+const botMessageEvent: MessageEvent = {
+  type: 'message',
+  subtype: 'bot_message',
+  channel: 'CHANNEL_ID',
+  event_ts: '123.123',
+  user: 'U1234567',
+  ts: '123.123',
+  text: 'this is my message',
+  bot_id: 'B1234567',
+  channel_type: 'channel',
+};
+
+const noop = () => Promise.resolve(undefined);
+const sayNoop = () => Promise.resolve({ ok: true });
 
 describe('matchMessage()', () => {
   function initializeTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
@@ -181,7 +235,7 @@ describe('directMention()', () => {
 
     try {
       await middleware(fakeArgs);
-    } catch (err) {
+    } catch (err: any) {
       error = err;
     }
 
@@ -343,6 +397,29 @@ describe('ignoreSelf()', () => {
     assert(fakeNext.notCalled);
   });
 
+  it("should filter an event out when only a botUserId is passed", async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId },
+      event: {
+        type: 'tokens_revoked',
+        user: fakeBotUserId,
+      },
+    } as unknown as TokensRevokedMiddlewareArgs;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    await middleware(fakeArgs);
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
   it("should filter an event out, because it matches our own app and shouldn't be retained", async () => {
     // Arrange
     const fakeNext = sinon.fake();
@@ -395,16 +472,14 @@ describe('ignoreSelf()', () => {
     const fakeBotUserId = 'BUSER1';
     const eventsWhichShouldNotBeFilteredOut = ['member_joined_channel', 'member_left_channel'];
 
-    const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => {
-      return {
-        next: fakeNext,
-        context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-        event: {
-          type: eventType,
-          user: fakeBotUserId,
-        },
-      } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
-    });
+    const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => ({
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+      event: {
+        type: eventType,
+        user: fakeBotUserId,
+      },
+    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs));
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -717,10 +792,7 @@ interface MiddlewareCommonArgs {
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
-type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<
-  'member_joined_channel' | 'member_left_channel'
-> &
-  MiddlewareCommonArgs;
+type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'> & MiddlewareCommonArgs;
 
 type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & MiddlewareCommonArgs;
 
@@ -754,57 +826,3 @@ function createFakeAppMentionEvent(text: string = ''): AppMentionEvent {
   };
   return event as AppMentionEvent;
 }
-
-const validCommandPayload: SlashCommand = {
-  token: 'token-value',
-  command: '/hi',
-  text: 'Steve!',
-  response_url: 'https://hooks.slack.com/foo/bar',
-  trigger_id: 'trigger-id-value',
-  user_id: 'U1234567',
-  user_name: 'steve',
-  team_id: 'T1234567',
-  team_domain: 'awesome-eng-team',
-  channel_id: 'C1234567',
-  channel_name: 'random',
-  api_app_id: 'A123456',
-};
-
-const appMentionEvent: AppMentionEvent = {
-  type: 'app_mention',
-  username: 'USERNAME',
-  user: 'U1234567',
-  text: 'this is my message',
-  ts: '123.123',
-  channel: 'C1234567',
-  event_ts: '123.123',
-  thread_ts: '123.123',
-};
-
-const appHomeOpenedEvent: AppHomeOpenedEvent = {
-  type: 'app_home_opened',
-  user: 'USERNAME',
-  channel: 'U1234567',
-  tab: 'home',
-  view: {
-    type: 'home',
-    blocks: [],
-    external_id: '',
-  },
-  event_ts: '123.123',
-};
-
-const botMessageEvent: MessageEvent = {
-  type: 'message',
-  subtype: 'bot_message',
-  channel: 'CHANNEL_ID',
-  event_ts: '123.123',
-  user: 'U1234567',
-  ts: '123.123',
-  text: 'this is my message',
-  bot_id: 'B1234567',
-  channel_type: 'channel',
-};
-
-const noop = () => Promise.resolve(undefined);
-const sayNoop = () => Promise.resolve({ ok: true });

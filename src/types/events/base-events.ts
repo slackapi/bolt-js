@@ -510,7 +510,7 @@ export interface PinAddedEvent {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {};
+  item: Record<string, unknown>;
 }
 
 export interface PinRemovedEvent {
@@ -518,7 +518,7 @@ export interface PinRemovedEvent {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {};
+  item: Record<string, unknown>;
   has_pins: boolean;
   event_ts: string;
 }
@@ -566,7 +566,7 @@ export interface ReactionRemovedEvent {
 export interface SharedChannelTeamItem {
   id: string;
   name: string;
-  icon: object;
+  icon: Record<string, unknown>;
   is_verified: boolean;
   domain: string;
   date_created: number;
@@ -650,7 +650,7 @@ export interface StarAddedEvent {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_added, https://api.slack.com/methods/stars.list
-  item: {};
+  item: Record<string, unknown>;
   event_ts: string;
 }
 
@@ -659,7 +659,7 @@ export interface StarRemovedEvent {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_removed, https://api.slack.com/methods/stars.list
-  item: {};
+  item: Record<string, unknown>;
   event_ts: string;
 }
 
@@ -775,14 +775,14 @@ export interface UserChangeEvent {
       image_1024?: string;
       team: string;
       fields:
-        | {
-            [key: string]: {
-              value: string;
-              alt: string;
-            };
-          }
-        | []
-        | null;
+      | {
+        [key: string]: {
+          value: string;
+          alt: string;
+        };
+      }
+      | []
+      | null;
     };
     is_admin: boolean;
     is_owner: boolean;

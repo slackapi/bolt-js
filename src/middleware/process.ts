@@ -2,7 +2,7 @@ import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 import { Middleware, AnyMiddlewareArgs, Context } from '../types';
 
-export async function processMiddleware(
+export default async function processMiddleware(
   middleware: Middleware<AnyMiddlewareArgs>[],
   initialArgs: AnyMiddlewareArgs,
   context: Context,
