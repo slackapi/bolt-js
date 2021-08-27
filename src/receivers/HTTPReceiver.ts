@@ -165,14 +165,15 @@ export default class HTTPReceiver implements Receiver {
     this.server = createServerFn(serverOptions, (req, res) => {
       try {
         this.requestListener(req, res);
-      } catch (error: any) {
-        if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
+      } catch (error) {
+        const e = error as any;
+        if (e.code === ErrorCode.HTTPReceiverDeferredRequestError) {
           this.logger.info('An unhandled request was ignored');
           res.writeHead(404);
           res.end();
         } else {
           this.logger.error('An unexpected error was encountered');
-          this.logger.debug(`Error details: ${error}`);
+          this.logger.debug(`Error details: ${e}`);
           res.writeHead(500);
           res.end();
         }
@@ -275,8 +276,9 @@ export default class HTTPReceiver implements Receiver {
       // Verify authenticity
       try {
         bufferedReq = await verifySlackAuthenticity({ signingSecret: this.signingSecret }, req);
-      } catch (err: any) {
-        this.logger.warn(`Request verification failed: ${err.message}`);
+      } catch (err) {
+        const e = err as any;
+        this.logger.warn(`Request verification failed: ${e.message}`);
         res.writeHead(401);
         res.end();
         return;
@@ -288,8 +290,9 @@ export default class HTTPReceiver implements Receiver {
       // parsed body to `req.body`, as this convention has been established by the popular `body-parser` package.
       try {
         body = parseBody(bufferedReq);
-      } catch (err: any) {
-        this.logger.warn(`Malformed request body: ${err.message}`);
+      } catch (err) {
+        const e = err as any;
+        this.logger.warn(`Malformed request body: ${e.message}`);
         res.writeHead(400);
         res.end();
         return;
@@ -369,9 +372,10 @@ export default class HTTPReceiver implements Receiver {
           }
           this.logger.debug('stored response sent');
         }
-      } catch (err: any) {
+      } catch (err) {
+        const e = err as any;
         this.logger.error('An unhandled error occurred while Bolt processed an event');
-        this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
+        this.logger.debug(`Error details: ${e}, storedResponse: ${storedResponse}`);
         res.writeHead(500);
         res.end();
       }
@@ -411,9 +415,10 @@ export default class HTTPReceiver implements Receiver {
           res.writeHead(200);
           res.end(body);
         }
-      } catch (err: any) {
+      } catch (err) {
+        const e = err as any;
         this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
-        this.logger.debug(`Error details: ${err}`);
+        this.logger.debug(`Error details: ${e}`);
       }
     })();
   }

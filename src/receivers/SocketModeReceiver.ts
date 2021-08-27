@@ -122,8 +122,9 @@ export default class SocketModeReceiver implements Receiver {
               res.writeHead(200, {});
               res.end(renderHtmlForInstallPath(url));
             }
-          } catch (err: any) {
-            throw new Error(err);
+          } catch (err) {
+            const e = err as any;
+            throw new Error(e);
           }
         } else {
           this.logger.error(`Tried to reach ${req.url} which isn't a valid route.`);
@@ -163,8 +164,9 @@ export default class SocketModeReceiver implements Receiver {
       try {
         this.client.disconnect();
         resolve();
-      } catch (error: any) {
-        reject(error);
+      } catch (error) {
+        const e = error as any;
+        reject(e);
       }
     });
   }
