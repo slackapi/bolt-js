@@ -163,7 +163,7 @@ export default class SocketModeReceiver implements Receiver {
       try {
         this.client.disconnect();
         resolve();
-      } catch (error) {
+      } catch (error: any) {
         reject(error);
       }
     });

@@ -369,7 +369,7 @@ export default class HTTPReceiver implements Receiver {
           }
           this.logger.debug('stored response sent');
         }
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error('An unhandled error occurred while Bolt processed an event');
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         res.writeHead(500);
@@ -411,7 +411,7 @@ export default class HTTPReceiver implements Receiver {
           res.writeHead(200);
           res.end(body);
         }
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
         this.logger.debug(`Error details: ${err}`);
       }

@@ -153,7 +153,7 @@ export default class ExpressReceiver implements Receiver {
             // The installation starts from a landing page served by this app.
             res.send(renderHtmlForInstallPath(url));
           }
-        } catch (error) {
+        } catch (error: any) {
           next(error);
         }
       });
@@ -212,7 +212,7 @@ export default class ExpressReceiver implements Receiver {
         }
         this.logger.debug('stored response sent');
       }
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).send();
       throw err;
     }
@@ -352,7 +352,7 @@ export function verifySignatureAndParseRawBody(
         stringBody,
         req.headers,
       );
-    } catch (error) {
+    } catch (error: any) {
       if (error) {
         if (error instanceof ReceiverAuthenticityError) {
           logError(logger, 'Request verification failed', error);

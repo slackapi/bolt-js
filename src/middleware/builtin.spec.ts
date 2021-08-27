@@ -181,7 +181,7 @@ describe('directMention()', () => {
 
     try {
       await middleware(fakeArgs);
-    } catch (err) {
+    } catch (err: any) {
       error = err;
     }
 
@@ -308,7 +308,7 @@ describe('ignoreSelf()', () => {
     let error;
     try {
       await middleware(fakeArgs);
-    } catch (err) {
+    } catch (err: any) {
       error = err;
     }
 
