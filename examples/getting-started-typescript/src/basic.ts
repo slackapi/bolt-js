@@ -1,11 +1,14 @@
-import './utils/env';
+import "./utils/env";
 import { App, LogLevel, subtype, BotMessageEvent, UsersSelectAction, BlockAction } from '@slack/bolt';
-import { isGenericMessageEvent, isMessageItem } from './utils/helpers';
+import {
+  isGenericMessageEvent,
+  isMessageItem
+} from './utils/helpers'
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  logLevel: LogLevel.DEBUG,
+  logLevel: LogLevel.DEBUG
 });
 
 /**
@@ -33,24 +36,22 @@ app.event('reaction_added', async ({ event, client }) => {
     await client.chat.postMessage({
       text: 'Pick a reminder date',
       channel: event.item.channel,
-      blocks: [
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: 'Pick a date for me to remind you',
-          },
-          accessory: {
-            type: 'datepicker',
-            action_id: 'datepicker_remind',
-            initial_date: '2019-04-28',
-            placeholder: {
-              type: 'plain_text',
-              text: 'Select a date',
-            },
-          },
+      blocks: [{
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'Pick a date for me to remind you'
         },
-      ],
+        accessory: {
+          type: 'datepicker',
+          action_id: 'datepicker_remind',
+          initial_date: '2019-04-28',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select a date'
+          }
+        }
+      }]
     });
   }
 });
@@ -66,10 +67,11 @@ app.event('team_join', async ({ event, client }) => {
     // Call chat.postMessage with the built-in client
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
-      text: `Welcome to the team, <@${event.user}>! 🎉 You can introduce yourself in this channel.`,
+      text: `Welcome to the team, <@${event.user}>! 🎉 You can introduce yourself in this channel.`
     });
     console.log(result);
-  } catch (error: any) {
+  }
+  catch (error) {
     console.error(error);
   }
 });
@@ -90,9 +92,10 @@ app.message('wake me up', async ({ message, client }) => {
     const result = await client.chat.scheduleMessage({
       channel: message.channel,
       post_at: whenSeptemberEnds,
-      text: 'Summer has come and passed',
+      text: 'Summer has come and passed'
     });
-  } catch (error: any) {
+  }
+  catch (error) {
     console.error(error);
   }
 });
@@ -107,23 +110,25 @@ app.action('approve_button', async ({ ack }) => {
 });
 
 // Your listener function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
-app.action({ action_id: 'select_user', block_id: 'assign_ticket' }, async ({ body, client, ack }) => {
-  await ack();
-  // TODO
-  body = body as BlockAction;
-  try {
-    // Make sure the event is not in a view
-    if (body.message) {
-      await client.reactions.add({
-        name: 'white_check_mark',
-        timestamp: body.message?.ts,
-        channel: body.channel?.id,
-      });
+app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
+  async ({ body, client, ack }) => {
+    await ack();
+    // TODO
+    body = body as BlockAction;
+    try {
+      // Make sure the event is not in a view
+      if (body.message) {
+        await client.reactions.add({
+          name: 'white_check_mark',
+          timestamp: body.message?.ts,
+          channel: body.channel?.id
+        });
+      }
     }
-  } catch (error: any) {
-    console.error(error);
-  }
-});
+    catch (error) {
+      console.error(error);
+    }
+  });
 
 // Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered
 app.action('approve_button', async ({ ack, say }) => {
@@ -138,3 +143,4 @@ app.action('approve_button', async ({ ack, say }) => {
 
   console.log('⚡️ Bolt app is running!');
 })();
+
