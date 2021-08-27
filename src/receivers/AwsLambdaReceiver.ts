@@ -80,7 +80,7 @@ export default class AwsLambdaReceiver implements Receiver {
       try {
         const handler = this.toHandler();
         resolve(handler);
-      } catch (error: any) {
+      } catch (error) {
         reject(error);
       }
     });
@@ -188,7 +188,7 @@ export default class AwsLambdaReceiver implements Receiver {
             body: JSON.stringify(storedResponse),
           };
         }
-      } catch (err: any) {
+      } catch (err) {
         this.logger.error('An unhandled error occurred while Bolt processed an event');
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         return { statusCode: 500, body: 'Internal server error' };
@@ -225,7 +225,7 @@ export default class AwsLambdaReceiver implements Receiver {
     try {
       // Parse this body anyway
       return JSON.parse(stringBody);
-    } catch (e: any) {
+    } catch (e) {
       logger.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
       throw e;
     }
