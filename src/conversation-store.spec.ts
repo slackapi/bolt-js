@@ -163,7 +163,7 @@ describe('MemoryStore', () => {
       try {
         await store.get('CONVERSATION_ID');
         assert.fail();
-      } catch (error) {
+      } catch (error: any) {
         // Assert
         assert.instanceOf(error, Error);
         assert.notInstanceOf(error, AssertionError);
@@ -184,7 +184,7 @@ describe('MemoryStore', () => {
       try {
         await store.get(dummyConversationId);
         assert.fail();
-      } catch (error) {
+      } catch (error: any) {
         // Assert
         assert.instanceOf(error, Error);
         assert.notInstanceOf(error, AssertionError);

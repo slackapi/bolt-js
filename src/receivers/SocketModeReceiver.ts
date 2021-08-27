@@ -123,7 +123,8 @@ export default class SocketModeReceiver implements Receiver {
               res.end(renderHtmlForInstallPath(url));
             }
           } catch (err) {
-            throw new Error(err);
+            const e = err as any;
+            throw new Error(e);
           }
         } else {
           this.logger.error(`Tried to reach ${req.url} which isn't a valid route.`);

@@ -676,9 +676,10 @@ export default class App {
         authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
     } catch (error) {
+      const e = error as any;
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      error.code = 'slack_bolt_authorization_error';
-      return this.handleError(error);
+      e.code = 'slack_bolt_authorization_error';
+      return this.handleError(e);
     }
 
     // Try to set teamId from AuthorizeResult before using one from source
@@ -854,7 +855,8 @@ export default class App {
         },
       );
     } catch (error) {
-      return this.handleError(error);
+      const e = error as any;
+      return this.handleError(e);
     }
   }
 
