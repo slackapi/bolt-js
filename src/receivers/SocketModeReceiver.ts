@@ -122,7 +122,7 @@ export default class SocketModeReceiver implements Receiver {
               res.writeHead(200, {});
               res.end(renderHtmlForInstallPath(url));
             }
-          } catch (err) {
+          } catch (err: any) {
             throw new Error(err);
           }
         } else {

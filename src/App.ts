@@ -675,7 +675,7 @@ export default class App {
       } else {
         authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
       error.code = 'slack_bolt_authorization_error';
       return this.handleError(error);
@@ -853,7 +853,7 @@ export default class App {
           }
         },
       );
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(error);
     }
   }

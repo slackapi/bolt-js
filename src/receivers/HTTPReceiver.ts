@@ -165,7 +165,7 @@ export default class HTTPReceiver implements Receiver {
     this.server = createServerFn(serverOptions, (req, res) => {
       try {
         this.requestListener(req, res);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
           this.logger.info('An unhandled request was ignored');
           res.writeHead(404);
@@ -275,7 +275,7 @@ export default class HTTPReceiver implements Receiver {
       // Verify authenticity
       try {
         bufferedReq = await verifySlackAuthenticity({ signingSecret: this.signingSecret }, req);
-      } catch (err) {
+      } catch (err: any) {
         this.logger.warn(`Request verification failed: ${err.message}`);
         res.writeHead(401);
         res.end();
@@ -288,7 +288,7 @@ export default class HTTPReceiver implements Receiver {
       // parsed body to `req.body`, as this convention has been established by the popular `body-parser` package.
       try {
         body = parseBody(bufferedReq);
-      } catch (err) {
+      } catch (err: any) {
         this.logger.warn(`Malformed request body: ${err.message}`);
         res.writeHead(400);
         res.end();
