@@ -560,7 +560,7 @@ describe('App', () => {
 
         try {
           await fakeReceiver.sendEvent(dummyReceiverEvent);
-        } catch (err) {
+        } catch (err: any) {
           actualError = err;
         }
 
