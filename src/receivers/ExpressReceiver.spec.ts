@@ -166,7 +166,7 @@ describe('ExpressReceiver', function () {
       let caughtError: Error | undefined;
       try {
         await receiver.start(port);
-      } catch (error) {
+      } catch (error: any) {
         caughtError = error;
       }
 
@@ -188,7 +188,7 @@ describe('ExpressReceiver', function () {
       await receiver.start(port);
       try {
         await receiver.start(port);
-      } catch (error) {
+      } catch (error: any) {
         caughtError = error;
       }
 
@@ -230,7 +230,7 @@ describe('ExpressReceiver', function () {
       let caughtError: Error | undefined;
       try {
         await receiver.stop();
-      } catch (error) {
+      } catch (error: any) {
         caughtError = error;
       }
 
