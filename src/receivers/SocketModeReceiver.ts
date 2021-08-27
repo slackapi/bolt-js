@@ -165,8 +165,7 @@ export default class SocketModeReceiver implements Receiver {
         this.client.disconnect();
         resolve();
       } catch (error) {
-        const e = error as any;
-        reject(e);
+        reject(error);
       }
     });
   }
