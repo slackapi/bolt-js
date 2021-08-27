@@ -78,11 +78,11 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-  | string
-  | {
-    [endpointType: string]: string;
-  };
-  requestVerification?: boolean;
+    | string
+    | {
+        [endpointType: string]: string;
+      };
+  signatureVerification?: boolean;
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -124,7 +124,7 @@ export default class ExpressReceiver implements Receiver {
 
   private processBeforeResponse: boolean;
 
-  private requestVerification: boolean;
+  private signatureVerification: boolean;
 
   public router: IRouter;
 
@@ -136,7 +136,7 @@ export default class ExpressReceiver implements Receiver {
     logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
     processBeforeResponse = false,
-    requestVerification = true,
+    signatureVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -155,8 +155,8 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
-    this.requestVerification = requestVerification;
-    const bodyParser = this.requestVerification ?
+    this.signatureVerification = signatureVerification;
+    const bodyParser = this.signatureVerification ?
       buildVerificationBodyParserMiddleware(this.logger, signingSecret) :
       buildBodyParserMiddleware(this.logger);
     const expressMiddleware: RequestHandler[] = [

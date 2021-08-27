@@ -60,7 +60,7 @@ export interface HTTPReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
-  requestVerification?: boolean;
+  signatureVerification?: boolean;
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
@@ -93,7 +93,7 @@ export default class HTTPReceiver implements Receiver {
 
   private processBeforeResponse: boolean;
 
-  private requestVerification: boolean;
+  private signatureVerification: boolean;
 
   private app?: App;
 
@@ -123,7 +123,7 @@ export default class HTTPReceiver implements Receiver {
     logger = undefined,
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
-    requestVerification = true,
+    signatureVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -134,12 +134,14 @@ export default class HTTPReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
-    this.requestVerification = requestVerification;
-    this.logger = logger ?? (() => {
-      const defaultLogger = new ConsoleLogger();
-      defaultLogger.setLevel(logLevel);
-      return defaultLogger;
-    })();
+    this.signatureVerification = signatureVerification;
+    this.logger =
+      logger ??
+      (() => {
+        const defaultLogger = new ConsoleLogger();
+        defaultLogger.setLevel(logLevel);
+        return defaultLogger;
+      })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
 
     // Initialize InstallProvider when it's required options are provided
@@ -324,7 +326,7 @@ export default class HTTPReceiver implements Receiver {
         bufferedReq = await verifySlackAuthenticity(
           {
             // If enabled: false, this method returns bufferredReq without verification
-            enabled: this.requestVerification,
+            enabled: this.signatureVerification,
             signingSecret: this.signingSecret,
           },
           req,
