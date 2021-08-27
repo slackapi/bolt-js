@@ -235,7 +235,7 @@ describe('directMention()', () => {
 
     try {
       await middleware(fakeArgs);
-    } catch (err: any) {
+    } catch (err) {
       error = err;
     }
 
@@ -397,7 +397,7 @@ describe('ignoreSelf()', () => {
     assert(fakeNext.notCalled);
   });
 
-  it("should filter an event out when only a botUserId is passed", async () => {
+  it('should filter an event out when only a botUserId is passed', async () => {
     // Arrange
     const fakeNext = sinon.fake();
     const fakeBotUserId = 'BUSER1';
