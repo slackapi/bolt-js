@@ -135,8 +135,7 @@ export default class HTTPReceiver implements Receiver {
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
-    this.logger =
-      logger ??
+    this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
