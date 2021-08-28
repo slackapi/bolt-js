@@ -9,7 +9,7 @@ import { URL } from 'url';
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import renderHtmlForInstallPath from './render-html-for-install-path';
+import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import {
   ReceiverMultipleAckError,
   ReceiverInconsistentStateError,
@@ -71,6 +71,7 @@ export interface HTTPReceiverOptions {
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
@@ -102,6 +103,8 @@ export default class HTTPReceiver implements Receiver {
   private installPath?: string; // always defined when installer is defined
 
   private directInstall?: boolean; // always defined when installer is defined
+
+  private renderHtmlForInstallPath: (url: string) => string;
 
   private installRedirectUriPath?: string; // always defined when installer is defined
 
@@ -165,6 +168,9 @@ export default class HTTPReceiver implements Receiver {
       };
       this.installCallbackOptions = installerOptions.callbackOptions ?? {};
     }
+    this.renderHtmlForInstallPath = installerOptions.renderHtmlForInstallPath !== undefined ?
+      installerOptions.renderHtmlForInstallPath :
+      defaultRenderHtmlForInstallPath;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
@@ -450,7 +456,7 @@ export default class HTTPReceiver implements Receiver {
         } else {
           // The installation starts from a landing page served by this app.
           // Generate HTML response body
-          const body = renderHtmlForInstallPath(url);
+          const body = this.renderHtmlForInstallPath(url);
 
           // Serve a basic HTML page including the "Add to Slack" button.
           // Regarding headers:

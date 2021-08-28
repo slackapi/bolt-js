@@ -17,7 +17,7 @@ import {
   CodedError,
 } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import renderHtmlForInstallPath from './render-html-for-install-path';
+import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -100,6 +100,7 @@ interface InstallerOptions {
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
@@ -208,7 +209,10 @@ export default class ExpressReceiver implements Receiver {
             res.redirect(url);
           } else {
             // The installation starts from a landing page served by this app.
-            res.send(renderHtmlForInstallPath(url));
+            const renderHtml = installerOptions.renderHtmlForInstallPath !== undefined ?
+              installerOptions.renderHtmlForInstallPath :
+              defaultRenderHtmlForInstallPath;
+            res.send(renderHtml(url));
           }
         } catch (error) {
           next(error);

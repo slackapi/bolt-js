@@ -5,7 +5,7 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import renderHtmlForInstallPath from './render-html-for-install-path';
+import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -28,6 +28,7 @@ interface InstallerOptions {
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
@@ -118,7 +119,10 @@ export default class SocketModeReceiver implements Receiver {
               res.end('');
             } else {
               res.writeHead(200, {});
-              res.end(renderHtmlForInstallPath(url));
+              const renderHtml = installerOptions.renderHtmlForInstallPath !== undefined ?
+                installerOptions.renderHtmlForInstallPath :
+                defaultRenderHtmlForInstallPath;
+              res.end(renderHtml(url));
             }
           } catch (err) {
             const e = err as any;
