@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import App from '../App';
 import { AckFn } from './index';
 import { StringIndexed } from './helpers';

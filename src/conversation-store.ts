@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Middleware, AnyMiddlewareArgs } from './types';
 import { getTypeAndConversation } from './helpers';
 
@@ -74,6 +75,7 @@ export function conversationContext<ConversationState = any>(
       logger.debug('No conversation ID for incoming event');
     }
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await next!();
   };
 }

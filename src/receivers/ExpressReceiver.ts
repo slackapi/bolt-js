@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServer, Server, ServerOptions } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
@@ -187,7 +188,7 @@ export default class ExpressReceiver implements Receiver {
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
-        authVersion: installerOptions.authVersion!,
+        authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
       });
@@ -199,15 +200,17 @@ export default class ExpressReceiver implements Receiver {
         '/slack/oauth_redirect' :
         installerOptions.redirectUriPath;
       this.router.use(redirectUriPath, async (req, res) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
       });
 
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       this.router.get(installPath, async (_req, res, next) => {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const url = await this.installer!.generateInstallUrl({
             metadata: installerOptions.metadata,
-            scopes: scopes!,
+            scopes: scopes ?? [],
             userScopes: installerOptions.userScopes,
           });
           if (installerOptions.directInstall) {

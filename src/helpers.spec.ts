@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'mocha';
 import { assert } from 'chai';
 import { getTypeAndConversation, IncomingEventType } from './helpers';

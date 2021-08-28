@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SocketModeClient } from '@slack/socket-mode';
 import { createServer } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
@@ -88,7 +89,7 @@ export default class SocketModeReceiver implements Receiver {
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
-        authVersion: installerOptions.authVersion!,
+        authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
       });
@@ -106,12 +107,14 @@ export default class SocketModeReceiver implements Receiver {
       const server = createServer(async (req, res) => {
         if (req.url !== undefined && req.url.startsWith(redirectUriPath)) {
           // call installer.handleCallback to wrap up the install flow
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
         } else if (req.url !== undefined && req.url.startsWith(installPath)) {
           try {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const url = await this.installer!.generateInstallUrl({
               metadata: installerOptions.metadata,
-              scopes: scopes!,
+              scopes: scopes ?? [],
               userScopes: installerOptions.userScopes,
             });
             if (directInstallEnabled) {

@@ -347,6 +347,7 @@ interface File {
   has_rich_preview?: boolean;
 
   shares?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
   channels: string[] | null;
@@ -354,6 +355,7 @@ interface File {
   users?: string[];
   pinned_to?: string[];
   reactions?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   }[];
   is_starred?: boolean;

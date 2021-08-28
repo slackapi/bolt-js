@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable func-names */
 import sinon from 'sinon';
 import { Logger, LogLevel } from '@slack/logger';
 import { assert } from 'chai';

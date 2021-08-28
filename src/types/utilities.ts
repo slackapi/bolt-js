@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
 
 // (issue#951) KnownKeys<ChatPostMessageArguments> no longer works in TypeScript 4.3

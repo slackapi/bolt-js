@@ -295,6 +295,7 @@ describe('WorkflowStep', () => {
       const { processStepMiddleware } = await importWorkflowStep();
 
       const fn1 = sinon.spy((async ({ next: continuation }) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await continuation!();
       }) as Middleware<WorkflowStepEdit>);
       const fn2 = sinon.spy(async () => {});

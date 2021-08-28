@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServer, Server, ServerOptions, RequestListener, IncomingMessage, ServerResponse } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
@@ -288,6 +289,7 @@ export default class HTTPReceiver implements Receiver {
     // NOTE: the domain and scheme of the following URL object are not necessarily accurate. The URL object is only
     // meant to be used to parse the path and query
     const { pathname: path } = new URL(req.url as string, `http://${req.headers.host}`);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const method = req.method!.toUpperCase();
 
     if (this.endpoints.includes(path) && method === 'POST') {
@@ -297,6 +299,7 @@ export default class HTTPReceiver implements Receiver {
 
     if (this.installer !== undefined && method === 'GET') {
       // When installer is defined then installPath and installRedirectUriPath are always defined
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
 
       if (path === installPath) {
@@ -454,6 +457,7 @@ export default class HTTPReceiver implements Receiver {
       try {
         // This function is only called from within unboundRequestListener after checking that installer is defined, and
         // when installer is defined then installUrlOptions is always defined too.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const [installer, installUrlOptions] = [this.installer!, this.installUrlOptions!];
 
         // Generate the URL for the "Add to Slack" button.
@@ -488,6 +492,7 @@ export default class HTTPReceiver implements Receiver {
   private handleInstallRedirectRequest(req: IncomingMessage, res: ServerResponse) {
     // This function is only called from within unboundRequestListener after checking that installer is defined, and
     // when installer is defined then installCallbackOptions is always defined too.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const [installer, installCallbackOptions] = [this.installer!, this.installCallbackOptions!];
 
     installer.handleCallback(req, res, installCallbackOptions).catch((err) => {

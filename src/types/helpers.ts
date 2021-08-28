@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
  */
