@@ -15,6 +15,7 @@ import {
   ReceiverInconsistentStateError,
   HTTPReceiverDeferredRequestError,
   ErrorCode,
+  CodedError,
 } from '../errors';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
@@ -406,6 +407,17 @@ export default class HTTPReceiver implements Receiver {
         }
       } catch (err) {
         const e = err as any;
+        if ('code' in e) {
+          // CodedError has code: string
+          const errorCode = (e as CodedError).code;
+          if (errorCode === ErrorCode.AuthorizationError) {
+            // authorize function threw an exception, which means there is no valid installation data
+            res.writeHead(401);
+            res.end();
+            isAcknowledged = true;
+            return;
+          }
+        }
         this.logger.error('An unhandled error occurred while Bolt processed an event');
         this.logger.debug(`Error details: ${e}, storedResponse: ${storedResponse}`);
         res.writeHead(500);
