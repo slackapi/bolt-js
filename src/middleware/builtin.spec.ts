@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import rewiremock from 'rewiremock';
 import { Logger } from '@slack/logger';
 import { WebClient } from '@slack/web-api';
-import { ErrorCode, ContextMissingPropertyError } from '../errors';
+import { ErrorCode } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
 import {
   SlackEventMiddlewareArgs,
@@ -235,7 +235,7 @@ describe('directMention()', () => {
 
     try {
       await middleware(fakeArgs);
-    } catch (err: any) {
+    } catch (err) {
       error = err;
     }
 
@@ -345,37 +345,6 @@ describe('directMention()', () => {
 });
 
 describe('ignoreSelf()', () => {
-  it('should handle context missing error', async () => {
-    // Arrange
-    const fakeNext = sinon.fake.resolves(null);
-    const fakeBotUserId = undefined;
-    const fakeArgs = {
-      next: fakeNext,
-      context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-    } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs;
-
-    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
-
-    // Act
-    const middleware = getIgnoreSelfMiddleware();
-
-    let error;
-    try {
-      await middleware(fakeArgs);
-    } catch (err: any) {
-      error = err;
-    }
-
-    // Assert
-    const expectedError = new ContextMissingPropertyError(
-      'botId',
-      'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
-    );
-
-    assert.equal(error.code, expectedError.code);
-    assert.equal(error.missingProperty, expectedError.missingProperty);
-  });
-
   it("should immediately call next(), because incoming middleware args don't contain event", async () => {
     // Arrange
     const fakeNext = sinon.fake();
@@ -417,6 +386,29 @@ describe('ignoreSelf()', () => {
         bot_id: fakeBotUserId,
       },
     } as any;
+
+    const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
+
+    // Act
+    const middleware = getIgnoreSelfMiddleware();
+    await middleware(fakeArgs);
+
+    // Assert
+    assert(fakeNext.notCalled);
+  });
+
+  it('should filter an event out when only a botUserId is passed', async () => {
+    // Arrange
+    const fakeNext = sinon.fake();
+    const fakeBotUserId = 'BUSER1';
+    const fakeArgs = {
+      next: fakeNext,
+      context: { botUserId: fakeBotUserId },
+      event: {
+        type: 'tokens_revoked',
+        user: fakeBotUserId,
+      },
+    } as unknown as TokensRevokedMiddlewareArgs;
 
     const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
