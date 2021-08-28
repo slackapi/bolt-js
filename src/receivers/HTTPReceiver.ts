@@ -60,6 +60,7 @@ export interface HTTPReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
+  requestVerification?: boolean;
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
@@ -92,6 +93,8 @@ export default class HTTPReceiver implements Receiver {
 
   private processBeforeResponse: boolean;
 
+  private requestVerification: boolean;
+
   private app?: App;
 
   public requestListener: RequestListener;
@@ -120,6 +123,7 @@ export default class HTTPReceiver implements Receiver {
     logger = undefined,
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
+    requestVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -130,12 +134,12 @@ export default class HTTPReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
-    this.logger = logger ??
-      (() => {
-        const defaultLogger = new ConsoleLogger();
-        defaultLogger.setLevel(logLevel);
-        return defaultLogger;
-      })();
+    this.requestVerification = requestVerification;
+    this.logger = logger ?? (() => {
+      const defaultLogger = new ConsoleLogger();
+      defaultLogger.setLevel(logLevel);
+      return defaultLogger;
+    })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
 
     // Initialize InstallProvider when it's required options are provided
@@ -317,7 +321,14 @@ export default class HTTPReceiver implements Receiver {
 
       // Verify authenticity
       try {
-        bufferedReq = await verifySlackAuthenticity({ signingSecret: this.signingSecret }, req);
+        bufferedReq = await verifySlackAuthenticity(
+          {
+            // If enabled: false, this method returns bufferredReq without verification
+            enabled: this.requestVerification,
+            signingSecret: this.signingSecret,
+          },
+          req,
+        );
       } catch (err) {
         const e = err as any;
         this.logger.warn(`Request verification failed: ${e.message}`);

@@ -82,6 +82,7 @@ export interface ExpressReceiverOptions {
   | {
     [endpointType: string]: string;
   };
+  requestVerification?: boolean;
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
@@ -123,6 +124,8 @@ export default class ExpressReceiver implements Receiver {
 
   private processBeforeResponse: boolean;
 
+  private requestVerification: boolean;
+
   public router: IRouter;
 
   public installer: InstallProvider | undefined = undefined;
@@ -133,6 +136,7 @@ export default class ExpressReceiver implements Receiver {
     logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
     processBeforeResponse = false,
+    requestVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -151,8 +155,12 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
+    this.requestVerification = requestVerification;
+    const bodyParser = this.requestVerification ?
+      buildVerificationBodyParserMiddleware(this.logger, signingSecret) :
+      buildBodyParserMiddleware(this.logger);
     const expressMiddleware: RequestHandler[] = [
-      verifySignatureAndParseRawBody(this.logger, signingSecret),
+      bodyParser,
       respondToSslCheck,
       respondToUrlVerification,
       this.requestHandler.bind(this),
@@ -375,12 +383,19 @@ export default class ExpressReceiver implements Receiver {
   }
 }
 
+export function verifySignatureAndParseRawBody(
+  logger: Logger,
+  signingSecret: string | (() => PromiseLike<string>),
+): RequestHandler {
+  return buildVerificationBodyParserMiddleware(logger, signingSecret);
+}
+
 /**
  * This request handler has two responsibilities:
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-export function verifySignatureAndParseRawBody(
+function buildVerificationBodyParserMiddleware(
   logger: Logger,
   signingSecret: string | (() => PromiseLike<string>),
 ): RequestHandler {
@@ -468,7 +483,7 @@ function verifyRequestSignature(
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-function verifySignatureAndParseBody(
+export function verifySignatureAndParseBody(
   signingSecret: string,
   body: string,
   headers: Record<string, any>,
@@ -483,6 +498,30 @@ function verifySignatureAndParseBody(
   verifyRequestSignature(signingSecret, body, signature, requestTimestamp);
 
   return parseRequestBody(body, contentType);
+}
+
+function buildBodyParserMiddleware(logger: Logger): RequestHandler {
+  return async (req, res, next) => {
+    let stringBody: string;
+    // On some environments like GCP (Google Cloud Platform),
+    // req.body can be pre-parsed and be passed as req.rawBody here
+    const preparsedRawBody: any = (req as any).rawBody;
+    if (preparsedRawBody !== undefined) {
+      stringBody = preparsedRawBody.toString();
+    } else {
+      stringBody = (await rawBody(req)).toString();
+    }
+    try {
+      const { 'content-type': contentType } = req.headers;
+      req.body = parseRequestBody(stringBody, contentType);
+    } catch (error) {
+      if (error) {
+        logError(logger, 'Parsing request body failed', error);
+        return res.status(400).send();
+      }
+    }
+    return next();
+  };
 }
 
 function parseRequestBody(stringBody: string, contentType: string | undefined): any {
