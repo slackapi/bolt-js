@@ -18,6 +18,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 const verifyErrorPrefix = 'Failed to verify authenticity';
 
 export interface VerifyOptions {
+  enabled?: boolean;
   signingSecret: string;
   nowMs?: () => number;
   logger?: Logger;
@@ -53,6 +54,11 @@ export async function verify(
 
   // Consume the readable stream (or use the previously consumed readable stream)
   const bufferedReq = await bufferIncomingMessage(req);
+
+  if (options.enabled !== undefined && !options.enabled) {
+    // As the validation is disabled, immediately return the bufferred reuest
+    return bufferedReq;
+  }
 
   // Find the relevant request headers
   const signature = getHeader(req, 'x-slack-signature');

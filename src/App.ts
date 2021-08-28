@@ -77,6 +77,7 @@ export interface AppOptions {
   signingSecret?: HTTPReceiverOptions['signingSecret'];
   endpoints?: HTTPReceiverOptions['endpoints'];
   processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
+  signatureVerification?: HTTPReceiverOptions['signatureVerification'];
   clientId?: HTTPReceiverOptions['clientId'];
   clientSecret?: HTTPReceiverOptions['clientSecret'];
   stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
@@ -221,6 +222,7 @@ export default class App {
     ignoreSelf = true,
     clientOptions = undefined,
     processBeforeResponse = false,
+    signatureVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -337,7 +339,7 @@ export default class App {
         logLevel: this.logLevel,
         installerOptions: this.installerOptions,
       });
-    } else if (signingSecret === undefined) {
+    } else if (signatureVerification && signingSecret === undefined) {
       // No custom receiver
       throw new AppInitializationError(
         'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
@@ -347,9 +349,10 @@ export default class App {
       this.logger.debug('Initializing HTTPReceiver');
       // Create default HTTPReceiver
       this.receiver = new HTTPReceiver({
-        signingSecret,
+        signingSecret: signingSecret || '',
         endpoints,
         processBeforeResponse,
+        signatureVerification,
         clientId,
         clientSecret,
         stateSecret,
