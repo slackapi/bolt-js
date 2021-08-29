@@ -284,6 +284,13 @@ module.exports = {
           assertionStyle: 'as',
           objectLiteralTypeAssertions: 'allow',
         }],
+        // Using any types is so useful for mock objects, we are fine with disabling this rule
+        '@typescript-eslint/no-explicit-any': 'off',
+        // Some parts in Bolt (e.g., listener arguments) are unnecessarily optional.
+        // It's okay to omit this validation in tests.
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        // Using ununamed functions (e.g., null logger) in tests is fine
+        'func-names': 'off',
         // In tests, don't force constructing a Symbol with a descriptor, as
         // it's probably just for tests
         'symbol-description': 'off',

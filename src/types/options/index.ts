@@ -212,6 +212,7 @@ export interface OptionsRequest<Source extends OptionsSource = OptionsSource> ex
   container: Source extends 'block_suggestion' ? StringIndexed : never;
 
   // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app_unfurl?: any;
 
   // exists for enterprise installs

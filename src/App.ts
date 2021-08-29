@@ -127,6 +127,8 @@ export interface AuthorizeResult {
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
   teamId?: string;
   enterpriseId?: string;
+  // TODO: for better type safety, we may want to reivit this
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -134,6 +136,7 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
   type?: A['type'];
   block_id?: A extends BlockAction ? string | RegExp : never;
   action_id?: A extends BlockAction ? string | RegExp : never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
 
@@ -365,9 +368,10 @@ export default class App {
     }
 
     let usingOauth = false;
+    const httpReceiver = (this.receiver as HTTPReceiver);
     if (
-      (this.receiver as HTTPReceiver).installer !== undefined &&
-      (this.receiver as HTTPReceiver).installer!.authorize !== undefined
+      httpReceiver.installer !== undefined &&
+      httpReceiver.installer.authorize !== undefined
     ) {
       // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
       // and theoretically, doing a fully custom (non express) receiver that implements OAuth
@@ -396,7 +400,8 @@ export default class App {
     } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
     } else if (authorize === undefined && usingOauth) {
-      this.authorize = (this.receiver as HTTPReceiver).installer!.authorize;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.authorize = httpReceiver.installer!.authorize;
     } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
     } else {
@@ -455,6 +460,7 @@ export default class App {
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public stop(...args: any[]): Promise<unknown> {
     return this.receiver.stop(...args);
   }
@@ -693,6 +699,7 @@ export default class App {
         authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
       }
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = error as any;
       this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
       e.code = ErrorCode.AuthorizationError;
@@ -766,6 +773,7 @@ export default class App {
       /** Respond function might be set below */
       respond?: RespondFn;
       /** Ack function might be set below */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ack?: AckFn<any>;
     } = {
       body: bodyArg,
@@ -894,6 +902,7 @@ export default class App {
         },
       );
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = error as any;
       // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
       // eslint-disable-next-line consistent-return

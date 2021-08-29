@@ -40,6 +40,7 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
 
   // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await next!();
 };
 
@@ -57,6 +58,7 @@ export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackSho
 
   // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await next!();
 };
 
@@ -71,6 +73,7 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
 
   // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await next!();
 };
 
@@ -85,6 +88,7 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOption
 
   // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await next!();
 };
 
@@ -99,6 +103,7 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 
   // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await next!();
 };
 
@@ -113,6 +118,7 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput
 
   // It matches so we should continue down this middleware listener chain
   // TODO: remove the non-null assertion operator
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await next!();
 };
 
@@ -201,6 +207,7 @@ export function matchConstraints(
     }
 
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await next!();
   };
 }
@@ -234,6 +241,7 @@ export function matchMessage(
     }
 
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await next!();
   };
 }
@@ -249,6 +257,7 @@ export function matchCommandName(pattern: string | RegExp): Middleware<SlackComm
     }
 
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await next!();
   };
 }
@@ -286,6 +295,7 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
     }
 
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await next!();
   };
 }
@@ -320,6 +330,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
 
     // If all the previous checks didn't skip this message, then its okay to resume to next
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await args.next!();
   };
 }
@@ -328,6 +339,7 @@ export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'
   return async ({ message, next }) => {
     if (message.subtype === subtype1) {
       // TODO: remove the non-null assertion operator
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await next!();
     }
   };
@@ -365,6 +377,7 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
     }
 
     // TODO: remove the non-null assertion operator
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await next!();
   };
 }

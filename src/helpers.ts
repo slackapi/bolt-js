@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   SlackEventMiddlewareArgs,
   SlackCommandMiddlewareArgs,
@@ -51,6 +52,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       // Using non-null assertion (!) because the alternative is to use `foundConversation: (string | undefined)`, which
       // impedes the very useful type checker help above that ensures the value is only defined to strings, not
       // undefined. This is safe when used in combination with the || operator with a default value.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return foundConversationId! || undefined;
     })();
 
