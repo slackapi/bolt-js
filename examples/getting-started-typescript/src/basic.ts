@@ -1,14 +1,17 @@
-import "./utils/env";
-import { App, LogLevel, subtype, BotMessageEvent, UsersSelectAction, BlockAction } from '@slack/bolt';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
+/* eslint-disable import/no-internal-modules */
+import './utils/env';
+import { App, LogLevel, subtype, BotMessageEvent, BlockAction } from '@slack/bolt';
 import {
   isGenericMessageEvent,
-  isMessageItem
-} from './utils/helpers'
+  isMessageItem,
+} from './utils/helpers';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  logLevel: LogLevel.DEBUG
+  logLevel: LogLevel.DEBUG,
 });
 
 /**
@@ -26,7 +29,7 @@ app.message(':wave:', async ({ message, say }) => {
  */
 // Listens for messages containing "knock knock" and responds with an italicized "who's there?"
 app.message('knock knock', async ({ say }) => {
-  await say(`_Who's there?_`);
+  await say('_Who\'s there?_');
 });
 
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
@@ -40,7 +43,7 @@ app.event('reaction_added', async ({ event, client }) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: 'Pick a date for me to remind you'
+          text: 'Pick a date for me to remind you',
         },
         accessory: {
           type: 'datepicker',
@@ -48,10 +51,10 @@ app.event('reaction_added', async ({ event, client }) => {
           initial_date: '2019-04-28',
           placeholder: {
             type: 'plain_text',
-            text: 'Select a date'
-          }
-        }
-      }]
+            text: 'Select a date',
+          },
+        },
+      }],
     });
   }
 });
@@ -62,22 +65,22 @@ app.event('reaction_added', async ({ event, client }) => {
 const welcomeChannelId = 'C12345';
 
 // When a user joins the team, send a message in a predefined channel asking them to introduce themselves
-app.event('team_join', async ({ event, client }) => {
+app.event('team_join', async ({ event, client, logger }) => {
   try {
     // Call chat.postMessage with the built-in client
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
-      text: `Welcome to the team, <@${event.user}>! 🎉 You can introduce yourself in this channel.`
+      text: `Welcome to the team, <@${event.user}>! 🎉 You can introduce yourself in this channel.`,
     });
-    console.log(result);
-  }
-  catch (error) {
-    console.error(error);
+    logger.info(result);
+  } catch (error) {
+    logger.error(error);
   }
 });
 
-app.message(subtype('bot_message'), async ({ message }) => {
-  console.log(`The bot user ${(message as BotMessageEvent).user} said ${(message as BotMessageEvent).text}`);
+app.message(subtype('bot_message'), async ({ message, logger }) => {
+  const botMessage = (message as BotMessageEvent);
+  logger.info(`The bot user ${botMessage.user} said ${botMessage.text}`);
 });
 
 /**
@@ -86,47 +89,45 @@ app.message(subtype('bot_message'), async ({ message }) => {
 // Unix Epoch time for September 30, 2019 11:59:59 PM
 const whenSeptemberEnds = '1569887999';
 
-app.message('wake me up', async ({ message, client }) => {
+app.message('wake me up', async ({ message, client, logger }) => {
   try {
     // Call chat.scheduleMessage with the built-in client
     const result = await client.chat.scheduleMessage({
       channel: message.channel,
       post_at: whenSeptemberEnds,
-      text: 'Summer has come and passed'
+      text: 'Summer has come and passed',
     });
-  }
-  catch (error) {
-    console.error(error);
+  } catch (error) {
+    logger.error(error);
   }
 });
 
 /**
  * Listening to actions
  */
-// Your listener function will be called every time an interactive component with the action_id "approve_button" is triggered
+// Your listener function will be called every time an interactive component
+// with the action_id "approve_button" is triggered
 app.action('approve_button', async ({ ack }) => {
   await ack();
   // Update the message to reflect the action
 });
 
-// Your listener function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
-app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, client, ack }) => {
+// Your listener function will only be called when the action_id matches 'select_user'
+// AND the block_id matches 'assign_ticket'
+app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
+  async ({ body, client, ack, logger }) => {
     await ack();
-    // TODO
-    body = body as BlockAction;
     try {
       // Make sure the event is not in a view
       if (body.message) {
         await client.reactions.add({
           name: 'white_check_mark',
           timestamp: body.message?.ts,
-          channel: body.channel?.id
+          channel: body.channel?.id,
         });
       }
-    }
-    catch (error) {
-      console.error(error);
+    } catch (error) {
+      logger.error(error);
     }
   });
 
@@ -143,4 +144,3 @@ app.action('approve_button', async ({ ack, say }) => {
 
   console.log('⚡️ Bolt app is running!');
 })();
-
