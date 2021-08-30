@@ -154,9 +154,7 @@ export class WorkflowStep {
       if (isStepEvent(args) && this.matchesConstraints(args)) {
         return this.processEvent(args);
       }
-      // `next` here exists for sure bu the typing on the MiddlwareArgs is not great enough
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return args.next!();
+      return args.next();
     };
   }
 

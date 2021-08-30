@@ -483,8 +483,8 @@ describe('App', () => {
         // Arrange
         app.use(fakeFirstMiddleware);
         app.use(async ({ next }) => {
-          await next!();
-          await next!();
+          await next();
+          await next();
         });
         app.use(fakeSecondMiddleware);
         app.error(fakeErrorHandler);
@@ -503,7 +503,7 @@ describe('App', () => {
           await delay(100);
           changed = true;
 
-          await next!();
+          await next();
         });
 
         await fakeReceiver.sendEvent(dummyReceiverEvent);
@@ -517,7 +517,7 @@ describe('App', () => {
 
         app.use(async ({ next }) => {
           try {
-            await next!();
+            await next();
           } catch (err: any) {
             caughtError = err;
           }
@@ -1216,7 +1216,7 @@ describe('App', () => {
 
           app.use(async ({ next }) => {
             await ackFn();
-            await next!();
+            await next();
           });
           app.shortcut({ callback_id: 'message_action_callback_id' }, async () => {
             await shortcutFn();
@@ -1317,7 +1317,7 @@ describe('App', () => {
 
           app.use(async ({ next }) => {
             await ackFn();
-            await next!();
+            await next();
           });
           app.shortcut({ callback_id: 'message_action_callback_id' }, async () => {
             await shortcutFn();
@@ -1635,7 +1635,7 @@ describe('App', () => {
           });
           app.use(async ({ logger, body, next }) => {
             logger.info(body);
-            await next!();
+            await next();
           });
 
           app.event('app_home_opened', async ({ logger, event }) => {
@@ -1683,7 +1683,7 @@ describe('App', () => {
           });
           app.use(async ({ logger, body, next }) => {
             logger.info(body);
-            await next!();
+            await next();
           });
 
           app.event('app_home_opened', async ({ logger, event }) => {
@@ -1746,7 +1746,7 @@ describe('App', () => {
           });
           app.use(async ({ client, next }) => {
             await client.auth.test();
-            await next!();
+            await next();
           });
           const clients: WebClient[] = [];
           app.event('app_home_opened', async ({ client }) => {

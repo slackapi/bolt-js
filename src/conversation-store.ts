@@ -74,8 +74,6 @@ export function conversationContext<ConversationState = any>(
     } else {
       logger.debug('No conversation ID for incoming event');
     }
-    // TODO: remove the non-null assertion operator
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await next!();
+    await next();
   };
 }
