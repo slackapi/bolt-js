@@ -76,6 +76,7 @@ export interface HTTPReceiverInstallerOptions {
   renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  stateValidation?: InstallProviderOptions['stateValidation']; // default true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   clientOptions?: InstallProviderOptions['clientOptions'];
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
