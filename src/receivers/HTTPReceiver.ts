@@ -58,6 +58,7 @@ const missingServerErrorDescription = 'The receiver cannot be started because pr
 export interface HTTPReceiverOptions {
   signingSecret: string;
   endpoints?: string | string[];
+  customRoutes?: CustomRoute[];
   logger?: Logger;
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
@@ -68,6 +69,12 @@ export interface HTTPReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
+}
+
+export interface CustomRoute {
+  path: string;
+  method: string | string[];
+  callback: (req: IncomingMessage, res: ServerResponse) => void;
 }
 
 export interface HTTPReceiverInstallerOptions {
@@ -89,6 +96,8 @@ export interface HTTPReceiverInstallerOptions {
  */
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
+
+  private customRoutes: CustomRoute[];
 
   private signingSecret: string;
 
@@ -121,6 +130,7 @@ export default class HTTPReceiver implements Receiver {
   public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
+    customRoutes = [],
     logger = undefined,
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
@@ -143,6 +153,7 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
+    this.customRoutes = customRoutes;
 
     // Initialize InstallProvider when it's required options are provided
     if (
@@ -302,13 +313,28 @@ export default class HTTPReceiver implements Receiver {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
 
+      // Visiting the installation endpoint
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);
       }
+
+      // Installation has been initiated
       if (path === installRedirectUriPath) {
         // Handle OAuth callback request (to exchange authorization grant for a new access token)
         return this.handleInstallRedirectRequest(req, res);
+      }
+    }
+
+    // Handle custom routes
+    if (this.customRoutes.length) {
+      const match = this.customRoutes.find((route) => {
+        const isMethodMatch = route.method === method || route.method.includes(method);
+        return route.path === path && isMethodMatch;
+      });
+
+      if (match) {
+        return match.callback(req, res);
       }
     }
 

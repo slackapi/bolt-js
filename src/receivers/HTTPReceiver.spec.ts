@@ -291,7 +291,35 @@ describe('HTTPReceiver', function () {
       await receiver.requestListener(fakeReq, fakeRes);
       assert(installProviderStub.handleCallback.calledWith(fakeReq, fakeRes, callbackOptions));
     });
-    it('should throw if a request comes into neither the install path nor the redirect URI path', async function () {
+
+    it('should call custom route callback only if request matches route path and method', async function () {
+      const HTTPReceiver = await importHTTPReceiver();
+      const customRoutes = [{ path: '/test', method: ['GET', 'POST'], callback: sinon.fake() }];
+      const receiver = new HTTPReceiver({
+        clientSecret: 'my-client-secret',
+        signingSecret: 'secret',
+        customRoutes,
+      });
+
+      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+      fakeReq.url = '/test';
+      fakeReq.headers = { host: 'localhost' };
+
+      fakeReq.method = 'GET';
+      receiver.requestListener(fakeReq, fakeRes);
+      assert(customRoutes[0].callback.calledWith(fakeReq, fakeRes));
+
+      fakeReq.method = 'POST';
+      receiver.requestListener(fakeReq, fakeRes);
+      assert(customRoutes[0].callback.calledWith(fakeReq, fakeRes));
+
+      fakeReq.method = 'UNHANDLED_METHOD';
+      assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+    });
+
+    it("should throw if request doesn't match install path, redirect URI path, or custom routes", async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(
@@ -303,6 +331,8 @@ describe('HTTPReceiver', function () {
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];
       const userScopes = ['chat:write'];
+      const customRoutes = [{ path: '/nope', method: 'POST', callback: sinon.fake() }];
+
       const receiver = new HTTPReceiver({
         logger: noopLogger,
         clientId: 'my-clientId',
@@ -317,18 +347,21 @@ describe('HTTPReceiver', function () {
           metadata,
           userScopes,
         },
+        customRoutes,
       });
+
       assert.isNotNull(receiver);
       receiver.installer = installProviderStub as unknown as InstallProvider;
+
       const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
       fakeReq.url = '/nope';
       fakeReq.headers = { host: 'localhost' };
       fakeReq.method = 'GET';
+
       const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-      const writeHead = sinon.fake();
-      const end = sinon.fake();
-      fakeRes.writeHead = writeHead;
-      fakeRes.end = end;
+      fakeRes.writeHead = sinon.fake();
+      fakeRes.end = sinon.fake();
+
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
     });
   });
