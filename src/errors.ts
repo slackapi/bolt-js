@@ -16,6 +16,8 @@ export enum ErrorCode {
 
   ContextMissingPropertyError = 'slack_bolt_context_missing_property_error',
 
+  CustomRouteInitializationError = 'slack_bolt_custom_route_initialization_error',
+
   ReceiverMultipleAckError = 'slack_bolt_receiver_ack_multiple_error',
   ReceiverAuthenticityError = 'slack_bolt_receiver_authenticity_error',
   ReceiverInconsistentStateError = 'slack_bolt_receiver_inconsistent_state_error',
@@ -78,6 +80,10 @@ export class ContextMissingPropertyError extends Error implements CodedError {
     super(message);
     this.missingProperty = missingProperty;
   }
+}
+
+export class CustomRouteInitializationError extends Error implements CodedError {
+  public code = ErrorCode.CustomRouteInitializationError;
 }
 
 export class ReceiverMultipleAckError extends Error implements CodedError {

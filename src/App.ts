@@ -343,6 +343,7 @@ export default class App {
         logger,
         logLevel: this.logLevel,
         installerOptions: this.installerOptions,
+        customRoutes,
       });
     } else if (signatureVerification && signingSecret === undefined) {
       // No custom receiver

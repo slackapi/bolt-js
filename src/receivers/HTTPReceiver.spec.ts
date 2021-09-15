@@ -294,7 +294,7 @@ describe('HTTPReceiver', function () {
 
     it('should call custom route callback only if request matches route path and method', async function () {
       const HTTPReceiver = await importHTTPReceiver();
-      const customRoutes = [{ path: '/test', method: ['GET', 'POST'], callback: sinon.fake() }];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], callback: sinon.fake() }];
       const receiver = new HTTPReceiver({
         clientSecret: 'my-client-secret',
         signingSecret: 'secret',
