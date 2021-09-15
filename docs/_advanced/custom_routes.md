@@ -6,9 +6,42 @@ order: 10
 ---
 
 <div class="section-content">
+As of `v3.7.0`, custom HTTP routes can be easily added by passing in a collection of routes as `customRoutes` when initializing `App`. 
 
-Adding custom HTTP routes is quite straightforward when using Bolt's built-in `ExpressReceiver`. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which more routes can be added.
+Each `CustomRoute` object must contain three properties: `path`, `method`, and `callback`. `method`, which corresponds to the HTTP verb, can be either a string or an array of strings.
+</div>
 
+```javascript
+const { App } = require('@slack/bolt');
+
+// Create the Bolt App, using the receiver
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  customRoutes: [
+    {
+      path: '/health-check',
+      method: ['GET'],
+      callback: (req, res) => {
+        res.writeHead(200);
+        res.end('Health check information displayed here!');
+      },
+    },
+  ],
+});
+
+(async () => {
+  await app.start();
+  console.log('⚡️ Bolt app started');
+})();
+```
+
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
+<h4 class="section-head">Custom ExpressReceiver routes</h4>
+</summary>
+
+<div class="secondary-content" markdown="0">
+Adding custom HTTP routes is quite straightforward when using Bolt’s built-in ExpressReceiver. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which additional routes can be added.
 </div>
 
 ```javascript
@@ -36,7 +69,8 @@ receiver.router.post('/secret-page', (req, res) => {
 });
 
 (async () => {
-  await app.start(8080);
-  console.log('app is running');
+  await app.start();
+  console.log('⚡️ Bolt app started');
 })();
 ```
+</details>
