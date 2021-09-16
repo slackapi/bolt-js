@@ -146,7 +146,6 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
-    this.logger.debug('===INSIDE HTTP RECEIVER====');
     // Initialize InstallProvider when it's required options are provided
     if (
       clientId !== undefined &&
