@@ -65,6 +65,7 @@ export interface HTTPReceiverOptions {
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: string;
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
@@ -85,9 +86,6 @@ export interface HTTPReceiverInstallerOptions {
   callbackOptions?: CallbackOptions;
 }
 
-/**
- * Receives HTTP requests with Events, Slash Commands, and Actions
- */
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
 
@@ -131,6 +129,7 @@ export default class HTTPReceiver implements Receiver {
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
@@ -175,7 +174,7 @@ export default class HTTPReceiver implements Receiver {
         scopes: scopes ?? [],
         userScopes: installerOptions.userScopes,
         metadata: installerOptions.metadata,
-        redirectUri: installerOptions.redirectUriPath,
+        redirectUri,
       };
       this.installCallbackOptions = installerOptions.callbackOptions ?? {};
     }
@@ -306,12 +305,11 @@ export default class HTTPReceiver implements Receiver {
       // When installer is defined then installPath and installRedirectUriPath are always defined
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
-      const { pathname: redirectPath } = new URL(installRedirectUriPath, `http://${req.headers.host}`);
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);
       }
-      if (path === redirectPath) {
+      if (path === installRedirectUriPath) {
         // Handle OAuth callback request (to exchange authorization grant for a new access token)
         return this.handleInstallRedirectRequest(req, res);
       }
@@ -513,7 +511,7 @@ export default class HTTPReceiver implements Receiver {
     } else {
       // when stateVerification is disabled
       // make installation options directly available to installation handler
-      installer.handleCallback(req, res, installCallbackOptions, installUrlOptions);
+      installer.handleCallback(req, res, installCallbackOptions, installUrlOptions).catch(errorHandler);
     }
   }
 }

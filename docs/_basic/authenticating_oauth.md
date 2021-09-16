@@ -96,7 +96,7 @@ const app = new App({
       authVersion: 'v1', // default  is 'v2', 'v1' is used for classic slack apps
       metadata: 'some session data',
       installPath: '/slack/installApp',
-      redirectUriPath: 'http://example.com/slack/redirect',
+      redirectUriPath: '/slack/redirect',
       callbackOptions: {
         success: (installation, installOptions, req, res) => {
           // Do custom success logic here

@@ -94,7 +94,7 @@ const app = new App({
       authVersion: 'v1', // デフォルトは 'v2' (クラシック Slack アプリは 'v1')
       metadata: 'some session data',
       installPath: '/slack/installApp',
-      redirectUriPath: 'http://example.com/slack/redirect',
+      redirectUriPath: '/slack/redirect',
       callbackOptions: {
         success: (installation, installOptions, req, res) => {
           // ここで成功時のカスタムロジックを実装
