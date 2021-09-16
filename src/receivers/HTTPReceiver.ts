@@ -86,6 +86,9 @@ export interface HTTPReceiverInstallerOptions {
   callbackOptions?: CallbackOptions;
 }
 
+/**
+ * Receives HTTP requests with Events, Slash Commands, and Actions
+ */
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
 
