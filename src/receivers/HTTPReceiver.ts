@@ -76,7 +76,7 @@ export interface HTTPReceiverInstallerOptions {
   renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
-  stateValidation?: InstallProviderOptions['stateValidation']; // default true
+  stateVerification?: InstallProviderOptions['stateVerification']; // default true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   clientOptions?: InstallProviderOptions['clientOptions'];
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
@@ -117,6 +117,8 @@ export default class HTTPReceiver implements Receiver {
 
   private installCallbackOptions?: CallbackOptions; // always defined when installer is defined
 
+  private stateVerification?: boolean; // always defined when installer is defined
+
   private logger: Logger;
 
   public constructor({
@@ -144,7 +146,7 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
-
+    this.logger.debug('===INSIDE HTTP RECEIVER====');
     // Initialize InstallProvider when it's required options are provided
     if (
       clientId !== undefined &&
@@ -159,6 +161,7 @@ export default class HTTPReceiver implements Receiver {
         logger,
         logLevel,
         stateStore: installerOptions.stateStore,
+        stateVerification: installerOptions.stateVerification,
         authVersion: installerOptions.authVersion,
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
@@ -168,10 +171,12 @@ export default class HTTPReceiver implements Receiver {
       this.installPath = installerOptions.installPath ?? '/slack/install';
       this.directInstall = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
+      this.stateVerification = installerOptions.stateVerification;
       this.installUrlOptions = {
         scopes: scopes ?? [],
         userScopes: installerOptions.userScopes,
         metadata: installerOptions.metadata,
+        redirectUri: installerOptions.redirectUriPath,
       };
       this.installCallbackOptions = installerOptions.callbackOptions ?? {};
     }
@@ -302,12 +307,12 @@ export default class HTTPReceiver implements Receiver {
       // When installer is defined then installPath and installRedirectUriPath are always defined
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
-
+      const { pathname: redirectPath } = new URL(installRedirectUriPath, `http://${req.headers.host}`);
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);
       }
-      if (path === installRedirectUriPath) {
+      if (path === redirectPath) {
         // Handle OAuth callback request (to exchange authorization grant for a new access token)
         return this.handleInstallRedirectRequest(req, res);
       }
@@ -460,7 +465,6 @@ export default class HTTPReceiver implements Receiver {
         // when installer is defined then installUrlOptions is always defined too.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const [installer, installUrlOptions] = [this.installer!, this.installUrlOptions!];
-
         // Generate the URL for the "Add to Slack" button.
         const url = await installer.generateInstallUrl(installUrlOptions);
 
@@ -494,14 +498,24 @@ export default class HTTPReceiver implements Receiver {
     // This function is only called from within unboundRequestListener after checking that installer is defined, and
     // when installer is defined then installCallbackOptions is always defined too.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [installer, installCallbackOptions] = [this.installer!, this.installCallbackOptions!];
-
-    installer.handleCallback(req, res, installCallbackOptions).catch((err) => {
+    const [installer, installCallbackOptions, installUrlOptions] = [
+      this.installer!,
+      this.installCallbackOptions!,
+      this.installUrlOptions!,
+    ];
+    const errorHandler = (err: Error) => {
       this.logger.error(
         'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',
       );
       this.logger.debug(`Error details: ${err}`);
-    });
+    };
+    if (this.stateVerification) {
+      installer.handleCallback(req, res, installCallbackOptions).catch(errorHandler);
+    } else {
+      // when stateVerification is disabled
+      // make installation options directly available to installation handler
+      installer.handleCallback(req, res, installCallbackOptions, installUrlOptions);
+    }
   }
 }
 
