@@ -255,6 +255,47 @@ describe('App', () => {
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
+    describe('with custom redirect supplied', () => {
+      it('should fail when missing redirectUri', async () => {
+        // Arrange
+        const MockApp = await importApp();
+
+        // Act
+        try {
+          new MockApp({ token: '', signingSecret: '', installerOptions: { redirectUriPath: '/redirect' } }); // eslint-disable-line no-new
+          assert.fail();
+        } catch (error: any) {
+          // Assert
+          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        }
+      });
+      it('should fail when missing installerOptions', async () => {
+        // Arrange
+        const MockApp = await importApp();
+
+        // Act
+        try {
+          new MockApp({ token: '', signingSecret: '', redirectUri: 'http://example.com/redirect' }); // eslint-disable-line no-new
+          assert.fail();
+        } catch (error: any) {
+          // Assert
+          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        }
+      });
+      it('should fail when missing installerOptions.redirectUriPath', async () => {
+        // Arrange
+        const MockApp = await importApp();
+
+        // Act
+        try {
+          new MockApp({ token: '', signingSecret: '', redirectUri: 'http://example.com/redirect', installerOptions: {} }); // eslint-disable-line no-new
+          assert.fail();
+        } catch (error: any) {
+          // Assert
+          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        }
+      });
+    });
     it('with clientOptions', async () => {
       const fakeConstructor = sinon.fake();
       const overrides = mergeOverrides(withNoopAppMetadata(), {

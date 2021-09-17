@@ -16,6 +16,7 @@ export interface SocketModeReceiverOptions {
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: string;
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
@@ -25,6 +26,7 @@ export interface SocketModeReceiverOptions {
 // Additional Installer Options
 interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  stateVerification?: InstallProviderOptions['stateVerification']; // default true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
@@ -58,6 +60,7 @@ export default class SocketModeReceiver implements Receiver {
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
@@ -89,6 +92,7 @@ export default class SocketModeReceiver implements Receiver {
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
+        stateVerification: installerOptions.stateVerification,
         authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
@@ -104,19 +108,34 @@ export default class SocketModeReceiver implements Receiver {
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       const directInstallEnabled = installerOptions.directInstall !== undefined && installerOptions.directInstall;
 
+      // create install url options
+      const installUrlOptions = {
+        metadata: installerOptions.metadata,
+        scopes: scopes ?? [],
+        userScopes: installerOptions.userScopes,
+        redirectUri,
+      };
       const server = createServer(async (req, res) => {
+        this.logger.debug('+++ checking path +++', req.url, redirectUriPath);
         if (req.url !== undefined && req.url.startsWith(redirectUriPath)) {
+          const { stateVerification, callbackOptions } = installerOptions;
           // call installer.handleCallback to wrap up the install flow
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
+          if (stateVerification) {
+            this.logger.debug(' +++ state verification on +++');
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            await this.installer!.handleCallback(req, res, callbackOptions);
+          } else {
+            this.logger.debug(' +++ state verification off +++');
+            // when stateVerification is disabled
+            // make installation options directly available to installation handler
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+          }
         } else if (req.url !== undefined && req.url.startsWith(installPath)) {
           try {
+            this.logger.debug('+++ inside redirect path +++', req.url, redirectUriPath);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const url = await this.installer!.generateInstallUrl({
-              metadata: installerOptions.metadata,
-              scopes: scopes ?? [],
-              userScopes: installerOptions.userScopes,
-            });
+            const url = await this.installer!.generateInstallUrl(installUrlOptions);
             if (directInstallEnabled) {
               res.writeHead(302, { Location: url });
               res.end('');

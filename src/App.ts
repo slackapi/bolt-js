@@ -81,6 +81,7 @@ export interface AppOptions {
   clientId?: HTTPReceiverOptions['clientId'];
   clientSecret?: HTTPReceiverOptions['clientSecret'];
   stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: HTTPReceiverOptions['redirectUri']
   installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
   scopes?: HTTPReceiverOptions['scopes'];
   installerOptions?: HTTPReceiverOptions['installerOptions'];
@@ -229,6 +230,7 @@ export default class App {
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = undefined,
@@ -319,6 +321,19 @@ export default class App {
       };
     }
 
+    // if either redirectUri or redirectUriPath are supplied
+    // both must be supplied
+    if (
+      (redirectUri && !this.installerOptions) ||
+        (redirectUri && !this.installerOptions.redirectUriPath) ||
+          (!redirectUri && this.installerOptions.redirectUriPath)
+    ) {
+      throw new AppInitializationError(
+        'To set a custom install redirect path, you must provide both redirectUri' +
+        ' and installerOptions#redirectUriPath during app initialization.' +
+        ' These should be consistent, e.g. https://example.com/redirect and /redirect',
+      );
+    }
     // Check for required arguments of HTTPReceiver
     if (receiver !== undefined) {
       if (this.socketMode) {
@@ -336,6 +351,7 @@ export default class App {
         clientId,
         clientSecret,
         stateSecret,
+        redirectUri,
         installationStore,
         scopes,
         logger,
@@ -359,6 +375,7 @@ export default class App {
         clientId,
         clientSecret,
         stateSecret,
+        redirectUri,
         installationStore,
         scopes,
         logger,

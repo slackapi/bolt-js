@@ -173,13 +173,13 @@ export default class HTTPReceiver implements Receiver {
       this.directInstall = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
       this.stateVerification = installerOptions.stateVerification;
+      this.installCallbackOptions = installerOptions.callbackOptions ?? {};
       this.installUrlOptions = {
         scopes: scopes ?? [],
         userScopes: installerOptions.userScopes,
         metadata: installerOptions.metadata,
         redirectUri,
       };
-      this.installCallbackOptions = installerOptions.callbackOptions ?? {};
     }
     this.renderHtmlForInstallPath = installerOptions.renderHtmlForInstallPath !== undefined ?
       installerOptions.renderHtmlForInstallPath :
@@ -497,12 +497,13 @@ export default class HTTPReceiver implements Receiver {
   private handleInstallRedirectRequest(req: IncomingMessage, res: ServerResponse) {
     // This function is only called from within unboundRequestListener after checking that installer is defined, and
     // when installer is defined then installCallbackOptions is always defined too.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     const [installer, installCallbackOptions, installUrlOptions] = [
       this.installer!,
       this.installCallbackOptions!,
       this.installUrlOptions!,
     ];
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     const errorHandler = (err: Error) => {
       this.logger.error(
         'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',
