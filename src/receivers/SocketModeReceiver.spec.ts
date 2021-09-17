@@ -197,9 +197,7 @@ describe('SocketModeReceiver', function () {
         end: sinon.fake(),
       };
       await this.listener(fakeReq, fakeRes);
-      assert(installProviderStub.generateInstallUrl.calledWith(
-        sinon.match({ metadata, scopes, userScopes }),
-      ));
+      assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
       assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
       assert(fakeRes.end.called);
     });
