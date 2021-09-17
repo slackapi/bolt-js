@@ -116,16 +116,13 @@ export default class SocketModeReceiver implements Receiver {
         redirectUri,
       };
       const server = createServer(async (req, res) => {
-        this.logger.debug('+++ checking path +++', req.url, redirectUriPath);
         if (req.url !== undefined && req.url.startsWith(redirectUriPath)) {
           const { stateVerification, callbackOptions } = installerOptions;
           // call installer.handleCallback to wrap up the install flow
           if (stateVerification) {
-            this.logger.debug(' +++ state verification on +++');
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             await this.installer!.handleCallback(req, res, callbackOptions);
           } else {
-            this.logger.debug(' +++ state verification off +++');
             // when stateVerification is disabled
             // make installation options directly available to installation handler
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -133,7 +130,6 @@ export default class SocketModeReceiver implements Receiver {
           }
         } else if (req.url !== undefined && req.url.startsWith(installPath)) {
           try {
-            this.logger.debug('+++ inside redirect path +++', req.url, redirectUriPath);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const url = await this.installer!.generateInstallUrl(installUrlOptions);
             if (directInstallEnabled) {
