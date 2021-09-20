@@ -321,19 +321,9 @@ export default class App {
       };
     }
 
-    // if either redirectUri or redirectUriPath are supplied
-    // both must be supplied
-    if (
-      (redirectUri && !this.installerOptions) ||
-        (redirectUri && !this.installerOptions.redirectUriPath) ||
-          (!redirectUri && this.installerOptions.redirectUriPath)
-    ) {
-      throw new AppInitializationError(
-        'To set a custom install redirect path, you must provide both redirectUri' +
-        ' and installerOptions#redirectUriPath during app initialization.' +
-        ' These should be consistent, e.g. https://example.com/redirect and /redirect',
-      );
-    }
+    // verify any redirect options supplied
+    this.verifyRedirectOpts(redirectUri);
+
     // Check for required arguments of HTTPReceiver
     if (receiver !== undefined) {
       if (this.socketMode) {
@@ -440,6 +430,26 @@ export default class App {
 
     // Should be last to avoid exposing partially initialized app
     this.receiver.init(this);
+  }
+
+  /**
+   * Verifies redirect uri and redirect uri path exist if either supplied
+   */
+  private verifyRedirectOpts(redirectUri: HTTPReceiverOptions['redirectUri']) {
+    // if either redirectUri or redirectUriPath are supplied
+    // both must be supplied
+    const { installerOptions } = this;
+    if (
+      (redirectUri && !installerOptions) ||
+        (redirectUri && installerOptions && !installerOptions.redirectUriPath) ||
+          (!redirectUri && installerOptions && installerOptions.redirectUriPath)
+    ) {
+      throw new AppInitializationError(
+        'To set a custom install redirect path, you must provide both redirectUri' +
+        ' and installerOptions.redirectUriPath during app initialization.' +
+        ' These should be consistent, e.g. https://example.com/redirect and /redirect',
+      );
+    }
   }
 
   /**
