@@ -149,10 +149,13 @@ export default class HTTPReceiver implements Receiver {
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
     // Initialize InstallProvider when it's required options are provided
+    this.stateVerification = installerOptions.stateVerification;
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-      (stateSecret !== undefined || installerOptions.stateStore !== undefined)
+       (this.stateVerification === false || // state store not needed
+         stateSecret !== undefined ||
+          installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -172,7 +175,6 @@ export default class HTTPReceiver implements Receiver {
       this.installPath = installerOptions.installPath ?? '/slack/install';
       this.directInstall = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
-      this.stateVerification = installerOptions.stateVerification;
       this.installCallbackOptions = installerOptions.callbackOptions ?? {};
       this.installUrlOptions = {
         scopes: scopes ?? [],

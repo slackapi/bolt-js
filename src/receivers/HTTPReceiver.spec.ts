@@ -204,7 +204,7 @@ describe('HTTPReceiver', function () {
       assert.isTrue(writeHead.calledWith(200));
       assert.isTrue(end.calledWith('Hello world!'));
     });
-    it('should rediect installers if directInstall is true', async function () {
+    it('should redirect installers if directInstall is true', async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(

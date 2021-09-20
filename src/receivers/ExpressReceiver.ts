@@ -181,7 +181,9 @@ export default class ExpressReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-      (stateSecret !== undefined || installerOptions.stateStore !== undefined)
+       (installerOptions.stateVerification === false || // state store not needed
+         stateSecret !== undefined ||
+          installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
