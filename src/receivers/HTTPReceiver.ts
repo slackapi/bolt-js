@@ -17,8 +17,8 @@ import {
   HTTPReceiverDeferredRequestError,
   ErrorCode,
   CodedError,
-  CustomRouteInitializationError,
 } from '../errors';
+import { CustomRoute, prepareRoutes, ReceiverRoutes } from './custom-routes';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -71,13 +71,6 @@ export interface HTTPReceiverOptions {
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
 }
-
-export interface CustomRoute {
-  path: string;
-  method: string | string[];
-  callback: (req: IncomingMessage, res: ServerResponse) => void;
-}
-
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
@@ -98,7 +91,7 @@ export interface HTTPReceiverInstallerOptions {
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
 
-  private customRoutes: CustomRoute[];
+  private routes: ReceiverRoutes;
 
   private signingSecret: string;
 
@@ -154,7 +147,7 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
-    this.customRoutes = prepareCustomRoutes(customRoutes);
+    this.routes = prepareRoutes(customRoutes);
 
     // Initialize InstallProvider when it's required options are provided
     if (
@@ -328,21 +321,14 @@ export default class HTTPReceiver implements Receiver {
     }
 
     // Handle custom routes
-    if (this.customRoutes.length) {
-      const match = this.customRoutes.find((route) => {
-        const isMethodMatch = Array.isArray(route.method) ?
-          route.method.includes(method) : route.method === method;
-        return route.path === path && isMethodMatch;
-      });
-
-      if (match) {
-        return match.callback(req, res);
-      }
+    if (Object.keys(this.routes).length) {
+      const match = this.routes[path] && this.routes[path][method] !== undefined;
+      if (match) { return this.routes[path][method](req, res); }
     }
 
     // If the request did not match the previous conditions, an error is thrown. The error can be caught by the
     // the caller in order to defer to other routing logic (similar to calling `next()` in connect middleware).
-    throw new HTTPReceiverDeferredRequestError(`Unhandled HTTP request made to ${path}`, req, res);
+    throw new HTTPReceiverDeferredRequestError(`Unhandled HTTP request (${method}) made to ${path}`, req, res);
   }
 
   private handleIncomingEvent(req: IncomingMessage, res: ServerResponse) {
@@ -546,32 +532,4 @@ function parseBody(req: BufferedIncomingMessage) {
     return parsedQs;
   }
   return JSON.parse(bodyAsString);
-}
-
-function prepareCustomRoutes(customRoutes: CustomRoute[]): CustomRoute[] {
-  const requiredKeys: (keyof CustomRoute)[] = ['path', 'method', 'callback'];
-  const missingKeys: (keyof CustomRoute)[] = [];
-
-  // Check for missing required keys
-  customRoutes.forEach((route) => {
-    requiredKeys.forEach((key) => {
-      if (route[key] === undefined && !missingKeys.includes(key)) {
-        missingKeys.push(key);
-      }
-    });
-  });
-
-  if (missingKeys.length > 0) {
-    const errorMsg = `One or more members of customRoutes are missing required keys: ${missingKeys.join(', ')}`;
-    throw new CustomRouteInitializationError(errorMsg);
-  }
-
-  // Convert methods to uppercase for ease of request processing
-  const updatedRoutes = customRoutes.map((route) => {
-    const method = Array.isArray(route.method) ?
-      route.method.map((m) => m.toUpperCase()) : route.method.toUpperCase();
-    return { ...route, method };
-  });
-
-  return updatedRoutes;
 }

@@ -7,7 +7,7 @@ import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
-import { CustomRouteInitializationError } from '../errors';
+import { prepareRoutes, ReceiverRoutes } from './custom-routes';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -27,7 +27,7 @@ export interface SocketModeReceiverOptions {
 export interface CustomRoute {
   path: string;
   method: string | string[];
-  callback: (req: IncomingMessage, res: ServerResponse) => void;
+  handler: (req: IncomingMessage, res: ServerResponse) => void;
 }
 
 // Additional Installer Options
@@ -59,7 +59,7 @@ export default class SocketModeReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
-  private customRoutes: CustomRoute[];
+  private routes: ReceiverRoutes;
 
   public constructor({
     appToken,
@@ -85,7 +85,7 @@ export default class SocketModeReceiver implements Receiver {
       defaultLogger.setLevel(logLevel);
       return defaultLogger;
     })();
-    this.customRoutes = prepareCustomRoutes(customRoutes);
+    this.routes = prepareRoutes(customRoutes);
 
     // Initialize InstallProvider
     if (clientId !== undefined && clientSecret !== undefined &&
@@ -105,7 +105,7 @@ export default class SocketModeReceiver implements Receiver {
     }
 
     // Add OAuth and/or custom routes to receiver
-    if (this.installer !== undefined || this.customRoutes.length) {
+    if (this.installer !== undefined || customRoutes.length) {
       // use default or passed in redirect path
       const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
 
@@ -155,20 +155,16 @@ export default class SocketModeReceiver implements Receiver {
         }
 
         // Handle request for custom routes
-        if (this.customRoutes.length) {
-          const match = this.customRoutes.find((route) => {
-            const isMethodMatch = Array.isArray(route.method) ?
-              route.method.includes(method) : route.method === method;
-            return route.path === req.url && isMethodMatch;
-          });
+        if (customRoutes.length && req.url) {
+          const match = this.routes[req.url] && this.routes[req.url][method] !== undefined;
 
           if (match) {
-            match.callback(req, res);
+            this.routes[req.url][method](req, res);
             return;
           }
         }
 
-        this.logger.info(`An unhandled HTTP request made to ${req.url} was ignored`);
+        this.logger.info(`An unhandled HTTP request (${req.method}) made to ${req.url} was ignored`);
         res.writeHead(404, {});
         res.end();
       });
@@ -211,32 +207,4 @@ export default class SocketModeReceiver implements Receiver {
       }
     });
   }
-}
-
-function prepareCustomRoutes(customRoutes: CustomRoute[]): CustomRoute[] {
-  const requiredKeys: (keyof CustomRoute)[] = ['path', 'method', 'callback'];
-  const missingKeys: (keyof CustomRoute)[] = [];
-
-  // Check for missing required keys
-  customRoutes.forEach((route) => {
-    requiredKeys.forEach((key) => {
-      if (route[key] === undefined && !missingKeys.includes(key)) {
-        missingKeys.push(key);
-      }
-    });
-  });
-
-  if (missingKeys.length > 0) {
-    const errorMsg = `One or more members of customRoutes are missing required keys: ${missingKeys.join(', ')}`;
-    throw new CustomRouteInitializationError(errorMsg);
-  }
-
-  // Convert methods to uppercase for ease of request processing
-  const updatedRoutes = customRoutes.map((route) => {
-    const method = Array.isArray(route.method) ?
-      route.method.map((m) => m.toUpperCase()) : route.method.toUpperCase();
-    return { ...route, method };
-  });
-
-  return updatedRoutes;
 }

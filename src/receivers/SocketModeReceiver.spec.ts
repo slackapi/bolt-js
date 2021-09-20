@@ -292,7 +292,7 @@ describe('SocketModeReceiver', function () {
       assert(fakeRes.end.called);
     });
 
-    it('should call custom route callback only if request matches route path and method', async function () {
+    it('should call custom route handler only if request matches route path and method', async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(
@@ -300,7 +300,7 @@ describe('SocketModeReceiver', function () {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
-      const customRoutes = [{ path: '/test', method: ['get', 'POST'], callback: sinon.fake() }];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
 
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
@@ -317,11 +317,11 @@ describe('SocketModeReceiver', function () {
 
       fakeReq.method = 'GET';
       await this.listener(fakeReq, fakeRes);
-      assert(customRoutes[0].callback.calledWith(fakeReq, fakeRes));
+      assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
 
       fakeReq.method = 'POST';
       await this.listener(fakeReq, fakeRes);
-      assert(customRoutes[0].callback.calledWith(fakeReq, fakeRes));
+      assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
 
       fakeReq.method = 'UNHANDLED_METHOD';
       await this.listener(fakeReq, fakeRes);
@@ -336,7 +336,7 @@ describe('SocketModeReceiver', function () {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
-      const customRoutes = [{ callback: sinon.fake() }] as any;
+      const customRoutes = [{ handler: sinon.fake() }] as any;
 
       assert.throws(() => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }), CustomRouteInitializationError);
     });
@@ -353,7 +353,7 @@ describe('SocketModeReceiver', function () {
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];
       const userScopes = ['chat:write'];
-      const customRoutes = [{ path: '/test', method: ['get', 'POST'], callback: sinon.fake() }];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
         logger: noopLogger,

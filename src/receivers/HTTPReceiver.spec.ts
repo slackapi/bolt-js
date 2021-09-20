@@ -7,7 +7,7 @@ import { EventEmitter } from 'events';
 import { InstallProvider } from '@slack/oauth';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Override, mergeOverrides } from '../test-helpers';
-import { HTTPReceiverDeferredRequestError } from '../errors';
+import { CustomRouteInitializationError, HTTPReceiverDeferredRequestError } from '../errors';
 
 /* Testing Harness */
 
@@ -292,9 +292,9 @@ describe('HTTPReceiver', function () {
       assert(installProviderStub.handleCallback.calledWith(fakeReq, fakeRes, callbackOptions));
     });
 
-    it('should call custom route callback only if request matches route path and method', async function () {
+    it('should call custom route handler only if request matches route path and method', async function () {
       const HTTPReceiver = await importHTTPReceiver();
-      const customRoutes = [{ path: '/test', method: ['get', 'POST'], callback: sinon.fake() }];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
       const receiver = new HTTPReceiver({
         clientSecret: 'my-client-secret',
         signingSecret: 'secret',
@@ -309,14 +309,25 @@ describe('HTTPReceiver', function () {
 
       fakeReq.method = 'GET';
       receiver.requestListener(fakeReq, fakeRes);
-      assert(customRoutes[0].callback.calledWith(fakeReq, fakeRes));
+      assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
 
       fakeReq.method = 'POST';
       receiver.requestListener(fakeReq, fakeRes);
-      assert(customRoutes[0].callback.calledWith(fakeReq, fakeRes));
+      assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
 
       fakeReq.method = 'UNHANDLED_METHOD';
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+    });
+
+    it("should throw an error if customRoutes don't have the required keys", async function () {
+      const HTTPReceiver = await importHTTPReceiver();
+      const customRoutes = [{ path: '/test' }] as any;
+
+      assert.throws(() => new HTTPReceiver({
+        clientSecret: 'my-client-secret',
+        signingSecret: 'secret',
+        customRoutes,
+      }), CustomRouteInitializationError);
     });
 
     it("should throw if request doesn't match install path, redirect URI path, or custom routes", async function () {
@@ -331,7 +342,7 @@ describe('HTTPReceiver', function () {
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];
       const userScopes = ['chat:write'];
-      const customRoutes = [{ path: '/nope', method: 'POST', callback: sinon.fake() }];
+      const customRoutes = [{ path: '/nope', method: 'POST', handler: sinon.fake() }];
 
       const receiver = new HTTPReceiver({
         logger: noopLogger,
