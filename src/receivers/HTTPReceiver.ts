@@ -466,7 +466,7 @@ export default class HTTPReceiver implements Receiver {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const [installer, installUrlOptions] = [this.installer!, this.installUrlOptions!];
         // Generate the URL for the "Add to Slack" button.
-        const url = await installer.generateInstallUrl(installUrlOptions);
+        const url = await installer.generateInstallUrl(installUrlOptions, this.stateVerification);
 
         if (this.directInstall !== undefined && this.directInstall) {
           // If a Slack app sets "Direct Install URL" in the Slack app configruation,
