@@ -228,7 +228,7 @@ export default class ExpressReceiver implements Receiver {
       this.router.get(installPath, async (_req, res, next) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const url = await this.installer!.generateInstallUrl(installUrlOptions);
+          const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
           if (installerOptions.directInstall) {
             // If a Slack app sets "Direct Install URL" in the Slack app configuration,
             // the installation flow of the app should start with the Slack authorize URL.

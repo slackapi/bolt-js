@@ -131,16 +131,17 @@ export default class SocketModeReceiver implements Receiver {
             await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
           }
         } else if (req.url !== undefined && req.url.startsWith(installPath)) {
+          const { stateVerification, renderHtmlForInstallPath } = installerOptions;
           try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const url = await this.installer!.generateInstallUrl(installUrlOptions);
+            const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
             if (directInstallEnabled) {
               res.writeHead(302, { Location: url });
               res.end('');
             } else {
               res.writeHead(200, {});
-              const renderHtml = installerOptions.renderHtmlForInstallPath !== undefined ?
-                installerOptions.renderHtmlForInstallPath :
+              const renderHtml = renderHtmlForInstallPath !== undefined ?
+                renderHtmlForInstallPath :
                 defaultRenderHtmlForInstallPath;
               res.end(renderHtml(url));
             }
