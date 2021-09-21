@@ -8,8 +8,8 @@ export interface CustomRoute {
 }
 
 export interface ReceiverRoutes {
-  [key: string]: {
-    [key: string]: (req: IncomingMessage, res: ServerResponse) => void;
+  [url: string]: {
+    [method: string]: (req: IncomingMessage, res: ServerResponse) => void;
   };
 }
 
