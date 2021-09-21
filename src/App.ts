@@ -76,6 +76,7 @@ const tokenUsage = 'Apps used in one workspace should be initialized with a toke
 export interface AppOptions {
   signingSecret?: HTTPReceiverOptions['signingSecret'];
   endpoints?: HTTPReceiverOptions['endpoints'];
+  customRoutes?: HTTPReceiverOptions['customRoutes'];
   processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
   signatureVerification?: HTTPReceiverOptions['signatureVerification'];
   clientId?: HTTPReceiverOptions['clientId'];
@@ -211,6 +212,7 @@ export default class App {
   public constructor({
     signingSecret = undefined,
     endpoints = undefined,
+    customRoutes = undefined,
     agent = undefined,
     clientTls = undefined,
     receiver = undefined,
@@ -341,6 +343,7 @@ export default class App {
         logger,
         logLevel: this.logLevel,
         installerOptions: this.installerOptions,
+        customRoutes,
       });
     } else if (signatureVerification && signingSecret === undefined) {
       // No custom receiver
@@ -354,6 +357,7 @@ export default class App {
       this.receiver = new HTTPReceiver({
         signingSecret: signingSecret || '',
         endpoints,
+        customRoutes,
         processBeforeResponse,
         signatureVerification,
         clientId,
