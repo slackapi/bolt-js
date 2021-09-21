@@ -10,7 +10,7 @@ To make your Slack app ready for distribution, you will need to implement OAuth 
 
 You will need to provide your:
 * `clientId`, `clientSecret`, `stateSecret` and `scopes`
-* A `storeInstallation` and `fetchInstallation` callback if storing to a database (recommended for production)
+* An `installationStore` option with `storeInstallation` and `fetchInstallation` handlers defined for storing installation data to a database *(recommended for production)*
 
 ---
 
@@ -22,18 +22,6 @@ If you need additional authorizations (user tokens) from users inside a team whe
 
 💡 *Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you're implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.*
 
-💡 *Installing an [org-wide](https://api.slack.com/enterprise/apps) app from admin pages requires additional configuration to work with Bolt. In that scenario, the recommended `state` parameter is not supplied. Bolt will try to verify `state` and stop the installation from progressing. You may disable state verification in Bolt by setting the `stateVerification` option to false. See the example setup below:*
-
-
-```javascript
-const app = new App({
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-  clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET,
-  scopes: ['chat:write'],
-  stateVerification: false,
-}
-```
 
 ---
 ##### Redirect URI
@@ -56,10 +44,26 @@ const app = new App({
   },
 }
 ```
+##### Org-wide installation
+To add support for [org-wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or newer. Make sure you have enabled org-wide installations in your app configuration settings under **Org Level Apps**.
+
+Installing an [org-wide](https://api.slack.com/enterprise/apps) app from admin pages requires additional configuration to work with Bolt. In that scenario, the recommended `state` parameter is not supplied. Bolt will try to verify `state` and stop the installation from progressing. 
+
+You may disable state verification in Bolt by setting the `stateVerification` option to false. See the example setup below:
+
+
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  scopes: ['chat:write'],
+  stateVerification: false,
+}
+```
 
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
 
-To add support for [org wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or newer. Make sure you have enabled org wide installations in your app configuration settings under **Org Level Apps**.
 </div>
 
 ```javascript
@@ -67,13 +71,13 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  stateSecret: 'my-state-secret',
-  scopes: ['chat:write', 'incoming-webhook'],
+  stateSecret: 'my-secret',
+  scopes: ['chat:write', 'commands'],
   installationStore: {
     storeInstallation: async (installation) => {
-      // change the line below so it saves to your database
+      // change the lines below so they save to your database
       if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
-        // support for org wide app installation
+        // support for org-wide app installation
         return await database.set(installation.enterprise.id, installation);
       }
       if (installation.team !== undefined) {
@@ -83,7 +87,7 @@ const app = new App({
       throw new Error('Failed saving installation data to installationStore');
     },
     fetchInstallation: async (installQuery) => {
-      // change the line below so it fetches from your database
+      // change the lines below so they fetch from your database
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // org wide app installation lookup
         return await database.get(installQuery.enterpriseId);
@@ -95,7 +99,7 @@ const app = new App({
       throw new Error('Failed fetching installation');
     },
     deleteInstallation: async (installQuery) => {
-      // change the line below so it deletes from your database
+      // change the lines below so they delete from your database
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // org wide app installation deletion
         return await database.delete(installQuery.enterpriseId);
