@@ -42,7 +42,7 @@ function validateCustomRoutes(customRoutes: CustomRoute[]): void {
   });
 
   if (missingKeys.length > 0) {
-    const errorMsg = `One or more members of customRoutes are missing required keys: ${missingKeys.join(', ')}`;
+    const errorMsg = `One or more routes in customRoutes are missing required keys: ${missingKeys.join(', ')}`;
     throw new CustomRouteInitializationError(errorMsg);
   }
 }
