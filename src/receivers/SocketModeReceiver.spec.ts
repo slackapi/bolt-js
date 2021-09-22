@@ -8,6 +8,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
 import { Override, mergeOverrides } from '../test-helpers';
+import { CustomRouteInitializationError } from '../errors';
 
 // Fakes
 class FakeServer extends EventEmitter {
@@ -150,6 +151,7 @@ describe('SocketModeReceiver', function () {
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = {
         url: '/heyo',
+        method: 'GET',
       };
       const fakeRes = null;
       await this.listener(fakeReq, fakeRes);
@@ -191,6 +193,7 @@ describe('SocketModeReceiver', function () {
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = {
         url: '/hiya',
+        method: 'GET',
       };
       const fakeRes = {
         writeHead: sinon.fake(),
@@ -232,6 +235,7 @@ describe('SocketModeReceiver', function () {
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = {
         url: '/hiya',
+        method: 'GET',
       };
       const fakeRes = {
         writeHead: sinon.fake(),
@@ -275,6 +279,7 @@ describe('SocketModeReceiver', function () {
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = {
         url: '/hiya',
+        method: 'GET',
       };
       const fakeRes = {
         writeHead: sinon.fake(),
@@ -286,7 +291,57 @@ describe('SocketModeReceiver', function () {
       assert(fakeRes.writeHead.calledWith(302, sinon.match.object));
       assert(fakeRes.end.called);
     });
-    it('should return a 404 if a request comes into neither the install path nor the redirect URI path', async function () {
+
+    it('should call custom route handler only if request matches route path and method', async function () {
+      // Arrange
+      const installProviderStub = sinon.createStubInstance(InstallProvider);
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        customRoutes,
+      });
+      assert.isNotNull(receiver);
+      receiver.installer = installProviderStub as unknown as InstallProvider;
+
+      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+
+      fakeReq.url = '/test';
+      fakeReq.headers = { host: 'localhost' };
+
+      fakeReq.method = 'GET';
+      await this.listener(fakeReq, fakeRes);
+      assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+      fakeReq.method = 'POST';
+      await this.listener(fakeReq, fakeRes);
+      assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+      fakeReq.method = 'UNHANDLED_METHOD';
+      await this.listener(fakeReq, fakeRes);
+      assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
+      assert(fakeRes.end.called);
+    });
+
+    it("should throw an error if customRoutes don't have the required keys", async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const customRoutes = [{ handler: sinon.fake() }] as any;
+
+      assert.throws(() => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }), CustomRouteInitializationError);
+    });
+
+    it('should return a 404 if a request passes the install path, redirect URI path and custom routes', async function () {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(
@@ -298,6 +353,7 @@ describe('SocketModeReceiver', function () {
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];
       const userScopes = ['chat:write'];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
         logger: noopLogger,
@@ -305,6 +361,7 @@ describe('SocketModeReceiver', function () {
         clientSecret: 'my-client-secret',
         stateSecret: 'state-secret',
         scopes,
+        customRoutes,
         installerOptions: {
           authVersion: 'v2',
           installPath: '/hiya',
@@ -317,6 +374,7 @@ describe('SocketModeReceiver', function () {
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = {
         url: '/nope',
+        method: 'GET',
       };
       const fakeRes = {
         writeHead: sinon.fake(),
@@ -324,7 +382,7 @@ describe('SocketModeReceiver', function () {
       };
       await this.listener(fakeReq, fakeRes);
       assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-      assert(fakeRes.end.calledWith(sinon.match("route /nope doesn't exist!")));
+      assert(fakeRes.end.calledOnce);
     });
   });
   describe('#start()', function () {

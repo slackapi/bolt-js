@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SocketModeClient } from '@slack/socket-mode';
-import { createServer } from 'http';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
+import { prepareRoutes, ReceiverRoutes } from './custom-routes';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -21,6 +22,13 @@ export interface SocketModeReceiverOptions {
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
+  customRoutes?: CustomRoute[];
+}
+
+export interface CustomRoute {
+  path: string;
+  method: string | string[];
+  handler: (req: IncomingMessage, res: ServerResponse) => void;
 }
 
 // Additional Installer Options
@@ -53,6 +61,8 @@ export default class SocketModeReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
+  private routes: ReceiverRoutes;
+
   public constructor({
     appToken,
     logger = undefined,
@@ -64,6 +74,7 @@ export default class SocketModeReceiver implements Receiver {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
+    customRoutes = [],
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
@@ -72,12 +83,12 @@ export default class SocketModeReceiver implements Receiver {
       clientOptions: installerOptions.clientOptions,
     });
 
-    if (typeof logger !== 'undefined') {
-      this.logger = logger;
-    } else {
-      this.logger = new ConsoleLogger();
-      this.logger.setLevel(logLevel);
-    }
+    this.logger = logger ?? (() => {
+      const defaultLogger = new ConsoleLogger();
+      defaultLogger.setLevel(logLevel);
+      return defaultLogger;
+    })();
+    this.routes = prepareRoutes(customRoutes);
 
     if (
       clientId !== undefined &&
@@ -101,14 +112,15 @@ export default class SocketModeReceiver implements Receiver {
       });
     }
 
-    // Add OAuth routes to receiver
-    if (this.installer !== undefined) {
+    // Add OAuth and/or custom routes to receiver
+    if (this.installer !== undefined || customRoutes.length) {
       // use default or passed in redirect path
       const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
 
       // use default or passed in installPath
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       const directInstallEnabled = installerOptions.directInstall !== undefined && installerOptions.directInstall;
+      const port = installerOptions.port === undefined ? 3000 : installerOptions.port;
 
       // create install url options
       const installUrlOptions = {
@@ -118,48 +130,70 @@ export default class SocketModeReceiver implements Receiver {
         redirectUri,
       };
       const server = createServer(async (req, res) => {
-        if (req.url !== undefined && req.url.startsWith(redirectUriPath)) {
-          const { stateVerification, callbackOptions } = installerOptions;
-          // call installer.handleCallback to wrap up the install flow
-          if (stateVerification) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await this.installer!.handleCallback(req, res, callbackOptions);
-          } else {
-            // when stateVerification is disabled
-            // make installation options directly available to installation handler
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
-          }
-        } else if (req.url !== undefined && req.url.startsWith(installPath)) {
-          const { stateVerification, renderHtmlForInstallPath } = installerOptions;
-          try {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
-            if (directInstallEnabled) {
-              res.writeHead(302, { Location: url });
-              res.end('');
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const method = req.method!.toUpperCase();
+
+        // Handle OAuth-related requests
+        if (this.installer) {
+          // Installation has been initiated
+          if (req.url && req.url.startsWith(redirectUriPath)) {
+            const { stateVerification, callbackOptions } = installerOptions;
+            if (stateVerification) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await this.installer!.handleCallback(req, res, callbackOptions);
             } else {
-              res.writeHead(200, {});
-              const renderHtml = renderHtmlForInstallPath !== undefined ?
-                renderHtmlForInstallPath :
-                defaultRenderHtmlForInstallPath;
-              res.end(renderHtml(url));
+              // if stateVerification is disabled make install options available to handler
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
             }
-          } catch (err) {
-            const e = err as any;
-            throw new Error(e);
+            return;
           }
-        } else {
-          this.logger.error(`Tried to reach ${req.url} which isn't a valid route.`);
-          // Return 404 because we don't support route
-          res.writeHead(404, {});
-          res.end(`route ${req.url} doesn't exist!`);
+
+          // Visiting the installation endpoint
+          if (req.url && req.url.startsWith(installPath)) {
+            const { stateVerification, renderHtmlForInstallPath } = installerOptions;
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
+              if (directInstallEnabled) {
+                res.writeHead(302, { Location: url });
+                res.end('');
+              } else {
+                res.writeHead(200, {});
+                const renderHtml = renderHtmlForInstallPath !== undefined ?
+                  renderHtmlForInstallPath :
+                  defaultRenderHtmlForInstallPath;
+                res.end(renderHtml(url));
+                return;
+              }
+            } catch (err) {
+              const e = err as any;
+              throw new Error(e);
+            }
+          }
         }
+
+        // Handle request for custom routes
+        if (customRoutes.length && req.url) {
+          const match = this.routes[req.url] && this.routes[req.url][method] !== undefined;
+
+          if (match) {
+            this.routes[req.url][method](req, res);
+            return;
+          }
+        }
+
+        this.logger.info(`An unhandled HTTP request (${req.method}) made to ${req.url} was ignored`);
+        res.writeHead(404, {});
+        res.end();
       });
 
-      const port = installerOptions.port === undefined ? 3000 : installerOptions.port;
-      this.logger.debug(`listening on port ${port} for OAuth`);
-      this.logger.debug(`Go to http://localhost:${port}${installPath} to initiate OAuth flow`);
+      this.logger.debug(`Listening for HTTP requests on port ${port}`);
+
+      if (this.installer) {
+        this.logger.debug(`Go to http://localhost:${port}${installPath} to initiate OAuth flow`);
+      }
+
       // use port 3000 by default
       server.listen(port);
     }

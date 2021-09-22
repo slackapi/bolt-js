@@ -18,6 +18,7 @@ import {
   ErrorCode,
   CodedError,
 } from '../errors';
+import { CustomRoute, prepareRoutes, ReceiverRoutes } from './custom-routes';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -58,6 +59,7 @@ const missingServerErrorDescription = 'The receiver cannot be started because pr
 export interface HTTPReceiverOptions {
   signingSecret: string;
   endpoints?: string | string[];
+  customRoutes?: CustomRoute[];
   logger?: Logger;
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
@@ -70,7 +72,6 @@ export interface HTTPReceiverOptions {
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
 }
-
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
@@ -91,6 +92,8 @@ export interface HTTPReceiverInstallerOptions {
  */
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
+
+  private routes: ReceiverRoutes;
 
   private signingSecret: string;
 
@@ -125,6 +128,7 @@ export default class HTTPReceiver implements Receiver {
   public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
+    customRoutes = [],
     logger = undefined,
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
@@ -148,6 +152,11 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
+<<<<<<< HEAD
+=======
+    this.routes = prepareRoutes(customRoutes);
+
+>>>>>>> main
     // Initialize InstallProvider when it's required options are provided
     this.stateVerification = installerOptions.stateVerification;
     if (
@@ -310,19 +319,32 @@ export default class HTTPReceiver implements Receiver {
       // When installer is defined then installPath and installRedirectUriPath are always defined
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
+<<<<<<< HEAD
+=======
+
+      // Visiting the installation endpoint
+>>>>>>> main
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);
       }
+
+      // Installation has been initiated
       if (path === installRedirectUriPath) {
         // Handle OAuth callback request (to exchange authorization grant for a new access token)
         return this.handleInstallRedirectRequest(req, res);
       }
     }
 
+    // Handle custom routes
+    if (Object.keys(this.routes).length) {
+      const match = this.routes[path] && this.routes[path][method] !== undefined;
+      if (match) { return this.routes[path][method](req, res); }
+    }
+
     // If the request did not match the previous conditions, an error is thrown. The error can be caught by the
     // the caller in order to defer to other routing logic (similar to calling `next()` in connect middleware).
-    throw new HTTPReceiverDeferredRequestError('Unhandled HTTP request', req, res);
+    throw new HTTPReceiverDeferredRequestError(`Unhandled HTTP request (${method}) made to ${path}`, req, res);
   }
 
   private handleIncomingEvent(req: IncomingMessage, res: ServerResponse) {
