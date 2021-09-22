@@ -152,11 +152,8 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
-<<<<<<< HEAD
-=======
     this.routes = prepareRoutes(customRoutes);
 
->>>>>>> main
     // Initialize InstallProvider when it's required options are provided
     this.stateVerification = installerOptions.stateVerification;
     if (
@@ -319,11 +316,8 @@ export default class HTTPReceiver implements Receiver {
       // When installer is defined then installPath and installRedirectUriPath are always defined
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
-<<<<<<< HEAD
-=======
 
       // Visiting the installation endpoint
->>>>>>> main
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);

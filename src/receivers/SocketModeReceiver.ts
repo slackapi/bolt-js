@@ -122,19 +122,19 @@ export default class SocketModeReceiver implements Receiver {
       const directInstallEnabled = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       const port = installerOptions.port === undefined ? 3000 : installerOptions.port;
 
-      // create install url options
-      const installUrlOptions = {
-        metadata: installerOptions.metadata,
-        scopes: scopes ?? [],
-        userScopes: installerOptions.userScopes,
-        redirectUri,
-      };
       const server = createServer(async (req, res) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const method = req.method!.toUpperCase();
 
         // Handle OAuth-related requests
         if (this.installer) {
+          // create install url options
+          const installUrlOptions = {
+            metadata: installerOptions.metadata,
+            scopes: scopes ?? [],
+            userScopes: installerOptions.userScopes,
+            redirectUri,
+          };
           // Installation has been initiated
           if (req.url && req.url.startsWith(redirectUriPath)) {
             const { stateVerification, callbackOptions } = installerOptions;
