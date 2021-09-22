@@ -42,7 +42,7 @@ const app = new App({
   installerOptions: {
     redirectUriPath: '/slack/redirect', // and here!
   },
-}
+});
 ```
 ##### Org-wide installation
 To add support for [org-wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or newer. Make sure you have enabled org-wide installations in your app configuration settings under **Org Level Apps**.
@@ -59,7 +59,7 @@ const app = new App({
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['chat:write'],
   stateVerification: false,
-}
+});
 ```
 
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
