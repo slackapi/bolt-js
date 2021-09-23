@@ -8,6 +8,7 @@ import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import { prepareRoutes, ReceiverRoutes } from './custom-routes';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -90,6 +91,9 @@ export default class SocketModeReceiver implements Receiver {
     })();
     this.routes = prepareRoutes(customRoutes);
 
+    // Verify redirect options if supplied, throws coded error if invalid
+    verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
+
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
@@ -138,13 +142,14 @@ export default class SocketModeReceiver implements Receiver {
           // Installation has been initiated
           if (req.url && req.url.startsWith(redirectUriPath)) {
             const { stateVerification, callbackOptions } = installerOptions;
-            if (stateVerification) {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              await this.installer!.handleCallback(req, res, callbackOptions);
-            } else {
+            if (stateVerification === false) {
               // if stateVerification is disabled make install options available to handler
+              // since they won't be encoded in the state param of the generated url
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+            } else {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await this.installer!.handleCallback(req, res, callbackOptions);
             }
             return;
           }

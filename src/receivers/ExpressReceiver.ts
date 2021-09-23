@@ -19,6 +19,7 @@ import {
 } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -133,6 +134,8 @@ export default class ExpressReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
+  public installerOptions?: InstallerOptions;
+
   public constructor({
     signingSecret = '',
     logger = undefined,
@@ -169,7 +172,6 @@ export default class ExpressReceiver implements Receiver {
       respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
-
     this.processBeforeResponse = processBeforeResponse;
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
@@ -177,6 +179,9 @@ export default class ExpressReceiver implements Receiver {
     endpointList.forEach((endpoint) => {
       this.router.post(endpoint, ...expressMiddleware);
     });
+
+    // Verify redirect options if supplied, throws coded error if invalid
+    verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
 
     if (
       clientId !== undefined &&
@@ -213,14 +218,14 @@ export default class ExpressReceiver implements Receiver {
         installerOptions.redirectUriPath;
       const { callbackOptions, stateVerification } = installerOptions;
       this.router.use(redirectUriPath, async (req, res) => {
-        if (stateVerification) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await this.installer!.handleCallback(req, res, callbackOptions);
-        } else {
-          // when stateVerification is disabled
-          // make installation options directly available to installation handler
+        if (stateVerification === false) {
+          // when stateVerification is disabled pass install options directly to handler
+          // since they won't be encoded in the state param of the generated url
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await this.installer!.handleCallback(req, res, callbackOptions);
         }
       });
 

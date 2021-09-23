@@ -255,20 +255,7 @@ describe('App', () => {
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
-    describe('with custom redirect supplied', () => {
-      it('should fail when missing redirectUri', async () => {
-        // Arrange
-        const MockApp = await importApp();
-
-        // Act
-        try {
-          new MockApp({ token: '', signingSecret: '', installerOptions: { redirectUriPath: '/redirect' } }); // eslint-disable-line no-new
-          assert.fail();
-        } catch (error: any) {
-          // Assert
-          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
-        }
-      });
+    describe('with custom redirectUri supplied', () => {
       it('should fail when missing installerOptions', async () => {
         // Arrange
         const MockApp = await importApp();

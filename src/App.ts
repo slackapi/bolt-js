@@ -254,6 +254,7 @@ export default class App {
       this.logLevel = logLevel ?? LogLevel.INFO;
     }
 
+    // Set up logger
     if (typeof logger === 'undefined') {
       // Initialize with the default logger
       const consoleLogger = new ConsoleLogger();
@@ -267,6 +268,7 @@ export default class App {
     }
     this.errorHandler = defaultErrorHandler(this.logger);
 
+    // Set up client options
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
     if (agent !== undefined && this.clientOptions.agent === undefined) {
       this.clientOptions.agent = agent;
@@ -278,7 +280,7 @@ export default class App {
       // only logLevel is passed
       this.clientOptions.logLevel = logLevel;
     } else {
-      // Since v3.4, WebClient starts sharing loggger with App
+      // Since v3.4, WebClient starts sharing logger with App
       this.clientOptions.logger = this.logger;
     }
     // The public WebClient instance (app.client)
@@ -309,8 +311,8 @@ export default class App {
       this.developerMode &&
       this.installerOptions &&
       (typeof this.installerOptions.callbackOptions === 'undefined' ||
-        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
-          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+      (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+      typeof this.installerOptions.callbackOptions.failure === 'undefined'))
     ) {
       // add a custom failure callback for Developer Mode in case they are using OAuth
       this.logger.debug('adding Developer Mode custom OAuth failure handler');
@@ -323,11 +325,9 @@ export default class App {
       };
     }
 
-    // verify any redirect options supplied
-    this.verifyRedirectOpts(redirectUri);
-
-    // Check for required arguments of HTTPReceiver
+    // Initialize receiver
     if (receiver !== undefined) {
+      // Custom receiver
       if (this.socketMode) {
         throw new AppInitializationError('receiver cannot be passed when socketMode is set to true');
       }
@@ -434,26 +434,6 @@ export default class App {
 
     // Should be last to avoid exposing partially initialized app
     this.receiver.init(this);
-  }
-
-  /**
-   * Verifies redirect uri and redirect uri path exist if either supplied
-   */
-  private verifyRedirectOpts(redirectUri: HTTPReceiverOptions['redirectUri']) {
-    // if either redirectUri or redirectUriPath are supplied
-    // both must be supplied
-    const { installerOptions } = this;
-    if (
-      (redirectUri && !installerOptions) ||
-        (redirectUri && installerOptions && !installerOptions.redirectUriPath) ||
-          (!redirectUri && installerOptions && installerOptions.redirectUriPath)
-    ) {
-      throw new AppInitializationError(
-        'To set a custom install redirect path, you must provide both redirectUri' +
-        ' and installerOptions.redirectUriPath during app initialization.' +
-        ' These should be consistent, e.g. https://example.com/redirect and /redirect',
-      );
-    }
   }
 
   /**
