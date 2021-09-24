@@ -1,0 +1,15 @@
+{
+  "name": "bolt-oauth-express-example",
+  "version": "1.0.0",
+  "description": "Example app using OAuth with ExpressReceiver",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Slack Technologies, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.6.0"
+  }
+}
