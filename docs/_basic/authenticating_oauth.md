@@ -6,20 +6,30 @@ order: 15
 ---
 
 <div class="section-content">
-Slack apps that are installed on multiple workspaces will need to implement OAuth and store installation information (i.e. access tokens) securely. Bolt supports OAuth and will handle most of the work for you by setting up OAuth routes and verifying state. All you need to do is provide your `clientId`, `clientSecret`, `stateSecret` and `scopes` when initializing `App`.
+To make your Slack app ready for distribution, you will need to implement OAuth and store installation information (i.e. access tokens) securely. Bolt supports OAuth and will handle most of the work for you by setting up OAuth routes and verifying state. 
 
-Bolt for JavaScript will create a **Redirect URL** `slack/oauth_redirect`, which Slack uses to redirect users after they complete your app's installation flow. You will need to add this **Redirect URL** in your app configuration settings under **OAuth and Permissions**. This path can be configured in the `installerOptions` argument described below.
+You will need to provide your:
+* `clientId`, `clientSecret`, `stateSecret` and `scopes`
+* An `installationStore` option with `storeInstallation` and `fetchInstallation` handlers defined for storing installation data to a database *(recommended for production)*
 
-Bolt for JavaScript will also create a `slack/install` route, where you can find an `Add to Slack` button for your app to perform direct installs of your app. If you need any additional authorizations (user tokens) from users inside a team when your app is already installed or a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
+---
 
-**NOTE: The `Add to Slack` button on your app's app configuration page will not work with Bolt's built-in OAuth support. The app configuration `Add to Slack` button does not include a `state` value. You must use the `slack/install` route created by your Bolt application to install the app.**
+##### Installing your App
+Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This returns a simple `Add to Slack` button where users can initiate direct installs of your app. 
 
-Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you're implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.
+If you need additional authorizations (user tokens) from users inside a team when your app is already installed, or have a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
-To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
 
-To add support for [org wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or newer. Make sure you have enabled org wide installations in your app configuration settings under **Org Level Apps**.
-</div>
+💡 *Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you're implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.*
+
+
+---
+##### Redirect URI
+Bolt for JavaScript provides a **Redirect URI Path** `/slack/oauth_redirect` out-of-the-box. Slack uses this to redirect users after they complete your app's installation flow. 
+
+💡 You will need to add the full **Redirect URI** including your app domain in your app configuration settings under **OAuth and Permissions**, e.g. `https://example.com/slack/oauth_redirect`. 
+
+If you'd like to supply your own custom **Redirect URI**, you can do this by setting `redirectUri` in the App options and `installerOptions.redirectUriPath`. You must supply both, and the path must be consistent with the full URI.
 
 ```javascript
 const app = new App({
@@ -27,12 +37,47 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
-  scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
+  scopes: ['chat:write'],
+  redirectUri: 'https://example.com/slack/redirect', // here
+  installerOptions: {
+    redirectUriPath: '/slack/redirect', // and here!
+  },
+});
+```
+##### Org-wide installation
+To add support for [org-wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or newer. Make sure you have enabled org-wide installations in your app configuration settings under **Org Level Apps**.
+
+Installing an [org-wide](https://api.slack.com/enterprise/apps) app from admin pages requires additional configuration to work with Bolt. In that scenario, the recommended `state` parameter is not supplied. Bolt will try to verify `state` and stop the installation from progressing. 
+
+You may disable state verification in Bolt by setting the `stateVerification` option to false. See the example setup below:
+
+
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  scopes: ['chat:write'],
+  stateVerification: false,
+});
+```
+
+To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
+
+</div>
+
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: 'my-secret',
+  scopes: ['chat:write', 'commands'],
   installationStore: {
     storeInstallation: async (installation) => {
-      // change the line below so it saves to your database
+      // change the lines below so they save to your database
       if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
-        // support for org wide app installation
+        // support for org-wide app installation
         return await database.set(installation.enterprise.id, installation);
       }
       if (installation.team !== undefined) {
@@ -42,7 +87,7 @@ const app = new App({
       throw new Error('Failed saving installation data to installationStore');
     },
     fetchInstallation: async (installQuery) => {
-      // change the line below so it fetches from your database
+      // change the lines below so they fetch from your database
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // org wide app installation lookup
         return await database.get(installQuery.enterpriseId);
@@ -54,7 +99,7 @@ const app = new App({
       throw new Error('Failed fetching installation');
     },
     deleteInstallation: async (installQuery) => {
-      // change the line below so it deletes from your database
+      // change the lines below so they delete from your database
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // org wide app installation deletion
         return await database.delete(installQuery.enterpriseId);
@@ -75,12 +120,12 @@ const app = new App({
 </summary>
 
 <div class="secondary-content" markdown="0">
-You can override the default OAuth using the `installerOptions` object, which can be passed in during the initialization of `App`. You can override the following:
+We provide several options for customizing default OAuth using the `installerOptions` object, which can be passed in during the initialization of `App`. You can override the following:
 
 - `authVersion`: Used to toggle between new Slack Apps and Classic Slack Apps
 - `metadata`: Used to pass around session related information
 - `installPath`: Override default path for "Add to Slack" button
-- `redirectUriPath`: Override default redirect url path
+- `redirectUriPath`: This relative path must match the `redirectUri` provided in the App options 
 - `callbackOptions`: Provide custom success and failure pages at the end of the OAuth flow
 - `stateStore`: Provide a custom state store instead of using the built in `ClearStateStore`
 
