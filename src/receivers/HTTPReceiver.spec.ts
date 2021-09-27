@@ -306,7 +306,7 @@ describe('HTTPReceiver', function () {
       });
     });
 
-    describe('handInstallRedirectRequest()', function () {
+    describe('handleInstallRedirectRequest()', function () {
       it('should invoke installer handler if a request comes into the redirect URI path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
