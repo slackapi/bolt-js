@@ -82,6 +82,7 @@ export interface AppOptions {
   clientId?: HTTPReceiverOptions['clientId'];
   clientSecret?: HTTPReceiverOptions['clientSecret'];
   stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: HTTPReceiverOptions['redirectUri']
   installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
   scopes?: HTTPReceiverOptions['scopes'];
   installerOptions?: HTTPReceiverOptions['installerOptions'];
@@ -231,6 +232,7 @@ export default class App {
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = undefined,
@@ -252,6 +254,7 @@ export default class App {
       this.logLevel = logLevel ?? LogLevel.INFO;
     }
 
+    // Set up logger
     if (typeof logger === 'undefined') {
       // Initialize with the default logger
       const consoleLogger = new ConsoleLogger();
@@ -265,6 +268,7 @@ export default class App {
     }
     this.errorHandler = defaultErrorHandler(this.logger);
 
+    // Set up client options
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
     if (agent !== undefined && this.clientOptions.agent === undefined) {
       this.clientOptions.agent = agent;
@@ -276,7 +280,7 @@ export default class App {
       // only logLevel is passed
       this.clientOptions.logLevel = logLevel;
     } else {
-      // Since v3.4, WebClient starts sharing loggger with App
+      // Since v3.4, WebClient starts sharing logger with App
       this.clientOptions.logger = this.logger;
     }
     // The public WebClient instance (app.client)
@@ -307,8 +311,8 @@ export default class App {
       this.developerMode &&
       this.installerOptions &&
       (typeof this.installerOptions.callbackOptions === 'undefined' ||
-        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
-          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+      (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+      typeof this.installerOptions.callbackOptions.failure === 'undefined'))
     ) {
       // add a custom failure callback for Developer Mode in case they are using OAuth
       this.logger.debug('adding Developer Mode custom OAuth failure handler');
@@ -321,8 +325,9 @@ export default class App {
       };
     }
 
-    // Check for required arguments of HTTPReceiver
+    // Initialize receiver
     if (receiver !== undefined) {
+      // Custom receiver
       if (this.socketMode) {
         throw new AppInitializationError('receiver cannot be passed when socketMode is set to true');
       }
@@ -338,6 +343,7 @@ export default class App {
         clientId,
         clientSecret,
         stateSecret,
+        redirectUri,
         installationStore,
         scopes,
         logger,
@@ -363,6 +369,7 @@ export default class App {
         clientId,
         clientSecret,
         stateSecret,
+        redirectUri,
         installationStore,
         scopes,
         logger,

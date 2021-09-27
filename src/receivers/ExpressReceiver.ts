@@ -19,6 +19,7 @@ import {
 } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -88,6 +89,7 @@ export interface ExpressReceiverOptions {
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: string;
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
@@ -98,6 +100,7 @@ export interface ExpressReceiverOptions {
 // Additional Installer Options
 interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  stateVerification?: InstallProviderOptions['stateVerification']; // defaults true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
@@ -131,6 +134,8 @@ export default class ExpressReceiver implements Receiver {
 
   public installer: InstallProvider | undefined = undefined;
 
+  public installerOptions?: InstallerOptions;
+
   public constructor({
     signingSecret = '',
     logger = undefined,
@@ -141,6 +146,7 @@ export default class ExpressReceiver implements Receiver {
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
@@ -166,7 +172,6 @@ export default class ExpressReceiver implements Receiver {
       respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
-
     this.processBeforeResponse = processBeforeResponse;
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
@@ -175,10 +180,15 @@ export default class ExpressReceiver implements Receiver {
       this.router.post(endpoint, ...expressMiddleware);
     });
 
+    // Verify redirect options if supplied, throws coded error if invalid
+    verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
+
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-      (stateSecret !== undefined || installerOptions.stateStore !== undefined)
+       (installerOptions.stateVerification === false || // state store not needed
+         stateSecret !== undefined ||
+          installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -188,31 +198,42 @@ export default class ExpressReceiver implements Receiver {
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
+        stateVerification: installerOptions.stateVerification,
         authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
       });
     }
-
+    // create install url options
+    const installUrlOptions = {
+      metadata: installerOptions.metadata,
+      scopes: scopes ?? [],
+      userScopes: installerOptions.userScopes,
+      redirectUri,
+    };
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
       const redirectUriPath = installerOptions.redirectUriPath === undefined ?
         '/slack/oauth_redirect' :
         installerOptions.redirectUriPath;
+      const { callbackOptions, stateVerification } = installerOptions;
       this.router.use(redirectUriPath, async (req, res) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
+        if (stateVerification === false) {
+          // when stateVerification is disabled pass install options directly to handler
+          // since they won't be encoded in the state param of the generated url
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await this.installer!.handleCallback(req, res, callbackOptions);
+        }
       });
 
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       this.router.get(installPath, async (_req, res, next) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const url = await this.installer!.generateInstallUrl({
-            metadata: installerOptions.metadata,
-            scopes: scopes ?? [],
-            userScopes: installerOptions.userScopes,
-          });
+          const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
           if (installerOptions.directInstall) {
             // If a Slack app sets "Direct Install URL" in the Slack app configuration,
             // the installation flow of the app should start with the Slack authorize URL.

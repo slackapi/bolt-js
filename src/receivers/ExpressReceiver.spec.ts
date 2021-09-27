@@ -7,7 +7,7 @@ import { Application, IRouter, Request, Response } from 'express';
 import { Readable } from 'stream';
 import { EventEmitter } from 'events';
 import { Override, mergeOverrides } from '../test-helpers';
-import { ErrorCode, CodedError, ReceiverInconsistentStateError } from '../errors';
+import { ErrorCode, CodedError, ReceiverInconsistentStateError, AppInitializationError } from '../errors';
 
 import ExpressReceiver, {
   respondToSslCheck,
@@ -136,6 +136,59 @@ describe('ExpressReceiver', function () {
       assert((app.use as any).calledOnce);
       assert((router.get as any).called);
       assert((router.post as any).calledOnce);
+    });
+    it('should throw an error if redirect uri options supplied invalid or incomplete', async function () {
+      const clientId = 'my-clientId';
+      const clientSecret = 'my-clientSecret';
+      const signingSecret = 'secret';
+      const stateSecret = 'my-stateSecret';
+      const scopes = ['chat:write'];
+      const redirectUri = 'http://example.com/heyo';
+      const installerOptions = {
+        redirectUriPath: '/heyo',
+      };
+      // correct format with redirect options supplied
+      const receiver = new ExpressReceiver({
+        clientId,
+        clientSecret,
+        signingSecret,
+        stateSecret,
+        scopes,
+        redirectUri,
+        installerOptions,
+      });
+      assert.isNotNull(receiver);
+      // missing redirectUriPath
+      assert.throws(() => new ExpressReceiver({
+        clientId,
+        clientSecret,
+        signingSecret,
+        stateSecret,
+        scopes,
+        redirectUri,
+      }), AppInitializationError);
+      // inconsistent redirectUriPath
+      assert.throws(() => new ExpressReceiver({
+        clientId: 'my-clientId',
+        clientSecret,
+        signingSecret,
+        stateSecret,
+        scopes,
+        redirectUri,
+        installerOptions: {
+          redirectUriPath: '/hiya',
+        },
+      }), AppInitializationError);
+      // inconsistent redirectUri
+      assert.throws(() => new ExpressReceiver({
+        clientId: 'my-clientId',
+        clientSecret,
+        signingSecret,
+        stateSecret,
+        scopes,
+        redirectUri: 'http://example.com/hiya',
+        installerOptions,
+      }), AppInitializationError);
     });
   });
 

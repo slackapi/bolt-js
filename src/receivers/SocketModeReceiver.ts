@@ -8,6 +8,7 @@ import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import { prepareRoutes, ReceiverRoutes } from './custom-routes';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -17,6 +18,7 @@ export interface SocketModeReceiverOptions {
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: string;
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
@@ -33,6 +35,7 @@ export interface CustomRoute {
 // Additional Installer Options
 interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  stateVerification?: InstallProviderOptions['stateVerification']; // default true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
@@ -68,6 +71,7 @@ export default class SocketModeReceiver implements Receiver {
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
@@ -87,9 +91,16 @@ export default class SocketModeReceiver implements Receiver {
     })();
     this.routes = prepareRoutes(customRoutes);
 
-    // Initialize InstallProvider
-    if (clientId !== undefined && clientSecret !== undefined &&
-      (stateSecret !== undefined || installerOptions.stateStore !== undefined)) {
+    // Verify redirect options if supplied, throws coded error if invalid
+    verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
+
+    if (
+      clientId !== undefined &&
+      clientSecret !== undefined &&
+       (installerOptions.stateVerification === false || // state store not needed
+         stateSecret !== undefined ||
+          installerOptions.stateStore !== undefined) // user provided state store
+    ) {
       this.installer = new InstallProvider({
         clientId,
         clientSecret,
@@ -98,6 +109,7 @@ export default class SocketModeReceiver implements Receiver {
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
+        stateVerification: installerOptions.stateVerification,
         authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
@@ -120,29 +132,41 @@ export default class SocketModeReceiver implements Receiver {
 
         // Handle OAuth-related requests
         if (this.installer) {
+          // create install url options
+          const installUrlOptions = {
+            metadata: installerOptions.metadata,
+            scopes: scopes ?? [],
+            userScopes: installerOptions.userScopes,
+            redirectUri,
+          };
           // Installation has been initiated
           if (req.url && req.url.startsWith(redirectUriPath)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
+            const { stateVerification, callbackOptions } = installerOptions;
+            if (stateVerification === false) {
+              // if stateVerification is disabled make install options available to handler
+              // since they won't be encoded in the state param of the generated url
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+            } else {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await this.installer!.handleCallback(req, res, callbackOptions);
+            }
             return;
           }
 
           // Visiting the installation endpoint
           if (req.url && req.url.startsWith(installPath)) {
+            const { stateVerification, renderHtmlForInstallPath } = installerOptions;
             try {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              const url = await this.installer!.generateInstallUrl({
-                metadata: installerOptions.metadata,
-                scopes: scopes ?? [],
-                userScopes: installerOptions.userScopes,
-              });
+              const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
               if (directInstallEnabled) {
                 res.writeHead(302, { Location: url });
                 res.end('');
               } else {
                 res.writeHead(200, {});
-                const renderHtml = installerOptions.renderHtmlForInstallPath !== undefined ?
-                  installerOptions.renderHtmlForInstallPath :
+                const renderHtml = renderHtmlForInstallPath !== undefined ?
+                  renderHtmlForInstallPath :
                   defaultRenderHtmlForInstallPath;
                 res.end(renderHtml(url));
                 return;
