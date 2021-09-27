@@ -525,7 +525,7 @@ export default class HTTPReceiver implements Receiver {
       this.installCallbackOptions!,
       this.installUrlOptions!,
     ];
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
     const errorHandler = (err: Error) => {
       this.logger.error(
         'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',
