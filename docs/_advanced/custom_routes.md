@@ -14,7 +14,7 @@ Each `CustomRoute` object must contain three properties: `path`, `method`, and `
 ```javascript
 const { App } = require('@slack/bolt');
 
-// Create the Bolt App, using the receiver
+// Initialize Bolt app, using the default HTTPReceiver
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
