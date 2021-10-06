@@ -56,6 +56,7 @@ import {
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode } from './errors';
+import { AllMiddlewareArgs } from './types/middleware';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
@@ -891,13 +892,15 @@ export default class App {
               context,
               client,
               this.logger,
-              // When the listener middleware chain is done processing, call the listener without a next fn
+              // When all of the listener middleware are done processing,
+              // `listener` here will be called without a `next` execution
               async () => listener({
                 ...(listenerArgs as AnyMiddlewareArgs),
                 context,
                 client,
                 logger: this.logger,
-              }),
+                // `next` is already set in the outer processMiddleware
+              } as AnyMiddlewareArgs & AllMiddlewareArgs),
             );
           });
 
