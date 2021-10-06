@@ -1,6 +1,6 @@
 import { PlainTextElement, Confirmation, Option } from '@slack/types';
 import { StringIndexed } from '../helpers';
-import { ViewOutput } from '../view';
+import { ViewOutput, ViewStateValue } from '../view';
 
 /**
  * All known actions from in Slack's interactive elements
@@ -234,6 +234,13 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     [key: string]: any;
   };
   view?: ViewOutput;
+  state?: {
+    values: {
+      [blockId: string]: {
+        [actionId: string]: ViewStateValue;
+      };
+    };
+  };
   token: string;
   response_url: string;
   trigger_id: string;
