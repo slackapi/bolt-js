@@ -16,7 +16,7 @@ You can access the value of the input blocks by accessing the `state` object. `s
 
 ##### Update views on submission
 
-To update a view in response to a `view_submission` event, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
+To update a view in response to a `view_submission` request, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
 
 ```javascript
 // Update the view on submission 
