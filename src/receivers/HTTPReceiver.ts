@@ -239,7 +239,7 @@ export default class HTTPReceiver implements Receiver {
           res.writeHead(404);
           res.end();
         } else {
-          this.logger.error('An unexpected error was encountered');
+          this.logger.error(`An unexpected error occurred during a request (${req.method}) made to ${req.url}`);
           this.logger.debug(`Error details: ${e}`);
           res.writeHead(500);
           res.end();
