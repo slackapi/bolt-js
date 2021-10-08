@@ -235,11 +235,11 @@ export default class HTTPReceiver implements Receiver {
       } catch (error) {
         const e = error as any;
         if (e.code === ErrorCode.HTTPReceiverDeferredRequestError) {
-          this.logger.info('An unhandled request was ignored');
+          this.logger.info(`Unhandled HTTP request (${req.method}) made to ${req.url}`);
           res.writeHead(404);
           res.end();
         } else {
-          this.logger.error('An unexpected error was encountered');
+          this.logger.error(`An unexpected error occurred during a request (${req.method}) made to ${req.url}`);
           this.logger.debug(`Error details: ${e}`);
           res.writeHead(500);
           res.end();
