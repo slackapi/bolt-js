@@ -291,12 +291,11 @@ describe('WorkflowStep', () => {
 
   describe('processStepMiddleware', () => {
     it('should call each callback in user-provided middleware', async () => {
-      const { next: _next, ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
+      const { ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
       const { processStepMiddleware } = await importWorkflowStep();
 
       const fn1 = sinon.spy((async ({ next: continuation }) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await continuation!();
+        await continuation();
       }) as Middleware<WorkflowStepEdit>);
       const fn2 = sinon.spy(async () => {});
       const fakeMiddleware = [fn1, fn2] as WorkflowStepMiddleware;
@@ -323,7 +322,6 @@ function createFakeStepEditAction() {
       workflow_step: {},
     },
     context: {},
-    next: sinon.fake(),
   };
 }
 
@@ -341,7 +339,6 @@ function createFakeStepSaveEvent() {
       callback_id: 'test_save_callback_id',
     },
     context: {},
-    next: sinon.fake(),
   };
 }
 
@@ -362,7 +359,6 @@ function createFakeStepExecuteEvent() {
       },
     },
     context: {},
-    next: sinon.fake(),
   };
 }
 
@@ -380,6 +376,5 @@ function createFakeViewEvent() {
       callback_id: 'test_view_callback_id',
     },
     context: {},
-    next: sinon.fake(),
   };
 }

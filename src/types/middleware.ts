@@ -21,8 +21,7 @@ export interface AllMiddlewareArgs {
   context: Context;
   logger: Logger;
   client: WebClient;
-  // TODO: figure out how to make next non-optional
-  next?: NextFn;
+  next: NextFn;
 }
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
