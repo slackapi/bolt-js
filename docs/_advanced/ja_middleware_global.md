@@ -28,7 +28,7 @@ async function authWithAcme({ payload, client, context, next }) {
     // 検索できたらそのユーザ情報でコンテクストを生成
     context.user = user;
   } catch (error) {
-      // Acme システム上にユーザが存在しないのでエラーをわたし、リクエストプロセスを終了
+      // Acme システム上にユーザが存在しないパターン。エラーを伝えることとし、リクエストの処理は継続しない
       if (error.message === 'Not Found') {
         await client.chat.postEphemeral({
           channel: payload.channel,
