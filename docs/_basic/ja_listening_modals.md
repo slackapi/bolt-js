@@ -8,9 +8,26 @@ order: 12
 <div class="section-content">
 <a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために <code>view_submission</code> のリクエストをリッスンする必要があります。<code>view_submission</code> イベントをリッスンするためには、組み込みの <code>view()</code> メソッドを使用します。
 
-<code>view()</code> メソッドは、文字列型または <code>RegeExp</code>型 の <code>callback_id</code> を必要とします。
+<code>view()</code> メソッドは、文字列型または <code>RegExp</code>型 の <code>callback_id</code> を必要とします。
 
 <code>input</code> ブロックの値は <code>state</code> オブジェクトを参照することで取得できます。<code>state</code> 内には <code>values</code> というオブジェクトがあり、これは <code>block_id</code> と一意な <code>action_id</code> に紐づける形で入力値を保持しています。
+
+---
+
+##### モーダル送信でのビューの更新
+
+<code>view_submission</code> リクエストに対してモーダルを更新するには、<code>update</code>型の <code>response_action</code> と新しく作成した <code>view</code> を指定すると確認を示します。
+
+```javascript
+// モーダル送信でのビューの更新
+app.view('modal-callback-id', async ({ ack, body }) => {
+  await ack({
+    response_action: 'update',
+    view: buildNewModalView(body),
+  });
+});
+```
+この例と同様に、モーダルでの送信イベントに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors)オプションもあります。
 
 より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
 </div>
