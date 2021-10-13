@@ -8,7 +8,7 @@ order: 12
 <div class="section-content">
 <a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために `view_submission` のリクエストをリッスンする必要があります。`view_submission` リクエストをリッスンするためには、組み込みの `view()` メソッドを使用します。
 
-`view()` メソッドは、文字列型または `RegExp`型 の `callback_id` を必要とします。
+`view()` メソッドは、文字列型または `RegExp` 型 の `callback_id` を必要とします。
 
 `input` ブロックの値は `state` オブジェクトを参照することで取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
 
@@ -16,9 +16,7 @@ order: 12
 
 ##### モーダル送信でのビューの更新
 
-`view_submission` リクエストに対してモーダルを更新するには、`update`型の `response_action` と新しく作成した `view` を指定すると確認を示します。
-
-`view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` を指定した `response_action` と新しく作成した `view` を指定します。
+`view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` という `response_action` と新しく作成した `view` を指定します。
 
 ```javascript
 // モーダル送信でのビューの更新
