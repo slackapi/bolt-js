@@ -24,10 +24,12 @@ export interface AllMiddlewareArgs {
   next: NextFn;
 }
 
+export type ExtendContext<T extends {} = {}> = { context: T };
+
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
 // constraint would mess up the interface of App#event(), App#message(), etc.
-export interface Middleware<Args> {
-  (args: Args & AllMiddlewareArgs): Promise<void>;
+export interface Middleware<Args, CustomContext = {}> {
+  (args: Args & AllMiddlewareArgs & ExtendContext<CustomContext>): Promise<void>;
 }
 
 /**
