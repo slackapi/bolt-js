@@ -24,7 +24,7 @@ export interface AllMiddlewareArgs {
   next: NextFn;
 }
 
-export interface ExtendContext<T extends StringIndexed = StringIndexed> { context: T };
+export interface ExtendContext<T extends StringIndexed = StringIndexed> { context: T }
 
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
 // constraint would mess up the interface of App#event(), App#message(), etc.
