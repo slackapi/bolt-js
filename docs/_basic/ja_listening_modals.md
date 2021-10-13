@@ -6,19 +6,19 @@ order: 12
 ---
 
 <div class="section-content">
-<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために <code>view_submission</code> のリクエストをリッスンする必要があります。<code>view_submission</code> イベントをリッスンするためには、組み込みの <code>view()</code> メソッドを使用します。
+<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために `view_submission` のリクエストをリッスンする必要があります。`view_submission` イベントをリッスンするためには、組み込みの `view()` メソッドを使用します。
 
-<code>view()</code> メソッドは、文字列型または <code>RegExp</code>型 の <code>callback_id</code> を必要とします。
+`view()` メソッドは、文字列型または `RegExp`型 の `callback_id` を必要とします。
 
-<code>input</code> ブロックの値は <code>state</code> オブジェクトを参照することで取得できます。<code>state</code> 内には <code>values</code> というオブジェクトがあり、これは <code>block_id</code> と一意な <code>action_id</code> に紐づける形で入力値を保持しています。
+`input` ブロックの値は `state` オブジェクトを参照することで取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
 
 ---
 
 ##### モーダル送信でのビューの更新
 
-<code>view_submission</code> リクエストに対してモーダルを更新するには、<code>update</code>型の <code>response_action</code> と新しく作成した <code>view</code> を指定すると確認を示します。
+`view_submission` リクエストに対してモーダルを更新するには、`update`型の `response_action` と新しく作成した `view` を指定すると確認を示します。
 
-<code>view_submission</code> リクエストに対してモーダルを更新するには、リクエストの確認の中で <code>update</code> を指定した <code>response_action</code> と新しく作成した <code>view</code> を指定します。
+`view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` を指定した `response_action` と新しく作成した `view` を指定します。
 
 ```javascript
 // モーダル送信でのビューの更新
