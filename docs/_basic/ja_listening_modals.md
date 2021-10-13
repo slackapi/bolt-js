@@ -18,6 +18,8 @@ order: 12
 
 <code>view_submission</code> リクエストに対してモーダルを更新するには、<code>update</code>型の <code>response_action</code> と新しく作成した <code>view</code> を指定すると確認を示します。
 
+<code>view_submission</code> リクエストに対してモーダルを更新するには、リクエストの確認の中で <code>update</code> を指定した <code>response_action</code> と新しく作成した <code>view</code> を指定します。
+
 ```javascript
 // モーダル送信でのビューの更新
 app.view('modal-callback-id', async ({ ack, body }) => {
@@ -27,7 +29,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
   });
 });
 ```
-この例と同様に、モーダルでの送信イベントに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors)オプションもあります。
+この例と同様に、モーダルでの送信イベントに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
 
 より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
 </div>
