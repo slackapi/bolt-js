@@ -39,7 +39,7 @@ const app = new App({
 
 The Slack **Request URL** for a Bolt app must have the path set to `/slack/events`.  
 For example: `https://my-slack-app.example.com/slack/events`.  
-Otherwise `[INFO] An unhandled request was ignored` errors may appear in the Bolt app's logs.
+Otherwise, all incoming requests from Slack won't be handled.
 
 Apps typically react to a collection of incoming events, which can correspond [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
 request, there's a method to build a listener function.
