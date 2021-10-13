@@ -35,9 +35,11 @@ const app = new App({
 })();
 ```
 
-> ⚙️ By default, Bolt listens to the `/slack/events` endpoint for *all* incoming requests (whether shortcuts, events, or actions payloads). When configuring Request URLs in your app configuration, they should all have `/slack/events` appended. The default behavior be modified using the constructor's `endpoints` parameter.
-
 ## Listening for events
+
+The Slack **Request URL** for a Bolt app must have the path set to `/slack/events`.  
+For example: `https://my-slack-app.example.com/slack/events`.  
+Otherwise, all incoming requests from Slack won't be handled.
 
 Apps typically react to a collection of incoming events, which can correspond [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
 request, there's a method to build a listener function.
