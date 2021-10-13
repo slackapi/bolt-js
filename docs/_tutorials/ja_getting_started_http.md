@@ -1,7 +1,7 @@
 ---
 title: Bolt 入門ガイド
 order: 0
-slug: getting-started
+slug: getting-started-http
 lang: ja-jp
 layout: tutorial
 permalink: /ja-jp/tutorial/getting-started
