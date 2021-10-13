@@ -17,19 +17,17 @@ export type AnyMiddlewareArgs =
   | SlackViewMiddlewareArgs
   | SlackShortcutMiddlewareArgs;
 
-export interface AllMiddlewareArgs {
-  context: Context;
+export interface AllMiddlewareArgs<CustomContext = StringIndexed> {
+  context: Context & CustomContext;
   logger: Logger;
   client: WebClient;
   next: NextFn;
 }
 
-export interface ExtendContext<T extends StringIndexed = StringIndexed> { context: T }
-
 // NOTE: Args should extend AnyMiddlewareArgs, but because of contravariance for function types, including that as a
 // constraint would mess up the interface of App#event(), App#message(), etc.
 export interface Middleware<Args, CustomContext = StringIndexed> {
-  (args: Args & AllMiddlewareArgs & ExtendContext<CustomContext>): Promise<void>;
+  (args: Args & AllMiddlewareArgs<CustomContext>): Promise<void>;
 }
 
 /**
