@@ -175,7 +175,7 @@ class WebClientPool {
 /**
  * A Slack App
  */
-export default class App<CustomContext extends StringIndexed = {}> {
+export default class App<CustomContext extends StringIndexed = StringIndexed> {
   /** Slack Web API client */
   public client: WebClient;
 
@@ -609,7 +609,10 @@ export default class App<CustomContext extends StringIndexed = {}> {
     this.listeners.push([onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs, CustomContext>[]): void {
+  public command(
+    commandName: string | RegExp,
+    ...listeners: Middleware<SlackCommandMiddlewareArgs, CustomContext>[]
+  ): void {
     this.listeners.push([onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
