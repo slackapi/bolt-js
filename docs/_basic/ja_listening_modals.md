@@ -6,7 +6,7 @@ order: 12
 ---
 
 <div class="section-content">
-<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために `view_submission` のリクエストをリッスンする必要があります。`view_submission` イベントをリッスンするためには、組み込みの `view()` メソッドを使用します。
+<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために `view_submission` のリクエストをリッスンする必要があります。`view_submission` リクエストをリッスンするためには、組み込みの `view()` メソッドを使用します。
 
 `view()` メソッドは、文字列型または `RegExp`型 の `callback_id` を必要とします。
 
@@ -29,7 +29,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
   });
 });
 ```
-この例と同様に、モーダルでの送信イベントに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
+この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
 
 より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
 </div>
