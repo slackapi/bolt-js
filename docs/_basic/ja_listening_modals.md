@@ -1,7 +1,7 @@
 ---
 title: モーダルでの送信のリスニング
 lang: ja-jp
-slug: view_submissions
+slug: view-submissions
 order: 12
 ---
 
