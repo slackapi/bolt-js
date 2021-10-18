@@ -127,9 +127,9 @@ const app = new App({
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-> 💡  OAuth認証を実装するなら、現時点では [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts) を使用する必要があります。
+> 💡  OAuth フローを実装するなら、現時点では [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts) を使用する必要があります。
 
-その後、[ソースコードのなかで Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14)を編集して、AwsLambdaReceiver を使ったカスタムのレシーバーを作成します。
+その後、[ソースコードの中で Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14)を編集して、`AwsLambdaReceiver` を使ったカスタムのレシーバーを作成します。
 
 ```javascript
 // カスタムのレシーバーを初期化します
