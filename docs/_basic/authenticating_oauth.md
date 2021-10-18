@@ -58,7 +58,9 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['chat:write'],
-  stateVerification: false,
+  installerOptions: {
+    stateVerification: false,
+  },
 });
 ```
 
