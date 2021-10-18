@@ -1,7 +1,7 @@
 ---
 title: Listening for view submissions
 lang: en
-slug: view_submissions
+slug: view-submissions
 order: 12
 ---
 
