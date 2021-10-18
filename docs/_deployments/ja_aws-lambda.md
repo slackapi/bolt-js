@@ -108,17 +108,28 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 
 **1. アプリを AWS Lambda に対応させる**
 
-デフォルトでは、Bolt アプリがリッスンするのは HTTP リクエストです。このセクションでは Bolt アプリの[`レシーバー`](https://slack.dev/bolt-js/concepts#receiver)に手を加えて、Lambda 関数のイベントをリッスンするように変更します。
+デフォルトでは、入門ガイドの Bolt サンプルアプリはソケットモードを使用しています。WebSocket イベントの代わりに HTTP リクエストをリッスンするため、 `app.js` の設定を変更しましょう。
 
-> 💡 このガイドはバージョン 4.x.x 以上を必要とします
+```javascript
+// ボットトークンを使ってアプリを初期化します
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  socketMode: true, // この行を削除します
+  appToken: process.env.SLACK_APP_TOKEN, // この行を削除します
+});
+```
 
-まず、`app.js` のソースコードのなかで[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の AwsLambdaReceiver モジュールを require します。
+次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](https://slack.dev/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
+
+`app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
 ```javascript
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-その後、[ソースコードのなかで Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L3-L7)を編集して、AwsLambdaReceiver を使ったカスタムのレシーバーを作成します。
+> 💡  OAuth フローを実装するなら、現時点では [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts) を使用する必要があります。
+
+その後、[ソースコードの中で Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14)を編集して、`AwsLambdaReceiver` を使ったカスタムのレシーバーを作成します。
 
 ```javascript
 // カスタムのレシーバーを初期化します
