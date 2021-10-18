@@ -108,7 +108,7 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 
 **1. アプリを AWS Lambda に対応させる**
 
-デフォルトでは、入門ガイドの Bolt サンプルアプリはソケットモードを使用しています。WebSocketイベントの代わりにHTTPリクエストをリッスンするため、 `app.js` の設定を変更しましょう。
+デフォルトでは、入門ガイドの Bolt サンプルアプリはソケットモードを使用しています。WebSocket イベントの代わりに HTTP リクエストをリッスンするため、 `app.js` の設定を変更しましょう。
 
 ```javascript
 // ボットトークンを使ってアプリを初期化します
@@ -119,9 +119,9 @@ const app = new App({
 });
 ```
 
-次、Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](https://slack.dev/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
+次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](https://slack.dev/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
 
-`app.js` のソースコードのなかで[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の AwsLambdaReceiver モジュールを require します。
+`app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
 ```javascript
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
