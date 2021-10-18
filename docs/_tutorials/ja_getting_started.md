@@ -103,7 +103,7 @@ const app = new App({
 });
 
 (async () => {
-  // アプリを start します
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
@@ -164,14 +164,14 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// "hello" を含むメッセージをリッスンする
+// "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // say() はイベントがトリガーされたチャンネルにメッセージを送信します
+  // イベントがトリガーされたチャンネルへ say() でメッセージを送信します
   await say(`Hey there <@${message.user}>!`);
 });
 
 (async () => {
-  // アプリを start します
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
@@ -208,9 +208,9 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// "hello" を含むメッセージをリッスンする
+// "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // say() はイベントがトリガーされたチャンネルにメッセージを送信します
+  // イベントがトリガーされたチャンネルへ say() でメッセージを送信します
   await say({
     blocks: [
       {
@@ -234,7 +234,7 @@ app.message('hello', async ({ message, say }) => {
 });
 
 (async () => {
-  // アプリを start します
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
@@ -261,9 +261,9 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// "hello" を含むメッセージをリッスンする
+// "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // say() はイベントがトリガーされたチャンネルにメッセージを送信します
+  // イベントがトリガーされたチャンネルへ say() でメッセージを送信します
   await say({
     blocks: [
       {
@@ -287,13 +287,13 @@ app.message('hello', async ({ message, say }) => {
 });
 
 app.action('button_click', async ({ body, ack, say }) => {
-  // アクションを確認
+  // アクションのリクエストを確認
   await ack();
   await say(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {
-  // アプリを start します
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
