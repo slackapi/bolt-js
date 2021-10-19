@@ -96,14 +96,14 @@ npm install @slack/bolt
 ```javascript
 const { App } = require('@slack/bolt');
 
-// Initializes your app with your bot token and signing secret
+// ボットトークンと Signing Secret を使ってアプリを初期化します
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
 (async () => {
-  // Start your app
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
@@ -164,14 +164,14 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// Listens to incoming messages that contain "hello"
+// "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
+  // イベントがトリガーされたチャンネルに say() でメッセージを送信します
   await say(`Hey there <@${message.user}>!`);
 });
 
 (async () => {
-  // Start your app
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
@@ -208,9 +208,9 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// Listens to incoming messages that contain "hello"
+// "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
+  // イベントがトリガーされたチャンネルに say() でメッセージを送信します
   await say({
     blocks: [
       {
@@ -234,7 +234,7 @@ app.message('hello', async ({ message, say }) => {
 });
 
 (async () => {
-  // Start your app
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
@@ -261,9 +261,9 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// Listens to incoming messages that contain "hello"
+// "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
+  // イベントがトリガーされたチャンネルに say() でメッセージを送信します
   await say({
     blocks: [
       {
@@ -287,13 +287,13 @@ app.message('hello', async ({ message, say }) => {
 });
 
 app.action('button_click', async ({ body, ack, say }) => {
-  // Acknowledge the action
+  // アクションのリクエストを確認
   await ack();
   await say(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {
-  // Start your app
+  // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
