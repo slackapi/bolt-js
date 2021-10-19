@@ -6,9 +6,43 @@ order: 9
 ---
 
 <div class="section-content">
+`v3.7.0` から `App` を初期化する時、`customRoutes` というルートの配列を渡し、カスタムHTTPルートを簡単に追加できます。
 
-Bolt の組み込みの `ExpressReceiver` を使っているなら、カスタムの HTTP ルートを追加するのはとても簡単です。`v2.1.0` から `ExpressReceiver` には `router` というプロパティが追加されています。これは、さらにルートを追加できるように `App` 内部で保持している Exprss の [Router](http://expressjs.com/en/4x/api.html#router) を public にしたものです。
+各 `CustomRoute` オブジェクトには `path` 、 `method` と `handler` という三つのプロパティが必要とします。 `method` は文字列または文字列の配列です。
+</div>
 
+```javascript
+const { App } = require('@slack/bolt');
+
+// Bolt アプリはデフォルトの HTTPReceiver を使って初期化します
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  customRoutes: [
+    {
+      path: '/health-check',
+      method: ['GET'],
+      handler: (req, res) => {
+        res.writeHead(200);
+        res.end('Health check information displayed here!');
+      },
+    },
+  ],
+});
+
+(async () => {
+  await app.start();
+  console.log('⚡️ Bolt app started');
+})();
+```
+
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
+<h4 class="section-head">カスタム ExpressReceiver ルート</h4>
+</summary>
+
+<div class="secondary-content" markdown="0">
+Bolt の組み込みの `ExpressReceiver` を使っているなら、カスタムの HTTP ルートを追加するのはとても簡単です。`v2.1.0` から `ExpressReceiver` には `router` というプロパティが追加されています。これは、さらにルートを追加できるように `App` 内部で保持している Express の [Router](http://expressjs.com/en/4x/api.html#router) を public にしたものです。
 </div>
 
 ```javascript
@@ -36,7 +70,8 @@ receiver.router.post('/secret-page', (req, res) => {
 });
 
 (async () => {
-  await app.start(8080);
-  console.log('app is running');
+  await app.start();
+  console.log('⚡️ Bolt app started'');
 })();
 ```
+</details>
