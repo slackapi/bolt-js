@@ -5,7 +5,8 @@ slug: steps-overview
 order: 1
 ---
 
-<div class="section-content">
+## Overview of Workflow Steps for apps
+
 Workflow Steps from apps allow your app to create and process custom workflow steps that users can add using [Workflow Builder](https://api.slack.com/workflows).
 
 A workflow step is made up of three distinct user events: 
@@ -17,5 +18,3 @@ A workflow step is made up of three distinct user events:
 All three events must be handled for a workflow step to function.
 
 Read more about workflow steps from apps in the [API documentation](https://api.slack.com/workflows/steps).
-
-</div>

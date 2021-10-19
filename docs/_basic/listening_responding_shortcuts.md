@@ -5,7 +5,7 @@ slug: shortcuts
 order: 8
 ---
 
-## Listening and responding to shortcuts {#shortcuts}
+## Listening and responding to shortcuts
 
 The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
@@ -71,7 +71,7 @@ app.shortcut('open_modal', async ({ shortcut, ack, client }) => {
 });
 ```
 
-### Listening to shortcuts using a constraint object
+#### Listening to shortcuts using a constraint object
 
 You can use a constraints object to listen to `callback_id`s, and `type`s. Constraints in the object can be of type string or RegExp object.
 

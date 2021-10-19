@@ -5,7 +5,7 @@ slug: web-api
 order: 4
 ---
 
-## Using the Web API {#web-api}
+## Using the Web API
 
 You can call [any Web API method](https://api.slack.com/methods) using the [`WebClient`](https://slack.dev/node-slack-sdk/web-api) provided to your app's listeners as `client`. This uses either the token that initialized your app <b>or</b> the token that is returned from the [`authorize` function](#authorization) for the incoming event. The built-in [OAuth support](#authenticating-oauth) handles the second case by default.
 

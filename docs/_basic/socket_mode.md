@@ -5,7 +5,7 @@ slug: socket-mode
 order: 16
 ---
 
-## Using Socket Mode {#socket-mode}
+## Using Socket Mode
 
 [Socket Mode](https://api.slack.com/socket-mode) allows your app to connect and receive data from Slack via a WebSocket connection. To handle the connection, Bolt for JavaScript includes a `SocketModeReceiver` (in `@slack/bolt@3.0.0` and higher). Before using Socket Mode, be sure to enable it within your app configuration.
 
@@ -26,7 +26,7 @@ const app = new App({
 })();
 ```
 
-### Custom SocketMode Receiver
+#### Custom SocketMode Receiver
 
 You can define a custom `SocketModeReceiver` by importing it from `@slack/bolt`.
 

@@ -6,7 +6,7 @@ lang: en
 layout: tutorial
 permalink: /tutorial/using-typescript
 ---
-# Using TypeScript
+## Using TypeScript
 > ⚠️ This guide is a work-in-progress.
 
 See [the sample TypeScript project][1] to see a TypeScript equivalent of the [Getting Started app][2] (and a few other basic examples).
@@ -15,7 +15,7 @@ This project is written and built using [TypeScript](https://www.typescriptlang.
 
 This page helps describe how to use this package from a project that also uses TypeScript.
 
-### Minimum version
+#### Minimum version
 
 The latest major version of `@slack/bolt` is supported to build against a minimum TypeScript version of v4.1.
 

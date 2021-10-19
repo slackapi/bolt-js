@@ -5,7 +5,7 @@ slug: authenticating-oauth
 order: 15
 ---
 
-## Authenticating with OAuth {#authenticating-oauth}
+## Authenticating with OAuth
 
 To make your Slack app ready for distribution, you will need to implement OAuth and store installation information (i.e. access tokens) securely. Bolt supports OAuth and will handle most of the work for you by setting up OAuth routes and verifying state. 
 
@@ -13,7 +13,7 @@ You will need to provide your:
 * `clientId`, `clientSecret`, `stateSecret` and `scopes`
 * An `installationStore` option with `storeInstallation` and `fetchInstallation` handlers defined for storing installation data to a database *(recommended for production)*
 
-### Installing your App
+#### Installing your App
 
 Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This returns a simple `Add to Slack` button where users can initiate direct installs of your app. 
 

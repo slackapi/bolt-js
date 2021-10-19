@@ -5,7 +5,8 @@ slug: listener-middleware
 order: 6
 ---
 
-<div class="section-content">
+## Listener middleware
+
 Listener middleware is used for logic across many listener functions (but usually not all of them). They are added as arguments before the listener function in one of the built-in methods. You can add any number of listener middleware before the listener function.
 
 There’s a collection of built-in listener middleware that you can use like `subtype()` for filtering on a message subtype and `directMention()` which filters out any message that doesn’t directly @-mention your bot at the start of a message.
@@ -15,7 +16,6 @@ But of course, you can write your own middleware for more custom functionality. 
 As an example, let’s say your listener should only deal with messages from humans. You can write a listener middleware that excludes any bot messages.
 
 *Note: Since v2, listener middleware was updated to support `async` functions! View the [migration guide for V2](https://slack.dev/bolt/tutorial/migration-v2) to learn about the changes.*
-</div>
 
 ```javascript
 // Listener middleware that filters out messages with 'bot_message' subtype

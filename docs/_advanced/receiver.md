@@ -5,7 +5,8 @@ slug: receiver
 order: 9
 ---
 
-<div class="section-content">
+## Customizing a receiver
+
 A receiver is responsible for handling and parsing any incoming requests from Slack then sending it to the app, so that the app can add context and pass the request to your listeners. Receivers must conform to the Receiver interface:
 
 | Method       | Parameters                       | Return type |
@@ -20,7 +21,6 @@ A receiver is responsible for handling and parsing any incoming requests from Sl
 To use a custom receiver, you can pass it into the constructor when initializing your Bolt for JavaScript app. Here is what a basic custom receiver might look like.
 
 For a more in-depth look at a receiver, [read the source code for the built-in `ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/master/src/receivers/ExpressReceiver.ts)
-</div>
 
 ```javascript
 import { createServer } from 'http';

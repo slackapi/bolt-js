@@ -6,17 +6,15 @@ lang: en
 layout: tutorial
 permalink: /deployments/heroku
 ---
-# Deploying to Heroku
+## Deploying to Heroku
 
-<div class="section-content">
 This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
-</div>
 
 When you’re finished, you’ll have this ⚡️[Deploying to Heroku app][deploy-heroku-app] to run, modify, and make your own.
 
 ---
 
-### Get a Bolt Slack app
+#### Get a Bolt Slack app
 
 If you haven't already built your own Bolt app, you can use our [Getting Started guide][getting-started-guide] or clone the template app below:
 
@@ -34,7 +32,7 @@ Now that you have an app, let's prepare it for Heroku.
 
 ---
 
-### Prepare the app for Heroku
+#### Prepare the app for Heroku
 
 Heroku is a flexible platform that requires some configuration to host your app. In this section, we'll update your Bolt app to support Heroku.
 
@@ -73,7 +71,7 @@ git commit -m "Add Procfile"
 
 ---
 
-### Set up the Heroku tools
+#### Set up the Heroku tools
 
 Now we can set up the Heroku tools on your local machine. These tools will help you manage, deploy, and debug your app on Heroku's platform.
 
@@ -114,7 +112,7 @@ You should now be set up with the Heroku tools! Let's move on to the exciting st
 
 ---
 
-### Create an app on Heroku
+#### Create an app on Heroku
 
 It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
 
@@ -167,7 +165,7 @@ Now that we have prepared your local app and created a Heroku app, the next step
 
 ---
 
-### Deploy the app
+#### Deploy the app
 
 To deploy the app, we're going to push your local code to Heroku, update your Slack app's settings, and say "hello" to your Heroku app. ✨
 
@@ -225,7 +223,7 @@ Open a Slack channel that your app has joined and say "hello" (lower-case). Just
 
 ---
 
-### Deploy an update
+#### Deploy an update
 
 As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
@@ -255,7 +253,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ---
 
-### Next steps
+#### Next steps
 
 You just deployed your first ⚡️[Bolt for JavaScript app to Heroku][deploy-heroku-app]! 🚀
 

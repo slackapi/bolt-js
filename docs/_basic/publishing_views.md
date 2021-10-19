@@ -5,7 +5,7 @@ slug: publishing-views
 order: 13
 ---
 
-## Publishing views to App Home {#publishing-views}
+## Publishing views to App Home
 
 <a href="https://api.slack.com/surfaces/tabs/using">Home tabs</a> are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and <a href="https://api.slack.com/reference/block-kit/views">view payload</a> to the <a href="https://api.slack.com/methods/views.publish">`views.publish`</a> method.
 

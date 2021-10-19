@@ -6,17 +6,15 @@ lang: en
 layout: tutorial
 permalink: /tutorial/migration-v3
 ---
-# Migrating to v3.x
+## Migrating to v3.x
 
-<div class="section-content">
 This guide will walk you through the process of updating your app from using `@slack/bolt@2.x` to `@slack/bolt@3.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes.
 
 *Note: Make sure to checkout our [support schedule](#slackbolt2x-support-schedule) for `@slack/bolt@2.x` if you don't plan on upgrading right away*
-</div> 
 
 ---
 
-### Org Wide App Installation Changes to InstallationStore & orgAuthorize
+## Org Wide App Installation Changes to InstallationStore & orgAuthorize
 
 In [Bolt for JavaScript 2.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0), we introduced support for [org wide app installations](https://api.slack.com/enterprise/apps). To add support to your applications, two new methods were introduced to the Installation Store used during OAuth, `fetchOrgInstallation` & `storeOrgInstallation`. With `@slack/bolt@3.x`, we have dropped support for these two new methods for a simpler interface and to be better aligned with Bolt for Python and Bolt for Java. See the code samples below for the recommended changes to migrate.
 
@@ -101,18 +99,18 @@ const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => {
 }
 ```
 
-### HTTP Receiver as default
+## HTTP Receiver as default
 
 In `@slack/bolt@3.x`, we have introduced a new default [`HTTPReceiver`](https://github.com/slackapi/bolt-js/issues/670) which replaces the previous default `ExpressReceiver`. This will allow Bolt for JavaScript apps to easily work with other popular web frameworks (Hapi.js, Koa, etc). `ExpressReceiver` is still being shipped with Bolt for JavaScript and `HTTPReceiver` will not provide all the same functionality. One use case that isn't supported by `HTTPReceiver` is creating custom routes (ex: create a route to do a health check). For these use cases, we recommend continuing to use `ExpressReceiver` by importing the class, and creating your own instance of it, and passing this instance into the constructor of `App`. See [our documentation on adding custom http routes](https://slack.dev/bolt-js/concepts#custom-routes) for an example.
 
-### @slack/bolt@2.x support schedule
+## @slack/bolt@2.x support schedule
 
 `@slack/bolt@2.x` will be deprecated on **January 12th, 2021**. We will only implement **critical bug fixes** until the official end of life date and close non critical issues and pull requests, which is slated for **May 31st, 2021**. At this time, development will fully stop for `@slack/bolt@2.x` and all remaining open issues and pull requests will be closed. 
 
-### Minimum Node Version
+## Minimum Node Version
 
 `@slack/bolt@3.x` requires a minimum Node version of `12.13.0` and minimum npm version of `6.12.0` .
 
-### Minimum TypeScript Version
+## Minimum TypeScript Version
 
 As outlined in our [using TypeScript guide](https://slack.dev/bolt/tutorial/using-typescript), `@slack/bolt@3.x` requires a minimum TypeScript version of `4.1`.

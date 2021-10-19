@@ -5,7 +5,7 @@ slug: action-respond
 order: 6
 ---
 
-## Responding to actions {#action-respond} 
+## Responding to actions
 
 There are two main ways to respond to actions. The first (and most common) way is to use the `say` function. The `say` function sends a message back to the conversation where the incoming request took place.
 
@@ -20,7 +20,7 @@ app.action('approve_button', async ({ ack, say }) => {
 });
 ```
 
-### Using respond()
+#### Using respond()
 
 Since `respond()` is a utility for calling the `response_url`, it behaves in the same way. You can pass a JSON object with a new message payload that will be published back to the source of the original interaction with optional properties like `response_type` (which has a value of `in_channel` or `ephemeral`), `replace_original`, and `delete_original`.
 

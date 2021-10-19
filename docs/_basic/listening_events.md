@@ -5,7 +5,7 @@ slug: event-listening
 order: 3
 ---
 
-## Listening to events {#event-listening}
+## Listening to events
 
 You can listen to [any Events API event](https://api.slack.com/events) using the `event()` method after subscribing to it in your app configuration. This allows your app to take action when something happens in Slack, like a user reacting to a message or joining a channel.
 
@@ -30,7 +30,7 @@ app.event('team_join', async ({ event, client }) => {
 });
 ```
 
-### Filtering on message subtypes</h4>
+#### Filtering on message subtypes</h4>
 
 A `message()` listener is equivalent to `event('message')`
 

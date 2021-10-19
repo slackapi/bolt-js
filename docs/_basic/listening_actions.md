@@ -5,7 +5,7 @@ slug: action-listening
 order: 5
 ---
 
-## Listening to actions {#action-listening}
+## Listening to actions
 
 Your app can listen to user actions like button clicks, and menu selects, using the `action` method.
 
@@ -23,7 +23,7 @@ app.action('approve_button', async ({ ack }) => {
 });
 ```
 
-### Listening to actions using a constraint object
+#### Listening to actions using a constraint object
 
 You can use a constraints object to listen to `callback_id`s, `block_id`s, and `action_id`s (or any combination of them). Constraints in the object can be of type string or RegExp object.
 

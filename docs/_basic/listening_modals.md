@@ -5,7 +5,7 @@ slug: view-submissions
 order: 12
 ---
 
-## Listening for view submissions {#view-submissions}
+## Listening for view submissions
 
 If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to `view_submission` requests to receive their values. To listen to `view_submission` requests, you can use the built-in `view()` method.
 
@@ -13,7 +13,7 @@ If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> 
 
 You can access the value of the input blocks by accessing the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
 
-### Update views on submission
+#### Update views on submission
 
 To update a view in response to a `view_submission` request, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
 

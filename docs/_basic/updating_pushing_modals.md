@@ -5,7 +5,7 @@ slug: updating-pushing-views
 order: 11
 ---
 
-## Updating and pushing views {#updating-pushing-views}
+## Updating and pushing views
 
 Modals contain a stack of views. When you call <a href="https://api.slack.com/methods/views.open">`views.open`</a>, you add the root view to the modal. After the initial call, you can dynamically update a view by calling <a href="https://api.slack.com/methods/views.update">`views.update`</a>, or stack a new view on top of the root view by calling <a href="https://api.slack.com/methods/views.push">`views.push`</a>.
 

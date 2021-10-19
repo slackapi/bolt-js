@@ -5,7 +5,7 @@ slug: creating-modals
 order: 10
 ---
 
-## Opening modals {#creating-modals}
+## Opening modals
 
 <a href="https://api.slack.com/block-kit/surfaces/modals">Modals</a> are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid <code>trigger_id</code> and a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> to the built-in client's <a href="https://api.slack.com/methods/views.open"><code>views.open</code></a> method. 
 

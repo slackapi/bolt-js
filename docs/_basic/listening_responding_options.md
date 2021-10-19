@@ -5,7 +5,7 @@ slug: options
 order: 14
 ---
 
-## Listening and responding to options {#options}
+## Listening and responding to options
 
 The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](#action-listening),
 an `action_id` or constraints object is required.

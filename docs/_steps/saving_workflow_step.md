@@ -5,7 +5,7 @@ slug: saving-steps
 order: 4
 ---
 
-<div class='section-content'>
+## Saving step configurations
 
 After the configuration modal is opened, your app will listen for the `view_submission` event. The `save` callback in your `WorkflowStep` configuration will be run when this event is received.
 
@@ -17,8 +17,6 @@ Within the `save` callback, the `update()` method can be used to save the builde
 - `step_image_url` overrides the default Step image
 
 To learn more about how to structure these parameters, [read the documentation](https://api.slack.com/reference/workflows/workflow_step).
-
-</div>
 
 ```javascript
 const ws = new WorkflowStep('add_task', {

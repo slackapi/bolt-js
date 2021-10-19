@@ -5,7 +5,7 @@ slug: commands
 order: 9
 ---
 
-## Listening and responding to commands {#commands}
+## Listening and responding to commands
 
 Your app can use the `command()` method to listen to incoming slash command requests. The method requires a `commandName` of type string or RegExp.
 

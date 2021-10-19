@@ -5,7 +5,7 @@ slug: message-listening
 order: 1
 ---
 
-## Listening to messages {#message-listening}
+## Listening to messages
 
 To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message`.
 
@@ -18,7 +18,7 @@ app.message(':wave:', async ({ message, say }) => {
 });
 ```
 
-### Using a RegExp pattern
+#### Using a RegExp pattern
 
 A RegExp pattern can be used instead of a string for more granular matching.
 

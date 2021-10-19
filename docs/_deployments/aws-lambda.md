@@ -6,17 +6,15 @@ lang: en
 layout: tutorial
 permalink: /deployments/aws-lambda
 ---
-# Deploying to AWS Lambda
+## Deploying to AWS Lambda
 
-<div class="section-content">
 This guide walks you through preparing and deploying a Slack app using [Bolt for JavaScript][bolt-js], the [Serverless Framework][serverless-framework], and [AWS Lambda][aws-lambda].
-</div>
 
 When you’re finished, you’ll have this ⚡️[Deploying to AWS Lambda app][deploy-aws-lambda-app] to run, modify, and make your own.
 
 ---
 
-### Set up AWS Lambda
+#### Set up AWS Lambda
 
 [AWS Lambda][aws-lambda] is a serverless, Function-as-a-Service (FaaS) platform that allows you to run code without managing servers. In this section, we'll configure your local machine to access AWS Lambda.
 
@@ -62,7 +60,7 @@ That wraps up configuring your local machine to access AWS. 👏 Next, let's do 
 
 ---
 
-### Set up Serverless Framework
+#### Set up Serverless Framework
 
 The [Serverless Framework](https://www.serverless.com/open-source/) includes tools that let you easily configure, debug, and deploy your app to AWS Lambda.
 
@@ -86,7 +84,7 @@ You're now set up with the Serverless tools! Let's move on to preparing your Bol
 
 ---
 
-### Get a Bolt Slack app
+#### Get a Bolt Slack app
 
 If you haven't already built your own Bolt app, you can use our [Getting Started guide][getting-started-guide] or clone the template app below:
 
@@ -104,7 +102,7 @@ Now that you have an app, let's prepare it for AWS Lambda and the Serverless Fra
 
 ---
 
-### Prepare the app
+#### Prepare the app
 
 **1. Prepare the app for AWS Lambda**
 

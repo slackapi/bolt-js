@@ -5,11 +5,11 @@ slug: context
 order: 7
 ---
 
-<div class="section-content">
+## Adding context
+
 All listeners have access to a `context` object, which can be used to enrich requests with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
 
 `context` is just an object, so you can add to it by setting it to a modified version of itself.
-</div>
 
 ```javascript
 async function addTimezoneContext({ payload, client, context, next }) {

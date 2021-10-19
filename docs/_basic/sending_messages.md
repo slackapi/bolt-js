@@ -5,7 +5,7 @@ slug: message-sending
 order: 2
 ---
 
-## Sending Messages {#message-sending}
+## Sending Messages
 
 Within your listener function, `say()` is available whenever there is an associated conversation (for example, a conversation where the event or action which triggered the listener occurred). `say()` accepts a string to post simple messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated conversation.
 
@@ -18,7 +18,7 @@ app.message('knock knock', async ({ message, say }) => {
 });
 ```
 
-### Sending a message with blocks
+#### Sending a message with blocks
 
 `say()` accepts more complex message payloads to make it easy to add functionality and structure to your messages.
 

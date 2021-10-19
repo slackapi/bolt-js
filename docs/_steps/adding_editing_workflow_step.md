@@ -5,7 +5,7 @@ slug: adding-editing-steps
 order: 3
 ---
 
-<div class='section-content'>
+## Adding for editing workflow steps
 
 When a builder adds (or later edits) your step in their workflow, your app will receive a [`workflow_step_edit` event](https://api.slack.com/reference/workflows/workflow_step_edit). The `edit` callback in your `WorkflowStep` configuration will be run when this event is received.
 
@@ -14,8 +14,6 @@ Whether a builder is adding or editing a step, you need to send them a [workflow
 Within the `edit` callback, the `configure()` utility can be used to easily open your step's configuration modal by passing in an object with your view's `blocks`. To disable saving the configuration before certain conditions are met, pass in `submit_disabled` with a value of `true`.
 
 To learn more about opening configuration modals, [read the documentation](https://api.slack.com/workflows/steps#handle_config_view).
-
-</div>
 
 ```javascript
 const ws = new WorkflowStep('add_task', {
