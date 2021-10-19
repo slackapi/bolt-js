@@ -166,7 +166,7 @@ const app = new App({
 
 // "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // イベントがトリガーされたチャンネルへ say() でメッセージを送信します
+  // イベントがトリガーされたチャンネルに say() でメッセージを送信します
   await say(`Hey there <@${message.user}>!`);
 });
 
@@ -210,7 +210,7 @@ const app = new App({
 
 // "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // イベントがトリガーされたチャンネルへ say() でメッセージを送信します
+  // イベントがトリガーされたチャンネルに say() でメッセージを送信します
   await say({
     blocks: [
       {
@@ -263,7 +263,7 @@ const app = new App({
 
 // "hello" を含むメッセージをリッスンします
 app.message('hello', async ({ message, say }) => {
-  // イベントがトリガーされたチャンネルへ say() でメッセージを送信します
+  // イベントがトリガーされたチャンネルに say() でメッセージを送信します
   await say({
     blocks: [
       {
