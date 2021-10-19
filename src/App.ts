@@ -166,8 +166,8 @@ export interface ExtendedErrorHandlerArgs extends AllErrorHandlerArgs {
 }
 
 export interface ErrorHandler {
-  <CodedError>(error: CodedError): Promise<void>;
-  <ExtendedErrorHandlerArgs>(args: ExtendedErrorHandlerArgs): Promise<void>;
+  <T extends CodedError>(error: T): Promise<void>;
+  <T extends ExtendedErrorHandlerArgs>(args: T): Promise<void>;
 }
 
 class WebClientPool {
@@ -961,9 +961,9 @@ export default class App {
   private handleError(args: AllErrorHandlerArgs): Promise<void> {
     const { error, ...rest } = args;
 
-    return this.extendedErrorHandler && this.hasCustomErrorHandler
-      ? this.errorHandler<ExtendedErrorHandlerArgs>({ error: asCodedError(error), ...rest })
-      : this.errorHandler<CodedError>(asCodedError(error));
+    return this.extendedErrorHandler && this.hasCustomErrorHandler ?
+      this.errorHandler({ error: asCodedError(error), ...rest }) :
+      this.errorHandler(asCodedError(error));
   }
 }
 

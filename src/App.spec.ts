@@ -593,8 +593,9 @@ describe('App', () => {
       it('should, on error, call the global error handler, extended', async () => {
         const error = new Error('Everything is broke, you probably should restart, if not then good luck');
         // Need to change value of private property for testing purposes
-        // @ts-ignore
-        app.extendedErrorHandler = true;
+        // Accessing through bracket notation because it is private
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        app['extendedErrorHandler'] = true;
 
         app.use(() => {
           throw error;
@@ -614,9 +615,10 @@ describe('App', () => {
 
         await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-        // Switch back to false to make sure nothing breaks
-        // @ts-ignore
-        app.extendedErrorHandler = false;
+        // Need to change value of private property for testing purposes
+        // Accessing through bracket notation because it is private
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        app['extendedErrorHandler'] = false;
       });
 
       it('with a default global error handler, rejects App#ProcessEvent', async () => {
