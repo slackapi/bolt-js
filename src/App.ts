@@ -154,15 +154,17 @@ export interface ViewConstraints {
   type?: 'view_closed' | 'view_submission';
 }
 
-export interface AllErrorHandlerArgs {
-  error: Error;
+// Passed internally to the handleError method
+interface AllErrorHandlerArgs {
+  error: Error; // Error is not necessarily a CodedError
   logger: Logger;
   body: AnyMiddlewareArgs['body'];
   context: Context;
 }
 
+// Passed into the error handler when extendedErrorHandler is true
 export interface ExtendedErrorHandlerArgs extends AllErrorHandlerArgs {
-  error: CodedError;
+  error: CodedError; // asCodedError has been called
 }
 
 export interface ErrorHandler {
@@ -291,6 +293,7 @@ export default class App {
     if (typeof this.logLevel !== 'undefined' && this.logger.getLevel() !== this.logLevel) {
       this.logger.setLevel(this.logLevel);
     }
+    // Error-related properties used to later determine args passed into the error handler
     this.hasCustomErrorHandler = false;
     this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
     this.extendedErrorHandler = extendedErrorHandler;
@@ -695,6 +698,7 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
+  // Error handler args dependent on extendedErrorHandler property
   public error(errorHandler: ErrorHandler): void;
   public error(errorHandler: ExtendedErrorHandler): void;
   public error(errorHandler: AnyErrorHandler): void {
