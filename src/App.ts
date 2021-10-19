@@ -166,8 +166,14 @@ export interface ExtendedErrorHandlerArgs extends AllErrorHandlerArgs {
 }
 
 export interface ErrorHandler {
-  <T extends CodedError>(error: T): Promise<void>;
-  <T extends ExtendedErrorHandlerArgs>(args: T): Promise<void>;
+  (error: CodedError): Promise<void>;
+}
+
+export interface ExtendedErrorHandler {
+  (args: ExtendedErrorHandlerArgs): Promise<void>;
+}
+
+export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 }
 
 class WebClientPool {
@@ -214,7 +220,7 @@ export default class App {
   /** Listener middleware chains */
   private listeners: Middleware<AnyMiddlewareArgs>[][];
 
-  private errorHandler: ErrorHandler;
+  private errorHandler: AnyErrorHandler;
 
   private axios: AxiosInstance;
 
@@ -286,7 +292,7 @@ export default class App {
       this.logger.setLevel(this.logLevel);
     }
     this.hasCustomErrorHandler = false;
-    this.errorHandler = defaultErrorHandler(this.logger);
+    this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
     this.extendedErrorHandler = extendedErrorHandler;
 
     // Set up client options
@@ -689,7 +695,9 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public error(errorHandler: ErrorHandler): void {
+  public error(errorHandler: ErrorHandler): void;
+  public error(errorHandler: ExtendedErrorHandler): void;
+  public error(errorHandler: AnyErrorHandler): void {
     this.errorHandler = errorHandler;
     this.hasCustomErrorHandler = true;
   }
