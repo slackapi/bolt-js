@@ -6,7 +6,7 @@ order: 4
 ---
 
 <div class="section-content">
-グローバルミドルウェアは、すべての受信イベントに対して、リスナーミドルウェアより前に実行されます。`app.use(fn({payload,...,next}))` を使用すると、グローバルミドルウェアをいくつでもアプリに追加できます。
+グローバルミドルウェアは、すべての受信リクエストに対して、リスナーミドルウェアより前に実行されます。`app.use(fn({payload,...,next}))` を使用すると、グローバルミドルウェアをいくつでもアプリに追加できます。
 
 グローバルミドルウェアとリスナーミドルウェアは、いずれも、`await next()` を呼び出して実行チェーンの制御を次のミドルウェアに渡すか、`throw` を呼び出して以前に実行したミドルウェアチェーンにエラーを渡す必要があります。
 
@@ -16,7 +16,7 @@ order: 4
 </div>
 
 ```javascript
-//  Acme ID情報管理プロバイダ上のユーザからの着信イベントと紐つけた認証ミドルウェア
+//  Acme ID情報管理プロバイダ上のユーザからの着信リクエストと紐つけた認証ミドルウェア
 async function authWithAcme({ payload, client, context, next }) {
   const slackUserId = payload.user;
   const helpChannelId = 'C12345';
@@ -28,7 +28,7 @@ async function authWithAcme({ payload, client, context, next }) {
     // 検索できたらそのユーザ情報でコンテクストを生成
     context.user = user;
   } catch (error) {
-      // Acme システム上にユーザが存在しないのでエラーをわたし、イベントプロセスを終了
+      // Acme システム上にユーザが存在しないパターン。エラーを伝えることとし、リクエストの処理は継続しない
       if (error.message === 'Not Found') {
         await client.chat.postEphemeral({
           channel: payload.channel,

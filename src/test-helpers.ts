@@ -1,4 +1,5 @@
-// tslint:disable:no-implicit-dependencies
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonSpy } from 'sinon';
 import { Logger } from '@slack/logger';
 
@@ -10,16 +11,16 @@ export interface Override {
 
 export function mergeOverrides(...overrides: Override[]): Override {
   let currentOverrides: Override = {};
-  for (const override of overrides) {
+  overrides.forEach((override) => {
     currentOverrides = mergeObjProperties(currentOverrides, override);
-  }
+  });
   return currentOverrides;
 }
 
 function mergeObjProperties(first: Override, second: Override): Override {
   const merged: Override = {};
   const props = Object.keys(first).concat(Object.keys(second));
-  for (const prop of props) {
+  props.forEach((prop) => {
     if (second[prop] === undefined && first[prop] !== undefined) {
       merged[prop] = first[prop];
     } else if (first[prop] === undefined && second[prop] !== undefined) {
@@ -28,7 +29,7 @@ function mergeObjProperties(first: Override, second: Override): Override {
       // second always overwrites the first
       merged[prop] = { ...first[prop], ...second[prop] };
     }
-  }
+  });
   return merged;
 }
 
@@ -53,9 +54,9 @@ export function createFakeLogger(): FakeLogger {
     //   Property '0' is missing in type 'any[]' but required in type '[LogLevel]'.
     // 49     setLevel: sinon.fake() as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
     //                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    setLevel: (sinon.fake() as unknown) as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
-    getLevel: (sinon.fake() as unknown) as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
-    setName: (sinon.fake() as unknown) as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
+    setLevel: sinon.fake() as unknown as SinonSpy<Parameters<Logger['setLevel']>, ReturnType<Logger['setLevel']>>,
+    getLevel: sinon.fake() as unknown as SinonSpy<Parameters<Logger['getLevel']>, ReturnType<Logger['getLevel']>>,
+    setName: sinon.fake() as unknown as SinonSpy<Parameters<Logger['setName']>, ReturnType<Logger['setName']>>,
     debug: sinon.fake(),
     info: sinon.fake(),
     warn: sinon.fake(),

@@ -1,4 +1,4 @@
-import { View } from '@slack/types';
+import { View, MessageAttachment, KnownBlock, Block } from '@slack/types';
 import { MessageEvent as AllMessageEvents } from './message-events';
 
 /**
@@ -55,6 +55,10 @@ export type SlackEvent =
   | PinRemovedEvent
   | ReactionAddedEvent
   | ReactionRemovedEvent
+  | SharedChannelInviteReceived
+  | SharedChannelInviteAccepted
+  | SharedChannelInviteApproved
+  | SharedChannelInviteDeclined
   | StarAddedEvent
   | StarRemovedEvent
   | SubteamCreated
@@ -152,6 +156,12 @@ export interface AppMentionEvent {
   username: string;
   user?: string;
   text: string;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
+  edited?: {
+    user: string;
+    ts: string;
+  };
   ts: string;
   channel: string;
   event_ts: string;
@@ -465,9 +475,11 @@ export interface InviteRequestedEvent {
 export interface LinkSharedEvent {
   type: 'link_shared';
   channel: string;
+  is_bot_user_member: boolean;
   user: string;
   message_ts: string;
   thread_ts?: string;
+  event_ts: string;
   links: {
     domain: string;
     url: string;
@@ -498,7 +510,7 @@ export interface PinAddedEvent {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {};
+  item: Record<string, unknown>;
 }
 
 export interface PinRemovedEvent {
@@ -506,7 +518,7 @@ export interface PinRemovedEvent {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {};
+  item: Record<string, unknown>;
   has_pins: boolean;
   event_ts: string;
 }
@@ -544,21 +556,101 @@ export interface ReactionRemovedEvent {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  // https://api.slack.com/events/reaction_removed
-  item: {};
+  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
   event_ts: string;
 }
 
 // NOTE: `resources_added`, `resources_removed`, `scope_denied`, `scope_granted`, are left out because they are
 // deprecated as part of the Workspace Apps Developer Preview
 
+export interface SharedChannelTeamItem {
+  id: string;
+  name: string;
+  icon: Record<string, unknown>;
+  is_verified: boolean;
+  domain: string;
+  date_created: number;
+}
+export interface SharedChannelUserItem {
+  id: string;
+  team_id: string;
+  name: string;
+  updated: number;
+  profile: {
+    real_name: string;
+    display_name: string;
+    real_name_normalized: string;
+    display_name_normalized: string;
+    team: string;
+    avatar_hash: string;
+    email: string;
+    image_24: string;
+    image_32: string;
+    image_48: string;
+    image_72: string;
+    image_192: string;
+    image_512: string;
+  };
+}
+export interface SharedChannelInviteItem {
+  id: string;
+  date_created: number;
+  date_invalid: number;
+  inviting_team: SharedChannelTeamItem;
+  inviting_user: SharedChannelUserItem;
+  recipient_email?: string;
+  recipient_user_id?: string;
+}
+
+export interface SharedChannelItem {
+  id: string;
+  is_private: boolean;
+  is_im: boolean;
+  name: string;
+}
+export interface SharedChannelInviteAccepted {
+  type: 'shared_channel_invite_accepted';
+  approval_required: boolean;
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  teams_in_channel: SharedChannelTeamItem[];
+  accepting_user: SharedChannelUserItem;
+  event_ts: string;
+}
+
+export interface SharedChannelInviteApproved {
+  type: 'shared_channel_invite_approved';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  approving_team_id: string;
+  teams_in_channel: SharedChannelTeamItem[];
+  approving_user: SharedChannelUserItem;
+  event_ts: string;
+}
+
+export interface SharedChannelInviteDeclined {
+  type: 'shared_channel_invite_declined';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  declining_team_id: string;
+  teams_in_channel: SharedChannelTeamItem[];
+  declining_user: SharedChannelUserItem;
+  event_ts: string;
+}
+
+export interface SharedChannelInviteReceived {
+  type: 'shared_channel_invite_received';
+  invite: SharedChannelInviteItem;
+  channel: SharedChannelItem;
+  event_ts: string;
+}
+
 export interface StarAddedEvent {
   type: 'star_added';
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_added, https://api.slack.com/methods/stars.list
-  item: {};
+  item: Record<string, unknown>;
   event_ts: string;
 }
 
@@ -567,7 +659,7 @@ export interface StarRemovedEvent {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_removed, https://api.slack.com/methods/stars.list
-  item: {};
+  item: Record<string, unknown>;
   event_ts: string;
 }
 
@@ -646,10 +738,73 @@ export interface TokensRevokedEvent {
 
 export interface UserChangeEvent {
   type: 'user_change';
-  // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
-  // https://api.slack.com/types/user
   user: {
     id: string;
+    team_id: string;
+    name: string;
+    deleted: boolean;
+    color: string;
+    real_name: string;
+    tz: string;
+    tz_label: string;
+    tz_offset: number;
+    profile: {
+      title: string;
+      phone: string;
+      skype: string;
+      real_name: string;
+      real_name_normalized: string;
+      display_name: string;
+      display_name_normalized: string;
+      status_text: string;
+      status_text_canonical: string;
+      status_emoji: string;
+      status_expiration: number;
+      avatar_hash: string;
+      first_name: string;
+      last_name: string;
+      email: string;
+      image_original?: string;
+      is_custom_image?: boolean;
+      image_24: string;
+      image_32: string;
+      image_48: string;
+      image_72: string;
+      image_192: string;
+      image_512: string;
+      image_1024?: string;
+      team: string;
+      fields:
+      | {
+        [key: string]: {
+          value: string;
+          alt: string;
+        };
+      }
+      | []
+      | null;
+    };
+    is_admin: boolean;
+    is_owner: boolean;
+    is_primary_owner: boolean;
+    is_restricted: boolean;
+    is_ultra_restricted: boolean;
+    is_bot: boolean;
+    is_stranger?: boolean;
+    updated: string;
+    is_email_confirmed: boolean;
+    is_app_user: boolean;
+    is_invited_user?: boolean;
+    has_2fa?: boolean;
+    locale: string;
+    enterprise_user?: {
+      id: string;
+      enterprise_id: string;
+      enterprise_name: string;
+      is_admin: boolean;
+      is_owner: boolean;
+      teams: string[];
+    };
   };
 }
 
@@ -727,6 +882,7 @@ export interface WorkflowStepExecuteEvent {
     step_id: string;
     inputs: {
       [key: string]: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         value: any;
       };
     };

@@ -9,14 +9,16 @@
  * can be reduced by implementing the equivalent functionality in terms of the functions in this file.
  */
 
-import type { IncomingMessage, ServerResponse } from 'http';
-import type { Logger } from '@slack/logger';
-
 import { createHmac } from 'crypto';
 import rawBody from 'raw-body';
 import tsscmp from 'tsscmp';
+import type { Logger } from '@slack/logger';
+import type { IncomingMessage, ServerResponse } from 'http';
+
+const verifyErrorPrefix = 'Failed to verify authenticity';
 
 export interface VerifyOptions {
+  enabled?: boolean;
   signingSecret: string;
   nowMs?: () => number;
   logger?: Logger;
@@ -46,12 +48,17 @@ export interface BufferedIncomingMessage extends IncomingMessage {
 export async function verify(
   options: VerifyOptions,
   req: IncomingMessage,
-  _res?: ServerResponse, // eslint-disable-line @typescript-eslint/no-unused-vars
+  _res?: ServerResponse,
 ): Promise<BufferedIncomingMessage> {
   const { signingSecret } = options;
 
   // Consume the readable stream (or use the previously consumed readable stream)
   const bufferedReq = await bufferIncomingMessage(req);
+
+  if (options.enabled !== undefined && !options.enabled) {
+    // As the validation is disabled, immediately return the bufferred reuest
+    return bufferedReq;
+  }
 
   // Find the relevant request headers
   const signature = getHeader(req, 'x-slack-signature');
@@ -113,5 +120,3 @@ function getHeader(req: IncomingMessage, header: string): string {
   }
   return value;
 }
-
-const verifyErrorPrefix = 'Failed to verify authenticity';

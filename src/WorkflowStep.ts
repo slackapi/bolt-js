@@ -1,4 +1,12 @@
-import { WebAPICallResult, KnownBlock, Block } from '@slack/web-api';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  KnownBlock,
+  Block,
+  ViewsOpenResponse,
+  WorkflowsUpdateStepResponse,
+  WorkflowsStepCompletedResponse,
+  WorkflowsStepFailedResponse,
+} from '@slack/web-api';
 import {
   Middleware,
   AllMiddlewareArgs,
@@ -11,7 +19,7 @@ import {
   ViewWorkflowStepSubmitAction,
   WorkflowStepExecuteEvent,
 } from './types';
-import { processMiddleware } from './middleware/process';
+import processMiddleware from './middleware/process';
 import { WorkflowStepInitializationError } from './errors';
 
 /** Interfaces */
@@ -55,19 +63,19 @@ export interface StepFailArguments {
 }
 
 export interface StepConfigureFn {
-  (params: StepConfigureArguments): Promise<WebAPICallResult>;
+  (params: StepConfigureArguments): Promise<ViewsOpenResponse>;
 }
 
 export interface StepUpdateFn {
-  (params?: StepUpdateArguments): Promise<WebAPICallResult>;
+  (params?: StepUpdateArguments): Promise<WorkflowsUpdateStepResponse>;
 }
 
 export interface StepCompleteFn {
-  (params?: StepCompleteArguments): Promise<WebAPICallResult>;
+  (params?: StepCompleteArguments): Promise<WorkflowsStepCompletedResponse>;
 }
 
 export interface StepFailFn {
-  (params: StepFailArguments): Promise<WebAPICallResult>;
+  (params: StepFailArguments): Promise<WorkflowsStepFailedResponse>;
 }
 
 export interface WorkflowStepConfig {
@@ -108,9 +116,8 @@ export type WorkflowStepMiddleware =
   | WorkflowStepSaveMiddleware[]
   | WorkflowStepExecuteMiddleware[];
 
-export type AllWorkflowStepMiddlewareArgs<
-  T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs
-> = T & AllMiddlewareArgs;
+export type AllWorkflowStepMiddlewareArgs<T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs> =
+  T & AllMiddlewareArgs;
 
 /** Constants */
 
@@ -131,7 +138,7 @@ export class WorkflowStep {
   /** Step Executed/Run :: 'workflow_step_execute' event */
   private execute: WorkflowStepExecuteMiddleware[];
 
-  constructor(callbackId: string, config: WorkflowStepConfig) {
+  public constructor(callbackId: string, config: WorkflowStepConfig) {
     validate(callbackId, config);
 
     const { save, edit, execute } = config;
@@ -147,7 +154,7 @@ export class WorkflowStep {
       if (isStepEvent(args) && this.matchesConstraints(args)) {
         return this.processEvent(args);
       }
-      return args.next!();
+      return args.next();
     };
   }
 
@@ -229,8 +236,9 @@ export async function processStepMiddleware(
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
-    await processMiddleware(callbacks, args, context, client, logger, async () =>
-      lastCallback({ ...args, context, client, logger }),
+    await processMiddleware(
+      callbacks, args, context, client, logger,
+      async () => lastCallback({ ...args, context, client, logger }),
     );
   }
 }
@@ -255,17 +263,15 @@ function createStepConfigure(args: AllWorkflowStepMiddlewareArgs<WorkflowStepEdi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepConfigureFn>[0]) => {
-    return client.views.open({
-      token,
-      trigger_id,
-      view: {
-        callback_id,
-        type: 'workflow_step',
-        ...params,
-      },
-    });
-  };
+  return (params: Parameters<StepConfigureFn>[0]) => client.views.open({
+    token,
+    trigger_id,
+    view: {
+      callback_id,
+      type: 'workflow_step',
+      ...params,
+    },
+  });
 }
 
 /**
@@ -282,13 +288,11 @@ function createStepUpdate(args: AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepUpdateFn>[0] = {}) => {
-    return client.workflows.updateStep({
-      token,
-      workflow_step_edit_id,
-      ...params,
-    });
-  };
+  return (params: Parameters<StepUpdateFn>[0] = {}) => client.workflows.updateStep({
+    token,
+    workflow_step_edit_id,
+    ...params,
+  });
 }
 
 /**
@@ -305,13 +309,11 @@ function createStepComplete(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExec
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepCompleteFn>[0] = {}) => {
-    return client.workflows.stepCompleted({
-      token,
-      workflow_step_execute_id,
-      ...params,
-    });
-  };
+  return (params: Parameters<StepCompleteFn>[0] = {}) => client.workflows.stepCompleted({
+    token,
+    workflow_step_execute_id,
+    ...params,
+  });
 }
 
 /**
@@ -346,7 +348,7 @@ function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteM
  * */
 // TODO :: refactor to incorporate a generic parameter
 export function prepareStepArgs(args: any): AllWorkflowStepMiddlewareArgs {
-  const { next, ...stepArgs } = args;
+  const { next: _next, ...stepArgs } = args;
   const preparedArgs: any = { ...stepArgs };
 
   switch (preparedArgs.payload.type) {

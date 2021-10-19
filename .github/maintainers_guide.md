@@ -13,7 +13,7 @@ All you need to work with this project is a supported version of [Node.js](https
 
 ### Testing
 
-This package has unit tests for most files in the same directory the code is in with the suffix `.spec` (i.e. `exampleFile.spec.ts`). You can run the entire test suite using the npm script `npm test`. This command is also executed by Travis, the continuous integration service, for every Pull Request and branch. The coverage is computed with the `codecode` package. The tests themselves are run using the `mocha` test runner.
+This package has unit tests for most files in the same directory the code is in with the suffix `.spec` (i.e. `exampleFile.spec.ts`). You can run the entire test suite using the npm script `npm test`. This command is also executed by GitHub Actions, the continuous integration service, for every Pull Request and branch. The coverage is computed with the `codecov` package. The tests themselves are run using the `mocha` test runner.
 
 Test code should be written in syntax that runs on the oldest supported Node.js version. This ensures that backwards compatibility is tested and the APIs look reasonable in versions of Node.js that do not support the most modern syntax.
 
@@ -24,9 +24,11 @@ A useful trick for debugging inside tests is to use the Chrome Debugging Protoco
 The documentation is built using [Jekyll](https://jekyllrb.com/) and hosted with GitHub Pages.
 The source files are contained in the `docs` directory. They are broken up into the `_basic`, `_advanced`, and `_tutorials` directories depending on content's nature.
 
-All documentation contains [front matter](https://jekyllrb.com/docs/front-matter/) that indicates the section's title, slug (for header), respective language, and if it's not a tutorial it contains the order it should appear within it's respective section (basic or advanced).
+All documentation contains [front matter](https://jekyllrb.com/docs/front-matter/) that indicates the section's title, slug (for header), respective language, and if it's not a tutorial it contains the order it should appear within its respective section (basic or advanced).
 
-To build the docs locally, you can run `bundle exec jekyll serve`.
+To build the docs locally, you must have [Ruby](https://www.ruby-lang.org/en/) installed. To easily install and manage different Ruby versions, you can use [`rbenv`](https://github.com/rbenv/rbenv). If you use macOS, you can install it via `brew install rbenv`. Hook it up to your shell by running `rbenv init` and following the instructions. Finally, install the required version for building the docs (this version is stored in the `.ruby-version` file) via `rbenv install <version>`.
+
+To build the docs, navigate to the `docs` folder and run `bundle install` to install necessary gems (Ruby dependencies). Run `bundle exec jekyll serve` to start up a local server which will compile documentation source and serve its contents.
 
 #### Adding beta documentation
 When documentation is in a beta state, it requires a new, distinct collection of docs. The process is a little nuanced, so make sure to build the documentation locally to make sure it appears how you expect. To create a new collection:
@@ -40,30 +42,44 @@ When documentation is in a beta state, it requires a new, distinct collection of
 * In `docs`>`_layouts`>`default.html` make a copy of the `basic` or `advanced` section, and modify the div ID and content to correspond to your beta collection. This step requires you to use variables from `_config.yml`.
 * Now in `docs`>`_includes`>`sidebar.html`, create a new section after the basic and advanced sections. Again, copy the `basic` or `advanced` section to use as a template. Be careful with the variable naming—it's a little more complex than in `default.html`, and requires you to use variables from `_config.yml`.
 
-### Releasing
+### Releases
+_For beta releases, see Beta Releases section below:_
 
-1.  Create the commit for the release:
-    *  Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`.
-    *  Update any dependency versions 
-    *  Confirm tests pass by running `npm test`
-    *  Commit with a message including the new version number. For example `v2.2.0`.
-    *  Tag the commit with the version number. For example `git tag @slack/bolt@2.2.0`.
+Releasing can feel intimidating at first, but rest assured: if you make a mistake, don't fret! npm allows you to unpublish a release within the first 72 hours of publishing (you just won’t be able to use the same version number again). Venture on!
 
-2.  Merge into main repository
-    *  Create a pull request with the commit that was just made. Be certain to include the tag. For
-       example: `git push username main --tags`.
-    *  Once tests pass and a reviewer has approved, merge the pull request. You will also want to
-       update your local `main` branch.
-    *  Push the new tag up to origin `git push --tags origin`.
+1. Check the status of the package's GitHub Milestone for issues that should be shipped with the release.
+    -  If all issues have been closed, continue with the release.
+    -  If issues are still open, discuss with the team about whether the open issues should be moved to a future release or if the release should be held off until the issues are resolved.
 
-3.  Distribute the release
-    *  Publish to the package manager. Once you have permission to publish on npm, you can run `npm publish . --otp YOUR_OTP_CODE`.
-    *  Create a GitHub Release with release notes. Release notes should mention contributors (@-mentions) and issues/PRs (#-mentions) for the release.
-    *  Example release: https://github.com/slackapi/bolt/releases/tag/%40slack%2Fbolt%401.5.0
+2. Make sure your local `main` branch has the latest changes.
 
-4.  (Slack Internal) Communicate the release internally. Include a link to the GitHub Release.
+3. Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`. (see [Versioning and Tags](https://github.com/slackapi/node-slack-sdk/blob/main/.github/maintainers_guide.md#versioning-and-tags))
+    -  Update any dependency versions in `package.json` and install locally `rm -rf node_modules && npm install`
+    -  Confirm tests pass and code is free of linting errors by running `npm test`.
+    -  Make a single commit with a message, following the format in: ([Example](https://github.com/slackapi/bolt-js/pull/1133/commits/bcc421cd05b50ddcdeb806fcb27a38d7d9f8ede8)).
+    - Create a pull request for the version change ([Example](https://github.com/slackapi/bolt-js/pull/1133))
+    - Add appropriate labels on the PR, including `release`
+4. Once the PR has been approved and tests have passed, merged to main repository.
+    -  Update your local main branch: `git pull origin main`
+    -  Add a version tag (ie, `git tag @slack/bolt@3.6.0`)
+    -  Push the new tag up to origin: `git push --tags origin`
+5. Distribute the release
+    - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your passsword generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
+    - Run `npm publish . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password)
+6. Close Github Milestone
+    - Close the relevant GitHub Milestone(s) for the release(s)
+    - Move any unfinished, open issues to the next GitHub Milestone
+7. Create GitHub Release(s) with release notes
+    - From the repository, navigate to the **Releases** section and draft a new release
+    - Release notes should mention contributors, issues and PRs ([Example](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.6.0))
 
-5.  Announce on community.slack.com in #slack-api
+8. Communicate the release (as appropriate)
+    - **Internal**
+      - Include a brief description and link to the GitHub release
+    - **External**
+      - **community.slack.com**: Post updates in relevant channels (e.g. #lang-javascript, #tools-bolt)
+      - **Twitter**: Primarily for major updates. Coordinate with Developer Marketing.
+
 
 #### Beta Release
 
@@ -96,7 +112,7 @@ As a maintainer, the development you do will be almost entirely off of your fork
 
 ### Branches
 
-`main` is where active development occurs. 
+`main` is where active development occurs.
 
 When developing, branches should be created off of your fork and not directly off of this repository. If working on a long-running feature and in collaboration with others, a corresponding branch of the same name is permitted. This makes collaboration on a single branch possible, as contributors working on the same feature cannot push commits to others' open Pull Requests.
 

@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility, @typescript-eslint/strict-boolean-expressions */
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServer, Server, ServerOptions } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
-import express, { Request, Response, Application, RequestHandler, Router } from 'express';
+import express, { Request, Response, Application, RequestHandler, Router, IRouter } from 'express';
 import rawBody from 'raw-body';
 import querystring from 'querystring';
 import crypto from 'crypto';
@@ -11,9 +10,68 @@ import tsscmp from 'tsscmp';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
 import App from '../App';
-import { ReceiverAuthenticityError, ReceiverMultipleAckError, ReceiverInconsistentStateError } from '../errors';
+import {
+  ReceiverAuthenticityError,
+  ReceiverMultipleAckError,
+  ReceiverInconsistentStateError,
+  ErrorCode,
+  CodedError,
+} from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
+import { verifyRedirectOpts } from './verify-redirect-opts';
+
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+
+export const respondToSslCheck: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.ssl_check) {
+    res.send();
+    return;
+  }
+  next();
+};
+
+export const respondToUrlVerification: RequestHandler = (req, res, next) => {
+  if (req.body && req.body.type && req.body.type === 'url_verification') {
+    res.json({ challenge: req.body.challenge });
+    return;
+  }
+  next();
+};
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -22,25 +80,32 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-    | string
-    | {
-        [endpointType: string]: string;
-      };
+  | string
+  | {
+    [endpointType: string]: string;
+  };
+  signatureVerification?: boolean;
   processBeforeResponse?: boolean;
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: string;
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
+  app?: Application;
+  router?: IRouter;
 }
 
 // Additional Installer Options
 interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  stateVerification?: InstallProviderOptions['stateVerification']; // defaults true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
+  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
@@ -63,24 +128,32 @@ export default class ExpressReceiver implements Receiver {
 
   private processBeforeResponse: boolean;
 
-  public router: Router;
+  private signatureVerification: boolean;
+
+  public router: IRouter;
 
   public installer: InstallProvider | undefined = undefined;
 
-  constructor({
+  public installerOptions?: InstallerOptions;
+
+  public constructor({
     signingSecret = '',
     logger = undefined,
     logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
     processBeforeResponse = false,
+    signatureVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
+    app = undefined,
+    router = undefined,
   }: ExpressReceiverOptions) {
-    this.app = express();
+    this.app = app !== undefined ? app : express();
 
     if (typeof logger !== 'undefined') {
       this.logger = logger;
@@ -89,32 +162,33 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
-    if (typeof logger !== 'undefined') {
-      this.logger = logger;
-    } else {
-      this.logger = new ConsoleLogger();
-      this.logger.setLevel(logLevel);
-    }
-
+    this.signatureVerification = signatureVerification;
+    const bodyParser = this.signatureVerification ?
+      buildVerificationBodyParserMiddleware(this.logger, signingSecret) :
+      buildBodyParserMiddleware(this.logger);
     const expressMiddleware: RequestHandler[] = [
-      verifySignatureAndParseRawBody(this.logger, signingSecret),
+      bodyParser,
       respondToSslCheck,
       respondToUrlVerification,
       this.requestHandler.bind(this),
     ];
-
     this.processBeforeResponse = processBeforeResponse;
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
-    this.router = Router();
+    this.router = router !== undefined ? router : Router();
     endpointList.forEach((endpoint) => {
       this.router.post(endpoint, ...expressMiddleware);
     });
 
+    // Verify redirect options if supplied, throws coded error if invalid
+    verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
+
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-      (stateSecret !== undefined || installerOptions.stateStore !== undefined)
+       (installerOptions.stateVerification === false || // state store not needed
+         stateSecret !== undefined ||
+          installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -124,29 +198,54 @@ export default class ExpressReceiver implements Receiver {
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
         stateStore: installerOptions.stateStore,
-        authVersion: installerOptions.authVersion!,
+        stateVerification: installerOptions.stateVerification,
+        authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
       });
     }
-
+    // create install url options
+    const installUrlOptions = {
+      metadata: installerOptions.metadata,
+      scopes: scopes ?? [],
+      userScopes: installerOptions.userScopes,
+      redirectUri,
+    };
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
-      const redirectUriPath =
-        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
+        '/slack/oauth_redirect' :
+        installerOptions.redirectUriPath;
+      const { callbackOptions, stateVerification } = installerOptions;
       this.router.use(redirectUriPath, async (req, res) => {
-        await this.installer!.handleCallback(req, res, installerOptions.callbackOptions);
+        if (stateVerification === false) {
+          // when stateVerification is disabled pass install options directly to handler
+          // since they won't be encoded in the state param of the generated url
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await this.installer!.handleCallback(req, res, callbackOptions);
+        }
       });
 
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       this.router.get(installPath, async (_req, res, next) => {
         try {
-          const url = await this.installer!.generateInstallUrl({
-            metadata: installerOptions.metadata,
-            scopes: scopes!,
-            userScopes: installerOptions.userScopes,
-          });
-          res.send(renderHtmlForInstallPath(url));
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
+          if (installerOptions.directInstall) {
+            // If a Slack app sets "Direct Install URL" in the Slack app configuration,
+            // the installation flow of the app should start with the Slack authorize URL.
+            // See https://api.slack.com/start/distributing/directory#direct_install for more details.
+            res.redirect(url);
+          } else {
+            // The installation starts from a landing page served by this app.
+            const renderHtml = installerOptions.renderHtmlForInstallPath !== undefined ?
+              installerOptions.renderHtmlForInstallPath :
+              defaultRenderHtmlForInstallPath;
+            res.send(renderHtml(url));
+          }
         } catch (error) {
           next(error);
         }
@@ -164,7 +263,6 @@ export default class ExpressReceiver implements Receiver {
           'An incoming event was not acknowledged within 3 seconds. Ensure that the ack() argument is called in a listener.',
         );
       }
-      // tslint:disable-next-line: align
     }, 3001);
 
     let storedResponse;
@@ -207,6 +305,17 @@ export default class ExpressReceiver implements Receiver {
         this.logger.debug('stored response sent');
       }
     } catch (err) {
+      const e = err as any;
+      if ('code' in e) {
+        // CodedError has code: string
+        const errorCode = (err as CodedError).code;
+        if (errorCode === ErrorCode.AuthorizationError) {
+          // authorize function threw an exception, which means there is no valid installation data
+          res.status(401).send();
+          isAcknowledged = true;
+          return;
+        }
+      }
       res.status(500).send();
       throw err;
     }
@@ -229,7 +338,7 @@ export default class ExpressReceiver implements Receiver {
   ): Promise<Server | HTTPSServer> {
     let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
 
-    // Decide which kind of server, HTTP or HTTPS, by search for any keys in the serverOptions that are exclusive to HTTPS
+    // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
       createServerFn = createHttpsServer;
     }
@@ -274,7 +383,7 @@ export default class ExpressReceiver implements Receiver {
           return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
 
-        resolve(this.server);
+        return resolve(this.server);
       });
     });
   }
@@ -282,44 +391,35 @@ export default class ExpressReceiver implements Receiver {
   // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
   // generic types
   public stop(): Promise<void> {
+    if (this.server === undefined) {
+      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+    }
     return new Promise((resolve, reject) => {
-      if (this.server === undefined) {
-        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
-      }
-      this.server.close((error) => {
+      this.server?.close((error) => {
         if (error !== undefined) {
           return reject(error);
         }
 
         this.server = undefined;
-        resolve();
+        return resolve();
       });
     });
   }
 }
 
-export const respondToSslCheck: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.ssl_check) {
-    res.send();
-    return;
-  }
-  next();
-};
-
-export const respondToUrlVerification: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.type && req.body.type === 'url_verification') {
-    res.json({ challenge: req.body.challenge });
-    return;
-  }
-  next();
-};
+export function verifySignatureAndParseRawBody(
+  logger: Logger,
+  signingSecret: string | (() => PromiseLike<string>),
+): RequestHandler {
+  return buildVerificationBodyParserMiddleware(logger, signingSecret);
+}
 
 /**
  * This request handler has two responsibilities:
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-export function verifySignatureAndParseRawBody(
+function buildVerificationBodyParserMiddleware(
   logger: Logger,
   signingSecret: string | (() => PromiseLike<string>),
 ): RequestHandler {
@@ -363,8 +463,9 @@ export function verifySignatureAndParseRawBody(
 }
 
 function logError(logger: Logger, message: string, error: any): void {
-  const logMessage =
-    'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
+  const logMessage = 'code' in error ?
+    `${message} (code: ${error.code}, message: ${error.message})` :
+    `${message} (error: ${error})`;
   logger.warn(logMessage);
 }
 
@@ -406,7 +507,7 @@ function verifyRequestSignature(
  * - Verify the request signature
  * - Parse request.body and assign the successfully parsed object to it.
  */
-function verifySignatureAndParseBody(
+export function verifySignatureAndParseBody(
   signingSecret: string,
   body: string,
   headers: Record<string, any>,
@@ -423,6 +524,30 @@ function verifySignatureAndParseBody(
   return parseRequestBody(body, contentType);
 }
 
+function buildBodyParserMiddleware(logger: Logger): RequestHandler {
+  return async (req, res, next) => {
+    let stringBody: string;
+    // On some environments like GCP (Google Cloud Platform),
+    // req.body can be pre-parsed and be passed as req.rawBody here
+    const preparsedRawBody: any = (req as any).rawBody;
+    if (preparsedRawBody !== undefined) {
+      stringBody = preparsedRawBody.toString();
+    } else {
+      stringBody = (await rawBody(req)).toString();
+    }
+    try {
+      const { 'content-type': contentType } = req.headers;
+      req.body = parseRequestBody(stringBody, contentType);
+    } catch (error) {
+      if (error) {
+        logError(logger, 'Parsing request body failed', error);
+        return res.status(400).send();
+      }
+    }
+    return next();
+  };
+}
+
 function parseRequestBody(stringBody: string, contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
@@ -436,41 +561,3 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
   return JSON.parse(stringBody);
 }
-
-// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
-const httpsOptionKeys = [
-  'ALPNProtocols',
-  'clientCertEngine',
-  'enableTrace',
-  'handshakeTimeout',
-  'rejectUnauthorized',
-  'requestCert',
-  'sessionTimeout',
-  'SNICallback',
-  'ticketKeys',
-  'pskCallback',
-  'pskIdentityHint',
-
-  'ca',
-  'cert',
-  'sigalgs',
-  'ciphers',
-  'clientCertEngine',
-  'crl',
-  'dhparam',
-  'ecdhCurve',
-  'honorCipherOrder',
-  'key',
-  'privateKeyEngine',
-  'privateKeyIdentifier',
-  'maxVersion',
-  'minVersion',
-  'passphrase',
-  'pfx',
-  'secureOptions',
-  'secureProtocol',
-  'sessionIdContext',
-];
-
-const missingServerErrorDescription =
-  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';

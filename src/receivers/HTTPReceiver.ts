@@ -1,39 +1,85 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServer, Server, ServerOptions, RequestListener, IncomingMessage, ServerResponse } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
 import { parse as qsParse } from 'querystring';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
+import { URL } from 'url';
 
 import { verify as verifySlackAuthenticity, BufferedIncomingMessage } from './verify-request';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import { renderHtmlForInstallPath } from './render-html-for-install-path';
+import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import {
   ReceiverMultipleAckError,
   ReceiverInconsistentStateError,
   HTTPReceiverDeferredRequestError,
   ErrorCode,
+  CodedError,
 } from '../errors';
+import { CustomRoute, prepareRoutes, ReceiverRoutes } from './custom-routes';
+
+// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
+const httpsOptionKeys = [
+  'ALPNProtocols',
+  'clientCertEngine',
+  'enableTrace',
+  'handshakeTimeout',
+  'rejectUnauthorized',
+  'requestCert',
+  'sessionTimeout',
+  'SNICallback',
+  'ticketKeys',
+  'pskCallback',
+  'pskIdentityHint',
+  'ca',
+  'cert',
+  'sigalgs',
+  'ciphers',
+  'clientCertEngine',
+  'crl',
+  'dhparam',
+  'ecdhCurve',
+  'honorCipherOrder',
+  'key',
+  'privateKeyEngine',
+  'privateKeyIdentifier',
+  'maxVersion',
+  'minVersion',
+  'passphrase',
+  'pfx',
+  'secureOptions',
+  'secureProtocol',
+  'sessionIdContext',
+];
+
+const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 export interface HTTPReceiverOptions {
   signingSecret: string;
   endpoints?: string | string[];
+  customRoutes?: CustomRoute[];
   logger?: Logger;
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
+  signatureVerification?: boolean;
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
+  redirectUri?: string;
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
 }
-
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
+  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: (url: string) => string;
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
+  stateVerification?: InstallProviderOptions['stateVerification']; // default true
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   clientOptions?: InstallProviderOptions['clientOptions'];
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
@@ -48,9 +94,13 @@ export interface HTTPReceiverInstallerOptions {
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
 
+  private routes: ReceiverRoutes;
+
   private signingSecret: string;
 
   private processBeforeResponse: boolean;
+
+  private signatureVerification: boolean;
 
   private app?: App;
 
@@ -62,23 +112,32 @@ export default class HTTPReceiver implements Receiver {
 
   private installPath?: string; // always defined when installer is defined
 
+  private directInstall?: boolean; // always defined when installer is defined
+
+  private renderHtmlForInstallPath: (url: string) => string;
+
   private installRedirectUriPath?: string; // always defined when installer is defined
 
   private installUrlOptions?: InstallURLOptions; // always defined when installer is defined
 
   private installCallbackOptions?: CallbackOptions; // always defined when installer is defined
 
+  private stateVerification?: boolean; // always defined when installer is defined
+
   private logger: Logger;
 
-  constructor({
+  public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
+    customRoutes = [],
     logger = undefined,
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
+    signatureVerification = true,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
+    redirectUri = undefined,
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
@@ -86,20 +145,27 @@ export default class HTTPReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
-    this.logger =
-      logger ??
+    this.signatureVerification = signatureVerification;
+    this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
+    this.routes = prepareRoutes(customRoutes);
 
+    // Verify redirect options if supplied, throws coded error if invalid
+    verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
+
+    this.stateVerification = installerOptions.stateVerification;
     // Initialize InstallProvider when it's required options are provided
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-      (stateSecret !== undefined || installerOptions.stateStore !== undefined)
+       (this.stateVerification === false || // state store not needed
+         stateSecret !== undefined ||
+          installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -109,6 +175,7 @@ export default class HTTPReceiver implements Receiver {
         logger,
         logLevel,
         stateStore: installerOptions.stateStore,
+        stateVerification: installerOptions.stateVerification,
         authVersion: installerOptions.authVersion,
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
@@ -116,20 +183,25 @@ export default class HTTPReceiver implements Receiver {
 
       // Store the remaining instance variables that are related to using the InstallProvider
       this.installPath = installerOptions.installPath ?? '/slack/install';
+      this.directInstall = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
+      this.installCallbackOptions = installerOptions.callbackOptions ?? {};
       this.installUrlOptions = {
         scopes: scopes ?? [],
         userScopes: installerOptions.userScopes,
         metadata: installerOptions.metadata,
+        redirectUri,
       };
-      this.installCallbackOptions = installerOptions.callbackOptions ?? {};
     }
+    this.renderHtmlForInstallPath = installerOptions.renderHtmlForInstallPath !== undefined ?
+      installerOptions.renderHtmlForInstallPath :
+      defaultRenderHtmlForInstallPath;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
   }
 
-  public init(app: App) {
+  public init(app: App): void {
     this.app = app;
   }
 
@@ -161,13 +233,14 @@ export default class HTTPReceiver implements Receiver {
       try {
         this.requestListener(req, res);
       } catch (error) {
-        if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
-          this.logger.info('An unhandled request was ignored');
+        const e = error as any;
+        if (e.code === ErrorCode.HTTPReceiverDeferredRequestError) {
+          this.logger.info(`Unhandled HTTP request (${req.method}) made to ${req.url}`);
           res.writeHead(404);
           res.end();
         } else {
-          this.logger.error('An unexpected error was encountered');
-          this.logger.debug(`Error details: ${error}`);
+          this.logger.error(`An unexpected error occurred during a request (${req.method}) made to ${req.url}`);
+          this.logger.debug(`Error details: ${e}`);
           res.writeHead(500);
           res.end();
         }
@@ -206,7 +279,7 @@ export default class HTTPReceiver implements Receiver {
           return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
 
-        resolve(this.server);
+        return resolve(this.server);
       });
     });
   }
@@ -214,17 +287,17 @@ export default class HTTPReceiver implements Receiver {
   // TODO: the arguments should be defined as the arguments to close() (which happen to be none), but for sake of
   // generic types
   public stop(): Promise<void> {
+    if (this.server === undefined) {
+      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+    }
     return new Promise((resolve, reject) => {
-      if (this.server === undefined) {
-        return reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
-      }
-      this.server.close((error) => {
+      this.server?.close((error) => {
         if (error !== undefined) {
           return reject(error);
         }
 
         this.server = undefined;
-        resolve();
+        return resolve();
       });
     });
   }
@@ -235,6 +308,7 @@ export default class HTTPReceiver implements Receiver {
     // NOTE: the domain and scheme of the following URL object are not necessarily accurate. The URL object is only
     // meant to be used to parse the path and query
     const { pathname: path } = new URL(req.url as string, `http://${req.headers.host}`);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const method = req.method!.toUpperCase();
 
     if (this.endpoints.includes(path) && method === 'POST') {
@@ -244,21 +318,31 @@ export default class HTTPReceiver implements Receiver {
 
     if (this.installer !== undefined && method === 'GET') {
       // When installer is defined then installPath and installRedirectUriPath are always defined
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
 
+      // Visiting the installation endpoint
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
         return this.handleInstallPathRequest(res);
       }
+
+      // Installation has been initiated
       if (path === installRedirectUriPath) {
         // Handle OAuth callback request (to exchange authorization grant for a new access token)
         return this.handleInstallRedirectRequest(req, res);
       }
     }
 
+    // Handle custom routes
+    if (Object.keys(this.routes).length) {
+      const match = this.routes[path] && this.routes[path][method] !== undefined;
+      if (match) { return this.routes[path][method](req, res); }
+    }
+
     // If the request did not match the previous conditions, an error is thrown. The error can be caught by the
     // the caller in order to defer to other routing logic (similar to calling `next()` in connect middleware).
-    throw new HTTPReceiverDeferredRequestError('Unhandled HTTP request', req, res);
+    throw new HTTPReceiverDeferredRequestError(`Unhandled HTTP request (${method}) made to ${path}`, req, res);
   }
 
   private handleIncomingEvent(req: IncomingMessage, res: ServerResponse) {
@@ -269,9 +353,17 @@ export default class HTTPReceiver implements Receiver {
 
       // Verify authenticity
       try {
-        bufferedReq = await verifySlackAuthenticity({ signingSecret: this.signingSecret }, req);
+        bufferedReq = await verifySlackAuthenticity(
+          {
+            // If enabled: false, this method returns bufferredReq without verification
+            enabled: this.signatureVerification,
+            signingSecret: this.signingSecret,
+          },
+          req,
+        );
       } catch (err) {
-        this.logger.warn(`Request verification failed: ${err.message}`);
+        const e = err as any;
+        this.logger.warn(`Request verification failed: ${e.message}`);
         res.writeHead(401);
         res.end();
         return;
@@ -284,14 +376,14 @@ export default class HTTPReceiver implements Receiver {
       try {
         body = parseBody(bufferedReq);
       } catch (err) {
-        this.logger.warn(`Malformed request body: ${err.message}`);
+        const e = err as any;
+        this.logger.warn(`Malformed request body: ${e.message}`);
         res.writeHead(400);
         res.end();
         return;
       }
 
       // Handle SSL checks
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (body.ssl_check) {
         res.writeHead(200);
         res.end();
@@ -327,7 +419,6 @@ export default class HTTPReceiver implements Receiver {
           }
           isAcknowledged = true;
           if (this.processBeforeResponse) {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               storedResponse = '';
             } else {
@@ -335,7 +426,6 @@ export default class HTTPReceiver implements Receiver {
             }
             this.logger.debug('ack() response stored');
           } else {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!response) {
               res.writeHead(200);
               res.end();
@@ -365,8 +455,20 @@ export default class HTTPReceiver implements Receiver {
           this.logger.debug('stored response sent');
         }
       } catch (err) {
+        const e = err as any;
+        if ('code' in e) {
+          // CodedError has code: string
+          const errorCode = (e as CodedError).code;
+          if (errorCode === ErrorCode.AuthorizationError) {
+            // authorize function threw an exception, which means there is no valid installation data
+            res.writeHead(401);
+            res.end();
+            isAcknowledged = true;
+            return;
+          }
+        }
         this.logger.error('An unhandled error occurred while Bolt processed an event');
-        this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
+        this.logger.debug(`Error details: ${e}, storedResponse: ${storedResponse}`);
         res.writeHead(500);
         res.end();
       }
@@ -383,23 +485,33 @@ export default class HTTPReceiver implements Receiver {
       try {
         // This function is only called from within unboundRequestListener after checking that installer is defined, and
         // when installer is defined then installUrlOptions is always defined too.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const [installer, installUrlOptions] = [this.installer!, this.installUrlOptions!];
-
         // Generate the URL for the "Add to Slack" button.
-        const url = await installer.generateInstallUrl(installUrlOptions);
+        const url = await installer.generateInstallUrl(installUrlOptions, this.stateVerification);
 
-        // Generate HTML response body
-        const body = renderHtmlForInstallPath(url);
+        if (this.directInstall !== undefined && this.directInstall) {
+          // If a Slack app sets "Direct Install URL" in the Slack app configruation,
+          // the installation flow of the app should start with the Slack authorize URL.
+          // See https://api.slack.com/start/distributing/directory#direct_install for more details.
+          res.writeHead(302, { Location: url });
+          res.end('');
+        } else {
+          // The installation starts from a landing page served by this app.
+          // Generate HTML response body
+          const body = this.renderHtmlForInstallPath(url);
 
-        // Serve a basic HTML page including the "Add to Slack" button.
-        // Regarding headers:
-        // - Content-Type is usually automatically detected by browsers
-        // - Content-Length is not used because Transfer-Encoding='chunked' is automatically used.
-        res.writeHead(200);
-        res.end(body);
+          // Serve a basic HTML page including the "Add to Slack" button.
+          // Regarding headers:
+          // - Content-Type is usually automatically detected by browsers
+          // - Content-Length is not used because Transfer-Encoding='chunked' is automatically used.
+          res.writeHead(200);
+          res.end(body);
+        }
       } catch (err) {
+        const e = err as any;
         this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
-        this.logger.debug(`Error details: ${err}`);
+        this.logger.debug(`Error details: ${e}`);
       }
     })();
   }
@@ -407,14 +519,26 @@ export default class HTTPReceiver implements Receiver {
   private handleInstallRedirectRequest(req: IncomingMessage, res: ServerResponse) {
     // This function is only called from within unboundRequestListener after checking that installer is defined, and
     // when installer is defined then installCallbackOptions is always defined too.
-    const [installer, installCallbackOptions] = [this.installer!, this.installCallbackOptions!];
-
-    installer.handleCallback(req, res, installCallbackOptions).catch((err) => {
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
+    const [installer, installCallbackOptions, installUrlOptions] = [
+      this.installer!,
+      this.installCallbackOptions!,
+      this.installUrlOptions!,
+    ];
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
+    const errorHandler = (err: Error) => {
       this.logger.error(
         'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',
       );
       this.logger.debug(`Error details: ${err}`);
-    });
+    };
+    if (this.stateVerification === false) {
+      // when stateVerification is disabled pass install options directly to handler
+      // since they won't be encoded in the state param of the generated url
+      installer.handleCallback(req, res, installCallbackOptions, installUrlOptions).catch(errorHandler);
+    } else {
+      installer.handleCallback(req, res, installCallbackOptions).catch(errorHandler);
+    }
   }
 }
 
@@ -433,41 +557,3 @@ function parseBody(req: BufferedIncomingMessage) {
   }
   return JSON.parse(bodyAsString);
 }
-
-// Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
-const httpsOptionKeys = [
-  'ALPNProtocols',
-  'clientCertEngine',
-  'enableTrace',
-  'handshakeTimeout',
-  'rejectUnauthorized',
-  'requestCert',
-  'sessionTimeout',
-  'SNICallback',
-  'ticketKeys',
-  'pskCallback',
-  'pskIdentityHint',
-
-  'ca',
-  'cert',
-  'sigalgs',
-  'ciphers',
-  'clientCertEngine',
-  'crl',
-  'dhparam',
-  'ecdhCurve',
-  'honorCipherOrder',
-  'key',
-  'privateKeyEngine',
-  'privateKeyIdentifier',
-  'maxVersion',
-  'minVersion',
-  'passphrase',
-  'pfx',
-  'secureOptions',
-  'secureProtocol',
-  'sessionIdContext',
-];
-
-const missingServerErrorDescription =
-  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';

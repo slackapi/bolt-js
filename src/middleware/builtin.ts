@@ -13,9 +13,10 @@ import {
   SlackAction,
   SlackShortcut,
   SlashCommand,
-  ViewSubmitAction,
-  ViewClosedAction,
-  OptionsRequest,
+  SlackOptions,
+  BlockSuggestion,
+  InteractiveMessageSuggestion,
+  DialogSuggestion,
   InteractiveMessage,
   DialogSubmitAction,
   GlobalShortcut,
@@ -23,6 +24,7 @@ import {
   BlockElementAction,
   SlackViewAction,
   EventTypePattern,
+  ViewOutput,
 } from '../types';
 import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
@@ -37,14 +39,12 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
   }
 
   // It matches so we should continue down this middleware listener chain
-  // TODO: remove the non-null assertion operator
-  await next!();
+  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-// tslint:disable-next-line: max-line-length
 export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({
   shortcut,
   next,
@@ -55,8 +55,7 @@ export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackSho
   }
 
   // It matches so we should continue down this middleware listener chain
-  // TODO: remove the non-null assertion operator
-  await next!();
+  await next();
 };
 
 /**
@@ -69,22 +68,20 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
   }
 
   // It matches so we should continue down this middleware listener chain
-  // TODO: remove the non-null assertion operator
-  await next!();
+  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: OptionsRequest }> = async ({ options, next }) => {
+export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOptions }> = async ({ options, next }) => {
   // Filter out any non-options requests
   if (options === undefined) {
     return;
   }
 
   // It matches so we should continue down this middleware listener chain
-  // TODO: remove the non-null assertion operator
-  await next!();
+  await next();
 };
 
 /**
@@ -97,25 +94,20 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
   }
 
   // It matches so we should continue down this middleware listener chain
-  // TODO: remove the non-null assertion operator
-  await next!();
+  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewSubmitAction | ViewClosedAction }> = async ({
-  view,
-  next,
-}) => {
+export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async ({ view, next }) => {
   // Filter out anything that doesn't have a view
   if (view === undefined) {
     return;
   }
 
   // It matches so we should continue down this middleware listener chain
-  // TODO: remove the non-null assertion operator
-  await next!();
+  await next();
 };
 
 /**
@@ -202,8 +194,7 @@ export function matchConstraints(
       if (body.type !== constraints.type) return;
     }
 
-    // TODO: remove the non-null assertion operator
-    await next!();
+    await next();
   };
 }
 
@@ -235,8 +226,7 @@ export function matchMessage(
       }
     }
 
-    // TODO: remove the non-null assertion operator
-    await next!();
+    await next();
   };
 }
 
@@ -250,8 +240,7 @@ export function matchCommandName(pattern: string | RegExp): Middleware<SlackComm
       return;
     }
 
-    // TODO: remove the non-null assertion operator
-    await next!();
+    await next();
   };
 }
 
@@ -287,21 +276,12 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
       }
     }
 
-    // TODO: remove the non-null assertion operator
-    await next!();
+    await next();
   };
 }
 
 export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return async (args) => {
-    // When context does not have a botId in it, then this middleware cannot perform its job. Bail immediately.
-    if (args.context.botId === undefined) {
-      throw new ContextMissingPropertyError(
-        'botId',
-        'Cannot ignore events from the app without a bot ID. Ensure authorize callback returns a botId.',
-      );
-    }
-
     const botId = args.context.botId as string;
     const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
 
@@ -329,17 +309,14 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
     }
 
     // If all the previous checks didn't skip this message, then its okay to resume to next
-    // TODO: remove the non-null assertion operator
-    await args.next!();
+    await args.next();
   };
 }
 
 export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
-  // eslint-disable-line no-shadow
   return async ({ message, next }) => {
     if (message.subtype === subtype1) {
-      // TODO: remove the non-null assertion operator
-      await next!();
+      await next();
     }
   };
 }
@@ -375,18 +352,17 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       return;
     }
 
-    // TODO: remove the non-null assertion operator
-    await next!();
+    await next();
   };
 }
 
 function isBlockPayload(
   payload:
-    | SlackActionMiddlewareArgs['payload']
-    | SlackOptionsMiddlewareArgs['payload']
-    | SlackViewMiddlewareArgs['payload'],
-): payload is BlockElementAction | OptionsRequest<'block_suggestion'> {
-  return (payload as BlockElementAction | OptionsRequest<'block_suggestion'>).action_id !== undefined;
+  | SlackActionMiddlewareArgs['payload']
+  | SlackOptionsMiddlewareArgs['payload']
+  | SlackViewMiddlewareArgs['payload'],
+): payload is BlockElementAction | BlockSuggestion {
+  return (payload as BlockElementAction | BlockSuggestion).action_id !== undefined;
 }
 
 type CallbackIdentifiedBody =
@@ -394,7 +370,8 @@ type CallbackIdentifiedBody =
   | DialogSubmitAction
   | MessageShortcut
   | GlobalShortcut
-  | OptionsRequest<'interactive_message' | 'dialog_suggestion'>;
+  | InteractiveMessageSuggestion
+  | DialogSuggestion;
 
 function isCallbackIdentifiedBody(
   body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],

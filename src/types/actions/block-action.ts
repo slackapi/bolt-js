@@ -1,6 +1,6 @@
 import { PlainTextElement, Confirmation, Option } from '@slack/types';
 import { StringIndexed } from '../helpers';
-import { ViewOutput } from '../view';
+import { ViewOutput, ViewStateValue } from '../view';
 
 /**
  * All known actions from in Slack's interactive elements
@@ -230,9 +230,17 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     user?: string; // undocumented that this is optional, it won't be there for bot messages
     ts: string;
     text?: string; // undocumented that this is optional, but how could it exist on block kit based messages?
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
   view?: ViewOutput;
+  state?: {
+    values: {
+      [blockId: string]: {
+        [actionId: string]: ViewStateValue;
+      };
+    };
+  };
   token: string;
   response_url: string;
   trigger_id: string;
@@ -242,6 +250,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   container: StringIndexed;
 
   // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app_unfurl?: any;
 
   // exists for enterprise installs

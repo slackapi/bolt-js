@@ -1,5 +1,6 @@
-import { expectError } from 'tsd';
 import { App, InteractiveButtonClick } from '../';
+import { expectType } from 'tsd';
+import { ChatPostMessageResponse } from '@slack/web-api';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -11,8 +12,10 @@ app.action<InteractiveButtonClick>('my_callback_id', async ({ respond, say }) =>
   await respond({ delete_original: true });
 
   // Expect say to work with text
-  await say({ text: 'Some more text' });
+  const response = await say({ text: 'Some more text' });
+  expectType<ChatPostMessageResponse>(response);
 
+  // since web-api v6.2, this is not an error anymore
   // Expect an error when calling say without text
-  expectError(await say({ blocks: [] }));
+  // expectError(await say({ blocks: [] }));
 });

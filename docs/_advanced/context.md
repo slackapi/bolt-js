@@ -2,11 +2,11 @@
 title: Adding context
 lang: en
 slug: context
-order: 6
+order: 7
 ---
 
 <div class="section-content">
-All listeners have access to a `context` object, which can be used to enrich events with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
+All listeners have access to a `context` object, which can be used to enrich requests with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
 
 `context` is just an object, so you can add to it by setting it to a modified version of itself.
 </div>
@@ -25,7 +25,7 @@ async function addTimezoneContext({ payload, client, context, next }) {
   await next();
 }
 
-app.command('request', addTimezoneContext, async ({ command, ack, client, context }) => {
+app.command('/request', addTimezoneContext, async ({ command, ack, client, context }) => {
   // Acknowledge command request
   await ack();
   // Get local hour of request

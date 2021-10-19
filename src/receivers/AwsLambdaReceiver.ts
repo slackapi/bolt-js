@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import querystring from 'querystring';
 import crypto from 'crypto';
@@ -56,11 +57,10 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private logger: Logger;
 
-  constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
+  public constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
-    this.logger =
-      logger ??
+    this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -73,7 +73,6 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   public start(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ..._args: any[]
   ): Promise<AwsHandler> {
     return new Promise((resolve, reject) => {
@@ -88,10 +87,8 @@ export default class AwsLambdaReceiver implements Receiver {
 
   // eslint-disable-next-line class-methods-use-this
   public stop(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ..._args: any[]
   ): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return new Promise((resolve, _reject) => {
       resolve();
     });
@@ -100,16 +97,18 @@ export default class AwsLambdaReceiver implements Receiver {
   public toHandler(): AwsHandler {
     return async (
       awsEvent: AwsEvent,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _awsContext: any,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _awsCallback: AwsCallback,
     ): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
-      const rawBody: string = typeof awsEvent.body === 'undefined' || awsEvent.body == null ? '' : awsEvent.body;
+      const rawBody = this.getRawBody(awsEvent);
 
-      const body: any = this.parseRequestBody(rawBody, awsEvent.headers['Content-Type'], this.logger);
+      const body: any = this.parseRequestBody(
+        rawBody,
+        this.getHeaderValue(awsEvent.headers, 'Content-Type'),
+        this.logger,
+      );
 
       // ssl_check (for Slash Commands)
       if (
@@ -122,8 +121,8 @@ export default class AwsLambdaReceiver implements Receiver {
       }
 
       // request signature verification
-      const signature = awsEvent.headers['X-Slack-Signature'] as string;
-      const ts = Number(awsEvent.headers['X-Slack-Request-Timestamp']);
+      const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
+      const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
       if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
         return Promise.resolve({ statusCode: 401, body: '' });
       }
@@ -194,6 +193,17 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  private getRawBody(awsEvent: AwsEvent): string {
+    if (typeof awsEvent.body === 'undefined' || awsEvent.body == null) {
+      return '';
+    }
+    if (awsEvent.isBase64Encoded) {
+      return Buffer.from(awsEvent.body, 'base64').toString('ascii');
+    }
+    return awsEvent.body;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   private parseRequestBody(stringBody: string, contentType: string | undefined, logger: Logger): any {
     if (contentType === 'application/x-www-form-urlencoded') {
       const parsedBody = querystring.parse(stringBody);
@@ -242,5 +252,11 @@ export default class AwsLambdaReceiver implements Receiver {
     }
 
     return true;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private getHeaderValue(headers: Record<string, any>, key: string): string | undefined {
+    const caseInsensitiveKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
+    return caseInsensitiveKey !== undefined ? headers[caseInsensitiveKey] : undefined;
   }
 }

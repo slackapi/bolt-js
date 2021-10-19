@@ -35,9 +35,11 @@ const app = new App({
 })();
 ```
 
-> ⚙️ By default, Bolt listens to the `/slack/events` endpoint for *all* incoming requests (whether shortcuts, events, or actions payloads). When configuring Request URLs in your app configuration, they should all have `/slack/events` appended. The default behavior be modified using the constructor's `endpoints` parameter.
-
 ## Listening for events
+
+The Slack **Request URL** for a Bolt app must have the path set to `/slack/events`.  
+For example: `https://my-slack-app.example.com/slack/events`.  
+Otherwise, all incoming requests from Slack won't be handled.
 
 Apps typically react to a collection of incoming events, which can correspond [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
 request, there's a method to build a listener function.
@@ -100,7 +102,7 @@ In addition to the [`client` property passed to listeners](#making-things-happen
 
 ### Acknowledging events
 
-Some types of events need to be acknowledged in order to ensure a consistent user experience inside the Slack client (web, mobile, and desktop apps). This includes all action, shortcut, view, command, and options requests. Listeners for these events need to call the `ack()` function, which is passed in as an argument. 
+Some types of events need to be acknowledged in order to ensure a consistent user experience inside the Slack client (web, mobile, and desktop apps). This includes all action, shortcut, view, command, and options requests. Listeners for these events need to call the `ack()` function, which is passed in as an argument.
 
 In general, the Slack platform expects an acknowledgement within 3 seconds, so listeners should call this function as soon as possible.
 
@@ -114,7 +116,7 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 
 *  Legacy message button clicks, menu selections, and slash commands: Either call `ack()` with no parameters, a `string` to to update the message with a simple message, or an `object` to replace it with a complex message. Replacing the message to remove the interactive elements is a best practice for any action that should only be performed once.
 
-* Events API events **do not** need an `ack()` function since they are automatically acknowledged by your app. 
+* Events API events **do not** need an `ack()` function since they are automatically acknowledged by your app.
 
 ## Getting Help
 
@@ -124,3 +126,8 @@ If you otherwise get stuck, we're here to help. The following are the best ways 
 
   * [Issue Tracker](http://github.com/slackapi/bolt-js/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for JavaScript. Try searching for an existing issue before creating a new one.
   * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`
+## Contributing
+
+We welcome contributions from everyone! Please check out our
+[Contributor's Guide](.github/contributing.md) for how to contribute in a
+helpful and collaborative way.

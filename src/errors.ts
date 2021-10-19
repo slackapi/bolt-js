@@ -1,9 +1,13 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import type { BufferedIncomingMessage } from './receivers/verify-request';
 
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 export interface CodedError extends Error {
   code: string; // This can be a value from ErrorCode, or WebClient's ErrorCode, or a NodeJS error code
+  original?: Error; // AuthorizationError, UnknownError
+  originals?: Error[]; // MultipleListenerError
+  missingProperty?: string; // ContextMissingPropertyError
+  req?: IncomingMessage | BufferedIncomingMessage; // HTTPReceiverDeferredRequestError
+  res?: ServerResponse; // HTTPReceiverDeferredRequestError
 }
 
 export enum ErrorCode {
@@ -11,6 +15,8 @@ export enum ErrorCode {
   AuthorizationError = 'slack_bolt_authorization_error',
 
   ContextMissingPropertyError = 'slack_bolt_context_missing_property_error',
+
+  CustomRouteInitializationError = 'slack_bolt_custom_route_initialization_error',
 
   ReceiverMultipleAckError = 'slack_bolt_receiver_ack_multiple_error',
   ReceiverAuthenticityError = 'slack_bolt_receiver_authenticity_error',
@@ -27,6 +33,18 @@ export enum ErrorCode {
   UnknownError = 'slack_bolt_unknown_error',
 
   WorkflowStepInitializationError = 'slack_bolt_workflow_step_initialization_error',
+}
+
+export class UnknownError extends Error implements CodedError {
+  public code = ErrorCode.UnknownError;
+
+  public original: Error;
+
+  public constructor(original: Error) {
+    super(original.message);
+
+    this.original = original;
+  }
 }
 
 export function asCodedError(error: CodedError | Error): CodedError {
@@ -46,7 +64,7 @@ export class AuthorizationError extends Error implements CodedError {
 
   public original: Error;
 
-  constructor(message: string, original: Error) {
+  public constructor(message: string, original: Error) {
     super(message);
 
     this.original = original;
@@ -58,16 +76,20 @@ export class ContextMissingPropertyError extends Error implements CodedError {
 
   public missingProperty: string;
 
-  constructor(missingProperty: string, message: string) {
+  public constructor(missingProperty: string, message: string) {
     super(message);
     this.missingProperty = missingProperty;
   }
 }
 
+export class CustomRouteInitializationError extends Error implements CodedError {
+  public code = ErrorCode.CustomRouteInitializationError;
+}
+
 export class ReceiverMultipleAckError extends Error implements CodedError {
   public code = ErrorCode.ReceiverMultipleAckError;
 
-  constructor() {
+  public constructor() {
     super("The receiver's `ack` function was called multiple times.");
   }
 }
@@ -87,7 +109,7 @@ export class HTTPReceiverDeferredRequestError extends Error implements CodedErro
 
   public res: ServerResponse;
 
-  constructor(message: string, req: IncomingMessage | BufferedIncomingMessage, res: ServerResponse) {
+  public constructor(message: string, req: IncomingMessage | BufferedIncomingMessage, res: ServerResponse) {
     super(message);
     this.req = req;
     this.res = res;
@@ -99,24 +121,12 @@ export class MultipleListenerError extends Error implements CodedError {
 
   public originals: Error[];
 
-  constructor(originals: Error[]) {
+  public constructor(originals: Error[]) {
     super(
       'Multiple errors occurred while handling several listeners. The `originals` property contains an array of each error.',
     );
 
     this.originals = originals;
-  }
-}
-
-export class UnknownError extends Error implements CodedError {
-  public code = ErrorCode.UnknownError;
-
-  public original: Error;
-
-  constructor(original: Error) {
-    super(original.message);
-
-    this.original = original;
   }
 }
 

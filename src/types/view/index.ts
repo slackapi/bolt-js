@@ -25,7 +25,7 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
 interface PlainTextElementOutput {
   type: 'plain_text';
   text: string;
-  emoji: boolean;
+  emoji?: boolean;
 }
 
 /**

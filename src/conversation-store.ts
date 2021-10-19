@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Middleware, AnyMiddlewareArgs } from './types';
 import { getTypeAndConversation } from './helpers';
 
@@ -64,15 +65,15 @@ export function conversationContext<ConversationState = any>(
         context.conversation = await store.get(conversationId);
         logger.debug(`Conversation context loaded for ID: ${conversationId}`);
       } catch (error) {
-        if (error.messsage !== undefined && error.message !== 'Conversation not found') {
+        const e = error as any;
+        if (e.message !== undefined && e.message !== 'Conversation not found') {
           // The conversation data can be expired - error: Conversation expired
-          logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${error.message}`);
+          logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${e.message}`);
         }
       }
     } else {
       logger.debug('No conversation ID for incoming event');
     }
-    // TODO: remove the non-null assertion operator
-    await next!();
+    await next();
   };
 }
