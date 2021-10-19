@@ -6,9 +6,9 @@ order: 9
 ---
 
 <div class="section-content">
-`v3.7.0` から `App` を初期化する時、 `customRoutes` というルートの配列を渡し、カスタムHTTPルートを簡単に追加できます。
+`v3.7.0` から `App` を初期化する際に `customRoutes` というルートの配列を渡すことでカスタムの HTTP ルートを簡単に追加できるようになりました。
 
-各 `CustomRoute` オブジェクトには `path` 、 `method` と `handler` という三つのプロパティを必要とします。 HTTP 動詞に相当する `method` は文字列または文字列の配列です。
+各 `CustomRoute` オブジェクトには `path` 、 `method`、 `handler` という三つのプロパティが含まれていなければなりません。 HTTP メソッドに相当する `method` は文字列または文字列の配列です
 </div>
 
 ```javascript
