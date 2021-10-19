@@ -955,8 +955,8 @@ export default class App {
       // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
       // eslint-disable-next-line consistent-return
       return this.handleError({
-        error: e,
         context,
+        error: e,
         logger: this.logger,
         body: bodyArg,
       });
