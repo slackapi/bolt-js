@@ -5,10 +5,10 @@ import rewiremock from 'rewiremock';
 import { LogLevel } from '@slack/logger';
 import { WebClientOptions, WebClient } from '@slack/web-api';
 import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
-import { ErrorCode, UnknownError, AuthorizationError } from './errors';
+import { ErrorCode, UnknownError, AuthorizationError, CodedError } from './errors';
 import { Receiver, ReceiverEvent, SayFn, NextFn } from './types';
 import { ConversationStore } from './conversation-store';
-import App, { ViewConstraints } from './App';
+import App, { ExtendedErrorHandlerArgs, ViewConstraints } from './App';
 import { WorkflowStep } from './WorkflowStep';
 
 // Utility functions
@@ -575,19 +575,50 @@ describe('App', () => {
         assert(fakeErrorHandler.notCalled);
       });
 
-      it('should, on error call the global error handler', async () => {
+      it('should, on error, call the global error handler, not extended', async () => {
         const error = new Error('Everything is broke, you probably should restart, if not then good luck');
 
         app.use(() => {
           throw error;
         });
 
-        app.error(async (actualError) => {
-          assert.instanceOf(actualError, UnknownError);
-          assert.equal(actualError.message, error.message);
+        app.error(async (codedError: CodedError) => {
+          assert.instanceOf(codedError, UnknownError);
+          assert.equal(codedError.message, error.message);
         });
 
         await fakeReceiver.sendEvent(dummyReceiverEvent);
+      });
+
+      it('should, on error, call the global error handler, extended', async () => {
+        const error = new Error('Everything is broke, you probably should restart, if not then good luck');
+        // Need to change value of private property for testing purposes
+        // Accessing through bracket notation because it is private
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        app['extendedErrorHandler'] = true;
+
+        app.use(() => {
+          throw error;
+        });
+
+        app.error(async (args: ExtendedErrorHandlerArgs) => {
+          assert.property(args, 'error');
+          assert.property(args, 'body');
+          assert.property(args, 'context');
+          assert.property(args, 'logger');
+          assert.isDefined(args.error);
+          assert.isDefined(args.body);
+          assert.isDefined(args.context);
+          assert.isDefined(args.logger);
+          assert.equal(args.error.message, error.message);
+        });
+
+        await fakeReceiver.sendEvent(dummyReceiverEvent);
+
+        // Need to change value of private property for testing purposes
+        // Accessing through bracket notation because it is private
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        app['extendedErrorHandler'] = false;
       });
 
       it('with a default global error handler, rejects App#ProcessEvent', async () => {

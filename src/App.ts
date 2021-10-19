@@ -103,6 +103,7 @@ export interface AppOptions {
   socketMode?: boolean;
   developerMode?: boolean;
   tokenVerificationEnabled?: boolean;
+  extendedErrorHandler?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -153,8 +154,28 @@ export interface ViewConstraints {
   type?: 'view_closed' | 'view_submission';
 }
 
+// Passed internally to the handleError method
+interface AllErrorHandlerArgs {
+  error: Error; // Error is not necessarily a CodedError
+  logger: Logger;
+  body: AnyMiddlewareArgs['body'];
+  context: Context;
+}
+
+// Passed into the error handler when extendedErrorHandler is true
+export interface ExtendedErrorHandlerArgs extends AllErrorHandlerArgs {
+  error: CodedError; // asCodedError has been called
+}
+
 export interface ErrorHandler {
   (error: CodedError): Promise<void>;
+}
+
+export interface ExtendedErrorHandler {
+  (args: ExtendedErrorHandlerArgs): Promise<void>;
+}
+
+export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 }
 
 class WebClientPool {
@@ -201,7 +222,7 @@ export default class App {
   /** Listener middleware chains */
   private listeners: Middleware<AnyMiddlewareArgs>[][];
 
-  private errorHandler: ErrorHandler;
+  private errorHandler: AnyErrorHandler;
 
   private axios: AxiosInstance;
 
@@ -210,6 +231,10 @@ export default class App {
   private socketMode: boolean;
 
   private developerMode: boolean;
+
+  private extendedErrorHandler: boolean;
+
+  private hasCustomErrorHandler: boolean;
 
   public constructor({
     signingSecret = undefined,
@@ -240,6 +265,7 @@ export default class App {
     socketMode = undefined,
     developerMode = false,
     tokenVerificationEnabled = true,
+    extendedErrorHandler = false,
   }: AppOptions = {}) {
     // this.logLevel = logLevel;
     this.developerMode = developerMode;
@@ -267,7 +293,10 @@ export default class App {
     if (typeof this.logLevel !== 'undefined' && this.logger.getLevel() !== this.logLevel) {
       this.logger.setLevel(this.logLevel);
     }
-    this.errorHandler = defaultErrorHandler(this.logger);
+    // Error-related properties used to later determine args passed into the error handler
+    this.hasCustomErrorHandler = false;
+    this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
+    this.extendedErrorHandler = extendedErrorHandler;
 
     // Set up client options
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
@@ -669,8 +698,12 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public error(errorHandler: ErrorHandler): void {
+  // Error handler args dependent on extendedErrorHandler property
+  public error(errorHandler: ErrorHandler): void;
+  public error(errorHandler: ExtendedErrorHandler): void;
+  public error(errorHandler: AnyErrorHandler): void {
     this.errorHandler = errorHandler;
+    this.hasCustomErrorHandler = true;
   }
 
   /**
@@ -717,7 +750,12 @@ export default class App {
       e.code = ErrorCode.AuthorizationError;
       // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
       // eslint-disable-next-line consistent-return
-      return this.handleError(e);
+      return this.handleError({
+        error: e,
+        logger: this.logger,
+        body: bodyArg,
+        context: {},
+      });
     }
 
     // Try to set teamId from AuthorizeResult before using one from source
@@ -920,15 +958,24 @@ export default class App {
       const e = error as any;
       // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
       // eslint-disable-next-line consistent-return
-      return this.handleError(e);
+      return this.handleError({
+        context,
+        error: e,
+        logger: this.logger,
+        body: bodyArg,
+      });
     }
   }
 
   /**
    * Global error handler. The final destination for all errors (hopefully).
    */
-  private handleError(error: Error): Promise<void> {
-    return this.errorHandler(asCodedError(error));
+  private handleError(args: AllErrorHandlerArgs): Promise<void> {
+    const { error, ...rest } = args;
+
+    return this.extendedErrorHandler && this.hasCustomErrorHandler ?
+      this.errorHandler({ error: asCodedError(error), ...rest }) :
+      this.errorHandler(asCodedError(error));
   }
 }
 
