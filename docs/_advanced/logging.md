@@ -6,7 +6,7 @@ order: 8
 ---
 
 <div class="section-content">
-By default, Bolt for JavaScript will log information from your app to the console. You can customize how much logging occurs by passing a `logLevel` in the constructor. The available log levels in order of most to least logs are `DEBUG`, `INFO`, `WARN`, and `ERROR`. 
+By default, Bolt for JavaScript will log information from your app to the console. You can customize how much logging occurs by passing a `logLevel` in the constructor. The available log levels in order of most to least logs are `DEBUG`, `INFO`, `WARN`, and `ERROR`.
 </div>
 
 ```javascript
@@ -52,12 +52,13 @@ const app = new App({
   signingSecret,
   // Creating a logger as a literal object. It's more likely that you'd create a class.
   logger: {
-    debug(...msgs): { logWritable.write('debug: ' + JSON.stringify(msgs)); },
-    info(...msgs): { logWritable.write('info: ' + JSON.stringify(msgs)); },
-    warn(...msgs): { logWritable.write('warn: ' + JSON.stringify(msgs)); },
-    error(...msgs): { logWritable.write('error: ' + JSON.stringify(msgs)); },
-    setLevel(): { },
-    setName(): { },
+    debug: (...msgs) => { logWritable.write('debug: ' + JSON.stringify(msgs)); },
+    info: (...msgs) => { logWritable.write('info: ' + JSON.stringify(msgs)); },
+    warn: (...msgs) => { logWritable.write('warn: ' + JSON.stringify(msgs)); },
+    error: (...msgs) => { logWritable.write('error: ' + JSON.stringify(msgs)); },
+    setLevel: (level) => { },
+    getLevel: () => { },
+    setName: (name) => { },
   },
 });
 ```
