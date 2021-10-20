@@ -52,12 +52,13 @@ const app = new App({
   signingSecret,
   // リテラルオブジェクトとして logger を設定（必要なメソッドを持つクラスを指定するイメージで）
   logger: {
-    debug(...msgs): { logWritable.write('debug: ' + JSON.stringify(msgs)); },
-    info(...msgs): { logWritable.write('info: ' + JSON.stringify(msgs)); },
-    warn(...msgs): { logWritable.write('warn: ' + JSON.stringify(msgs)); },
-    error(...msgs): { logWritable.write('error: ' + JSON.stringify(msgs)); },
-    setLevel(): { },
-    setName(): { },
+    debug: (...msgs) => { logWritable.write('debug: ' + JSON.stringify(msgs)); },
+    info: (...msgs) => { logWritable.write('info: ' + JSON.stringify(msgs)); },
+    warn: (...msgs) => { logWritable.write('warn: ' + JSON.stringify(msgs)); },
+    error: (...msgs) => { logWritable.write('error: ' + JSON.stringify(msgs)); },
+    setLevel: (level) => { },
+    getLevel: () => { },
+    setName: (name) => { },
   },
 });
 ```
