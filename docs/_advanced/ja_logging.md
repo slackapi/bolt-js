@@ -2,7 +2,7 @@
 title: ログの表示
 lang: ja-jp
 slug: logging
-order: 7
+order: 8
 ---
 
 <div class="section-content">

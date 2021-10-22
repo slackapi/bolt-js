@@ -2,7 +2,7 @@
 title: 会話ストア
 lang: ja-jp
 slug: conversation-store
-order: 3
+order: 4
 ---
 
 <div class="section-content">
