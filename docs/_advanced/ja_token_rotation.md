@@ -6,11 +6,11 @@ order: 3
 ---
 
 <div class="section-content">
-Bolt for JavaScript `v3.5.0` から, [OAuth V2 RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4)で定義されているトークンローテーションはアクセストークンのセキュリティーをより一層強化します。
+Bolt for JavaScript [v3.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.5.0) から、アクセストークンのさらなるセキュリティ強化のレイヤーであるトークンローテーションの機能に対応しています。トークンローテーションは [OAuth V2 の RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4) で規定されているものです。
 
-トークンローテションを有効にすると既存のインストレーションを表す無期限のアクセストークンの有効期限は切れます。リフレッシュトークンはアクセストークンを再生成する長期的な方法として利用できます。
+既存の Slack アプリではアクセストークンが無期限に存在し続けるのに対して、トークンローテーションを有効にしたアプリではアクセストークンが失効するようになります。リフレッシュトークンを利用して、アクセストークンを長期間にわたって更新し続けることができます。
 
-組み込みの [OAuth 機能](https://slack.dev/bolt-js/ja-jp/concepts#authenticating-oauth)を使われている限り、Bolt for JavaScript は自動的にトークンローテーションをサポートします。
+[Bolt for JavaScript の組み込みの OAuth 機能](https://slack.dev/bolt-js/ja-jp/concepts#authenticating-oauth) を使用していれば、Bolt for JavaScript が自動的にトークンローテーションの処理をハンドリングします。
 
-トークンローテーションについてのより詳細な情報は [API ドキュメント](https://api.slack.com/authentication/rotation)を参照してください。
+トークンローテーションに関する詳細は [API ドキュメント](https://api.slack.com/authentication/rotation)を参照してください。
 </div>
