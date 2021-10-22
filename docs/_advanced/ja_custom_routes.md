@@ -2,7 +2,7 @@
 title: カスタム HTTP ルートの追加
 lang: ja-jp
 slug: custom-routes
-order: 9
+order: 10
 ---
 
 <div class="section-content">

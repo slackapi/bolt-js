@@ -2,7 +2,7 @@
 title: レシーバーのカスタマイズ
 lang: ja-jp
 slug: receiver
-order: 8
+order: 9
 ---
 
 <div class="section-content">
