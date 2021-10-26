@@ -168,6 +168,10 @@ export default class AwsLambdaReceiver implements Receiver {
             storedResponse = response;
           }
         },
+        retryNum: this.getHeaderValue(awsEvent.headers, 'X-Slack-Retry-Num') as number | undefined,
+        retryReason: this.getHeaderValue(awsEvent.headers, 'X-Slack-Retry-Reason'),
+        // TODO
+        customProperties: {},
       };
 
       // Send the event to the app for processing

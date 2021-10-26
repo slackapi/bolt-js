@@ -7,6 +7,7 @@ import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
+import { StringIndexed } from '../types/helpers';
 import { prepareRoutes, ReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
@@ -24,6 +25,7 @@ export interface SocketModeReceiverOptions {
   installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
   customRoutes?: CustomRoute[];
+  customPropertiesExtractor?: (request: any) => StringIndexed;
 }
 
 export interface CustomRoute {
@@ -76,6 +78,7 @@ export default class SocketModeReceiver implements Receiver {
     scopes = undefined,
     installerOptions = {},
     customRoutes = [],
+    customPropertiesExtractor = (_req) => ({}),
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
@@ -207,6 +210,9 @@ export default class SocketModeReceiver implements Receiver {
       const event: ReceiverEvent = {
         body,
         ack,
+        retryNum: body.retry_attempt,
+        retryReason: body.retry_reason,
+        customProperties: customPropertiesExtractor(body),
       };
       await this.app?.processEvent(event);
     });

@@ -20,6 +20,8 @@ import {
   CodedError,
 } from '../errors';
 import { CustomRoute, prepareRoutes, ReceiverRoutes } from './custom-routes';
+import { StringIndexed } from '../types/helpers';
+import { extractRetryNum, extractRetryReason } from './http-utils';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -72,6 +74,7 @@ export interface HTTPReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
+  customPropertiesExtractor?: (request: BufferedIncomingMessage) => StringIndexed;
 }
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
@@ -126,6 +129,8 @@ export default class HTTPReceiver implements Receiver {
 
   private logger: Logger;
 
+  private customPropertiesExtractor: (request: BufferedIncomingMessage) => StringIndexed;
+
   public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
@@ -141,6 +146,7 @@ export default class HTTPReceiver implements Receiver {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
+    customPropertiesExtractor = () => ({}),
   }: HTTPReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
@@ -196,6 +202,7 @@ export default class HTTPReceiver implements Receiver {
     this.renderHtmlForInstallPath = installerOptions.renderHtmlForInstallPath !== undefined ?
       installerOptions.renderHtmlForInstallPath :
       defaultRenderHtmlForInstallPath;
+    this.customPropertiesExtractor = customPropertiesExtractor;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
@@ -439,6 +446,9 @@ export default class HTTPReceiver implements Receiver {
             this.logger.debug('ack() response sent');
           }
         },
+        retryNum: extractRetryNum(req),
+        retryReason: extractRetryReason(req),
+        customProperties: this.customPropertiesExtractor(bufferedReq),
       };
 
       // Send the event to the app for processing

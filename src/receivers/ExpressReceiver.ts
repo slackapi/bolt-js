@@ -20,6 +20,8 @@ import {
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import { StringIndexed } from '../types/helpers';
+import { extractRetryNum, extractRetryReason } from './http-utils';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -95,6 +97,7 @@ export interface ExpressReceiverOptions {
   installerOptions?: InstallerOptions;
   app?: Application;
   router?: IRouter;
+  customPropertiesExtractor?: (request: Request) => StringIndexed;
 }
 
 // Additional Installer Options
@@ -136,6 +139,8 @@ export default class ExpressReceiver implements Receiver {
 
   public installerOptions?: InstallerOptions;
 
+  private customPropertiesExtractor: (request: Request) => StringIndexed;
+
   public constructor({
     signingSecret = '',
     logger = undefined,
@@ -152,6 +157,7 @@ export default class ExpressReceiver implements Receiver {
     installerOptions = {},
     app = undefined,
     router = undefined,
+    customPropertiesExtractor = () => ({}),
   }: ExpressReceiverOptions) {
     this.app = app !== undefined ? app : express();
 
@@ -179,6 +185,8 @@ export default class ExpressReceiver implements Receiver {
     endpointList.forEach((endpoint) => {
       this.router.post(endpoint, ...expressMiddleware);
     });
+
+    this.customPropertiesExtractor = customPropertiesExtractor;
 
     // Verify redirect options if supplied, throws coded error if invalid
     verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
@@ -292,6 +300,9 @@ export default class ExpressReceiver implements Receiver {
           this.logger.debug('ack() response sent');
         }
       },
+      retryNum: extractRetryNum(req),
+      retryReason: extractRetryReason(req),
+      customProperties: this.customPropertiesExtractor(req),
     };
 
     try {

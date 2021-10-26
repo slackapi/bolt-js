@@ -64,6 +64,26 @@ export interface Context extends StringIndexed {
    * Enterprise Grid Organization ID.
    */
   enterpriseId?: string;
+
+  /**
+   * Retry count of an Events API request (this property does not exist for other requests)
+   */
+  retryNum?: number;
+  /**
+   * Retry reason of an Events API request (this property does not exist for other requests)
+   */
+  retryReason?: string;
 }
+
+export const contextBuiltinKeys: string[] = [
+  'botToken',
+  'userToken',
+  'botId',
+  'botUserId',
+  'teamId',
+  'enterpriseId',
+  'retryNum',
+  'retryReason',
+];
 
 export type NextFn = () => Promise<void>;

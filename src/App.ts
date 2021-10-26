@@ -55,8 +55,9 @@ import {
   WorkflowStepEdit,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
-import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode } from './errors';
-import { AllMiddlewareArgs } from './types/middleware';
+import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
+import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
+import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
@@ -768,7 +769,20 @@ export default class App {
       authorizeResult.enterpriseId = source.enterpriseId;
     }
 
-    const context: Context = { ...authorizeResult };
+    if (typeof event.customProperties !== 'undefined') {
+      const customProps: StringIndexed = event.customProperties;
+      const builtinKeyDetected = contextBuiltinKeys.find((key) => key in customProps);
+      if (typeof builtinKeyDetected !== 'undefined') {
+        throw new InvalidCustomPropertyError('customProperties cannot have the same names with the built-in ones');
+      }
+    }
+
+    const context: Context = {
+      ...authorizeResult,
+      ...event.customProperties,
+      retryNum: event.retryNum,
+      retryReason: event.retryReason,
+    };
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
