@@ -28,10 +28,10 @@ const ws = new WorkflowStep('add_task', {
     };
 
     // もし全て OK なら
-    await complete({ outputs });
+    complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
 
     // もし何か問題が起きたら
-    // fail({ error: { message: "Just testing step failure!" } });
+    // fail({ error: { message: "Just testing step failure!" } }).then(() => { console.log('workflow step execution failure registered'); });
   },
 });
 ```
