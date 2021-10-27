@@ -27,12 +27,17 @@ const ws = new WorkflowStep('add_task', {
       taskDescription: inputs.taskDescription.value,
     };
 
-    // if everything was successful
-    // If you run your app with processBeforeResponse: true option,
-    // await complete() here is not recommended because of the slow response of the API endpoint
-    complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
+    // signal back to Slack that everything was successful
+    await complete({ outputs });
+    // NOTE: If you run your app with processBeforeResponse: true option,
+    // `await complete()` is not recommended because of the slow response of the API endpoint
+    // which could result in not responding to the Slack Events API within the required 3 seconds
+    // instead, use:
+    // complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
 
-    // if something went wrong
+    // let Slack know if something went wrong
+    // await fail({ error: { message: "Just testing step failure!" } });
+    // NOTE: If you run your app with processBeforeResponse: true, use this instead:
     // fail({ error: { message: "Just testing step failure!" } }).then(() => { console.log('workflow step execution failure registered'); });
   },
 });
