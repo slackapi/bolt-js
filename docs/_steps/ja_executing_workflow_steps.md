@@ -28,6 +28,8 @@ const ws = new WorkflowStep('add_task', {
     };
 
     // もし全て OK なら
+    // もし processBeforeResponse: true option を有効にしてアプリを動作させているなら
+    // 呼び出す API の応答が遅いため、ここでは await complete() はおすすめしません
     complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
 
     // もし何か問題が起きたら
