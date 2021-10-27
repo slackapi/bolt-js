@@ -28,6 +28,8 @@ const ws = new WorkflowStep('add_task', {
     };
 
     // if everything was successful
+    // If you run your app with processBeforeResponse: true option,
+    // await complete() here is not recommended because of the slow response of the API endpoint
     complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
 
     // if something went wrong
