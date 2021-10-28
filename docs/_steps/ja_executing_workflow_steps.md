@@ -28,8 +28,10 @@ const ws = new WorkflowStep('add_task', {
     };
 
     // もし全て OK なら
-    // もし processBeforeResponse: true option を有効にしてアプリを動作させているなら
-    // 呼び出す API の応答が遅いため、ここでは await complete() はおすすめしません
+    // ここでは await complete() はおすすめしません。呼び出す API の応答が遅いためです。
+    // これにより、3 秒以内に Slack のイベント API に応答することができなくなる場合があります。
+    // 代わりに以下のようにすることができます:
+    // complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
     complete({ outputs }).then(() => { console.log('workflow step execution complete registered'); });
 
     // もし何か問題が起きたら
