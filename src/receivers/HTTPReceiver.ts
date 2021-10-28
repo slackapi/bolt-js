@@ -146,7 +146,7 @@ export default class HTTPReceiver implements Receiver {
     installationStore = undefined,
     scopes = undefined,
     installerOptions = {},
-    customPropertiesExtractor = () => ({}),
+    customPropertiesExtractor = (_req) => ({}),
   }: HTTPReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;

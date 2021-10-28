@@ -25,7 +25,7 @@ export interface SocketModeReceiverOptions {
   installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
   customRoutes?: CustomRoute[];
-  customPropertiesExtractor?: (request: any) => StringIndexed;
+  customPropertiesExtractor?: (args: any) => StringIndexed;
 }
 
 export interface CustomRoute {
@@ -78,7 +78,7 @@ export default class SocketModeReceiver implements Receiver {
     scopes = undefined,
     installerOptions = {},
     customRoutes = [],
-    customPropertiesExtractor = (_req) => ({}),
+    customPropertiesExtractor = (_args) => ({}),
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
@@ -206,13 +206,14 @@ export default class SocketModeReceiver implements Receiver {
       server.listen(port);
     }
 
-    this.client.on('slack_event', async ({ ack, body }) => {
+    this.client.on('slack_event', async (args) => {
+      const { ack, body, retry_num, retry_reason } = args;
       const event: ReceiverEvent = {
         body,
         ack,
-        retryNum: body.retry_attempt,
-        retryReason: body.retry_reason,
-        customProperties: customPropertiesExtractor(body),
+        retryNum: retry_num,
+        retryReason: retry_reason,
+        customProperties: customPropertiesExtractor(args),
       };
       await this.app?.processEvent(event);
     });

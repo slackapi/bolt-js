@@ -157,7 +157,7 @@ export default class ExpressReceiver implements Receiver {
     installerOptions = {},
     app = undefined,
     router = undefined,
-    customPropertiesExtractor = () => ({}),
+    customPropertiesExtractor = (_req) => ({}),
   }: ExpressReceiverOptions) {
     this.app = app !== undefined ? app : express();
 

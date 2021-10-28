@@ -114,6 +114,7 @@ describe('HTTPReceiver', function () {
           authVersion: 'v2',
           userScopes: ['chat:write'],
         },
+        customPropertiesExtractor: (req) => ({ headers: req.headers }),
       });
       assert.isNotNull(receiver);
     });
