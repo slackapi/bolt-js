@@ -15,6 +15,7 @@ export enum ErrorCode {
   AuthorizationError = 'slack_bolt_authorization_error',
 
   ContextMissingPropertyError = 'slack_bolt_context_missing_property_error',
+  InvalidCustomPropertyError = 'slack_bolt_context_invalid_custom_property_error',
 
   CustomRouteInitializationError = 'slack_bolt_custom_route_initialization_error',
 
@@ -80,6 +81,10 @@ export class ContextMissingPropertyError extends Error implements CodedError {
     super(message);
     this.missingProperty = missingProperty;
   }
+}
+
+export class InvalidCustomPropertyError extends Error implements CodedError {
+  public code = ErrorCode.AppInitializationError;
 }
 
 export class CustomRouteInitializationError extends Error implements CodedError {

@@ -120,6 +120,21 @@ describe('SocketModeReceiver', function () {
       assert.isNotNull(receiver);
       assert.isOk(this.fakeServer.listen.calledWith(customPort));
     });
+    it('should allow for extracting additional values from Socket Mode messages', async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        customPropertiesExtractor: ({ type, body }) => ({ payload_type: type, body }),
+      });
+      assert.isNotNull(receiver);
+    });
     it('should throw an error if redirect uri options supplied invalid or incomplete', async function () {
       const overrides = mergeOverrides(
         withHttpCreateServer(this.fakeCreateServer),

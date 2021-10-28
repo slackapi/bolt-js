@@ -6,6 +6,7 @@ import tsscmp from 'tsscmp';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types/receiver';
 import { ReceiverMultipleAckError } from '../errors';
+import { StringIndexed } from '../types/helpers';
 
 export interface AwsEvent {
   body: string | null;
@@ -42,6 +43,7 @@ export interface AwsLambdaReceiverOptions {
   signingSecret: string;
   logger?: Logger;
   logLevel?: LogLevel;
+  customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
 }
 
 /*
@@ -57,7 +59,14 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private logger: Logger;
 
-  public constructor({ signingSecret, logger = undefined, logLevel = LogLevel.INFO }: AwsLambdaReceiverOptions) {
+  private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
+
+  public constructor({
+    signingSecret,
+    logger = undefined,
+    logLevel = LogLevel.INFO,
+    customPropertiesExtractor = (_) => ({}),
+  }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.logger = logger ??
@@ -66,6 +75,7 @@ export default class AwsLambdaReceiver implements Receiver {
         defaultLogger.setLevel(logLevel);
         return defaultLogger;
       })();
+    this.customPropertiesExtractor = customPropertiesExtractor;
   }
 
   public init(app: App): void {
@@ -168,6 +178,9 @@ export default class AwsLambdaReceiver implements Receiver {
             storedResponse = response;
           }
         },
+        retryNum: this.getHeaderValue(awsEvent.headers, 'X-Slack-Retry-Num') as number | undefined,
+        retryReason: this.getHeaderValue(awsEvent.headers, 'X-Slack-Retry-Reason'),
+        customProperties: this.customPropertiesExtractor(awsEvent),
       };
 
       // Send the event to the app for processing
