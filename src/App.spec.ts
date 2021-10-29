@@ -51,6 +51,82 @@ function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEv
 
 describe('App', () => {
   describe('constructor', () => {
+    describe('with a custom port value in HTTP Mode', () => {
+      const fakeBotId = 'B_FAKE_BOT_ID';
+      const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
+      const overrides = mergeOverrides(
+        withNoopAppMetadata(),
+        withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+      );
+      it('should accept a port value at the top-level', async () => {
+        // Arrange
+        const MockApp = await importApp(overrides);
+        // Act
+        const app = new MockApp({ token: '', signingSecret: '', port: 9999 });
+        // Assert
+        assert.equal((app as any).receiver.port, 9999);
+      });
+      it('should accept a port value under installerOptions', async () => {
+        // Arrange
+        const MockApp = await importApp(overrides);
+        // Act
+        const app = new MockApp({ token: '', signingSecret: '', port: 7777, installerOptions: { port: 9999 } });
+        // Assert
+        assert.equal((app as any).receiver.port, 9999);
+      });
+    });
+
+    describe('with a custom port value in Socket Mode', () => {
+      const fakeBotId = 'B_FAKE_BOT_ID';
+      const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
+      const installationStore = {
+        storeInstallation: async () => { },
+        fetchInstallation: async () => { throw new Error('Failed fetching installation'); },
+        deleteInstallation: async () => { },
+      };
+      const overrides = mergeOverrides(
+        withNoopAppMetadata(),
+        withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+      );
+      it('should accept a port value at the top-level', async () => {
+        // Arrange
+        const MockApp = await importApp(overrides);
+        // Act
+        const app = new MockApp({
+          socketMode: true,
+          appToken: '',
+          port: 9999,
+          clientId: '',
+          clientSecret: '',
+          stateSecret: '',
+          installerOptions: {
+          },
+          installationStore,
+        });
+        // Assert
+        assert.equal((app as any).receiver.httpServerPort, 9999);
+      });
+      it('should accept a port value under installerOptions', async () => {
+        // Arrange
+        const MockApp = await importApp(overrides);
+        // Act
+        const app = new MockApp({
+          socketMode: true,
+          appToken: '',
+          port: 7777,
+          clientId: '',
+          clientSecret: '',
+          stateSecret: '',
+          installerOptions: {
+            port: 9999,
+          },
+          installationStore,
+        });
+        // Assert
+        assert.equal((app as any).receiver.httpServerPort, 9999);
+      });
+    });
+
     // TODO: test when the single team authorization results fail. that should still succeed but warn. it also means
     // that the `ignoreSelf` middleware will fail (or maybe just warn) a bunch.
     describe('with successful single team authorization results', () => {

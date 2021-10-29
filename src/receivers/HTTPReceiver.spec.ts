@@ -119,6 +119,38 @@ describe('HTTPReceiver', function () {
       assert.isNotNull(receiver);
     });
 
+    it('should accept a custom port', async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const HTTPReceiver = await importHTTPReceiver(overrides);
+
+      const defaultPort = new HTTPReceiver({
+        signingSecret: 'secret',
+      });
+      assert.isNotNull(defaultPort);
+      assert.equal((defaultPort as any).port, 3000);
+
+      const customPort = new HTTPReceiver({
+        port: 9999,
+        signingSecret: 'secret',
+      });
+      assert.isNotNull(customPort);
+      assert.equal((customPort as any).port, 9999);
+
+      const customPort2 = new HTTPReceiver({
+        port: 7777,
+        signingSecret: 'secret',
+        installerOptions: {
+          port: 9999,
+        },
+      });
+      assert.isNotNull(customPort2);
+      assert.equal((customPort2 as any).port, 9999);
+    });
+
     it('should throw an error if redirect uri options supplied invalid or incomplete', async function () {
       const HTTPReceiver = await importHTTPReceiver();
       const clientId = 'my-clientId';

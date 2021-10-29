@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SocketModeClient } from '@slack/socket-mode';
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { createServer, IncomingMessage, ServerResponse, Server } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
@@ -48,7 +48,7 @@ interface InstallerOptions {
   userScopes?: InstallURLOptions['userScopes'];
   clientOptions?: InstallProviderOptions['clientOptions'];
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
-  port?: number; // used to create a server when doing OAuth
+  port?: number; // used to create a server when doing OAuth or serving custom routes
 }
 
 /**
@@ -63,6 +63,10 @@ export default class SocketModeReceiver implements Receiver {
   private logger: Logger;
 
   public installer: InstallProvider | undefined = undefined;
+
+  private httpServer?: Server;
+
+  private httpServerPort?: number;
 
   private routes: ReceiverRoutes;
 
@@ -127,9 +131,9 @@ export default class SocketModeReceiver implements Receiver {
       // use default or passed in installPath
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       const directInstallEnabled = installerOptions.directInstall !== undefined && installerOptions.directInstall;
-      const port = installerOptions.port === undefined ? 3000 : installerOptions.port;
+      this.httpServerPort = installerOptions.port === undefined ? 3000 : installerOptions.port;
 
-      const server = createServer(async (req, res) => {
+      this.httpServer = createServer(async (req, res) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const method = req.method!.toUpperCase();
 
@@ -196,14 +200,11 @@ export default class SocketModeReceiver implements Receiver {
         res.end();
       });
 
-      this.logger.debug(`Listening for HTTP requests on port ${port}`);
+      this.logger.debug(`Listening for HTTP requests on port ${this.httpServerPort}`);
 
       if (this.installer) {
-        this.logger.debug(`Go to http://localhost:${port}${installPath} to initiate OAuth flow`);
+        this.logger.debug(`Go to http://localhost:${this.httpServerPort}${installPath} to initiate OAuth flow`);
       }
-
-      // use port 3000 by default
-      server.listen(port);
     }
 
     this.client.on('slack_event', async (args) => {
@@ -224,11 +225,21 @@ export default class SocketModeReceiver implements Receiver {
   }
 
   public start(): Promise<AppsConnectionsOpenResponse> {
+    if (this.httpServer !== undefined) {
+      // This HTTP server is only for the OAuth flow support
+      this.httpServer.listen(this.httpServerPort);
+    }
     // start socket mode client
     return this.client.start();
   }
 
   public stop(): Promise<void> {
+    if (this.httpServer !== undefined) {
+      // This HTTP server is only for the OAuth flow support
+      this.httpServer.close((error) => {
+        this.logger.error(`Failed to shutdown the HTTP server for OAuth flow: ${error}`);
+      });
+    }
     return new Promise((resolve, reject) => {
       try {
         this.client.disconnect();

@@ -62,6 +62,7 @@ const missingServerErrorDescription = 'The receiver cannot be started because pr
 export interface HTTPReceiverOptions {
   signingSecret: string;
   endpoints?: string | string[];
+  port?: number; // if you pass another port number to #start() method, the argument will be used instead
   customRoutes?: CustomRoute[];
   logger?: Logger;
   logLevel?: LogLevel;
@@ -89,6 +90,9 @@ export interface HTTPReceiverInstallerOptions {
   metadata?: InstallURLOptions['metadata'];
   userScopes?: InstallURLOptions['userScopes'];
   callbackOptions?: CallbackOptions;
+  // This value exists here only for the compatibility with SocketModeReceiver.
+  // If you use only HTTPReceiver, the top-level is recommended.
+  port?: number;
 }
 
 /**
@@ -96,6 +100,8 @@ export interface HTTPReceiverInstallerOptions {
  */
 export default class HTTPReceiver implements Receiver {
   private endpoints: string[];
+
+  private port: number; // you can override this value by the #start() method argument
 
   private routes: ReceiverRoutes;
 
@@ -134,6 +140,7 @@ export default class HTTPReceiver implements Receiver {
   public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
+    port = 3000,
     customRoutes = [],
     logger = undefined,
     logLevel = LogLevel.INFO,
@@ -159,6 +166,7 @@ export default class HTTPReceiver implements Receiver {
         return defaultLogger;
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
+    this.port = installerOptions?.port ? installerOptions.port : port;
     this.routes = prepareRoutes(customRoutes);
 
     // Verify redirect options if supplied, throws coded error if invalid
@@ -281,7 +289,15 @@ export default class HTTPReceiver implements Receiver {
         this.server = undefined;
       });
 
-      this.server.listen(portOrListenOptions, () => {
+      let listenOptions: ListenOptions | number = this.port;
+      if (portOrListenOptions !== undefined) {
+        if (typeof portOrListenOptions === 'number') {
+          listenOptions = portOrListenOptions as number;
+        } else if (typeof portOrListenOptions === 'object') {
+          listenOptions = portOrListenOptions as ListenOptions;
+        }
+      }
+      this.server.listen(listenOptions, () => {
         if (this.server === undefined) {
           return reject(new ReceiverInconsistentStateError(missingServerErrorDescription));
         }
