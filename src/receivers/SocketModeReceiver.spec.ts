@@ -93,7 +93,8 @@ describe('SocketModeReceiver', function () {
         },
       });
       assert.isNotNull(receiver);
-      assert.isOk(this.fakeServer.listen.calledWith(3000));
+      // since v3.8, the constructor does not start the server
+      // assert.isNotOk(this.fakeServer.listen.calledWith(3000));
     });
     it('should allow for customizing port the socket listens on', async function () {
       // Arrange
@@ -118,7 +119,8 @@ describe('SocketModeReceiver', function () {
         },
       });
       assert.isNotNull(receiver);
-      assert.isOk(this.fakeServer.listen.calledWith(customPort));
+      // since v3.8, the constructor does not start the server
+      // assert.isOk(this.fakeServer.listen.calledWith(customPort));
     });
     it('should allow for extracting additional values from Socket Mode messages', async function () {
       // Arrange

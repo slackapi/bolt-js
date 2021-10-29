@@ -78,6 +78,7 @@ const tokenUsage = 'Apps used in one workspace should be initialized with a toke
 export interface AppOptions {
   signingSecret?: HTTPReceiverOptions['signingSecret'];
   endpoints?: HTTPReceiverOptions['endpoints'];
+  port?: HTTPReceiverOptions['port'];
   customRoutes?: HTTPReceiverOptions['customRoutes'];
   processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
   signatureVerification?: HTTPReceiverOptions['signatureVerification'];
@@ -240,6 +241,7 @@ export default class App {
   public constructor({
     signingSecret = undefined,
     endpoints = undefined,
+    port = undefined,
     customRoutes = undefined,
     agent = undefined,
     clientTls = undefined,
@@ -337,6 +339,11 @@ export default class App {
       clientOptions: this.clientOptions,
       ...installerOptions,
     };
+    if (socketMode && port !== undefined && this.installerOptions.port === undefined) {
+      // As SocketModeReceiver uses a custom port number to listen on only for the OAuth flow,
+      // only installerOptions.port is available in the constructor arguments.
+      this.installerOptions.port = port;
+    }
 
     if (
       this.developerMode &&
@@ -394,6 +401,7 @@ export default class App {
       this.receiver = new HTTPReceiver({
         signingSecret: signingSecret || '',
         endpoints,
+        port,
         customRoutes,
         processBeforeResponse,
         signatureVerification,
