@@ -180,6 +180,9 @@ export interface ExtendedErrorHandler {
 export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 }
 
+// Used only in this file
+type MessageEventMiddleware = Middleware<SlackEventMiddlewareArgs<'message'>>;
+
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
 
@@ -549,11 +552,10 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
   // TODO: maybe remove the first two overloads
-  public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]): void {
+  public message(...listeners: MessageEventMiddleware[]): void;
+  public message(pattern: string | RegExp, ...listeners: MessageEventMiddleware[]): void;
+  public message(...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware)[]): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
       if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
         return matchMessage(patternOrMiddleware);
