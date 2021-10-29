@@ -115,6 +115,26 @@ describe('HTTPReceiver', function () {
           userScopes: ['chat:write'],
         },
         customPropertiesExtractor: (req) => ({ headers: req.headers }),
+        dispatchErrorHandler: ({ error, logger, response }) => {
+          logger.error(`An unhandled request detected: ${error}`);
+          response.writeHead(500);
+          response.write('Something is wrong!');
+          response.end();
+        },
+        processEventErrorHandler: async ({ error, logger, response }) => {
+          logger.error(`processEvent error: ${error}`);
+          // acknowledge it anyway!
+          response.writeHead(200);
+          response.end();
+          return true;
+        },
+        unhandledRequestHandler: ({ logger, response }) => {
+          // acknowledge it anyway!
+          logger.info('Acknowledging this incoming request because 2 seconds already passed...');
+          response.writeHead(200);
+          response.end();
+        },
+        unhandledRequestTimeoutMillis: 2000, // the default is 3001
       });
       assert.isNotNull(receiver);
     });

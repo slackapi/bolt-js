@@ -9,7 +9,28 @@ const app = new App({
         "headers": req.headers,
         "foo": "bar",
       };
-    }
+    },
+    // other custom handlers
+    dispatchErrorHandler: ({ error, logger, response }) => {
+      logger.error(`dispatch error: ${error}`);
+      response.writeHead(404);
+      response.write("Something is wrong!");
+      response.end();
+    },
+    processEventErrorHandler: ({ error, logger, response }) => {
+      logger.error(`processEvent error: ${error}`);
+      // acknowledge it anyway!
+      response.writeHead(200);
+      response.end();
+      return true;
+    },
+    unhandledRequestHandler: async ({ logger, response }) => {
+      // acknowledge it anyway!
+      logger.info('Acknowledging this incoming request because 2 seconds already passed...');
+      response.writeHead(200);
+      response.end();
+    },
+    unhandledRequestTimeoutMillis: 2000, // the default is 3001
   }),
 });
 
