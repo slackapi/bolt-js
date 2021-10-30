@@ -116,7 +116,7 @@ export interface HTTPReceiverDispatchErrorHandlerArgs {
 // The default dispathErrorHandler implementation:
 // Developers can customize this behavior by passing dispatchErrorHandler to the constructor
 // Note that it was not possible to make this function async due to the limitation of http module
-function defaultDispatchErrorHandler(args: HTTPReceiverDispatchErrorHandlerArgs) {
+export function defaultDispatchErrorHandler(args: HTTPReceiverDispatchErrorHandlerArgs): void {
   const { error, logger, request, response } = args;
   if ('code' in error) {
     if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
@@ -144,7 +144,9 @@ export interface HTTPReceiverProcessEventErrorHandlerArgs {
 
 // The default processEventErrorHandler implementation:
 // Developers can customize this behavior by passing processEventErrorHandler to the constructor
-async function defaultProcessEventErrorHandler(args: HTTPReceiverProcessEventErrorHandlerArgs): Promise<boolean> {
+export async function defaultProcessEventErrorHandler(
+  args: HTTPReceiverProcessEventErrorHandlerArgs,
+): Promise<boolean> {
   const { error, response, logger, storedResponse } = args;
   if ('code' in error) {
     // CodedError has code: string
@@ -175,7 +177,7 @@ export interface HTTPReceiverUnhandledRequestHandlerArgs {
 // The default unhandledRequestHandler implementation:
 // Developers can customize this behavior by passing unhandledRequestHandler to the constructor
 // Note that this method cannot be an async function to align with the implementation using setTimeout
-function defaultUnhandledRequestHandler(args: HTTPReceiverUnhandledRequestHandlerArgs): void {
+export function defaultUnhandledRequestHandler(args: HTTPReceiverUnhandledRequestHandlerArgs): void {
   const { logger } = args;
   logger.error(
     'An incoming event was not acknowledged within 3 seconds. ' +
@@ -589,13 +591,18 @@ export default class HTTPReceiver implements Receiver {
           this.logger.debug('stored response sent');
         }
       } catch (error) {
-        isAcknowledged = await this.processEventErrorHandler({
+        const acknowledgedByHandler = await this.processEventErrorHandler({
           error: error as Error | CodedError,
           logger: this.logger,
           request: req,
           response: res,
           storedResponse,
         });
+        if (acknowledgedByHandler) {
+          // If the value is false, we don't touch the value as a race condition
+          // with ack() call may occur especially when processBeforeResponse: false
+          isAcknowledged = true;
+        }
       }
     })();
   }
