@@ -6,7 +6,12 @@ import { LogLevel } from '@slack/logger';
 import { WebClientOptions, WebClient } from '@slack/web-api';
 import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
 import { ErrorCode, UnknownError, AuthorizationError, CodedError } from './errors';
-import { Receiver, ReceiverEvent, SayFn, NextFn } from './types';
+import {
+  Receiver,
+  ReceiverEvent,
+  SayFn,
+  NextFn,
+} from './types';
 import { ConversationStore } from './conversation-store';
 import App, { ExtendedErrorHandlerArgs, ViewConstraints } from './App';
 import { WorkflowStep } from './WorkflowStep';
@@ -2137,6 +2142,218 @@ describe('App', () => {
 
           // Assert
           assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
+        });
+      });
+
+      describe('App#message', () => {
+        let fakeMiddleware1: sinon.SinonSpy<any[], any>;
+        let fakeMiddleware2: sinon.SinonSpy<any[], any>;
+        let fakeMiddlewares: sinon.SinonSpy<any[], any>[];
+        let passFilter: sinon.SinonSpy<any[], any>;
+        let failFilter: sinon.SinonSpy<any[], any>;
+        let MockApp: typeof import('./App').default;
+        let app: App;
+
+        const callNextMiddleware = () => async ({ next }: { next?: NextFn }) => {
+          if (next) {
+            await next();
+          }
+        };
+
+        const fakeMessageEvent = (receiver: FakeReceiver, message: string): Promise<void> => receiver.sendEvent({
+          body: {
+            type: 'event_callback',
+            event: {
+              type: 'message',
+              text: message,
+            },
+          },
+          ack: noop,
+        });
+
+        const controlledMiddleware = (shouldCallNext: boolean) => async ({ next }: { next?: NextFn }) => {
+          if (next && shouldCallNext) {
+            await next();
+          }
+        };
+
+        const assertMiddlewaresCalledOnce = () => {
+          assert(fakeMiddleware1.calledOnce);
+          assert(fakeMiddleware2.calledOnce);
+        };
+
+        const assertMiddlewaresCalledOrder = () => {
+          sinon.assert.callOrder(...fakeMiddlewares);
+        };
+
+        const assertMiddlewaresNotCalled = () => {
+          assert(fakeMiddleware1.notCalled);
+          assert(fakeMiddleware2.notCalled);
+        };
+
+        const message = 'val - pass-string - val';
+        const PASS_STRING = 'pass-string';
+        const PASS_PATTERN = /.*pass-string.*/;
+        const FAIL_STRING = 'fail-string';
+        const FAIL_PATTERN = /.*fail-string.*/;
+
+        beforeEach(async () => {
+          sinon.restore();
+          MockApp = await importApp();
+          app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+          fakeMiddleware1 = sinon.spy(callNextMiddleware());
+          fakeMiddleware2 = sinon.spy(callNextMiddleware());
+          fakeMiddlewares = [
+            fakeMiddleware1,
+            fakeMiddleware2,
+          ];
+
+          passFilter = sinon.spy(controlledMiddleware(true));
+          failFilter = sinon.spy(controlledMiddleware(false));
+        });
+
+        //  public message(...listeners: MessageEventMiddleware[]): void;
+        it('overload1 - should accept list of listeners and call each one', async () => {
+          // Act
+          app.message(...fakeMiddlewares);
+          await fakeMessageEvent(fakeReceiver, 'testing message');
+
+          // Assert
+          assertMiddlewaresCalledOnce();
+        });
+
+        it('overload1 - should not call second listener if first does not pass', async () => {
+          // Act
+          app.message(controlledMiddleware(false), fakeMiddleware1);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assert(fakeMiddleware1.notCalled);
+        });
+
+        // public message(pattern: string | RegExp, ...listeners: MessageEventMiddleware[]): void;
+        it('overload2 - should call listeners if message contains string', async () => {
+          // Act
+          app.message(PASS_STRING, ...fakeMiddlewares);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresCalledOnce();
+          assertMiddlewaresCalledOrder();
+        });
+
+        it('overload2 - should not call listeners if message does not contain string', async () => {
+          // Act
+          app.message(FAIL_STRING, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
+        });
+
+        it('overload2 - should call listeners if message matches pattern', async () => {
+          // Act
+          app.message(PASS_PATTERN, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresCalledOnce();
+          assertMiddlewaresCalledOrder();
+        });
+
+        it('overload2 - should not call listeners if message does not match pattern', async () => {
+          // Act
+          app.message(FAIL_PATTERN, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
+        });
+
+        it('overload3 - should call listeners if filter and string match', async () => {
+          // Act
+          app.message(passFilter, PASS_STRING, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresCalledOnce();
+          assertMiddlewaresCalledOrder();
+        });
+
+        it('overload3 - should not call listeners if filter does not pass', async () => {
+          // Act
+          app.message(failFilter, PASS_STRING, ...fakeMiddlewares);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
+        });
+
+        it('overload3 - should not call listeners if string does not match', async () => {
+          // Act
+          app.message(passFilter, FAIL_STRING, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
+        });
+
+        it('overload3 - should not call listeners if message does not match pattern', async () => {
+          // Act
+          app.message(passFilter, FAIL_PATTERN, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
+        });
+
+        it('overload4 - should call listeners if filter passes', async () => {
+          // Act
+          app.message(passFilter, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresCalledOrder();
+          assertMiddlewaresCalledOnce();
+        });
+
+        it('overload4 - should not call listeners if filter fails', async () => {
+          // Act
+          app.message(failFilter, fakeMiddleware1, fakeMiddleware2);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
+        });
+
+        it('should accept multiple strings', async () => {
+          // Act
+          app.message(PASS_STRING, '- val', ...fakeMiddlewares);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresCalledOnce();
+          assertMiddlewaresCalledOrder();
+        });
+
+        it('should accept string and pattern', async () => {
+          // Act
+          app.message(PASS_STRING, PASS_PATTERN, ...fakeMiddlewares);
+          await fakeMessageEvent(fakeReceiver, message);
+          // Assert
+          assertMiddlewaresCalledOnce();
+          assertMiddlewaresCalledOrder();
+        });
+
+        it('should not call listeners after fail', async () => {
+          // Act
+          app.message(PASS_STRING, FAIL_PATTERN, ...fakeMiddlewares);
+          app.message(FAIL_STRING, PASS_PATTERN, ...fakeMiddlewares);
+          app.message(passFilter, failFilter, ...fakeMiddlewares);
+          await fakeMessageEvent(fakeReceiver, message);
+
+          // Assert
+          assertMiddlewaresNotCalled();
         });
       });
     });
