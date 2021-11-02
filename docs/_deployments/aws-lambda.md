@@ -154,7 +154,7 @@ Finally, at the bottom of your app, update the [source code that starts the HTTP
 ```javascript
 // Handle the Lambda function event
 module.exports.handler = async (event, context, callback) => {
-    const handler = await app.start();
+    const handler = await awsLambdaReceiver.start();
     return handler(event, context, callback);
 }
 ```
