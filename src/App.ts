@@ -180,6 +180,9 @@ export interface ExtendedErrorHandler {
 export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 }
 
+// Used only in this file
+type MessageEventMiddleware = Middleware<SlackEventMiddlewareArgs<'message'>>;
+
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
 
@@ -549,11 +552,44 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // TODO: just make a type alias for Middleware<SlackEventMiddlewareArgs<'message'>>
-  // TODO: maybe remove the first two overloads
-  public message(...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(pattern: string | RegExp, ...listeners: Middleware<SlackEventMiddlewareArgs<'message'>>[]): void;
-  public message(...patternsOrMiddleware: (string | RegExp | Middleware<SlackEventMiddlewareArgs<'message'>>)[]): void {
+  /**
+   *
+   * @param listeners Middlewares that process and react to a message event
+   */
+  public message(...listeners: MessageEventMiddleware[]): void;
+  /**
+   *
+   * @param pattern Used for filtering out messages that don't match.
+   * Strings match via {@link String.prototype.includes}.
+   * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
+   */
+  public message(pattern: string | RegExp, ...listeners: MessageEventMiddleware[]): void;
+  /**
+   *
+   * @param filter Middleware that can filter out messages. Generally this is done by returning before
+   * calling {@link AllMiddlewareArgs.next} if there is no match. See {@link directMention} for an example.
+   * @param pattern Used for filtering out messages that don't match the pattern. Strings match
+   * via {@link String.prototype.includes}.
+   * @param listeners Middlewares that process and react to the message events that matched the provided pattern.
+   */
+  public message(
+    filter: MessageEventMiddleware, pattern: string | RegExp, ...listeners: MessageEventMiddleware[]
+  ): void;
+  /**
+   *
+   * @param filter Middleware that can filter out messages. Generally this is done by returning before calling
+   * {@link AllMiddlewareArgs.next} if there is no match. See {@link directMention} for an example.
+   * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
+   */
+  public message(filter: MessageEventMiddleware, ...listeners: MessageEventMiddleware[]): void;
+  /**
+   * This allows for further control of the filtering and response logic. Patterns and middlewares are processed in
+   * the order provided. If any patterns do not match, or a middleware does not call {@link AllMiddlewareArgs.next},
+   * all remaining patterns and middlewares will be skipped.
+   * @param patternsOrMiddleware A mix of patterns and/or middlewares.
+   */
+  public message(...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware)[]): void;
+  public message(...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware)[]): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
       if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
         return matchMessage(patternOrMiddleware);
