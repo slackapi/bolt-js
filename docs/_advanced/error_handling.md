@@ -26,7 +26,7 @@ app.error((error) => {
 <div class="secondary-content" markdown="0">
 There may be cases where you need to log additional data from a request in the global error handler. Or you may simply wish to have access to the `logger` you've passed into Bolt. 
 
-When passing `extendedErrorHandler: true` to the constructor, the error handler will receive an object with `error`, `logger`, `context`, and the `body` of the request.    
+Starting with version 3.8.0, when passing `extendedErrorHandler: true` to the constructor, the error handler will receive an object with `error`, `logger`, `context`, and the `body` of the request.    
 
 It is recommended to check whether a property exists on the `context` or `body` objects before accessing its value, as the data available in the `body` object differs from event to event, and because errors can happen at any point in a request's lifecycle (i.e. before a certain property of `context` has been set).    
 </div>
