@@ -7,7 +7,13 @@ import { EventEmitter } from 'events';
 import { InstallProvider } from '@slack/oauth';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Override, mergeOverrides } from '../test-helpers';
-import { AppInitializationError, CustomRouteInitializationError, HTTPReceiverDeferredRequestError } from '../errors';
+import {
+  AppInitializationError,
+  CustomRouteInitializationError,
+  HTTPReceiverDeferredRequestError,
+  CodedError,
+} from '../errors';
+import { defaultDispatchErrorHandler, defaultProcessEventErrorHandler, defaultUnhandledRequestHandler } from './HTTPReceiver';
 
 /* Testing Harness */
 
@@ -115,6 +121,26 @@ describe('HTTPReceiver', function () {
           userScopes: ['chat:write'],
         },
         customPropertiesExtractor: (req) => ({ headers: req.headers }),
+        dispatchErrorHandler: ({ error, logger, response }) => {
+          logger.error(`An unhandled request detected: ${error}`);
+          response.writeHead(500);
+          response.write('Something is wrong!');
+          response.end();
+        },
+        processEventErrorHandler: async ({ error, logger, response }) => {
+          logger.error(`processEvent error: ${error}`);
+          // acknowledge it anyway!
+          response.writeHead(200);
+          response.end();
+          return true;
+        },
+        unhandledRequestHandler: ({ logger, response }) => {
+          // acknowledge it anyway!
+          logger.info('Acknowledging this incoming request because 2 seconds already passed...');
+          response.writeHead(200);
+          response.end();
+        },
+        unhandledRequestTimeoutMillis: 2000, // the default is 3001
       });
       assert.isNotNull(receiver);
     });
@@ -526,6 +552,63 @@ describe('HTTPReceiver', function () {
       fakeRes.end = sinon.fake();
 
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+    });
+  });
+
+  describe('handlers for customization', async function () {
+    it('should have defaultDispatchErrorHandler', async function () {
+      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      fakeReq.url = '/nope';
+      fakeReq.headers = { host: 'localhost' };
+      fakeReq.method = 'GET';
+
+      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      fakeRes.writeHead = sinon.fake();
+      fakeRes.end = sinon.fake();
+
+      defaultDispatchErrorHandler({
+        error: { code: 'foo' } as CodedError,
+        logger: noopLogger,
+        request: fakeReq,
+        response: fakeRes,
+      });
+    });
+
+    it('should have defaultProcessEventErrorHandler', async function () {
+      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      fakeReq.url = '/nope';
+      fakeReq.headers = { host: 'localhost' };
+      fakeReq.method = 'GET';
+
+      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      fakeRes.writeHead = sinon.fake();
+      fakeRes.end = sinon.fake();
+
+      const result = await defaultProcessEventErrorHandler({
+        error: { code: 'foo' } as CodedError,
+        logger: noopLogger,
+        request: fakeReq,
+        response: fakeRes,
+        storedResponse: undefined,
+      });
+      assert.isFalse(result);
+    });
+
+    it('should have defaultUnhandledRequestHandler', async function () {
+      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      fakeReq.url = '/nope';
+      fakeReq.headers = { host: 'localhost' };
+      fakeReq.method = 'GET';
+
+      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      fakeRes.writeHead = sinon.fake();
+      fakeRes.end = sinon.fake();
+
+      defaultUnhandledRequestHandler({
+        logger: noopLogger,
+        request: fakeReq,
+        response: fakeRes,
+      });
     });
   });
 });

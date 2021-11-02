@@ -59,6 +59,7 @@ const httpsOptionKeys = [
 
 const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
+// All the available arguments in the constructor
 export interface HTTPReceiverOptions {
   signingSecret: string;
   endpoints?: string | string[];
@@ -76,7 +77,15 @@ export interface HTTPReceiverOptions {
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: HTTPReceiverInstallerOptions;
   customPropertiesExtractor?: (request: BufferedIncomingMessage) => StringIndexed;
+  // NOTE: As http.RequestListener is not an async function, this cannot be async
+  dispatchErrorHandler?: (args: HTTPReceiverDispatchErrorHandlerArgs) => void;
+  processEventErrorHandler?: (args: HTTPReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  // NOTE: As we use setTimeout under the hood, this cannot be async
+  unhandledRequestHandler?: (args: HTTPReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestTimeoutMillis?: number;
 }
+
+// All the available argument for OAuth flow enabled apps
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
@@ -93,6 +102,87 @@ export interface HTTPReceiverInstallerOptions {
   // This value exists here only for the compatibility with SocketModeReceiver.
   // If you use only HTTPReceiver, the top-level is recommended.
   port?: number;
+}
+
+// The arguments for the dispatchErrorHandler,
+// which handles errors occurred while dispatching a rqeuest
+export interface HTTPReceiverDispatchErrorHandlerArgs {
+  error: Error | CodedError;
+  logger: Logger;
+  request: IncomingMessage;
+  response: ServerResponse;
+}
+
+// The default dispathErrorHandler implementation:
+// Developers can customize this behavior by passing dispatchErrorHandler to the constructor
+// Note that it was not possible to make this function async due to the limitation of http module
+export function defaultDispatchErrorHandler(args: HTTPReceiverDispatchErrorHandlerArgs): void {
+  const { error, logger, request, response } = args;
+  if ('code' in error) {
+    if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
+      logger.info(`Unhandled HTTP request (${request.method}) made to ${request.url}`);
+      response.writeHead(404);
+      response.end();
+      return;
+    }
+  }
+  logger.error(`An unexpected error occurred during a request (${request.method}) made to ${request.url}`);
+  logger.debug(`Error details: ${error}`);
+  response.writeHead(500);
+  response.end();
+}
+
+// The arguments for the processEventErrorHandler,
+// which handles errors `await app.processEvent(even)` method throws
+export interface HTTPReceiverProcessEventErrorHandlerArgs {
+  error: Error | CodedError;
+  logger: Logger;
+  request: IncomingMessage;
+  response: ServerResponse;
+  storedResponse: any;
+}
+
+// The default processEventErrorHandler implementation:
+// Developers can customize this behavior by passing processEventErrorHandler to the constructor
+export async function defaultProcessEventErrorHandler(
+  args: HTTPReceiverProcessEventErrorHandlerArgs,
+): Promise<boolean> {
+  const { error, response, logger, storedResponse } = args;
+  if ('code' in error) {
+    // CodedError has code: string
+    const errorCode = (error as CodedError).code;
+    if (errorCode === ErrorCode.AuthorizationError) {
+      // authorize function threw an exception, which means there is no valid installation data
+      response.writeHead(401);
+      response.end();
+      return true;
+    }
+  }
+  logger.error('An unhandled error occurred while Bolt processed an event');
+  logger.debug(`Error details: ${error}, storedResponse: ${storedResponse}`);
+  response.writeHead(500);
+  response.end();
+  return false;
+}
+
+// The arguments for the unhandledRequestHandler,
+// which deals with any unhandled incoming requests from Slack.
+// (The default behavior is just printing error logs)
+export interface HTTPReceiverUnhandledRequestHandlerArgs {
+  logger: Logger;
+  request: IncomingMessage;
+  response: ServerResponse;
+}
+
+// The default unhandledRequestHandler implementation:
+// Developers can customize this behavior by passing unhandledRequestHandler to the constructor
+// Note that this method cannot be an async function to align with the implementation using setTimeout
+export function defaultUnhandledRequestHandler(args: HTTPReceiverUnhandledRequestHandlerArgs): void {
+  const { logger } = args;
+  logger.error(
+    'An incoming event was not acknowledged within 3 seconds. ' +
+      'Ensure that the ack() argument is called in a listener.',
+  );
 }
 
 /**
@@ -137,6 +227,14 @@ export default class HTTPReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: BufferedIncomingMessage) => StringIndexed;
 
+  private dispatchErrorHandler: (args: HTTPReceiverDispatchErrorHandlerArgs) => void;
+
+  private processEventErrorHandler: (args: HTTPReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+
+  private unhandledRequestHandler: (args: HTTPReceiverUnhandledRequestHandlerArgs) => void;
+
+  private unhandledRequestTimeoutMillis: number;
+
   public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
@@ -154,6 +252,10 @@ export default class HTTPReceiver implements Receiver {
     scopes = undefined,
     installerOptions = {},
     customPropertiesExtractor = (_req) => ({}),
+    dispatchErrorHandler = defaultDispatchErrorHandler,
+    processEventErrorHandler = defaultProcessEventErrorHandler,
+    unhandledRequestHandler = defaultUnhandledRequestHandler,
+    unhandledRequestTimeoutMillis = 3001,
   }: HTTPReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
@@ -211,6 +313,10 @@ export default class HTTPReceiver implements Receiver {
       installerOptions.renderHtmlForInstallPath :
       defaultRenderHtmlForInstallPath;
     this.customPropertiesExtractor = customPropertiesExtractor;
+    this.dispatchErrorHandler = dispatchErrorHandler;
+    this.processEventErrorHandler = processEventErrorHandler;
+    this.unhandledRequestHandler = unhandledRequestHandler;
+    this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
@@ -248,17 +354,14 @@ export default class HTTPReceiver implements Receiver {
       try {
         this.requestListener(req, res);
       } catch (error) {
-        const e = error as any;
-        if (e.code === ErrorCode.HTTPReceiverDeferredRequestError) {
-          this.logger.info(`Unhandled HTTP request (${req.method}) made to ${req.url}`);
-          res.writeHead(404);
-          res.end();
-        } else {
-          this.logger.error(`An unexpected error occurred during a request (${req.method}) made to ${req.url}`);
-          this.logger.debug(`Error details: ${e}`);
-          res.writeHead(500);
-          res.end();
-        }
+        // You may get an error here only when the requestListener failed
+        // to start processing incoming requests, or your app receives a request to an unexpected path.
+        this.dispatchErrorHandler({
+          error: error as Error | CodedError,
+          logger: this.logger,
+          request: req,
+          response: res,
+        });
       }
     });
 
@@ -365,6 +468,9 @@ export default class HTTPReceiver implements Receiver {
 
     // If the request did not match the previous conditions, an error is thrown. The error can be caught by the
     // the caller in order to defer to other routing logic (similar to calling `next()` in connect middleware).
+    // If you would like to customize the HTTP repsonse for this pattern,
+    // implement your own dispatchErrorHandler that handles an exception
+    // with ErrorCode.HTTPReceiverDeferredRequestError.
     throw new HTTPReceiverDeferredRequestError(`Unhandled HTTP request (${method}) made to ${path}`, req, res);
   }
 
@@ -424,12 +530,13 @@ export default class HTTPReceiver implements Receiver {
       let isAcknowledged = false;
       setTimeout(() => {
         if (!isAcknowledged) {
-          this.logger.error(
-            'An incoming event was not acknowledged within 3 seconds. ' +
-              'Ensure that the ack() argument is called in a listener.',
-          );
+          this.unhandledRequestHandler({
+            logger: this.logger,
+            request: req,
+            response: res,
+          });
         }
-      }, 3001);
+      }, this.unhandledRequestTimeoutMillis);
 
       // Structure the ReceiverEvent
       let storedResponse;
@@ -442,6 +549,8 @@ export default class HTTPReceiver implements Receiver {
           }
           isAcknowledged = true;
           if (this.processBeforeResponse) {
+            // In the case where processBeforeResponse: true is enabled, we don't send the HTTP response immediately.
+            // We hold off until the listener execution is completed.
             if (!response) {
               storedResponse = '';
             } else {
@@ -471,6 +580,7 @@ export default class HTTPReceiver implements Receiver {
       try {
         await this.app?.processEvent(event);
         if (storedResponse !== undefined) {
+          // in the case of processBeforeResponse: true
           if (typeof storedResponse === 'string') {
             res.writeHead(200);
             res.end(storedResponse);
@@ -480,23 +590,19 @@ export default class HTTPReceiver implements Receiver {
           }
           this.logger.debug('stored response sent');
         }
-      } catch (err) {
-        const e = err as any;
-        if ('code' in e) {
-          // CodedError has code: string
-          const errorCode = (e as CodedError).code;
-          if (errorCode === ErrorCode.AuthorizationError) {
-            // authorize function threw an exception, which means there is no valid installation data
-            res.writeHead(401);
-            res.end();
-            isAcknowledged = true;
-            return;
-          }
+      } catch (error) {
+        const acknowledgedByHandler = await this.processEventErrorHandler({
+          error: error as Error | CodedError,
+          logger: this.logger,
+          request: req,
+          response: res,
+          storedResponse,
+        });
+        if (acknowledgedByHandler) {
+          // If the value is false, we don't touch the value as a race condition
+          // with ack() call may occur especially when processBeforeResponse: false
+          isAcknowledged = true;
         }
-        this.logger.error('An unhandled error occurred while Bolt processed an event');
-        this.logger.debug(`Error details: ${e}, storedResponse: ${storedResponse}`);
-        res.writeHead(500);
-        res.end();
       }
     })();
   }
