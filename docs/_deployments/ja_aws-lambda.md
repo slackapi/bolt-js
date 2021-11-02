@@ -154,7 +154,7 @@ const app = new App({
 ```javascript
 // Lambda 関数のイベントを処理します
 module.exports.handler = async (event, context, callback) => {
-  const handler = await app.start();
+  const handler = await awsLambdaReceiver.start();
   return handler(event, context, callback);
 }
 ```
