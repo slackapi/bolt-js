@@ -65,6 +65,8 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     -  Push the new tag up to origin: `git push --tags origin`
 5. Distribute the release
     - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your passsword generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
+    - Before publishing a new version, run `rm -rf node_modules/ dist/` to clean your module dependencies in the project first (usually this is not required but in some cases, `npm publish` cannot include all the required files in a package) 
+    - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package are correct
     - Run `npm publish . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password)
 6. Close Github Milestone
     - Close the relevant GitHub Milestone(s) for the release(s)
