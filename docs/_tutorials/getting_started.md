@@ -12,20 +12,20 @@ redirect_from:
 
 <div class="section-content">
 This guide is meant to walk you through getting up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
-</div> 
+</div>
 
 When you’re finished, you’ll have this ⚡️[Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own.
 
 ---
 
 ### Create an app
-First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new). 
+First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new).
 
 > 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
 
 After you fill out an app name (_you can change it later_) and pick a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
 
-This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header. 
+This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header.
 
 ![Basic Information page](../assets/basic-information-page.png "Basic Information page")
 
@@ -34,10 +34,10 @@ Look around, add an app icon and description, and then let's start configuring y
 ---
 
 ### Tokens and installing apps
-Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods. 
+Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods.
 
-There are three main token types available to a Slack app: user (`xoxp`), bot (`xoxb`), and app (`xapp`) tokens. 
-- [User tokens](https://api.slack.com/authentication/token-types#user) allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. 
+There are three main token types available to a Slack app: user (`xoxp`), bot (`xoxb`), and app (`xapp`) tokens.
+- [User tokens](https://api.slack.com/authentication/token-types#user) allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace.
 - [Bot tokens](https://api.slack.com/authentication/token-types#bot) are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
 - [App-level tokens](https://api.slack.com/authentication/token-types#app) represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.
 
@@ -70,7 +70,7 @@ npm init
 
 You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
 
-Before we install the Bolt for JavaScript package to your new project, let's save the **bot token** and **Signing Secret** that were generated when you configured your app. 
+Before we install the Bolt for JavaScript package to your new project, let's save the **bot token** and **Signing Secret** that were generated when you configured your app.
 
 1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
 ```shell
@@ -116,24 +116,24 @@ Save your `app.js` file, then on the command line run the following:
 node app.js
 ```
 
-Your app should let you know that it's up and running. 🎉 
+Your app should let you know that it's up and running. 🎉
 
 ---
 
 ### Setting up events
-Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events. 
+Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.
 
-To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team. 
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team.
 
-> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue this setting up guide with HTTP, head over [here](/bolt-js/tutorial/getting-started-http#setting-up-events).  
+> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue this setting up guide with HTTP, head over [here](/bolt-js/tutorial/getting-started-http#setting-up-events).
 
 Okay, let's enable Socket Mode:
 
-1. Head to your app's configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable. 
+1. Head to your app's configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable.
 
-2. Go to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use that in just a moment. 
+2. Go to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use that in just a moment.
 
-Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**. 
+Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**.
 
 When an event occurs, Slack will send your app information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
 
@@ -176,7 +176,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: process.env.PORT || 3000 // socket mode doesn't listen on a port, but in case you want your app to respond to OAuth, you still need to listen on some port!
 });
 
 // Listens to incoming messages that contain "hello"
@@ -187,7 +188,7 @@ app.message('hello', async ({ message, say }) => {
 
 (async () => {
   // Start your app
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
@@ -201,11 +202,11 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ### Sending and responding to actions
 
-To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration. 
+To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration.
 
 > 💡 You'll notice that with Socket Mode on, basic interactivity is enabled for us by default, so no further action here is needed. If you're using HTTP, you'll need to supply a [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) for Slack to send events to.
 
-When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events. 
+When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events.
 
 Now, let’s go back to your app’s code and add logic to handle those events:
 - First, we'll send a message that contains an interactive component (in this case a button).
@@ -220,7 +221,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: process.env.PORT || 3000 // socket mode doesn't listen on a port, but in case you want your app to respond to OAuth, you still need to listen on some port!
 });
 
 // Listens to incoming messages that contain "hello"
@@ -250,7 +252,7 @@ app.message('hello', async ({ message, say }) => {
 
 (async () => {
   // Start your app
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
@@ -273,7 +275,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: process.env.PORT || 3000 // socket mode doesn't listen on a port, but in case you want your app to respond to OAuth, you still need to listen on some port!
 });
 
 // Listens to incoming messages that contain "hello"
@@ -309,7 +312,7 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 (async () => {
   // Start your app
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
@@ -330,4 +333,4 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Bolt allows you to [call Web API methods](/bolt-js/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only a bot (`xoxb`) token is required. For example of this, see [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only a bot (`xoxb`) token is required. For example of this, see [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http).
