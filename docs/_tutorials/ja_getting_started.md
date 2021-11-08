@@ -161,7 +161,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: process.env.PORT || 3000 // ソケットモードはポートでリッスンしませんが、アプリがOAuthに応答するようにしたい場合は、ポートでリッスンする必要があります。
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -172,7 +173,7 @@ app.message('hello', async ({ message, say }) => {
 
 (async () => {
   // アプリを起動します
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
@@ -205,7 +206,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: process.env.PORT || 3000 // ソケットモードはポートでリッスンしませんが、アプリがOAuthに応答するようにしたい場合は、ポートでリッスンする必要があります。
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -235,7 +237,7 @@ app.message('hello', async ({ message, say }) => {
 
 (async () => {
   // アプリを起動します
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
@@ -258,7 +260,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: process.env.PORT || 3000 // ソケットモードはポートでリッスンしませんが、アプリがOAuthに応答するようにしたい場合は、ポートでリッスンする必要があります。
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -294,7 +297,7 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 (async () => {
   // アプリを起動します
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
