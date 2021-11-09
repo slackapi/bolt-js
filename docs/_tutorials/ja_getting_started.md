@@ -209,7 +209,9 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
-  port: process.env.PORT || 3000 // ソケットモードはポートでリッスンしませんが、アプリがOAuthに応答するようにしたい場合は、ポートでリッスンする必要があります。
+  // ソケットモードではポートをリッスンしませんが、アプリを OAuth フローに対応させる場合、
+  // 何らかのポートをリッスンする必要があります
+  port: process.env.PORT || 3000
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -263,7 +265,9 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
-  port: process.env.PORT || 3000 // ソケットモードはポートでリッスンしませんが、アプリがOAuthに応答するようにしたい場合は、ポートでリッスンする必要があります。
+  // ソケットモードではポートをリッスンしませんが、アプリを OAuth フローに対応させる場合、
+  // 何らかのポートをリッスンする必要があります
+  port: process.env.PORT || 3000
 });
 
 // "hello" を含むメッセージをリッスンします
