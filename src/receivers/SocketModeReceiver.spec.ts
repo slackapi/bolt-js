@@ -468,6 +468,43 @@ describe('SocketModeReceiver', function () {
         assert(fakeRes.end.called);
       });
 
+      it('should call custom route handler when request matches path, ignoring query params', async function () {
+        // Arrange
+        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const overrides = mergeOverrides(
+          withHttpCreateServer(this.fakeCreateServer),
+          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        );
+        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+
+        const receiver = new SocketModeReceiver({
+          appToken: 'my-secret',
+          customRoutes,
+        });
+        assert.isNotNull(receiver);
+        receiver.installer = installProviderStub as unknown as InstallProvider;
+
+        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+
+        fakeReq.url = '/test?hello=world';
+        fakeReq.headers = { host: 'localhost' };
+
+        fakeReq.method = 'GET';
+        await this.listener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+        fakeReq.method = 'POST';
+        await this.listener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+        fakeReq.method = 'UNHANDLED_METHOD';
+        await this.listener(fakeReq, fakeRes);
+        assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
+        assert(fakeRes.end.called);
+      });
+
       it("should throw an error if customRoutes don't have the required keys", async function () {
         // Arrange
         const overrides = mergeOverrides(

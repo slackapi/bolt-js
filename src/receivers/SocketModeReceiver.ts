@@ -185,12 +185,13 @@ export default class SocketModeReceiver implements Receiver {
           }
         }
 
-        // Handle request for custom routes
+        // Handle request for custom routes, only match against the path
         if (customRoutes.length && req.url) {
-          const match = this.routes[req.url] && this.routes[req.url][method] !== undefined;
+          const [url] = req.url.split('?');
+          const match = this.routes[url] && this.routes[url][method] !== undefined;
 
           if (match) {
-            this.routes[req.url][method](req, res);
+            this.routes[url][method](req, res);
             return;
           }
         }
