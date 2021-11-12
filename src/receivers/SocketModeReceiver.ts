@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { URL } from 'url';
 import { SocketModeClient } from '@slack/socket-mode';
 import { createServer, IncomingMessage, ServerResponse, Server } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
@@ -185,13 +186,15 @@ export default class SocketModeReceiver implements Receiver {
           }
         }
 
-        // Handle request for custom routes, only match against the path
+        // Handle request for custom routes
         if (customRoutes.length && req.url) {
-          const [url] = req.url.split('?');
-          const match = this.routes[url] && this.routes[url][method] !== undefined;
+          // NOTE: the domain and scheme are irrelevant here.
+          // The URL object is only used to safely obtain the path to match
+          const { pathname: path } = new URL(req.url as string, 'http://localhost');
+          const match = this.routes[path] && this.routes[path][method] !== undefined;
 
           if (match) {
-            this.routes[url][method](req, res);
+            this.routes[path][method](req, res);
             return;
           }
         }
