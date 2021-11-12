@@ -264,7 +264,6 @@ describe('HTTPReceiver', function () {
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/hiya';
-        fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const writeHead = sinon.fake();
@@ -307,7 +306,6 @@ describe('HTTPReceiver', function () {
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/hiya';
-        fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const writeHead = sinon.fake();
@@ -352,7 +350,6 @@ describe('HTTPReceiver', function () {
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/hiya';
-        fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const writeHead = sinon.fake();
@@ -401,7 +398,6 @@ describe('HTTPReceiver', function () {
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/heyo';
-        fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const writeHead = sinon.fake();
@@ -456,7 +452,6 @@ describe('HTTPReceiver', function () {
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/heyo';
-        fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         fakeRes.writeHead = sinon.fake();
@@ -481,7 +476,32 @@ describe('HTTPReceiver', function () {
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
         fakeReq.url = '/test';
-        fakeReq.headers = { host: 'localhost' };
+
+        fakeReq.method = 'GET';
+        receiver.requestListener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+        fakeReq.method = 'UNHANDLED_METHOD';
+        assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+      });
+
+      it('should call custom route handler only if request matches route path and method, ignoring query params', async function () {
+        const HTTPReceiver = await importHTTPReceiver();
+        const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+        const receiver = new HTTPReceiver({
+          clientSecret: 'my-client-secret',
+          signingSecret: 'secret',
+          customRoutes,
+        });
+
+        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+        fakeReq.url = '/test?hello=world';
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
@@ -544,7 +564,6 @@ describe('HTTPReceiver', function () {
 
       const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
       fakeReq.url = '/nope';
-      fakeReq.headers = { host: 'localhost' };
       fakeReq.method = 'GET';
 
       const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
@@ -559,7 +578,6 @@ describe('HTTPReceiver', function () {
     it('should have defaultDispatchErrorHandler', async function () {
       const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
       fakeReq.url = '/nope';
-      fakeReq.headers = { host: 'localhost' };
       fakeReq.method = 'GET';
 
       const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
@@ -577,7 +595,6 @@ describe('HTTPReceiver', function () {
     it('should have defaultProcessEventErrorHandler', async function () {
       const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
       fakeReq.url = '/nope';
-      fakeReq.headers = { host: 'localhost' };
       fakeReq.method = 'GET';
 
       const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
@@ -597,7 +614,6 @@ describe('HTTPReceiver', function () {
     it('should have defaultUnhandledRequestHandler', async function () {
       const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
       fakeReq.url = '/nope';
-      fakeReq.headers = { host: 'localhost' };
       fakeReq.method = 'GET';
 
       const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
