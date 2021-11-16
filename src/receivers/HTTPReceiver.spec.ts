@@ -43,10 +43,11 @@ function withHttpsCreateServer(spy: SinonSpy): Override {
 class FakeServer extends EventEmitter {
   public on = sinon.fake();
 
-  public listen = sinon.fake(() => {
+  public listen = sinon.fake((_listenOptions: any, cb: any) => {
     if (this.listeningFailure !== undefined) {
       this.emit('error', this.listeningFailure);
     }
+    cb();
   });
 
   public close = sinon.fake((...args: any[]) => {
@@ -230,6 +231,28 @@ describe('HTTPReceiver', function () {
         redirectUri: 'http://example.com/hiya',
         installerOptions,
       }), AppInitializationError);
+    });
+  });
+  describe('start() method', function () {
+    it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const HTTPReceiver = await importHTTPReceiver(overrides);
+
+      const defaultPort = new HTTPReceiver({
+        signingSecret: 'secret',
+      });
+      assert.isNotNull(defaultPort);
+      assert.equal((defaultPort as any).port, 3000);
+      await defaultPort.start(9001);
+      assert.isTrue(this.fakeServer.listen.calledWith(9001));
+      await defaultPort.stop();
+      await defaultPort.start('1337');
+      assert.isTrue(this.fakeServer.listen.calledWith(1337));
+      await defaultPort.stop();
     });
   });
   describe('request handling', function () {

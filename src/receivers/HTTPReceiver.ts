@@ -327,13 +327,14 @@ export default class HTTPReceiver implements Receiver {
   }
 
   public start(port: number): Promise<Server>;
-  public start(portOrListenOptions: number | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
+  public start(port: string): Promise<Server>;
+  public start(portOrListenOptions: number | string | ListenOptions, serverOptions?: ServerOptions): Promise<Server>;
   public start(
-    portOrListenOptions: number | ListenOptions,
+    portOrListenOptions: number | string | ListenOptions,
     httpsServerOptions?: HTTPSServerOptions,
   ): Promise<HTTPSServer>;
   public start(
-    portOrListenOptions: number | ListenOptions,
+    portOrListenOptions: number | string | ListenOptions,
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
@@ -396,6 +397,8 @@ export default class HTTPReceiver implements Receiver {
       if (portOrListenOptions !== undefined) {
         if (typeof portOrListenOptions === 'number') {
           listenOptions = portOrListenOptions as number;
+        } else if (typeof portOrListenOptions === 'string') {
+          listenOptions = Number(portOrListenOptions) as number;
         } else if (typeof portOrListenOptions === 'object') {
           listenOptions = portOrListenOptions as ListenOptions;
         }
