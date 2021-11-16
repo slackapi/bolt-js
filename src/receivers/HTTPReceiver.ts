@@ -431,9 +431,9 @@ export default class HTTPReceiver implements Receiver {
   private unboundRequestListener(req: IncomingMessage, res: ServerResponse) {
     // Route the request
 
-    // NOTE: the domain and scheme of the following URL object are not necessarily accurate. The URL object is only
-    // meant to be used to parse the path and query
-    const { pathname: path } = new URL(req.url as string, `http://${req.headers.host}`);
+    // NOTE: the domain and scheme are irrelevant here.
+    // The URL object is only used to safely obtain the path to match
+    const { pathname: path } = new URL(req.url as string, 'http://localhost');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const method = req.method!.toUpperCase();
 
