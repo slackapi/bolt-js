@@ -1,5 +1,5 @@
 ---
-title: Listening for view changes
+title: Listening to views
 lang: en
 slug: view-submissions
 order: 12
@@ -7,8 +7,10 @@ order: 12
 
 <div class="section-content">
 
-If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to `view_submission` requests to receive their values.
-If the `notify_on_close` flag of a view is active, an respective event is sent when a view has been closed.
+You may listen for user interactions with views using the `view` method. 
+
+Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in [view](https://api.slack.com/reference/interaction-payloads/views) input blocks, you can access the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
+If the `notify_on_close` field of a view has been set to `true`, Slack will also send a `view_closed` event if a user clicks the close button. See the section on **Handling views on close** for more detail.
 To listen to either a `view_submission` request or `view_closed` event, you can use the built-in `view()` method.
 
 `view()` requires a `callback_id` of type `string` or `RegExp` or a constraint object with properties `type` and `callback_id`. 
@@ -74,17 +76,15 @@ app.view('view_b', async ({ ack, body, view, client }) => {
 
 ---
 
-##### handle view closed events
+##### Handling views on close
 
-The built-in `view()` method can also handle `view_closed` events, which are sent when a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> has the `notify_on_close` flag set.
-The event contains the respective `callback_id` of the closed view.
-Please note that you have to specify the `type: 'view_closed'` in the constraint object explicitly, since otherwise the handler is not triggered.
+💡 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this:
 
-See the <a href="https://api.slack.com/surfaces/modals/using#modal_cancellations">API documentation</a> for more information about the view closed event.
+See the <a href="https://api.slack.com/surfaces/modals/using#modal_cancellations">API documentation</a> for more information about `view_closed.
 
 ```javascript
-// Handle a view_canceled event
-app.view({ type: 'view_closed', callback_id: 'view_b' }, async ({ ack, body, view, client }) => {
+// Handle a view_closed event
+app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
   // Acknowledge the view_closed event
   await ack();
 
