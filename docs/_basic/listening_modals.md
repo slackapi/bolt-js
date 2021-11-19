@@ -19,7 +19,6 @@ To listen to either a `view_submission` request or `view_closed` event, you can 
 
 ##### Update views on submission
 
-You can access the value of the input blocks by accessing the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
 To update a view in response to a `view_submission` request, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
 
 ```javascript
@@ -33,7 +32,8 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 ```
 Similarly, there are options for [displaying errors](https://api.slack.com/surfaces/modals/using#displaying_errors) in response to view submissions.
 
-Read more about view submissions in our <a href="https://api.slack.com/surfaces/modals/using#interactions">API documentation</a>.
+You can access the value of the input blocks by accessing the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
+Read more about view submissions in our [API documentation](https://api.slack.com/surfaces/modals/using#interactions).
 </div>
 
 ```javascript
@@ -80,7 +80,7 @@ app.view('view_b', async ({ ack, body, view, client }) => {
 
 💡 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this:
 
-See the <a href="https://api.slack.com/surfaces/modals/using#modal_cancellations">API documentation</a> for more information about `view_closed.
+See the [API documentation](https://api.slack.com/surfaces/modals/using#modal_cancellations) for more information about `view_closed.
 
 ```javascript
 // Handle a view_closed event
