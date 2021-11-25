@@ -34,6 +34,23 @@ Similarly, there are options for [displaying errors](https://api.slack.com/surfa
 
 You can access the value of the input blocks by accessing the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
 Read more about view submissions in our [API documentation](https://api.slack.com/surfaces/modals/using#interactions).
+
+---
+
+##### Handling views on close
+
+💡 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this:
+
+See the [API documentation](https://api.slack.com/surfaces/modals/using#modal_cancellations) for more information about `view_closed`.
+
+```javascript
+// Handle a view_closed event
+app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
+  // Acknowledge the view_closed event
+  await ack();
+  // react on close event
+});
+```
 </div>
 
 ```javascript
@@ -71,23 +88,5 @@ app.view('view_b', async ({ ack, body, view, client }) => {
     console.error(error);
   }
 
-});
-```
-
----
-
-##### Handling views on close
-
-💡 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this:
-
-See the [API documentation](https://api.slack.com/surfaces/modals/using#modal_cancellations) for more information about `view_closed.
-
-```javascript
-// Handle a view_closed event
-app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
-  // Acknowledge the view_closed event
-  await ack();
-
-  // react on close event
 });
 ```
