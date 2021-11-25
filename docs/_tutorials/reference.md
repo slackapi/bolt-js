@@ -114,7 +114,9 @@ App options are passed into the `App` constructor.
 | `logLevel` | Option to control how much or what kind of information is logged. The `LogLevel` export contains the possible levels–in order of most to least information: `DEBUG`, `INFO`, `WARN`, and `ERROR`. By default, `logLevel` is set to `INFO`. More information on logging can be found [in the documentation](/bolt-js/concepts#logging). |
 | `extendedErrorHandler` | Option that accepts a `boolean` value. When set to `true`, the global error handler is passed an object with additional request context. Available from version 3.8.0, defaults to `false`. More information on advanced error handling can be found [in the documentation](/bolt-js/concepts#error-handling). |
 | `ignoreSelf` | `boolean` to enable a middleware function that ignores any messages coming from your app. Requires a `botId`. Defaults to `true`.  |
-| `clientOptions.slackApiUrl` | Allows setting a custom endpoint for the Slack API. Used most often for testing. | 
+| `clientOptions.slackApiUrl` | Allows setting a custom endpoint for the Slack API. Used most often for testing. |
+| `socketMode` | Option that accepts a `boolean` value. When set to `true` the app is started in socket mode, i.e. it allows your app to connect and receive data from Slack via a WebSocket connection. Defaults to `false`. See [socket mode documentation](/bolt-js/concepts#socket-mode) for further information.
+| `developerMode` | `boolean` to activate the developer mode. When set to `true` the `logLevel` is automatically set to `DEBUG` and `socketMode` is set to `true`. However, every explicit setting of these two properties takes precedence over the automatic values. Furthermore, a custom oAuth failure handler is provided to help debugging. Finally, the body of all incoming request is logged and, thus sensitive information like tokens might be contained in the logs. Defaults to `false`  | 
 
 > Bolt's client is an instance of `WebClient` from the [Node Slack SDK](/node-slack-sdk), so some of that documentation may be helpful as you're developing.
 
