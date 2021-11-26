@@ -100,6 +100,7 @@ export interface AppOptions {
   receiver?: Receiver;
   logger?: Logger;
   logLevel?: LogLevel;
+  manifest?: any;
   ignoreSelf?: boolean;
   clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
   socketMode?: boolean;
@@ -213,7 +214,7 @@ export default class App {
   private receiver: Receiver;
 
   /** Logger */
-  private logger: Logger;
+  public logger: Logger;
 
   /** Log Level */
   private logLevel: LogLevel;
@@ -230,6 +231,8 @@ export default class App {
   private errorHandler: AnyErrorHandler;
 
   private axios: AxiosInstance;
+
+  public manifest: any;
 
   private installerOptions: HTTPReceiverOptions['installerOptions'];
 
@@ -257,6 +260,7 @@ export default class App {
     authorize = undefined,
     logger = undefined,
     logLevel = undefined,
+    manifest = undefined,
     ignoreSelf = true,
     clientOptions = undefined,
     processBeforeResponse = false,
@@ -285,6 +289,9 @@ export default class App {
       this.socketMode = socketMode ?? false;
       // Set logLevel to Info if one wasn't passed in
       this.logLevel = logLevel ?? LogLevel.INFO;
+    }
+    if (manifest) {
+      this.manifest = manifest;
     }
 
     // Set up logger
