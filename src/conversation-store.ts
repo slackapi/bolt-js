@@ -59,7 +59,8 @@ export function conversationContext<ConversationState = any>(
   return async ({ body, context, next, logger }) => {
     const { conversationId } = getTypeAndConversation(body);
     if (conversationId !== undefined) {
-      context.updateConversation = (conversation: ConversationState,expiresAt?:number) => store.set(conversationId, conversation,expiresAt);
+      context.updateConversation = (conversation: ConversationState,
+        expiresAt?:number) => store.set(conversationId, conversation, expiresAt);
       try {
         context.conversation = await store.get(conversationId);
         logger.debug(`Conversation context loaded for ID: ${conversationId}`);
