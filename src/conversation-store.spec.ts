@@ -38,7 +38,43 @@ describe('conversationContext middleware', () => {
     assert.notProperty(dummyContext, 'conversation');
   });
 
-  // TODO: test that expiresAt is passed through on calls to store.set
+  it('should add to the context for events within a conversation that was not previously stored and pass expiresAt', async () => {
+    // Arrange
+    const dummyConversationState = Symbol();
+    const dummyConversationId = 'CONVERSATION_ID';
+    const dummyStoreSetResult = Symbol();
+    const dummyExpiresAt = 1234;
+    const fakeGetTypeAndConversation = sinon.fake.returns({ conversationId: dummyConversationId });
+    const fakeStore = createFakeStore(
+      sinon.fake.rejects(new Error('Test conversation missing')),
+      sinon.fake.resolves(dummyStoreSetResult),
+    );
+    const fakeLogger = createFakeLogger();
+    const fakeNext = sinon.fake();
+    const dummyContext: DummyContext<symbol> = {};
+    const { conversationContext } = await importConversationStore(
+      withGetTypeAndConversation(fakeGetTypeAndConversation),
+    );
+    const fakeArgs = {
+      body: {},
+      context: dummyContext,
+      next: fakeNext,
+      logger: fakeLogger,
+    } as unknown as MiddlewareArgs;
+
+    // Act
+    const middleware = conversationContext(fakeStore);
+    await middleware(fakeArgs);
+
+    assert(fakeNext.called);
+    assert.notProperty(dummyContext, 'conversation');
+    if (dummyContext.updateConversation === undefined) {
+      assert.fail();
+    }
+    assert.equal(await dummyContext.updateConversation(dummyConversationState, dummyExpiresAt), dummyStoreSetResult);
+    assert(fakeStore.set.calledOnce);
+    assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState, dummyExpiresAt));
+  });
 
   it('should add to the context for events within a conversation that was not previously stored', async () => {
     // Arrange
@@ -203,7 +239,7 @@ type MiddlewareArgs = AnyMiddlewareArgs & {
 
 interface DummyContext<ConversationState> {
   conversation?: ConversationState;
-  updateConversation?: (c: ConversationState) => Promise<unknown>;
+  updateConversation?: (c: ConversationState, expiresAt?: number) => Promise<unknown>;
 }
 
 // Loading the system under test using overrides
