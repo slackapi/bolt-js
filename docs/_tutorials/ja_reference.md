@@ -117,7 +117,7 @@ App オプションは、`App` のコンストラクターに渡します。
 | `ignoreSelf` | アプリ自身から発信されたメッセージをミドルウェアの関数で無視するかどうかを指定する真偽値。`botId` が必要です。デフォルトは `true` です。  |
 | `clientOptions.slackApiUrl` | Slack Web API で使用するエンドポイントをカスタマイズできます。これが使用されるのはほとんどがテスト用途です。 | 
 | `socketMode` | 真偽値を指定するオプションで、`true` に設定するとアプリは[ソケットモード](/bolt-js/ja-jp/concepts#socket-mode)で起動します。 ソケットモードは WebSocket のコネクションを通して Slack からのデータを受信する機能です。デフォルトは `false` です。
-| `developerMode` | デベロッパーモードを有効にする真偽地です。 `true` に設定したとき、`logLevel` は `DEBUG` に、そして `socketMode` は `true` に自動的に設定されます。 しかし、 `logLevel` と `socketMode` の二つのプロパティのいずれかが明示的に設定した場合、設定した値が優先されます。 また、デバッグに役たつ OAuth のエラーハンドラーが提供されます。 最後に、 Slack からのリクエストが全てログ出力されるのでトークンのような重要なデータがログに含まれる可能性があります。デフォルトは `false` です。  | 
+| `developerMode` | デベロッパーモードを有効にする真偽値です。 `true` に設定したとき、`logLevel` は `DEBUG`、 `socketMode` は `true` に自動的に設定されます。しかし、 これらの二つのプロパティを明示的に設定した場合、それらの設定が `developerMode` による設定よりも優先されます。さらに、デバッグをしやすくするためのカスタムの OAuth エラーハンドラーも提供されます。 また、全ての Slack からのリクエストのボディがログ出力されるため、トークンのようなセンシティブな情報がログに含まれる可能性があります。デフォルトは `false` です。| 
 
 > Bolt のclientは [Node Slack SDK](/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
 
