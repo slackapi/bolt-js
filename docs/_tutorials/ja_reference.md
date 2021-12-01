@@ -116,6 +116,9 @@ App オプションは、`App` のコンストラクターに渡します。
 | `logLevel` | 出力するログのレベルを指定するオプション。`LogLevel` の出力に含まれる情報のレベルには、重要度の低い順から高い順に `DEBUG`、`INFO`、`WARN`、`ERROR` があります。デフォルトの `logLevel` は `INFO` に設定されています。ログ出力の詳細については、[ドキュメント](/bolt-js/concepts#logging)を参照してください。 |
 | `ignoreSelf` | アプリ自身から発信されたメッセージをミドルウェアの関数で無視するかどうかを指定する真偽値。`botId` が必要です。デフォルトは `true` です。  |
 | `clientOptions.slackApiUrl` | Slack Web API で使用するエンドポイントをカスタマイズできます。これが使用されるのはほとんどがテスト用途です。 | 
+| `socketMode` | 真偽値を受け付けるオプションです. 真偽値を`true` に設定したとき、アプリは[ソケットモード](/bolt-js/concepts#socket-mode)で起動します。 ソケットモードは Slack からのデータを WebSocket の接続を通して受信する機能です。デフォルトは `false` です. 
+| `developerMode` | デベロッパーモードを有効にする真偽地です。 `true` に設定したとき、`logLevel` は `DEBUG` に、そして`socketMode` は `true` に自動的に設定されます。 しかし, 
+`logLevel` と `socketMode` の二つのプロパティのいずれかが明示的に設定した場合、設定した値が優先されます。 また, デバッグに役たつ OAuth のエラーハンドラーが提供されます。 最後に, Slack からのリクエストが全てログ出力されるのでトークンのような重要なデータがログに含まれる可能性があります。デフォルトは `false` です  | 
 
 > Bolt のclientは [Node Slack SDK](/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
 
@@ -131,7 +134,6 @@ Bolt では、さまざまなエラーが定義されています。これらに
 | `ReceiverMultipleAckError` | Receiver 内で、すでに確認が済んでいるリクエストに対してアプリがさらに `ack()` を呼んだ場合にスローされるエラーです。現在、デフォルトの `HTTPReceiver` でのみ使用されます。 |
 | `ReceiverAuthenticityError` | アプリのリクエストの署名が検証できないときにスローされるエラーです。このエラーには、失敗した理由を示す情報が含まれます（例 : タイムスタンプが有効でない、ヘッダーに抜けがある、署名シークレットが有効でない）。
 | `MultipleListenerError` | 単一のイベントに対して複数のリスナーでの処理中に複数のエラーが発生した場合にスローされるエラーです。個々のエラーを配列に収めた `originals` プロパティを持ちます。 |
-| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/concepts#steps)を参照してください。  |
 | `UnknownError` | フレームワーク内でスローされる、特定のエラーコードを持たないエラーです。`original` プロパティで詳細を確認できます。 |
 
 > [errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts) のコードで、エラー定義の部分とコンストラクターの部分を読み、参考にしてみてください。
