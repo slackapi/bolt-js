@@ -17,3 +17,37 @@ app.error((error) => {
   console.error(error);
 });
 ```
+
+<details class="secondary-wrapper">
+<summary class="section-head" markdown="0">
+<h4 class="section-head">エラーハンドラーでのさらなるデータを参照する</h4>
+</summary>
+
+<div class="secondary-content" markdown="0">
+グローバルエラーハンドラーでリクエストからのデータをログする必要があるでしょう。または、単に Bolt で指定した `logger` を利用したい場合があるでしょう。
+
+バージョン 3.8.0 から初め、 `extendedErrorHandler: true` をコンストラクターに渡すとリクエストの `error` 、 `logger` 、 `context` 、 `body`を含むオブジェクトがエラーハンドラーに追加されます。
+
+リクエストライフサイクル中に、どの時点でもエラーは生じることがあります(例： `context` での特定したプロパティを指定する前に)。また、 `body` オブジェクトに利用できるデータはイベントによって異なります。これらの理由のため、値を利用する前に `context` と `body` オブジェクトに指定するプロパティの有無を確認することをおすすめします。
+</div>
+
+```javascript
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN,
+  extendedErrorHandler: true,
+});
+
+app.error(({ error, logger, context, body }) => {
+  // Bolt で指定した logger を使ってエラーをログ出力させる
+  logger.error(error);
+
+  if (context.teamId) {
+    // デバッグ目的で、`teamId` を使う
+  }
+});
+```
+
+</details>
