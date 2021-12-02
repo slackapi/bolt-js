@@ -20,15 +20,15 @@ app.error((error) => {
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">
-<h4 class="section-head">エラーハンドラーでのさらなるデータを参照する</h4>
+<h4 class="section-head">エラーハンドラーでのさらなるデータの参照</h4>
 </summary>
 
 <div class="secondary-content" markdown="0">
-グローバルエラーハンドラーでリクエストからのデータをログする必要があるでしょう。または、単に Bolt で指定した `logger` を利用したい場合があるでしょう。
+グローバルエラーハンドラーの中で、リクエストからのデータをログ出力したい場合もあるでしょう。あるいは単に Bolt に設定した `logger` を利用したい場合もあるでしょう。
 
-バージョン 3.8.0 から初め、 `extendedErrorHandler: true` をコンストラクターに渡すとリクエストの `error` 、 `logger` 、 `context` 、 `body`を含むオブジェクトがエラーハンドラーに追加されます。
+バージョン 3.8.0 からは、コンストラクターに  `extendedErrorHandler: true` を渡すと、エラーハンドラーはリクエストの `error` 、 `logger` 、 `context` 、 `body` を含むオブジェクトを受け取ります。
 
-リクエストライフサイクル中に、どの時点でもエラーは生じることがあります(例： `context` での特定したプロパティを指定する前に)。また、 `body` オブジェクトに利用できるデータはイベントによって異なります。これらの理由のため、値を利用する前に `context` と `body` オブジェクトに指定するプロパティの有無を確認することをおすすめします。
+`context` や `body` オブジェクト内にアクセスしたいプロパティが存在するかどうかをチェックすることをおすすめします。なぜなら `body` オブジェクト内に存在するデータはイベント毎に異なりますし、エラーはリクエストのライフサイクルの中のどんなタイミング（例えば `context` のプロパティが設定される前）でも発生しうるからです。
 </div>
 
 ```javascript
@@ -41,11 +41,11 @@ const app = new App({
 });
 
 app.error(({ error, logger, context, body }) => {
-  // Bolt で指定した logger を使ってエラーをログ出力させる
+  // Bolt で指定した logger を使ってエラー内容をログ出力
   logger.error(error);
 
   if (context.teamId) {
-    // デバッグ目的で、`teamId` を使う
+    // デバッグのために teamId を使ってなんらかの処理
   }
 });
 ```
