@@ -98,7 +98,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `installerOptions` | Optional object that can be used to customize [the default OAuth support](/bolt-js/concepts#authenticating-oauth). Read more in the OAuth documentation. |
 
 ### App options
-App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialise either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
+App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialize either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
 
 | Option  | Description  |
 | :---: | :--- |
