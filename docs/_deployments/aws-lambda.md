@@ -140,7 +140,16 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 // Initializes your app with your bot token and the AWS Lambda ready receiver
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
-    receiver: awsLambdaReceiver
+    receiver: awsLambdaReceiver,
+    
+    // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
+    // If you use other Receivers, such as ExpressReceiver for OAuth flow support
+    // then processBeforeResponse: true is required. This option will defer sending back
+    // the acknowledgement until after your handler has run to ensure your function
+    // isn't terminated early by responding to the HTTP request that triggered it.
+
+    // processBeforeResponse: true
+
 });
 ```
 

@@ -9,6 +9,14 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: awsLambdaReceiver,
+
+  // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
+  // If you use other Receivers, such as ExpressReceiver for OAuth flow support
+  // then processBeforeResponse: true is required. This option will defer sending back
+  // the acknowledgement until after your handler has run to ensure your function
+  // isn't terminated early by responding to the HTTP request that triggered it.
+
+  // processBeforeResponse: true
 });
 
 // Listens to incoming messages that contain "hello"
