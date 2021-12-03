@@ -141,11 +141,15 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: awsLambdaReceiver,
-    // The `processBeforeResponse` option is required for all FaaS environments.
-    // It allows Bolt methods (e.g. `app.message`) to handle a Slack request
-    // before the Bolt framework responds to the request (e.g. `ack()`). This is
-    // important because FaaS immediately terminate handlers after the response.
-    processBeforeResponse: true
+    
+    // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
+    // If you use other Receivers, such as ExpressReceiver for OAuth flow support
+    // then processBeforeResponse: true is required. This option will defer sending back
+    // the acknowledgement until after your handler has run to ensure your function
+    // isn't terminated early by responding to the HTTP request that triggered it.
+
+    // processBeforeResponse: true
+
 });
 ```
 
