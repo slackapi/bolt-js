@@ -9,7 +9,7 @@ order: 12
 
 You may listen for user interactions with views using the `view` method. 
 
-Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in [view](https://api.slack.com/reference/interaction-payloads/views) input blocks, you can access the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
+Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in [view](https://api.slack.com/reference/interaction-payloads/views) input blocks, you can access the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 If the `notify_on_close` field of a view has been set to `true`, Slack will also send a `view_closed` request if a user clicks the close button. See the section on **Handling views on close** for more detail.
 To listen to either a `view_submission` request or `view_closed` request, you can use the built-in `view()` method.
 
