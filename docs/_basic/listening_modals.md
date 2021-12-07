@@ -32,8 +32,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 ```
 Similarly, there are options for [displaying errors](https://api.slack.com/surfaces/modals/using#displaying_errors) in response to view submissions.
 
-You can access the value of the input blocks by accessing the `state` object. `state` contains a values object that uses the `block_id` and unique `action_id` to store the input values.
-Read more about view submissions in our [API documentation](https://api.slack.com/surfaces/modals/using#interactions).
+Read more about view submissions in our [API documentation](https://api.slack.com/surfaces/modals/using#handling_submissions).
 
 ---
 

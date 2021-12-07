@@ -33,6 +33,23 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
 
 より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API ドキュメント</a>を参照してください。
+
+---
+
+##### モーダルを閉じるときのハンドリング
+
+💡 `view_closed` リクエストをリッスンするとき、`callback_id` と `type: 'view_closed'` を含んだオブジェクトを指定することが必要とします。以下の例を参照してください。
+
+`view_closed` についてより詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#modal_cancellations)を参照してください。
+
+```javascript
+// view_closed リクエストの処理
+app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
+  // view_closed リクエストの確認
+  await ack();
+  // close リクエストに何らかの処理
+});
+```
 </div>
 
 ```javascript
@@ -70,21 +87,5 @@ app.view('view_b', async ({ ack, body, view, client }) => {
     console.error(error);
   }
 
-});
-```
-
----
-
-##### モーダルを閉じるときのハンドリング
-
-💡 `view_closed` リクエストをリッスンするとき、`callback_id` と `type: 'view_closed'` を含んだオブジェクトを指定することが必要とします。以下の例を参照してください。
-
-`view_closed` についてより詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#modal_cancellations)を参照してください。
-```javascript
-// view_closed リクエストの処理
-app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
-  // view_closed リクエストの確認
-  await ack();
-  // close リクエストに何らかの処理
 });
 ```
