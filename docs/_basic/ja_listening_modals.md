@@ -9,11 +9,11 @@ order: 12
 
 `view` メソッドを使ってユーザーからのインタラクションをリッスンすることができます。
 
-`view_submission` リクエストは、アプリが開いたモーダルでユーザーがデータ送信の操作をしたときに発生します。`input` ブロックの値は `state` オブジェクトを参照することで取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
-モーダルでの `notify_on_close` プロパティが `true` に設定した場合、ユーザーが Close ボタンを押すと Slack は `view_closed` リクエストを送信します。 より詳細な情報は以下の **モーダルの閉じるときのハンドリング**
-`view_submission` リクエストあるいは `view_closed` イベントをリッスンするためには、組み込みの `view()` メソッドを使用します。
+`view_submission` リクエストは、アプリが開いたモーダルでユーザーが Submit ボタンを押したときに発生します。`input` ブロックの値は `state` オブジェクトを参照することで取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
+モーダルでの `notify_on_close` プロパティが `true` に設定した場合、ユーザーが Close ボタンを押すと Slack は `view_closed` リクエストも送信します。 より詳細な情報は以下の **モーダルを閉じるときのハンドリング** を参照してください。
+`view_submission` リクエストあるいは `view_closed` リクエストをリッスンするためには、組み込みの `view()` メソッドを使用します。
 
-`view()` メソッドは、文字列型または `RegExp` 型 の `callback_id` を必要とします。あるいは、 `type` と `callback_id` を用いた制約付きオブジェクトを必要とします。
+`view()` メソッドは、文字列型または `RegExp` 型の `callback_id` を必要とします。あるいは、 `type` と `callback_id` を用いた制約付きオブジェクトを必要とします。
 
 ---
 
@@ -32,7 +32,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 ```
 この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
 
-より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
+より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API ドキュメント</a>を参照してください。
 </div>
 
 ```javascript
@@ -75,16 +75,16 @@ app.view('view_b', async ({ ack, body, view, client }) => {
 
 ---
 
-##### モーダルの閉じるときのハンドリング
+##### モーダルを閉じるときのハンドリング
 
 💡 `view_closed` リクエストをリッスンするとき、`callback_id` と `type: 'view_closed'` を含んだオブジェクトを指定することが必要とします。以下の例を参照してください。
 
 `view_closed` についてより詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#modal_cancellations)を参照してください。
 ```javascript
-// Handle a view_closed event
+// view_closed リクエストの処理
 app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
-  // Acknowledge the view_closed event
+  // view_closed リクエストの確認
   await ack();
-  // react on close event
+  // close リクエストに何らかの処理
 });
 ```
