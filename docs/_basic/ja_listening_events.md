@@ -46,7 +46,7 @@ const { App, subtype } = require('@slack/bolt');
 
 // user からのメッセージの編集と一致
 app.message(subtype('message_changed'), ({ event }) => {
-    console.log(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+  console.log(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
 });
 ```
 
