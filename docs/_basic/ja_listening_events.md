@@ -19,7 +19,7 @@ app.event('team_join', async ({ event, client, logger }) => {
   try {
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
-      text: `Welcome to the team, <@${event.user}>! 🎉 You can introduce yourself in this channel.`
+      text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
     logger.info(result);
   }
