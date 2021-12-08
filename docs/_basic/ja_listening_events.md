@@ -37,7 +37,7 @@ app.event('team_join', async ({ event, client }) => {
 <div class="secondary-content" markdown="0">
 `message()` リスナーは `event('message')` と等価の機能を提供します。
 
-イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `bot_message` や `message_changed` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
+イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `message_changed` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
 </div>
 
 ```javascript
