@@ -46,7 +46,7 @@ app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
           channel: body.channel.id
         });
 
-        logger.log(result);
+        logger.info(result);
       }
     }
     catch (error) {
