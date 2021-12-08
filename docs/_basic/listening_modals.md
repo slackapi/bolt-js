@@ -55,7 +55,7 @@ app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, vie
 
 ```javascript
 // Handle a view_submission request
-app.view('view_b', async ({ ack, body, view, client }) => {
+app.view('view_b', async ({ ack, body, view, client, logger }) => {
   // Acknowledge the view_submission request
   await ack();
 
@@ -85,7 +85,7 @@ app.view('view_b', async ({ ack, body, view, client }) => {
     });
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 
 });

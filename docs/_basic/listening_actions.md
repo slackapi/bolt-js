@@ -35,7 +35,7 @@ You can use a constraints object to listen to `callback_id`s, `block_id`s, and `
 ```javascript
 // Your listener function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, client, ack }) => {
+  async ({ body, client, ack, logger }) => {
     await ack();
     try {
       // Make sure the action isn't from a view (modal or app home)
@@ -46,11 +46,11 @@ app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
           channel: body.channel.id
         });
 
-        console.log(result);
+        logger.info(result);
       }
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
 ```

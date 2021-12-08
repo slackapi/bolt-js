@@ -19,7 +19,7 @@ Learn more about updating and pushing views in our <a href="https://api.slack.co
 
 ```javascript
 // Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)
-app.action('button_abc', async ({ ack, body, client }) => {
+app.action('button_abc', async ({ ack, body, client, logger }) => {
   // Acknowledge the button request
   await ack();
 
@@ -55,10 +55,10 @@ app.action('button_abc', async ({ ack, body, client }) => {
         ]
       }
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

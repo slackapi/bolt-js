@@ -35,7 +35,7 @@ app.action('approve_button', async ({ ack }) => {
 ```javascript
 // action_id が 'select_user' と一致し、block_id が 'assign_ticket' と一致する場合のみミドルウェアが呼び出される
 app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, client, ack }) => {
+  async ({ body, client, ack, logger }) => {
     await ack();
     try {
       if (body.message) {
@@ -45,11 +45,11 @@ app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
           channel: body.channel.id
         });
 
-        console.log(result);
+        logger.info(result);
       }
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
 ```

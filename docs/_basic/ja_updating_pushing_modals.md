@@ -20,7 +20,7 @@ order: 11
 ```javascript
 // action_id: button_abc のボタンを押すイベントをリッスン
 // （そのボタンはモーダルの中にあるという想定）
-app.action('button_abc', async ({ ack, body, client }) => {
+app.action('button_abc', async ({ ack, body, client, logger }) => {
   // ボタンを押したイベントを確認
   await ack();
 
@@ -55,10 +55,10 @@ app.action('button_abc', async ({ ack, body, client }) => {
         ]
       }
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```
