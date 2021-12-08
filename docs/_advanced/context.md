@@ -25,7 +25,7 @@ async function addTimezoneContext({ payload, client, context, next }) {
   await next();
 }
 
-app.command('/request', addTimezoneContext, async ({ command, ack, client, context }) => {
+app.command('/request', addTimezoneContext, async ({ command, ack, client, context, logger }) => {
   // Acknowledge command request
   await ack();
   // Get local hour of request
@@ -50,7 +50,7 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
       });
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   } else {
     try {
@@ -61,7 +61,7 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
       });
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 });

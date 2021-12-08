@@ -113,7 +113,7 @@ Hubot では、`@slack/client` から `WebClient` パッケージをインポー
 組み込みの `WebClient` を使用するには、アプリをインスタンス化するために使用されるトークン、またはリクエストの送信元のチームに関連付けられているトークンを渡す必要があります。これは、リスナー関数に渡された `context` オブジェクトにあります。たとえば、メッセージにリアクションを追加するには、次を使用します:
 
 ```javascript
-app.message('react', async ({ message, context }) => {
+app.message('react', async ({ message, context, logger }) => {
   try {
     const result = await app.client.reactions.add({
       token: context.botToken,
@@ -123,7 +123,7 @@ app.message('react', async ({ message, context }) => {
     });
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

@@ -22,7 +22,7 @@ order: 8
 
 ```javascript
 // open_modal というグローバルショートカットはシンプルなモーダルを開く
-app.shortcut('open_modal', async ({ shortcut, ack, context }) => {
+app.shortcut('open_modal', async ({ shortcut, ack, context, logger }) => {
   // グローバルショートカットリクエストの確認
   ack();
 
@@ -63,10 +63,10 @@ app.shortcut('open_modal', async ({ shortcut, ack, context }) => {
       }
     });
 
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```
@@ -83,7 +83,7 @@ app.shortcut('open_modal', async ({ shortcut, ack, context }) => {
 
   ```javascript
   // callback_id が 'open_modal' と一致し type が 'message_action' と一致する場合のみミドルウェアが呼び出される
-  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, context, client }) => {
+  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, context, client, logger }) => {
     try {
       // ショートカットリクエストの確認
       await ack();
@@ -124,10 +124,10 @@ app.shortcut('open_modal', async ({ shortcut, ack, context }) => {
         }
       });
 
-      console.log(result);
+      logger.info(result);
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
   ```
