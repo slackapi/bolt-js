@@ -115,7 +115,7 @@ In Hubot, you needed to import the `WebClient` package from `@slack/client`. Bol
 To use the built-in `WebClient`, you’ll need to pass the token used to instantiate your app or the token associated with the team your request is coming from. This is found on the `context` object passed in to your listener functions. For example, to add a reaction to a message, you’d use:
 
 ```javascript
-app.message('react', async ({ message, context, client }) => {
+app.message('react', async ({ message, context, client, logger }) => {
   try {
     const result = await client.reactions.add({
       token: context.botToken,
@@ -125,7 +125,7 @@ app.message('react', async ({ message, context, client }) => {
     });
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

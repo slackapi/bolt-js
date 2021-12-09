@@ -16,7 +16,7 @@ order: 10
 
 ```javascript
 // コマンド起動をリッスン
-app.command('/ticket', async ({ ack, body, client }) => {
+app.command('/ticket', async ({ ack, body, client, logger }) => {
   // コマンドのリクエストを確認
   await ack();
 
@@ -69,10 +69,10 @@ app.command('/ticket', async ({ ack, body, client }) => {
         }
       }
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

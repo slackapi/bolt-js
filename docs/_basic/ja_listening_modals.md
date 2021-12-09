@@ -53,8 +53,8 @@ app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, vie
 </div>
 
 ```javascript
-// モーダルでのデータ送信リクエストを処理
-app.view('view_b', async ({ ack, body, view, client }) => {
+// モーダルでのデータ送信リクエストを処理します
+app.view('view_b', async ({ ack, body, view, client, logger }) => {
   // モーダルでのデータ送信リクエストを確認
   await ack();
 
@@ -84,7 +84,7 @@ app.view('view_b', async ({ ack, body, view, client }) => {
     });
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 
 });

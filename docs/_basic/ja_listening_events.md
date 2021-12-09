@@ -15,16 +15,16 @@ order: 3
 const welcomeChannelId = 'C12345';
 
 // 新しいユーザーがワークスペースに加入したタイミングで、指定のチャンネルにメッセージを送信して自己紹介を促す
-app.event('team_join', async ({ event, client }) => {
+app.event('team_join', async ({ event, client, logger }) => {
   try {
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```
@@ -42,8 +42,8 @@ app.event('team_join', async ({ event, client }) => {
 
 ```javascript
 // bot からのメッセージ全てと一致
-app.message(subtype('bot_message'), ({ message }) => {
-  console.log(`The bot user ${message.user} said ${message.text}`);
+app.message(subtype('bot_message'), ({ message, logger }) => {
+  logger.info(`The bot user ${message.user} said ${message.text}`);
 });
 ```
 
