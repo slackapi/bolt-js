@@ -26,7 +26,7 @@ async function noBotMessages({ message, next }) {
 }
 
 // ボットではなく人間からのメッセージのみを受信するリスナー
-app.message(noBotMessages, async ({ message }) => console.log(
+app.message(noBotMessages, async ({ message, logger }) => logger.info(
   `(MSG) User: ${message.user}
    Message: ${message.text}`
 ));

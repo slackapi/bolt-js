@@ -25,7 +25,7 @@ When configuring shortcuts within your app configuration, you'll continue to app
 
 ```javascript
 // The open_modal shortcut opens a plain old modal
-app.shortcut('open_modal', async ({ shortcut, ack, client }) => {
+app.shortcut('open_modal', async ({ shortcut, ack, client, logger }) => {
 
   try {
     // Acknowledge shortcut request
@@ -65,10 +65,10 @@ app.shortcut('open_modal', async ({ shortcut, ack, client }) => {
       }
     });
 
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```
@@ -84,7 +84,7 @@ app.shortcut('open_modal', async ({ shortcut, ack, client }) => {
 
   ```javascript
   // Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
-  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, client }) => {
+  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, client, logger }) => {
     try {
       // Acknowledge shortcut request
       await ack();
@@ -123,10 +123,10 @@ app.shortcut('open_modal', async ({ shortcut, ack, client }) => {
         }
       });
 
-      console.log(result);
+      logger.info(result);
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
   ```

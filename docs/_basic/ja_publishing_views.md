@@ -13,7 +13,7 @@ order: 13
 
 ```javascript
 // ユーザーが App Home にアクセスしたことを伝えるイベントをリッスン
-app.event('app_home_opened', async ({ event, client }) => {
+app.event('app_home_opened', async ({ event, client, logger }) => {
   try {
     // 組み込みの API クライアントを使って views.publish を呼び出す
     const result = await client.views.publish({
@@ -41,10 +41,10 @@ app.event('app_home_opened', async ({ event, client }) => {
       }
     });
 
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

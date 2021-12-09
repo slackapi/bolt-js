@@ -13,7 +13,7 @@ You can subscribe to the <a href="https://api.slack.com/events/app_home_opened">
 
 ```javascript
 // Listen for users opening your App Home
-app.event('app_home_opened', async ({ event, client }) => {
+app.event('app_home_opened', async ({ event, client, logger }) => {
   try {
     // Call views.publish with the built-in client
     const result = await client.views.publish({
@@ -41,10 +41,10 @@ app.event('app_home_opened', async ({ event, client }) => {
       }
     });
 
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

@@ -15,7 +15,7 @@ Read more about modal composition in the <a href="https://api.slack.com/surfaces
 
 ```javascript
 // Listen for a slash command invocation
-app.command('/ticket', async ({ ack, body, client }) => {
+app.command('/ticket', async ({ ack, body, client, logger }) => {
   // Acknowledge the command request
   await ack();
 
@@ -69,10 +69,10 @@ app.command('/ticket', async ({ ack, body, client }) => {
         }
       }
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

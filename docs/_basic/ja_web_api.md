@@ -19,7 +19,7 @@ Bolt アプリケーションは、トップレベルに `app.client` も持っ�
 // September 30, 2019 11:59:59 PM を Unix エポックタイムで表示
 const whenSeptemberEnds = '1569887999';
 
-app.message('wake me up', async ({ message, context }) => {
+app.message('wake me up', async ({ message, context, logger }) => {
   try {
     // トークンを用いて chat.scheduleMessage 関数を呼び出す
     const result = await app.client.chat.scheduleMessage({
@@ -31,7 +31,7 @@ app.message('wake me up', async ({ message, context }) => {
     });
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```

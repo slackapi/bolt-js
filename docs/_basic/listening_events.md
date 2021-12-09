@@ -15,17 +15,17 @@ The `event()` method requires an `eventType` of type string.
 const welcomeChannelId = 'C12345';
 
 // When a user joins the team, send a message in a predefined channel asking them to introduce themselves
-app.event('team_join', async ({ event, client }) => {
+app.event('team_join', async ({ event, client, logger }) => {
   try {
     // Call chat.postMessage with the built-in client
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```
@@ -46,8 +46,8 @@ You can filter on subtypes of events by using the built-in `subtype()` middlewar
 const { App, subtype } = require('@slack/bolt');
 
 // Matches all message changes from users
-app.message(subtype('message_changed'), ({ event }) => {
-  console.log(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+app.message(subtype('message_changed'), ({ event, logger }) => {
+  logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
 });
 ```
 

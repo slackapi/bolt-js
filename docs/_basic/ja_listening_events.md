@@ -15,16 +15,17 @@ order: 3
 const welcomeChannelId = 'C12345';
 
 // 新しいユーザーがワークスペースに加入したタイミングで、指定のチャンネルにメッセージを送信して自己紹介を促す
-app.event('team_join', async ({ event, client }) => {
+app.event('team_join', async ({ event, client, logger }) => {
   try {
+    // 組み込みの client で chat.postMessage を呼び出す
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
     });
-    console.log(result);
+    logger.info(result);
   }
   catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 ```
@@ -45,8 +46,8 @@ app.event('team_join', async ({ event, client }) => {
 const { App, subtype } = require('@slack/bolt');
 
 // user からのメッセージの編集と一致
-app.message(subtype('message_changed'), ({ event }) => {
-  console.log(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+app.message(subtype('message_changed'), ({ event, logger }) => {
+  logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
 });
 ```
 
