@@ -6,11 +6,14 @@ order: 12
 ---
 
 <div class="section-content">
-<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>が入力のブロックを含む場合、その入力値を受け取るために `view_submission` のリクエストをリッスンする必要があります。`view_submission` リクエストをリッスンするためには、組み込みの `view()` メソッドを使用します。
 
-`view()` メソッドは、文字列型または `RegExp` 型 の `callback_id` を必要とします。
+`view` メソッドを使うと、ユーザーのビューとのインタラクションをリッスンすることができます。
 
-`input` ブロックの値は `state` オブジェクトを参照することで取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
+ユーザーがモーダルからデータ送信したとき、Slack から `view_submission` のリクエストが送信されます。送信された `input` ブロックの値は `state` オブジェクトから取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
+モーダルでの `notify_on_close` プロパティを `true` に設定した場合、ユーザーが Close ボタンを押したときに Slack から `view_closed` リクエストが送信されます。 より詳細な情報は以下の **モーダルを閉じるときのハンドリング** を参照してください。
+`view_submission` や `view_closed` リクエストをリッスンするには、組み込みの `view()` メソッドを使用できます。
+
+`view()` メソッドでは、文字列か正規表現の `callback_id` の指定が必要です。`type` と `callback_id` を含む制約付きオブジェクトを渡すこともできます。
 
 ---
 
@@ -29,7 +32,24 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 ```
 この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
 
-より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
+より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API ドキュメント</a>を参照してください。
+
+---
+
+##### モーダルを閉じるときのハンドリング
+
+💡 `view_closed` リクエストをリッスンするとき、`callback_id` と `type: 'view_closed'` を含むオブジェクトの指定が必要です。以下の例を参照してください。
+
+`view_closed` に関するより詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#modal_cancellations)を参照してください。
+
+```javascript
+// view_closed リクエストの処理
+app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
+  // view_closed リクエストの確認
+  await ack();
+  // close リクエストについて何らかの処理
+});
+```
 </div>
 
 ```javascript
