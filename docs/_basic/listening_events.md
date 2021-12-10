@@ -38,13 +38,16 @@ app.event('team_join', async ({ event, client, logger }) => {
 <div class="secondary-content" markdown="0">
 A `message()` listener is equivalent to `event('message')`
 
-You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
+You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
 </div>
 
 ```javascript
-// Matches all messages from bot users
-app.message(subtype('bot_message'), ({ message, logger }) => {
-  logger.info(`The bot user ${message.user} said ${message.text}`);
+// Import subtype from the package
+const { App, subtype } = require('@slack/bolt');
+
+// Matches all message changes from users
+app.message(subtype('message_changed'), ({ event, logger }) => {
+  logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
 });
 ```
 
