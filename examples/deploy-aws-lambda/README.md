@@ -41,6 +41,8 @@ npm install
 
 You may also want to [install ngrok][ngrok-install] to start a local tunnel for local development.
 
+Ensure you can correctly run the `serverless` command from your terminal. You may have to reference it from the `./node_modules/.bin/serverless` location within the project. If that still doesn't work, refer to the [Serverless Getting Started documentation][serverless-install] on how to install the Serverless framework.
+
 ## 3. Create a Slack app
 
 ### Create an app on api.slack.com
@@ -71,7 +73,7 @@ export SLACK_BOT_TOKEN=<your-xoxb-bot-token>      # Slack app settings > "OAuth 
 Run the following the command to deploy to AWS Lambda:
 
 ```zsh
-npx serverless deploy
+serverless deploy
 # ...
 # endpoints:
 #  POST - https://d5c0t1xad4.execute-api.us-east-1.amazonaws.com/dev/slack/events
@@ -112,7 +114,7 @@ _Remember, your app must be in the channel or DM where you say hello._
 Open a terminal session to listen for incoming requests:
 
 ```zsh
-npx serverless offline --noPrependStageInUrl
+serverless offline --noPrependStageInUrl
 ```
 
 Open another terminal session to proxy Slack API requests locally:
@@ -140,4 +142,5 @@ Follow the steps to [test your app](#6-test-your-slack-app).
 [bolt-website]: https://slack.dev/bolt-js/
 [ngrok-install]: https://api.slack.com/tutorials/tunneling-with-ngrok
 [serverless-framework]: https://serverless.com/
+[serverless-install]: https://www.serverless.com/framework/docs/getting-started/
 [slack-app-settings]: https://api.slack.com/apps
