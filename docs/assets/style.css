@@ -274,14 +274,6 @@ a code {
   color: var(--blue);
 }
 
-.reference .method-content table {
-  table-layout: auto;
-}
-
-.reference .method-content table td:first-child {
-  width: 30%;
-}
-
 .content .section-wrapper .section-content {
   grid-area: body;
   font-size: 1em;

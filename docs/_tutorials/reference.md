@@ -27,7 +27,6 @@ This guide is intended to detail the Bolt interface–including listeners and th
 ## Listener functions
 Slack apps typically receive and/or respond to one to many incoming events from Slack. This can be something like listening to an Events API event (like when a link associated with your app is shared) or a user invoking one of your app's shortcuts. For each type of incoming request from Slack, there are distinct methods that you can pass **listener functions** to handle and respond to the event.
 
-<div class="method-content">
 ### Methods
 Below is the current list of methods that accept listener functions. These methods handle specific event types coming from Slack, and typically include an identifing parameter before the listener function. The identifying parameter (included below) narrows the events to specific interactions that your listener function is intended to handle, such as a specific `callback_id`, or a certain substring within a message.
 
@@ -51,8 +50,6 @@ There are a collection of constraint objects that some methods have access to. T
 | `app.shortcut(constraints, fn)` | `type`, `callback_id` | Allows specification of the type of shortcut. `type` must either be `shortcut` for **global shortcuts** or `message_action` for **message_shortcuts**. `callbackId` can be a `string` or `RegExp`. |
 | `app.view(constraints, fn)` | `type`, `callback_id` | `type` must either be `view_closed` or `view_submission`, which determines what specific event your listener function is sent. `callback_id` is the `callback_id` of the view that is sent when your app opens the modal. |
 | `app.options(constraints, fn)` | `block_id`, `action_id`, `callback_id` | Optionally listens for `block_id` and `callback_id` in addition to `action_id`. `callback_id` can only be passed when handling options elements within modals. |
-
-</div>
 
 ### Listener function arguments
 Listener functions have access to a set of arguments that may change based on the method which the function is passed to. Below is an explanation of the different arguments. The below table details the different arguments and the methods they'll be accessible in.
