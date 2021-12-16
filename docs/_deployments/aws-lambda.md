@@ -64,22 +64,16 @@ That wraps up configuring your local machine to access AWS. 👏 Next, let's do 
 
 ### Set up Serverless Framework
 
-The [Serverless Framework](https://www.serverless.com/open-source/) includes tools that let you easily configure, debug, and deploy your app to AWS Lambda.
+The [Serverless Framework][serverless-framework] includes tools that let you easily configure, debug, and deploy your app to AWS Lambda.
 
 **1. Install the Serverless Framework CLI**
 
-The Serverless tools are available as a Command Line Interface (CLI) and can be [installed on macOS, Windows, or Linux](https://www.serverless.com/framework/docs/getting-started/). To install it using npm, run the following command:
-
-```shell
-npm install --save-dev serverless
-```
-
-> 💡 You can also [globally install the Serverless CLI](https://www.serverless.com/framework/docs/getting-started/) using the command `npm install -g serverless`.
+The Serverless tools are available as a Command Line Interface (CLI) and can be [installed on macOS, Windows, or Linux](https://www.serverless.com/framework/docs/getting-started/). Check out the [Serverless Getting Started documentation](https://www.serverless.com/framework/docs/getting-started/) for instructions on how to install.
 
 Once the installation is complete, test the Serverless CLI by displaying the commands available to you:
 
 ```shell
-npx serverless help
+serverless help
 ```
 
 You're now set up with the Serverless tools! Let's move on to preparing your Bolt app to run as an AWS Lambda function.
@@ -127,7 +121,7 @@ Update the [source code that imports your modules](https://github.com/slackapi/b
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-> 💡  If you are planning on implementing authentication with OAuth, as of today you need to use the [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts). 
+> 💡  If you are planning on implementing authentication with OAuth, as of today you need to use the [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts).
 
 Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
 
@@ -141,7 +135,7 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: awsLambdaReceiver,
-    
+
     // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
     // If you use other Receivers, such as ExpressReceiver for OAuth flow support
     // then processBeforeResponse: true is required. This option will defer sending back
@@ -214,11 +208,13 @@ Now that your app is configured to respond to an AWS Lambda function, we'll set 
 
 **1. Start your local servers**
 
-First, use the `serverless offline` command to listen for an AWS Lambda function event:
+First, use the `serverless offline` command to start your app and listen to AWS Lambda function events:
 
 ```zsh
-npx serverless offline --noPrependStageInUrl
+serverless offline --noPrependStageInUrl
 ```
+
+> 🏌️ Pro-tip: you can make code changes to your app in one terminal while running the above command in another terminal, and as you save code changes your app will reload automatically.
 
 Next, use ngrok to forward Slack events to your local machine:
 
@@ -258,6 +254,8 @@ If you don’t receive a response, check your **Request URL** and try again.
 
 ### Deploy the app
 
+In the previous section of this tutorial, you ran your app locally and tested it in a live Slack workspace. Now that you have a working app, let's deploy it!
+
 You can use the Serverless Framework tools to provision, package, and deploy your app onto AWS Lambda. After your app is deployed, you'll need to update your app's request URL to say "hello" to your app. ✨
 
 **1. Deploy the app to AWS Lambda**
@@ -265,7 +263,7 @@ You can use the Serverless Framework tools to provision, package, and deploy you
 Now, deploy your app to AWS Lambda with the following command:
 
 ```shell
-npx serverless deploy
+serverless deploy
 # Serverless: Packaging service...
 # ...
 # endpoints:
@@ -316,10 +314,12 @@ app.message('goodbye', async ({ message, say }) => {
 Deploy the update using the same command as before:
 
 ```shell
-npx serverless deploy
+serverless deploy
 ```
 
 When the deploy is complete, you can open a Slack channel that your app has joined and say "goodbye" (lower-case). You should see a friendly farewell from your Slack app.
+
+> ⛳️ If you are making small changes to single functions, you can deploy only a single function using `serverless deploy function -f my-function` which is much faster. Run `serverless help deploy function` for more detailed help.
 
 ---
 
