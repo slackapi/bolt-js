@@ -71,8 +71,8 @@ const validViewTypes = ['view_closed', 'view_submission'];
 // ----------------------------
 // For the constructor
 
-const tokenUsage = 'Apps used in one workspace should be initialized with a token. Apps used in many workspaces ' +
-  'should be initialized with oauth installer or authorize.';
+const tokenUsage = 'Apps used in one workspace only can be initialized with a token. Apps used in many workspaces ' +
+  'should be initialized with oauth installer options or authorize.';
 
 /** App initialization options */
 export interface AppOptions {
@@ -274,6 +274,8 @@ export default class App {
     extendedErrorHandler = false,
   }: AppOptions = {}) {
     // this.logLevel = logLevel;
+
+    /* ------------------------ Developer mode ----------------------------- */
     this.developerMode = developerMode;
     if (developerMode) {
       // Set logLevel to Debug in Developer Mode if one wasn't passed in
@@ -287,7 +289,7 @@ export default class App {
       this.logLevel = logLevel ?? LogLevel.INFO;
     }
 
-    // Set up logger
+    /* ------------------------ Set logger ----------------------------- */
     if (typeof logger === 'undefined') {
       // Initialize with the default logger
       const consoleLogger = new ConsoleLogger();
@@ -304,7 +306,7 @@ export default class App {
     this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
     this.extendedErrorHandler = extendedErrorHandler;
 
-    // Set up client options
+    /* ------------------------ Set client options ------------------------*/
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
     if (agent !== undefined && this.clientOptions.agent === undefined) {
       this.clientOptions.agent = agent;
@@ -343,8 +345,8 @@ export default class App {
       ...installerOptions,
     };
     if (socketMode && port !== undefined && this.installerOptions.port === undefined) {
-      // As SocketModeReceiver uses a custom port number to listen on only for the OAuth flow,
-      // only installerOptions.port is available in the constructor arguments.
+      // SocketModeReceiver uses a custom port number to listen on only, for the OAuth flow
+      // therefore only installerOptions.port is available in the constructor arguments.
       this.installerOptions.port = port;
     }
 
@@ -366,19 +368,22 @@ export default class App {
       };
     }
 
-    // Initialize receiver
+    /* --------------------- Initialize receiver ---------------------- */
     if (receiver !== undefined) {
-      // Custom receiver
+      // Custom receiver supplied
       if (this.socketMode) {
-        throw new AppInitializationError('receiver cannot be passed when socketMode is set to true');
+        // socketMode = true should result in SocketModeReceiver being used as receiver
+        // TODO: Add case for when socketMode = true and receiver = SocketModeReceiver
+        // this should not result in error
+        throw new AppInitializationError('You cannot supply a custom receiver when socketMode is set to true.');
       }
       this.receiver = receiver;
-    } else if (this.socketMode) {
+    } else if (this.socketMode === true) {
       if (appToken === undefined) {
-        throw new AppInitializationError('You must provide an appToken when using Socket Mode');
+        throw new AppInitializationError('You must provide an appToken when socketMode is set to true. To generate an appToken see: https://api.slack.com/apis/connections/socket#token');
       }
       this.logger.debug('Initializing SocketModeReceiver');
-      // Create default SocketModeReceiver
+      // Set receiver to SocketModeReceiver
       this.receiver = new SocketModeReceiver({
         appToken,
         clientId,
@@ -392,15 +397,15 @@ export default class App {
         installerOptions: this.installerOptions,
         customRoutes,
       });
-    } else if (signatureVerification && signingSecret === undefined) {
-      // No custom receiver
+    } else if (signatureVerification === true && signingSecret === undefined) {
+      // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
-        'Signing secret not found, so could not initialize the default receiver. Set a signing secret or use a ' +
-          'custom receiver.',
+        'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
+          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
       );
     } else {
       this.logger.debug('Initializing HTTPReceiver');
-      // Create default HTTPReceiver
+      // Set receiver to HTTPReceiver
       this.receiver = new HTTPReceiver({
         signingSecret: signingSecret || '',
         endpoints,
@@ -420,6 +425,7 @@ export default class App {
       });
     }
 
+    /* ------------------------ Set authorize ----------------------------- */
     let usingOauth = false;
     const httpReceiver = (this.receiver as HTTPReceiver);
     if (
@@ -430,11 +436,11 @@ export default class App {
       // and theoretically, doing a fully custom (non express) receiver that implements OAuth
       usingOauth = true;
     }
-
     if (token !== undefined) {
-      if (authorize !== undefined || usingOauth) {
+      // If a token is supplied, the app is installed in at least one workspace
+      if (usingOauth || authorize !== undefined) {
         throw new AppInitializationError(
-          `token as well as authorize or oauth installer options were provided. ${tokenUsage}`,
+          `You provided a token along with either oauth installer options or authorize. ${tokenUsage}`,
         );
       }
       this.authorize = singleAuthorization(
@@ -448,17 +454,17 @@ export default class App {
       );
     } else if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `No token, no authorize, and no oauth installer options provided. ${tokenUsage}`,
+        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer option(s). See https://slack.dev/bolt-js/concepts#authenticating-oauth for these required fields.\n`,
       );
     } else if (authorize !== undefined && usingOauth) {
-      throw new AppInitializationError(`Both authorize options and oauth installer options provided. ${tokenUsage}`);
+      throw new AppInitializationError(`You provided both authorize and oauth installer options. ${tokenUsage}`);
     } else if (authorize === undefined && usingOauth) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.authorize = httpReceiver.installer!.authorize;
     } else if (authorize !== undefined && !usingOauth) {
       this.authorize = authorize;
     } else {
-      this.logger.error('Never should have reached this point, please report to the team');
+      this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
       assertNever();
     }
 
@@ -474,6 +480,7 @@ export default class App {
       this.use(conversationContext(store));
     }
 
+    /* ------------------------ Initialize receiver ------------------------ */
     // Should be last to avoid exposing partially initialized app
     this.receiver.init(this);
   }
