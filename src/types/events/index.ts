@@ -4,14 +4,23 @@ import { SayFn } from '../utilities';
 
 export * from './base-events';
 export {
-  BotMessageEvent,
   GenericMessageEvent,
-  MessageRepliedEvent,
-  MeMessageEvent,
-  MessageDeletedEvent,
-  ThreadBroadcastMessageEvent,
-  MessageChangedEvent,
+  BotMessageEvent,
+  ChannelArchiveMessageEvent,
+  ChannelJoinMessageEvent,
+  ChannelLeaveMessageEvent,
+  ChannelNameMessageEvent,
+  ChannelPostingPermissionsMessageEvent,
+  ChannelPurposeMessageEvent,
+  ChannelTopicMessageEvent,
+  ChannelUnarchiveMessageEvent,
   EKMAccessDeniedMessageEvent,
+  FileShareMessageEvent,
+  MeMessageEvent,
+  MessageChangedEvent,
+  MessageDeletedEvent,
+  MessageRepliedEvent,
+  ThreadBroadcastMessageEvent,
 } from './message-events';
 
 /**
