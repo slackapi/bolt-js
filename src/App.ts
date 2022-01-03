@@ -371,10 +371,10 @@ export default class App {
     /* --------------------- Initialize receiver ---------------------- */
     if (receiver !== undefined) {
       // Custom receiver supplied
-      if (this.socketMode) {
+      if (this.socketMode === true) {
         // socketMode = true should result in SocketModeReceiver being used as receiver
         // TODO: Add case for when socketMode = true and receiver = SocketModeReceiver
-        // this should not result in error
+        // as this should not result in an error
         throw new AppInitializationError('You cannot supply a custom receiver when socketMode is set to true.');
       }
       this.receiver = receiver;
