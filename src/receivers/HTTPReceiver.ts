@@ -639,7 +639,7 @@ export default class HTTPReceiver implements Receiver {
           // Serve a basic HTML page including the "Add to Slack" button.
           // Regarding headers:
           // - Content-Length is not used because Transfer-Encoding='chunked' is automatically used.
-          res.setHeader('Content-Type', 'text/html');
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
           res.writeHead(200);
           res.end(body);
         }
