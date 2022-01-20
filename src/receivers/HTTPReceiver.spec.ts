@@ -291,11 +291,14 @@ describe('HTTPReceiver', function () {
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const writeHead = sinon.fake();
         const end = sinon.fake();
+        const setHeader = sinon.fake();
         fakeRes.writeHead = writeHead;
         fakeRes.end = end;
+        fakeRes.setHeader = setHeader;
         await receiver.requestListener(fakeReq, fakeRes);
         assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
         assert.isTrue(writeHead.calledWith(200));
+        assert.isTrue(setHeader.calledWith('Content-Type', 'text/html'));
       });
 
       it('should use a custom HTML renderer for the install path webpage', async function () {
