@@ -298,7 +298,7 @@ describe('HTTPReceiver', function () {
         await receiver.requestListener(fakeReq, fakeRes);
         assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
         assert.isTrue(writeHead.calledWith(200));
-        assert.isTrue(setHeader.calledWith('Content-Type', 'text/html'));
+        assert.isTrue(setHeader.calledWith('Content-Type', 'text/html; charset=utf-8'));
       });
 
       it('should use a custom HTML renderer for the install path webpage', async function () {
