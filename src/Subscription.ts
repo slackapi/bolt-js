@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { View } from '@slack/types';
-import processMiddleware from './middleware/process';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -18,20 +17,20 @@ import {
 
 /* Interfaces */
 export interface SubscriptionOptions {
-  onCreate: SubscriptionOnCreateMiddleware[];
-  onConfigure: SubscriptionOnConfigureMiddleware[];
-  onDeleted?: SubscriptionOnDeletedMiddleware[];
+  onCreate: SubscriptionOnCreateMiddleware | SubscriptionOnCreateMiddleware[];
+  onConfigure: SubscriptionOnConfigureMiddleware | SubscriptionOnConfigureMiddleware[];
+  onDeleted?: SubscriptionOnDeletedMiddleware | SubscriptionOnDeletedMiddleware[];
 }
 /* Types */
 type AllSubscriptionMiddlewareArgs<T extends SlackSubscriptionMiddlewareArgs = SlackSubscriptionMiddlewareArgs> =
 T & AllMiddlewareArgs;
 
-type SubscriptionMiddleware = SubscriptionOnCreateMiddleware[] |
+export type SubscriptionMiddleware = SubscriptionOnCreateMiddleware[] |
 SubscriptionOnConfigureMiddleware[] |
 SubscriptionOnDeletedMiddleware[] | [];
 
 /* Constants */
-const VALID_NOTIFICATION_SUBSCRIPTION_INTERACTION_TYPES = [
+export const VALID_NOTIFICATION_SUBSCRIPTION_INTERACTION_TYPES = [
   'notification_subscription_create_requested',
   'notification_subscription_configure_requested',
   'notification_subscription_deleted',
@@ -62,9 +61,9 @@ export class Subscription {
    * */
   private onDeleted: SubscriptionOnDeletedMiddleware[] = [];
 
-  public constructor(id: string, config: SubscriptionOptions) {
-    validate(id, config);
-    const { onCreate, onConfigure, onDeleted } = config;
+  public constructor(id: string, options: SubscriptionOptions) {
+    validate(id, options);
+    const { onCreate, onConfigure, onDeleted } = options;
     this.id = id;
     this.onCreate = Array.isArray(onCreate) ? onCreate : [onCreate];
     this.onConfigure = Array.isArray(onConfigure) ? onConfigure : [onConfigure];
@@ -117,42 +116,43 @@ export class Subscription {
 }
 
 /* Utilities */
-function validate(id: string, config: SubscriptionOptions): void {
+export function validate(id: string, options: SubscriptionOptions): void {
 // id must be a string
   if (typeof id !== 'string') {
-    // TODO: Create a custom error type for this and improve error messages
     throw new Error('Subscription id must be a string');
   }
   // Check user has supplied minimal required middleware
   const requiredKeys: (keyof SubscriptionOptions)[] = ['onCreate', 'onConfigure'];
-  const missingKeys = requiredKeys.filter((key) => !(key in config));
+  const missingKeys = requiredKeys.filter((key) => !(key in options));
   if (missingKeys.length > 0) {
-    throw new Error(`Subcription handling options provided are missing required keys: ${missingKeys.join(', ')}`);
+    throw new Error(`Subscription handling options provided are missing required keys: ${missingKeys.join(', ')}`);
   }
   // Check user has supplied valid middleware
-  const currentKeys = Object.keys(config) as (keyof SubscriptionOptions)[];
+  const currentKeys = Object.keys(options) as (keyof SubscriptionOptions)[];
   currentKeys.forEach((fnKey) => {
     // must be non-falsy value
-    if (!config[fnKey]) {
+    if (!options[fnKey]) {
       throw new Error(`You must supply a middleware for ${fnKey}`);
     }
-    // must be either a fn or array of fns
-    if (typeof config[fnKey] !== 'function' && !Array.isArray(config[fnKey])) {
+    // must be either a fn or array
+    if (typeof options[fnKey] !== 'function' && !Array.isArray(options[fnKey])) {
       throw new Error(`Subscription handling option ${fnKey} must be a function or an array of functions`);
     }
-    // if array, it must contain fns
-    if (Array.isArray(config[fnKey])) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      config[fnKey]!.forEach((ele) => {
-        if (typeof ele !== 'function') {
-          throw new Error(`If you provide an array for ${fnKey}, it must contain only functions`);
+    // arrays must contain middleware functions
+    if (Array.isArray(options[fnKey])) {
+      const array = options[fnKey] as SubscriptionOnCreateMiddleware[] |
+      SubscriptionOnConfigureMiddleware[] |
+      SubscriptionOnDeletedMiddleware[];
+      array.forEach((middleware) => {
+        if (typeof middleware !== 'function') {
+          throw new Error('Subscription handling option(s) supplied as arrays must contain only functions');
         }
       });
     }
   });
 }
 
-function isSubscriptionInteraction(args: AnyMiddlewareArgs): args is AllSubscriptionMiddlewareArgs {
+export function isSubscriptionInteraction(args: AnyMiddlewareArgs): args is AllSubscriptionMiddlewareArgs {
   return VALID_NOTIFICATION_SUBSCRIPTION_INTERACTION_TYPES
     .includes(args.payload.type);
 }
@@ -161,27 +161,32 @@ function isSubscriptionInteraction(args: AnyMiddlewareArgs): args is AllSubscrip
  * `processSubMiddleware()` processes subscription interaction payload with the
  * middleware supplied by the user.
  * */
-async function processSubMiddleware(
+export async function processSubMiddleware(
   args: AllSubscriptionMiddlewareArgs,
   origMiddleware: SubscriptionMiddleware,
 ): Promise<void> {
-  const { context, client, logger } = args;
   // Copy the array so modifications don't affect the original
   const middlewares = [...origMiddleware] as Middleware<AnyMiddlewareArgs>[];
   // Don't process the last item in the array, it shouldn't get a next fn
-  const lastCallback = middlewares.pop();
-  if (lastCallback !== undefined) {
-    await processMiddleware(
-      middlewares, args, context, client, logger,
-      async () => lastCallback({ ...args, context, client, logger }),
-    );
-  }
+  let lastCalledMiddlewareIndex = -1;
+  // recursively call each middleware in array
+  const invokeMiddleware = async (toCallMiddlewareIndex: number): Promise<void> => {
+    if (lastCalledMiddlewareIndex < middlewares.length - 1) {
+      lastCalledMiddlewareIndex = toCallMiddlewareIndex;
+      // invoke middleware
+      await middlewares[toCallMiddlewareIndex]({
+        ...args,
+      });
+      invokeMiddleware(toCallMiddlewareIndex + 1);
+    }
+  };
+  invokeMiddleware(0);
 }
 /**
  * `prepareSubArgs()` prepares the arguments for the specific middlewares
  * adding specific arguments for utilities
  * */
-function prepareSubArgs(args: AllMiddlewareArgs): AllSubscriptionMiddlewareArgs {
+export function prepareSubArgs(args: AllMiddlewareArgs): AllSubscriptionMiddlewareArgs {
   const { next: _next, ...subArgs } = args;
   const preparedArgs: any = { ...subArgs };
   switch (preparedArgs.payload.type) {
@@ -201,7 +206,7 @@ function prepareSubArgs(args: AllMiddlewareArgs): AllSubscriptionMiddlewareArgs 
  * Utility which returns a fxn which can be used to
  * open a configure view for configuring a Slack subscription
  * */
-function createConfigure(args: any): SubConfigureFn {
+export function createConfigure(args: any): SubConfigureFn {
   const { payload }: { payload: SubscriptionCreateRequested | SubscriptionConfigureRequested } = args;
   const trigger_id = payload.notification_subscription_action_trigger_id;
   const { client, context } = args;

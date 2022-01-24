@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/dot-notation */
-
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   Middleware,
   AnyMiddlewareArgs,

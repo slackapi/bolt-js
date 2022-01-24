@@ -1,50 +1,50 @@
-import { ViewsOpenResponse, ChatPostMessageResponse } from '@slack/web-api';
+import { ViewsOpenResponse } from '@slack/web-api';
 import { View } from '@slack/types';
 import { Middleware } from '../middleware';
-import { SayFn, AckFn, SayArguments } from '../utilities';
+import { SayFn, AckFn } from '../utilities';
 
 /* Notification Subscription :: 0 - Base */
 export interface NotificationSubscription<T extends string = string> {
-  type: T,
-  token: string,
-  action_ts: string,
-  action_id: string,
+  type: T;
+  token: string;
+  action_ts: string;
+  action_id: string;
   user: {
-    id: string,
-    name: string,
-  },
+    id: string;
+    name: string;
+  };
   team: {
-    id: string,
-    domain: string,
-    enterprise_id?: string, // exists for enterprise installs
-    enterprise_name?: string, // exists for enterprise installs
-  },
+    id: string;
+    domain: string;
+    enterprise_id?: string; // exists for enterprise installs
+    enterprise_name?: string; // exists for enterprise installs
+  };
 }
 
 /* Notification Subscription :: 1 - Create Requested */
 export interface SubscriptionCreateRequested extends NotificationSubscription<'notification_subscription_create_requested'> {
   channel: {
-    id: string, // id of channel where request was initiated
-  },
-  notification_subscription_action_trigger_id: string,
+    id: string; // id of channel where request was initiated
+  };
+  notification_subscription_action_trigger_id: string;
   notification_subscription: {
-    resource_link: string,
-  },
+    resource_link: string;
+  };
 }
 
 /* Notification Subscription :: 2 - Configure Requested */
 export interface SubscriptionConfigureRequested extends NotificationSubscription<'notification_subscription_configure_requested'> {
-  notification_subscription_action_trigger_id: string,
+  notification_subscription_action_trigger_id: string;
   notification_subscription: {
-    id: string, // slack generated id of notification subscription
-  },
+    id: string; // slack generated id of notification subscription
+  };
 }
 
 /* Notification Subscription :: 3 - Deleted */
 export interface SubscriptionDeleted extends NotificationSubscription<'notification_subscription_deleted'> {
   notification_subscription: {
-    id: string, // slack generated id of notification subscription
-  },
+    id: string; // slack generated id of notification subscription
+  };
 }
 
 export type SubscriptionInteraction =
@@ -93,8 +93,5 @@ export type SubscriptionOnConfigureMiddleware = Middleware<SubscriptionOnConfigu
 export type SubscriptionOnDeletedMiddleware = Middleware<SubscriptionMiddlewareArgs>;
 
 export interface SubConfigureFn {
-  (params: View): Promise<ViewsOpenResponse>,
-}
-export interface SubSayFn {
-  (params: SayArguments): Promise<ChatPostMessageResponse>,
+  (params: View): Promise<ViewsOpenResponse>;
 }
