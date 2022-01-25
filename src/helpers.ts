@@ -5,6 +5,7 @@ import {
   SlackOptionsMiddlewareArgs,
   SlackActionMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
+  SlackSubscriptionMiddlewareArgs,
   SlackAction,
   OptionsSource,
   MessageShortcut,
@@ -20,6 +21,7 @@ export enum IncomingEventType {
   Options,
   ViewAction,
   Shortcut,
+  Subscription,
 }
 
 /**
@@ -55,7 +57,6 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return foundConversationId! || undefined;
     })();
-
     return {
       conversationId,
       type: IncomingEventType.Event,
@@ -72,6 +73,13 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
     return {
       type: IncomingEventType.Options,
       conversationId: optionsBody.channel !== undefined ? optionsBody.channel.id : undefined,
+    };
+  }
+  if (body.type !== undefined && body.type.startsWith('notification_subscription_')) {
+    const subscriptionBody = body as SlackSubscriptionMiddlewareArgs['body'];
+    return {
+      type: IncomingEventType.Subscription,
+      conversationId: 'channel' in subscriptionBody ? subscriptionBody.channel.id : undefined,
     };
   }
   if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'workflow_step_edit') {
