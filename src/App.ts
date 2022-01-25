@@ -22,6 +22,7 @@ import {
 import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
+import { Subscription, SubscriptionOptions } from './Subscription';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -53,6 +54,8 @@ import {
   KnownEventFromType,
   SlashCommand,
   WorkflowStepEdit,
+  SubscriptionInteraction,
+  SlackSubscriptionMiddlewareArgs,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -528,6 +531,23 @@ export default class App {
     return this.receiver.stop(...args);
   }
 
+  /**
+   * Register subcription middleware
+   *
+   * @param listeners middleware that process and react to subscription payloads
+   */
+  public subscription(options: SubscriptionOptions): this {
+    /*
+     * TODO If it becomes possible for users to set a custom unique resource id,
+     * custom id should be supplied in place of the default.
+     * */
+    const defaultId = 'DEFAULTID';
+    const s = new Subscription(defaultId, options);
+    const m = s.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+
   public event<EventType extends string = string>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
@@ -766,7 +786,6 @@ export default class App {
    */
   public async processEvent(event: ReceiverEvent): Promise<void> {
     const { body, ack } = event;
-
     if (this.developerMode) {
       // log the body of the event
       // this may contain sensitive info like tokens
@@ -815,7 +834,6 @@ export default class App {
         });
       }
     }
-
     // Try to set teamId from AuthorizeResult before using one from source
     if (authorizeResult.teamId === undefined && source.teamId !== undefined) {
       authorizeResult.teamId = source.teamId;
@@ -855,7 +873,8 @@ export default class App {
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
+    let payload: DialogSubmitAction | WorkflowStepEdit |
+    SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
     | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
@@ -886,6 +905,7 @@ export default class App {
         )['body']);
         break;
     }
+
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
     const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
@@ -1279,7 +1299,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     if (type === IncomingEventType.Command) {
       return (body as SlackCommandMiddlewareArgs['body']).team_id;
     }
-
+    if (type === IncomingEventType.Subscription) {
+      const bodyAsSubscriptionInteraction = body as SlackSubscriptionMiddlewareArgs['body'];
+      return bodyAsSubscriptionInteraction.team.id;
+    }
     if (
       type === IncomingEventType.Action ||
       type === IncomingEventType.Options ||
@@ -1322,7 +1345,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     if (type === IncomingEventType.Command) {
       return (body as SlackCommandMiddlewareArgs['body']).enterprise_id;
     }
-
+    if (type === IncomingEventType.Subscription) {
+      const bodyAsSubscriptionInteraction = body as SlackSubscriptionMiddlewareArgs['body'];
+      return bodyAsSubscriptionInteraction.team.enterprise_id;
+    }
     if (
       type === IncomingEventType.Action ||
       type === IncomingEventType.Options ||
@@ -1378,7 +1404,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       }
       return undefined;
     }
-
+    if (type === IncomingEventType.Subscription) {
+      const bodyAsSubscriptionInteraction = body as SlackSubscriptionMiddlewareArgs['body'];
+      return bodyAsSubscriptionInteraction.user.id;
+    }
     if (
       type === IncomingEventType.Action ||
       type === IncomingEventType.Options ||
@@ -1418,13 +1447,18 @@ function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: 
       return !!bodyAsEvent.authorizations[0].is_enterprise_install;
     }
   }
-  // command payloads have this property set as a string
-  if (typeof body.is_enterprise_install === 'string') {
-    return body.is_enterprise_install === 'true';
+  if (type === IncomingEventType.Subscription) {
+    return body.team.enterprise_id !== undefined;
   }
-  // all remaining types have a boolean property
-  if (body.is_enterprise_install !== undefined) {
-    return body.is_enterprise_install;
+  if ('is_enterprise_install' in body) {
+    // command payloads have this property set as a string
+    if (typeof body.is_enterprise_install === 'string') {
+      return body.is_enterprise_install === 'true';
+    }
+    // all remaining types have a boolean property
+    if (body.is_enterprise_install !== undefined) {
+      return body.is_enterprise_install;
+    }
   }
   // as a fallback we assume it's a single team installation (but this should never happen)
   return false;
