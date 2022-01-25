@@ -83,8 +83,7 @@ export type SlackEvent =
   | WorkflowPublishedEvent
   | WorkflowUnpublishedEvent
   | WorkflowStepDeletedEvent
-  | WorkflowStepExecuteEvent
-  | FunctionExecutedEvent;
+  | WorkflowStepExecuteEvent;
 
 export type EventTypePattern = string | RegExp;
 
@@ -1310,28 +1309,3 @@ export interface WorkflowStepExecuteEvent {
 
 // NOTE: `user_resourced_denied`, `user_resource_granted`, `user_resourced_removed` are left out because they are
 // deprecated as part of the Workspace Apps Developer Preview
-
-export interface FunctionExecutedEvent {
-  type: 'function_executed';
-  function_execution_id: string;
-  function: {
-    id: string;
-    callback_id: string;
-    name: string;
-    description: string;
-    input_parameters: {
-      name: string;
-      description: string;
-      type: string;
-    }[];
-    output_parameters: {
-      name: string;
-      description: string;
-      type: string;
-    }[];
-  };
-  arguments: {
-    [index: string]: any;
-  };
-  event_ts: string;
-}
