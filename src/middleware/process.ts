@@ -11,7 +11,6 @@ export default async function processMiddleware(
   last: () => Promise<void>,
 ): Promise<void> {
   let lastCalledMiddlewareIndex = -1;
-
   async function invokeMiddleware(toCallMiddlewareIndex: number): ReturnType<Middleware<AnyMiddlewareArgs>> {
     if (lastCalledMiddlewareIndex >= toCallMiddlewareIndex) {
       // TODO: use a coded error
