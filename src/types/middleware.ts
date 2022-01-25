@@ -7,6 +7,7 @@ import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
 import { SlackShortcutMiddlewareArgs } from './shortcuts';
 import { SlackViewMiddlewareArgs } from './view';
+import { SlackSubscriptionMiddlewareArgs } from './subscription';
 
 // TODO: rename this to AnyListenerArgs, and all the constituent types
 export type AnyMiddlewareArgs =
@@ -15,8 +16,8 @@ export type AnyMiddlewareArgs =
   | SlackCommandMiddlewareArgs
   | SlackOptionsMiddlewareArgs
   | SlackViewMiddlewareArgs
-  | SlackShortcutMiddlewareArgs;
-
+  | SlackShortcutMiddlewareArgs
+  | SlackSubscriptionMiddlewareArgs;
 export interface AllMiddlewareArgs {
   context: Context;
   logger: Logger;
@@ -64,7 +65,6 @@ export interface Context extends StringIndexed {
    * Enterprise Grid Organization ID.
    */
   enterpriseId?: string;
-
   /**
    * Retry count of an Events API request (this property does not exist for other requests)
    */
