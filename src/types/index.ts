@@ -7,3 +7,4 @@ export * from './options';
 export * from './view';
 export * from './receiver';
 export * from './shortcuts';
+export * from './subscription';
