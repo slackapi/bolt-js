@@ -7,6 +7,7 @@ import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
 import { SlackShortcutMiddlewareArgs } from './shortcuts';
 import { SlackViewMiddlewareArgs } from './view';
+import { SlackSubscriptionMiddlewareArgs } from './subscription';
 
 // TODO: rename this to AnyListenerArgs, and all the constituent types
 export type AnyMiddlewareArgs =
@@ -15,7 +16,8 @@ export type AnyMiddlewareArgs =
   | SlackCommandMiddlewareArgs
   | SlackOptionsMiddlewareArgs
   | SlackViewMiddlewareArgs
-  | SlackShortcutMiddlewareArgs;
+  | SlackShortcutMiddlewareArgs
+  | SlackSubscriptionMiddlewareArgs;
 
 export interface AllMiddlewareArgs<CustomContext = StringIndexed> {
   context: Context & CustomContext;
@@ -68,7 +70,6 @@ export interface Context extends StringIndexed {
    * Is the app installed at an Enterprise level?
    */
   isEnterpriseInstall: boolean,
-
   /**
    * Retry count of an Events API request (this property does not exist for other requests)
    */
