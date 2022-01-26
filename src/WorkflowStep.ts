@@ -6,6 +6,7 @@ import {
   WorkflowsUpdateStepResponse,
   WorkflowsStepCompletedResponse,
   WorkflowsStepFailedResponse,
+  WebClient
 } from '@slack/web-api';
 import {
   Middleware,
@@ -96,6 +97,7 @@ export interface WorkflowStepSaveMiddlewareArgs extends SlackViewMiddlewareArgs<
 
 export interface WorkflowStepExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'workflow_step_execute'> {
   step: WorkflowStepExecuteEvent['workflow_step'];
+  client: WebClient;
   complete: StepCompleteFn;
   fail: StepFailFn;
 }
