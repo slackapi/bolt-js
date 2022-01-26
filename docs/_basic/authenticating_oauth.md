@@ -130,6 +130,7 @@ We provide several options for customizing default OAuth using the `installerOpt
 - `redirectUriPath`: This relative path must match the `redirectUri` provided in the App options 
 - `callbackOptions`: Provide custom success and failure pages at the end of the OAuth flow
 - `stateStore`: Provide a custom state store instead of using the built in `ClearStateStore`
+- `userScopes`: Array of user scopes needed when the user installs the app, similar to `scopes` attribute at the parent level.
 
 </div>
 
@@ -144,6 +145,7 @@ const app = new App({
       metadata: 'some session data',
       installPath: '/slack/installApp',
       redirectUriPath: '/slack/redirect',
+      userScopes: ['chat:write']
       callbackOptions: {
         success: (installation, installOptions, req, res) => {
           // Do custom success logic here
