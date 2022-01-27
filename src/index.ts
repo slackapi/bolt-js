@@ -34,7 +34,7 @@ export {
   WorkflowStepExecuteMiddleware,
   WorkflowStepEditMiddlewareArgs,
   WorkflowStepSaveMiddlewareArgs,
-  WorkflowStepExecuteMiddlewareArgs
+  WorkflowStepExecuteMiddlewareArgs,
 } from './WorkflowStep';
 
 export {
