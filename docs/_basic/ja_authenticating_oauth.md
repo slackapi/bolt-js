@@ -81,6 +81,7 @@ const app = new App({
 - `redirectUriPath`: Redirect URL を変更するために使用
 - `callbackOptions`: OAuth フロー完了時の成功・エラー完了画面をカスタマイズするために使用
 - `stateStore`: 組み込みの `ClearStateStore` の代わりにカスタムのデータストアを有効にするために使用
+- `userScopes`: 親の階層にある `scopes` プロパティと同様、ユーザがアプリをインストールする際に必要となるユーザスコープのリストの指定に使用
 
 </div>
 
@@ -95,6 +96,7 @@ const app = new App({
       metadata: 'some session data',
       installPath: '/slack/installApp',
       redirectUriPath: '/slack/redirect',
+      userScopes: ['chat:write'],
       callbackOptions: {
         success: (installation, installOptions, req, res) => {
           // ここで成功時のカスタムロジックを実装
