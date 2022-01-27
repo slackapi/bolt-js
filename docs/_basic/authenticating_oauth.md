@@ -145,7 +145,7 @@ const app = new App({
       metadata: 'some session data',
       installPath: '/slack/installApp',
       redirectUriPath: '/slack/redirect',
-      userScopes: ['chat:write']
+      userScopes: ['chat:write'],
       callbackOptions: {
         success: (installation, installOptions, req, res) => {
           // Do custom success logic here
