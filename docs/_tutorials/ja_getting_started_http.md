@@ -131,7 +131,7 @@ Slack ワークスペースで発生するイベント (メッセージが投稿
 
 2. Request URLを追加します。Slackはイベントに対応するHTTP POSTリクエストをこの[Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls)エンドポイントに送信します。Boltは`/slack/events`のパスを使用して、すべての受信リクエスト（ショートカット、イベント、インタラクティビティのペイロードなど）をリッスンします。アプリの設定でRequest URLを設定する際には、`https://<your-domain>/slack/events`のように`/slack/events`を追加します。💡
 
-> ローカル開発では、[ngrok](https://ngrok.com/)のようなプロキシサービスを使って公開URLを作成し、リクエストを開発環境にトンネリングすることができます。[ローカル開発のためのSlackでのngrokの使用](https://api.slack.com/tutorials/tunneling-with-ngrok)については別のチュートリアルがありますので、そちらを参照してください。
+> ローカル開発では、[ngrok](https://ngrok.com/)のようなプロキシサービスを使って公開 URL を作成し、リクエストを開発環境にトンネリングすることができます。このトンネリングの方法については、[ngrok のガイド](https://ngrok.com/docs#getting-started-expose)を参照してください。
 
 最後に、聞きたいイベントをSlackに伝えましょう。**Event Subscriptions**の下にある、**Enable Events**というラベルの付いたスイッチを切り替えます。
 
