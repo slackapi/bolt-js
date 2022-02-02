@@ -238,7 +238,7 @@ export default class App {
 
   private socketMode: boolean;
 
-  private developerMode: boolean;
+  public developerMode: boolean;
 
   private extendedErrorHandler: boolean;
 
