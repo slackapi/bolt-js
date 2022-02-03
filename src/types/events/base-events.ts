@@ -3,6 +3,7 @@ import { MessageEvent as AllMessageEvents } from './message-events';
 
 /**
  * All known event types in Slack's Events API
+ * Please refer to https://api.slack.com/events for more details
  *
  * This is a discriminated union. The discriminant is the `type` property.
  */
@@ -16,6 +17,7 @@ export type SlackEvent =
   | ChannelCreatedEvent
   | ChannelDeletedEvent
   | ChannelHistoryChangedEvent
+  | ChannelIDChangedEvent
   | ChannelLeftEvent
   | ChannelRenameEvent
   | ChannelSharedEvent
