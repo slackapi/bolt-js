@@ -16,6 +16,7 @@ export type SlackEvent =
   | ChannelCreatedEvent
   | ChannelDeletedEvent
   | ChannelHistoryChangedEvent
+  | ChannelIDChangedEvent
   | ChannelLeftEvent
   | ChannelRenameEvent
   | ChannelSharedEvent
