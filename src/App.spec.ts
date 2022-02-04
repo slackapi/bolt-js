@@ -417,6 +417,42 @@ describe('App', () => {
       // Assert
       assert.instanceOf(app, MockApp);
     });
+
+    it('should fail in await App#init()', async () => {
+      // Arrange
+      const fakeConstructor = sinon.fake();
+      const overrides = mergeOverrides(withNoopAppMetadata(), {
+        '@slack/web-api': {
+          WebClient: class {
+            public constructor() {
+              fakeConstructor(...arguments); // eslint-disable-line prefer-rest-params
+            }
+
+            public auth = {
+              test: () => {
+                throw new Error('Failing for init() test!');
+              },
+            };
+          },
+        },
+      });
+
+      const MockApp = await importApp(overrides);
+      const app = new MockApp({
+        token: 'xoxb-completely-invalid-token',
+        signingSecret: 'invalid-one',
+        deferInitialization: true,
+      });
+      // Assert
+      assert.instanceOf(app, MockApp);
+      try {
+        await app.init();
+        assert.fail('The init() method should fail here');
+      } catch (err: any) {
+        assert.equal(err.message, 'Failing for init() test!');
+      }
+    });
+
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
     // TODO: tests for providing botId and botUserId options
