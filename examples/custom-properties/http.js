@@ -32,6 +32,8 @@ const app = new App({
     },
     unhandledRequestTimeoutMillis: 2000, // the default is 3001
   }),
+  // This option enables developer to call #init() in async/await style
+  deferInitialization: true,
 });
 
 app.use(async ({ logger, context, next }) => {
@@ -41,7 +43,12 @@ app.use(async ({ logger, context, next }) => {
 
 (async () => {
   // Start your app
-  await app.start(process.env.PORT || 3000);
-
+  try {
+    await app.init();
+    await app.start(process.env.PORT || 3000);
+  } catch (e) {
+    console.error(e);
+    process.exit(255);
+  }
   console.log('⚡️ Bolt app is running!');
 })();

@@ -2,10 +2,10 @@
   "name": "bolt-js-custom-properties-app",
   "version": "1.0.0",
   "description": "Having custom request properties in ⚡️ Bolt for JavaScript",
-  "main": "app.js",
+  "main": "http.js",
   "scripts": {
     "ngrok": "ngrok http 3000",
-    "start": "node app.js",
+    "start": "node http.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "MIT",
