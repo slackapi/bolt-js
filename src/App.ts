@@ -242,16 +242,18 @@ export default class App {
 
   private hasCustomErrorHandler: boolean;
 
-  // used for the deferred initialization
+  // used when deferInitialization is true
   private argToken?: string;
 
-  // used for the deferred initialization
+  // used when deferInitialization is true
   private argAuthorize?: Authorize;
 
-  // used for the deferred initialization
+  // used when deferInitialization is true
   private argAuthorization?: Authorization;
 
   private tokenVerificationEnabled: boolean;
+
+  private initialized: boolean;
 
   public constructor({
     signingSecret = undefined,
@@ -381,7 +383,6 @@ export default class App {
       };
     }
 
-    /* --------------------- Initialize receiver ---------------------- */
     this.receiver = this.initReceiver(
       receiver,
       signingSecret,
@@ -414,13 +415,15 @@ export default class App {
       this.argToken = token;
       this.argAuthorize = authorize;
       this.argAuthorization = argAuthorization;
+      this.initialized = false;
       // You need to run `await app.init();` on your own
     } else {
-      this.initInConstructor(
+      this.authorize = this.initAuthorizeInConstructor(
         token,
         authorize,
         argAuthorization,
       );
+      this.initialized = true;
     }
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
@@ -441,11 +444,12 @@ export default class App {
   }
 
   public async init(): Promise<void> {
-    this.initAuthorizeIfNoTokenIsGiven(
+    const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(
       this.argToken,
       this.argAuthorize,
     );
-    if (this.authorize !== undefined) {
+    if (initializedAuthorize !== undefined) {
+      this.authorize = initializedAuthorize;
       return;
     }
     if (this.argToken !== undefined && this.argAuthorization !== undefined) {
@@ -502,6 +506,11 @@ export default class App {
   public start(
     ...args: Parameters<HTTPReceiver['start'] | SocketModeReceiver['start']>
   ): ReturnType<HTTPReceiver['start']> {
+    if (!this.initialized) {
+      throw new AppInitializationError(
+        'This App instance is not yet initialized. Call `await App#init()` before starting the app.',
+      );
+    }
     // TODO: HTTPReceiver['start'] should be the actual receiver's return type
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
@@ -1109,7 +1118,7 @@ export default class App {
   private initAuthorizeIfNoTokenIsGiven(
     token?: string,
     authorize?: Authorize,
-  ): void {
+  ): Authorize<boolean> | undefined {
     let usingOauth = false;
     const httpReceiver = (this.receiver as HTTPReceiver);
     if (
@@ -1127,7 +1136,7 @@ export default class App {
           `You cannot provide a token along with either oauth installer options or authorize. ${tokenUsage}`,
         );
       }
-      return;
+      return undefined;
     }
 
     if (authorize === undefined && !usingOauth) {
@@ -1138,34 +1147,36 @@ export default class App {
       throw new AppInitializationError(`You cannot provide both authorize and oauth installer options. ${tokenUsage}`);
     } else if (authorize === undefined && usingOauth) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.authorize = httpReceiver.installer!.authorize;
+      return httpReceiver.installer!.authorize;
     } else if (authorize !== undefined && !usingOauth) {
-      this.authorize = authorize as Authorize<boolean>;
+      return authorize as Authorize<boolean>;
     }
+    return undefined;
   }
 
-  private initInConstructor(
+  private initAuthorizeInConstructor(
     token?: string,
-    authorize?: Authorize,
+    authorize?: Authorize<boolean>,
     authorization?: Authorization,
-  ): void {
-    this.initAuthorizeIfNoTokenIsGiven(
+  ): Authorize<boolean> {
+    const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(
       token,
       authorize,
     );
-    if (this.authorize !== undefined) {
-      return;
+    if (initializedAuthorize !== undefined) {
+      return initializedAuthorize;
     }
     if (token !== undefined && authorization !== undefined) {
-      this.authorize = singleAuthorization(
+      return singleAuthorization(
         this.client,
         authorization,
         this.tokenVerificationEnabled,
       );
-    } else {
-      this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
-      assertNever();
     }
+    const hasToken = token !== undefined && token.length > 0;
+    const errorMessage = `Something has gone wrong in #initAuthorizeInConstructor method (hasToken: ${hasToken}, authorize: ${authorize}). Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues`;
+    this.logger.error(errorMessage);
+    throw new Error(errorMessage);
   }
 }
 

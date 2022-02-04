@@ -446,6 +446,13 @@ describe('App', () => {
       // Assert
       assert.instanceOf(app, MockApp);
       try {
+        // call #start() before #init()
+        await app.start();
+        assert.fail('The start() method should fail befofe init() call');
+      } catch (err: any) {
+        assert.equal(err.message, 'This App instance is not yet initialized. Call `await App#init()` before starting the app.');
+      }
+      try {
         await app.init();
         assert.fail('The init() method should fail here');
       } catch (err: any) {
