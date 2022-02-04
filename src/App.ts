@@ -476,7 +476,7 @@ export default class App {
         this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
         assertNever();
       }
-    } catch (e: unknown) {
+    } catch (e) {
       // Revert the flag change as the initialization failed
       this.initialized = false;
       throw e;
