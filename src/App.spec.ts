@@ -448,7 +448,7 @@ describe('App', () => {
       try {
         // call #start() before #init()
         await app.start();
-        assert.fail('The start() method should fail befofe init() call');
+        assert.fail('The start() method should fail before init() call');
       } catch (err: any) {
         assert.equal(err.message, 'This App instance is not yet initialized. Call `await App#init()` before starting the app.');
       }
