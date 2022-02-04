@@ -440,68 +440,6 @@ export default class App {
     this.receiver.init(this);
   }
 
-  public initAuthorizeIfNoTokenIsGiven(
-    token?: string,
-    authorize?: Authorize,
-  ): void {
-    let usingOauth = false;
-    const httpReceiver = (this.receiver as HTTPReceiver);
-    if (
-      httpReceiver.installer !== undefined &&
-      httpReceiver.installer.authorize !== undefined
-    ) {
-      // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
-      // and theoretically, doing a fully custom (non express) receiver that implements OAuth
-      usingOauth = true;
-    }
-
-    if (token !== undefined) {
-      if (usingOauth || authorize !== undefined) {
-        throw new AppInitializationError(
-          `You cannot provide a token along with either oauth installer options or authorize. ${tokenUsage}`,
-        );
-      }
-      return;
-    }
-
-    if (authorize === undefined && !usingOauth) {
-      throw new AppInitializationError(
-        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://slack.dev/bolt-js/concepts#authenticating-oauth for these required fields.\n`,
-      );
-    } else if (authorize !== undefined && usingOauth) {
-      throw new AppInitializationError(`You cannot provide both authorize and oauth installer options. ${tokenUsage}`);
-    } else if (authorize === undefined && usingOauth) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.authorize = httpReceiver.installer!.authorize;
-    } else if (authorize !== undefined && !usingOauth) {
-      this.authorize = authorize as Authorize<boolean>;
-    }
-  }
-
-  public initInConstructor(
-    token?: string,
-    authorize?: Authorize,
-    authorization?: Authorization,
-  ): void {
-    this.initAuthorizeIfNoTokenIsGiven(
-      token,
-      authorize,
-    );
-    if (this.authorize !== undefined) {
-      return;
-    }
-    if (token !== undefined && authorization !== undefined) {
-      this.authorize = singleAuthorization(
-        this.client,
-        authorization,
-        this.tokenVerificationEnabled,
-      );
-    } else {
-      this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
-      assertNever();
-    }
-  }
-
   public async init(): Promise<void> {
     this.initAuthorizeIfNoTokenIsGiven(
       this.argToken,
@@ -531,79 +469,6 @@ export default class App {
       this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
       assertNever();
     }
-  }
-
-  private initReceiver(
-    receiver?: Receiver,
-    signingSecret?: HTTPReceiverOptions['signingSecret'],
-    endpoints?: HTTPReceiverOptions['endpoints'],
-    port?: HTTPReceiverOptions['port'],
-    customRoutes?: HTTPReceiverOptions['customRoutes'],
-    processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'],
-    signatureVerification?: HTTPReceiverOptions['signatureVerification'],
-    clientId?: HTTPReceiverOptions['clientId'],
-    clientSecret?: HTTPReceiverOptions['clientSecret'],
-    stateSecret?: HTTPReceiverOptions['stateSecret'],
-    redirectUri?: HTTPReceiverOptions['redirectUri'],
-    installationStore?: HTTPReceiverOptions['installationStore'],
-    scopes?: HTTPReceiverOptions['scopes'],
-    appToken?: string,
-    logger?: Logger,
-  ): Receiver {
-    if (receiver !== undefined) {
-      // Custom receiver supplied
-      if (this.socketMode === true) {
-        // socketMode = true should result in SocketModeReceiver being used as receiver
-        // TODO: Add case for when socketMode = true and receiver = SocketModeReceiver
-        // as this should not result in an error
-        throw new AppInitializationError('You cannot supply a custom receiver when socketMode is set to true.');
-      }
-      return receiver;
-    }
-    if (this.socketMode === true) {
-      if (appToken === undefined) {
-        throw new AppInitializationError('You must provide an appToken when socketMode is set to true. To generate an appToken see: https://api.slack.com/apis/connections/socket#token');
-      }
-      this.logger.debug('Initializing SocketModeReceiver');
-      return new SocketModeReceiver({
-        appToken,
-        clientId,
-        clientSecret,
-        stateSecret,
-        redirectUri,
-        installationStore,
-        scopes,
-        logger,
-        logLevel: this.logLevel,
-        installerOptions: this.installerOptions,
-        customRoutes,
-      });
-    }
-    if (signatureVerification === true && signingSecret === undefined) {
-      // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
-      throw new AppInitializationError(
-        'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
-          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
-      );
-    }
-    this.logger.debug('Initializing HTTPReceiver');
-    return new HTTPReceiver({
-      signingSecret: signingSecret || '',
-      endpoints,
-      port,
-      customRoutes,
-      processBeforeResponse,
-      signatureVerification,
-      clientId,
-      clientSecret,
-      stateSecret,
-      redirectUri,
-      installationStore,
-      scopes,
-      logger,
-      logLevel: this.logLevel,
-      installerOptions: this.installerOptions,
-    });
   }
 
   /**
@@ -1162,6 +1027,145 @@ export default class App {
     return this.extendedErrorHandler && this.hasCustomErrorHandler ?
       this.errorHandler({ error: asCodedError(error), ...rest }) :
       this.errorHandler(asCodedError(error));
+  }
+
+  // ---------------------
+  // Private methods for initialization
+  // ---------------------
+
+  private initReceiver(
+    receiver?: Receiver,
+    signingSecret?: HTTPReceiverOptions['signingSecret'],
+    endpoints?: HTTPReceiverOptions['endpoints'],
+    port?: HTTPReceiverOptions['port'],
+    customRoutes?: HTTPReceiverOptions['customRoutes'],
+    processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'],
+    signatureVerification?: HTTPReceiverOptions['signatureVerification'],
+    clientId?: HTTPReceiverOptions['clientId'],
+    clientSecret?: HTTPReceiverOptions['clientSecret'],
+    stateSecret?: HTTPReceiverOptions['stateSecret'],
+    redirectUri?: HTTPReceiverOptions['redirectUri'],
+    installationStore?: HTTPReceiverOptions['installationStore'],
+    scopes?: HTTPReceiverOptions['scopes'],
+    appToken?: string,
+    logger?: Logger,
+  ): Receiver {
+    if (receiver !== undefined) {
+      // Custom receiver supplied
+      if (this.socketMode === true) {
+        // socketMode = true should result in SocketModeReceiver being used as receiver
+        // TODO: Add case for when socketMode = true and receiver = SocketModeReceiver
+        // as this should not result in an error
+        throw new AppInitializationError('You cannot supply a custom receiver when socketMode is set to true.');
+      }
+      return receiver;
+    }
+    if (this.socketMode === true) {
+      if (appToken === undefined) {
+        throw new AppInitializationError('You must provide an appToken when socketMode is set to true. To generate an appToken see: https://api.slack.com/apis/connections/socket#token');
+      }
+      this.logger.debug('Initializing SocketModeReceiver');
+      return new SocketModeReceiver({
+        appToken,
+        clientId,
+        clientSecret,
+        stateSecret,
+        redirectUri,
+        installationStore,
+        scopes,
+        logger,
+        logLevel: this.logLevel,
+        installerOptions: this.installerOptions,
+        customRoutes,
+      });
+    }
+    if (signatureVerification === true && signingSecret === undefined) {
+      // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
+      throw new AppInitializationError(
+        'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
+          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
+      );
+    }
+    this.logger.debug('Initializing HTTPReceiver');
+    return new HTTPReceiver({
+      signingSecret: signingSecret || '',
+      endpoints,
+      port,
+      customRoutes,
+      processBeforeResponse,
+      signatureVerification,
+      clientId,
+      clientSecret,
+      stateSecret,
+      redirectUri,
+      installationStore,
+      scopes,
+      logger,
+      logLevel: this.logLevel,
+      installerOptions: this.installerOptions,
+    });
+  }
+
+  private initAuthorizeIfNoTokenIsGiven(
+    token?: string,
+    authorize?: Authorize,
+  ): void {
+    let usingOauth = false;
+    const httpReceiver = (this.receiver as HTTPReceiver);
+    if (
+      httpReceiver.installer !== undefined &&
+      httpReceiver.installer.authorize !== undefined
+    ) {
+      // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
+      // and theoretically, doing a fully custom (non express) receiver that implements OAuth
+      usingOauth = true;
+    }
+
+    if (token !== undefined) {
+      if (usingOauth || authorize !== undefined) {
+        throw new AppInitializationError(
+          `You cannot provide a token along with either oauth installer options or authorize. ${tokenUsage}`,
+        );
+      }
+      return;
+    }
+
+    if (authorize === undefined && !usingOauth) {
+      throw new AppInitializationError(
+        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://slack.dev/bolt-js/concepts#authenticating-oauth for these required fields.\n`,
+      );
+    } else if (authorize !== undefined && usingOauth) {
+      throw new AppInitializationError(`You cannot provide both authorize and oauth installer options. ${tokenUsage}`);
+    } else if (authorize === undefined && usingOauth) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.authorize = httpReceiver.installer!.authorize;
+    } else if (authorize !== undefined && !usingOauth) {
+      this.authorize = authorize as Authorize<boolean>;
+    }
+  }
+
+  private initInConstructor(
+    token?: string,
+    authorize?: Authorize,
+    authorization?: Authorization,
+  ): void {
+    this.initAuthorizeIfNoTokenIsGiven(
+      token,
+      authorize,
+    );
+    if (this.authorize !== undefined) {
+      return;
+    }
+    if (token !== undefined && authorization !== undefined) {
+      this.authorize = singleAuthorization(
+        this.client,
+        authorization,
+        this.tokenVerificationEnabled,
+      );
+    } else {
+      this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
+      assertNever();
+    }
   }
 }
 
