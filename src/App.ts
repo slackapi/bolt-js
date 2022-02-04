@@ -444,34 +444,42 @@ export default class App {
   }
 
   public async init(): Promise<void> {
-    const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(
-      this.argToken,
-      this.argAuthorize,
-    );
-    if (initializedAuthorize !== undefined) {
-      this.authorize = initializedAuthorize;
-      return;
-    }
-    if (this.argToken !== undefined && this.argAuthorization !== undefined) {
-      let authorization = this.argAuthorization;
-      if (this.tokenVerificationEnabled) {
-        const authTestResult = await this.client.auth.test({ token: this.argToken });
-        if (authTestResult.ok) {
-          authorization = {
-            botUserId: authTestResult.user_id as string,
-            botId: authTestResult.bot_id as string,
-            botToken: this.argToken,
-          };
-        }
-      }
-      this.authorize = singleAuthorization(
-        this.client,
-        authorization,
-        this.tokenVerificationEnabled,
+    this.initialized = true;
+    try {
+      const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(
+        this.argToken,
+        this.argAuthorize,
       );
-    } else {
-      this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
-      assertNever();
+      if (initializedAuthorize !== undefined) {
+        this.authorize = initializedAuthorize;
+        return;
+      }
+      if (this.argToken !== undefined && this.argAuthorization !== undefined) {
+        let authorization = this.argAuthorization;
+        if (this.tokenVerificationEnabled) {
+          const authTestResult = await this.client.auth.test({ token: this.argToken });
+          if (authTestResult.ok) {
+            authorization = {
+              botUserId: authTestResult.user_id as string,
+              botId: authTestResult.bot_id as string,
+              botToken: this.argToken,
+            };
+          }
+        }
+        this.authorize = singleAuthorization(
+          this.client,
+          authorization,
+          this.tokenVerificationEnabled,
+        );
+        this.initialized = true;
+      } else {
+        this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
+        assertNever();
+      }
+    } catch (e: unknown) {
+      // Revert the flag change as the initialization failed
+      this.initialized = false;
+      throw e;
     }
   }
 
