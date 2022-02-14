@@ -15,7 +15,41 @@ You will need to provide your:
 ---
 
 ##### Installing your App
-Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This returns a simple `Add to Slack` button where users can initiate direct installs of your app. 
+Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This returns a simple `Add to Slack` button where users can initiate direct installs of your app. For example, if your app was hosted at `www.example.com`, you would be able to install your app at `www.example.com/slack/install`. Once you click on the `Add to Slack` button, this will initiate the OAuth process. You will see a green `Allow` button and dialouge of your app asking permissions. Once you click on the `Allow` button, this is when the redirect URI will be called. The out of the box redirect will ask you to "Open Slack". Once you open Slack, the `fetchInstallation` and `storeInstallation` part of the OAuth code will execute. 
+
+Additionally, you can expect the `installation` object to look like the following:
+
+```json
+{
+  team: { id: 'T012345678', name: 'example-team-name' },
+  enterprise: undefined,
+  user: { token: undefined, scopes: undefined, id: 'U01234567' },
+  tokenType: 'bot',
+  isEnterpriseInstall: false,
+  appId: 'A01234567',
+  authVersion: 'v2',
+  bot: {
+    scopes: [
+      'chat:write',
+    ],
+    token: 'xoxb-244493-28*********-********************',
+    userId: 'U012345678',
+    id: 'B01234567'
+  }
+}
+```
+
+Similarly, the installQuery object will look like the following:
+
+```json
+{
+  userId: 'U012345678',
+  isEnterpriseInstall: false,
+  teamId: 'T012345678',
+  enterpriseId: undefined,
+  conversationId: 'D02345678'
+}
+```
 
 If you need additional authorizations (user tokens) from users inside a team when your app is already installed, or have a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
