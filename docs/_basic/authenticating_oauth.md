@@ -17,7 +17,7 @@ You will need to provide your:
 ##### Installing your App
 Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This endpoint returns a simple `Add to Slack` button where users can initiate direct installs of your app. For example, if your app was hosted at `www.example.com`, you would be able to install your app at `www.example.com/slack/install`. 
 
-Once you click on the `Add to Slack` button, this will initiate the OAuth process. Users will see a green `Allow` button and dialogue of your app asking for permissions. Once you click on the `Allow` button, Slack will call your app's redirect URI. After this, the `fetchInstallation` and `storeInstallation` handlers you will execute. 
+Once you click on the `Add to Slack` button, this will initiate the OAuth process. Users will see a green `Allow` button and dialogue of your app asking for permissions. Once you click on the `Allow` button, Slack will call your app's redirect URI. This will bring you to the `slack/oauth_redirect` endpoint and alert you in your browser to "Open Slack". Only after you **Open Slack** will the `fetchInstallation` and `storeInstallation` handlers execute. 
 
 Bolt provides a redirect URI out-of-the-box. See the following section, Redirect URI for more details.  
 
