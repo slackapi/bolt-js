@@ -15,7 +15,59 @@ You will need to provide your:
 ---
 
 ##### Installing your App
-Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This returns a simple `Add to Slack` button where users can initiate direct installs of your app. 
+Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This endpoint returns a simple `Add to Slack` button where users can initiate direct installs of your app with a valid `state` parameter. For example, if your app was hosted at `www.example.com`, you would be able to install your app at `www.example.com/slack/install`. If you would like to skip rendering the simple webpage and directly navigate end-users to Slack authorize URL, your app can set `installerOptions.directInstall: true` in the `App` constructor. See example code below:
+
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: 'my-state-secret',
+  scopes: ['chat:write'],
+  // optional code for directInstall. Defaults to false. When set to true, user does not see "Add to Slack" button page. 
+  installerOptions: {
+    directInstall: true,
+  },
+});
+```
+
+Once you click on the `Add to Slack` button, this will initiate the OAuth process. Users will see a green `Allow` button and dialogue of your app asking for permissions. Once you click on the `Allow` button, Slack will call your app's redirect URI. This will bring you to the `slack/oauth_redirect` endpoint and alert you in your browser to "Open Slack". After you **Open Slack** and here on after as your app processes events from Slack, `fetchInstallation` and `storeInstallation` handlers will execute. 
+
+Bolt provides a redirect URI out-of-the-box. See the following section, Redirect URI for more details.  
+
+Additionally, you can expect the `installation` object to look like the following:
+
+```json
+{
+  team: { id: 'T012345678', name: 'example-team-name' },
+  enterprise: undefined,
+  user: { token: undefined, scopes: undefined, id: 'U01234567' },
+  tokenType: 'bot',
+  isEnterpriseInstall: false,
+  appId: 'A01234567',
+  authVersion: 'v2',
+  bot: {
+    scopes: [
+      'chat:write',
+    ],
+    token: 'xoxb-244493-28*********-********************',
+    userId: 'U012345678',
+    id: 'B01234567'
+  }
+}
+```
+
+Similarly, the installQuery object will look like the following:
+
+```json
+{
+  userId: 'U012345678',
+  isEnterpriseInstall: false,
+  teamId: 'T012345678',
+  enterpriseId: undefined,
+  conversationId: 'D02345678'
+}
+```
 
 If you need additional authorizations (user tokens) from users inside a team when your app is already installed, or have a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
