@@ -22,8 +22,8 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  ...
-  scopes: [],
+  stateSecret: 'my-state-secret',
+  scopes: ['chat:write'],
   installerOptions: {
     directInstall: true,
   },
