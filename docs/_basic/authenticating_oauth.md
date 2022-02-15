@@ -24,6 +24,7 @@ const app = new App({
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
   scopes: ['chat:write'],
+  // optional code for directInstall. Defaults to false. When set to true, this option skips the user from seeing the "Add to Slack" button page. 
   installerOptions: {
     directInstall: true,
   },
