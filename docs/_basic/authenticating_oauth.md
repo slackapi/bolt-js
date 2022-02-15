@@ -31,7 +31,7 @@ const app = new App({
 });
 ```
 
-Once you click on the `Add to Slack` button, this will initiate the OAuth process. Users will see a green `Allow` button and dialogue of your app asking for permissions. Once you click on the `Allow` button, Slack will call your app's redirect URI. This will bring you to the `slack/oauth_redirect` endpoint and alert you in your browser to "Open Slack". Only after you **Open Slack** will the `fetchInstallation` and `storeInstallation` handlers execute. 
+Once you click on the `Add to Slack` button, this will initiate the OAuth process. Users will see a green `Allow` button and dialogue of your app asking for permissions. Once you click on the `Allow` button, Slack will call your app's redirect URI. This will bring you to the `slack/oauth_redirect` endpoint and alert you in your browser to "Open Slack". After you **Open Slack** and here on after as your app processes events from Slack, `fetchInstallation` and `storeInstallation` handlers will execute. 
 
 Bolt provides a redirect URI out-of-the-box. See the following section, Redirect URI for more details.  
 
