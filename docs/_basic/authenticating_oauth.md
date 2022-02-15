@@ -15,8 +15,20 @@ You will need to provide your:
 ---
 
 ##### Installing your App
-Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This endpoint returns a simple `Add to Slack` button where users can initiate direct installs of your app with a valid `state` parameter. For example, if your app was hosted at `www.example.com`, you would be able to install your app at `www.example.com/slack/install`. If you would like to skip rendering the simple webpage and directly navigate end-users to Slack authorize URL, your app can set `installerOptions.directInstall: true` in the `App` constructor.
+Bolt for JavaScript provides an **Install Path** `/slack/install` out-of-the-box. This endpoint returns a simple `Add to Slack` button where users can initiate direct installs of your app with a valid `state` parameter. For example, if your app was hosted at `www.example.com`, you would be able to install your app at `www.example.com/slack/install`. If you would like to skip rendering the simple webpage and directly navigate end-users to Slack authorize URL, your app can set `installerOptions.directInstall: true` in the `App` constructor. See example code below:
 
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  ...
+  scopes: [],
+  installerOptions: {
+    directInstall: true,
+  },
+});
+```
 
 Once you click on the `Add to Slack` button, this will initiate the OAuth process. Users will see a green `Allow` button and dialogue of your app asking for permissions. Once you click on the `Allow` button, Slack will call your app's redirect URI. This will bring you to the `slack/oauth_redirect` endpoint and alert you in your browser to "Open Slack". Only after you **Open Slack** will the `fetchInstallation` and `storeInstallation` handlers execute. 
 
