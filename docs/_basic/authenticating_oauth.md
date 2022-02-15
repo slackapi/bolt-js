@@ -37,7 +37,7 @@ Bolt provides a redirect URI out-of-the-box. See the following section, Redirect
 
 Additionally, you can expect the `installation` object to look like the following:
 
-```javascript
+```
 {
   team: { id: 'T012345678', name: 'example-team-name' },
   enterprise: undefined,
@@ -59,7 +59,7 @@ Additionally, you can expect the `installation` object to look like the followin
 
 Similarly, the installQuery object will look like the following:
 
-```javascript
+```
 {
   userId: 'U012345678',
   isEnterpriseInstall: false,
