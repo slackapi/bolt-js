@@ -92,6 +92,18 @@ export interface BasicSlackEvent<Type extends string = string> {
   type: Type;
 }
 
+interface BotProfile {
+  id: string;
+  name: string;
+  app_id: string;
+  team_id: string;
+  icons: {
+    [size: string]: string;
+  };
+  updated: number;
+  deleted: boolean;
+}
+
 /* ------- TODO: Generate these interfaces ------- */
 
 export interface AppRequestedEvent {
@@ -109,6 +121,19 @@ export interface AppRequestedEvent {
       is_app_directory_approved: boolean;
       is_internal: boolean;
       additional_info: string;
+      icons?: {
+        image_32?: string;
+        image_36?: string;
+        image_48?: string;
+        image_64?: string;
+        image_72?: string;
+        image_96?: string;
+        image_128?: string;
+        image_192?: string;
+        image_512?: string;
+        image_1024?: string;
+        image_original?: string;
+      }
     };
   };
   previous_resolution: {
@@ -120,6 +145,7 @@ export interface AppRequestedEvent {
       token_type: 'bot' | 'user' | 'app' | null;
     };
   } | null;
+  is_user_app_collaborator: boolean;
   user: {
     id: string;
     name: string;
@@ -155,6 +181,7 @@ export interface AppMentionEvent {
   type: 'app_mention';
   subtype?: string;
   bot_id?: string;
+  bot_profile?: BotProfile;
   username: string;
   user?: string;
   text: string;
@@ -192,15 +219,21 @@ export interface ChannelArchiveEvent {
   type: 'channel_archive';
   channel: string;
   user: string;
+  is_moved?: number;
+  event_ts: string;
 }
 
 export interface ChannelCreatedEvent {
   type: 'channel_created';
   channel: {
     id: string;
+    is_channel: boolean;
     name: string;
+    name_normalized: string;
     created: number;
     creator: string; // user ID
+    is_shared: boolean;
+    is_org_shared: boolean;
   };
 }
 
@@ -226,6 +259,8 @@ export interface ChannelIDChangedEvent {
 export interface ChannelLeftEvent {
   type: 'channel_left';
   channel: string;
+  actor_id: string;
+  event_ts: string;
 }
 
 export interface ChannelRenameEvent {
@@ -233,8 +268,12 @@ export interface ChannelRenameEvent {
   channel: {
     id: string;
     name: string;
+    name_normalized: string;
     created: number;
+    is_channel: boolean;
+    is_mpim: boolean;
   };
+  event_ts: string;
 }
 
 export interface ChannelSharedEvent {
@@ -248,6 +287,7 @@ export interface ChannelUnarchiveEvent {
   type: 'channel_unarchive';
   channel: string;
   user: string;
+  event_ts: string;
 }
 
 export interface ChannelUnsharedEvent {
@@ -269,6 +309,7 @@ export interface DNDUpdatedEvent {
     snooze_endtime: number;
     snooze_remaining: number;
   };
+  event_ts: string;
 }
 
 export interface DNDUpdatedUserEvent {
@@ -279,6 +320,7 @@ export interface DNDUpdatedUserEvent {
     next_dnd_start_ts: number;
     next_dnd_end_ts: number;
   };
+  event_ts: string;
 }
 
 export interface EmailDomainChangedEvent {
@@ -290,18 +332,18 @@ export interface EmailDomainChangedEvent {
 // NOTE: this should probably be broken into its two subtypes
 export interface EmojiChangedEvent {
   type: 'emoji_changed';
-  subtype: 'add' | 'remove';
+  subtype: 'add' | 'remove' | 'rename';
   names?: string[]; // only for remove
   name?: string; // only for add
   value?: string; // only for add
+  old_name?: string;
+  new_name?: string;
   event_ts: string;
 }
 
 export interface FileChangeEvent {
   type: 'file_change';
   file_id: string;
-  // TODO: incomplete, this should be a reference to a File shape from @slack/types
-  // https://api.slack.com/types/file
   file: {
     id: string;
   };
@@ -313,8 +355,6 @@ export interface FileCommentDeletedEvent {
   type: 'file_comment_deleted';
   comment: string; // this is an ID
   file_id: string;
-  // TODO: incomplete, this should be a reference to a File shape from @slack/types
-  // https://api.slack.com/types/file
   file: {
     id: string;
   };
@@ -323,47 +363,50 @@ export interface FileCommentDeletedEvent {
 export interface FileCreatedEvent {
   type: 'file_created';
   file_id: string;
-  // TODO: incomplete, this should be a reference to a File shape from @slack/types
-  // https://api.slack.com/types/file
+  user_id: string;
   file: {
     id: string;
   };
+  event_ts: string;
 }
 
 export interface FileDeletedEvent {
   type: 'file_deleted';
   file_id: string;
+  channel_ids?: string[];
   event_ts: string;
 }
 
 export interface FilePublicEvent {
   type: 'file_public';
   file_id: string;
-  // TODO: incomplete, this should be a reference to a File shape from @slack/types
-  // https://api.slack.com/types/file
+  user_id: string;
   file: {
     id: string;
   };
+  event_ts: string;
 }
 
 export interface FileSharedEvent {
   type: 'file_shared';
   file_id: string;
-  // TODO: incomplete, this should be a reference to a File shape from @slack/types
-  // https://api.slack.com/types/file
+  user_id: string;
   file: {
     id: string;
   };
+  channel_id: string;
+  event_ts: string;
 }
 
 export interface FileUnsharedEvent {
   type: 'file_unshared';
   file_id: string;
-  // TODO: incomplete, this should be a reference to a File shape from @slack/types
-  // https://api.slack.com/types/file
+  user_id: string;
   file: {
     id: string;
   };
+  channel_id: string;
+  event_ts: string;
 }
 
 export interface GridMigrationFinishedEvent {
@@ -379,6 +422,9 @@ export interface GridMigrationStartedEvent {
 export interface GroupArchiveEvent {
   type: 'group_archive';
   channel: string;
+  user: string;
+  is_moved: number;
+  event_ts: string;
 }
 
 export interface GroupCloseEvent {
@@ -390,6 +436,9 @@ export interface GroupCloseEvent {
 export interface GroupDeletedEvent {
   type: 'group_deleted';
   channel: string;
+  date_deleted: number;
+  actor_id: string;
+  event_ts: string;
 }
 
 export interface GroupHistoryChangedEvent {
@@ -402,6 +451,8 @@ export interface GroupHistoryChangedEvent {
 export interface GroupLeftEvent {
   type: 'group_left';
   channel: string;
+  actor_id: string;
+  event_ts: string;
 }
 
 export interface GroupOpenEvent {
@@ -415,19 +466,26 @@ export interface GroupRenameEvent {
   channel: {
     id: string;
     name: string;
+    name_normalized: string;
     created: number;
+    is_channel: boolean;
+    is_mpim: boolean;
   };
+  event_ts: string;
 }
 
 export interface GroupUnarchiveEvent {
   type: 'group_unarchive';
   channel: string;
+  actor_id: string;
+  event_ts: string;
 }
 
 export interface IMCloseEvent {
   type: 'im_close';
   user: string;
   channel: string;
+  event_ts: string;
 }
 
 export interface IMCreatedEvent {
@@ -452,6 +510,7 @@ export interface IMOpenEvent {
   type: 'im_open';
   user: string;
   channel: string;
+  event_ts: string;
 }
 
 export interface InviteRequestedEvent {
@@ -481,11 +540,13 @@ export interface LinkSharedEvent {
   user: string;
   message_ts: string;
   thread_ts?: string;
-  event_ts: string;
   links: {
     domain: string;
     url: string;
   }[];
+  unfurl_id?: string;
+  source?: string;
+  event_ts: string;
 }
 
 export interface MemberJoinedChannelEvent {
@@ -495,6 +556,7 @@ export interface MemberJoinedChannelEvent {
   channel_type: string;
   team: string;
   inviter?: string;
+  event_ts: string;
 }
 
 export interface MemberLeftChannelEvent {
@@ -503,6 +565,7 @@ export interface MemberLeftChannelEvent {
   channel: string;
   channel_type: string;
   team: string;
+  event_ts: string;
 }
 
 export type MessageEvent = AllMessageEvents;
@@ -513,6 +576,14 @@ export interface PinAddedEvent {
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
   item: Record<string, unknown>;
+  item_user: string;
+  pin_count: string;
+  pinned_info: {
+    channel: string;
+    pinned_by: string;
+    pinned_ts: number;
+  };
+  event_ts: string;
 }
 
 export interface PinRemovedEvent {
@@ -521,6 +592,13 @@ export interface PinRemovedEvent {
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
   item: Record<string, unknown>;
+  item_user: string;
+  pin_count: string;
+  pinned_info: {
+    channel: string;
+    pinned_by: string;
+    pinned_ts: number;
+  };
   has_pins: boolean;
   event_ts: string;
 }
@@ -665,14 +743,35 @@ export interface StarRemovedEvent {
   event_ts: string;
 }
 
+interface Subteam {
+  id: string;
+  team_id?: string;
+  is_usergroup: boolean;
+  is_subteam: boolean;
+  name: string;
+  description?: string;
+  handle: string;
+  is_external: boolean;
+  date_create: number;
+  date_update?: number;
+  date_delete?: number;
+  auto_provision: boolean;
+  enterprise_subteam_id?: string;
+  created_by: string;
+  updated_by?: string;
+  prefs?: {
+    channels?: string[];
+    groups?: string[];
+  };
+  users: string[];
+  user_count: number;
+  channel_count?: number;
+}
+
 export interface SubteamCreated {
   type: 'subteam_created';
-  // TODO: incomplete, this should probably be a reference to a Usergroup shape from @slack/types.
-  // https://api.slack.com/types/usergroup
-  subteam: {
-    id: string;
-    created_by: string;
-  };
+  subteam: Subteam;
+  event_ts: string;
 }
 
 export interface SubteamMembersChanged {
@@ -681,30 +780,29 @@ export interface SubteamMembersChanged {
   team_id: string;
   date_previous_update: number;
   date_update: number;
-  added_users: string[];
-  added_users_count: number;
-  removed_users: string[];
-  removed_users_count: number;
+  added_users?: string[];
+  added_users_count?: number;
+  removed_users?: string[];
+  removed_users_count?: number;
+  event_ts: string;
 }
 
 export interface SubteamSelfAddedEvent {
   type: 'subteam_self_added';
   subteam_id: string;
+  event_ts: string;
 }
 
 export interface SubteamSelfRemovedEvent {
   type: 'subteam_self_removed';
   subteam_id: string;
+  event_ts: string;
 }
 
 export interface SubteamUpdatedEvent {
   type: 'subteam_updated';
-  // TODO: incomplete, this should probably be a reference to a Usergroup shape from @slack/types.
-  // https://api.slack.com/types/usergroup
-  subteam: {
-    id: string;
-    created_by: string;
-  };
+  subteam: Subteam;
+  event_ts: string;
 }
 
 export interface TeamDomainChangedEvent {
@@ -730,9 +828,8 @@ export interface TeamRenameEvent {
 export interface TokensRevokedEvent {
   type: 'tokens_revoked';
   tokens: {
-    // TODO: are either or both of these optional?
-    oauth: string[];
-    bot: string[];
+    oauth?: string[];
+    bot?: string[];
   };
 }
 
@@ -793,12 +890,13 @@ export interface UserChangeEvent {
     is_ultra_restricted: boolean;
     is_bot: boolean;
     is_stranger?: boolean;
-    updated: string;
+    updated: number;
     is_email_confirmed: boolean;
     is_app_user: boolean;
     is_invited_user?: boolean;
     has_2fa?: boolean;
     locale: string;
+    presence: string;
     enterprise_user?: {
       id: string;
       enterprise_id: string;
@@ -807,7 +905,12 @@ export interface UserChangeEvent {
       is_owner: boolean;
       teams: string[];
     };
+    two_factor_type: string;
+    has_files: boolean;
+    is_workflow_bot: boolean;
+    who_can_share_contact_card: boolean;
   };
+  cache_ts: number;
 }
 
 export interface WorkflowDeletedEvent {
