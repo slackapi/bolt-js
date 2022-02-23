@@ -35,7 +35,7 @@ const MOCK_CONFIG_MULTIPLE = {
   execute: [MOCK_FN, MOCK_FN, MOCK_FN],
 };
 
-describe('WorkflowStep', () => {
+describe('WorkflowStep class', () => {
   describe('constructor', () => {
     it('should accept config as single functions', async () => {
       const ws = new WorkflowStep('test_callback_id', MOCK_CONFIG_SINGLE);

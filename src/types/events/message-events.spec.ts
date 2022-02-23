@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { BotMessageEvent, GenericMessageEvent, MessageEvent } from './message-events';
 
-describe('message event types', () => {
+describe('Events API payload types (message events)', () => {
   it('should be compatible with bot_message payload', () => {
     const payload: BotMessageEvent = {
       type: 'message',

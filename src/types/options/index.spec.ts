@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { BlockSuggestion, DialogSuggestion, InteractiveMessageSuggestion } from './index';
 
-describe('options types', () => {
+describe('External data source options event types', () => {
   it('should be compatible with block_suggestion payloads', () => {
     const payload: BlockSuggestion = {
       type: 'block_suggestion',
