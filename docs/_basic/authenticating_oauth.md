@@ -19,6 +19,7 @@ To enable OAuth, will need to provide:
 We've provided a default implementation of the `installationStore`  `FileInstallationStore` which you can use during app development and testing.
 
 ```javascript
+const { App } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
