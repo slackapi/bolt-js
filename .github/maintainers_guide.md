@@ -30,6 +30,8 @@ To build the docs locally, you must have [Ruby](https://www.ruby-lang.org/en/) i
 
 To build the docs, navigate to the `docs` folder and run `bundle install` to install necessary gems (Ruby dependencies). Run `bundle exec jekyll serve` to start up a local server which will compile documentation source and serve its contents.
 
+_(zsh users)_: If you are running into issues with permissions to install ruby gems during `bundle install`, you may need to add `eval "$(rbenv init - zsh)"` to your ~/.zshrc then run `source ~/.zshrc`. 
+
 #### Adding beta documentation
 When documentation is in a beta state, it requires a new, distinct collection of docs. The process is a little nuanced, so make sure to build the documentation locally to make sure it appears how you expect. To create a new collection:
 1. Add content
