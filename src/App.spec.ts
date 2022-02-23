@@ -921,6 +921,110 @@ describe('App', () => {
           // Assert
           assert.isTrue(workedAsExpected);
         });
+        it('should be skipped for tokens_revoked events #674', async () => {
+          // Arrange
+          const fakeAxiosPost = sinon.fake.resolves({});
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
+
+          // Act
+          let workedAsExpected = false;
+          let authorizeCallCount = 0;
+          const app = new MockApp({
+            receiver: fakeReceiver,
+            authorize: async () => {
+              authorizeCallCount += 1;
+              return {};
+            },
+          });
+          app.event('tokens_revoked', async () => {
+            workedAsExpected = true;
+          });
+
+          // The authorize must be called for other events
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'app_mention',
+              },
+              type: 'event_callback',
+            },
+          });
+          assert.equal(authorizeCallCount, 1);
+
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'tokens_revoked',
+                tokens: {
+                  oauth: ['P'],
+                  bot: ['B'],
+                },
+              },
+              type: 'event_callback',
+            },
+          });
+
+          // Assert
+          assert.equal(authorizeCallCount, 1); // still 1
+          assert.isTrue(workedAsExpected);
+        });
+        it('should be skipped for app_uninstalled events #674', async () => {
+          // Arrange
+          const fakeAxiosPost = sinon.fake.resolves({});
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
+
+          // Act
+          let workedAsExpected = false;
+          let authorizeCallCount = 0;
+          const app = new MockApp({
+            receiver: fakeReceiver,
+            authorize: async () => {
+              authorizeCallCount += 1;
+              return {};
+            },
+          });
+          app.event('app_uninstalled', async () => {
+            workedAsExpected = true;
+          });
+
+          // The authorize must be called for other events
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'app_mention',
+              },
+              type: 'event_callback',
+            },
+          });
+          assert.equal(authorizeCallCount, 1);
+
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'app_uninstalled',
+              },
+              type: 'event_callback',
+            },
+          });
+
+          // Assert
+          assert.equal(authorizeCallCount, 1); // still 1
+          assert.isTrue(workedAsExpected);
+        });
       });
 
       describe('routing', () => {
