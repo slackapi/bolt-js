@@ -114,6 +114,7 @@ App options are passed into the `App` constructor. When the `receiver` argument 
 | `clientOptions.slackApiUrl` | Allows setting a custom endpoint for the Slack API. Used most often for testing. |
 | `socketMode` | Option that accepts a `boolean` value. When set to `true` the app is started in [Socket Mode](/bolt-js/concepts#socket-mode), i.e. it allows your app to connect and receive data from Slack via a WebSocket connection. Defaults to `false`. 
 | `developerMode` | `boolean` to activate the developer mode. When set to `true` the `logLevel` is automatically set to `DEBUG` and `socketMode` is set to `true`. However, explicitly setting these two properties takes precedence over implicitly setting them via `developerMode`. Furthermore, a custom OAuth failure handler is provided to help debugging. Finally, the body of all incoming requests are logged and thus sensitive information like tokens might be contained in the logs. Defaults to `false`.  | 
+| `deferInitialization` | `boolean` to defer initialization of the app and places responsibility for manually calling the `async` `App#init()` method on the developer. `init()` must be called before `App#start()`. Defaults to `false`. |
 
 > Bolt's client is an instance of `WebClient` from the [Node Slack SDK](/node-slack-sdk), so some of that documentation may be helpful as you're developing.
 
