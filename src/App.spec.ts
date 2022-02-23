@@ -417,6 +417,49 @@ describe('App', () => {
       // Assert
       assert.instanceOf(app, MockApp);
     });
+
+    it('should fail in await App#init()', async () => {
+      // Arrange
+      const fakeConstructor = sinon.fake();
+      const overrides = mergeOverrides(withNoopAppMetadata(), {
+        '@slack/web-api': {
+          WebClient: class {
+            public constructor() {
+              fakeConstructor(...arguments); // eslint-disable-line prefer-rest-params
+            }
+
+            public auth = {
+              test: () => {
+                throw new Error('Failing for init() test!');
+              },
+            };
+          },
+        },
+      });
+
+      const MockApp = await importApp(overrides);
+      const app = new MockApp({
+        token: 'xoxb-completely-invalid-token',
+        signingSecret: 'invalid-one',
+        deferInitialization: true,
+      });
+      // Assert
+      assert.instanceOf(app, MockApp);
+      try {
+        // call #start() before #init()
+        await app.start();
+        assert.fail('The start() method should fail before init() call');
+      } catch (err: any) {
+        assert.equal(err.message, 'This App instance is not yet initialized. Call `await App#init()` before starting the app.');
+      }
+      try {
+        await app.init();
+        assert.fail('The init() method should fail here');
+      } catch (err: any) {
+        assert.equal(err.message, 'Failing for init() test!');
+      }
+    });
+
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
     // TODO: tests for providing botId and botUserId options
@@ -876,6 +919,110 @@ describe('App', () => {
           });
 
           // Assert
+          assert.isTrue(workedAsExpected);
+        });
+        it('should be skipped for tokens_revoked events #674', async () => {
+          // Arrange
+          const fakeAxiosPost = sinon.fake.resolves({});
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
+
+          // Act
+          let workedAsExpected = false;
+          let authorizeCallCount = 0;
+          const app = new MockApp({
+            receiver: fakeReceiver,
+            authorize: async () => {
+              authorizeCallCount += 1;
+              return {};
+            },
+          });
+          app.event('tokens_revoked', async () => {
+            workedAsExpected = true;
+          });
+
+          // The authorize must be called for other events
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'app_mention',
+              },
+              type: 'event_callback',
+            },
+          });
+          assert.equal(authorizeCallCount, 1);
+
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'tokens_revoked',
+                tokens: {
+                  oauth: ['P'],
+                  bot: ['B'],
+                },
+              },
+              type: 'event_callback',
+            },
+          });
+
+          // Assert
+          assert.equal(authorizeCallCount, 1); // still 1
+          assert.isTrue(workedAsExpected);
+        });
+        it('should be skipped for app_uninstalled events #674', async () => {
+          // Arrange
+          const fakeAxiosPost = sinon.fake.resolves({});
+          overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+          const MockApp = await importApp(overrides);
+
+          // Act
+          let workedAsExpected = false;
+          let authorizeCallCount = 0;
+          const app = new MockApp({
+            receiver: fakeReceiver,
+            authorize: async () => {
+              authorizeCallCount += 1;
+              return {};
+            },
+          });
+          app.event('app_uninstalled', async () => {
+            workedAsExpected = true;
+          });
+
+          // The authorize must be called for other events
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'app_mention',
+              },
+              type: 'event_callback',
+            },
+          });
+          assert.equal(authorizeCallCount, 1);
+
+          await fakeReceiver.sendEvent({
+            ack: noop,
+            body: {
+              enterprise_id: 'E_org_id',
+              api_app_id: 'A111',
+              event: {
+                type: 'app_uninstalled',
+              },
+              type: 'event_callback',
+            },
+          });
+
+          // Assert
+          assert.equal(authorizeCallCount, 1); // still 1
           assert.isTrue(workedAsExpected);
         });
       });

@@ -1,7 +1,7 @@
 export default function defaultRenderHtmlForInstallPath(addToSlackUrl: string): string {
   return `<html>
       <body>
-        <a href=${addToSlackUrl}>
+        <a href="${addToSlackUrl}">
           <img
             alt="Add to Slack"
             height="40"
