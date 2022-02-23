@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { InteractiveMessage, ButtonClick } from './interactive-message';
 
-describe('interactive-message action types', () => {
+describe('Message shortcut payload types', () => {
   it('should be compatible with block_actions payloads', () => {
     const payload: InteractiveMessage<ButtonClick> = {
       type: 'interactive_message',

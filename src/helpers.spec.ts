@@ -2,127 +2,112 @@ import 'mocha';
 import { assert } from 'chai';
 import { getTypeAndConversation, IncomingEventType } from './helpers';
 
-describe('getTypeAndConversation()', () => {
-  describe('event types', () => {
-    // Arrange
-    const conversationId = 'CONVERSATION_ID';
-    const dummyEventBody = {
-      event: {
-        type: 'app_home_opened',
-        channel: conversationId,
-      },
-    };
+describe('Helpers', () => {
+  describe('getTypeAndConversation()', () => {
+    describe('event types', () => {
+      // Arrange
+      const conversationId = 'CONVERSATION_ID';
+      const dummyEventBody = {
+        event: {
+          type: 'app_home_opened',
+          channel: conversationId,
+        },
+      };
 
-    it('should find Event type for generic event', () => {
-      // Act
-      const typeAndConversation = getTypeAndConversation(dummyEventBody);
-
-      // Assert
-      assert(typeAndConversation.type === IncomingEventType.Event);
-      assert(typeAndConversation.conversationId === conversationId);
-    });
-  });
-
-  describe('command types', () => {
-    // Arrange
-    const conversationId = 'CONVERSATION_ID';
-    const dummyCommandBody = {
-      command: 'COMMAND_NAME',
-      channel_id: conversationId,
-      response_url: 'https://hooks.slack.com/commands/RESPONSE_URL',
-    };
-
-    it('should find Command type for generic command', () => {
-      // Act
-      const typeAndConversation = getTypeAndConversation(dummyCommandBody);
-
-      // Assert
-      assert(typeAndConversation.type === IncomingEventType.Command);
-      assert(typeAndConversation.conversationId === conversationId);
-    });
-  });
-
-  describe('options types', () => {
-    // Arrange
-    const conversationId = 'CONVERSATION_ID';
-    const dummyActionBodies = createFakeOptions(conversationId);
-
-    dummyActionBodies.forEach((option) => {
-      it(`should find Option type for ${option.type}`, () => {
+      it('should find Event type for generic event', () => {
         // Act
-        const typeAndConversation = getTypeAndConversation(option);
-
+        const typeAndConversation = getTypeAndConversation(dummyEventBody);
         // Assert
-        assert(typeAndConversation.type === IncomingEventType.Options);
+        assert(typeAndConversation.type === IncomingEventType.Event);
         assert(typeAndConversation.conversationId === conversationId);
       });
     });
-  });
-
-  describe('action types', () => {
-    // Arrange
-    const conversationId = 'CONVERSATION_ID';
-    const dummyActionBodies = createFakeActions(conversationId);
-
-    dummyActionBodies.forEach((action) => {
-      it(`should find Action type for ${action.type}`, () => {
+    describe('command types', () => {
+      // Arrange
+      const conversationId = 'CONVERSATION_ID';
+      const dummyCommandBody = {
+        command: 'COMMAND_NAME',
+        channel_id: conversationId,
+        response_url: 'https://hooks.slack.com/commands/RESPONSE_URL',
+      };
+      it('should find Command type for generic command', () => {
         // Act
-        const typeAndConversation = getTypeAndConversation(action);
-
+        const typeAndConversation = getTypeAndConversation(dummyCommandBody);
         // Assert
-        assert(typeAndConversation.type === IncomingEventType.Action);
+        assert(typeAndConversation.type === IncomingEventType.Command);
         assert(typeAndConversation.conversationId === conversationId);
       });
     });
-  });
-
-  describe('shortcut types', () => {
-    // Arrange
-    const conversationId = 'CONVERSATION_ID';
-    const dummyShortcutBodies = createFakeShortcuts(conversationId);
-
-    dummyShortcutBodies.forEach((shortcut) => {
-      it(`should find Shortcut type for ${shortcut.type}`, () => {
-        // Act
-        const typeAndConversation = getTypeAndConversation(shortcut);
-
-        // Assert
-        assert(typeAndConversation.type === IncomingEventType.Shortcut);
-        if (typeAndConversation.conversationId != null) {
+    describe('options types', () => {
+      // Arrange
+      const conversationId = 'CONVERSATION_ID';
+      const dummyActionBodies = createFakeOptions(conversationId);
+      dummyActionBodies.forEach((option) => {
+        it(`should find Option type for ${option.type}`, () => {
+          // Act
+          const typeAndConversation = getTypeAndConversation(option);
+          // Assert
+          assert(typeAndConversation.type === IncomingEventType.Options);
           assert(typeAndConversation.conversationId === conversationId);
-        }
+        });
       });
     });
-  });
+    describe('action types', () => {
+      // Arrange
+      const conversationId = 'CONVERSATION_ID';
+      const dummyActionBodies = createFakeActions(conversationId);
+      dummyActionBodies.forEach((action) => {
+        it(`should find Action type for ${action.type}`, () => {
+          // Act
+          const typeAndConversation = getTypeAndConversation(action);
+          // Assert
+          assert(typeAndConversation.type === IncomingEventType.Action);
+          assert(typeAndConversation.conversationId === conversationId);
+        });
+      });
+    });
+    describe('shortcut types', () => {
+      // Arrange
+      const conversationId = 'CONVERSATION_ID';
+      const dummyShortcutBodies = createFakeShortcuts(conversationId);
+      dummyShortcutBodies.forEach((shortcut) => {
+        it(`should find Shortcut type for ${shortcut.type}`, () => {
+          // Act
+          const typeAndConversation = getTypeAndConversation(shortcut);
+          // Assert
+          assert(typeAndConversation.type === IncomingEventType.Shortcut);
+          if (typeAndConversation.conversationId != null) {
+            assert(typeAndConversation.conversationId === conversationId);
+          }
+        });
+      });
+    });
+    describe('view types', () => {
+      // Arrange
+      const dummyViewBodies = createFakeViews();
+      dummyViewBodies.forEach((viewBody) => {
+        it(`should find Action type for ${viewBody.type}`, () => {
+          // Act
+          const typeAndConversation = getTypeAndConversation(viewBody);
+          // Assert
+          assert(typeAndConversation.type === IncomingEventType.ViewAction);
+        });
+      });
+    });
+    describe('invalid events', () => {
+      // Arrange
+      const fakeEventBody = {
+        fake: 'THIS_IS_FAKE',
+        channel: { id: 'FAKE_CONVERSATION_ID' },
+      };
 
-  describe('view types', () => {
-    // Arrange
-    const dummyViewBodies = createFakeViews();
-
-    dummyViewBodies.forEach((viewBody) => {
-      it(`should find Action type for ${viewBody.type}`, () => {
+      it('should not find type for invalid event', () => {
         // Act
-        const typeAndConversation = getTypeAndConversation(viewBody);
+        const typeAndConversation = getTypeAndConversation(fakeEventBody);
 
         // Assert
-        assert(typeAndConversation.type === IncomingEventType.ViewAction);
+        assert.isEmpty(typeAndConversation);
       });
-    });
-  });
-
-  describe('invalid events', () => {
-    // Arrange
-    const fakeEventBody = {
-      fake: 'THIS_IS_FAKE',
-      channel: { id: 'FAKE_CONVERSATION_ID' },
-    };
-
-    it('should not find type for invalid event', () => {
-      // Act
-      const typeAndConversation = getTypeAndConversation(fakeEventBody);
-
-      // Assert
-      assert.isEmpty(typeAndConversation);
     });
   });
 });
