@@ -792,25 +792,32 @@ export default class App {
     const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
     let authorizeResult: AuthorizeResult;
-    try {
-      if (source.isEnterpriseInstall) {
-        authorizeResult = await this.authorize(source as AuthorizeSourceData<true>, bodyArg);
-      } else {
-        authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
+    if (type === IncomingEventType.Event && isEventTypeToSkipAuthorize(event.body.event.type)) {
+      authorizeResult = {
+        enterpriseId: source.enterpriseId,
+        teamId: source.teamId,
+      };
+    } else {
+      try {
+        if (source.isEnterpriseInstall) {
+          authorizeResult = await this.authorize(source as AuthorizeSourceData<true>, bodyArg);
+        } else {
+          authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
+        }
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const e = error as any;
+        this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+        e.code = ErrorCode.AuthorizationError;
+        // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
+        // eslint-disable-next-line consistent-return
+        return this.handleError({
+          error: e,
+          logger: this.logger,
+          body: bodyArg,
+          context: {},
+        });
       }
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const e = error as any;
-      this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-      e.code = ErrorCode.AuthorizationError;
-      // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
-      // eslint-disable-next-line consistent-return
-      return this.handleError({
-        error: e,
-        logger: this.logger,
-        body: bodyArg,
-        context: {},
-      });
     }
 
     // Try to set teamId from AuthorizeResult before using one from source
@@ -1446,6 +1453,13 @@ function buildRespondFn(
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
     return axiosInstance.post(responseUrl, normalizedArgs);
   };
+}
+
+// token revocation use cases
+// https://github.com/slackapi/bolt-js/issues/674
+const eventTypesToSkipAuthorize = ['app_uninstalled', 'tokens_revoked'];
+function isEventTypeToSkipAuthorize(eventType: string) {
+  return eventTypesToSkipAuthorize.includes(eventType);
 }
 
 // ----------------------------
