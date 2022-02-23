@@ -793,11 +793,7 @@ export default class App {
 
     let authorizeResult: AuthorizeResult;
     try {
-      if (source.isEnterpriseInstall) {
-        authorizeResult = await this.authorize(source as AuthorizeSourceData<true>, bodyArg);
-      } else {
-        authorizeResult = await this.authorize(source as AuthorizeSourceData<false>, bodyArg);
-      }
+      authorizeResult = await this.authorize(source, bodyArg);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = error as any;
