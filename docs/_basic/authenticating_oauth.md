@@ -8,7 +8,7 @@ order: 15
 <div class="section-content">
 To prepare your Slack app for distribution, you will need to enable Bolt OAuth and store installation information securely. Bolt supports OAuth and will handle the rest of the work; this includes setting up OAuth routes, state verification, and passing your app an installation object which you must store. 
 
-To enable OAuth, will need to provide:
+To enable OAuth, you must provide:
 * `clientId`, `clientSecret`, `stateSecret` and `scopes` _(required)_
 * An `installationStore` option with handlers that store and fetch installations to your database *(optional, strongly recommended in production)*
 
@@ -45,16 +45,16 @@ const app = new App({
 
 * If you need additional authorizations (user tokens) from users inside a team when your app is already installed, or have a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
-* 💡 Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you"re implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.
+* 💡 Bolt for JavaScript does not support OAuth for [custom receivers](#receiver). If you're implementing a custom receiver, you can use our [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth), which is what Bolt for JavaScript uses under the hood.
 
 
 ---
 ##### Redirect URI
-Bolt for JavaScript provides a **Redirect URI Path** `/slack/oauth_redirect` out-of-the-box. Slack uses this to redirect users after they complete your app's installation flow. 
+Bolt for JavaScript provides a **Redirect URI Path** `/slack/oauth_redirect`. Slack uses the Redirect URI to redirect users after they complete an app's installation flow. 
 
-💡 You will need to add the full **Redirect URI** including your app domain in your app configuration settings under **OAuth and Permissions**, e.g. `https://example.com/slack/oauth_redirect`. 
+💡 You will need to add the full **Redirect URI** including your app domain in your Slack app configuration settings under **OAuth and Permissions**, e.g. `https://example.com/slack/oauth_redirect`. 
 
-If you'd like to supply your own custom **Redirect URI**, you can do this by setting `redirectUri` in the App options and `installerOptions.redirectUriPath`. You must supply both, and the path must be consistent with the full URI.
+To supply your own custom **Redirect URI**, you can set `redirectUri` in the App options and `installerOptions.redirectUriPath`. You must supply both, and the path must be consistent with the full URI.
 
 ```javascript
 const app = new App({
