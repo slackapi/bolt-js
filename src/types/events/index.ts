@@ -39,7 +39,7 @@ export interface SlackEventMiddlewareArgs<EventType extends string = string> {
  *
  * This describes the entire JSON-encoded body of a request from Slack's Events API.
  */
-interface EnvelopedEvent<Event = BasicSlackEvent> extends StringIndexed {
+export interface EnvelopedEvent<Event = BasicSlackEvent> extends StringIndexed {
   token: string;
   team_id: string;
   enterprise_id?: string;
