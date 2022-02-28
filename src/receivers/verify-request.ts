@@ -50,6 +50,11 @@ export async function verify(
   req: IncomingMessage,
   _res?: ServerResponse,
 ): Promise<BufferedIncomingMessage> {
+  // for testing purposes, should not be used in production
+  if (process.env.DISABLE_SIGNATURE_VERIFICATION === "true") {
+    return Promise.resolve({} as any);
+  }
+
   const { signingSecret } = options;
 
   // Consume the readable stream (or use the previously consumed readable stream)

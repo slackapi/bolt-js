@@ -486,6 +486,11 @@ function verifyRequestSignature(
   signature: string | undefined,
   requestTimestamp: string | undefined,
 ): void {
+  // for testing purposes, should not be used in production
+  if (process.env.DISABLE_SIGNATURE_VERIFICATION === "true") {
+    return;
+  }
+
   if (signature === undefined || requestTimestamp === undefined) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Some headers are missing.');
   }
