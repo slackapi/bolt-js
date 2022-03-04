@@ -35,6 +35,7 @@ export type SlackEvent =
   | FilePublicEvent
   | FileSharedEvent
   | FileUnsharedEvent
+  | FunctionExecutedEvent
   | GridMigrationFinishedEvent
   | GridMigrationStartedEvent
   | GroupArchiveEvent
@@ -423,6 +424,31 @@ export interface FileUnsharedEvent {
   };
   channel_id: string;
   event_ts: string;
+}
+interface FunctionParams {
+  type: string,
+  name: string,
+  description: string,
+  title: string,
+  is_required: boolean,
+}
+export interface FunctionExecutedEvent {
+  type: 'function_executed',
+  function: {
+    id: string,
+    callback_id: string,
+    title: string,
+    description: string,
+    type: string,
+    input_parameters: FunctionParams[],
+    output_parameters: FunctionParams[],
+    app_id: string,
+    date_updated: number,
+  },
+  function_execution_id: string,
+  inputs: Record<string, unknown>,
+  workflow_token: string, // xwfp-xxxxxxxxxxx
+  event_ts: string,
 }
 
 export interface GridMigrationFinishedEvent {
