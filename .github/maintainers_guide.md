@@ -54,22 +54,26 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     -  If issues are still open, discuss with the team about whether the open issues should be moved to a future release or if the release should be held off until the issues are resolved.
 
 2. Make sure your local `main` branch has the latest changes.
+    - Run `git rebase main` from your feature branch (this will rebase your feature branch from `main`). You can opt for `git merge main` if you are not comfortable with rebasing.
+    - If you do not have a feature branch, you can also use generic release candidate branch name like `<next-version>rc`, i.e. `2.5.0rc`.
 
 3. Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`. (see [Versioning and Tags](https://github.com/slackapi/node-slack-sdk/blob/main/.github/maintainers_guide.md#versioning-and-tags))
+    - The version must be in the format of `Major.Minor.Patch-BetaNamespace.BetaVersion` (ex: `5.10.0-workflowStepsBeta.1`, `2.5.0-rc.1`)
     -  Update any dependency versions in `package.json` and install locally `rm -rf node_modules && npm install`
     -  Confirm tests pass and code is free of linting errors by running `npm test`.
-    -  Make a single commit with a message, following the format in: ([Example](https://github.com/slackapi/bolt-js/pull/1133/commits/bcc421cd05b50ddcdeb806fcb27a38d7d9f8ede8)).
+    -  Make a single commit with a message for the version bump ([Example](https://github.com/slackapi/bolt-js/pull/1133/commits/bcc421cd05b50ddcdeb806fcb27a38d7d9f8ede8)).
     - Create a pull request for the version change ([Example](https://github.com/slackapi/bolt-js/pull/1133))
     - Add appropriate labels on the PR, including `release`
 4. Once the PR has been approved and tests have passed, merged to main repository.
     -  Update your local main branch: `git pull origin main`
     -  Add a version tag (ie, `git tag @slack/bolt@3.6.0`)
     -  Push the new tag up to origin: `git push --tags origin`
-5. Distribute the release
+5. Publish the release to npm
     - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your passsword generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
     - Before publishing a new version, run `rm -rf node_modules/ dist/` to clean your module dependencies in the project first (usually this is not required but in some cases, `npm publish` cannot include all the required files in a package) 
     - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package contain, at a minimum: `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `dist/index.js`, `dist/App.js`
-    - Run `npm publish . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password)
+    - Run `npm publish --tag <dist-tag> . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password). 
+    - `<dist-tag>` should be a label representative of the beta release. It could be feature-specific (i.e. `feat-token-rotation`) or it can be a generic release candidate (i.e. `2.5.0rc`). Whatever you decide: it must _not_ be `latest`, as that is reserved for non-beta releases. You can run `npm info` to see all dist tags. 
 6. Close Github Milestone
     - Close the relevant GitHub Milestone(s) for the release(s)
     - Move any unfinished, open issues to the next GitHub Milestone
