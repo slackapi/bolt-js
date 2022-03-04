@@ -23,6 +23,7 @@ import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
 import { Subscription, SubscriptionOptions } from './Subscription';
+import { Function as SlackFunction } from './Function';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -31,6 +32,7 @@ import {
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
+  SlackSubscriptionMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackAction,
   EventTypePattern,
@@ -55,7 +57,7 @@ import {
   SlashCommand,
   WorkflowStepEdit,
   SubscriptionInteraction,
-  SlackSubscriptionMiddlewareArgs,
+  FunctionExecutedEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -595,6 +597,20 @@ export default class App {
   }
 
   /**
+   * Register listeners that process and react to a function execution event
+   * @param fnTitle the name of the fn as defined in manifest.json
+   * must match the function defined in manifest json
+   * @param fn a single function to register
+   * */
+  public function(fnTitle: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
+    // TODO: Support for multiple function listeners will be accepted
+    const slackFn = new SlackFunction(fnTitle, fn);
+    const m = slackFn.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+
+  /**
    *
    * @param listeners Middlewares that process and react to a message event
    */
@@ -654,16 +670,16 @@ export default class App {
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
     >(
-    constraints: Constraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
-  ): void;
+      constraints: Constraints,
+      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+    ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
     >(
-    callbackIdOrConstraints: string | RegExp | Constraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
-  ): void {
+      callbackIdOrConstraints: string | RegExp | Constraints,
+      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+    ): void {
     const constraints: ShortcutConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
       { callback_id: callbackIdOrConstraints } :
       callbackIdOrConstraints;
@@ -694,17 +710,17 @@ export default class App {
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
     >(
-    constraints: Constraints,
-  // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
-  ): void;
+      constraints: Constraints,
+      // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
+      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+    ): void;
   public action<
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
     >(
-    actionIdOrConstraints: string | RegExp | Constraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
-  ): void {
+      actionIdOrConstraints: string | RegExp | Constraints,
+      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+    ): void {
     // Normalize Constraints
     const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
       { action_id: actionIdOrConstraints } :
@@ -855,7 +871,7 @@ export default class App {
     if (authorizeResult.enterpriseId === undefined && source.enterpriseId !== undefined) {
       authorizeResult.enterpriseId = source.enterpriseId;
     }
-
+    // Try to set custom properties if they exist
     if (typeof event.customProperties !== 'undefined') {
       const customProps: StringIndexed = event.customProperties;
       const builtinKeyDetected = contextBuiltinKeys.find((key) => key in customProps);
@@ -885,9 +901,9 @@ export default class App {
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    let payload: DialogSubmitAction | WorkflowStepEdit |
-    SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
-    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
+    let payload: FunctionExecutedEvent | DialogSubmitAction | WorkflowStepEdit |
+      SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
+      | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -910,8 +926,8 @@ export default class App {
       default:
         payload = (bodyArg as (
           | Exclude<
-          AnyMiddlewareArgs,
-          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+            AnyMiddlewareArgs,
+            SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
           >
           | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
         )['body']);
@@ -932,6 +948,8 @@ export default class App {
       body: bodyArg,
       payload,
     };
+    // TODO : Remove
+    console.log(listenerArgs);
 
     // Set aliases
     if (type === IncomingEventType.Event) {
