@@ -23,6 +23,7 @@ import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
 import { Subscription, SubscriptionOptions } from './Subscription';
+import { Function as SlackFunction } from './Function';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -31,6 +32,7 @@ import {
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
+  SlackSubscriptionMiddlewareArgs,
   SlackViewMiddlewareArgs,
   SlackAction,
   EventTypePattern,
@@ -55,7 +57,7 @@ import {
   SlashCommand,
   WorkflowStepEdit,
   SubscriptionInteraction,
-  SlackSubscriptionMiddlewareArgs,
+  FunctionExecutedEvent,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -608,6 +610,20 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
+   * Register listeners that process and react to a function execution event
+   * @param fnTitle the name of the fn as defined in manifest.json
+   * must match the function defined in manifest json
+   * @param fn a single function to register
+   * */
+  public function(fnTitle: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
+    // TODO: Support for multiple function listeners will be accepted
+    const slackFn = new SlackFunction(fnTitle, fn);
+    const m = slackFn.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+
+  /**
    *
    * @param listeners Middlewares that process and react to a message event
    */
@@ -942,7 +958,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     if (authorizeResult.enterpriseId === undefined && source.enterpriseId !== undefined) {
       authorizeResult.enterpriseId = source.enterpriseId;
     }
-
+    // Try to set custom properties if they exist
     if (typeof event.customProperties !== 'undefined') {
       const customProps: StringIndexed = event.customProperties;
       const builtinKeyDetected = contextBuiltinKeys.find((key) => key in customProps);
@@ -973,9 +989,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    let payload: DialogSubmitAction | WorkflowStepEdit |
-    SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
-    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
+    let payload: FunctionExecutedEvent | DialogSubmitAction | WorkflowStepEdit |
+      SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
+      | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -998,8 +1014,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       default:
         payload = (bodyArg as (
           | Exclude<
-          AnyMiddlewareArgs,
-          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+            AnyMiddlewareArgs,
+            SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
           >
           | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
         )['body']);
@@ -1020,6 +1036,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       body: bodyArg,
       payload,
     };
+    // TODO : Remove
+    console.log(listenerArgs);
 
     // Set aliases
     if (type === IncomingEventType.Event) {
