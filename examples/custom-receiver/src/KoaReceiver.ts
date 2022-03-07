@@ -76,7 +76,7 @@ export interface KoaReceiverOptions {
   unhandledRequestTimeoutMillis?: number;
 }
 
-export default class KoaRecevier implements Receiver {
+export default class KoaReceiver implements Receiver {
   private app: App | undefined;
 
   private logger: Logger;

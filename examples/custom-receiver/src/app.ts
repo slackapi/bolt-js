@@ -10,7 +10,7 @@ import Koa from 'koa';
 import { App, FileInstallationStore } from '@slack/bolt';
 import { FileStateStore } from '@slack/oauth';
 import { ConsoleLogger, LogLevel } from '@slack/logger';
-import KoaRecevier from './KoaReceiver';
+import KoaReceiver from './KoaReceiver';
 
 const logger = new ConsoleLogger();
 logger.setLevel(LogLevel.DEBUG);
