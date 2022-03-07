@@ -21,7 +21,7 @@ router.get('/', async (ctx) => {
   ctx.redirect('/slack/install');
 });
 
-const receiver = new KoaRecevier({
+const receiver = new KoaReceiver({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
   clientId: process.env.SLACK_CLIENT_ID,
