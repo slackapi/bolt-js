@@ -1,5 +1,6 @@
 import { IncomingMessage } from 'http';
 
+// Deprecated: this function will be removed in the near future
 export function extractRetryNum(req: IncomingMessage): number | undefined {
   let retryNum;
   const retryNumHeaderValue = req.headers['x-slack-retry-num'];
@@ -13,6 +14,7 @@ export function extractRetryNum(req: IncomingMessage): number | undefined {
   return retryNum;
 }
 
+// Deprecated: this function will be removed in the near future
 export function extractRetryReason(req: IncomingMessage): string | undefined {
   let retryReason;
   const retryReasonHeaderValue = req.headers['x-slack-retry-reason'];

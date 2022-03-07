@@ -1,3 +1,5 @@
+// Deprecated: this function will be removed in the near future
+// Use the ones from @slack/oauth (v2.5 or newer) instead
 export default function defaultRenderHtmlForInstallPath(addToSlackUrl: string): string {
   return `<html>
       <body>
@@ -14,6 +16,7 @@ export default function defaultRenderHtmlForInstallPath(addToSlackUrl: string): 
     </html>`;
 }
 
+// Deprecated: this function will be removed in the near future
 // For backward-compatibility
 export function renderHtmlForInstallPath(addToSlackUrl: string): string {
   return defaultRenderHtmlForInstallPath(addToSlackUrl);

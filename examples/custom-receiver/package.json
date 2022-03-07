@@ -1,0 +1,26 @@
+{
+  "name": "bolt-oauth-example",
+  "version": "1.0.0",
+  "description": "Example app using OAuth",
+  "main": "app.js",
+  "scripts": {
+    "lint": "eslint --fix --ext .ts src",
+    "build": "npm run lint && tsc -p .",
+    "build:watch": "npm run lint && tsc -w -p .",
+    "start": "npm run build && node dist/app.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@koa/router": "^10.1.1",
+    "@slack/logger": "^3.0.0",
+    "@slack/oauth": "^2.5.0-rc.1",
+    "dotenv": "^8.2.0",
+    "koa": "^2.13.4"
+  },
+  "devDependencies": {
+    "@types/koa__router": "^8.0.11",
+    "@types/node": "^14.14.35",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  }
+}
