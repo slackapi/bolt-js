@@ -293,7 +293,7 @@ export default class ExpressReceiver implements Receiver {
         if (errorCode === ErrorCode.AuthorizationError) {
           // authorize function threw an exception, which means there is no valid installation data
           httpFunc.buildNoBodyResponse(res, 401);
-          ack.markAsAcknowledged();
+          ack.ack();
           return;
         }
       }

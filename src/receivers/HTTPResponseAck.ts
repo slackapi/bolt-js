@@ -65,7 +65,7 @@ export class HTTPResponseAck {
       if (this.isAcknowledged) {
         throw new ReceiverMultipleAckError();
       }
-      this.markAsAcknowledged();
+      this.ack();
       if (this.processBeforeResponse) {
         // In the case where processBeforeResponse: true is enabled,
         // we don't send the HTTP response immediately. We hold off until the listener execution is completed.
@@ -82,7 +82,7 @@ export class HTTPResponseAck {
     };
   }
 
-  public markAsAcknowledged(): void {
+  public ack(): void {
     this.isAcknowledged = true;
   }
 }

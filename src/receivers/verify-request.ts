@@ -1,8 +1,10 @@
 // Deprecated: this function will be removed in the near future. Use HTTPModuleFunctions instead.
-import type { Logger } from '@slack/logger';
+import { ConsoleLogger, Logger } from '@slack/logger';
 import type { IncomingMessage, ServerResponse } from 'http';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { HTTPModuleFunctions, RequestVerificationOptions } from './HTTPModuleFunctions';
+
+const logger = new ConsoleLogger();
 
 // Deprecated: this function will be removed in the near future. Use HTTPModuleFunctions instead.
 export interface VerifyOptions extends RequestVerificationOptions {
@@ -16,7 +18,8 @@ export interface VerifyOptions extends RequestVerificationOptions {
 export async function verify(
   options: VerifyOptions,
   req: IncomingMessage,
-  _res?: ServerResponse,
+  res?: ServerResponse,
 ): Promise<BufferedIncomingMessage> {
-  return HTTPModuleFunctions.parseAndVerifyHTTPRequest(options, req, _res);
+  logger.warn('This method is deprecated. Use HTTPModuleFunctions.parseAndVerifyHTTPRequest(options, req, res) instead.');
+  return HTTPModuleFunctions.parseAndVerifyHTTPRequest(options, req, res);
 }

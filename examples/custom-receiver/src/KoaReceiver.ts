@@ -60,8 +60,8 @@ export interface KoaReceiverOptions {
   installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
-  koa: Koa;
-  router: Router;
+  koa?: Koa;
+  router?: Router;
   customPropertiesExtractor?: (
     request: BufferedIncomingMessage
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,8 +123,8 @@ export default class KoaReceiver implements Receiver {
     this.path = options.path ?? '/slack/events';
     this.unhandledRequestTimeoutMillis = options.unhandledRequestTimeoutMillis ?? 3001;
 
-    this.koa = options.koa;
-    this.router = options.router;
+    this.koa = options.koa ?? new Koa();
+    this.router = options.router ?? new Router();
     this.logger = initializeLogger(options.logger, options.logLevel);
     this.processBeforeResponse = options.processBeforeResponse ?? false;
     this.dispatchErrorHandler = options.dispatchErrorHandler ?? httpFunc.defaultDispatchErrorHandler;
@@ -214,7 +214,11 @@ export default class KoaReceiver implements Receiver {
       } catch (err) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const e = err as any;
-        this.logger.warn(`Request verification failed: ${e.message}`);
+        if (this.signatureVerification) {
+          this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
+        } else {
+          this.logger.warn(`Failed to parse the request body: ${e.message}`);
+        }
         httpFunc.buildNoBodyResponse(res, 401);
         return;
       }
@@ -280,7 +284,7 @@ export default class KoaReceiver implements Receiver {
         if (acknowledgedByHandler) {
           // If the value is false, we don't touch the value as a race condition
           // with ack() call may occur especially when processBeforeResponse: false
-          ack.markAsAcknowledged();
+          ack.ack();
         }
       }
     });

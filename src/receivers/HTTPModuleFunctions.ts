@@ -123,7 +123,7 @@ export class HTTPModuleFunctions {
   public static getHeader(req: IncomingMessage, header: string): string {
     const value = req.headers[header];
     if (value === undefined || Array.isArray(value)) {
-      throw new Error(`${verifyErrorPrefix}: header ${header} did not have the expected type (${value})`);
+      throw new Error(`${verifyErrorPrefix}: header ${header} did not have the expected type (received ${typeof value}, expected string)`);
     }
     return value;
   }

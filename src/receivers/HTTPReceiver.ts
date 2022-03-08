@@ -417,7 +417,11 @@ export default class HTTPReceiver implements Receiver {
         );
       } catch (err) {
         const e = err as any;
-        this.logger.warn(`Request verification failed: ${e.message}`);
+        if (this.signatureVerification) {
+          this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
+        } else {
+          this.logger.warn(`Failed to parse the request body: ${e.message}`);
+        }
         httpFunc.buildNoBodyResponse(res, 401);
         return;
       }
@@ -483,7 +487,7 @@ export default class HTTPReceiver implements Receiver {
         if (acknowledgedByHandler) {
           // If the value is false, we don't touch the value as a race condition
           // with ack() call may occur especially when processBeforeResponse: false
-          ack.markAsAcknowledged();
+          ack.ack();
         }
       }
     })();
