@@ -616,7 +616,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param fn a single function to register
    * */
   public function(fnTitle: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
-    // TODO: Support for multiple function listeners will be accepted
+    // TODO: Support for multiple function listeners
     const slackFn = new SlackFunction(fnTitle, fn);
     const m = slackFn.getMiddleware();
     this.middleware.push(m);
@@ -1036,8 +1036,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       body: bodyArg,
       payload,
     };
-    // TODO : Remove
-    console.log(listenerArgs);
 
     // Set aliases
     if (type === IncomingEventType.Event) {
