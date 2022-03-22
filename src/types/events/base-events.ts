@@ -11,6 +11,7 @@ export type SlackEvent =
   | AppRequestedEvent
   | AppHomeOpenedEvent
   | AppMentionEvent
+  | AppRateLimitedEvent
   | AppUninstalledEvent
   | CallRejectedEvent
   | ChannelArchiveEvent
@@ -68,6 +69,8 @@ export type SlackEvent =
   | SubteamSelfAddedEvent
   | SubteamSelfRemovedEvent
   | SubteamUpdatedEvent
+  | TeamAccessGrantedEvent
+  | TeamAccessRevokedEvent
   | TeamDomainChangedEvent
   | TeamJoinEvent
   | TeamRenameEvent
@@ -183,6 +186,7 @@ export interface AppMentionEvent {
   bot_id?: string;
   bot_profile?: BotProfile;
   username: string;
+  team?: string;
   user?: string;
   text: string;
   attachments?: MessageAttachment[];
@@ -194,7 +198,15 @@ export interface AppMentionEvent {
   ts: string;
   channel: string;
   event_ts: string;
-  thread_ts: string;
+  thread_ts?: string;
+}
+
+export interface AppRateLimitedEvent {
+  type: 'app_rate_limited';
+  token: string;
+  team_id: string;
+  minute_rate_limited: number;
+  api_app_id: string;
 }
 
 // TODO: this event doesn't use the envelope. write test cases to make sure its works without breaking, and figure out
@@ -802,6 +814,18 @@ export interface SubteamSelfRemovedEvent {
 export interface SubteamUpdatedEvent {
   type: 'subteam_updated';
   subteam: Subteam;
+  event_ts: string;
+}
+
+export interface TeamAccessGrantedEvent {
+  type: 'team_access_granted';
+  team_ids: string[];
+  event_ts: string;
+}
+
+export interface TeamAccessRevokedEvent {
+  type: 'team_access_revoked';
+  team_ids: string[];
   event_ts: string;
 }
 
