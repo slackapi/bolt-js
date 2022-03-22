@@ -15,7 +15,7 @@ export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddle
 
 /**
  * A Function is a deterministic machine with
- * specified outputs given specihfic inputs.
+ * specified outputs given specific inputs.
  * --
  * You configure a Function's title, inputs, and outputs
  * in your project's manifest.json. If your project contains any
@@ -93,7 +93,7 @@ function prepareFnArgs(args: AnyMiddlewareArgs & AllMiddlewareArgs): AllSlackFun
   preparedArgs.error = createError(preparedArgs);
   return preparedArgs;
 }
-// TODO: Move to src/types/functions/index
+
 interface SuccessFn {
   (outputs: Record<string, unknown>): Promise<void>
 }
@@ -121,15 +121,11 @@ function createError(args: any): ErrorFn {
   const { client, event } = args;
   const { function_execution_id } = event;
   // TODO: Support client.functions.completeFailure in node-slack-sdk
-  // TODO: Currently uses the installed app's bot token to make the api call
-  // TODO: Fix the client.apiCall error
+  // TODO: Review whether to use installed app's bot token to make the api call
   // in the future it is possible that the event payload itself will contain
   // workspace token which should be used instead of the app token
-  return (error: string) => {
-    console.log('*** calling error', error);
-    return client.apiCAll('functions.completeError', {
-      error,
-      function_execution_id,
-    });
-  };
+  return (error: string) => client.apiCall('functions.completeError', {
+    error,
+    function_execution_id,
+  });
 }
