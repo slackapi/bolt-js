@@ -4,7 +4,7 @@
   "keywords": ["slack", "heroku", "nodejs", "bolt", "bolt-js", "javascript"],
   "logo": "https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/assets/bolt-logo.svg",
   "image": "heroku/nodejs",
-  "website": "https://slack.dev/bolt-js/tutorial/getting-started",
+  "website": "https://slack.dev/bolt-js/",
   "repository": "https://github.com/slackapi/bolt-js",
   "success_url": "/",
   "env": {
