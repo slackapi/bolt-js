@@ -1,0 +1,41 @@
+{
+  "name": "Deploying to Heroku ⚡️ Bolt for JavaScript",
+  "description": "This is a Slack app built with the Bolt for JavaScript framework that showcases deploying to the Heroku platform.",
+  "keywords": ["slack", "heroku", "nodejs", "bolt", "bolt-js", "javascript"],
+  "logo": "https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/assets/bolt-logo.svg",
+  "image": "heroku/nodejs",
+  "website": "https://slack.dev/bolt-js/",
+  "repository": "https://github.com/slackapi/bolt-js",
+  "success_url": "/",
+  "env": {
+    "SLACK_SIGNING_SECRET": {
+      "description": "Slack creates a unique string for your app and shares it with you. Verify requests from Slack with confidence by verifying signatures using your signing secret. (begins with xoxb-)",
+      "value": "",
+      "required": true
+    },
+    "SLACK_BOT_TOKEN": {
+      "description": "Bot tokens represent a bot associated with the app installed in a workspace. Unlike user tokens, they're not tied to a user's identity; they're just tied to your app.",
+      "value": "",
+      "required": true
+    },
+    "APP_BASE": {
+      "description": "Do not change. Used by heroku-buildpack-monorepo",
+      "value": "examples/deploy-heroku",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/lstoll/heroku-buildpack-monorepo"
+    },
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}

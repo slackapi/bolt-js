@@ -55,6 +55,10 @@ heroku ps:scale web=1
 2. Follow the [Deploying to Heroku with Bolt for JavaScript][1] guide to:
     - Update your **Request URL** for actions and events
 
+### 6. Bonus: Deploy to Heroku with one click
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/slackapi/bolt-js)
+
 [1]: https://slack.dev/bolt-js/deployments/heroku
 [2]: https://slack.dev/bolt-js/
 [3]: https://heroku.com/
