@@ -15,12 +15,18 @@ describe('HTTPModuleFunctions', async () => {
   describe('Request header extraction', async () => {
     it('should have extractRetryNumFromHTTPRequest', async () => {
       const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        req.headers = {};
+      }
       req.headers['x-slack-retry-num'] = '2';
       const result = func.extractRetryNumFromHTTPRequest(req);
       assert.equal(result, 2);
     });
     it('should have extractRetryNumFromHTTPRequest', async () => {
       const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        req.headers = {};
+      }
       req.headers['x-slack-retry-reason'] = 'timeout';
       const result = func.extractRetryReasonFromHTTPRequest(req);
       assert.equal(result, 'timeout');
@@ -30,6 +36,9 @@ describe('HTTPModuleFunctions', async () => {
   describe('HTTP request parsing and verification', async () => {
     it('should have getHeader', async () => {
       const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        req.headers = {};
+      }
       req.headers.Cookie = 'foo=bar';
       const result = func.getHeader(req, 'Cookie');
       assert.equal(result, 'foo=bar');
