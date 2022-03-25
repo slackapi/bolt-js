@@ -1,4 +1,4 @@
-# Bolt for JavaScript Koa Receiver Example App
+# Bolt for JavaScript: Custom Receiver Example App
 
 This is a quick example app to demonstrate how to implement a custom receiver to integrate `App` with 3rd party web framework, which allows developers to directly access Node.js http package interface.
 
@@ -25,7 +25,7 @@ export SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
 Start the app with the following command:
 
 ```
-npm start
+npm run koa
 ```
 
 ### Running with OAuth
