@@ -18,5 +18,6 @@ const app = new App({
     console.log('⚡️ Bolt app is running! ⚡️');
   } catch (error) {
     console.error('Unable to start App', error);
+    process.exit(1);
   }
 })();
