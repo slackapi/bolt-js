@@ -9,16 +9,6 @@ const app = new App({
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
   scopes: ['channels:history', 'chat:write', 'commands'],
-  customRoutes: [
-    {
-      path: '/health-check',
-      method: ['GET'],
-      handler: (req, res) => {
-        res.writeHead(200);
-        res.end('Health check information displayed here!');
-      },
-    },
-  ],
 });
 
 /** Start Bolt App */
