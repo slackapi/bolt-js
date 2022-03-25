@@ -1,7 +1,10 @@
-const { App, SocketModeReceiver } = require('@slack/bolt');
+const { App, LogLevel } = require('@slack/bolt');
 
-const socketModeReceiver = new SocketModeReceiver({
+const app = new App({
+  logLevel: LogLevel.DEBUG,
+  socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: 'my-state-secret',
@@ -16,9 +19,6 @@ const socketModeReceiver = new SocketModeReceiver({
       },
     },
   ],
-});
-const app = new App({
-  receiver: socketModeReceiver,
 });
 
 /** Start Bolt App */
