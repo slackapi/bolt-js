@@ -1,10 +1,10 @@
 /* eslint-disable node/no-extraneous-import */
 /* eslint-disable import/no-extraneous-dependencies */
-import { InstallProvider, CallbackOptions } from '@slack/oauth';
+import { InstallProvider, CallbackOptions, InstallPathOptions } from '@slack/oauth';
 import { ConsoleLogger, LogLevel, Logger } from '@slack/logger';
 import Router from '@koa/router';
 import Koa from 'koa';
-import { Server, IncomingMessage, ServerResponse } from 'http';
+import { Server, createServer } from 'http';
 import {
   App,
   CodedError,
@@ -16,19 +16,9 @@ import {
   InstallProviderOptions,
   InstallURLOptions,
   BufferedIncomingMessage,
-  ReceiverDispatchErrorHandlerArgs,
   ReceiverProcessEventErrorHandlerArgs,
   ReceiverUnhandledRequestHandlerArgs,
 } from '@slack/bolt';
-
-// TODO: import from @slack/oauth
-export interface InstallPathOptions {
-  beforeRedirection?: (
-    request: IncomingMessage,
-    response: ServerResponse,
-    options?: InstallURLOptions
-  ) => Promise<boolean>;
-}
 
 export interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
@@ -66,8 +56,6 @@ export interface KoaReceiverOptions {
     request: BufferedIncomingMessage
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Record<string, any>;
-  // NOTE: As http.RequestListener is not an async function, this cannot be async
-  dispatchErrorHandler?: (args: ReceiverDispatchErrorHandlerArgs) => void;
   processEventErrorHandler?: (
     args: ReceiverProcessEventErrorHandlerArgs
   ) => Promise<boolean>;
@@ -96,8 +84,6 @@ export default class KoaReceiver implements Receiver {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Record<string, any>;
 
-  private dispatchErrorHandler: (args: ReceiverDispatchErrorHandlerArgs) => void;
-
   private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
   private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
@@ -125,9 +111,15 @@ export default class KoaReceiver implements Receiver {
 
     this.koa = options.koa ?? new Koa();
     this.router = options.router ?? new Router();
-    this.logger = initializeLogger(options.logger, options.logLevel);
+    this.logger = options.logger ??
+      (() => {
+        const defaultLogger = new ConsoleLogger();
+        if (options.logLevel) {
+          defaultLogger.setLevel(options.logLevel);
+        }
+        return defaultLogger;
+      })();
     this.processBeforeResponse = options.processBeforeResponse ?? false;
-    this.dispatchErrorHandler = options.dispatchErrorHandler ?? httpFunc.defaultDispatchErrorHandler;
     this.processEventErrorHandler = options.processEventErrorHandler ?? httpFunc.defaultProcessEventErrorHandler;
     this.unhandledRequestHandler = options.unhandledRequestHandler ?? httpFunc.defaultUnhandledRequestHandler;
 
@@ -294,14 +286,31 @@ export default class KoaReceiver implements Receiver {
     // Enable routes
     this.koa.use(this.router.routes()).use(this.router.allowedMethods());
 
-    // TODO: error handler here
+    if (this.server !== undefined) {
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be started because it was already started.'),
+      );
+    }
+
     return new Promise((resolve, reject) => {
-      try {
-        this.server = this.koa.listen(port);
-        resolve(this.server);
-      } catch (e) {
-        reject(e);
-      }
+      this.server = createServer(this.koa.callback());
+      this.server.on('error', (error) => {
+        if (this.server) {
+          this.server.close();
+        }
+        reject(error);
+      });
+
+      this.server.on('close', () => {
+        this.server = undefined;
+      });
+
+      this.server.listen(port, () => {
+        if (this.server === undefined) {
+          return reject(new ReceiverInconsistentStateError('The HTTP server is unexpectedly missing'));
+        }
+        return resolve(this.server);
+      });
     });
   }
 
@@ -321,19 +330,4 @@ export default class KoaReceiver implements Receiver {
       });
     });
   }
-}
-
-// TODO: move
-export function initializeLogger(
-  logger: Logger | undefined,
-  logLevel: LogLevel | undefined,
-): Logger {
-  if (logger !== undefined) {
-    return logger;
-  }
-  const newLogger = new ConsoleLogger();
-  if (logLevel !== undefined) {
-    newLogger.setLevel(logLevel);
-  }
-  return newLogger;
 }

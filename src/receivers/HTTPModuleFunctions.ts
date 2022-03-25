@@ -108,7 +108,7 @@ export class HTTPModuleFunctions {
     const hmac = createHmac('sha256', signingSecret);
     hmac.update(`${signatureVersion}:${requestTimestampSec}:${bufferedReq.rawBody.toString()}`);
     const ourSignatureHash = hmac.digest('hex');
-    if (!tsscmp(signatureHash, ourSignatureHash)) {
+    if (!signatureHash || !tsscmp(signatureHash, ourSignatureHash)) {
       throw new Error(`${verifyErrorPrefix}: signature mismatch`);
     }
 

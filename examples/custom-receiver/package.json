@@ -7,13 +7,13 @@
     "lint": "eslint --fix --ext .ts src",
     "build": "npm run lint && tsc -p .",
     "build:watch": "npm run lint && tsc -w -p .",
-    "start": "npm run build && node dist/app.js"
+    "koa": "npm run build && node dist/koa-main.js"
   },
   "license": "MIT",
   "dependencies": {
     "@koa/router": "^10.1.1",
     "@slack/logger": "^3.0.0",
-    "@slack/oauth": "^2.5.0-rc.1",
+    "@slack/oauth": "^2.5.0",
     "dotenv": "^8.2.0",
     "koa": "^2.13.4"
   },
