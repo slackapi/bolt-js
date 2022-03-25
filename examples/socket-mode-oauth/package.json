@@ -1,0 +1,15 @@
+{
+  "name": "socket-mode-oauth-example",
+  "version": "1.0.0",
+  "description": "Example of Bolt SocketMode App with Oauth enabled",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "Slack Technologies, LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.10.0"
+  }
+}
