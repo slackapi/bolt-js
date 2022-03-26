@@ -7,7 +7,8 @@
     "lint": "eslint --fix --ext .ts src",
     "build": "npm run lint && tsc -p .",
     "build:watch": "npm run lint && tsc -w -p .",
-    "koa": "npm run build && node dist/koa-main.js"
+    "koa": "npm run build && node dist/koa-main.js",
+    "fastify": "npm run build && node dist/fastify-main.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -15,6 +16,7 @@
     "@slack/logger": "^3.0.0",
     "@slack/oauth": "^2.5.0",
     "dotenv": "^8.2.0",
+    "fastify": "^3.27.4",
     "koa": "^2.13.4"
   },
   "devDependencies": {
