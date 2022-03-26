@@ -12,7 +12,6 @@ import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOpt
 import App from '../App';
 import {
   ReceiverAuthenticityError,
-  ReceiverMultipleAckError,
   ReceiverInconsistentStateError,
   ErrorCode,
   CodedError,
@@ -21,7 +20,8 @@ import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import { StringIndexed } from '../types/helpers';
-import { extractRetryNum, extractRetryReason } from './http-utils';
+import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
+import { HTTPResponseAck } from './HTTPResponseAck';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -264,55 +264,25 @@ export default class ExpressReceiver implements Receiver {
   }
 
   private async requestHandler(req: Request, res: Response): Promise<void> {
-    let isAcknowledged = false;
-    setTimeout(() => {
-      if (!isAcknowledged) {
-        this.logger.error(
-          'An incoming event was not acknowledged within 3 seconds. Ensure that the ack() argument is called in a listener.',
-        );
-      }
-    }, 3001);
-
-    let storedResponse;
+    const ack = new HTTPResponseAck({
+      logger: this.logger,
+      processBeforeResponse: this.processBeforeResponse,
+      unhandledRequestTimeoutMillis: 3001, // TODO: this.unhandledRequestTimeoutMillis
+      httpRequest: req,
+      httpResponse: res,
+    });
     const event: ReceiverEvent = {
       body: req.body,
-      ack: async (response): Promise<void> => {
-        this.logger.debug('ack() begin');
-        if (isAcknowledged) {
-          throw new ReceiverMultipleAckError();
-        }
-        isAcknowledged = true;
-        if (this.processBeforeResponse) {
-          if (!response) {
-            storedResponse = '';
-          } else {
-            storedResponse = response;
-          }
-          this.logger.debug('ack() response stored');
-        } else {
-          if (!response) {
-            res.send('');
-          } else if (typeof response === 'string') {
-            res.send(response);
-          } else {
-            res.json(response);
-          }
-          this.logger.debug('ack() response sent');
-        }
-      },
-      retryNum: extractRetryNum(req),
-      retryReason: extractRetryReason(req),
+      ack: ack.bind(),
+      retryNum: httpFunc.extractRetryNumFromHTTPRequest(req),
+      retryReason: httpFunc.extractRetryReasonFromHTTPRequest(req),
       customProperties: this.customPropertiesExtractor(req),
     };
 
     try {
       await this.bolt?.processEvent(event);
-      if (storedResponse !== undefined) {
-        if (typeof storedResponse === 'string') {
-          res.send(storedResponse);
-        } else {
-          res.json(storedResponse);
-        }
+      if (ack.storedResponse !== undefined) {
+        httpFunc.buildContentResponse(res, ack.storedResponse);
         this.logger.debug('stored response sent');
       }
     } catch (err) {
@@ -322,12 +292,12 @@ export default class ExpressReceiver implements Receiver {
         const errorCode = (err as CodedError).code;
         if (errorCode === ErrorCode.AuthorizationError) {
           // authorize function threw an exception, which means there is no valid installation data
-          res.status(401).send();
-          isAcknowledged = true;
+          httpFunc.buildNoBodyResponse(res, 401);
+          ack.ack();
           return;
         }
       }
-      res.status(500).send();
+      httpFunc.buildNoBodyResponse(res, 500);
       throw err;
     }
   }

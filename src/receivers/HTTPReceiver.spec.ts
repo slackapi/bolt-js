@@ -13,7 +13,7 @@ import {
   HTTPReceiverDeferredRequestError,
   CodedError,
 } from '../errors';
-import { defaultDispatchErrorHandler, defaultProcessEventErrorHandler, defaultUnhandledRequestHandler } from './HTTPReceiver';
+import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
 
 /* Testing Harness */
 
@@ -610,7 +610,7 @@ describe('HTTPReceiver', function () {
       fakeRes.writeHead = sinon.fake();
       fakeRes.end = sinon.fake();
 
-      defaultDispatchErrorHandler({
+      httpFunc.defaultDispatchErrorHandler({
         error: { code: 'foo' } as CodedError,
         logger: noopLogger,
         request: fakeReq,
@@ -627,7 +627,7 @@ describe('HTTPReceiver', function () {
       fakeRes.writeHead = sinon.fake();
       fakeRes.end = sinon.fake();
 
-      const result = await defaultProcessEventErrorHandler({
+      const result = await httpFunc.defaultProcessEventErrorHandler({
         error: { code: 'foo' } as CodedError,
         logger: noopLogger,
         request: fakeReq,
@@ -646,7 +646,7 @@ describe('HTTPReceiver', function () {
       fakeRes.writeHead = sinon.fake();
       fakeRes.end = sinon.fake();
 
-      defaultUnhandledRequestHandler({
+      httpFunc.defaultUnhandledRequestHandler({
         logger: noopLogger,
         request: fakeReq,
         response: fakeRes,

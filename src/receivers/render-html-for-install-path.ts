@@ -1,4 +1,12 @@
+import { ConsoleLogger } from '@slack/logger';
+
+const logger = new ConsoleLogger();
+
+// Deprecated: this function will be removed in the near future
+// Use the ones from @slack/oauth (v2.5 or newer) instead
 export default function defaultRenderHtmlForInstallPath(addToSlackUrl: string): string {
+  logger.warn('This method is deprecated. Use defaultRenderHtmlForInstallPath from @slack/oatuh instead.');
+  // TODO: replace the internals of this method with the one from @slack/oauth@2.5 or newer
   return `<html>
       <body>
         <a href="${addToSlackUrl}">
@@ -14,6 +22,7 @@ export default function defaultRenderHtmlForInstallPath(addToSlackUrl: string): 
     </html>`;
 }
 
+// Deprecated: this function will be removed in the near future
 // For backward-compatibility
 export function renderHtmlForInstallPath(addToSlackUrl: string): string {
   return defaultRenderHtmlForInstallPath(addToSlackUrl);

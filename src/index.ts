@@ -20,6 +20,16 @@ export { default as SocketModeReceiver, SocketModeReceiverOptions } from './rece
 export { default as HTTPReceiver, HTTPReceiverOptions } from './receivers/HTTPReceiver';
 export { default as AwsLambdaReceiver, AwsLambdaReceiverOptions } from './receivers/AwsLambdaReceiver';
 
+export { BufferedIncomingMessage } from './receivers/BufferedIncomingMessage';
+export {
+  HTTPModuleFunctions,
+  RequestVerificationOptions,
+  ReceiverDispatchErrorHandlerArgs,
+  ReceiverProcessEventErrorHandlerArgs,
+  ReceiverUnhandledRequestHandlerArgs,
+} from './receivers/HTTPModuleFunctions';
+export { HTTPResponseAck } from './receivers/HTTPResponseAck';
+
 export * from './errors';
 export * from './middleware/builtin';
 export * from './types';

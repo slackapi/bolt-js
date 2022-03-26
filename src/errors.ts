@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import type { BufferedIncomingMessage } from './receivers/verify-request';
+import type { BufferedIncomingMessage } from './receivers/BufferedIncomingMessage';
 
 export interface CodedError extends Error {
   code: string; // This can be a value from ErrorCode, or WebClient's ErrorCode, or a NodeJS error code

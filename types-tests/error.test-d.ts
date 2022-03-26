@@ -2,7 +2,7 @@ import App from '../src/App';
 import { expectType } from 'tsd';
 import { CodedError } from '../src/errors';
 import { IncomingMessage, ServerResponse } from 'http';
-import { BufferedIncomingMessage } from '../src/receivers/verify-request';
+import { BufferedIncomingMessage } from '../src/receivers/BufferedIncomingMessage';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
