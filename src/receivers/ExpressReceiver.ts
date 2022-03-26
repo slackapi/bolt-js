@@ -8,7 +8,7 @@ import querystring from 'querystring';
 import crypto from 'crypto';
 import tsscmp from 'tsscmp';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
+import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import App from '../App';
 import {
   ReceiverAuthenticityError,
@@ -17,7 +17,6 @@ import {
   CodedError,
 } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import { StringIndexed } from '../types/helpers';
 import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
@@ -104,12 +103,16 @@ export interface ExpressReceiverOptions {
 interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
   stateVerification?: InstallProviderOptions['stateVerification']; // defaults true
+  legacyStateVerification?: InstallProviderOptions['legacyStateVerification'];
+  stateCookieName?: InstallProviderOptions['stateCookieName'];
+  stateCookieExpirationSeconds?: InstallProviderOptions['stateCookieExpirationSeconds'];
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
-  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
-  renderHtmlForInstallPath?: (url: string) => string;
+  directInstall?: InstallProviderOptions['directInstall']; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: InstallProviderOptions['renderHtmlForInstallPath'];
   redirectUriPath?: string;
+  installPathOptions?: InstallPathOptions;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
   clientOptions?: InstallProviderOptions['clientOptions'];
@@ -205,8 +208,13 @@ export default class ExpressReceiver implements Receiver {
         installationStore,
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
+        directInstall: installerOptions.directInstall,
         stateStore: installerOptions.stateStore,
         stateVerification: installerOptions.stateVerification,
+        legacyStateVerification: installerOptions.legacyStateVerification,
+        stateCookieName: installerOptions.stateCookieName,
+        stateCookieExpirationSeconds: installerOptions.stateCookieExpirationSeconds,
+        renderHtmlForInstallPath: installerOptions.renderHtmlForInstallPath,
         authVersion: installerOptions.authVersion ?? 'v2',
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
@@ -221,6 +229,7 @@ export default class ExpressReceiver implements Receiver {
     };
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
+      const { installer } = this;
       const redirectUriPath = installerOptions.redirectUriPath === undefined ?
         '/slack/oauth_redirect' :
         installerOptions.redirectUriPath;
@@ -229,31 +238,17 @@ export default class ExpressReceiver implements Receiver {
         if (stateVerification === false) {
           // when stateVerification is disabled pass install options directly to handler
           // since they won't be encoded in the state param of the generated url
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+          await installer.handleCallback(req, res, callbackOptions, installUrlOptions);
         } else {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await this.installer!.handleCallback(req, res, callbackOptions);
+          await installer.handleCallback(req, res, callbackOptions);
         }
       });
 
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
-      this.router.get(installPath, async (_req, res, next) => {
+      const { installPathOptions } = installerOptions;
+      this.router.get(installPath, async (req, res, next) => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
-          if (installerOptions.directInstall) {
-            // If a Slack app sets "Direct Install URL" in the Slack app configuration,
-            // the installation flow of the app should start with the Slack authorize URL.
-            // See https://api.slack.com/start/distributing/directory#direct_install for more details.
-            res.redirect(url);
-          } else {
-            // The installation starts from a landing page served by this app.
-            const renderHtml = installerOptions.renderHtmlForInstallPath !== undefined ?
-              installerOptions.renderHtmlForInstallPath :
-              defaultRenderHtmlForInstallPath;
-            res.send(renderHtml(url));
-          }
+          await installer.handleInstallPath(req, res, installPathOptions, installUrlOptions);
         } catch (error) {
           next(error);
         }

@@ -3,13 +3,12 @@ import { createServer, Server, ServerOptions, RequestListener, IncomingMessage, 
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
+import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { URL } from 'url';
 
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import {
   ReceiverInconsistentStateError,
   HTTPReceiverDeferredRequestError,
@@ -91,16 +90,20 @@ export interface HTTPReceiverOptions {
 // All the available argument for OAuth flow enabled apps
 export interface HTTPReceiverInstallerOptions {
   installPath?: string;
-  directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
-  renderHtmlForInstallPath?: (url: string) => string;
+  directInstall?: InstallProviderOptions['directInstall']; // see https://api.slack.com/start/distributing/directory#direct_install
+  renderHtmlForInstallPath?: InstallProviderOptions['renderHtmlForInstallPath'];
   redirectUriPath?: string;
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
   stateVerification?: InstallProviderOptions['stateVerification']; // default true
+  legacyStateVerification?: InstallProviderOptions['legacyStateVerification'];
+  stateCookieName?: InstallProviderOptions['stateCookieName'];
+  stateCookieExpirationSeconds?: InstallProviderOptions['stateCookieExpirationSeconds'];
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   clientOptions?: InstallProviderOptions['clientOptions'];
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
   metadata?: InstallURLOptions['metadata'];
   userScopes?: InstallURLOptions['userScopes'];
+  installPathOptions?: InstallPathOptions;
   callbackOptions?: CallbackOptions;
   // This value exists here only for the compatibility with SocketModeReceiver.
   // If you use only HTTPReceiver, the top-level is recommended.
@@ -133,13 +136,11 @@ export default class HTTPReceiver implements Receiver {
 
   private installPath?: string; // always defined when installer is defined
 
-  private directInstall?: boolean; // always defined when installer is defined
-
-  private renderHtmlForInstallPath: (url: string) => string;
-
   private installRedirectUriPath?: string; // always defined when installer is defined
 
   private installUrlOptions?: InstallURLOptions; // always defined when installer is defined
+
+  private installPathOptions?: InstallPathOptions; // always defined when installer is defined
 
   private installCallbackOptions?: CallbackOptions; // always defined when installer is defined
 
@@ -212,8 +213,13 @@ export default class HTTPReceiver implements Receiver {
         installationStore,
         logger,
         logLevel,
+        directInstall: installerOptions.directInstall,
         stateStore: installerOptions.stateStore,
         stateVerification: installerOptions.stateVerification,
+        legacyStateVerification: installerOptions.legacyStateVerification,
+        stateCookieName: installerOptions.stateCookieName,
+        stateCookieExpirationSeconds: installerOptions.stateCookieExpirationSeconds,
+        renderHtmlForInstallPath: installerOptions.renderHtmlForInstallPath,
         authVersion: installerOptions.authVersion,
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
@@ -221,8 +227,8 @@ export default class HTTPReceiver implements Receiver {
 
       // Store the remaining instance variables that are related to using the InstallProvider
       this.installPath = installerOptions.installPath ?? '/slack/install';
-      this.directInstall = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.installRedirectUriPath = installerOptions.redirectUriPath ?? '/slack/oauth_redirect';
+      this.installPathOptions = installerOptions.installPathOptions ?? {};
       this.installCallbackOptions = installerOptions.callbackOptions ?? {};
       this.installUrlOptions = {
         scopes: scopes ?? [],
@@ -231,9 +237,6 @@ export default class HTTPReceiver implements Receiver {
         redirectUri,
       };
     }
-    this.renderHtmlForInstallPath = installerOptions.renderHtmlForInstallPath !== undefined ?
-      installerOptions.renderHtmlForInstallPath :
-      defaultRenderHtmlForInstallPath;
     this.customPropertiesExtractor = customPropertiesExtractor;
     this.dispatchErrorHandler = dispatchErrorHandler;
     this.processEventErrorHandler = processEventErrorHandler;
@@ -375,7 +378,7 @@ export default class HTTPReceiver implements Receiver {
       // Visiting the installation endpoint
       if (path === installPath) {
         // Render installation path (containing Add to Slack button)
-        return this.handleInstallPathRequest(res);
+        return this.handleInstallPathRequest(req, res);
       }
 
       // Installation has been initiated
@@ -493,42 +496,20 @@ export default class HTTPReceiver implements Receiver {
     })();
   }
 
-  private handleInstallPathRequest(res: ServerResponse) {
+  private handleInstallPathRequest(req: IncomingMessage, res: ServerResponse) {
     // Wrapped in an async closure for ease of using await
     (async () => {
-      // NOTE: Skipping some ceremony such as content negotiation, setting informative headers, etc. These may be nice
-      // to have for completeness, but there's no clear benefit to adding them, so just keeping things simple. If a
-      // user desires a more custom page, they can always call `App.installer.generateInstallUrl()` and render their
-      // own page instead of using this one.
       try {
-        // This function is only called from within unboundRequestListener after checking that installer is defined, and
-        // when installer is defined then installUrlOptions is always defined too.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const [installer, installUrlOptions] = [this.installer!, this.installUrlOptions!];
-        // Generate the URL for the "Add to Slack" button.
-        const url = await installer.generateInstallUrl(installUrlOptions, this.stateVerification);
-
-        if (this.directInstall !== undefined && this.directInstall) {
-          // If a Slack app sets "Direct Install URL" in the Slack app configruation,
-          // the installation flow of the app should start with the Slack authorize URL.
-          // See https://api.slack.com/start/distributing/directory#direct_install for more details.
-          res.writeHead(302, { Location: url });
-          res.end('');
-        } else {
-          // The installation starts from a landing page served by this app.
-          // Generate HTML response body
-          const body = this.renderHtmlForInstallPath(url);
-
-          // Serve a basic HTML page including the "Add to Slack" button.
-          // Regarding headers:
-          // - Content-Length is not used because Transfer-Encoding='chunked' is automatically used.
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          res.writeHead(200);
-          res.end(body);
-        }
+        /* eslint-disable @typescript-eslint/no-non-null-assertion */
+        await this.installer!.handleInstallPath(
+          req,
+          res,
+          this.installPathOptions,
+          this.installUrlOptions,
+        );
       } catch (err) {
         const e = err as any;
-        this.logger.error('An unhandled error occurred while Bolt processed a request to the installation path');
+        this.logger.error(`An unhandled error occurred while Bolt processed a request to the installation path (${e.message})`);
         this.logger.debug(`Error details: ${e}`);
       }
     })();

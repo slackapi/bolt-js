@@ -3,11 +3,10 @@ import { URL } from 'url';
 import { SocketModeClient } from '@slack/socket-mode';
 import { createServer, IncomingMessage, ServerResponse, Server } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions } from '@slack/oauth';
+import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
-import defaultRenderHtmlForInstallPath from './render-html-for-install-path';
 import { StringIndexed } from '../types/helpers';
 import { prepareRoutes, ReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
@@ -39,12 +38,16 @@ export interface CustomRoute {
 interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
   stateVerification?: InstallProviderOptions['stateVerification']; // default true
+  legacyStateVerification?: InstallProviderOptions['legacyStateVerification'];
+  stateCookieName?: InstallProviderOptions['stateCookieName'];
+  stateCookieExpirationSeconds?: InstallProviderOptions['stateCookieExpirationSeconds'];
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
   directInstall?: boolean; // see https://api.slack.com/start/distributing/directory#direct_install
-  renderHtmlForInstallPath?: (url: string) => string;
+  renderHtmlForInstallPath?: InstallProviderOptions['renderHtmlForInstallPath'];
   redirectUriPath?: string;
+  installPathOptions?: InstallPathOptions;
   callbackOptions?: CallbackOptions;
   userScopes?: InstallURLOptions['userScopes'];
   clientOptions?: InstallProviderOptions['clientOptions'];
@@ -116,9 +119,14 @@ export default class SocketModeReceiver implements Receiver {
         installationStore,
         logLevel,
         logger, // pass logger that was passed in constructor, not one created locally
+        directInstall: installerOptions.directInstall,
         stateStore: installerOptions.stateStore,
         stateVerification: installerOptions.stateVerification,
-        authVersion: installerOptions.authVersion ?? 'v2',
+        legacyStateVerification: installerOptions.legacyStateVerification,
+        stateCookieName: installerOptions.stateCookieName,
+        stateCookieExpirationSeconds: installerOptions.stateCookieExpirationSeconds,
+        renderHtmlForInstallPath: installerOptions.renderHtmlForInstallPath,
+        authVersion: installerOptions.authVersion,
         clientOptions: installerOptions.clientOptions,
         authorizationUrl: installerOptions.authorizationUrl,
       });
@@ -126,14 +134,8 @@ export default class SocketModeReceiver implements Receiver {
 
     // Add OAuth and/or custom routes to receiver
     if (this.installer !== undefined || customRoutes.length) {
-      // use default or passed in redirect path
-      const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
-
-      // use default or passed in installPath
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
-      const directInstallEnabled = installerOptions.directInstall !== undefined && installerOptions.directInstall;
       this.httpServerPort = installerOptions.port === undefined ? 3000 : installerOptions.port;
-
       this.httpServer = createServer(async (req, res) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const method = req.method!.toUpperCase();
@@ -148,41 +150,23 @@ export default class SocketModeReceiver implements Receiver {
             redirectUri,
           };
           // Installation has been initiated
+          const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
           if (req.url && req.url.startsWith(redirectUriPath)) {
             const { stateVerification, callbackOptions } = installerOptions;
             if (stateVerification === false) {
               // if stateVerification is disabled make install options available to handler
               // since they won't be encoded in the state param of the generated url
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              await this.installer!.handleCallback(req, res, callbackOptions, installUrlOptions);
+              await this.installer.handleCallback(req, res, callbackOptions, installUrlOptions);
             } else {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              await this.installer!.handleCallback(req, res, callbackOptions);
+              await this.installer.handleCallback(req, res, callbackOptions);
             }
             return;
           }
-
           // Visiting the installation endpoint
           if (req.url && req.url.startsWith(installPath)) {
-            const { stateVerification, renderHtmlForInstallPath } = installerOptions;
-            try {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              const url = await this.installer!.generateInstallUrl(installUrlOptions, stateVerification);
-              if (directInstallEnabled) {
-                res.writeHead(302, { Location: url });
-                res.end('');
-              } else {
-                res.writeHead(200, {});
-                const renderHtml = renderHtmlForInstallPath !== undefined ?
-                  renderHtmlForInstallPath :
-                  defaultRenderHtmlForInstallPath;
-                res.end(renderHtml(url));
-                return;
-              }
-            } catch (err) {
-              const e = err as any;
-              throw new Error(e);
-            }
+            const { installPathOptions } = installerOptions;
+            await this.installer.handleInstallPath(req, res, installPathOptions, installUrlOptions);
+            return;
           }
         }
 

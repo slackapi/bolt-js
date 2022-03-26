@@ -198,7 +198,7 @@ describe('SocketModeReceiver', function () {
   });
   describe('request handling', function () {
     describe('handleInstallPathRequest()', function () {
-      it('should invoke installer generateInstallUrl if a request comes into the install path', async function () {
+      it('should invoke installer handleInstallPath if a request comes into the install path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
@@ -229,15 +229,13 @@ describe('SocketModeReceiver', function () {
         const fakeReq = {
           url: '/hiya',
           method: 'GET',
-        };
+        } as IncomingMessage;
         const fakeRes = {
           writeHead: sinon.fake(),
           end: sinon.fake(),
-        };
+        } as unknown as ServerResponse;
         await this.listener(fakeReq, fakeRes);
-        assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
-        assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
       it('should use a custom HTML renderer for the install path webpage', async function () {
         // Arrange
@@ -271,16 +269,13 @@ describe('SocketModeReceiver', function () {
         const fakeReq = {
           url: '/hiya',
           method: 'GET',
-        };
+        } as IncomingMessage;
         const fakeRes = {
           writeHead: sinon.fake(),
           end: sinon.fake(),
-        };
+        } as unknown as ServerResponse;
         await this.listener(fakeReq, fakeRes);
-        assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
-        assert(fakeRes.writeHead.calledWith(200, sinon.match.object));
-        assert(fakeRes.end.called);
-        assert.isTrue(fakeRes.end.calledWith('Hello world!'));
+        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
       it('should redirect installers if directInstall is true', async function () {
         // Arrange
@@ -314,16 +309,13 @@ describe('SocketModeReceiver', function () {
         const fakeReq = {
           url: '/hiya',
           method: 'GET',
-        };
+        } as IncomingMessage;
         const fakeRes = {
           writeHead: sinon.fake(),
           end: sinon.fake(),
-        };
-        /* eslint-disable-next-line @typescript-eslint/await-thenable */
+        } as unknown as ServerResponse;
         await this.listener(fakeReq, fakeRes);
-        assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
-        assert(fakeRes.writeHead.calledWith(302, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
     });
     describe('handleInstallRedirectRequest()', function () {
