@@ -1070,6 +1070,11 @@ export default class App {
     appToken?: string,
     logger?: Logger,
   ): Receiver {
+    if (port !== undefined && receiver !== undefined) {
+      // Check https://github.com/slackapi/bolt-js/issues/1357 for the context
+      this.logger.info("You've passed both port and receiver. Some receivers may not respect the port passed in App constructor. If you encounter the unexpected behavior, check the appropriate way to pass port to the receiver.");
+    }
+
     if (receiver !== undefined) {
       // Custom receiver supplied
       if (this.socketMode === true) {
