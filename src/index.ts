@@ -37,6 +37,12 @@ export * from './types';
 export { ConversationStore, MemoryStore } from './conversation-store';
 
 export {
+  CustomRoute,
+  ReceiverRoutes,
+  buildReceiverRoutes,
+} from './receivers/custom-routes';
+
+export {
   WorkflowStep,
   WorkflowStepConfig,
   WorkflowStepEditMiddleware,
