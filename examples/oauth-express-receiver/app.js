@@ -1,4 +1,4 @@
-const { App, ExpressReceiver, LogLevel } = require('@slack/bolt');
+const { App, ExpressReceiver, LogLevel, FileInstallationStore } = require('@slack/bolt');
 
 // Create an ExpressReceiver
 const receiver = new ExpressReceiver({ 
@@ -13,32 +13,7 @@ const receiver = new ExpressReceiver({
     // This flag is available in @slack/bolt v3.7 or higher
     // directInstall: true,
   },
-  installationStore: {
-    storeInstallation: async (installation) => {
-      // replace database.set so it fetches from your database
-      if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
-        // support for org wide app installation
-        return await database.set(installation.enterprise.id, installation);
-      }
-      if (installation.team !== undefined) {
-        // single team app installation
-        return await database.set(installation.team.id, installation);
-      }
-      throw new Error('Failed saving installation data to installationStore');
-    },
-    fetchInstallation: async (installQuery) => {
-      // replace database.get so it fetches from your database
-      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
-        // org wide app installation lookup
-        return await database.get(installQuery.enterpriseId);
-      }
-      if (installQuery.teamId !== undefined) {
-        // single team app installation lookup
-        return await database.get(installQuery.teamId);
-      }
-      throw new Error('Failed fetching installation');
-    },
-  },
+  installationStore: new FileInstallationStore(),
 });
 
 // Create the Bolt App, using the receiver
@@ -60,6 +35,6 @@ receiver.router.get('/secret-page', (req, res) => {
 });
 
 (async () => {
-  await app.start(8080);
+  await app.start(3000);
   console.log('Express app is running');
 })();

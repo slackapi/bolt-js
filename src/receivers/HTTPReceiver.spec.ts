@@ -257,7 +257,7 @@ describe('HTTPReceiver', function () {
   });
   describe('request handling', function () {
     describe('handleInstallPathRequest()', function () {
-      it('should invoke installer generateInstallUrl if a request comes into the install path', async function () {
+      it('should invoke installer handleInstallPath if a request comes into the install path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
@@ -296,9 +296,7 @@ describe('HTTPReceiver', function () {
         fakeRes.end = end;
         fakeRes.setHeader = setHeader;
         await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
-        assert.isTrue(writeHead.calledWith(200));
-        assert.isTrue(setHeader.calledWith('Content-Type', 'text/html; charset=utf-8'));
+        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
 
       it('should use a custom HTML renderer for the install path webpage', async function () {
@@ -340,9 +338,7 @@ describe('HTTPReceiver', function () {
         fakeRes.end = end;
         /* eslint-disable-next-line @typescript-eslint/await-thenable */
         await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
-        assert.isTrue(writeHead.calledWith(200));
-        assert.isTrue(end.calledWith('Hello world!'));
+        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
 
       it('should redirect installers if directInstall is true', async function () {
@@ -383,8 +379,7 @@ describe('HTTPReceiver', function () {
         fakeRes.writeHead = writeHead;
         fakeRes.end = end;
         await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.generateInstallUrl.calledWith(sinon.match({ metadata, scopes, userScopes })));
-        assert.isTrue(writeHead.calledWith(302, sinon.match.object));
+        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
     });
 
