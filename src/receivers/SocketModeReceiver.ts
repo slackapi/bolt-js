@@ -8,7 +8,7 @@ import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
 import { StringIndexed } from '../types/helpers';
-import { prepareRoutes, ReceiverRoutes } from './custom-routes';
+import { buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
@@ -100,7 +100,7 @@ export default class SocketModeReceiver implements Receiver {
       defaultLogger.setLevel(logLevel);
       return defaultLogger;
     })();
-    this.routes = prepareRoutes(customRoutes);
+    this.routes = buildReceiverRoutes(customRoutes);
 
     // Verify redirect options if supplied, throws coded error if invalid
     verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });

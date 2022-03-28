@@ -14,7 +14,7 @@ import {
   HTTPReceiverDeferredRequestError,
   CodedError,
 } from '../errors';
-import { CustomRoute, prepareRoutes, ReceiverRoutes } from './custom-routes';
+import { CustomRoute, buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
 import { StringIndexed } from '../types/helpers';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import {
@@ -192,7 +192,7 @@ export default class HTTPReceiver implements Receiver {
       })();
     this.endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
     this.port = installerOptions?.port ? installerOptions.port : port;
-    this.routes = prepareRoutes(customRoutes);
+    this.routes = buildReceiverRoutes(customRoutes);
 
     // Verify redirect options if supplied, throws coded error if invalid
     verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
