@@ -1072,7 +1072,7 @@ export default class App {
   ): Receiver {
     if (port !== undefined && receiver !== undefined) {
       // Check https://github.com/slackapi/bolt-js/issues/1357 for the context
-      this.logger.info("You've passed both port and receiver. Some receivers may not respect the port passed in App constructor. If you encounter the unexpected behavior, check the appropriate way to pass port to the receiver.");
+      this.logger.info("You provided both port and receiver arguments. Some receivers may not respect the port passed to the App constructor. If you encounter any unexpected behavior, check the appropriate way to pass port to the receiver.");
     }
 
     if (receiver !== undefined) {
