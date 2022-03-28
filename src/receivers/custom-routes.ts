@@ -13,7 +13,7 @@ export interface ReceiverRoutes {
   };
 }
 
-export function prepareRoutes(customRoutes: CustomRoute[]): ReceiverRoutes {
+export function buildReceiverRoutes(customRoutes: CustomRoute[]): ReceiverRoutes {
   const routes: ReceiverRoutes = {};
 
   validateCustomRoutes(customRoutes);
