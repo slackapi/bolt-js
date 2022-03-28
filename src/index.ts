@@ -15,6 +15,11 @@ export {
   Logger,
 } from './App';
 
+export {
+  verifySlackRequest,
+  isValidSlackRequest,
+} from './receivers/verify-request';
+
 export { default as ExpressReceiver, ExpressReceiverOptions } from './receivers/ExpressReceiver';
 export { default as SocketModeReceiver, SocketModeReceiverOptions } from './receivers/SocketModeReceiver';
 export { default as HTTPReceiver, HTTPReceiverOptions } from './receivers/HTTPReceiver';

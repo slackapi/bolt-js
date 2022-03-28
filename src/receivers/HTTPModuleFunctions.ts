@@ -1,12 +1,11 @@
 /* eslint-disable import/prefer-default-export */
-import { createHmac } from 'crypto';
 import { parse as qsParse } from 'querystring';
 import rawBody from 'raw-body';
-import tsscmp from 'tsscmp';
 import type { Logger } from '@slack/logger';
 import type { IncomingMessage, ServerResponse } from 'http';
 import { CodedError, ErrorCode } from '../errors';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import { verifySlackRequest } from './verify-request';
 
 const verifyErrorPrefix = 'Failed to verify authenticity';
 
@@ -79,38 +78,15 @@ export class HTTPModuleFunctions {
     // Find the relevant request headers
     const signature = HTTPModuleFunctions.getHeader(req, 'x-slack-signature');
     const requestTimestampSec = Number(HTTPModuleFunctions.getHeader(req, 'x-slack-request-timestamp'));
-    if (Number.isNaN(requestTimestampSec)) {
-      throw new Error(
-        `${verifyErrorPrefix}: header x-slack-request-timestamp did not have the expected type (${requestTimestampSec})`,
-      );
-    }
-
-    // Calculate time-dependent values
-    const nowMsFn = options.nowMilliseconds ?? (() => Date.now());
-    const nowMs = nowMsFn();
-    const fiveMinutesAgoSec = Math.floor(nowMs / 1000) - 60 * 5;
-
-    // Enforce verification rules
-
-    // Rule 1: Check staleness
-    if (requestTimestampSec < fiveMinutesAgoSec) {
-      throw new Error(`${verifyErrorPrefix}: stale`);
-    }
-
-    // Rule 2: Check signature
-    // Separate parts of signature
-    const [signatureVersion, signatureHash] = signature.split('=');
-    // Only handle known versions
-    if (signatureVersion !== 'v0') {
-      throw new Error(`${verifyErrorPrefix}: unknown signature version`);
-    }
-    // Compute our own signature hash
-    const hmac = createHmac('sha256', signingSecret);
-    hmac.update(`${signatureVersion}:${requestTimestampSec}:${bufferedReq.rawBody.toString()}`);
-    const ourSignatureHash = hmac.digest('hex');
-    if (!signatureHash || !tsscmp(signatureHash, ourSignatureHash)) {
-      throw new Error(`${verifyErrorPrefix}: signature mismatch`);
-    }
+    verifySlackRequest({
+      signingSecret,
+      body: bufferedReq.rawBody.toString(),
+      headers: {
+        'x-slack-signature': signature,
+        'x-slack-request-timestamp': requestTimestampSec,
+      },
+      logger: options.logger,
+    });
 
     // Checks have passed! Return the value that has a side effect (the buffered request)
     return bufferedReq;
