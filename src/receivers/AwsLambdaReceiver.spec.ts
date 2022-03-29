@@ -40,6 +40,7 @@ describe('AwsLambdaReceiver', function () {
   it('should instantiate with default logger', async (): Promise<void> => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
+      logger: noopLogger,
     });
     assert.isNotNull(awsReceiver);
   });
@@ -47,9 +48,19 @@ describe('AwsLambdaReceiver', function () {
   it('should have start method', async (): Promise<void> => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
+      logger: noopLogger,
     });
-    const handler: AwsHandler = await awsReceiver.start();
-    assert.isNotNull(handler);
+    const startedHandler: AwsHandler = await awsReceiver.start();
+    assert.isNotNull(startedHandler);
+  });
+
+  it('should have stop method', async (): Promise<void> => {
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: 'my-secret',
+      logger: noopLogger,
+    });
+    await awsReceiver.start();
+    await awsReceiver.stop();
   });
 
   it('should accept events', async (): Promise<void> => {
@@ -379,6 +390,157 @@ describe('AwsLambdaReceiver', function () {
       (_error, _result) => {},
     );
     assert.equal(response1.statusCode, 404);
+  });
+
+  it('should accept ssl_check requests', async (): Promise<void> => {
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: 'my-secret',
+      logger: noopLogger,
+    });
+    const handler = awsReceiver.toHandler();
+    const body = 'ssl_check=1&token=legacy-fixed-token';
+    const awsEvent = {
+      resource: '/slack/events',
+      path: '/slack/events',
+      httpMethod: 'POST',
+      headers: {
+        Accept: 'application/json,*/*',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+        'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+      },
+      multiValueHeaders: {},
+      queryStringParameters: null,
+      multiValueQueryStringParameters: null,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {},
+      body,
+      isBase64Encoded: false,
+    };
+    const response = await handler(
+      awsEvent,
+      {},
+      (_error, _result) => {},
+    );
+    assert.equal(response.statusCode, 200);
+  });
+
+  const urlVerificationBody = JSON.stringify({
+    token: 'Jhj5dZrVaK7ZwHHjRyZWjbDl',
+    challenge: '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P',
+    type: 'url_verification',
+  });
+
+  it('should accept url_verification requests', async (): Promise<void> => {
+    const timestamp = Math.floor(Date.now() / 1000);
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: 'my-secret',
+      logger: noopLogger,
+    });
+    const handler = awsReceiver.toHandler();
+    const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${urlVerificationBody}`).digest('hex');
+    const awsEvent = {
+      resource: '/slack/events',
+      path: '/slack/events',
+      httpMethod: 'POST',
+      headers: {
+        Accept: 'application/json,*/*',
+        'Content-Type': 'application/json',
+        Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+        'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+        'X-Slack-Request-Timestamp': `${timestamp}`,
+        'X-Slack-Signature': `v0=${signature}`,
+      },
+      multiValueHeaders: {},
+      queryStringParameters: null,
+      multiValueQueryStringParameters: null,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {},
+      body: urlVerificationBody,
+      isBase64Encoded: false,
+    };
+    const response = await handler(
+      awsEvent,
+      {},
+      (_error, _result) => {},
+    );
+    assert.equal(response.statusCode, 200);
+  });
+
+  it('should detect invalid signature', async (): Promise<void> => {
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: 'my-secret',
+      logger: noopLogger,
+    });
+    const handler = awsReceiver.toHandler();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${urlVerificationBody}`).digest('hex');
+    const awsEvent = {
+      resource: '/slack/events',
+      path: '/slack/events',
+      httpMethod: 'POST',
+      headers: {
+        Accept: 'application/json,*/*',
+        'Content-Type': 'application/json',
+        Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+        'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+        'X-Slack-Request-Timestamp': `${timestamp}`,
+        'X-Slack-Signature': `v0=${signature}XXXXXXXX`, // invalid signature
+      },
+      multiValueHeaders: {},
+      queryStringParameters: null,
+      multiValueQueryStringParameters: null,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {},
+      body: urlVerificationBody,
+      isBase64Encoded: false,
+    };
+    const response = await handler(
+      awsEvent,
+      {},
+      (_error, _result) => {},
+    );
+    assert.equal(response.statusCode, 401);
+  });
+
+  it('should detect too old request timestamp', async (): Promise<void> => {
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: 'my-secret',
+      logger: noopLogger,
+    });
+    const handler = awsReceiver.toHandler();
+    const timestamp = Math.floor(Date.now() / 1000) - 600; // 10 minutes ago
+    const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${urlVerificationBody}`).digest('hex');
+    const awsEvent = {
+      resource: '/slack/events',
+      path: '/slack/events',
+      httpMethod: 'POST',
+      headers: {
+        Accept: 'application/json,*/*',
+        'Content-Type': 'application/json',
+        Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+        'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+        'X-Slack-Request-Timestamp': `${timestamp}`,
+        'X-Slack-Signature': `v0=${signature}`,
+      },
+      multiValueHeaders: {},
+      queryStringParameters: null,
+      multiValueQueryStringParameters: null,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {},
+      body: urlVerificationBody,
+      isBase64Encoded: false,
+    };
+    const response = await handler(
+      awsEvent,
+      {},
+      (_error, _result) => {},
+    );
+    assert.equal(response.statusCode, 401);
   });
 });
 

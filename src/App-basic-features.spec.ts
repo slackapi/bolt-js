@@ -459,6 +459,22 @@ describe('App basic features', () => {
       }
     });
 
+    describe('with developerMode', () => {
+      it('should accept developerMode: true', async () => {
+        // Arrange
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
+        );
+        const MockApp = await importApp(overrides);
+        // Act
+        const app = new MockApp({ token: '', appToken: '', developerMode: true });
+        // Assert
+        assert.equal((app as any).logLevel, LogLevel.DEBUG);
+        assert.equal((app as any).socketMode, true);
+      });
+    });
+
     // TODO: tests for ignoreSelf option
     // TODO: tests for logger and logLevel option
     // TODO: tests for providing botId and botUserId options
