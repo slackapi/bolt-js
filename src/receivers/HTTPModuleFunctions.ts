@@ -74,13 +74,23 @@ export class HTTPModuleFunctions {
       // As the validation is disabled, immediately return the bufferred reuest
       return bufferedReq;
     }
+    const textBody = bufferedReq.rawBody.toString();
+
+    const contentType = req.headers['content-type'];
+    if (contentType === 'application/x-www-form-urlencoded') {
+      // `ssl_check=1` requests do not require x-slack-signature verification
+      const parsedQs = qsParse(textBody);
+      if (parsedQs && parsedQs.ssl_check) {
+        return bufferedReq;
+      }
+    }
 
     // Find the relevant request headers
     const signature = HTTPModuleFunctions.getHeader(req, 'x-slack-signature');
     const requestTimestampSec = Number(HTTPModuleFunctions.getHeader(req, 'x-slack-request-timestamp'));
     verifySlackRequest({
       signingSecret,
-      body: bufferedReq.rawBody.toString(),
+      body: textBody,
       headers: {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': requestTimestampSec,

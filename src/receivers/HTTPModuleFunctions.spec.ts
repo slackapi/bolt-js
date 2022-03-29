@@ -178,6 +178,38 @@ describe('HTTPModuleFunctions', async () => {
           assert.equal((e as any).message, 'Failed to verify authenticity: signature mismatch');
         }
       });
+      it('should parse a ssl_check request body without signature verification', async () => {
+        const signingSecret = 'secret';
+        const rawBody = 'ssl_check=1&token=legacy-fixed-verification-token';
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+        assert.isDefined(result.rawBody);
+      });
+      it('should detect invalid signature for application/x-www-form-urlencoded body', async () => {
+        const signingSecret = 'secret';
+        const rawBody = 'payload={}';
+        const timestamp = Math.floor(Date.now() / 1000);
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/json',
+            'x-slack-signature': 'v0=invalid-signature',
+            'x-slack-request-timestamp': timestamp,
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        try {
+          await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+        } catch (e) {
+          assert.equal((e as any).message, 'Failed to verify authenticity: signature mismatch');
+        }
+      });
     });
   });
 
