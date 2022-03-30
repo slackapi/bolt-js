@@ -6,10 +6,15 @@ import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import App from '../App';
+import { CodedError } from '../errors';
 import { Receiver, ReceiverEvent } from '../types';
 import { StringIndexed } from '../types/helpers';
 import { buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import {
+  SocketModeFunctions as socketModeFunc,
+  SocketModeReceiverProcessEventErrorHandlerArgs,
+} from './SocketModeFunctions';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -26,6 +31,7 @@ export interface SocketModeReceiverOptions {
   appToken: string; // App Level Token
   customRoutes?: CustomRoute[];
   customPropertiesExtractor?: (args: any) => StringIndexed;
+  processEventErrorHandler?: (args: SocketModeReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 }
 
 export interface CustomRoute {
@@ -74,6 +80,8 @@ export default class SocketModeReceiver implements Receiver {
 
   private routes: ReceiverRoutes;
 
+  private processEventErrorHandler: (args: SocketModeReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+
   public constructor({
     appToken,
     logger = undefined,
@@ -87,6 +95,7 @@ export default class SocketModeReceiver implements Receiver {
     installerOptions = {},
     customRoutes = [],
     customPropertiesExtractor = (_args) => ({}),
+    processEventErrorHandler = socketModeFunc.defaultProcessEventErrorHandler,
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
@@ -101,6 +110,7 @@ export default class SocketModeReceiver implements Receiver {
       return defaultLogger;
     })();
     this.routes = buildReceiverRoutes(customRoutes);
+    this.processEventErrorHandler = processEventErrorHandler;
 
     // Verify redirect options if supplied, throws coded error if invalid
     verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
@@ -204,7 +214,18 @@ export default class SocketModeReceiver implements Receiver {
         retryReason: retry_reason,
         customProperties: customPropertiesExtractor(args),
       };
-      await this.app?.processEvent(event);
+      try {
+        await this.app?.processEvent(event);
+      } catch (error) {
+        const shouldBeAcked = await this.processEventErrorHandler({
+          error: error as Error | CodedError,
+          logger: this.logger,
+          event,
+        });
+        if (shouldBeAcked) {
+          await ack();
+        }
+      }
     });
   }
 

@@ -225,7 +225,7 @@ export interface RequestVerificationOptions {
   logger?: Logger;
 }
 
-// which handles errors occurred while dispatching a rqeuest
+// which handles errors occurred while dispatching a request
 export interface ReceiverDispatchErrorHandlerArgs {
   error: Error | CodedError;
   logger: Logger;
