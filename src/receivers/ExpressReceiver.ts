@@ -13,13 +13,12 @@ import App from '../App';
 import {
   ReceiverAuthenticityError,
   ReceiverInconsistentStateError,
-  ErrorCode,
   CodedError,
 } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import { StringIndexed } from '../types/helpers';
-import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
+import { HTTPModuleFunctions as httpFunc, ReceiverDispatchErrorHandlerArgs, ReceiverProcessEventErrorHandlerArgs, ReceiverUnhandledRequestHandlerArgs } from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
@@ -97,6 +96,13 @@ export interface ExpressReceiverOptions {
   app?: Application;
   router?: IRouter;
   customPropertiesExtractor?: (request: Request) => StringIndexed;
+  dispatchErrorHandler?: (args: ReceiverDispatchErrorHandlerArgs) => Promise<void>;
+  processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  // NOTE: for the compatibility with HTTPResponseAck, this handler is not async
+  // If we receive requests to provide async version of this handler,
+  // we can add a different name function for it.
+  unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestTimeoutMillis?: number;
 }
 
 // Additional Installer Options
@@ -144,6 +150,14 @@ export default class ExpressReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: Request) => StringIndexed;
 
+  private dispatchErrorHandler: (args: ReceiverDispatchErrorHandlerArgs) => Promise<void>;
+
+  private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+
+  private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+
+  private unhandledRequestTimeoutMillis: number;
+
   public constructor({
     signingSecret = '',
     logger = undefined,
@@ -161,6 +175,10 @@ export default class ExpressReceiver implements Receiver {
     app = undefined,
     router = undefined,
     customPropertiesExtractor = (_req) => ({}),
+    dispatchErrorHandler = httpFunc.defaultAsyncDispatchErrorHandler,
+    processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
+    unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
+    unhandledRequestTimeoutMillis = 3001,
   }: ExpressReceiverOptions) {
     this.app = app !== undefined ? app : express();
 
@@ -190,6 +208,10 @@ export default class ExpressReceiver implements Receiver {
     });
 
     this.customPropertiesExtractor = customPropertiesExtractor;
+    this.dispatchErrorHandler = dispatchErrorHandler;
+    this.processEventErrorHandler = processEventErrorHandler;
+    this.unhandledRequestHandler = unhandledRequestHandler;
+    this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
 
     // Verify redirect options if supplied, throws coded error if invalid
     verifyRedirectOpts({ redirectUri, redirectUriPath: installerOptions.redirectUriPath });
@@ -235,12 +257,21 @@ export default class ExpressReceiver implements Receiver {
         installerOptions.redirectUriPath;
       const { callbackOptions, stateVerification } = installerOptions;
       this.router.use(redirectUriPath, async (req, res) => {
-        if (stateVerification === false) {
-          // when stateVerification is disabled pass install options directly to handler
-          // since they won't be encoded in the state param of the generated url
-          await installer.handleCallback(req, res, callbackOptions, installUrlOptions);
-        } else {
-          await installer.handleCallback(req, res, callbackOptions);
+        try {
+          if (stateVerification === false) {
+            // when stateVerification is disabled pass install options directly to handler
+            // since they won't be encoded in the state param of the generated url
+            await installer.handleCallback(req, res, callbackOptions, installUrlOptions);
+          } else {
+            await installer.handleCallback(req, res, callbackOptions);
+          }
+        } catch (e) {
+          await this.dispatchErrorHandler({
+            error: e as Error | CodedError,
+            logger: this.logger,
+            request: req,
+            response: res,
+          });
         }
       });
 
@@ -248,9 +279,18 @@ export default class ExpressReceiver implements Receiver {
       const { installPathOptions } = installerOptions;
       this.router.get(installPath, async (req, res, next) => {
         try {
-          await installer.handleInstallPath(req, res, installPathOptions, installUrlOptions);
-        } catch (error) {
-          next(error);
+          try {
+            await installer.handleInstallPath(req, res, installPathOptions, installUrlOptions);
+          } catch (error) {
+            next(error);
+          }
+        } catch (e) {
+          await this.dispatchErrorHandler({
+            error: e as Error | CodedError,
+            logger: this.logger,
+            request: req,
+            response: res,
+          });
         }
       });
     }
@@ -262,7 +302,8 @@ export default class ExpressReceiver implements Receiver {
     const ack = new HTTPResponseAck({
       logger: this.logger,
       processBeforeResponse: this.processBeforeResponse,
-      unhandledRequestTimeoutMillis: 3001, // TODO: this.unhandledRequestTimeoutMillis
+      unhandledRequestHandler: this.unhandledRequestHandler,
+      unhandledRequestTimeoutMillis: this.unhandledRequestTimeoutMillis,
       httpRequest: req,
       httpResponse: res,
     });
@@ -281,19 +322,18 @@ export default class ExpressReceiver implements Receiver {
         this.logger.debug('stored response sent');
       }
     } catch (err) {
-      const e = err as any;
-      if ('code' in e) {
-        // CodedError has code: string
-        const errorCode = (err as CodedError).code;
-        if (errorCode === ErrorCode.AuthorizationError) {
-          // authorize function threw an exception, which means there is no valid installation data
-          httpFunc.buildNoBodyResponse(res, 401);
-          ack.ack();
-          return;
-        }
+      const acknowledgedByHandler = await this.processEventErrorHandler({
+        error: err as Error | CodedError,
+        logger: this.logger,
+        request: req,
+        response: res,
+        storedResponse: ack.storedResponse,
+      });
+      if (acknowledgedByHandler) {
+        // If the value is false, we don't touch the value as a race condition
+        // with ack() call may occur especially when processBeforeResponse: false
+        ack.ack();
       }
-      httpFunc.buildNoBodyResponse(res, 500);
-      throw err;
     }
   }
 

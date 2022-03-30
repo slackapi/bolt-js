@@ -179,6 +179,10 @@ export class HTTPModuleFunctions {
     response.end();
   }
 
+  public static async defaultAsyncDispatchErrorHandler(args: ReceiverDispatchErrorHandlerArgs): Promise<void> {
+    return HTTPModuleFunctions.defaultDispatchErrorHandler(args);
+  }
+
   // The default processEventErrorHandler implementation:
   // Developers can customize this behavior by passing processEventErrorHandler to the constructor
   public static async defaultProcessEventErrorHandler(
