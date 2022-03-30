@@ -17,7 +17,7 @@ export class SocketModeFunctions {
     // TODO: more details like envelop_id, payload type etc. here
     // To make them available, we need to enhance underlying SocketModeClient
     // to return more properties to 'slack_event' listeners
-    logger.error('An unhandled error occurred while Bolt processed an event');
+    logger.error(`An unhandled error occurred while Bolt processed a ${event.type} event: ${error}`);
     logger.debug(`Error details: ${error}, retry num: ${event.retryNum}, retry reason: ${event.retryReason}`);
     const errorCode = (error as CodedError).code;
     if (errorCode === ErrorCode.AuthorizationError) {
