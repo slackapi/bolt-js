@@ -13,7 +13,7 @@ describe('SocketModeFunctions', async () => {
     const logger = createFakeLogger();
 
     describe('defaultProcessEventErrorHandler', async () => {
-      it('should properly handle ReceiverMultipleAckError', async () => {
+      it('should return false if passed any Error other than AuthorizationError', async () => {
         const event: ReceiverEvent = {
           ack: async () => {},
           body: {},
@@ -25,7 +25,7 @@ describe('SocketModeFunctions', async () => {
         });
         assert.isFalse(shouldBeAcked);
       });
-      it('should properly handle AuthorizationError', async () => {
+      it('should return true if passed an AuthorizationError', async () => {
         const event: ReceiverEvent = {
           ack: async () => {},
           body: {},
