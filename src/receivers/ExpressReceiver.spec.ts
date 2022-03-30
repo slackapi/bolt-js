@@ -451,15 +451,16 @@ describe('ExpressReceiver', function () {
 
       // Act
       const req = { body: { } } as Request;
-      const resp = { send: () => { } } as Response;
-      try {
-        await receiver.requestHandler(req, resp);
-        assert.fail('Should throw');
-      } catch (e: any) {
-        assert.equal(e.message, 'uh oh', 'Raised error not propagated to top level');
-      }
+      let writeHeadStatus = 0;
+      const resp = {
+        send: () => { },
+        writeHead: (status: number) => { writeHeadStatus = status; },
+        end: () => { },
+      } as unknown as Response;
+      await receiver.requestHandler(req, resp);
+
       // Assert
-      assert(this.buildNoBodyResponseStub.calledWith(resp, 500), 'buildNoBodyResponse not called with the HTTP response and a 500 status code');
+      assert.equal(writeHeadStatus, 500);
     });
     it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async function () {
       // Arrange
@@ -476,11 +477,15 @@ describe('ExpressReceiver', function () {
 
       // Act
       const req = { body: { } } as Request;
-      const resp = { send: () => { } } as Response;
+      let writeHeadStatus = 0;
+      const resp = {
+        send: () => { },
+        writeHead: (status: number) => { writeHeadStatus = status; },
+        end: () => { },
+      } as unknown as Response;
       await receiver.requestHandler(req, resp);
       // Assert
-      assert(this.buildNoBodyResponseStub.calledWith(resp, 401), 'buildNoBodyResponse not called with the HTTP response and a 401 status code');
-      assert(this.ackStub.prototype.ack.called, 'ack() not called');
+      assert.equal(writeHeadStatus, 401);
     });
   });
 
