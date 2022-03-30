@@ -11,9 +11,7 @@ import {
   AppInitializationError,
   CustomRouteInitializationError,
   HTTPReceiverDeferredRequestError,
-  CodedError,
 } from '../errors';
-import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
 
 /* Testing Harness */
 
@@ -592,60 +590,6 @@ describe('HTTPReceiver', function () {
       fakeRes.end = sinon.fake();
 
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
-    });
-  });
-
-  describe('handlers for customization', async function () {
-    it('should have defaultDispatchErrorHandler', async function () {
-      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-      fakeReq.url = '/nope';
-      fakeReq.method = 'GET';
-
-      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-      fakeRes.writeHead = sinon.fake();
-      fakeRes.end = sinon.fake();
-
-      httpFunc.defaultDispatchErrorHandler({
-        error: { code: 'foo' } as CodedError,
-        logger: noopLogger,
-        request: fakeReq,
-        response: fakeRes,
-      });
-    });
-
-    it('should have defaultProcessEventErrorHandler', async function () {
-      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-      fakeReq.url = '/nope';
-      fakeReq.method = 'GET';
-
-      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-      fakeRes.writeHead = sinon.fake();
-      fakeRes.end = sinon.fake();
-
-      const result = await httpFunc.defaultProcessEventErrorHandler({
-        error: { code: 'foo' } as CodedError,
-        logger: noopLogger,
-        request: fakeReq,
-        response: fakeRes,
-        storedResponse: undefined,
-      });
-      assert.isFalse(result);
-    });
-
-    it('should have defaultUnhandledRequestHandler', async function () {
-      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-      fakeReq.url = '/nope';
-      fakeReq.method = 'GET';
-
-      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-      fakeRes.writeHead = sinon.fake();
-      fakeRes.end = sinon.fake();
-
-      httpFunc.defaultUnhandledRequestHandler({
-        logger: noopLogger,
-        request: fakeReq,
-        response: fakeRes,
-      });
     });
   });
 });
