@@ -466,9 +466,10 @@ describe('App basic features', () => {
           withNoopAppMetadata(),
           withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
         );
+        const fakeLogger = createFakeLogger();
         const MockApp = await importApp(overrides);
         // Act
-        const app = new MockApp({ token: '', appToken: '', developerMode: true });
+        const app = new MockApp({ logger: fakeLogger, token: '', appToken: '', developerMode: true });
         // Assert
         assert.equal((app as any).logLevel, LogLevel.DEBUG);
         assert.equal((app as any).socketMode, true);
