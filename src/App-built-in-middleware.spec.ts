@@ -166,7 +166,7 @@ describe('App built-in middleware and mechanism', () => {
       let changed = false;
 
       app.use(async ({ next }) => {
-        await delay(100);
+        await delay(10);
         changed = true;
 
         await next();
@@ -211,7 +211,7 @@ describe('App built-in middleware and mechanism', () => {
        * @param orderUp The order it should be called when processing middleware up the chain
        */
       const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
-        await delay(100);
+        await delay(10);
         middlewareCount += 1;
         assert.equal(middlewareCount, orderDown);
         if (next !== undefined) {

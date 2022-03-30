@@ -6,13 +6,16 @@ import { Logger, LogLevel } from '@slack/logger';
 import { Application, IRouter, Request, Response } from 'express';
 import { Readable } from 'stream';
 import { EventEmitter } from 'events';
-import { Override, mergeOverrides } from '../test-helpers';
-import { ErrorCode, CodedError, ReceiverInconsistentStateError, AppInitializationError } from '../errors';
+import { Override, mergeOverrides, createFakeLogger } from '../test-helpers';
+import { ErrorCode, CodedError, ReceiverInconsistentStateError, AppInitializationError, AuthorizationError } from '../errors';
+import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
+import App from '../App';
 
 import ExpressReceiver, {
   respondToSslCheck,
   respondToUrlVerification,
   verifySignatureAndParseRawBody,
+  buildBodyParserMiddleware,
 } from './ExpressReceiver';
 
 // Fakes
@@ -33,12 +36,12 @@ class FakeServer extends EventEmitter {
     setImmediate(() => {
       this.emit('close');
       setImmediate(() => {
-        args[0]();
+        args[0](this.closingFailure);
       });
     });
   });
 
-  public constructor(private listeningFailure?: Error) {
+  public constructor(private listeningFailure?: Error, private closingFailure?: Error) {
     super();
   }
 }
@@ -231,7 +234,6 @@ describe('ExpressReceiver', function () {
       assert.strictEqual(server, this.fakeServer);
       assert(this.fakeServer.listen.calledWith(port));
     });
-
     it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async function () {
       // Arrange
       const fakeCreateFailingServer = sinon.fake.returns(new FakeServer(new Error('fake listening error')));
@@ -253,6 +255,29 @@ describe('ExpressReceiver', function () {
 
       // Assert
       assert.instanceOf(caughtError, Error);
+    });
+    it('should reject with an error when the built-in HTTP server returns undefined', async function () {
+      // Arrange
+      const fakeCreateUndefinedServer = sinon.fake.returns(undefined);
+      const overrides = mergeOverrides(
+        withHttpCreateServer(fakeCreateUndefinedServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
+      const port = 12345;
+
+      // Act
+      let caughtError: Error | undefined;
+      try {
+        await receiver.start(port);
+      } catch (error: any) {
+        caughtError = error;
+      }
+
+      // Assert
+      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
+      assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
     });
     it('should reject with an error when starting and the server was already previously started', async function () {
       // Arrange
@@ -279,7 +304,7 @@ describe('ExpressReceiver', function () {
     });
   });
 
-  describe('#stop', function () {
+  describe('#stop()', function () {
     it('should stop listening for requests when a built-in HTTP server is already started', async function () {
       // Arrange
       const overrides = mergeOverrides(
@@ -319,6 +344,214 @@ describe('ExpressReceiver', function () {
       // As long as control reaches this point, the test passes
       assert.instanceOf(caughtError, ReceiverInconsistentStateError);
       assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
+    });
+    it('should reject when a built-in HTTP server raises an error when closing', async function () {
+      // Arrange
+      this.fakeServer = new FakeServer(undefined, new Error('this error will be raised by the underlying HTTP server during close()'));
+      this.fakeCreateServer = sinon.fake.returns(this.fakeServer);
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
+      await receiver.start(12345);
+
+      // Act
+      let caughtError: Error | undefined;
+      try {
+        await receiver.stop();
+      } catch (error: any) {
+        caughtError = error;
+      }
+
+      // Assert
+      // As long as control reaches this point, the test passes
+      assert.instanceOf(caughtError, Error);
+      assert.equal(caughtError?.message, 'this error will be raised by the underlying HTTP server during close()');
+    });
+  });
+
+  describe('#requestHandler()', function () {
+    before(function () {
+      this.extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
+      this.extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
+      this.buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
+      this.buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
+      this.processStub = sinon.stub().resolves({});
+      this.ackStub = function ackStub() {};
+      this.ackStub.prototype.bind = function () { return this; };
+      this.ackStub.prototype.ack = sinon.spy();
+    });
+    afterEach(() => {
+      sinon.reset();
+    });
+    after(function () {
+      this.extractRetryNumStub.restore();
+      this.extractRetryReasonStub.restore();
+      this.buildNoBodyResponseStub.restore();
+      this.buildContentResponseStub.restore();
+    });
+    it('should not build an HTTP response if processBeforeResponse=false', async function () {
+      // Arrange
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
+      );
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
+      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      receiver.init(app);
+
+      // Act
+      const req = { body: { } } as Request;
+      const resp = { send: () => { } } as Response;
+      await receiver.requestHandler(req, resp);
+
+      // Assert
+      assert(this.buildContentResponseStub.notCalled, 'HTTPFunction buildContentResponse called incorrectly');
+    });
+    it('should build an HTTP response if processBeforeResponse=true', async function () {
+      // Arrange
+      this.processStub.callsFake((event: any) => {
+        // eslint-disable-next-line no-param-reassign
+        event.ack.storedResponse = 'something';
+        return Promise.resolve({});
+      });
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
+      );
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
+      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      receiver.init(app);
+
+      // Act
+      const req = { body: { } } as Request;
+      const resp = { send: () => { } } as Response;
+      await receiver.requestHandler(req, resp);
+      // Assert
+      assert(this.buildContentResponseStub.called, 'HTTPFunction buildContentResponse not called incorrectly');
+    });
+    it('should throw and build an HTTP 500 response with no body if processEvent raises an uncoded Error or a coded, non-Authorization Error', async function () {
+      // Arrange
+      this.processStub.callsFake(() => Promise.reject(new Error('uh oh')));
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
+      );
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
+      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      receiver.init(app);
+
+      // Act
+      const req = { body: { } } as Request;
+      const resp = { send: () => { } } as Response;
+      try {
+        await receiver.requestHandler(req, resp);
+        assert.fail('Should throw');
+      } catch (e: any) {
+        assert.equal(e.message, 'uh oh', 'Raised error not propagated to top level');
+      }
+      // Assert
+      assert(this.buildNoBodyResponseStub.calledWith(resp, 500), 'buildNoBodyResponse not called with the HTTP response and a 500 status code');
+    });
+    it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async function () {
+      // Arrange
+      this.processStub.callsFake(() => Promise.reject(new AuthorizationError('uh oh', new Error())));
+      const overrides = mergeOverrides(
+        withHttpCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
+      );
+      const ER = await importExpressReceiver(overrides);
+      const receiver = new ER({ signingSecret: '' });
+      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      receiver.init(app);
+
+      // Act
+      const req = { body: { } } as Request;
+      const resp = { send: () => { } } as Response;
+      await receiver.requestHandler(req, resp);
+      // Assert
+      assert(this.buildNoBodyResponseStub.calledWith(resp, 401), 'buildNoBodyResponse not called with the HTTP response and a 401 status code');
+      assert(this.ackStub.prototype.ack.called, 'ack() not called');
+    });
+  });
+
+  describe('oauth support', function () {
+    describe('install path route', function () {
+      it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async function () {
+        const overrides = mergeOverrides(
+          withHttpCreateServer(this.fakeCreateServer),
+          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        );
+        const ER = await importExpressReceiver(overrides);
+        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '' });
+        const handleStub = sinon.stub(receiver.installer as any, 'handleInstallPath').resolves();
+
+        // Act
+        const req = { body: { }, url: 'http://localhost/slack/install', method: 'GET' } as Request;
+        const resp = { send: () => { } } as Response;
+        const next = sinon.spy();
+        (receiver.router as any).handle(req, resp, next);
+
+        // Assert
+        assert(handleStub.calledWith(req, resp), 'installer.handleInstallPath not called');
+      });
+    });
+    describe('redirect path route', function () {
+      it('should call installer.handleCallback with callbackOptions when HTTP request hits the redirect URI path and stateVerification=true', async function () {
+        const overrides = mergeOverrides(
+          withHttpCreateServer(this.fakeCreateServer),
+          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        );
+        const ER = await importExpressReceiver(overrides);
+        const callbackOptions = {};
+        const scopes = ['some'];
+        const installerOptions = {
+          stateVerification: true,
+          callbackOptions,
+        };
+        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '', scopes, installerOptions });
+        const handleStub = sinon.stub(receiver.installer as any, 'handleCallback').resolves('poop');
+
+        // Act
+        const req = { body: { }, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
+        const resp = { send: () => { } } as Response;
+        (receiver.router as any).handle(req, resp);
+
+        // Assert
+        assert(handleStub.calledWith(req, resp, callbackOptions), 'installer.handleCallback not called');
+      });
+      it('should call installer.handleCallback with callbackOptions and installUrlOptions when HTTP request hits the redirect URI path and stateVerification=false', async function () {
+        const overrides = mergeOverrides(
+          withHttpCreateServer(this.fakeCreateServer),
+          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        );
+        const ER = await importExpressReceiver(overrides);
+        const callbackOptions = {};
+        const scopes = ['some'];
+        const installerOptions = {
+          stateVerification: false,
+          callbackOptions,
+        };
+        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '', scopes, installerOptions });
+        const handleStub = sinon.stub(receiver.installer as any, 'handleCallback').resolves('poop');
+
+        // Act
+        const req = { body: { }, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
+        const resp = { send: () => { } } as Response;
+        (receiver.router as any).handle(req, resp);
+
+        // Assert
+        assert(handleStub.calledWith(req, resp, callbackOptions, sinon.match({ scopes })), 'installer.handleCallback not called');
+      });
     });
   });
 
@@ -749,6 +982,67 @@ describe('ExpressReceiver', function () {
       };
       const req = untypedReq as Request;
       await verifySignatureMismatch(req);
+    });
+  });
+
+  describe('buildBodyParserMiddleware', () => {
+    beforeEach(function () {
+      this.req = { body: { }, headers: { 'content-type': 'application/json' } } as Request;
+      this.res = { send: () => { } } as Response;
+      this.next = sinon.spy();
+    });
+    it('should JSON.parse a stringified rawBody if exists on a application/json request', async function () {
+      this.req.rawBody = '{"awesome": true}';
+      const parser = buildBodyParserMiddleware(createFakeLogger());
+      await parser(this.req, this.res, this.next);
+      assert(this.next.called, 'next() was not called');
+      assert.equal(this.req.body.awesome, true, 'request body JSON was not parsed');
+    });
+    it('should querystring.parse a stringified rawBody if exists on a application/x-www-form-urlencoded request', async function () {
+      this.req.headers['content-type'] = 'application/x-www-form-urlencoded';
+      this.req.rawBody = 'awesome=true';
+      const parser = buildBodyParserMiddleware(createFakeLogger());
+      await parser(this.req, this.res, this.next);
+      assert(this.next.called, 'next() was not called');
+      assert.equal(this.req.body.awesome, 'true', 'request body form-urlencoded was not parsed');
+    });
+    it('should JSON.parse a stringified rawBody payload if exists on a application/x-www-form-urlencoded request', async function () {
+      this.req.headers['content-type'] = 'application/x-www-form-urlencoded';
+      this.req.rawBody = 'payload=%7B%22awesome%22:true%7D';
+      const parser = buildBodyParserMiddleware(createFakeLogger());
+      await parser(this.req, this.res, this.next);
+      assert(this.next.called, 'next() was not called');
+      assert.equal(this.req.body.awesome, true, 'request body form-urlencoded was not parsed');
+    });
+    it('should JSON.parse a body if exists on a application/json request', async function () {
+      this.req = new Readable();
+      this.req.push('{"awesome": true}');
+      this.req.push(null);
+      this.req.headers = { 'content-type': 'application/json' };
+      const parser = buildBodyParserMiddleware(createFakeLogger());
+      await parser(this.req, this.res, this.next);
+      assert(this.next.called, 'next() was not called');
+      assert.equal(this.req.body.awesome, true, 'request body JSON was not parsed');
+    });
+    it('should querystring.parse a body if exists on a application/x-www-form-urlencoded request', async function () {
+      this.req = new Readable();
+      this.req.push('awesome=true');
+      this.req.push(null);
+      this.req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+      const parser = buildBodyParserMiddleware(createFakeLogger());
+      await parser(this.req, this.res, this.next);
+      assert(this.next.called, 'next() was not called');
+      assert.equal(this.req.body.awesome, 'true', 'request body form-urlencoded was not parsed');
+    });
+    it('should JSON.parse a body payload if exists on a application/x-www-form-urlencoded request', async function () {
+      this.req = new Readable();
+      this.req.push('payload=%7B%22awesome%22:true%7D');
+      this.req.push(null);
+      this.req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+      const parser = buildBodyParserMiddleware(createFakeLogger());
+      await parser(this.req, this.res, this.next);
+      assert(this.next.called, 'next() was not called');
+      assert.equal(this.req.body.awesome, true, 'request body form-urlencoded was not parsed');
     });
   });
 });

@@ -258,7 +258,7 @@ export default class ExpressReceiver implements Receiver {
     this.app.use(this.router);
   }
 
-  private async requestHandler(req: Request, res: Response): Promise<void> {
+  public async requestHandler(req: Request, res: Response): Promise<void> {
     const ack = new HTTPResponseAck({
       logger: this.logger,
       processBeforeResponse: this.processBeforeResponse,
@@ -500,7 +500,7 @@ export function verifySignatureAndParseBody(
   return parseRequestBody(body, contentType);
 }
 
-function buildBodyParserMiddleware(logger: Logger): RequestHandler {
+export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
   return async (req, res, next) => {
     let stringBody: string;
     // On some environments like GCP (Google Cloud Platform),
