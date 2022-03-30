@@ -24,11 +24,12 @@ const clientOptions = {
 
 const app = new App({
   // receiver: socketModeReceiver,
-  token: process.env.BOT_TOKEN, //disable this if enabling OAuth in socketModeReceiver
+  token: process.env.SLACK_BOT_TOKEN, //disable this if enabling OAuth in socketModeReceiver
   // logLevel: LogLevel.DEBUG,
   clientOptions,
-  appToken: process.env.APP_TOKEN,
+  appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
+  logLevel: LogLevel.DEBUG,
 });
 
 (async () => {
@@ -40,9 +41,9 @@ const app = new App({
 app.event('app_home_opened', async ({ event, client }) => {
   await client.views.publish({
     user_id: event.user,
-    view: { 
-      "type":"home",
-      "blocks":[
+    view: {
+      "type": "home",
+      "blocks": [
         {
           "type": "section",
           "block_id": "section678",
@@ -103,8 +104,7 @@ app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client })
         ]
       }
     });
-  }
-  catch (error) { 
+  } catch (error) {
     console.error(error);
   }
 });
@@ -114,12 +114,44 @@ app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client })
 // need app_mentions:read and chat:write scopes
 app.event('app_mention', async ({ event, context, client, say }) => {
   try {
-    await say({"blocks": [
+    await say({
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": `Thanks for the mention <@${event.user}>! Click my fancy button`
+          },
+          "accessory": {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "Button",
+              "emoji": true
+            },
+            "value": "click_me_123",
+            "action_id": "first_button"
+          }
+        }
+      ]
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// subscribe to `message.channels` event in your App Config
+// need channels:read scope
+app.message('hello', async ({ message, say }) => {
+  // say() sends a message to the channel where the event was triggered
+  // no need to directly use 'chat.postMessage', no need to include token
+  await say({
+    "blocks": [
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Thanks for the mention <@${event.user}>! Click my fancy button`
+          "text": `Thanks for the mention <@${message.user}>! Click my fancy button`
         },
         "accessory": {
           "type": "button",
@@ -132,41 +164,12 @@ app.event('app_mention', async ({ event, context, client, say }) => {
           "action_id": "first_button"
         }
       }
-    ]});
-  }
-  catch (error) {
-    console.error(error);
-  }
-});
-
-// subscribe to `message.channels` event in your App Config
-// need channels:read scope
-app.message('hello', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  // no need to directly use 'chat.postMessage', no need to include token
-  await say({"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": `Thanks for the mention <@${message.user}>! Click my fancy button`
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Button",
-					"emoji": true
-				},
-        "value": "click_me_123",
-        "action_id": "first_button"
-			}
-		}
-	]});
+    ]
+  });
 });
 
 // Listen and respond to button click
-app.action('first_button', async({action, ack, say, context}) => {
+app.action('first_button', async ({ action, ack, say, context }) => {
   console.log('button clicked');
   console.log(action);
   // acknowledge the request right away

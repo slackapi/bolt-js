@@ -35,6 +35,11 @@ export {
 } from './receivers/HTTPModuleFunctions';
 export { HTTPResponseAck } from './receivers/HTTPResponseAck';
 
+export {
+  SocketModeFunctions,
+  SocketModeReceiverProcessEventErrorHandlerArgs,
+} from './receivers/SocketModeFunctions';
+
 export * from './errors';
 export * from './middleware/builtin';
 export * from './types';
