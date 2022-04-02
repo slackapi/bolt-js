@@ -670,16 +670,16 @@ export default class App {
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
     >(
-      constraints: Constraints,
-      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
-    ): void;
+    constraints: Constraints,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+  ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
     >(
-      callbackIdOrConstraints: string | RegExp | Constraints,
-      ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
-    ): void {
+    callbackIdOrConstraints: string | RegExp | Constraints,
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+  ): void {
     const constraints: ShortcutConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
       { callback_id: callbackIdOrConstraints } :
       callbackIdOrConstraints;
@@ -710,17 +710,17 @@ export default class App {
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
     >(
-      constraints: Constraints,
-      // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
-      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
-    ): void;
+    constraints: Constraints,
+  // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+  ): void;
   public action<
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
     >(
-      actionIdOrConstraints: string | RegExp | Constraints,
-      ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
-    ): void {
+    actionIdOrConstraints: string | RegExp | Constraints,
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+  ): void {
     // Normalize Constraints
     const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
       { action_id: actionIdOrConstraints } :
@@ -902,8 +902,8 @@ export default class App {
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     let payload: FunctionExecutedEvent | DialogSubmitAction | WorkflowStepEdit |
-      SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
-      | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
+    SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
+    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -926,8 +926,8 @@ export default class App {
       default:
         payload = (bodyArg as (
           | Exclude<
-            AnyMiddlewareArgs,
-            SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+          AnyMiddlewareArgs,
+          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
           >
           | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
         )['body']);
