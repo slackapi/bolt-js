@@ -118,9 +118,9 @@ export default class SocketModeReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-       (installerOptions.stateVerification === false || // state store not needed
-         stateSecret !== undefined ||
-          installerOptions.stateStore !== undefined) // user provided state store
+      (installerOptions.stateVerification === false || // state store not needed
+        stateSecret !== undefined ||
+        installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
