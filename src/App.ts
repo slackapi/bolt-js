@@ -990,8 +990,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     let payload: FunctionExecutedEvent | DialogSubmitAction | WorkflowStepEdit |
-      SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
-      | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
+    SubscriptionInteraction | SlackShortcut | KnownEventFromType<string> | SlashCommand
+    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -1014,8 +1014,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       default:
         payload = (bodyArg as (
           | Exclude<
-            AnyMiddlewareArgs,
-            SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+          AnyMiddlewareArgs,
+          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
           >
           | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
         )['body']);
