@@ -62,6 +62,10 @@ import { StringIndexed } from './types/helpers';
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
+// ----------------------------
+// For CLI local run use case
+const cliAppTokenOverride = process.env.SLACK_CLI_XAPP;
+const cliBotTokenOverride = process.env.SLACK_CLI_XOXB;
 
 // ----------------------------
 // For listener registration methods
@@ -292,7 +296,7 @@ export default class App {
 
     /* ------------------------ Developer mode ----------------------------- */
     this.developerMode = developerMode;
-    if (developerMode) {
+    if (developerMode || cliAppTokenOverride) {
       // Set logLevel to Debug in Developer Mode if one wasn't passed in
       this.logLevel = logLevel ?? LogLevel.DEBUG;
       // Set SocketMode to true if one wasn't passed in
@@ -338,7 +342,7 @@ export default class App {
     }
     // The public WebClient instance (app.client)
     // Since v3.4, it can have the passed token in the case of single workspace installation.
-    this.client = new WebClient(token, this.clientOptions);
+    this.client = new WebClient(cliBotTokenOverride || token, this.clientOptions);
 
     this.axios = axios.create({
       httpAgent: agent,
@@ -369,8 +373,8 @@ export default class App {
       this.developerMode &&
       this.installerOptions &&
       (typeof this.installerOptions.callbackOptions === 'undefined' ||
-      (typeof this.installerOptions.callbackOptions !== 'undefined' &&
-      typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
     ) {
       // add a custom failure callback for Developer Mode in case they are using OAuth
       this.logger.debug('adding Developer Mode custom OAuth failure handler');
@@ -397,7 +401,7 @@ export default class App {
       redirectUri,
       installationStore,
       scopes,
-      appToken,
+      cliAppTokenOverride || appToken,
       logger,
     );
 
@@ -411,7 +415,15 @@ export default class App {
         botToken: token,
       };
     }
+    if (cliBotTokenOverride !== undefined) {
+      argAuthorization = {
+        botId,
+        botUserId,
+        botToken: cliBotTokenOverride,
+      };
+    }
     if (deferInitialization) {
+      // TODO: Deal with this
       this.argToken = token;
       this.argAuthorize = authorize;
       this.argAuthorization = argAuthorization;
@@ -419,7 +431,7 @@ export default class App {
       // You need to run `await app.init();` on your own
     } else {
       this.authorize = this.initAuthorizeInConstructor(
-        token,
+        cliBotTokenOverride || token,
         authorize,
         argAuthorization,
       );
@@ -551,8 +563,8 @@ export default class App {
     if (invalidEventName) {
       throw new AppInitializationError(
         `Although the document mentions "${eventNameOrPattern}",` +
-          'it is not a valid event type. Use "message" instead. ' +
-          'If you want to filter message events, you can use event.channel_type for it.',
+        'it is not a valid event type. Use "message" instead. ' +
+        'If you want to filter message events, you can use event.channel_type for it.',
       );
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -624,14 +636,14 @@ export default class App {
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
-  >(
+    >(
     constraints: Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
-  >(
+    >(
     callbackIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
   ): void {
@@ -666,15 +678,15 @@ export default class App {
   public action<
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
-  >(
+    >(
     constraints: Constraints,
-    // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
+  // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
     ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
-  >(
+    >(
     actionIdOrConstraints: string | RegExp | Constraints,
     ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
   ): void {
@@ -892,7 +904,7 @@ export default class App {
           [payload] = actions;
           break;
         }
-        // If above conditional does not hit, fall through to fallback payload in default block below
+      // If above conditional does not hit, fall through to fallback payload in default block below
       default:
         payload = (bodyArg as (
           | Exclude<
@@ -1098,29 +1110,32 @@ export default class App {
       return receiver;
     }
     if (this.socketMode === true) {
-      if (appToken === undefined) {
+      if (cliAppTokenOverride === undefined && appToken === undefined) {
         throw new AppInitializationError('You must provide an appToken when socketMode is set to true. To generate an appToken see: https://api.slack.com/apis/connections/socket#token');
       }
       this.logger.debug('Initializing SocketModeReceiver');
-      return new SocketModeReceiver({
-        appToken,
-        clientId,
-        clientSecret,
-        stateSecret,
-        redirectUri,
-        installationStore,
-        scopes,
-        logger,
-        logLevel: this.logLevel,
-        installerOptions: this.installerOptions,
-        customRoutes,
-      });
+      const xaxpToken = cliAppTokenOverride || appToken;
+      if (xaxpToken !== undefined) {
+        return new SocketModeReceiver({
+          appToken: xaxpToken,
+          clientId,
+          clientSecret,
+          stateSecret,
+          redirectUri,
+          installationStore,
+          scopes,
+          logger,
+          logLevel: this.logLevel,
+          installerOptions: this.installerOptions,
+          customRoutes,
+        });
+      }
     }
     if (signatureVerification === true && signingSecret === undefined) {
       // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
         'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
-          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
+        'custom receiver. You can find your Signing Secret in your Slack App Settings.',
       );
     }
     this.logger.debug('Initializing HTTPReceiver');
