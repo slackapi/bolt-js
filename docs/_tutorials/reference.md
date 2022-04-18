@@ -93,6 +93,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `installationStore` | Defines how to save, fetch and delete installation data when [configuring OAuth](/bolt-js/concepts#authenticating-oauth). Contains three methods: `fetchInstallation`, `storeInstallation` and `deleteInstallation`. The default `installationStore` is an in-memory store. |
 | `scopes` | Array of scopes that your app will request [within the OAuth process](/bolt-js/concepts#authenticating-oauth). |
 | `installerOptions` | Optional object that can be used to customize [the default OAuth support](/bolt-js/concepts#authenticating-oauth). Read more in the OAuth documentation. |
+| `signatureVerification` | `boolean` that determines whether Bolt should [verify Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack). Defaults to `true`. |
 
 ### App options
 App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialize either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
@@ -115,6 +116,7 @@ App options are passed into the `App` constructor. When the `receiver` argument 
 | `socketMode` | Option that accepts a `boolean` value. When set to `true` the app is started in [Socket Mode](/bolt-js/concepts#socket-mode), i.e. it allows your app to connect and receive data from Slack via a WebSocket connection. Defaults to `false`. 
 | `developerMode` | `boolean` to activate the developer mode. When set to `true` the `logLevel` is automatically set to `DEBUG` and `socketMode` is set to `true`. However, explicitly setting these two properties takes precedence over implicitly setting them via `developerMode`. Furthermore, a custom OAuth failure handler is provided to help debugging. Finally, the body of all incoming requests are logged and thus sensitive information like tokens might be contained in the logs. Defaults to `false`.  | 
 | `deferInitialization` | `boolean` to defer initialization of the app and places responsibility for manually calling the `async` `App#init()` method on the developer. `init()` must be called before `App#start()`. Defaults to `false`. |
+| `signatureVerification` | `boolean` that determines whether Bolt should [verify Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack). Defaults to `true`. |
 
 > Bolt's client is an instance of `WebClient` from the [Node Slack SDK](/node-slack-sdk), so some of that documentation may be helpful as you're developing.
 

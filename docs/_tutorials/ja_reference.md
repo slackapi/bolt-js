@@ -32,8 +32,8 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 
 | メソッド                          | 説明 |
 | :---: | :--- |
-| `app.event(eventType, fn);`     | Events API のイベントをリッスンします。`eventType` は、処理対象の[イベント](https://api.slack.com/events)を指定するための文字列 です。この値は、Slackアプリの設定画面でサブスクライブの設定がされている必要があります。   | 
-| `app.message([pattern ,] fn);`  | [`message` イベント](https://api.slack.com/events/message)のリッスンに特化した、便利なメソッドです。`pattern` パラメーターには、部分一致させる文字列、または正規表現を指定します。これによって処理対象のメッセージを判別します。 | 
+| `app.event(eventType, fn);`     | Events API のイベントをリッスンします。`eventType` は、処理対象の[イベント](https://api.slack.com/events)を指定するための文字列 です。この値は、Slackアプリの設定画面でサブスクライブの設定がされている必要があります。   |
+| `app.message([pattern ,] fn);`  | [`message` イベント](https://api.slack.com/events/message)のリッスンに特化した、便利なメソッドです。`pattern` パラメーターには、部分一致させる文字列、または正規表現を指定します。これによって処理対象のメッセージを判別します。 |
 | `app.action(actionId, fn);`     | Block Kit エレメントから送信される `action` イベントをリッスンします。このイベントにはユーザーのボタン操作、メニュー選択、日付ピッカーの操作などがあります。`actionId` は文字列型で、アプリがビュー内に含めたブロックエレメントに指定した一意の `action_id` の値と一致する必要があります。ここでいう「ビュー」とは、メッセージ、モーダル、アプリのホームタブのことを指します。アクションエレメントを `input` ブロックに配置した場合はイベントがトリガーされないことに注意してください。
 | `app.shortcut(callbackId, fn);` | グローバルショートカットまたはメッセージショートカットの呼び出しをリッスンします。`callbackId` は文字列または正規表現で、アプリの設定で指定したショートカットの `callback_id` にマッチする必要があります。
 | `app.view(callbackId, fn);`     | `view_submission` イベントと `view_closed` イベントをリッスンします。`view_submission` イベントは、アプリが開いたモーダルでユーザーがデータ送信の操作をしたときに発生します。`view_closed` イベントは、ユーザーがデータ送信を実行せずにモーダルを閉じたときに発生します。
@@ -42,7 +42,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 | `app.options(actionId, fn);`    | 外部データソースを使用するセレクトメニューなどから送られる選択肢読み込みのリクエストをリッスンします。使う機会は多くありませんが、`app.action` と混同しないようにしましょう。`actionId` は文字列型で、アプリがビュー内に[外部データソースを使用するセレクトメニュー](https://api.slack.com/reference/block-kit/block-elements#external_select)を含めるときに指定した`action_id` と一致する必要があります。
 
 #### 制約オブジェクト
-一部のメソッドでは、さまざまな制約オブジェクトを指定することができます。制約オブジェクトを使用すると、リスナー関数で扱うイベントをさらに絞り込んだり、特定のケースに対応することができます。制約オブジェクトは、上で説明した識別子の代わりとしてメソッドに渡すことができます。さまざまな制約オブジェクトとそれを渡せるメソッドを以下の表にまとめます。 
+一部のメソッドでは、さまざまな制約オブジェクトを指定することができます。制約オブジェクトを使用すると、リスナー関数で扱うイベントをさらに絞り込んだり、特定のケースに対応することができます。制約オブジェクトは、上で説明した識別子の代わりとしてメソッドに渡すことができます。さまざまな制約オブジェクトとそれを渡せるメソッドを以下の表にまとめます。
 
 | メソッド                                         | オプション | 詳細 |
 | :---: | :--- | :--- |
@@ -68,7 +68,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 
 `payload` と `body` の構造は、API サイトで説明しています。
 
-- `action` : [`body`](https://api.slack.com/reference/interaction-payloads/block-actions) と [`payload`](https://api.slack.com/reference/block-kit/block-elements) 
+- `action` : [`body`](https://api.slack.com/reference/interaction-payloads/block-actions) と [`payload`](https://api.slack.com/reference/block-kit/block-elements)
 - `event` : [`body`](https://api.slack.com/types/event) と [`payload`](https://api.slack.com/events)
 - `shortcut` : [`body` と `payload`](https://api.slack.com/reference/interaction-payloads/shortcuts)
 - `command` : [`body`](https://api.slack.com/interactivity/slash-commands)
@@ -95,6 +95,7 @@ Bolt には、アプリをカスタマイズするためのさまざまな初期
 | `installationStore` | [OAuth の設定時](/bolt-js/ja-jp/concepts#authenticating-oauth)に、インストールデータの保存・取得・削除の手段を定義します。`fetchInstallation` 、`storeInstallation`、`deleteInstallation` という 3 つのメソッドが含まれます。デフォルトの `installationStore` はインメモリストアです。 |
 | `scopes` | アプリが [OAuth のプロセスの中で](/bolt-js/concepts#authenticating-oauth)アクセス許可を求めるスコープのリスト。 |
 | `installerOptions` | [デフォルトの OAuth サポート](/bolt-js/concepts#authenticating-oauth)をカスタマイズする場合に指定するオブジェクト（必須ではない）。詳しくは、OAuth のドキュメントを参照してください。 |
+| `signatureVerification` | Bolt が Slack からの受信リクエストの署名を検証するかどうかを指定する真偽値。 デフォルトは `true` です。 |
 
 ### App オプション
 App オプションは、`App` のコンストラクターに渡します。
@@ -113,10 +114,11 @@ App オプションは、`App` のコンストラクターに渡します。
 | `logLevel` | 出力するログのレベルを指定するオプション。`LogLevel` の出力に含まれる情報のレベルには、重要度の低い順から高い順に `DEBUG`、`INFO`、`WARN`、`ERROR` があります。デフォルトの `logLevel` は `INFO` に設定されています。ログ出力の詳細については、[ドキュメント](/bolt-js/concepts#logging)を参照してください。 |
 | `extendedErrorHandler` | 真偽値を指定するオプションで、 `true` に設定するとさらなるリクエストのコンテキスト情報を含んだオブジェクトがグローバルエラーハンドラーに渡されます。 バージョン 3.8.0 から利用することができます。 デフォルトは `false` です。 より高度なエラーの処理に関する詳細は [API ドキュメント](/bolt-js/ja-jp/concepts#error-handling)を参照してください。 |
 | `ignoreSelf` | アプリ自身から発信されたメッセージをミドルウェアの関数で無視するかどうかを指定する真偽値。`botId` が必要です。デフォルトは `true` です。  |
-| `clientOptions.slackApiUrl` | Slack Web API で使用するエンドポイントをカスタマイズできます。これが使用されるのはほとんどがテスト用途です。 | 
+| `clientOptions.slackApiUrl` | Slack Web API で使用するエンドポイントをカスタマイズできます。これが使用されるのはほとんどがテスト用途です。 |
 | `socketMode` | 真偽値を指定するオプションで、`true` に設定するとアプリは[ソケットモード](/bolt-js/ja-jp/concepts#socket-mode)で起動します。ソケットモードは WebSocket のコネクションを通して Slack からのデータを受信する機能です。デフォルトは `false` です。
-| `developerMode` | デベロッパーモードを有効にする真偽値です。 `true` に設定したとき、`logLevel` は `DEBUG`、 `socketMode` は `true` に自動的に設定されます。しかし、 これらの二つのプロパティを明示的に設定した場合、それらの設定が `developerMode` による設定よりも優先されます。さらに、デバッグをしやすくするためのカスタムの OAuth エラーハンドラーも提供されます。また、全ての Slack からのリクエストのボディがログ出力されるため、トークンのようなセンシティブな情報がログに含まれる可能性があります。デフォルトは `false` です。| 
+| `developerMode` | デベロッパーモードを有効にする真偽値です。 `true` に設定したとき、`logLevel` は `DEBUG`、 `socketMode` は `true` に自動的に設定されます。しかし、 これらの二つのプロパティを明示的に設定した場合、それらの設定が `developerMode` による設定よりも優先されます。さらに、デバッグをしやすくするためのカスタムの OAuth エラーハンドラーも提供されます。また、全ての Slack からのリクエストのボディがログ出力されるため、トークンのようなセンシティブな情報がログに含まれる可能性があります。デフォルトは `false` です。|
 | `deferInitialization` | アプリの初期化を遅延させる真偽値です。有効にすると非同期の `App#init()` メソッドを手動で呼び出す必要があります。 また `init()` メソッドは `App#start()` を実行する前に呼び出さなければなりません。 デフォルトは `false` です。 |
+| `signatureVerification` | Boltが着信リクエストでSlackの署名を検証する必要があるかどうかを決定するブール値。 デフォルトは`true`です。 |
 
 > Bolt のclientは [Node Slack SDK](/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
 
