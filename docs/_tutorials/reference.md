@@ -93,6 +93,10 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `installationStore` | Defines how to save, fetch and delete installation data when [configuring OAuth](/bolt-js/concepts#authenticating-oauth). Contains three methods: `fetchInstallation`, `storeInstallation` and `deleteInstallation`. The default `installationStore` is an in-memory store. |
 | `scopes` | Array of scopes that your app will request [within the OAuth process](/bolt-js/concepts#authenticating-oauth). |
 | `installerOptions` | Optional object that can be used to customize [the default OAuth support](/bolt-js/concepts#authenticating-oauth). Read more in the OAuth documentation. |
+| `dispatchErrorHandler` | Error handler triggered if an incoming request is to an unexpected path. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
+| `processEventErrorHandler` | Error handler triggered if event processing threw an exception. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
+| `unhandledRequestHandler` | Error handler triggered when a request from Slack goes unacknowledged. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
+| `unhandledRequestTimeoutMillis` | How long to wait, in milliseconds, from the time a request is received to when the `unhandledRequestHandler` should be triggered. Default is `3001`. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
 
 ### App options
 App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialize either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
