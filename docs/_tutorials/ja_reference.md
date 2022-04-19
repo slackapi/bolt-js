@@ -95,6 +95,10 @@ Bolt には、アプリをカスタマイズするためのさまざまな初期
 | `installationStore` | [OAuth の設定時](/bolt-js/ja-jp/concepts#authenticating-oauth)に、インストールデータの保存・取得・削除の手段を定義します。`fetchInstallation` 、`storeInstallation`、`deleteInstallation` という 3 つのメソッドが含まれます。デフォルトの `installationStore` はインメモリストアです。 |
 | `scopes` | アプリが [OAuth のプロセスの中で](/bolt-js/concepts#authenticating-oauth)アクセス許可を求めるスコープのリスト。 |
 | `installerOptions` | [デフォルトの OAuth サポート](/bolt-js/concepts#authenticating-oauth)をカスタマイズする場合に指定するオブジェクト（必須ではない）。詳しくは、OAuth のドキュメントを参照してください。 |
+| `dispatchErrorHandler` | 受信リクエストが想定しないパスへのリクエストを受信したときに実行されるエラーハンドラー。 詳細は[エラー処理のドキュメント](/bolt-js/concepts#error-handling)を参照してください。 |
+| `processEventErrorHandler` | イベントの処理中に例外がスローされたときに実行されるエラーハンドラー。  詳細は[ドキュメント](/bolt-js/concepts#error-handling)を参照してください。|
+| `unhandledRequestHandler` | Slack からのリクエストが Bolt アプリによって確認（`ack()`）されなかったときに実行されるエラーハンドラー。 詳細は[ドキュメント](/bolt-js/concepts#error-handling)を参照してください。 |
+| `unhandledRequestTimeoutMillis` | リクエストが受信されてから `unhandledRequestHandler` が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは `3001` です。 詳細は[ドキュメント](/bolt-js/concepts#error-handling)を参照してください。 |
 | `signatureVerification` | Bolt が Slack からの受信リクエストの署名を検証するかどうかを指定する真偽値。 デフォルトは `true` です。 |
 
 ### App オプション
