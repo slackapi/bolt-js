@@ -17,7 +17,7 @@ You can also define more focussed and specific error handlers for a variety of e
 - `unhandledRequestHandler`: triggered when a request from Slack goes unacknowledged.
 - `unhandledRequestTimeoutMillis`: the amount of time in milliseconds to wait for request acknowledgement from the application before triggering the `unhandledRequestHandler`. Default is `3001`.
 
-*NOTE*: It is imperative that any custom Error Handlers defined in your app respond to the underlying Slack request that led to the error, using `response.writeHead` to set the HTTP status code of the response and `response.end()` to dispatch the response back to Slack. See the example for details.
+*NOTE*: It is imperative that any custom Error Handlers defined in your app respond to the underlying Slack request that led to the error, using `response.writeHead()` to set the HTTP status code of the response and `response.end()` to dispatch the response back to Slack. See the example for details.
 </div>
 
 ```javascript
@@ -41,8 +41,8 @@ const app = new App({
       return true;
     },
     unhandledRequestHandler: async ({ logger, response }) => {
-      // acknowledge it anyway!
       logger.info('Acknowledging this incoming request because 2 seconds already passed...');
+      // acknowledge it anyway!
       response.writeHead(200);
       response.end();
     },

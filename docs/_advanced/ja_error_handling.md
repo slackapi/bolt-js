@@ -11,7 +11,47 @@ order: 1
 リスナーでエラーが発生した場合は `try`/`catch` を使って直接ハンドリングすることをおすすめします。しかし、それでもなおすり抜けてしまうエラーのパターンもあるでしょう。デフォルトでは、このようなエラーはコンソールにログ出力されます。ご自身でこれらをハンドリングするには、`app.error(fn)` メソッドによって、グローバルエラーハンドラーを定義してください。
 </div>
 
+また、様々なエラーパターンにより特化したエラーハンドラーを `HTTPReceiver` に直接設定することができます。
+
+- `dispatchErrorHandler`: 想定しないパスにリクエストが来たときに実行されます
+- `processEventErrorHandler`: リクエストを処理するとき（例：ミドルウェアや認可プロセス）に発生した例外に対して実行されます
+- `unhandledRequestHandler`: Slack からのリクエストが確認（`ack()`）されなかったときに実行されます
+- `unhandledRequestTimeoutMillis`: リクエストが受信されてから `unhandledRequestHandler` が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは `3001` です。 
+
+*注*: あなたのアプリ内に定義されたカスタムのエラーハンドラーは、エラーとなった Slack からのリクストに応答するために `response.writeHead()` を呼び出して応答の HTTP ステータスコードを設定し、かつ `response.end()` を呼び出して Slack へのレスポンスを送信する必要があります。詳細は以下の例を参考にしてください。
+</div>
+
 ```javascript
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  receiver: new HTTPReceiver({
+    signingSecret: process.env.SLACK_SIGNING_SECRET,
+    // より詳細で特化したエラーハンドラー
+    dispatchErrorHandler: ({ error, logger, response }) => {
+      logger.error(`dispatch error: ${error}`);
+      response.writeHead(404);
+      response.write("Something is wrong!");
+      response.end();
+    },
+    processEventErrorHandler: ({ error, logger, response }) => {
+      logger.error(`processEvent error: ${error}`);
+      // とにかく ack する場合の方法！
+      response.writeHead(200);
+      response.end();
+      return true;
+    },
+    unhandledRequestHandler: async ({ logger, response }) => {
+      logger.info('Acknowledging this incoming request because 2 seconds already passed...');
+      // とにかく ack する場合の方法！
+      response.writeHead(200);
+      response.end();
+    },
+    unhandledRequestTimeoutMillis: 2000, // デフォルト値は 3001
+  }),
+});
+
+// より一般的でグローバルなエラーハンドラー
 app.error((error) => {
   // メッセージ再送信もしくはアプリを停止するかの判断をするためにエラーの詳細を出力して確認
   console.error(error);
