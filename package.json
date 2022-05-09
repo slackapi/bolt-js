@@ -36,7 +36,9 @@
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "bin": {
-    "bolt-cli-get-hooks": "./src/cli/get-hooks.js"
+    "slack-cli-get-hooks": "./src/cli/get-hooks.js",
+    "slack-cli-get-manifest": "./src/cli/manifest.js",
+    "slack-cli-start": "./src/cli/start.js"
   },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",
