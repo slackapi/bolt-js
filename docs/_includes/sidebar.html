@@ -68,9 +68,7 @@
   {% assign deployments_sections = site.deployments | sort: "order" | where: "lang", page.lang %}
   {% if deployments_sections.size > 0 %}
     <ul class="sidebar-section">
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/deployments">
         <li class="title">{{ site.t[page.lang].deployments }}</li>
-      </a>
       {% for section in deployments_sections %}
         <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/deployments/{{ section.slug }}">
           <li>{{section.title}}</li>
