@@ -167,10 +167,10 @@ Create a new file called `serverless.yml` in your app's root directory and paste
 
 ```yaml
 service: serverless-bolt-js
-frameworkVersion: '2'
+frameworkVersion: '3'
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
