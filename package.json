@@ -35,6 +35,9 @@
     "coverage": "codecov",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
+  "bin": {
+    "bolt-cli-get-hooks": "./src/cli/get-hooks.js"
+  },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",
   "bugs": {
