@@ -1,5 +1,5 @@
 import { expectNotType, expectType } from 'tsd';
-import { App, SlackEvent, AppMentionEvent, ReactionAddedEvent, ReactionRemovedEvent } from '..';
+import { App, SlackEvent, AppMentionEvent, ReactionAddedEvent, ReactionRemovedEvent, UserHuddleChangedEvent, UserProfileChangedEvent, UserStatusChangedEvent } from '..';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -22,6 +22,30 @@ expectType<void>(
 expectType<void>(
   app.event('reaction_removed', async ({ event }) => {
     expectType<ReactionRemovedEvent>(event);
+    expectNotType<SlackEvent>(event);
+    await Promise.resolve(event);
+  })
+);
+
+expectType<void>(
+  app.event('user_huddle_changed', async ({ event }) => {
+    expectType<UserHuddleChangedEvent>(event);
+    expectNotType<SlackEvent>(event);
+    await Promise.resolve(event);
+  })
+);
+
+expectType<void>(
+  app.event('user_profile_changed', async ({ event }) => {
+    expectType<UserProfileChangedEvent>(event);
+    expectNotType<SlackEvent>(event);
+    await Promise.resolve(event);
+  })
+);
+
+expectType<void>(
+  app.event('user_status_changed', async ({ event }) => {
+    expectType<UserStatusChangedEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
   })
