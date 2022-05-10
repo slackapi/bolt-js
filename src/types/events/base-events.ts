@@ -885,11 +885,14 @@ export interface UserChangeEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
+      status_emoji_display_info: [];
       status_expiration: number;
       avatar_hash: string;
+      huddle_state?: string;
+      huddle_state_expiration_ts?: number;
       first_name: string;
       last_name: string;
-      email: string;
+      email?: string;
       image_original?: string;
       is_custom_image?: boolean;
       image_24: string;
@@ -923,7 +926,7 @@ export interface UserChangeEvent {
     is_invited_user?: boolean;
     has_2fa?: boolean;
     locale: string;
-    presence: string;
+    presence?: string;
     enterprise_user?: {
       id: string;
       enterprise_id: string;
@@ -932,12 +935,13 @@ export interface UserChangeEvent {
       is_owner: boolean;
       teams: string[];
     };
-    two_factor_type: string;
-    has_files: boolean;
-    is_workflow_bot: boolean;
-    who_can_share_contact_card: boolean;
+    two_factor_type?: string;
+    has_files?: boolean;
+    is_workflow_bot?: boolean;
+    who_can_share_contact_card: string;
   };
   cache_ts: number;
+  event_ts: string;
 }
 
 export interface UserHuddleChangedEvent {
@@ -963,11 +967,14 @@ export interface UserHuddleChangedEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
+      status_emoji_display_info: [];
       status_expiration: number;
       avatar_hash: string;
+      huddle_state: string;
+      huddle_state_expiration_ts: number;
       first_name: string;
       last_name: string;
-      email: string;
+      email?: string;
       image_original?: string;
       is_custom_image?: boolean;
       image_24: string;
@@ -1001,7 +1008,7 @@ export interface UserHuddleChangedEvent {
     is_invited_user?: boolean;
     has_2fa?: boolean;
     locale: string;
-    presence: string;
+    presence?: string;
     enterprise_user?: {
       id: string;
       enterprise_id: string;
@@ -1010,12 +1017,13 @@ export interface UserHuddleChangedEvent {
       is_owner: boolean;
       teams: string[];
     };
-    two_factor_type: string;
-    has_files: boolean;
-    is_workflow_bot: boolean;
-    who_can_share_contact_card: boolean;
+    two_factor_type?: string;
+    has_files?: boolean;
+    is_workflow_bot?: boolean;
+    who_can_share_contact_card: string;
   };
   cache_ts: number;
+  event_ts: string;
 }
 
 export interface UserProfileChangedEvent {
@@ -1041,11 +1049,14 @@ export interface UserProfileChangedEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
+      status_emoji_display_info: [];
       status_expiration: number;
       avatar_hash: string;
+      huddle_state: string;
+      huddle_state_expiration_ts: number;
       first_name: string;
       last_name: string;
-      email: string;
+      email?: string;
       image_original?: string;
       is_custom_image?: boolean;
       image_24: string;
@@ -1079,7 +1090,7 @@ export interface UserProfileChangedEvent {
     is_invited_user?: boolean;
     has_2fa?: boolean;
     locale: string;
-    presence: string;
+    presence?: string;
     enterprise_user?: {
       id: string;
       enterprise_id: string;
@@ -1088,12 +1099,13 @@ export interface UserProfileChangedEvent {
       is_owner: boolean;
       teams: string[];
     };
-    two_factor_type: string;
-    has_files: boolean;
-    is_workflow_bot: boolean;
-    who_can_share_contact_card: boolean;
+    two_factor_type?: string;
+    has_files?: boolean;
+    is_workflow_bot?: boolean;
+    who_can_share_contact_card: string;
   };
   cache_ts: number;
+  event_ts: string;
 }
 
 export interface UserStatusChangedEvent {
@@ -1119,11 +1131,12 @@ export interface UserStatusChangedEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
+      status_emoji_display_info: [],
       status_expiration: number;
       avatar_hash: string;
       first_name: string;
       last_name: string;
-      email: string;
+      email?: string;
       image_original?: string;
       is_custom_image?: boolean;
       image_24: string;
@@ -1157,7 +1170,7 @@ export interface UserStatusChangedEvent {
     is_invited_user?: boolean;
     has_2fa?: boolean;
     locale: string;
-    presence: string;
+    presence?: string;
     enterprise_user?: {
       id: string;
       enterprise_id: string;
@@ -1166,12 +1179,13 @@ export interface UserStatusChangedEvent {
       is_owner: boolean;
       teams: string[];
     };
-    two_factor_type: string;
-    has_files: boolean;
-    is_workflow_bot: boolean;
-    who_can_share_contact_card: boolean;
+    two_factor_type?: string;
+    has_files?: boolean;
+    is_workflow_bot?: boolean;
+    who_can_share_contact_card: string;
   };
   cache_ts: number;
+  event_ts: string;
 }
 
 export interface WorkflowDeletedEvent {
