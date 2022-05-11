@@ -1,11 +1,12 @@
-import { spawn } from 'child_process';
-import path from 'path';
+#!/usr/bin/env node
+const { spawn } = require('child_process');
+const path = require('path');
 
 // Run script hook verifies that requirements for running an App in
 // in developerMode (via Socket Mode) are met
-(function _(cwd: string) {
+(function _(cwd) {
   // TODO - Format so that its less miss-able in output
-  process.stdout.write('Preparing local run in developer mode (Socket Mode)\n');
+  console.log('Preparing local run in developer mode (Socket Mode)');
   // Check required local run tokens
   validate();
 
@@ -21,7 +22,7 @@ import path from 'path';
   });
 
   app.on('close', (code) => {
-    process.stdout.write(`bolt-app local run exited with code ${code}`);
+    console.log(`bolt-app local run exited with code ${code}`);
   });
 }(process.cwd()));
 
