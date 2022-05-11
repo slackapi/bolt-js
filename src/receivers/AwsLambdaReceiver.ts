@@ -154,7 +154,7 @@ export default class AwsLambdaReceiver implements Receiver {
 
       // Setup ack timeout warning
       let isAcknowledged = false;
-      setTimeout(() => {
+      const noAckTimeoutId = setTimeout(() => {
         if (!isAcknowledged) {
           this.logger.error(
             'An incoming event was not acknowledged within 3 seconds. ' +
@@ -172,6 +172,7 @@ export default class AwsLambdaReceiver implements Receiver {
             throw new ReceiverMultipleAckError();
           }
           isAcknowledged = true;
+          clearTimeout(noAckTimeoutId);
           if (typeof response === 'undefined' || response == null) {
             storedResponse = '';
           } else {
