@@ -172,6 +172,7 @@ export default class AwsLambdaReceiver implements Receiver {
             throw new ReceiverMultipleAckError();
           }
           isAcknowledged = true;
+          clearTimeout(noAckTimeoutId);
           if (typeof response === 'undefined' || response == null) {
             storedResponse = '';
           } else {
@@ -186,7 +187,6 @@ export default class AwsLambdaReceiver implements Receiver {
       // Send the event to the app for processing
       try {
         await this.app?.processEvent(event);
-        clearTimeout(noAckTimeoutId);
         if (storedResponse !== undefined) {
           if (typeof storedResponse === 'string') {
             return { statusCode: 200, body: storedResponse };
@@ -198,7 +198,6 @@ export default class AwsLambdaReceiver implements Receiver {
           };
         }
       } catch (err) {
-        clearTimeout(noAckTimeoutId);
         this.logger.error('An unhandled error occurred while Bolt processed an event');
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         return { statusCode: 500, body: 'Internal server error' };
