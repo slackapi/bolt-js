@@ -862,6 +862,12 @@ export interface TokensRevokedEvent {
 
 // NOTE: url_verification does not use the envelope, but its also not interesting for an app developer. its omitted.
 
+export interface StatusEmojiDisplayInfo {
+  emoji_name?: string;
+  display_alias?: string;
+  display_url?: string;
+}
+
 export interface UserChangeEvent {
   type: 'user_change';
   user: {
@@ -885,7 +891,7 @@ export interface UserChangeEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
-      status_emoji_display_info: [];
+      status_emoji_display_info: StatusEmojiDisplayInfo[];
       status_expiration: number;
       avatar_hash: string;
       huddle_state?: string;
@@ -967,7 +973,7 @@ export interface UserHuddleChangedEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
-      status_emoji_display_info: [];
+      status_emoji_display_info: StatusEmojiDisplayInfo[];
       status_expiration: number;
       avatar_hash: string;
       huddle_state: string;
@@ -1049,7 +1055,7 @@ export interface UserProfileChangedEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
-      status_emoji_display_info: [];
+      status_emoji_display_info: StatusEmojiDisplayInfo[];
       status_expiration: number;
       avatar_hash: string;
       huddle_state: string;
@@ -1131,7 +1137,7 @@ export interface UserStatusChangedEvent {
       status_text: string;
       status_text_canonical: string;
       status_emoji: string;
-      status_emoji_display_info: [],
+      status_emoji_display_info: StatusEmojiDisplayInfo[],
       status_expiration: number;
       avatar_hash: string;
       first_name: string;
