@@ -31,6 +31,8 @@ export class HTTPResponseAck {
 
   private httpResponse: ServerResponse;
 
+  private noAckTimeoutId?: NodeJS.Timeout;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public storedResponse: any | string | undefined;
 
@@ -43,11 +45,12 @@ export class HTTPResponseAck {
     this.httpRequest = args.httpRequest;
     this.httpResponse = args.httpResponse;
     this.storedResponse = undefined;
+    this.noAckTimeoutId = undefined;
     this.init();
   }
 
   private init(): HTTPResponseAck {
-    setTimeout(() => {
+    this.noAckTimeoutId = setTimeout(() => {
       if (!this.isAcknowledged) {
         this.unhandledRequestHandler({
           logger: this.logger,
@@ -84,5 +87,8 @@ export class HTTPResponseAck {
 
   public ack(): void {
     this.isAcknowledged = true;
+    if (this.noAckTimeoutId) {
+      clearTimeout(this.noAckTimeoutId);
+    }
   }
 }

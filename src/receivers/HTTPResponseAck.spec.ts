@@ -39,6 +39,25 @@ describe('HTTPResponseAck', async () => {
       done();
     }, 2);
   });
+  it('should not trigger unhandledRequestHandler if acknowledged', (done) => {
+    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const spy = sinon.spy();
+    // eslint-disable-next-line no-new
+    const responseAck = new HTTPResponseAck({
+      logger: createFakeLogger(),
+      processBeforeResponse: false,
+      unhandledRequestTimeoutMillis: 1,
+      unhandledRequestHandler: spy,
+      httpRequest,
+      httpResponse,
+    });
+    responseAck.ack();
+    setTimeout(() => {
+      assert(spy.notCalled);
+      done();
+    }, 2);
+  });
   it('should throw an error if a bound Ack invocation was already acknowledged', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
