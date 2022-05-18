@@ -1,5 +1,4 @@
-import { View, PlainTextElement } from '@slack/types';
-import { StringIndexed } from '../helpers';
+import { Block, KnownBlock, PlainTextElement } from '@slack/types';
 import { AckFn, RespondFn } from '../utilities';
 
 /**
@@ -26,6 +25,13 @@ interface PlainTextElementOutput {
   type: 'plain_text';
   text: string;
   emoji?: boolean;
+}
+
+export interface ViewResponseUrl {
+  block_id: string;
+  action_id: string;
+  channel_id: string;
+  response_url: string;
 }
 
 /**
@@ -56,6 +62,7 @@ export interface ViewSubmitAction {
     id: string;
     name: string;
   };
+  response_urls: ViewResponseUrl[];
 }
 
 /**
@@ -96,7 +103,7 @@ export interface ViewClosedAction {
 
 export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
   trigger_id: string;
-  response_urls: [];
+  response_urls: ViewResponseUrl[];
   workflow_step: {
     workflow_step_edit_id: string;
     workflow_id: string;
@@ -146,7 +153,7 @@ export interface ViewOutput {
   bot_id: string;
   title: PlainTextElementOutput;
   type: string;
-  blocks: StringIndexed; // TODO: should this just be any?
+  blocks: (KnownBlock | Block)[];
   close: PlainTextElementOutput | null;
   submit: PlainTextElementOutput | null;
   state: {
@@ -167,12 +174,12 @@ export interface ViewOutput {
 
 export interface ViewUpdateResponseAction {
   response_action: 'update';
-  view: View;
+  view: ViewOutput;
 }
 
 export interface ViewPushResponseAction {
   response_action: 'push';
-  view: View;
+  view: ViewOutput;
 }
 
 export interface ViewClearResponseAction {
