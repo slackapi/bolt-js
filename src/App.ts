@@ -653,7 +653,7 @@ export default class App {
   }
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
-  // https://basarat.gitbooks.io/typescript/docs/types/generics.html#design-pattern-convenience-generic
+  // https://web.archive.org/web/20210629110615/https://basarat.gitbook.io/typescript/type-system/generics#motivation-and-samples
   public action<Action extends SlackAction = SlackAction>(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
