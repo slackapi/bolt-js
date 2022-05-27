@@ -700,7 +700,13 @@ export default class App {
   }
 
   public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
-    this.listeners.push([onlyCommands, matchCommandName(commandName), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    this.listeners.push([
+      onlyCommands,
+      matchCommandName(commandName),
+      ..._listeners,
+    ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public options<Source extends OptionsSource = 'block_suggestion'>(
