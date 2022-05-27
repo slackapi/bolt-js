@@ -605,7 +605,8 @@ export default class App {
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any; // FIXME: workaround for TypeScript 4.7 breaking changes
 
     this.listeners.push([
       onlyEvents,
@@ -689,7 +690,9 @@ export default class App {
       return;
     }
 
-    this.listeners.push([onlyActions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    this.listeners.push([onlyActions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
@@ -714,7 +717,9 @@ export default class App {
       { action_id: actionIdOrConstraints } :
       actionIdOrConstraints;
 
-    this.listeners.push([onlyOptions, matchConstraints(constraints), ...listeners] as Middleware<AnyMiddlewareArgs>[]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    this.listeners.push([onlyOptions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public view<ViewActionType extends SlackViewAction = SlackViewAction>(
@@ -746,10 +751,12 @@ export default class App {
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
     this.listeners.push([
       onlyViewActions,
       matchConstraints(constraints),
-      ...listeners,
+      ..._listeners,
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
