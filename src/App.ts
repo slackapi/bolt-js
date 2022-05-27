@@ -555,10 +555,12 @@ export default class App {
           'If you want to filter message events, you can use event.channel_type for it.',
       );
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
     this.listeners.push([
       onlyEvents,
       matchEventType(eventNameOrPattern),
-      ...listeners,
+      ..._listeners,
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
@@ -646,10 +648,12 @@ export default class App {
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
     this.listeners.push([
       onlyShortcuts,
       matchConstraints(constraints),
-      ...listeners,
+      ..._listeners,
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
