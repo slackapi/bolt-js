@@ -1,26 +1,18 @@
-#!/usr/bin/env node
-const { spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const { main: pkgJSONMain } = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
+import { spawn } from 'child_process';
+import path from 'path';
 
 // Run script hook verifies that requirements for running an App in
 // in developerMode (via Socket Mode) are met
-(function _(cwd, customPath) {
+(function _(cwd: string) {
   // TODO - Format so that its less miss-able in output
-  console.log('Preparing local run in developer mode (Socket Mode)');
+  process.stdout.write('Preparing local run in developer mode (Socket Mode)\n');
   // Check required local run tokens
   validate();
 
-  // tries the provided path, then package.json main, then defaults to index.js in the current 
-  // working directory
-  const pkgJSONDefault = 'index.js';
-  const fullPath = path.resolve(cwd, customPath ? customPath : pkgJSONMain ? pkgJSONMain : pkgJSONDefault);
-  console.log(fullPath);
-
   // Kick off a subprocess to run the app in development mode
-  const app = spawn('node', [`${fullPath}`]);
+  const app = spawn('node', [`${path.resolve(cwd, 'app.js')}`]);
   app.stdout.setEncoding('utf-8');
+  // TODO - Is there a way to configure this in spawn invocation
   app.stdout.on('data', (data) => {
     process.stdout.write(data);
   });
@@ -29,9 +21,9 @@ const { main: pkgJSONMain } = JSON.parse(fs.readFileSync('./package.json', 'utf-
   });
 
   app.on('close', (code) => {
-    console.log(`bolt-app local run exited with code ${code}`);
+    process.stdout.write(`bolt-app local run exited with code ${code}`);
   });
-}(process.cwd(), process.env.SLACK_CLI_CUSTOM_FILE_PATH));
+}(process.cwd()));
 
 function validate() {
   if (!process.env.SLACK_CLI_XOXB) {
