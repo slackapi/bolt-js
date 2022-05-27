@@ -500,7 +500,7 @@ describe('Built-in global middleware', () => {
     it('should detect valid requests', async () => {
       const payload: SlashCommand = { ...validCommandPayload };
       const fakeNext = sinon.fake();
-      await onlyCommands({
+      const args = {
         logger,
         client,
         payload,
@@ -511,14 +511,15 @@ describe('Built-in global middleware', () => {
         ack: noop,
         next: fakeNext,
         context: {},
-      });
+      };
+      await onlyCommands(args);
       assert.isTrue(fakeNext.called);
     });
 
     it('should skip other requests', async () => {
       const payload: any = {};
       const fakeNext = sinon.fake();
-      await onlyCommands({
+      const args = {
         logger,
         client,
         payload,
@@ -530,7 +531,8 @@ describe('Built-in global middleware', () => {
         ack: noop,
         next: fakeNext,
         context: {},
-      });
+      };
+      await onlyCommands(args);
       assert.isTrue(fakeNext.notCalled);
     });
   });
@@ -580,7 +582,9 @@ describe('Built-in global middleware', () => {
 
     it('should detect valid requests', async () => {
       const fakeNext = sinon.fake();
-      const args: SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } = {
+      // FIXME: Removing type def here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const args /* : SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } */ = {
         payload: appMentionEvent,
         event: appMentionEvent,
         message: null as never, // a bit hackey to satisfy TS compiler as 'null' cannot be assigned to type 'never'
@@ -596,20 +600,23 @@ describe('Built-in global middleware', () => {
         },
         say: sayNoop,
       };
-      await onlyEvents({
+      const allArgs = {
         logger,
         client,
         next: fakeNext,
         context: {},
         ...args,
-      });
+      };
+      // FIXME: Using any is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      await onlyEvents(allArgs as any);
       assert.isTrue(fakeNext.called);
     });
 
     it('should skip other requests', async () => {
       const payload: SlashCommand = { ...validCommandPayload };
       const fakeNext = sinon.fake();
-      await onlyEvents({
+      const args = {
         logger,
         client,
         payload,
@@ -620,7 +627,8 @@ describe('Built-in global middleware', () => {
         ack: noop,
         next: fakeNext,
         context: {},
-      });
+      };
+      await onlyEvents(args);
       assert.isFalse(fakeNext.called);
     });
   });
@@ -630,6 +638,8 @@ describe('Built-in global middleware', () => {
     const client = new WebClient(undefined, { logger, slackApiUrl: undefined });
 
     function buildArgs(): SlackEventMiddlewareArgs<'app_mention'> & { event?: SlackEvent } {
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
       return {
         payload: appMentionEvent,
         event: appMentionEvent,
@@ -645,12 +655,14 @@ describe('Built-in global middleware', () => {
           authed_users: [],
         },
         say: sayNoop,
-      };
+      } as any;
     }
 
     function buildArgsAppHomeOpened(): SlackEventMiddlewareArgs<'app_home_opened'> & {
       event?: SlackEvent;
     } {
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
       return {
         payload: appHomeOpenedEvent,
         event: appHomeOpenedEvent,
@@ -666,66 +678,86 @@ describe('Built-in global middleware', () => {
           authed_users: [],
         },
         say: sayNoop,
-      };
+      } as any;
     }
 
     it('should detect valid requests', async () => {
       const fakeNext = sinon.fake();
-      await matchEventType('app_mention')({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgs() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgs(),
-      });
+        ..._args,
+      };
+      await matchEventType('app_mention')(args);
       assert.isTrue(fakeNext.called);
     });
 
     it('should detect valid RegExp requests with app_mention', async () => {
       const fakeNext = sinon.fake();
-      await matchEventType(/app_mention|app_home_opened/)({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgs() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgs(),
-      });
+        ..._args,
+      };
+      await matchEventType(/app_mention|app_home_opened/)(args);
       assert.isTrue(fakeNext.called);
     });
 
     it('should detect valid RegExp requests with app_home_opened', async () => {
       const fakeNext = sinon.fake();
-      await matchEventType(/app_mention|app_home_opened/)({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgsAppHomeOpened() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgsAppHomeOpened(),
-      });
+        ..._args,
+      };
+      await matchEventType(/app_mention|app_home_opened/)(args);
       assert.isTrue(fakeNext.called);
     });
 
     it('should skip other requests', async () => {
       const fakeNext = sinon.fake();
-      await matchEventType('app_home_opened')({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgs() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgs(),
-      });
+        ..._args,
+      };
+      await matchEventType('app_home_opened')(args);
       assert.isFalse(fakeNext.called);
     });
 
     it('should skip other requests for RegExp', async () => {
       const fakeNext = sinon.fake();
-      await matchEventType(/foo/)({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgs() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgs(),
-      });
+        ..._args,
+      } as any;
+      await matchEventType(/foo/)(args);
       assert.isFalse(fakeNext.called);
     });
   });
@@ -735,6 +767,8 @@ describe('Built-in global middleware', () => {
     const client = new WebClient(undefined, { logger, slackApiUrl: undefined });
 
     function buildArgs(): SlackEventMiddlewareArgs<'message'> & { event?: SlackEvent } {
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
       return {
         payload: botMessageEvent,
         event: botMessageEvent,
@@ -750,30 +784,38 @@ describe('Built-in global middleware', () => {
           authed_users: [],
         },
         say: sayNoop,
-      };
+      } as any;
     }
 
     it('should detect valid requests', async () => {
       const fakeNext = sinon.fake();
-      await subtype('bot_message')({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgs() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgs(),
-      });
+        ..._args,
+      };
+      await subtype('bot_message')(args);
       assert.isTrue(fakeNext.called);
     });
 
     it('should skip other requests', async () => {
       const fakeNext = sinon.fake();
-      await subtype('me_message')({
+      // FIXME: Using any here is a workaround for TypeScript 4.7 breaking changes
+      // TS2589: Type instantiation is excessively deep and possibly infinite.
+      const _args = buildArgs() as any;
+      const args = {
         logger,
         client,
         next: fakeNext,
         context: {},
-        ...buildArgs(),
-      });
+        ..._args,
+      };
+      await subtype('me_message')(args);
       assert.isFalse(fakeNext.called);
     });
   });

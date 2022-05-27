@@ -32,12 +32,13 @@ import { ContextMissingPropertyError } from '../errors';
 /**
  * Middleware that filters out any event that isn't an action
  */
-export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = async ({ action, next }) => {
+export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = async (args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { action, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
   // Filter out any non-actions
   if (action === undefined) {
     return;
   }
-
   // It matches so we should continue down this middleware listener chain
   await next();
 };
@@ -45,10 +46,9 @@ export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async ({
-  shortcut,
-  next,
-}) => {
+export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async (args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { shortcut, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
   // Filter out any non-shortcuts
   if (shortcut === undefined) {
     return;
@@ -61,7 +61,9 @@ export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackSho
 /**
  * Middleware that filters out any event that isn't a command
  */
-export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> = async ({ command, next }) => {
+export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> = async (args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { command, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
   // Filter out any non-commands
   if (command === undefined) {
     return;
@@ -74,7 +76,9 @@ export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashComma
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOptions }> = async ({ options, next }) => {
+export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOptions }> = async (args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { options, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
   // Filter out any non-options requests
   if (options === undefined) {
     return;
@@ -87,7 +91,9 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOption
 /**
  * Middleware that filters out any event that isn't an event
  */
-export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = async ({ event, next }) => {
+export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = async (args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { event, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
   // Filter out any non-events
   if (event === undefined) {
     return;
@@ -100,7 +106,9 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async ({ view, next }) => {
+export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async (args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { view, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
   // Filter out anything that doesn't have a view
   if (view === undefined) {
     return;
