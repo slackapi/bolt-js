@@ -650,6 +650,7 @@ export interface ReactionMessageItem {
 
 export interface ReactionFileItem {
   type: 'file';
+  channel: string;
   file: string;
 }
 
@@ -657,6 +658,7 @@ export interface ReactionFileItem {
 // See https://api.slack.com/changelog/2018-05-file-threads-soon-tread
 export interface ReactionFileCommentItem {
   type: 'file_comment';
+  channel: string;
   file_comment: string;
   file: string;
 }
