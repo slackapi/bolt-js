@@ -31,7 +31,7 @@ app.action('approve_button', async ({ ack, say }) => {
 
 ```javascript
 // "user_select" の action_id がトリガーされたアクションをリッスン
-app.action('user_choice', async ({ action, ack, respond }) => {
+app.action('user_select', async ({ action, ack, respond }) => {
   await ack();
   await respond(`You selected <@${action.selected_user}>`);
 });
