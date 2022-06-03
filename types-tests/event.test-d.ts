@@ -66,3 +66,17 @@ expectType<void>(
     await Promise.resolve(event);
   })
 );
+
+expectType<void>(
+  app.event('reaction_added', async ({ say, event }) => {
+    expectType<SayFn>(say);
+    await Promise.resolve(event);
+  })
+);
+
+expectType<void>(
+  app.event('reaction_removed', async ({ say, event }) => {
+    expectType<SayFn>(say);
+    await Promise.resolve(event);
+  })
+);
