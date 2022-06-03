@@ -585,12 +585,38 @@ export interface MemberLeftChannelEvent {
 
 export type MessageEvent = AllMessageEvents;
 
+export interface PinnedMessageItem {
+  client_msg_id?: string;
+  type: string;
+  app_id?: string;
+  team?: string;
+  user: string;
+  bot_id?: string;
+  bot_profile?: BotProfile;
+  text?: string;
+  attachments?: MessageAttachment[];
+  blocks?: (KnownBlock | Block)[];
+  pinned_to?: string[];
+  permalink: string;
+}
+export interface PinnedFileItem {
+  id: string;
+  // TODO: Add all other possible properties here
+}
+
+export interface PinnedItem {
+  type: string;
+  channel: string;
+  created_by: string;
+  created: number;
+  message?: PinnedMessageItem;
+  file?: PinnedFileItem;
+}
 export interface PinAddedEvent {
   type: 'pin_added';
   user: string;
   channel_id: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: Record<string, unknown>;
+  item: PinnedItem;
   item_user: string;
   pin_count: string;
   pinned_info: {
@@ -600,13 +626,11 @@ export interface PinAddedEvent {
   };
   event_ts: string;
 }
-
 export interface PinRemovedEvent {
   type: 'pin_removed';
   user: string;
   channel_id: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: Record<string, unknown>;
+  item: PinnedItem;
   item_user: string;
   pin_count: string;
   pinned_info: {
