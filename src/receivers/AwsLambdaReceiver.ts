@@ -134,6 +134,7 @@ export default class AwsLambdaReceiver implements Receiver {
       const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
       const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
       if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
+        this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
         return Promise.resolve({ statusCode: 401, body: '' });
       }
 
@@ -202,6 +203,7 @@ export default class AwsLambdaReceiver implements Receiver {
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         return { statusCode: 500, body: 'Internal server error' };
       }
+      this.logger.info(`No request handler matched the request: ${awsEvent.path}`);
       return { statusCode: 404, body: '' };
     };
   }
