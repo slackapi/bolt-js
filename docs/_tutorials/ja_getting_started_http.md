@@ -1,13 +1,12 @@
 ---
-title: Bolt 入門ガイド
+title: Bolt 入門ガイド (HTTP)
 order: 0
 slug: getting-started-http
 lang: ja-jp
 layout: tutorial
-permalink: /ja-jp/tutorial/getting-started
+permalink: /ja-jp/tutorial/getting-started-http
 redirect_from:
-  - /ja-jp/getting-started
-  - /getting-started/ja-jp
+  - /ja-jp/getting-started-http
 ---
 # Bolt 入門ガイド
 
