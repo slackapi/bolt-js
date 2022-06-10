@@ -32,6 +32,8 @@ export interface SlackEventMiddlewareArgs<EventType extends string = string> {
   message: EventType extends 'message' ? this['payload'] : never;
   body: EnvelopedEvent<this['payload']>;
   say: WhenEventHasChannelContext<this['payload'], SayFn>;
+  // Add `ack` as undefined for global middleware in TypeScript
+  ack: undefined;
 }
 
 /**

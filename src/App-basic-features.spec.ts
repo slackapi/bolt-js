@@ -1081,6 +1081,82 @@ describe('App basic features', () => {
         assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
       });
     });
+
+    describe('ack()', () => {
+      it('should be available in middleware/listener args', async () => {
+        // Arrange
+        const MockApp = await importApp(overrides);
+        const fakeLogger = createFakeLogger();
+        const app = new MockApp({
+          logger: fakeLogger,
+          receiver: fakeReceiver,
+          authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        });
+        app.use(async ({ ack, next }) => {
+          if (ack) {
+            // this should be called even if app.view listeners do not exist
+            await ack();
+            return;
+          }
+          fakeLogger.info('Events API');
+          await next();
+        });
+
+        app.event('app_home_opened', async ({ logger, event }) => {
+          logger.debug(event);
+        });
+
+        let ackInMiddlewareCalled = false;
+
+        const receiverEvents = [
+          {
+            body: {
+              type: 'event_callback',
+              token: 'XXYYZZ',
+              team_id: 'TXXXXXXXX',
+              api_app_id: 'AXXXXXXXXX',
+              event: {
+                type: 'app_home_opened',
+                event_ts: '1234567890.123456',
+                user: 'UXXXXXXX1',
+                text: 'hello friends!',
+                tab: 'home',
+                view: {},
+              },
+            },
+            respond: noop,
+            ack: noop,
+          },
+          {
+            body: {
+              type: 'view_submission',
+              team: {},
+              user: {},
+              view: {
+                id: 'V111',
+                type: 'modal',
+                callback_id: 'view-id',
+                state: {},
+                title: {},
+                close: {},
+                submit: {},
+              },
+            },
+            respond: noop,
+            ack: async () => {
+              ackInMiddlewareCalled = true;
+            },
+          },
+        ];
+
+        // Act
+        await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
+
+        // Assert
+        assert.isTrue(fakeLogger.info.called);
+        assert.isTrue(ackInMiddlewareCalled);
+      });
+    });
   });
 });
 

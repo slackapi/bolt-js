@@ -10,3 +10,10 @@ app.use(async (args) => {
 app.use(async (args) => {
   onlyCommands(args);
 });
+app.use(async ({ ack, next }) => {
+  if (ack) {
+    await ack();
+    return;
+  }
+  await next();
+});
