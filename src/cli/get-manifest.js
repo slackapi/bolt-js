@@ -27,8 +27,8 @@ const merge = require('deepmerge');
   try {
     let manifest = merge(manifestJSON, manifestJS);
     manifest = merge(manifest, manifestTS);
-    console.log(manifest);
-    // console.log(JSON.stringify(manifest));
+    // console.log(manifest);
+    console.log(JSON.stringify(manifest));
   } catch (error) {
     throw new Error(`Error generating manifest: ${error}`);
   }
