@@ -21,7 +21,7 @@ const merge = require('deepmerge');
   manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
 
   if (multipleManifests(manifestJS, manifestTS, manifestJSON)) {
-    console.log('Warning, multiple manifests may exist. We strongly recommend supplying a single manifest file. Valid formats: .ts, .js, or .json.')
+    // console.log('Warning, multiple manifests may exist. We strongly recommend supplying a single manifest file. Valid formats: .ts, .js, or .json.')
   }
   // merge if required and return output
   try {
