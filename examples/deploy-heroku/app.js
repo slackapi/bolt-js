@@ -45,7 +45,8 @@ app.message('goodbye', async ({ message, say }) => {
 
 (async () => {
   // Start your app
-  await app.start(process.env.PORT || 3000);
+  // Heroku don't support fixed port
+  await app.start(/*process.env.PORT || 3000*/);
 
   console.log('⚡️ Bolt app is running!');
 })();
