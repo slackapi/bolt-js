@@ -40,7 +40,9 @@ function readManifestJSONFile (cwd, filename) {
   let jsonFilePath, manifestJSON;
   try {
     jsonFilePath = path.resolve(cwd, filename);
-    manifestJSON = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
+    if (fs.existsSync(jsonFilePath)) {
+      manifestJSON = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
+    }
   } catch (error) {
     return {};
   }
@@ -50,16 +52,18 @@ function readManifestJSONFile (cwd, filename) {
 // look for a manifest file in the current working directory
 function readImportedManifestFile (cwd, filename) {
   let jsFilePath, manifestImported;
+
   try {
     jsFilePath = path.resolve(cwd, filename);
-    console.log(jsFilePath)
-    manifestImported = require(`${jsFilePath}`);
+    if (fs.existsSync(jsFilePath)) {
+      manifestImported = require(`${jsFilePath}`);
+    }
   } catch (error) {
     console.log(error);
     return {};
   }
   return manifestImported;
-};
+}
 
 // returns true if at least two provided objects is non-empty
 function multipleManifests (...manifests) {
