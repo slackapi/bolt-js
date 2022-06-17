@@ -1,4 +1,4 @@
-import { Block, KnownBlock, PlainTextElement } from '@slack/types';
+import { Block, KnownBlock, PlainTextElement, View } from '@slack/types';
 import { AckFn, RespondFn } from '../utilities';
 
 /**
@@ -62,7 +62,7 @@ export interface ViewSubmitAction {
     id: string;
     name: string;
   };
-  response_urls: ViewResponseUrl[];
+  response_urls?: ViewResponseUrl[];
 }
 
 /**
@@ -103,7 +103,7 @@ export interface ViewClosedAction {
 
 export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
   trigger_id: string;
-  response_urls: ViewResponseUrl[];
+  response_urls?: ViewResponseUrl[];
   workflow_step: {
     workflow_step_edit_id: string;
     workflow_id: string;
@@ -174,12 +174,12 @@ export interface ViewOutput {
 
 export interface ViewUpdateResponseAction {
   response_action: 'update';
-  view: ViewOutput;
+  view: View;
 }
 
 export interface ViewPushResponseAction {
   response_action: 'push';
-  view: ViewOutput;
+  view: View;
 }
 
 export interface ViewClearResponseAction {
