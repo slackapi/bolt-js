@@ -1013,6 +1013,26 @@ describe('App event routing', () => {
       assertMiddlewaresNotCalled();
     });
   });
+
+  describe('Quick type compatibility checks', () => {
+    it('app.view ack() method can compile with minimum inputs', async () => {
+      const MockApp = await importApp(buildOverrides([withNoopWebClient()]));
+      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      app.view('callback_id', async ({ ack }) => {
+        await ack({
+          response_action: 'push',
+          view: {
+            type: 'modal',
+            title: {
+              type: 'plain_text',
+              text: 'Title',
+            },
+            blocks: [],
+          },
+        });
+      });
+    });
+  });
 });
 
 /* Testing Harness */
