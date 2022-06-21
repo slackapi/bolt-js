@@ -68,7 +68,6 @@ function readImportedManifestFile (cwd, filename) {
 
 // true if any non empty manifest has been supplied
 function hasManifest(...entries) {
-  console.log(entries);
   for (let ent of entries) {
     if (ent && (Object.keys(ent).length > 0)) {
       return true;
