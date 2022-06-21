@@ -13,27 +13,31 @@ const merge = require('deepmerge');
 */
 (function _(cwd) {
   const file = 'manifest';
-  let manifestJSON, manifestTS, manifestJS;
-  
+  let manifest = {};
+
   // look for a manifest files
-  manifestTS = readImportedManifestFile(cwd, `${file}.ts`);
-  manifestJS = readImportedManifestFile(cwd, `${file}.js`);
-  manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
+  const manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
+  const manifestTS = readImportedManifestFile(cwd, `${file}.ts`);
+  const manifestJS = readImportedManifestFile(cwd, `${file}.js`);
 
   if (!hasManifest(manifestTS, manifestJS, manifestJSON)) {
-    throw new Error('A valid m was found in this project');
+    throw new Error('Unable to find a manifest file in this project');
   }
 
-  // merge if required and return output
-  try {
-    let manifest = merge(manifestJSON, manifestJS);
+  // manage manifest merge
+  // check for .json
+  if (manifestJSON) {
+    manifest = merge(manifest, manifestJSON);
+  }
+  // check for either .ts or .js file
+  if (manifestTS) {
     manifest = merge(manifest, manifestTS);
+  } else if (manifestJS) {
+    manifest = merge(manifest, manifestJS);
+  }
     
     // write the merged manifest to stdout
     console.log(JSON.stringify(manifest));
-  } catch (error) {
-    throw new Error(`Error generating manifest: ${error}`);
-  }
 }(process.cwd()));
 
 // look for manifest.json in the current working directory
@@ -45,7 +49,7 @@ function readManifestJSONFile (cwd, filename) {
       manifestJSON = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
     }
   } catch (error) {
-    return {};
+    return;
   }
   return manifestJSON;
 }
@@ -61,7 +65,7 @@ function readImportedManifestFile (cwd, filename) {
     }
   } catch (error) {
     console.log(error);
-    return {};
+    return;
   }
   return manifestImported;
 }
