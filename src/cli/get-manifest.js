@@ -20,26 +20,27 @@ const merge = require('deepmerge');
   manifestJS = readImportedManifestFile(cwd, `${file}.js`);
   manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
 
-  if (multipleManifests(manifestJS, manifestTS, manifestJSON)) {
-    // console.log('Warning, multiple manifests may exist. We strongly recommend supplying a single manifest file. Valid formats: .ts, .js, or .json.')
+  if (!hasManifest(manifestTS, manifestJS, manifestJSON)) {
+    throw new Error('A valid m was found in this project');
   }
+
   // merge if required and return output
   try {
     let manifest = merge(manifestJSON, manifestJS);
     manifest = merge(manifest, manifestTS);
-    // console.log(manifest);
+    
+    // write the merged manifest to stdout
     console.log(JSON.stringify(manifest));
   } catch (error) {
     throw new Error(`Error generating manifest: ${error}`);
   }
-  // return the manifest
 }(process.cwd()));
 
 // look for manifest.json in the current working directory
 function readManifestJSONFile (cwd, filename) {
   let jsonFilePath, manifestJSON;
   try {
-    jsonFilePath = path.resolve(cwd, filename);
+    jsonFilePath = find(cwd, filename);
     if (fs.existsSync(jsonFilePath)) {
       manifestJSON = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
     }
@@ -54,7 +55,7 @@ function readImportedManifestFile (cwd, filename) {
   let jsFilePath, manifestImported;
 
   try {
-    jsFilePath = path.resolve(cwd, filename);
+    jsFilePath = find(cwd, filename);
     if (fs.existsSync(jsFilePath)) {
       manifestImported = require(`${jsFilePath}`);
     }
@@ -65,17 +66,46 @@ function readImportedManifestFile (cwd, filename) {
   return manifestImported;
 }
 
-// returns true if at least two provided objects is non-empty
-function multipleManifests (...manifests) {
-  let mCount = 0;
-  for (let m of manifests) {
-    if (Object.keys(m).length > 0) {
-      mCount++;
+// true if any non empty manifest has been supplied
+function hasManifest(...entries) {
+  console.log(entries);
+  for (let ent of entries) {
+    if (ent && (Object.keys(ent).length > 0)) {
+      return true;
     }
   }
-  return mCount > 1; 
+  return false;
 }
+
 // removes manifest attributes that don't belong in API payloads
+// TODO, do we need  to be able to export this or should we write this
+// ourselves? 
 // function prepareManifest = (manifest) => {
 //   // remove function source_file
 // }
+
+// recursive search for provided path and return full path when filename is found
+function find(currentPath, targetFilename) {
+  if (currentPath.endsWith(`/${targetFilename}`)) {
+    return currentPath;
+  }
+
+  if (fs.existsSync(currentPath) && fs.lstatSync(currentPath).isDirectory()) {
+    // get entries
+    let foundEntry;
+    let dirents = fs.readdirSync(currentPath);
+    for (let entry of dirents) {
+      if (entry !== 'node_modules') {
+        let newPath = path.resolve(currentPath, entry);
+        foundEntry = find(newPath, targetFilename);
+        if (foundEntry) {
+          return foundEntry;
+        }
+      }
+    }
+  }
+}
+
+
+// :todo: deep merge of arrays is a little janky (it creates multiple values) - test to see if deno does that too
+// :todo: implement a find
