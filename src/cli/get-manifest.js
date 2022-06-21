@@ -27,18 +27,23 @@ const merge = require('deepmerge');
   // manage manifest merge
   // check for .json
   if (manifestJSON) {
-    manifest = merge(manifest, manifestJSON);
+    manifest = merge(manifest, manifestJSON, { arrayMerge: unionMerge});
   }
   // check for either .ts or .js file
   if (manifestTS) {
-    manifest = merge(manifest, manifestTS);
+    manifest = merge(manifest, manifestTS, { arrayMerge: unionMerge });
   } else if (manifestJS) {
-    manifest = merge(manifest, manifestJS);
+    manifest = merge(manifest, manifestJS, { arrayMerge: unionMerge });
   }
     
     // write the merged manifest to stdout
     console.log(JSON.stringify(manifest));
 }(process.cwd()));
+
+// helper array merge function
+function unionMerge (array1, array2) {
+  return [...new Set(array1.concat(array2))];
+}
 
 // look for manifest.json in the current working directory
 function readManifestJSONFile (cwd, filename) {
