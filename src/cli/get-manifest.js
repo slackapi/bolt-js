@@ -34,6 +34,6 @@ const { unionMerge, readManifestJSONFile, readImportedManifestFile, hasManifest 
     manifest = merge(manifest, manifestJS, { arrayMerge: unionMerge });
   }
     
-    // write the merged manifest to stdout
-    console.log(JSON.stringify(manifest));
+  // write the merged manifest to stdout
+  console.log(JSON.stringify(manifest));
 }(process.cwd()));
