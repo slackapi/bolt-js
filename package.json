@@ -38,7 +38,8 @@
   "bin": {
     "slack-cli-get-hooks": "./src/cli/get-hooks.js",
     "slack-cli-get-manifest": "./src/cli/get-manifest.js",
-    "slack-cli-start": "./src/cli/start.js"
+    "slack-cli-start": "./src/cli/start.js",
+    "slack-cli-hook-utils": "./src/cli/hook-utils"
   },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",
