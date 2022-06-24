@@ -38,7 +38,7 @@ describe('Request verification', async () => {
           body: rawBody,
         });
       } catch (e) {
-        assert.equal((e as any).message, 'Failed to verify authenticity: stale');
+        assert.equal((e as any).message, 'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale');
       }
     });
     it('should detect an invalid signature', async () => {
