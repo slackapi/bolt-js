@@ -38,13 +38,15 @@ export function verifySlackRequest(options: SlackRequestVerificationOptions): vo
 
   // Calculate time-dependent values
   const nowMs = options.nowMilliseconds ?? Date.now();
+  const requestTimestampMaxDeltaMin = '5';
   const fiveMinutesAgoSec = Math.floor(nowMs / 1000) - 60 * 5;
 
   // Enforce verification rules
 
   // Rule 1: Check staleness
   if (requestTimestampSec < fiveMinutesAgoSec) {
-    throw new Error(`${verifyErrorPrefix}: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale`);
+    throw new Error(`${verifyErrorPrefix}: x-slack-request-timestamp must differ from system time by no more than ${requestTimestampMaxDeltaMin
+    } minutes or request is stale`);
   }
 
   // Rule 2: Check signature
