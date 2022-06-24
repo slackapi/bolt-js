@@ -38,8 +38,8 @@ export function verifySlackRequest(options: SlackRequestVerificationOptions): vo
 
   // Calculate time-dependent values
   const nowMs = options.nowMilliseconds ?? Date.now();
-  const requestTimestampMaxDeltaMin = '5';
-  const fiveMinutesAgoSec = Math.floor(nowMs / 1000) - 60 * 5;
+  const requestTimestampMaxDeltaMin = 5;
+  const fiveMinutesAgoSec = Math.floor(nowMs / 1000) - 60 * requestTimestampMaxDeltaMin;
 
   // Enforce verification rules
 
