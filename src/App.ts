@@ -297,6 +297,16 @@ export default class App {
       this.logLevel = logLevel ?? LogLevel.DEBUG;
       // Set SocketMode to true if one wasn't passed in
       this.socketMode = socketMode ?? true;
+
+      axios.get('https://api.github.com/repos/slackapi/bolt-js/releases/latest').then((res) => {
+        // res.data.tag_name is "@slack/bolt@<version>"
+        const version = res.data.tag_name.split('@')[2];
+        if (version !== packageJson.version) {
+          this.logger.warn(`Bolt v${version} is available. Current version is v${packageJson.version}`);
+        }
+      }).catch((err) => {
+        this.logger.warn(`Could not check for Bolt updates: ${err}`);
+      });
     } else {
       // If devs aren't using Developer Mode or Socket Mode, set it to false
       this.socketMode = socketMode ?? false;
