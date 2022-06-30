@@ -1,5 +1,5 @@
 import { View, MessageAttachment, KnownBlock, Block } from '@slack/types';
-import { MessageEvent as AllMessageEvents } from './message-events';
+import { MessageEvent as AllMessageEvents, MessageMetadataEvent as AllMessageMetadataEvents } from './message-events';
 
 /**
  * All known event types in Slack's Events API
@@ -54,6 +54,7 @@ export type SlackEvent =
   | MemberJoinedChannelEvent
   | MemberLeftChannelEvent
   | MessageEvent
+  | MessageMetadataEvent
   | PinAddedEvent
   | PinRemovedEvent
   | ReactionAddedEvent
@@ -584,6 +585,8 @@ export interface MemberLeftChannelEvent {
 }
 
 export type MessageEvent = AllMessageEvents;
+
+export type MessageMetadataEvent = AllMessageMetadataEvents;
 
 export interface PinnedMessageItem {
   client_msg_id?: string;
