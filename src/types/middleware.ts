@@ -64,6 +64,10 @@ export interface Context extends StringIndexed {
    * Enterprise Grid Organization ID.
    */
   enterpriseId?: string;
+  /**
+   * Is the app installed at an Enterprise level?
+   */
+  isEnterpriseInstall: boolean,
 
   /**
    * Retry count of an Events API request (this property does not exist for other requests)
