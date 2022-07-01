@@ -321,6 +321,7 @@ export interface MessageMetadataDeletedEvent {
   user_id: string;
   team_id: string;
   message_ts: string;
+  deleted_ts: string;
 }
 
 export type channelTypes = 'channel' | 'group' | 'im' | 'mpim' | 'app_home';
