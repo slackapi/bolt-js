@@ -607,7 +607,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   public message<
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    filter: MessageEventMiddleware, pattern: string | RegExp,
+    filter: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
+    pattern: string | RegExp,
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
