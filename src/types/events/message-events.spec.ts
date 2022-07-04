@@ -242,6 +242,7 @@ describe('Events API payload types (message events)', () => {
       user_id: 'U123',
       team_id: 'T111',
       message_ts: '',
+      deleted_ts: ''
     };
     assert.isNotEmpty(payload);
   });
