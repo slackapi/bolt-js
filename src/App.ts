@@ -828,7 +828,9 @@ export default class App {
           error: e,
           logger: this.logger,
           body: bodyArg,
-          context: {},
+          context: {
+            isEnterpriseInstall,
+          },
         });
       }
     }
@@ -854,6 +856,7 @@ export default class App {
     const context: Context = {
       ...authorizeResult,
       ...event.customProperties,
+      isEnterpriseInstall,
       retryNum: event.retryNum,
       retryReason: event.retryReason,
     };
@@ -1329,7 +1332,7 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     if (type === IncomingEventType.Event) {
       const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
       if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
-        // The enteprise_id here can be null when the workspace is not in an Enterprise Grid
+        // The enterprise_id here can be null when the workspace is not in an Enterprise Grid
         const theId = bodyAsEvent.authorizations[0].enterprise_id;
         return theId !== null ? theId : undefined;
       }

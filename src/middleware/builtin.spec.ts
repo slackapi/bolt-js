@@ -225,7 +225,9 @@ describe('Built-in global middleware', () => {
       const fakeArgs = {
         next: () => Promise.resolve(),
         message: createFakeMessageEvent(),
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
       } as unknown as MessageMiddlewareArgs;
       const { directMention } = await importBuiltin();
 
@@ -510,7 +512,9 @@ describe('Built-in global middleware', () => {
         respond: noop,
         ack: noop,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
       };
       await onlyCommands(args);
       assert.isTrue(fakeNext.called);
@@ -530,7 +534,9 @@ describe('Built-in global middleware', () => {
         respond: noop,
         ack: noop,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
       };
       await onlyCommands(args);
       assert.isTrue(fakeNext.notCalled);
@@ -553,7 +559,9 @@ describe('Built-in global middleware', () => {
         respond: noop,
         ack: noop,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
       };
     }
 
@@ -604,7 +612,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ...args,
       };
       // FIXME: Using any is a workaround for TypeScript 4.7 breaking changes
@@ -626,7 +636,9 @@ describe('Built-in global middleware', () => {
         respond: noop,
         ack: noop,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
       };
       await onlyEvents(args);
       assert.isFalse(fakeNext.called);
@@ -690,7 +702,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       };
       await matchEventType('app_mention')(args);
@@ -706,7 +720,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       };
       await matchEventType(/app_mention|app_home_opened/)(args);
@@ -722,7 +738,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       };
       await matchEventType(/app_mention|app_home_opened/)(args);
@@ -738,7 +756,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       };
       await matchEventType('app_home_opened')(args);
@@ -754,7 +774,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       } as any;
       await matchEventType(/foo/)(args);
@@ -796,7 +818,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       };
       await subtype('bot_message')(args);
@@ -812,7 +836,9 @@ describe('Built-in global middleware', () => {
         logger,
         client,
         next: fakeNext,
-        context: {},
+        context: {
+          isEnterpriseInstall: false,
+        },
         ..._args,
       };
       await subtype('me_message')(args);
