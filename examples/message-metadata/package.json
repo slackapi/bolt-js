@@ -10,7 +10,6 @@
   "author": "Slack Technologies, LLC",
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^3.12.0",
-    "@slack/types": "^2.7.0"
+    "@slack/bolt": "^3.12.0"
   }
 }
