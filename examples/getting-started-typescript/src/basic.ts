@@ -3,10 +3,6 @@
 /* eslint-disable import/no-internal-modules */
 import './utils/env';
 import { App, LogLevel, subtype, BotMessageEvent, BlockAction } from '@slack/bolt';
-import {
-  isGenericMessageEvent,
-  isMessageItem,
-} from './utils/helpers';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -19,9 +15,9 @@ const app = new App({
  */
 // This will match any message that contains 👋
 app.message(':wave:', async ({ message, say }) => {
-  if (!isGenericMessageEvent(message)) return;
-
-  await say(`Hello, <@${message.user}>`);
+  if (message.subtype === undefined || message.subtype === 'bot_message') {
+    await say(`Hello, <@${message.user}>`);
+  }
 });
 
 /**
@@ -35,7 +31,7 @@ app.message('knock knock', async ({ say }) => {
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
 app.event('reaction_added', async ({ event, client }) => {
   // Could be a file that was reacted upon
-  if (event.reaction === 'calendar' && isMessageItem(event.item)) {
+  if (event.reaction === 'calendar' && event.item.type === 'message') {
     await client.chat.postMessage({
       text: 'Pick a reminder date',
       channel: event.item.channel,
