@@ -63,7 +63,7 @@ describe('Slack CLI Script Hooks: get-manifest utilities', () => {
   
       // when target doesn't exist
       const result2 = find(cwd, 'hobbitses.js');
-      expect(result2).to.equal(undefined);
+      expect(result2).to.equal(null);
   
       // when multiple similar files exist, it is greedy
       const result3 = find(cwd, 'nazgul.js');

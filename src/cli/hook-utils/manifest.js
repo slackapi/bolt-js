@@ -65,6 +65,7 @@ function find(currentPath, targetFilename) {
         }
       }
     }
+    return null;
   }
 }
 
