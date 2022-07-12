@@ -68,9 +68,12 @@ describe('Slack CLI Script Hooks: get-manifest utilities', () => {
       // when multiple similar files exist, it is greedy
       const result3 = find(cwd, 'nazgul.js');
       expect(result3).to.equal(`${cwd}/eriador/shire/nazgul.js`);
-  
-      // cleanup
-      mockfs.restore();
+    });
+    it('should not search within node_modules', () => {
+      const cwd = '/middle-earth';
+      //test
+      const result = find(cwd, 'node_modules');
+      expect(result).to.equal(null);
     });
   });
   describe('manifest imports', () => {
