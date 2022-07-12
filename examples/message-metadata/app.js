@@ -17,7 +17,7 @@ const app = new App({
 // Post a message with Message Metadata
 app.command('/post', async ({ ack, command, say }) => {
   await ack();
-  say({
+  await say({
     text: "Message Metadata Posting",
     metadata: {
       "event_type": "my_event",
@@ -30,7 +30,7 @@ app.command('/post', async ({ ack, command, say }) => {
 
 app.event('message_metadata_posted', async ({ event, say }) => {
   const { message_ts: thread_ts } = event;
-  say({
+  await say({
     text: "Message Metadata Posted",
     blocks: [
       {
