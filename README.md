@@ -91,8 +91,11 @@ The arguments are grouped into properties of one object, so that it's easier to 
 ```js
 // Reverse all messages the app can hear
 app.message(async ({ message, say }) => {
-  const reversedText = [...message.text].reverse().join("");
-  await say(reversedText);
+  // Filter out message events with subtypes (see https://api.slack.com/events/message)
+  if (message.subtype === undefined || message.subtype === 'bot_message') {
+    const reversedText = [...message.text].reverse().join("");
+    await say(reversedText);
+  }
 });
 ```
 
