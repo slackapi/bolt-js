@@ -182,7 +182,9 @@ export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 }
 
 // Used only in this file
-type MessageEventMiddleware = Middleware<SlackEventMiddlewareArgs<'message'>>;
+type MessageEventMiddleware<
+    CustomContext extends StringIndexed = StringIndexed,
+> = Middleware<SlackEventMiddlewareArgs<'message'>, CustomContext>;
 
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
@@ -201,7 +203,7 @@ class WebClientPool {
 /**
  * A Slack App
  */
-export default class App {
+export default class App<AppCustomContext extends StringIndexed = StringIndexed> {
   /** Slack Web API client */
   public client: WebClient;
 
@@ -488,8 +490,10 @@ export default class App {
    *
    * @param m global middleware function
    */
-  public use(m: Middleware<AnyMiddlewareArgs>): this {
-    this.middleware.push(m);
+  public use<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
+    m: Middleware<AnyMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>,
+  ): this {
+    this.middleware.push(m as Middleware<AnyMiddlewareArgs>);
     return this;
   }
 
@@ -528,17 +532,26 @@ export default class App {
     return this.receiver.stop(...args);
   }
 
-  public event<EventType extends string = string>(
+  public event<
+      EventType extends string = string,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  public event<EventType extends RegExp = RegExp>(
+  public event<
+      EventType extends RegExp = RegExp,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  public event<EventType extends EventTypePattern = EventTypePattern>(
+  public event<
+      EventType extends EventTypePattern = EventTypePattern,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     eventNameOrPattern: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<string>>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     let invalidEventName = false;
     if (typeof eventNameOrPattern === 'string') {
@@ -568,14 +581,21 @@ export default class App {
    *
    * @param listeners Middlewares that process and react to a message event
    */
-  public message(...listeners: MessageEventMiddleware[]): void;
+  public message<
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]): void;
   /**
    *
    * @param pattern Used for filtering out messages that don't match.
    * Strings match via {@link String.prototype.includes}.
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
-  public message(pattern: string | RegExp, ...listeners: MessageEventMiddleware[]): void;
+  public message<
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    pattern: string | RegExp,
+    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+  ): void;
   /**
    *
    * @param filter Middleware that can filter out messages. Generally this is done by returning before
@@ -584,8 +604,12 @@ export default class App {
    * via {@link String.prototype.includes}.
    * @param listeners Middlewares that process and react to the message events that matched the provided pattern.
    */
-  public message(
-    filter: MessageEventMiddleware, pattern: string | RegExp, ...listeners: MessageEventMiddleware[]
+  public message<
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    filter: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
+    pattern: string | RegExp,
+    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
    *
@@ -593,15 +617,28 @@ export default class App {
    * {@link AllMiddlewareArgs.next} if there is no match. See {@link directMention} for an example.
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
-  public message(filter: MessageEventMiddleware, ...listeners: MessageEventMiddleware[]): void;
+  public message<
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    filter: MessageEventMiddleware,
+    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+  ): void;
   /**
    * This allows for further control of the filtering and response logic. Patterns and middlewares are processed in
    * the order provided. If any patterns do not match, or a middleware does not call {@link AllMiddlewareArgs.next},
    * all remaining patterns and middlewares will be skipped.
    * @param patternsOrMiddleware A mix of patterns and/or middlewares.
    */
-  public message(...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware)[]): void;
-  public message(...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware)[]): void {
+  public message<
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+  ): void;
+  public message<
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+  ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
       if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
         return matchMessage(patternOrMiddleware);
@@ -617,23 +654,28 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public shortcut<Shortcut extends SlackShortcut = SlackShortcut>(
+  public shortcut<
+    Shortcut extends SlackShortcut = SlackShortcut,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     callbackId: string | RegExp,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>>[]
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Shortcut>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     constraints: Constraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     Constraints extends ShortcutConstraints<Shortcut> = ShortcutConstraints<Shortcut>,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     callbackIdOrConstraints: string | RegExp | Constraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>>[]
+    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     const constraints: ShortcutConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
       { callback_id: callbackIdOrConstraints } :
@@ -659,24 +701,29 @@ export default class App {
 
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://web.archive.org/web/20210629110615/https://basarat.gitbook.io/typescript/type-system/generics#motivation-and-samples
-  public action<Action extends SlackAction = SlackAction>(
+  public action<
+    Action extends SlackAction = SlackAction,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     actionId: string | RegExp,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Action>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Action>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     constraints: Constraints,
     // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     actionIdOrConstraints: string | RegExp | Constraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>>[]
+    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     // Normalize Constraints
     const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
@@ -699,7 +746,12 @@ export default class App {
     this.listeners.push([onlyActions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public command(commandName: string | RegExp, ...listeners: Middleware<SlackCommandMiddlewareArgs>[]): void {
+  public command<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
+    commandName: string | RegExp, ...listeners: Middleware<
+    SlackCommandMiddlewareArgs,
+    AppCustomContext & MiddlewareCustomContext
+    >[]
+  ): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
     this.listeners.push([
@@ -709,19 +761,28 @@ export default class App {
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public options<Source extends OptionsSource = 'block_suggestion'>(
+  public options<
+    Source extends OptionsSource = 'block_suggestion',
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     actionId: string | RegExp,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  // TODO: reflect the type in constraits to Source
-  public options<Source extends OptionsSource = OptionsSource>(
+  // TODO: reflect the type in constraints to Source
+  public options<
+    Source extends OptionsSource = OptionsSource,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     constraints: ActionConstraints,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  // TODO: reflect the type in constraits to Source
-  public options<Source extends OptionsSource = OptionsSource>(
+  // TODO: reflect the type in constraints to Source
+  public options<
+    Source extends OptionsSource = OptionsSource,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     actionIdOrConstraints: string | RegExp | ActionConstraints,
-    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>>[]
+    ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
       { action_id: actionIdOrConstraints } :
@@ -732,17 +793,26 @@ export default class App {
     this.listeners.push([onlyOptions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  public view<ViewActionType extends SlackViewAction = SlackViewAction>(
+  public view<
+    ViewActionType extends SlackViewAction = SlackViewAction,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     callbackId: string | RegExp,
-    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  public view<ViewActionType extends SlackViewAction = SlackViewAction>(
+  public view<
+    ViewActionType extends SlackViewAction = SlackViewAction,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     constraints: ViewConstraints,
-    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  public view<ViewActionType extends SlackViewAction = SlackViewAction>(
+  public view<
+    ViewActionType extends SlackViewAction = SlackViewAction,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
-    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>>[]
+    ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     const constraints: ViewConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
       { callback_id: callbackIdOrConstraints, type: 'view_submission' } :
