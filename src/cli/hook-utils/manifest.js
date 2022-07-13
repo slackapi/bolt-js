@@ -48,6 +48,10 @@ function hasManifest(...entries) {
 }
 
 // recursive search for provided path and return full path when filename is found
+// TODO: Cache searched paths and check that they haven't been explored already
+// This guards against rare edge case of a subdir in the file tree which is 
+// symlinked back to root or in such a way that creates a cycle. Can also implement
+// max depth check. 
 function find(currentPath, targetFilename) {
   if (currentPath.endsWith(`/${targetFilename}`)) {
     return currentPath;
