@@ -1,0 +1,15 @@
+{
+  "name": "bolt-message-metadata-example",
+  "version": "1.0.0",
+  "description": "Example app to manage Message Metadata events.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Slack Technologies, LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.12.0"
+  }
+}

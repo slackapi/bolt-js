@@ -1,4 +1,4 @@
-import { MessageAttachment, KnownBlock, Block } from '@slack/types';
+import { MessageAttachment, KnownBlock, Block, MessageMetadata } from '@slack/types';
 
 export type MessageEvent =
   | GenericMessageEvent
@@ -18,6 +18,11 @@ export type MessageEvent =
   | MessageDeletedEvent
   | MessageRepliedEvent
   | ThreadBroadcastMessageEvent;
+
+export type MessageMetadataEvent =
+| MessageMetadataPostedEvent
+| MessageMetadataUpdatedEvent
+| MessageMetadataDeletedEvent;
 
 export interface GenericMessageEvent {
   type: 'message';
@@ -279,6 +284,44 @@ export interface ThreadBroadcastMessageEvent {
   client_msg_id: string;
   channel: string;
   channel_type: channelTypes;
+}
+
+export interface MessageMetadataPostedEvent {
+  type: 'message_metadata_posted';
+  app_id: string;
+  bot_id?: string;
+  user_id: string;
+  team_id: string;
+  channel_id: string;
+  metadata: MessageMetadata;
+  message_ts: string;
+  event_ts: string;
+}
+
+export interface MessageMetadataUpdatedEvent {
+  type: 'message_metadata_updated';
+  channel_id: string;
+  event_ts: string;
+  previous_metadata: MessageMetadata;
+  app_id: string;
+  bot_id?: string;
+  user_id: string;
+  team_id: string;
+  message_ts: string;
+  metadata: MessageMetadata;
+}
+
+export interface MessageMetadataDeletedEvent {
+  type: 'message_metadata_deleted';
+  channel_id: string;
+  event_ts: string;
+  previous_metadata: MessageMetadata;
+  app_id: string;
+  bot_id?: string;
+  user_id: string;
+  team_id: string;
+  message_ts: string;
+  deleted_ts: string;
 }
 
 export type channelTypes = 'channel' | 'group' | 'im' | 'mpim' | 'app_home';

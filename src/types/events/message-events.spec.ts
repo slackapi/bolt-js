@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { BotMessageEvent, GenericMessageEvent, MessageEvent } from './message-events';
+import { BotMessageEvent, GenericMessageEvent, MessageEvent, MessageMetadataEvent } from './message-events';
 
 describe('Events API payload types (message events)', () => {
   it('should be compatible with bot_message payload', () => {
@@ -179,6 +179,70 @@ describe('Events API payload types (message events)', () => {
       channel: 'C111',
       event_ts: '1610261539.000900',
       channel_type: 'channel',
+    };
+    assert.isNotEmpty(payload);
+  });
+  it('should be compatible with message_metadata_posted payload', () => {
+    const payload: MessageMetadataEvent = {
+      type: 'message_metadata_posted',
+      app_id: 'A222',
+      bot_id: 'B999',
+      user_id: 'U123',
+      team_id: 'T111',
+      channel_id: 'C111',
+      metadata: {
+        event_type: '',
+        event_payload: {
+          key: 'value',
+        },
+      },
+      message_ts: '',
+      event_ts: '',
+    };
+    assert.isNotEmpty(payload);
+  });
+  it('should be compatible with message_metadata_updated payload', () => {
+    const payload: MessageMetadataEvent = {
+      type: 'message_metadata_updated',
+      channel_id: 'C111',
+      event_ts: '',
+      previous_metadata: {
+        event_type: '',
+        event_payload: {
+          key: 'value',
+        },
+      },
+      app_id: 'A222',
+      bot_id: 'B999',
+      user_id: 'U123',
+      team_id: 'T111',
+      message_ts: '',
+      metadata: {
+        event_type: '',
+        event_payload: {
+          key: 'value',
+        },
+      },
+    };
+    assert.isNotEmpty(payload);
+  });
+  it('should be compatible with message_metadata_deleted payload', () => {
+    const payload: MessageMetadataEvent = {
+      type: 'message_metadata_deleted',
+      channel_id: 'C111',
+      event_ts: '',
+      previous_metadata: {
+        event_type: '',
+        event_payload: {
+          key: 'value',
+        },
+      },
+      app_id: 'A222',
+      bot_id: 'B999',
+      user_id: 'U123',
+      team_id: 'T111',
+      message_ts: '',
+      deleted_ts: ''
     };
     assert.isNotEmpty(payload);
   });
