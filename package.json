@@ -29,7 +29,7 @@
     "build": "tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "eslint --fix --ext .ts src",
-    "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
+    "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\" \"src/**/*.spec.js\"",
     "test": "npm run lint && npm run mocha && npm run test:types",
     "test:types": "tsd",
     "coverage": "codecov",
@@ -37,8 +37,9 @@
   },
   "bin": {
     "slack-cli-get-hooks": "./src/cli/get-hooks.js",
-    "slack-cli-get-manifest": "./src/cli/manifest.js",
-    "slack-cli-start": "./src/cli/start.js"
+    "slack-cli-get-manifest": "./src/cli/get-manifest.js",
+    "slack-cli-start": "./src/cli/start.js",
+    "slack-cli-hook-utils": "./src/cli/hook-utils/manifest.js"
   },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",
@@ -56,6 +57,7 @@
     "@types/promise.allsettled": "^1.0.3",
     "@types/tsscmp": "^1.0.0",
     "axios": "^0.26.1",
+    "deepmerge": "^4.2.2",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "please-upgrade-node": "^3.2.0",
@@ -80,14 +82,16 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.29.3",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "memfs": "^3.4.6",
     "mocha": "^9.1.3",
+    "mock-fs": "^5.1.2",
     "nyc": "^15.1.0",
     "rewiremock": "^3.13.4",
     "shx": "^0.3.2",
     "sinon": "^7.3.1",
     "source-map-support": "^0.5.12",
     "ts-node": "^8.1.0",
-    "tsd": "^0.13.1",
+    "tsd": "^0.22.0",
     "typescript": "^4.1.0"
   },
   "tsd": {
