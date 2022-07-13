@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 console.log(JSON.stringify({
   hooks: {
-    'get-manifest': 'npm exec --package=@slack/bolt slack-cli-get-manifest',
-    start: 'npm exec --package=@slack/bolt slack-cli-start',
+    'get-manifest': 'npx -q --no-install -p @slack/bolt slack-cli-get-manifest',
+    start: 'npx -q --no-install -p @slack/bolt slack-cli-start',
   },
   config: {
     watch: {
