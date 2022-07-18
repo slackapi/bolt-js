@@ -61,6 +61,16 @@ export {
 } from './WorkflowStep';
 
 export {
+  Manifest,
+  SlackManifestType,
+  DefineFunction,
+  DefineWorkflow,
+  DefineType,
+  DefineDatastore,
+  Schema
+} from './Manifest';
+
+export {
   Installation,
   InstallURLOptions,
   InstallationQuery,
