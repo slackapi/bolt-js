@@ -5,7 +5,6 @@ import {
   DefineWorkflow,
   DefineType,
   Schema,
-  DefineDatastore,
   ManifestSchema
 } from '@slack/deno-slack-sdk';
 
@@ -20,6 +19,5 @@ export type {
   DefineFunction,
   DefineWorkflow,
   DefineType,
-  DefineDatastore,
   Schema
 };
