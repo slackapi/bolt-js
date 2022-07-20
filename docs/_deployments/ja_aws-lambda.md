@@ -64,22 +64,16 @@ aws configure
 
 ### Serverless Framework をセットアップする
 
-[Serverless Framework](https://www.serverless.com/open-source/) では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
+[Serverless Framework][serverless-framework] では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
 
 **1. Serverless Framework CLI をインストールする**
 
-Serverless でも [macOS、Windows、Linux](https://www.serverless.com/framework/docs/getting-started/) にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールには npm を使用します。次のコマンドを実行してください。
-
-```shell
-npm install --save-dev serverless
-```
-
-> 💡 [Serverless CLI をグローバルにインストールする](https://www.serverless.com/framework/docs/getting-started/)こともできます。その場合は`npm install -g serverless` というコマンドを実行します。
+Serverless でも macOS、Windows、Linux にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールするには Serverless の[入門ガイド（英語）](https://www.serverless.com/framework/docs/getting-started/) をお読みください。
 
 インストールが完了したら Serverless CLI をテストするため、利用可能なコマンドを表示してみましょう。
 
 ```shell
-npx serverless help
+serverless help
 ```
 
 Serverless のツールのセットアップが完了しました。次に、AWS Lambda 関数として実行する Bolt アプリの準備へと進みましょう。
@@ -139,13 +133,16 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 
 // ボットトークンと、AWS Lambda に対応させたレシーバーを使ってアプリを初期化します。
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  receiver: awsLambdaReceiver,
-  // `processBeforeResponse` オプションは、あらゆる FaaS 環境で必須です。
-  // このオプションにより、Bolt フレームワークが `ack()` などでリクエストへの応答を返す前に
-  // `app.message` などのメソッドが Slack からのリクエストを処理できるようになります。FaaS では
-  // 応答を返した後にハンドラーがただちに終了してしまうため、このオプションの指定が重要になります。
-  processBeforeResponse: true
+    token: process.env.SLACK_BOT_TOKEN,
+    receiver: awsLambdaReceiver,
+    
+    // AwsLambdaReceiver を利用する場合は  `processBeforeResponse` は省略可能です。
+    // OAuth フローに対応した ExpressReceiver など、他のレシーバーを使用する場合、
+    // `processBeforeResponse: true` が必要になります。
+    // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
+    // これによってハンドラーがトリガーとなった HTTP リクエストに応答を返すことでただちに終了されることを防ぐことができます。
+    
+    //processBeforeResponse: true
 });
 ```
 
@@ -187,7 +184,7 @@ plugins:
   - serverless-offline
 ```
 
-> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/tutorial/getting-started#setting-up-your-local-project)を入門ガイドで参照してください。
+> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/tutorial/getting-started#setting-up-your-project)を入門ガイドで参照してください。
 
 **3. serverless-offline モジュールをインストールする**
 
@@ -209,11 +206,12 @@ npm install --save-dev serverless-offline
 
 **1. ローカルのサーバーを起動する**
 
-まず、AWS Lambda 関数のイベントをリッスンするため、`serverless offline` コマンドを実行します。
+まず、アプリの起動と AWS Lambda 関数のイベントをリッスンするため、`serverless offline` コマンドを実行します。
 
 ```zsh
-npx serverless offline --noPrependStageInUrl
+serverless offline --noPrependStageInUrl
 ```
+> 🏌️ Pro-tip: 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
 
 次に、ngrok を使って Slack のイベントをローカルマシンに転送します。
 
@@ -252,6 +250,8 @@ Slack アプリをテストします。今作った Bolt アプリを Slack の�
 
 ### アプリをデプロイする
 
+今までローカルでアプリを実行し、 Slack ワークスペースでテストをしてきました。さて、動作するアプリができたので、デプロイしてみましょう!
+
 AWS Lambda 向けのアプリのプロビジョニング、パッケージング、デプロイには、Serverless Framework のツールが利用できます。アプリのデプロイが完了したら、アプリのリクエスト URL を更新して、「hello」と入力した時にアプリが応答できるようにします。✨
 
 **1. AWS Lambda にアプリをデプロイする**
@@ -259,7 +259,7 @@ AWS Lambda 向けのアプリのプロビジョニング、パッケージング
 次のコマンドを使って AWS Lambda にアプリをデプロイします。
 
 ```shell
-npx serverless deploy
+serverless deploy
 # Serverless:Packaging service...
 # ...
 # endpoints:
@@ -309,10 +309,12 @@ app.message('goodbye', async ({ message, say }) => {
 先ほどと同じコマンドを使って更新をデプロイします。
 
 ```shell
-npx serverless deploy
+serverless deploy
 ```
 
 デプロイが完了したら、アプリを参加させた Slack チャンネルを開いて、半角の小文字で「goodbye」と入力してみましょう。Slack アプリに「See you later」と表示されるはずです。
+
+> ⛳️ 一つの関数に小さな変更を加える場合、その関数だけをデプロイするためにより高速な `serverless deploy function -f my-function` を実行することができます。より詳細なヘルプを見るには `serverless help deploy function` を実行してください。
 
 ---
 

@@ -68,7 +68,7 @@ The [Serverless Framework][serverless-framework] includes tools that let you eas
 
 **1. Install the Serverless Framework CLI**
 
-The Serverless tools are available as a Command Line Interface (CLI) and can be [installed on macOS, Windows, or Linux](https://www.serverless.com/framework/docs/getting-started/). Check out the [Serverless Getting Started documentation](https://www.serverless.com/framework/docs/getting-started/) for instructions on how to install.
+The Serverless tools are available as a Command Line Interface (CLI) and can be installed on macOS, Windows, or Linux. Check out the [Serverless Getting Started documentation](https://www.serverless.com/framework/docs/getting-started/) for instructions on how to install.
 
 Once the installation is complete, test the Serverless CLI by displaying the commands available to you:
 
@@ -139,7 +139,7 @@ const app = new App({
     // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
     // If you use other Receivers, such as ExpressReceiver for OAuth flow support
     // then processBeforeResponse: true is required. This option will defer sending back
-    // the acknowledgement until after your handler has run to ensure your function
+    // the acknowledgement until after your handler has run to ensure your handler
     // isn't terminated early by responding to the HTTP request that triggered it.
 
     // processBeforeResponse: true
@@ -186,7 +186,7 @@ plugins:
 ```
 
 > 💡 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be enviornment variables on your local machine.
-> You can [learn how to export Slack environment variables](/bolt-js/tutorial/getting-started#setting-up-your-local-project) in our Getting Started guide.
+> You can [learn how to export Slack environment variables](/bolt-js/tutorial/getting-started#setting-up-your-project) in our Getting Started guide.
 
 **3. Install Serverless Offline**
 
