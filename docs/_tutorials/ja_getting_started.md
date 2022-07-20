@@ -126,7 +126,7 @@ node app.js
 
 Slack ワークスペースで発生するイベント（メッセージが投稿されたときや、メッセージに対するリアクションがつけられたときなど）をリッスンするには、[Events API を使って特定の種類のイベントをサブスクライブします](https://api.slack.com/events-api)。このチュートリアルでは、[ソケットモード](https://api.slack.com/apis/connections/socket)を使用します。Socketモードは、チームのために何かを作り始めたばかりの人にお勧めのオプションです。
 
-> 💡 ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)など）にデプロイするアプリや Slack App Directoryで配布されるアプリに適しています。HTTP での情報については[こちらのドキュメント](/bolt-js/ja-jp/tutorial/getting-started-http)を参照してください。
+> 💡 ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/bolt-js/ja-jp/deployments/aws-lambda) or [Heroku](/bolt-js/ja-jp/deployments/heroku)など）にデプロイするアプリや Slack App Directoryで配布されるアプリに適しています。HTTP での情報については[こちらのドキュメント](/bolt-js/ja-jp/tutorial/getting-started-http)を参照してください。
 
 
 それではソケットモードを有効にします。

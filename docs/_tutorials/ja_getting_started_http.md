@@ -312,4 +312,4 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 * Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/bolt-js/ja-jp/concepts#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
 
-* 異なるトークンの種類については、[APIサイト](https://api.slack.com/docs/token-types)を参照してください。アプリケーションが実行したいアクションに応じて、異なるトークンが必要になる場合があります。HTTPではなく[Socket Mode](/bolt-js/tutorial/getting-started)を使用している場合は、`connections:write`スコープを持つ追加の(`xapp`)トークンが必要です。
+* 異なるトークンの種類については、[APIサイト](https://api.slack.com/docs/token-types)を参照してください。アプリケーションが実行したいアクションに応じて、異なるトークンが必要になる場合があります。HTTPではなく[Socket Mode](/bolt-js/ja-jp/tutorial/getting-started)を使用している場合は、`connections:write`スコープを持つ追加の(`xapp`)トークンが必要です。

@@ -24,10 +24,10 @@ This guide is intended to detail the Bolt interface–including listeners and th
 
 ---
 
-## Listener functions
+## Listener functions {#listener-functions}
 Slack apps typically receive and/or respond to one to many incoming events from Slack. This can be something like listening to an Events API event (like when a link associated with your app is shared) or a user invoking one of your app's shortcuts. For each type of incoming request from Slack, there are distinct methods that you can pass **listener functions** to handle and respond to the event.
 
-### Methods
+### Methods {#methods}
 Below is the current list of methods that accept listener functions. These methods handle specific event types coming from Slack, and typically include an identifing parameter before the listener function. The identifying parameter (included below) narrows the events to specific interactions that your listener function is intended to handle, such as a specific `callback_id`, or a certain substring within a message.
 
 | Method                          | Description |
@@ -51,7 +51,7 @@ There are a collection of constraint objects that some methods have access to. T
 | `app.view(constraints, fn)` | `type`, `callback_id` | `type` must either be `view_closed` or `view_submission`, which determines what specific event your listener function is sent. `callback_id` is the `callback_id` of the view that is sent when your app opens the modal. |
 | `app.options(constraints, fn)` | `block_id`, `action_id`, `callback_id` | Optionally listens for `block_id` and `callback_id` in addition to `action_id`. `callback_id` can only be passed when handling options elements within modals. |
 
-### Listener function arguments
+### Listener function arguments {#listener-function-arguments}
 Listener functions have access to a set of arguments that may change based on the method which the function is passed to. Below is an explanation of the different arguments. The below table details the different arguments and the methods they'll be accessible in.
 
 | Argument  | Description  |
@@ -73,13 +73,13 @@ The structure of the `payload` and `body` is detailed on the API site:
 - `view`: [`view_submission` `body` and `payload`](https://api.slack.com/reference/interaction-payloads/views#view_submission); [`view_closed` `body` and `payload`](https://api.slack.com/reference/interaction-payloads/views#view_closed)
 - `options`: [`body` and `payload`](https://api.slack.com/reference/block-kit/block-elements#external_select)
 
-### Difference from listener middleware
+### Difference from listener middleware {#difference-from-listener-middleware}
 Listener middleware is used to implement logic across many listener functions (though usually not all of them). Listener middleware has the same arguments as the above listener functions, with one distinction: they also have a `next()` function that **must** be called in order to pass the chain of execution. Learn more about listener middleware [in the documentation](/bolt-js/concepts#listener-middleware).
 
-## Initialization options
+## Initialization options  {#initialization-options}
 Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `HTTPReceiver` (so they'll work as long as you aren't using a custom receiver).
 
-### Receiver options
+### Receiver options {#receiver-options}
 `HTTPReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `HTTPReceiver` instance upon initialization.
 
 | Option  | Description  |
@@ -99,7 +99,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `unhandledRequestTimeoutMillis` | How long to wait, in milliseconds, from the time a request is received to when the `unhandledRequestHandler` should be triggered. Default is `3001`. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
 | `signatureVerification` | `boolean` that determines whether Bolt should [verify Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack). Defaults to `true`. |
 
-### App options
+### App options {#app-options}
 App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialize either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
 
 | Option  | Description  |
@@ -124,7 +124,7 @@ App options are passed into the `App` constructor. When the `receiver` argument 
 
 > Bolt's client is an instance of `WebClient` from the [Node Slack SDK](/node-slack-sdk), so some of that documentation may be helpful as you're developing.
 
-## Framework error types
+## Framework error types {#framework-error-types}
 Bolt includes a set of error types to make errors easier to handle, with more specific contextual information. Below is a non-exhaustive list of error codes you may run into during development:
 
 | Error code                         | Details |
@@ -140,7 +140,7 @@ Bolt includes a set of error types to make errors easier to handle, with more sp
 
 > You can read the code for error definition and construction [in errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts).
 
-### Client errors
+### Client errors {#client-errors}
 Bolt imports a `WebClient` to call Slack's APIs. Below is a set of errors you may encounter when making API calls with the client, though you can read more [in the web API documentation](/node-slack-sdk/web-api#handle-errors). When handling client errors, more information can be found in the body within the `data` property.
 
 | Error code                         | Details |

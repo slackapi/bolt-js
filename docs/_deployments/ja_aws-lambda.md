@@ -113,7 +113,7 @@ const app = new App({
 });
 ```
 
-次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](https://slack.dev/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
+次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
 
 `app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
@@ -184,7 +184,7 @@ plugins:
   - serverless-offline
 ```
 
-> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/tutorial/getting-started#setting-up-your-project)を入門ガイドで参照してください。
+> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/ja-jp/tutorial/getting-started#setting-up-your-project)を入門ガイドで参照してください。
 
 **3. serverless-offline モジュールをインストールする**
 
@@ -325,8 +325,8 @@ serverless deploy
 基本的なアプリのデプロイができましたので、次はアプリのカスタマイズやモニタリングを行う方法を調べてみましょう。
 
 - [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) と [Serverless Framework](https://www.serverless.com/framework/docs/providers/aws/guide/intro/) の理解を深める。
-- [Bolt の基本的な概念](/bolt-js/concepts#basic)と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
-- [Bolt の応用コンセプト](/bolt-js/concepts#logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
+- [Bolt の基本的な概念](/bolt-js/ja-jp/concepts#basic)と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
+- [Bolt の応用コンセプト](/bolt-js/ja-jp/concepts#logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
 - Serverless の [AWS Lambda のテスト環境](https://www.serverless.com/framework/docs/providers/aws/guide/testing/)や[デプロイ環境](https://www.serverless.com/framework/docs/providers/aws/guide/deploying/)を本格的に活用する。
 
 [aws-cli-configure]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config
@@ -342,5 +342,5 @@ serverless deploy
 [deploy-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
 [deploy-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js
 [getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
-[getting-started-guide]: /bolt-js/tutorial/getting-started
+[getting-started-guide]: /bolt-js/ja-jp/tutorial/getting-started
 [serverless-framework]: https://serverless.com/
