@@ -68,7 +68,7 @@ aws configure
 
 **1. Serverless Framework CLI をインストールする**
 
-Serverless でも [macOS、Windows、Linux](https://www.serverless.com/framework/docs/getting-started/) にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールするには Serverless の[入門ガイド（英語）](https://www.serverless.com/framework/docs/getting-started/) をお読みください。
+Serverless でも macOS、Windows、Linux にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールするには Serverless の[入門ガイド（英語）](https://www.serverless.com/framework/docs/getting-started/) をお読みください。
 
 インストールが完了したら Serverless CLI をテストするため、利用可能なコマンドを表示してみましょう。
 
