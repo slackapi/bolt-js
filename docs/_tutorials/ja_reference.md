@@ -88,7 +88,7 @@ Bolt には、アプリをカスタマイズするためのさまざまな初期
 | :---: | :--- |
 | `signingSecret` | アプリの設定の「Basic Information」から取得した 文字列。受信イベントが Slack から送信されたものであることを検証するために使用されます。 |
 | `endpoints` | レシーバーが Slack からの受信リクエストをリッスンするエンドポイントを指定する文字列または `オブジェクト`。現在、オブジェクトに指定できるキーはラベルとしての任意の文字列のみで、値にはカスタムのエンドポイントを指定します（例 : `/myapp/events`）。**デフォルトでは `/slack/events` というエンドポイントにすべてのイベントが送信されます。** |
-| `processBeforeResponse` | イベントに対して即座に確認の応答を返すかどうかを指定する真偽値。リクエストが完了したら、リスナーがただちに終了してしまうので、FaaS プラットフォームでアプリを実行する場合に有用な設定です。 `true` に設定すると早期終了を防ぐため、ハンドラーが実行されるまで応答を返すのを遅らせます。デフォルトは `false` です。  |
+| `processBeforeResponse` | イベントに対して即座に確認の応答を返すかどうかを指定する真偽値。リクエストへの往々とが完了するとリスナーはただちに終了してしまうため、FaaS プラットフォームでアプリを実行する場合に有用な設定です。 `true` に設定すると早期終了を防ぐためにハンドラーが実行されるまで応答を返すのを遅らせます。デフォルトは `false` です。  |
 | `clientId` | アプリの設定で指定した、クライアントの ID を示す文字列。[OAuth の設定を行うために必要です](/bolt-js/concepts#authenticating-oauth)。 |
 | `clientSecret` | アプリの設定で指定した、クライアントのシークレットキーを示す 文字列。[OAuth の設定を行うために必要です](/bolt-js/concepts#authenticating-oauth)。 |
 | `stateSecret` | CSRF 攻撃を防ぐために [OAuth の設定時](/bolt-js/concepts#authenticating-oauth)に渡すことができる、推奨のパラメーター（文字列）。 |
@@ -102,7 +102,7 @@ Bolt には、アプリをカスタマイズするためのさまざまな初期
 | `signatureVerification` | Bolt が Slack からの受信リクエストの署名を検証するかどうかを指定する真偽値。 デフォルトは `true` です。 |
 
 ### App オプション
-App オプションは、`App` のコンストラクターに渡します。`receiver` 引数が未定義な場合 `App` コンストラクターは上記の[ `receiver` オプション](#レシーバーオプション)も受け付けます。 `socketMode` の値により `HttpReceiver` または `SocketModeReceiver` を初期化します。
+App オプションは、`App` のコンストラクターに渡します。`receiver` 引数が設定されない場合 `App` コンストラクターは上記の[ `receiver` オプション](#レシーバーオプション)を受け取り、それを用いて `socketMode` の値に応じて `HttpReceiver` または `SocketModeReceiver` を初期化します。
 
 | オプション  | 説明  |
 | :---: | :--- |

@@ -139,8 +139,8 @@ const app = new App({
     // AwsLambdaReceiver を利用するとき、 `processBeforeResponse` は省略可能です。
     // OAuth フローに対応した ExpressReceiver など、他のレシーバーを使用する場合、
     // `processBeforeResponse: true` が必要になります。
-    // このオプションは、ハンドラーが実行されるまで応答を返すのを遅らせます。
-    // こうすることで、ハンドラーがトリガーとなった HTTP リクエストにより、ただちに終了することを防ぎます。
+    // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
+    // これによってハンドラーがトリガーとなった HTTP リクエストに応答を返すことでただちに終了されることを防ぐことができます。
     
     //processBeforeResponse: true
 });
@@ -211,7 +211,7 @@ npm install --save-dev serverless-offline
 ```zsh
 serverless offline --noPrependStageInUrl
 ```
-> 🏌️ Pro-tip: 一つの端末でアプリのコード変更をしながら、別の端末で上記のコマンドを実行することでコードの変更を保存する度にアプリは自動的に再読み込みされます。
+> 🏌️ Pro-tip: 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
 
 次に、ngrok を使って Slack のイベントをローカルマシンに転送します。
 
@@ -314,7 +314,7 @@ serverless deploy
 
 デプロイが完了したら、アプリを参加させた Slack チャンネルを開いて、半角の小文字で「goodbye」と入力してみましょう。Slack アプリに「See you later」と表示されるはずです。
 
-> ⛳️ 一つの関数に小さな変更を加える場合、より速くその関数だけをデプロイするには `serverless deploy function -f my-function` を実行してください。もっと詳細なヘルプは `serverless help deploy function` を実行してください。
+> ⛳️ 一つの関数に小さな変更を加える場合、その関数だけをデプロイするためにより高速な `serverless deploy function -f my-function` を実行することができます。より詳細なヘルプを見るには `serverless help deploy function` を実行してください。
 
 ---
 
