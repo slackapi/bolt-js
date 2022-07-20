@@ -136,7 +136,7 @@ const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: awsLambdaReceiver,
     
-    // AwsLambdaReceiver を利用するとき、 `processBeforeResponse` は省略可能です。
+    // AwsLambdaReceiver を利用する場合は  `processBeforeResponse` は省略可能です。
     // OAuth フローに対応した ExpressReceiver など、他のレシーバーを使用する場合、
     // `processBeforeResponse: true` が必要になります。
     // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
