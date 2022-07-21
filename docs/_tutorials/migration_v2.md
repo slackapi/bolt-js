@@ -16,7 +16,7 @@ This guide will walk you through the process of updating your app from using `@s
 
 ---
 
-### Upgrading your listeners to `async`
+### Upgrading your listeners to `async` {#upgrading-your-listeners-to-async}
 
 Listeners in your app should updated to `async` functions and `say()`,  `respond()`, and `ack()` should be prefaced with `await`.
 
@@ -39,7 +39,7 @@ app.action('some-action-id', async ({action, ack, say}) => {
 ```
 
 
-### Error Handling
+### Error Handling {#error-handling}
 
 The recent changes in Bolt for JavaScript V2 have improved our ability to catch errors and filter them to the global error handler.  It is still recommended to manage errors in the listeners themselves instead of letting them propagate to the global handler when possible.
 
@@ -72,7 +72,7 @@ Other error related changes include:
 - If multiple errors occur when processing multiple listeners for a single event, Bolt for Javascript will return a wrapper error with a `code` property of `ErrorCode.MultipleListenerError` and an `originals` property that contains an array of the individual errors. 
 
 
-### Message Shortcuts
+### Message Shortcuts {#message-shortcuts}
 
 [Message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts) (previously referred to as message actions) now use the `shortcut()` method instead of the `action()` method.
 
@@ -94,7 +94,7 @@ app.shortcut('message-action-callback', async ({shortcut, ack, context}) => {
 })
 ```
 
-### Upgrading Middleware
+### Upgrading Middleware {#upgrading-middleware}
 
 If you wrote a custom middleware, adjust your function to `async`  and update `next()` to `await next()`. If your middleware does some post processing, instead of passing a function to `next()`, you can now run it after `await next()`.
 
@@ -123,10 +123,10 @@ async function noBotMessages({ message, next }) {
 }
 ```
 
-### @slack/bolt@1.x support schedule
+### @slack/bolt@1.x support schedule {#slackbolt1x-support-schedule}
 
 `@slack/bolt@1.x` will be deprecated on **June 30th, 2020**. We plan on continuing to implement bug fixes and will also consider back-porting new features on a case by case basis up until then. Once `@slack/bolt@1.x` has been deprecated, we will only implement **critical bug fixes** until the official end of life date and close non critical issues and pull requests. End of life is slated for **April 30th, 2021**. At this time, development will fully stop for `@slack/bolt@1.x` and all remaining open issues and pull requests will be closed. 
 
-### Minimum TypeScript Version
+### Minimum TypeScript Version {#minimum-typescript-version}
 
 As outlined in our [using TypeScript guide](https://slack.dev/bolt/tutorial/using-typescript), `@slack/bolt@2.x` requires a minimum TypeScript version of 3.7.

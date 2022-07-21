@@ -16,7 +16,7 @@ permalink: /ja-jp/deployments/heroku
 
 ---
 
-### Bolt Slack アプリを入手する
+### Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
 Bolt アプリを作るのが初めてという場合は、まず[Bolt 入門ガイド][getting-started-guide]に沿って進めてみましょう。または、以下のテンプレートアプリをクローンしてもよいでしょう。
 
@@ -34,7 +34,7 @@ cd bolt-js-getting-started-app/
 
 ---
 
-### アプリをHeroku で動かすための準備する
+### アプリをHeroku で動かすための準備する {#prepare-the-app-for-heroku}
 
 Heroku は、作ったアプリをホストできる柔軟性の高いプラットフォームで、少し設定が必要です。このセクションでは、Bolt アプリに変更を加え、Heroku に対応させます。
 
@@ -73,7 +73,7 @@ git commit -m "Add Procfile"
 
 ---
 
-### Heroku ツールをセットアップする
+### Heroku ツールをセットアップする {#set-up-the-heroku-tools}
 
 ローカルマシンでHeroku ツールのセットアップを行います。このツールは、Heroku プラットフォームを使用するアプリの管理、デプロイ、デバッグを行う場合に便利です。
 
@@ -114,7 +114,7 @@ heroku auth:whoami
 
 ---
 
-### Heroku アプリを作成する
+### Heroku アプリを作成する {#create-an-app-on-heroku}
 
 先ほどインストールしたツールを使って、[Heroku アプリを作成](https://devcenter.heroku.com/articles/creating-apps)します。アプリを作成するときは、ユニークな名前を自分で指定するか、ランダムな名前を生成することができます。
 
@@ -168,7 +168,7 @@ heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 
 ---
 
-### アプリをデプロイする
+### アプリをデプロイする {#deploy-the-app}
 
 アプリをデプロイするため、ローカルのコードをHeroku にプッシュします。その後Slack アプリの設定を更新し、Heroku アプリに"hello" と声をかけてみましょう。 ✨
 
@@ -227,7 +227,7 @@ heroku info
 
 ---
 
-### 変更をデプロイする
+### 変更をデプロイする {#deploy-an-update}
 
 Slack アプリを構築するなかで、変更を加えてデプロイする必要があります。一般的な流れでは、変更を加え、コミットし、Heroku にプッシュするという順番です。
 
@@ -257,7 +257,7 @@ git push heroku main
 
 ---
 
-### 次のステップ
+### 次のステップ {#next-steps}
 
 これではじめて️⚡Bolt for JavaScript アプリをHerokuへデプロイすることに成功しました。🚀
 

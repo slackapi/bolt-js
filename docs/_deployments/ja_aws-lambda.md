@@ -16,7 +16,7 @@ permalink: /ja-jp/deployments/aws-lambda
 
 ---
 
-### AWS Lambda のセットアップ
+### AWS Lambda のセットアップ {#set-up-aws-lambda}
 
 [AWS Lambda][aws-lambda] はサーバーレスの Function-as-a-Service（FaaS）プラットフォームです。AWS Lambda を利用すると、サーバーを管理することなく、コードを実行することができます。このセクションでは、ローカルマシンから AWS Lambda にアクセスするための設定を行います。
 
@@ -62,7 +62,7 @@ aws configure
 
 ---
 
-### Serverless Framework をセットアップする
+### Serverless Framework をセットアップする {#set-up-serverless-framework}
 
 [Serverless Framework][serverless-framework] では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
 
@@ -80,7 +80,7 @@ Serverless のツールのセットアップが完了しました。次に、AWS
 
 ---
 
-### Bolt Slack アプリを入手する
+### Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
 まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド][getting-started-guide]を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
 
@@ -98,7 +98,7 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 
 ---
 
-### アプリをセットアップする
+### アプリをセットアップする {#prepare-the-app}
 
 **1. アプリを AWS Lambda に対応させる**
 
@@ -200,7 +200,7 @@ npm install --save-dev serverless-offline
 
 ---
 
-### アプリをローカルで実行する
+### アプリをローカルで実行する {#run-the-app-locally}
 
 アプリを AWS Lambda 関数に応答させるための準備が完了したので、次にローカルでアプリを実行できるように環境を設定します。
 
@@ -248,7 +248,7 @@ Slack アプリをテストします。今作った Bolt アプリを Slack の�
 
 ---
 
-### アプリをデプロイする
+### アプリをデプロイする {#deploy-the-app}
 
 今までローカルでアプリを実行し、 Slack ワークスペースでテストをしてきました。さて、動作するアプリができたので、デプロイしてみましょう!
 
@@ -318,7 +318,7 @@ serverless deploy
 
 ---
 
-### 次のステップ
+### 次のステップ {#next-steps}
 
 ⚡️[AWS Lambda を使った最初の Bolt for JavaScript アプリ][deploy-aws-lambda-app]をデプロイできました。🚀
 
@@ -341,6 +341,6 @@ serverless deploy
 [bolt-js]: /bolt-js
 [deploy-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
 [deploy-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js
-[getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
+[getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/ja-jp/tutorial/getting-started#setting-up-events
 [getting-started-guide]: /bolt-js/ja-jp/tutorial/getting-started
 [serverless-framework]: https://serverless.com/

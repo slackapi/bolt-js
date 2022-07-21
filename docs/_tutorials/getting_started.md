@@ -18,7 +18,7 @@ When you’re finished, you’ll have this ⚡️[Getting Started app](https://g
 
 ---
 
-### Create an app
+### Create an app {#create-an-app}
 First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new).
 
 > 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
@@ -33,7 +33,7 @@ Look around, add an app icon and description, and then let's start configuring y
 
 ---
 
-### Tokens and installing apps
+### Tokens and installing apps {#tokens-and-installing-apps}
 Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods.
 
 There are three main token types available to a Slack app: user (`xoxp`), bot (`xoxb`), and app (`xapp`) tokens.
@@ -57,7 +57,7 @@ We're going to use bot and app tokens for this guide.
 
 ---
 
-### Setting up your project
+### Setting up your project {#setting-up-your-project}
 With the initial configuration handled, it's time to set up a new Bolt project. This is where you'll write the code that handles the logic for your app.
 
 If you don’t already have a project, let’s create a new one. Create an empty directory and initialize a new project:
@@ -120,12 +120,12 @@ Your app should let you know that it's up and running. 🎉
 
 ---
 
-### Setting up events
+### Setting up events {#setting-up-events}
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.
 
 To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team.
 
-> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue this setting up guide with HTTP, head over [here](/bolt-js/tutorial/getting-started-http#setting-up-events).
+> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue this setting up guide with HTTP, head over [here](/bolt-js/tutorial/getting-started-http#setting-up-events-with-http).
 
 Okay, let's enable Socket Mode:
 
@@ -164,7 +164,7 @@ const app = new App({
 ```
 
 ---
-### Listening and responding to a message
+### Listening and responding to a message {#listening-and-responding-to-a-message}
 Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
 
 The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello":
@@ -202,7 +202,7 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ---
 
-### Sending and responding to actions
+### Sending and responding to actions {#sending-and-responding-to-actions}
 
 To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration.
 
@@ -328,7 +328,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 
 ---
 
-### Next steps
+### Next steps {#next-steps}
 You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app) with Socket Mode! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
