@@ -15,7 +15,7 @@ This project is written and built using [TypeScript](https://www.typescriptlang.
 
 This page helps describe how to use this package from a project that also uses TypeScript.
 
-### Minimum version
+### Minimum version {#minimum-version}
 
 The latest major version of `@slack/bolt` is supported to build against a minimum TypeScript version of v4.1.
 

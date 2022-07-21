@@ -16,7 +16,7 @@ permalink: /ja-jp/tutorial/migration-v3
 
 ---
 
-### InstallationStore と orgAuthorize での OrG レベルでのインストール対応に関する変更
+### InstallationStore と orgAuthorize での OrG レベルでのインストール対応に関する変更 {#org-wide-app-installation-changes-to-installationstore--orgauthorize}
 
 [Bolt for JavaScript 2.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0) で、私たちは [OrG レベルでのインストール](https://api.slack.com/enterprise/apps)のサポートを追加しました。このサポートをあなたのアプリケーションに追加するには、OAuth フローの中で使用される `fetchOrgInstallation`、`storeOrgInstallation` という二つの新しいメソッドを導入する必要がありました。 3.x では、よりシンプルなインタフェースの実現と Bolt for Python、Bolt for Java との互換性を考慮して、これらの二つの新しいメソッドのサポートを廃止しました。マイグレーションに必要となる変更については以下のコード例を参考にしてください。
 
@@ -98,18 +98,18 @@ const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => {
 }
 ```
 
-### デフォルトのレシーバーを HTTPReceiver に変更
+### デフォルトのレシーバーを HTTPReceiver に変更 {#http-receiver-as-default}
 
 3.x から新しい [`HTTPReceiver`](https://github.com/slackapi/bolt-js/issues/670) というレシーバーを導入し、デフォルトのレシーバー実装を、これまでの `ExpressReceiver` からこのレシーバーに変更します。この変更は、Bolt for JavaScript を Express.js 以外の人気のある Web フレームワーク（Hapi.js や Koa など）とともに動作させることを容易にします。`ExpressReceiver` は引き続き Bolt for JavaScript のリリースに含まれます。また、`HTTPReceiver` は `ExpressReceiver` が提供する全ての機能を提供するわけではありません。例えば、一つのユースケースとしては、`HTTPReceiver` ではカスタムの HTTP ルート（例: ヘルスチェックのための URL を追加する）を追加する機能はサポートされていません。このようなユースケースに対応するためには、引き続き `ExpressReceiver` を利用することを推奨します。その場合はクラスを import して、インスタンス化したものを `App` のコンストラクタに渡してください。詳細は[カスタム HTTP ルートの追加](https://slack.dev/bolt-js/ja-jp/concepts#custom-routes)を参考にしてください。
 
-### Bolt 2.x のサポートスケジュール
+### Bolt 2.x のサポートスケジュール {#slackbolt2x-support-schedule}
 
 `@slack/bolt@2.x` は **2021 年 1 月 12 日** より非推奨となります。それまでの期間はケースバイケースでバグ修正や新機能のバックポートを対応を継続します。`@slack/bolt@2.x` が非推奨となった後は、End of life（正式サポートの終了日）まで **クリティカルなバグ修正のみ** を実装し、クリティカルではない issue や pull request はクローズします。End of life は **2021 年 5 月 31 日** の予定です。この日からは `@slack/bolt@2.x` の開発は完全に終了となり、残っている open issue や pull request もクローズされます。
 
-### Node の最低必須バージョン
+### Node の最低必須バージョン {#minimum-node-version}
 
 `@slack/bolt@3.x` は Node は `12.13.0` 以上、npm は `6.12.0` 以上が必須バージョンです。
 
-### TypeScript の最低必須バージョン
+### TypeScript の最低必須バージョン {#minimum-typescript-version}
 
 [TypeScript 利用ガイド]({{ site.url | append: site.baseurl }}/ja-jp/tutorial/using-typescript) でも説明していますが、`@slack/bolt@3.x` は TypeScirpt 4.1 以上が必須バージョンです。

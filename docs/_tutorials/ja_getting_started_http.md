@@ -1,6 +1,6 @@
 ---
 title: Bolt 入門ガイド (HTTP)
-order: 0
+order: 5
 slug: getting-started-http
 lang: ja-jp
 layout: tutorial
@@ -8,7 +8,7 @@ permalink: /ja-jp/tutorial/getting-started-http
 redirect_from:
   - /ja-jp/getting-started-http
 ---
-# Bolt 入門ガイド
+# Bolt 入門ガイド (HTTP)
 
 <div class="section-content">
 このガイドでは、Bolt を使用して Slack アプリを起動し実行する方法について説明します。その過程で、新しい Slack アプリを作成し、ローカル環境を設定し、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発します。
@@ -18,7 +18,7 @@ redirect_from:
 
 ---
 
-### アプリを作成する
+### アプリを作成する {#create-an-app}
 最初にやるべきこと: Bolt で開発を始める前に、 [Slack アプリを作成](https://api.slack.com/apps/new)します。
 
 > 💡 いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをおすすめします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
@@ -33,7 +33,7 @@ redirect_from:
 
 ---
 
-### トークンとアプリのインストール
+### トークンとアプリのインストール {#tokens-and-installing-apps}
 Slack アプリは、[OAuth を使用して、Slack の API へのアクセスを管理](https://api.slack.com/docs/oauth)します。アプリがインストールされると、トークンを受け取ります。そのトークンを使って、アプリは API メソッドを呼び出すことができます。
 
 Slack アプリで使用できるトークンには、ユーザートークン（`xoxp`）とボットトークン（`xoxb`）、アプリレベルトークン（`xapp`）の 3 種類があります。
@@ -57,7 +57,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 ---
 
-### ローカルプロジェクトの設定
+### ローカルプロジェクトの設定 {#setting-up-your-project}
 初期設定が完了したので、次は新しい Bolt プロジェクトを設定します。ここで、アプリのロジックを処理するコードを記述します。
 
 プロジェクトをまだ作成していない場合は、新しいプロジェクトを作成しましょう。次のように、空のディレクトリを作成して、新しいプロジェクトを初期化します。
@@ -117,7 +117,7 @@ node app.js
 
 ---
 
-### イベントの設定 (HTTP)
+### イベントの設定 (HTTP) {#setting-up-events-with-http}
 アプリはボットとしてチームメンバーのように動作し、メッセージを投稿したり、絵文字リアクションを追加したりすることができます。
 
 Slack ワークスペースで発生するイベント (メッセージが投稿されたときや、メッセージに対するリアクションが投稿されたときなど) をリッスンするには、[Events API を使用してイベントタイプに登録](https://api.slack.com/events-api)します。
@@ -148,7 +148,7 @@ Request URL が検証されたら、**Subscribe to Bot Events** までスクロ�
 
 ---
 
-### メッセージのリスニングと応答
+### メッセージのリスニングと応答 {#listening-and-responding-to-a-message}
 これで、アプリでいくつかのロジックを設定する準備が整いました。まずは `message()` メソッドを使用して、メッセージのリスナーをアタッチしましょう。
 
 次の例では、あなたのアプリが追加されているチャンネルや DM で `hello` という単語を含むすべてのメッセージをリッスンし、 `Hey there @user!` と応答します。
@@ -181,7 +181,7 @@ app.message('hello', async ({ message, say }) => {
 
 ---
 
-### アクションの送信と応答
+### アクションの送信と応答 {#sending-and-responding-to-actions}
 
 ボタン、選択メニュー、日付ピッカー、モーダルなどの機能を使用するには、インタラクティブ性を有効にする必要があります。イベントと同様に、Slack の URL を指定してアクション ( 「ボタン・クリック」など) を送信する必要があります。
 
@@ -301,7 +301,7 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 ---
 
-### 次のステップ
+### 次のステップ {#next-steps}
 これで最初の Bolt アプリが構築できました! 🎉
 
 基本的なアプリの作成ができましたので、次回は是非もっといろいろな、 Bolt の機能を使ってアプリを作ってみましょう。下記のリンクを辿っていろいろアイデアを模索してみてください！
@@ -312,4 +312,4 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 * Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/bolt-js/ja-jp/concepts#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
 
-* 異なるトークンの種類については、[APIサイト](https://api.slack.com/docs/token-types)を参照してください。アプリケーションが実行したいアクションに応じて、異なるトークンが必要になる場合があります。HTTPではなく[Socket Mode](/bolt-js/tutorial/getting-started)を使用している場合は、`connections:write`スコープを持つ追加の(`xapp`)トークンが必要です。
+* 異なるトークンの種類については、[APIサイト](https://api.slack.com/docs/token-types)を参照してください。アプリケーションが実行したいアクションに応じて、異なるトークンが必要になる場合があります。HTTPではなく[Socket Mode](/bolt-js/ja-jp/tutorial/getting-started)を使用している場合は、`connections:write`スコープを持つ追加の(`xapp`)トークンが必要です。

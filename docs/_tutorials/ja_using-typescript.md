@@ -13,6 +13,6 @@ permalink: /ja-jp/tutorial/using-typescript
 
 このページでは、TypeScript を利用しているプロジェクトからこの npm パッケージを利用する方法について解説します。
 
-### 最低必須バージョン
+### 最低必須バージョン {#minimum-version}
 
 `@slack/bolt` の最新のメジャーバージョンは TypeScript 4.1 以上での利用をサポートしています。
