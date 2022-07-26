@@ -52,6 +52,7 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
 1. Check the status of the package's GitHub Milestone for issues that should be shipped with the release.
     -  If all issues have been closed, continue with the release.
     -  If issues are still open, discuss with the team about whether the open issues should be moved to a future release or if the release should be held off until the issues are resolved.
+    -  Take a look at all issues under the Milestone to make sure that the type of issues included aligns with the Milestone name based on [semantic versioning](https://semver.org/). If the issues do not align with the naming of the Milestone (ex: if the issues are all bug fixes, but the Milestone is labeled as a minor release), then you can tweak the Milestone name to reflect the correct versioning.
 
 2. Make sure your local `main` branch has the latest changes.
     - Run `git rebase main` from your feature branch (this will rebase your feature branch from `main`). You can opt for `git merge main` if you are not comfortable with rebasing.
@@ -65,7 +66,7 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     - Create a pull request for the version change ([Example](https://github.com/slackapi/bolt-js/pull/1133))
     - Add appropriate labels on the PR, including `release`
 4. Once the PR has been approved and tests have passed, merged to main repository.
-    -  Update your local main branch: `git pull origin main`
+    -  Check out your local `main` branch and update it to get the latest changes: `git checkout main && git pull origin main`
     -  Add a version tag (ie, `git tag @slack/bolt@3.6.0`)
     -  Push the new tag up to origin: `git push --tags origin`
 5. Publish the release to npm
@@ -76,10 +77,13 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     - `<dist-tag>` should be a label representative of the beta release. It could be feature-specific (i.e. `feat-token-rotation`) or it can be a generic release candidate (i.e. `2.5.0rc`). Whatever you decide: it must _not_ be `latest`, as that is reserved for non-beta releases. You can run `npm info` to see all dist tags. 
 6. Close Github Milestone
     - Close the relevant GitHub Milestone(s) for the release(s)
+    - Check the existing GitHub Milestones to see if the next minor version exists. If it doesn't, then create a GitHub Milestone for new issues to live in. Typically, you'll create a new minor version - however, if there are any bugs that need to be carried over from the current GitHub Milestone, you could make a Milestone for a patch version to reflect those issues
     - Move any unfinished, open issues to the next GitHub Milestone
 7. Create GitHub Release(s) with release notes
     - From the repository, navigate to the **Releases** section and draft a new release
+    - When creating the release notes, select the tag you generated earlier for your release and title the release the same name as the tag
     - Release notes should mention contributors, issues and PRs ([Example](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.6.0))
+    - Once the release notes are ready, click the "Publish Release" button to make them public
 
 8. Communicate the release (as appropriate)
     - **Internal**
