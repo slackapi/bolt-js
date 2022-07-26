@@ -16,7 +16,7 @@ permalink: /ja-jp/deployments/aws-lambda
 
 ---
 
-### AWS Lambda のセットアップ
+### AWS Lambda のセットアップ {#set-up-aws-lambda}
 
 [AWS Lambda][aws-lambda] はサーバーレスの Function-as-a-Service（FaaS）プラットフォームです。AWS Lambda を利用すると、サーバーを管理することなく、コードを実行することができます。このセクションでは、ローカルマシンから AWS Lambda にアクセスするための設定を行います。
 
@@ -62,31 +62,25 @@ aws configure
 
 ---
 
-### Serverless Framework をセットアップする
+### Serverless Framework をセットアップする {#set-up-serverless-framework}
 
-[Serverless Framework](https://www.serverless.com/open-source/) では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
+[Serverless Framework][serverless-framework] では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
 
 **1. Serverless Framework CLI をインストールする**
 
-Serverless でも [macOS、Windows、Linux](https://www.serverless.com/framework/docs/getting-started/) にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールには npm を使用します。次のコマンドを実行してください。
-
-```shell
-npm install --save-dev serverless
-```
-
-> 💡 [Serverless CLI をグローバルにインストールする](https://www.serverless.com/framework/docs/getting-started/)こともできます。その場合は`npm install -g serverless` というコマンドを実行します。
+Serverless でも macOS、Windows、Linux にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールするには Serverless の[入門ガイド（英語）](https://www.serverless.com/framework/docs/getting-started/) をお読みください。
 
 インストールが完了したら Serverless CLI をテストするため、利用可能なコマンドを表示してみましょう。
 
 ```shell
-npx serverless help
+serverless help
 ```
 
 Serverless のツールのセットアップが完了しました。次に、AWS Lambda 関数として実行する Bolt アプリの準備へと進みましょう。
 
 ---
 
-### Bolt Slack アプリを入手する
+### Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
 まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド][getting-started-guide]を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
 
@@ -104,7 +98,7 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 
 ---
 
-### アプリをセットアップする
+### アプリをセットアップする {#prepare-the-app}
 
 **1. アプリを AWS Lambda に対応させる**
 
@@ -119,7 +113,7 @@ const app = new App({
 });
 ```
 
-次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](https://slack.dev/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
+次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
 
 `app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
@@ -139,13 +133,16 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 
 // ボットトークンと、AWS Lambda に対応させたレシーバーを使ってアプリを初期化します。
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  receiver: awsLambdaReceiver,
-  // `processBeforeResponse` オプションは、あらゆる FaaS 環境で必須です。
-  // このオプションにより、Bolt フレームワークが `ack()` などでリクエストへの応答を返す前に
-  // `app.message` などのメソッドが Slack からのリクエストを処理できるようになります。FaaS では
-  // 応答を返した後にハンドラーがただちに終了してしまうため、このオプションの指定が重要になります。
-  processBeforeResponse: true
+    token: process.env.SLACK_BOT_TOKEN,
+    receiver: awsLambdaReceiver,
+    
+    // AwsLambdaReceiver を利用する場合は  `processBeforeResponse` は省略可能です。
+    // OAuth フローに対応した ExpressReceiver など、他のレシーバーを使用する場合、
+    // `processBeforeResponse: true` が必要になります。
+    // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
+    // これによってハンドラーがトリガーとなった HTTP リクエストに応答を返すことでただちに終了されることを防ぐことができます。
+    
+    //processBeforeResponse: true
 });
 ```
 
@@ -187,7 +184,7 @@ plugins:
   - serverless-offline
 ```
 
-> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/tutorial/getting-started#setting-up-your-local-project)を入門ガイドで参照してください。
+> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/ja-jp/tutorial/getting-started#setting-up-your-project)を入門ガイドで参照してください。
 
 **3. serverless-offline モジュールをインストールする**
 
@@ -203,17 +200,18 @@ npm install --save-dev serverless-offline
 
 ---
 
-### アプリをローカルで実行する
+### アプリをローカルで実行する {#run-the-app-locally}
 
 アプリを AWS Lambda 関数に応答させるための準備が完了したので、次にローカルでアプリを実行できるように環境を設定します。
 
 **1. ローカルのサーバーを起動する**
 
-まず、AWS Lambda 関数のイベントをリッスンするため、`serverless offline` コマンドを実行します。
+まず、アプリの起動と AWS Lambda 関数のイベントをリッスンするため、`serverless offline` コマンドを実行します。
 
 ```zsh
-npx serverless offline --noPrependStageInUrl
+serverless offline --noPrependStageInUrl
 ```
+> 🏌️ Pro-tip: 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
 
 次に、ngrok を使って Slack のイベントをローカルマシンに転送します。
 
@@ -250,7 +248,9 @@ Slack アプリをテストします。今作った Bolt アプリを Slack の�
 
 ---
 
-### アプリをデプロイする
+### アプリをデプロイする {#deploy-the-app}
+
+今までローカルでアプリを実行し、 Slack ワークスペースでテストをしてきました。さて、動作するアプリができたので、デプロイしてみましょう!
 
 AWS Lambda 向けのアプリのプロビジョニング、パッケージング、デプロイには、Serverless Framework のツールが利用できます。アプリのデプロイが完了したら、アプリのリクエスト URL を更新して、「hello」と入力した時にアプリが応答できるようにします。✨
 
@@ -259,7 +259,7 @@ AWS Lambda 向けのアプリのプロビジョニング、パッケージング
 次のコマンドを使って AWS Lambda にアプリをデプロイします。
 
 ```shell
-npx serverless deploy
+serverless deploy
 # Serverless:Packaging service...
 # ...
 # endpoints:
@@ -309,22 +309,24 @@ app.message('goodbye', async ({ message, say }) => {
 先ほどと同じコマンドを使って更新をデプロイします。
 
 ```shell
-npx serverless deploy
+serverless deploy
 ```
 
 デプロイが完了したら、アプリを参加させた Slack チャンネルを開いて、半角の小文字で「goodbye」と入力してみましょう。Slack アプリに「See you later」と表示されるはずです。
 
+> ⛳️ 一つの関数に小さな変更を加える場合、その関数だけをデプロイするためにより高速な `serverless deploy function -f my-function` を実行することができます。より詳細なヘルプを見るには `serverless help deploy function` を実行してください。
+
 ---
 
-### 次のステップ
+### 次のステップ {#next-steps}
 
 ⚡️[AWS Lambda を使った最初の Bolt for JavaScript アプリ][deploy-aws-lambda-app]をデプロイできました。🚀
 
 基本的なアプリのデプロイができましたので、次はアプリのカスタマイズやモニタリングを行う方法を調べてみましょう。
 
 - [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) と [Serverless Framework](https://www.serverless.com/framework/docs/providers/aws/guide/intro/) の理解を深める。
-- [Bolt の基本的な概念](/bolt-js/concepts#basic)と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
-- [Bolt の応用コンセプト](/bolt-js/concepts#logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
+- [Bolt の基本的な概念](/bolt-js/ja-jp/concepts#basic)と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
+- [Bolt の応用コンセプト](/bolt-js/ja-jp/concepts#logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
 - Serverless の [AWS Lambda のテスト環境](https://www.serverless.com/framework/docs/providers/aws/guide/testing/)や[デプロイ環境](https://www.serverless.com/framework/docs/providers/aws/guide/deploying/)を本格的に活用する。
 
 [aws-cli-configure]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config
@@ -339,6 +341,6 @@ npx serverless deploy
 [bolt-js]: /bolt-js
 [deploy-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
 [deploy-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js
-[getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
-[getting-started-guide]: /bolt-js/tutorial/getting-started
+[getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/ja-jp/tutorial/getting-started#setting-up-events
+[getting-started-guide]: /bolt-js/ja-jp/tutorial/getting-started
 [serverless-framework]: https://serverless.com/

@@ -16,7 +16,7 @@ When you’re finished, you’ll have this ⚡️[Deploying to Heroku app][deplo
 
 ---
 
-### Get a Bolt Slack app
+### Get a Bolt Slack app {#get-a-bolt-slack-app}
 
 If you haven't already built your own Bolt app, you can use our [Getting Started guide][getting-started-guide] or clone the template app below:
 
@@ -34,7 +34,7 @@ Now that you have an app, let's prepare it for Heroku.
 
 ---
 
-### Prepare the app for Heroku
+### Prepare the app for Heroku {#prepare-the-app-for-heroku}
 
 Heroku is a flexible platform that requires some configuration to host your app. In this section, we'll update your Bolt app to support Heroku.
 
@@ -73,7 +73,7 @@ git commit -m "Add Procfile"
 
 ---
 
-### Set up the Heroku tools
+### Set up the Heroku tools {#set-up-the-heroku-tools}
 
 Now we can set up the Heroku tools on your local machine. These tools will help you manage, deploy, and debug your app on Heroku's platform.
 
@@ -114,7 +114,7 @@ You should now be set up with the Heroku tools! Let's move on to the exciting st
 
 ---
 
-### Create an app on Heroku
+### Create an app on Heroku {#create-an-app-on-heroku}
 
 It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
 
@@ -167,7 +167,7 @@ Now that we have prepared your local app and created a Heroku app, the next step
 
 ---
 
-### Deploy the app
+### Deploy the app {#deploy-the-app}
 
 To deploy the app, we're going to push your local code to Heroku, update your Slack app's settings, and say "hello" to your Heroku app. ✨
 
@@ -225,7 +225,7 @@ Open a Slack channel that your app has joined and say "hello" (lower-case). Just
 
 ---
 
-### Deploy an update
+### Deploy an update {#deploy-an-update}
 
 As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
@@ -255,7 +255,7 @@ When the deploy is complete, you can open a Slack channel that your app has join
 
 ---
 
-### Next steps
+### Next steps {#next-steps}
 
 You just deployed your first ⚡️[Bolt for JavaScript app to Heroku][deploy-heroku-app]! 🚀
 
