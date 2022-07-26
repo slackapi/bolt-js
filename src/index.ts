@@ -61,13 +61,13 @@ export {
 } from './WorkflowStep';
 
 export {
-  Manifest,
+  SlackManifest,
   SlackManifestType,
   DefineFunction,
   DefineWorkflow,
   DefineType,
-  DefineDatastore,
-  Schema
+  Schema,
+  DefineOAuth2Provider
 } from './Manifest';
 
 export {

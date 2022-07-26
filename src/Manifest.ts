@@ -5,7 +5,8 @@ import {
   DefineWorkflow,
   DefineType,
   Schema,
-  ManifestSchema
+  ManifestSchema,
+  DefineOAuth2Provider,
 } from '@slack/deno-slack-sdk';
 
 export const Manifest = (definition: SlackManifestType): ManifestSchema => {
@@ -15,9 +16,11 @@ export const Manifest = (definition: SlackManifestType): ManifestSchema => {
 
 // pass through re-export
 export type { 
+  SlackManifest,
   SlackManifestType,
   DefineFunction,
   DefineWorkflow,
   DefineType,
-  Schema
+  Schema,
+  DefineOAuth2Provider
 };
