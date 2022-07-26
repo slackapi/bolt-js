@@ -129,6 +129,7 @@ export class HTTPModuleFunctions {
 
   public static buildNoBodyResponse(res: ServerResponse, status: number): void {
     res.writeHead(status);
+    res.end();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
