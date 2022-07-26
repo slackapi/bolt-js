@@ -61,6 +61,7 @@ export {
 } from './WorkflowStep';
 
 export {
+  Manifest,
   SlackManifest,
   SlackManifestType,
   DefineFunction,
