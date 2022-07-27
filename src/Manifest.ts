@@ -15,12 +15,15 @@ export const Manifest = (definition: SlackManifestType): ManifestSchema => {
 };
 
 // pass through re-export
-export type { 
-  SlackManifest,
-  SlackManifestType,
+export { 
   DefineFunction,
   DefineWorkflow,
-  DefineType,
+  DefineOAuth2Provider,
   Schema,
-  DefineOAuth2Provider
+  SlackManifest,
+};
+
+export type {
+  SlackManifestType,
+  DefineType,
 };
