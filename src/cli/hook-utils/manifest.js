@@ -22,7 +22,6 @@ function readManifestJSONFile(cwd, filename) {
 
 // look for a manifest file in the current working directory
 function readImportedManifestFile(cwd, filename) {
-
   let importedManifestFilePath, manifestImported;
 
   try {

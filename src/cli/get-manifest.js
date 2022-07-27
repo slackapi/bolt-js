@@ -15,10 +15,8 @@ const { unionMerge, readManifestJSONFile, readImportedManifestFile, hasManifest 
 
   // look for a manifest files
   const manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
-  const manifestTS = readImportedManifestFile(cwd, `${file}.ts`);
   const manifestJS = readImportedManifestFile(cwd, `${file}.js`);
-
-  if (!hasManifest(manifestTS, manifestJS, manifestJSON)) {
+  if (!hasManifest(manifestJS, manifestJSON)) {
     throw new Error('Unable to find a manifest file in this project');
   }
 
@@ -26,11 +24,8 @@ const { unionMerge, readManifestJSONFile, readImportedManifestFile, hasManifest 
   // check for .json
   if (manifestJSON) {
     manifest = merge(manifest, manifestJSON, { arrayMerge: unionMerge});
-  }
-  // check for either .ts or .js file
-  if (manifestTS) {
-    manifest = merge(manifest, manifestTS, { arrayMerge: unionMerge });
-  } else if (manifestJS) {
+  }  
+  if (manifestJS) {
     manifest = merge(manifest, manifestJS, { arrayMerge: unionMerge });
   }
     
