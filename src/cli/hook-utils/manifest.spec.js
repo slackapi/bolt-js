@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const { fs } = require('memfs');
 const mockfs = require('mock-fs');
 const manifestUtils = require('./manifest');
-const { unionMerge, hasManifest, find, readManifestJSONFile, readImportedManifestFile} = manifestUtils;
+const { unionMerge, hasManifest, find } = manifestUtils;
 
 describe('Slack CLI Script Hooks: get-manifest utilities', () => {
   describe('unionMerge', () => {
@@ -74,52 +74,6 @@ describe('Slack CLI Script Hooks: get-manifest utilities', () => {
       //test
       const result = find(cwd, 'node_modules');
       expect(result).to.equal(null);
-    });
-  });
-  describe('manifest imports', () => {
-    let manifestFilePath, manifestFind, fsReadFileSync, fsExistsSync;
-    beforeEach(() => {
-      // These stubs affect the `os` package behaviors
-      manifestFilePath = "a/dummy/path";
-      manifestFind = sinon.stub(manifestUtils, "find").returns(manifestFilePath);
-      fsReadFileSync = sinon.stub(fs, "readFileSync").returns(JSON.parse("{}"));
-      fsExistsSync = sinon.stub(fs, "existsSync").returns(true);
-    });
-
-    afterEach(() => {
-      manifestFind.restore();
-      fsReadFileSync.restore();
-      fsExistsSync.restore();
-    });
-    describe('readManifestJSONFile', () => {
-      it("when file exists at path, it should read the file", () => {
-        readManifestJSONFile("", "testFileName");
-        fsReadFileSync.calledWith(manifestFilePath, 'utf8');
-      });
-  
-      it("when file doesn't exist at path, it should NOT read a file", () => {
-        // disable spy for this test, should return false
-        fsExistsSync.restore();
-        readManifestJSONFile("", "testFileName");
-        fsReadFileSync.neverCalledWith(manifestFilePath, 'utf');
-      });
-    });
-    describe('readImportedManifestFile', () => {
-      let requireStub;
-      beforeEach(() => {
-        requireStub = sinon.stub(module, "require");
-      });
-      afterEach(() => {
-        requireStub.restore();
-      })
-      it("when file exists at path, it should import module", () => {
-        readImportedManifestFile("", "testFileName");
-        requireStub.calledWith(manifestFilePath);
-      });
-      it("when file doesn't exists at path, it should NOT import module", () => {
-        readImportedManifestFile("", "testFileName");
-        requireStub.neverCalledWith(manifestFilePath);
-      });
     });
   });
 });
