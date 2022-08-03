@@ -424,13 +424,20 @@ export interface FileUnsharedEvent {
   channel_id: string;
   event_ts: string;
 }
-interface FunctionParams {
-  type: string,
-  name: string,
-  description: string,
-  title: string,
-  is_required: boolean,
+export interface FunctionParams {
+  type?: string,
+  name?: string,
+  description?: string,
+  title?: string,
+  is_required?: boolean,
 }
+
+export type FunctionInputValues = {
+  [key: string]: unknown;
+};
+
+export type FunctionOutputValues = FunctionInputValues;
+
 export interface FunctionExecutedEvent {
   type: 'function_executed',
   function: {
@@ -445,7 +452,7 @@ export interface FunctionExecutedEvent {
     date_updated: number,
   },
   function_execution_id: string,
-  inputs: Record<string, unknown>,
+  inputs: FunctionInputValues,
   workflow_token: string, // xwfp-xxxxxxxxxxx
   event_ts: string,
 }

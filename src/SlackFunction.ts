@@ -7,8 +7,15 @@ import {
 
 /* Types */
 export interface SlackFunctionExecutedMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
-  success: SuccessFn;
-  error: ErrorFn;
+  completeSuccess: SuccessFn;
+  completeError: ErrorFn;
+}
+
+export interface SuccessFn {
+  (outputs: Record<string, unknown>): Promise<void>
+}
+export interface ErrorFn {
+  (error: string): Promise<void>
 }
 
 export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddlewareArgs & AllMiddlewareArgs;
@@ -18,9 +25,9 @@ export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddle
  * specified outputs given specific inputs.
  * --
  * You configure a Function's title, inputs, and outputs
- * in your project's manifest.json. If your project contains any
+ * in your project's manifest file (json or js). If your project contains any
  * functions via app.function, it must have a corresponding
- * manifest.json entries or App will throw an error when attempting to
+ * manifest entry or App will throw an error when attempting to
  * initialize.
  * --
  * Slack will take care of providing inputs to your function
@@ -34,12 +41,12 @@ export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddle
  * You must call the supplied utility success with your specified
  * outputs or failure.
  * */
-export class Function {
+export class SlackFunction {
   /**
     * @description The named title of the function
-    * Should correspond to manifest.json
+    * Should correspond to manifest file
     * */
-  private fnTitle: string;
+  private title: string;
 
   /**
    * @description fn to to process corresponding
@@ -47,10 +54,9 @@ export class Function {
    */
   private fn: Middleware<SlackEventMiddlewareArgs>;
 
-  public constructor(fnTitle: string, fn: Middleware<SlackEventMiddlewareArgs>) {
-    // TODO: Add validation step?
-    // validate();
-    this.fnTitle = fnTitle;
+  public constructor(title: string, fn: Middleware<SlackEventMiddlewareArgs>) {
+    // TODO: Add validation step
+    this.title = title;
     this.fn = fn;
   }
 
@@ -66,7 +72,7 @@ export class Function {
 
   private matchesConstraints(args: AnyMiddlewareArgs): boolean {
     if ('function' in args.payload) {
-      return this.fnTitle === args.payload.function.callback_id;
+      return this.title === args.payload.function.callback_id;
     }
     return false;
   }
@@ -77,7 +83,7 @@ export class Function {
   };
 }
 
-export function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
+function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
   return args.payload.type === 'function_executed';
 }
 
@@ -89,22 +95,16 @@ export function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
 function prepareFnArgs(args: AnyMiddlewareArgs & AllMiddlewareArgs): AllSlackFunctionExecutedMiddlewareArgs {
   const { next: _next, ...subArgs } = args;
   const preparedArgs: any = { ...subArgs };
-  preparedArgs.success = createSuccess(preparedArgs);
-  preparedArgs.error = createError(preparedArgs);
+  preparedArgs.completeSuccess = createCompleteSuccess(preparedArgs);
+  preparedArgs.completeError = createCompleteError(preparedArgs);
   return preparedArgs;
 }
 
-interface SuccessFn {
-  (outputs: Record<string, unknown>): Promise<void>
-}
-interface ErrorFn {
-  (error: string): Promise<void>
-}
 /**
  * Returns a utility function that is used to call the functions.completeSuccess
  * API endpoint with the provided outputs
 */
-function createSuccess(args: any): SuccessFn {
+function createCompleteSuccess(args: any): SuccessFn {
   const { client, event } = args;
   const { function_execution_id } = event;
   // TODO: Support client.functions.completeSuccess in node-slack-sdk
@@ -114,13 +114,13 @@ function createSuccess(args: any): SuccessFn {
   });
 }
 /**
- * Returns a utility function that is used to call the functions.completeFailure
+ * Returns a utility function that is used to call the functions.completeError
  * API endpoint with the provided outputs
 */
-function createError(args: any): ErrorFn {
+function createCompleteError(args: any): ErrorFn {
   const { client, event } = args;
   const { function_execution_id } = event;
-  // TODO: Support client.functions.completeFailure in node-slack-sdk
+  // TODO: Support client.functions.completeError in node-slack-sdk
   // TODO: Review whether to use installed app's bot token to make the api call
   // in the future it is possible that the event payload itself will contain
   // workspace token which should be used instead of the app token
