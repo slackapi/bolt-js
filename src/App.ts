@@ -23,7 +23,7 @@ import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
 import { Subscription, SubscriptionOptions } from './Subscription';
-import { Function as SlackFunction } from './Function';
+import { SlackFunction } from './SlackFunction';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -600,13 +600,13 @@ export default class App {
 
   /**
    * Register listeners that process and react to a function execution event
-   * @param fnTitle the name of the fn as defined in manifest.json
-   * must match the function defined in manifest json
+   * @param title the name of the fn as defined in manifest file
+   * must match the function defined in manifest file
    * @param fn a single function to register
    * */
-  public function(fnTitle: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
+  public function(title: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
     // TODO: Support for multiple function listeners
-    const slackFn = new SlackFunction(fnTitle, fn);
+    const slackFn = new SlackFunction(title, fn);
     const m = slackFn.getMiddleware();
     this.middleware.push(m);
     return this;
