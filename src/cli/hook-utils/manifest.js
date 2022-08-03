@@ -28,6 +28,11 @@ function readImportedManifestFile(cwd, filename) {
     importedManifestFilePath = find(cwd, filename);
     if (fs.existsSync(importedManifestFilePath)) {
       manifestImported = require(`${importedManifestFilePath}`);
+      
+      // if a default key is provided, assumes default export contains manifest
+      if (manifestImported["default"]) {
+        manifestImported = manifestImported["default"]
+      }
     }
   } catch (error) {
     console.log(error);
