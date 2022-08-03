@@ -8,6 +8,7 @@ import { SlackOptionsMiddlewareArgs } from './options';
 import { SlackShortcutMiddlewareArgs } from './shortcuts';
 import { SlackViewMiddlewareArgs } from './view';
 import { SlackSubscriptionMiddlewareArgs } from './subscription';
+import { SlackFunctionExecutedMiddlewareArgs } from '../SlackFunction';
 
 // TODO: rename this to AnyListenerArgs, and all the constituent types
 export type AnyMiddlewareArgs =
@@ -17,7 +18,8 @@ export type AnyMiddlewareArgs =
   | SlackOptionsMiddlewareArgs
   | SlackViewMiddlewareArgs
   | SlackShortcutMiddlewareArgs
-  | SlackSubscriptionMiddlewareArgs;
+  | SlackSubscriptionMiddlewareArgs
+  | SlackFunctionExecutedMiddlewareArgs;
 
 export interface AllMiddlewareArgs<CustomContext = StringIndexed> {
   context: Context & CustomContext;
