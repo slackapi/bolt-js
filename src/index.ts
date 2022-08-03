@@ -68,7 +68,7 @@ export {
   DefineWorkflow,
   DefineType,
   Schema,
-  DefineOAuth2Provider
+  DefineOAuth2Provider,
 } from './Manifest';
 
 export {
@@ -82,4 +82,5 @@ export {
   InstallProviderOptions,
 } from '@slack/oauth';
 
+export * from './SlackFunction';
 export * from '@slack/types';
