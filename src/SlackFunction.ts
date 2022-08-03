@@ -24,8 +24,16 @@ export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddle
  * A Function is a deterministic machine with
  * specified outputs given specific inputs.
  * --
+<<<<<<< HEAD
  * You configure a Function's callback_id, inputs, and outputs
  * in your project's manifest file (json or js). 
+=======
+ * You configure a Function's title, inputs, and outputs
+ * in your project's manifest file (json or js). If your project contains any
+ * functions via app.function, it must have a corresponding
+ * manifest entry or App will throw an error when attempting to
+ * initialize.
+>>>>>>> 1c37f9b (Update Function (#1536))
  * --
  * Slack will take care of providing inputs to your function
  * via a function_execution event. Bolt handles delivering those
