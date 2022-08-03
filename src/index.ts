@@ -60,16 +60,7 @@ export {
   WorkflowStepExecuteMiddleware,
 } from './WorkflowStep';
 
-export {
-  Manifest,
-  SlackManifest,
-  SlackManifestType,
-  DefineFunction,
-  DefineWorkflow,
-  DefineType,
-  Schema,
-  DefineOAuth2Provider
-} from './Manifest';
+export * from './Manifest';
 
 export {
   Installation,
