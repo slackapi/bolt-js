@@ -21,9 +21,9 @@ export {
   DefineOAuth2Provider,
   Schema,
   SlackManifest,
+  DefineType,
 };
 
 export type {
   SlackManifestType,
-  DefineType,
 };

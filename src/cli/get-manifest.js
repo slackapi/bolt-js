@@ -13,15 +13,19 @@ const { unionMerge, readManifestJSONFile, readImportedManifestFile, hasManifest 
   const file = 'manifest';
   let manifest = {};
 
-  // look for a manifest files
+  // look for a manifest JSON
   const manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
-  const manifestJS = readImportedManifestFile(cwd, `${file}.js`);
+  
+  // look for manifest.js
+  // stringify and parses the JSON in order to ensure that objects with .toJSON() functions
+  // resolve properly. This is a known behavior for CustomType
+  const manifestJS = JSON.parse(JSON.stringify(readImportedManifestFile(cwd, `${file}.js`)));
+
   if (!hasManifest(manifestJS, manifestJSON)) {
     throw new Error('Unable to find a manifest file in this project');
   }
 
   // manage manifest merge
-  // check for .json
   if (manifestJSON) {
     manifest = merge(manifest, manifestJSON, { arrayMerge: unionMerge});
   }  
