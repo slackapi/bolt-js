@@ -24,11 +24,8 @@ export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddle
  * A Function is a deterministic machine with
  * specified outputs given specific inputs.
  * --
- * You configure a Function's title, inputs, and outputs
- * in your project's manifest file (json or js). If your project contains any
- * functions via app.function, it must have a corresponding
- * manifest entry or App will throw an error when attempting to
- * initialize.
+ * You configure a Function's callback_id, inputs, and outputs
+ * in your project's manifest file (json or js). 
  * --
  * Slack will take care of providing inputs to your function
  * via a function_execution event. Bolt handles delivering those
@@ -36,17 +33,17 @@ export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddle
  * messages, shortcuts commands, etc.
  * --
  * When initiating an instance of Function below, you supply the
- * fn you want to process the supplied inputs and what logical
+ * callback you want to process the supplied inputs and what logical
  * conditions determine success or failure in your use case.
- * You must call the supplied utility success with your specified
- * outputs or failure.
+ * Call the supplied utilities completeSuccess with your specified
+ * outputs or completeError.
  * */
 export class SlackFunction {
   /**
-    * @description The named title of the function
-    * Should correspond to manifest file
+    * @description The callback_id of the function
+    * as defined in your manifest file
     * */
-  private title: string;
+  private callbackId: string;
 
   /**
    * @description fn to to process corresponding
@@ -54,9 +51,9 @@ export class SlackFunction {
    */
   private fn: Middleware<SlackEventMiddlewareArgs>;
 
-  public constructor(title: string, fn: Middleware<SlackEventMiddlewareArgs>) {
+  public constructor(callbackId: string, fn: Middleware<SlackEventMiddlewareArgs>) {
     // TODO: Add validation step
-    this.title = title;
+    this.callbackId = callbackId;
     this.fn = fn;
   }
 
@@ -72,7 +69,7 @@ export class SlackFunction {
 
   private matchesConstraints(args: AnyMiddlewareArgs): boolean {
     if ('function' in args.payload) {
-      return this.title === args.payload.function.callback_id;
+      return this.callbackId === args.payload.function.callback_id;
     }
     return false;
   }
