@@ -95,7 +95,7 @@ app.shortcut('message-action-callback', async ({shortcut, ack, context}) => {
 
 ### ミドルウェアに関する変更 {#upgrading-middleware}
 
-もしカスタムのミドルウェアを書いている場合は、その関数を `async` に変更し、さらに `next()` の呼び出しを `await next()` に変更してください。もし後続の処理がある場合は、関数右を `next()` に渡す代わりに、その後続の処理を `await next()` の後に実行してください。
+もしカスタムのミドルウェアを書いている場合は、その関数を `async` に変更し、さらに `next()` の呼び出しを `await next()` に変更してください。もし後続の処理がある場合は、関数を `next()` に渡す代わりに、その後続の処理を `await next()` の後に実行してください。
 
 これまで:
 
