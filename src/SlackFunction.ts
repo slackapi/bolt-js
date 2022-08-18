@@ -21,30 +21,21 @@ export interface ErrorFn {
 export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddlewareArgs & AllMiddlewareArgs;
 
 /**
- * A Function is a deterministic machine with
+ * A SlackFunction is a deterministic machine with
  * specified outputs given specific inputs.
  * --
-<<<<<<< HEAD
- * You configure a Function's callback_id, inputs, and outputs
+ * Configure a SlackFunction's callback_id, inputs, and outputs
  * in your project's manifest file (json or js). 
-=======
- * You configure a Function's title, inputs, and outputs
- * in your project's manifest file (json or js). If your project contains any
- * functions via app.function, it must have a corresponding
- * manifest entry or App will throw an error when attempting to
- * initialize.
->>>>>>> 1c37f9b (Update Function (#1536))
  * --
  * Slack will take care of providing inputs to your function
  * via a function_execution event. Bolt handles delivering those
  * to your function in the way you can expect of regular events,
  * messages, shortcuts commands, etc.
  * --
- * When initiating an instance of Function below, you supply the
+ * When initiating an instance of SlackFunction below, you supply the
  * callback you want to process the supplied inputs and what logical
  * conditions determine success or failure in your use case.
- * Call the supplied utilities completeSuccess with your specified
- * outputs or completeError.
+ * Call the supplied utility complete with either outputs or an error
  * */
 export class SlackFunction {
   /**

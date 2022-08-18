@@ -433,9 +433,9 @@ export interface FunctionParams {
   is_required?: boolean,
 }
 
-export type FunctionInputValues = {
+export interface FunctionInputValues {
   [key: string]: unknown;
-};
+}
 
 export type FunctionOutputValues = FunctionInputValues;
 
