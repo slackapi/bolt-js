@@ -10,6 +10,7 @@ export default async function processMiddleware(
   logger: Logger,
   last: () => Promise<void>,
 ): Promise<void> {
+
   let lastCalledMiddlewareIndex = -1;
   async function invokeMiddleware(toCallMiddlewareIndex: number): ReturnType<Middleware<AnyMiddlewareArgs>> {
     if (lastCalledMiddlewareIndex >= toCallMiddlewareIndex) {

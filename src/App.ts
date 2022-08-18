@@ -513,17 +513,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
-   * Register WorkflowStep middleware
-   *
-   * @param workflowStep global workflow step middleware function
-   */
-  public step(workflowStep: WorkflowStep): this {
-    const m = workflowStep.getMiddleware();
-    this.middleware.push(m);
-    return this;
-  }
-
-  /**
    * Convenience method to call start on the receiver
    *
    * TODO: should replace HTTPReceiver in type definition with a generic that is constrained to Receiver
@@ -548,7 +537,20 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
-   * Register subcription middleware
+   * Register WorkflowStep middleware
+   * 
+   * Not to be confused with next-gen platform Workflows + Functions
+   *
+   * @param workflowStep global workflow step middleware function
+   */
+    public step(workflowStep: WorkflowStep): this {
+    const m = workflowStep.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+  
+  /**
+   * Process a subscription event
    *
    * @param listeners middleware that process and react to subscription payloads
    */
@@ -564,6 +566,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     return this;
   }
 
+  /**
+   * Register an event listener
+  */
   public event<
       EventType extends string = string,
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
@@ -610,21 +615,27 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
-   * Register listeners that process and react to a function execution event
-   * @param title the name of the fn as defined in manifest file
-   * must match the function defined in manifest file
-   * @param fn a single function to register
+   * Register a Slack Function handler
+   * 
+   * and other function-scoped 
+   * interactivity handlers
+   * (block_actions, view interaction payloads)
+   * 
+   * 
+   * @param callbackId the id of the function as defined in manifest
+   * 
+   * @param fn a function to register
    * */
-  public function(title: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
-    // TODO: Support for multiple function listeners
-    const slackFn = new SlackFunction(title, fn);
+  public function(callbackId: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
+    const slackFn = new SlackFunction(callbackId, fn);
     const m = slackFn.getMiddleware();
     this.middleware.push(m);
     return this;
   }
 
   /**
-   *
+   * Process a message event 
+   * 
    * @param listeners Middlewares that process and react to a message event
    */
   public message<
@@ -700,6 +711,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
+  /** 
+   * Process a shortcut event
+  */
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
@@ -745,6 +759,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
+  /** 
+   * Process a block_action event
+   * https://api.slack.com/reference/interaction-payloads/block-actions
+   * 
+  */
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://web.archive.org/web/20210629110615/https://basarat.gitbook.io/typescript/type-system/generics#motivation-and-samples
   public action<
@@ -923,6 +942,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(bodyArg, type);
     const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
+    // Get the result of any custom authorize provided
     let authorizeResult: AuthorizeResult;
     if (type === IncomingEventType.Event && isEventTypeToSkipAuthorize(event.body.event.type)) {
       authorizeResult = {
@@ -967,13 +987,20 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
+    // check for a bot access token
+    const botAccessToken = event.body.event.bot_access_token;
+
+    // Declare the event context
     const context: Context = {
       ...authorizeResult,
       ...event.customProperties,
+      botAccessToken,
       isEnterpriseInstall,
       retryNum: event.retryNum,
       retryReason: event.retryReason,
     };
+    console.log("DEBUG***: PROCESSEVENT: EVENT BODY", event.body);
+    console.log("DEBUG***: PROCESSEVENT: CONTEXT", context);
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
@@ -1589,9 +1616,11 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-// Returns either a bot token or a user token for client, say()
+/** 
+ * Returns a bot token, bot access token or user token for client, say()
+ * */
 function selectToken(context: Context): string | undefined {
-  return context.botToken !== undefined ? context.botToken : context.userToken;
+  return context.botAccessToken ?? context.botToken ?? context.userToken; 
 }
 
 function buildRespondFn(
