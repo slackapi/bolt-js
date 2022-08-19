@@ -987,8 +987,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
-    // check for a bot access token
-    const botAccessToken = event.body.event.bot_access_token;
+    // set bot access token if it exists
+    let botAccessToken = body.bot_access_token ?? body.event.bot_access_token;
 
     // Declare the event context
     const context: Context = {
@@ -999,8 +999,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       retryNum: event.retryNum,
       retryReason: event.retryReason,
     };
-    console.log("DEBUG***: PROCESSEVENT: EVENT BODY", event.body);
-    console.log("DEBUG***: PROCESSEVENT: CONTEXT", context);
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {

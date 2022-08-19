@@ -7,15 +7,17 @@ import {
 
 /* Types */
 export interface SlackFunctionExecutedMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
-  completeSuccess: SuccessFn;
-  completeError: ErrorFn;
+  complete: completeFunction
 }
 
-export interface SuccessFn {
-  (outputs: Record<string, unknown>): Promise<void>
+export interface completeFunction {
+  (args: completeFunctionArgs): Promise<void>
 }
-export interface ErrorFn {
-  (error: string): Promise<void>
+
+export type completeFunctionArgs = {
+  // outputs are set by developer in the manifest file
+  outputs?: Record<string, unknown>,
+  error?: string
 }
 
 export type AllSlackFunctionExecutedMiddlewareArgs = SlackFunctionExecutedMiddlewareArgs & AllMiddlewareArgs;
@@ -91,37 +93,29 @@ function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
 function prepareFnArgs(args: AnyMiddlewareArgs & AllMiddlewareArgs): AllSlackFunctionExecutedMiddlewareArgs {
   const { next: _next, ...subArgs } = args;
   const preparedArgs: any = { ...subArgs };
-  preparedArgs.completeSuccess = createCompleteSuccess(preparedArgs);
-  preparedArgs.completeError = createCompleteError(preparedArgs);
+  preparedArgs.complete = createComplete(preparedArgs);
   return preparedArgs;
 }
 
-/**
- * Returns a utility function that is used to call the functions.completeSuccess
- * API endpoint with the provided outputs
-*/
-function createCompleteSuccess(args: any): SuccessFn {
+function createComplete(args: any): completeFunction {
   const { client, event } = args;
   const { function_execution_id } = event;
-  // TODO: Support client.functions.completeSuccess in node-slack-sdk
-  return (outputs: any) => client.apiCall('functions.completeSuccess', {
-    outputs,
-    function_execution_id,
-  });
-}
-/**
- * Returns a utility function that is used to call the functions.completeError
- * API endpoint with the provided outputs
-*/
-function createCompleteError(args: any): ErrorFn {
-  const { client, event } = args;
-  const { function_execution_id } = event;
-  // TODO: Support client.functions.completeError in node-slack-sdk
-  // TODO: Review whether to use installed app's bot token to make the api call
-  // in the future it is possible that the event payload itself will contain
-  // workspace token which should be used instead of the app token
-  return (error: string) => client.apiCall('functions.completeError', {
-    error,
-    function_execution_id,
-  });
+
+  return ({ outputs, error }: completeFunctionArgs) => {
+    if (outputs && error) {
+      throw new Error("Cannot complete a function with both outputs and error message");
+    }
+    // if user has supplied outputs OR has supplied neither outputs nor error
+    if (outputs !== undefined || (outputs === undefined && error === undefined)) {
+      return client.apiCall('functions.completeSuccess', { 
+        outputs,
+        function_execution_id
+      })
+    } else if (error !== undefined) {
+      return client.apiCall('functions.completeError', {
+        error,
+        function_execution_id
+      })
+    }
+  }
 }
