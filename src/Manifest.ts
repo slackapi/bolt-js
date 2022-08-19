@@ -7,6 +7,7 @@ import {
   Schema,
   ManifestSchema,
   DefineOAuth2Provider,
+  DefineDatastore,
 } from '@slack/deno-slack-sdk';
 
 export const Manifest = (definition: SlackManifestType): ManifestSchema => {
@@ -22,6 +23,7 @@ export {
   Schema,
   SlackManifest,
   DefineType,
+  DefineDatastore,
 };
 
 export type {

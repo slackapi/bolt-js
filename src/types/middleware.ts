@@ -47,15 +47,15 @@ export interface Context extends StringIndexed {
   /**
    * A bot access token, which starts with `xwfp-`.
    * This is a just-in-time token.
-   * 
+   *
    * A bot access token is a short-lived (JIT) token
-   * sent along in any event payload associated with 
-   * for one of your apps custom Slack Functions.  
-   * 
+   * sent along in any event payload associated with
+   * for one of your apps custom Slack Functions.
+   *
    * When present, client should use this token over
-   * any other regular xoxb or xoxb. 
-   * 
-   * Read about custom Slack Functions @ https://api.slack.com/future/functions 
+   * any other regular xoxb or xoxb.
+   *
+   * Read about custom Slack Functions @ https://api.slack.com/future/functions
    * */
   botAccessToken?: string;
   /**

@@ -1,7 +1,7 @@
 import { PlainTextElement, Confirmation, Option } from '@slack/types';
 import { StringIndexed } from '../helpers';
 import { ViewOutput, ViewStateValue } from '../view';
-import { FunctionExecutionContext, FunctionInteractivityContext } from '../functions';
+import { FunctionContext } from '../functions';
 
 /**
  * All known actions from in Slack's interactive elements
@@ -208,7 +208,7 @@ export interface PlainTextInputAction extends BasicElementAction<'plain_text_inp
  *
  * This describes the entire JSON-encoded body of a request from Slack's Block Kit interactive components.
  */
-export interface BlockAction<ElementAction extends BasicElementAction = BlockElementAction> {
+export interface BlockAction<ElementAction extends BasicElementAction = BlockElementAction> extends FunctionContext {
   type: 'block_actions';
   actions: ElementAction[];
   team: {
@@ -260,11 +260,6 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     id: string;
     name: string;
   };
-
-  // exists for actions occurring in a function execution context
-  bot_access_token?: string;
-  function_data?: FunctionExecutionContext;
-  interactivity?: FunctionInteractivityContext;
 }
 
 /*

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-const merge = require('deepmerge');
-const { unionMerge, readManifestJSONFile, readImportedManifestFile, hasManifest } = require('./hook-utils/manifest');
+const { getManifestData } = require('./hook-utils/manifest');
 
 /** 
  * Implements the get-manifest script hook required by the Slack CLI
@@ -10,29 +9,8 @@ const { unionMerge, readManifestJSONFile, readImportedManifestFile, hasManifest 
  * properties will merge into any manifest.json
 */
 (function _(cwd) {
-  const file = 'manifest';
-  let manifest = {};
-
-  // look for a manifest JSON
-  const manifestJSON = readManifestJSONFile(cwd, `${file}.json`);
-  
-  // look for manifest.js
-  // stringify and parses the JSON in order to ensure that objects with .toJSON() functions
-  // resolve properly. This is a known behavior for CustomType
-  const manifestJS = JSON.parse(JSON.stringify(readImportedManifestFile(cwd, `${file}.js`)));
-
-  if (!hasManifest(manifestJS, manifestJSON)) {
-    throw new Error('Unable to find a manifest file in this project');
-  }
-
-  // manage manifest merge
-  if (manifestJSON) {
-    manifest = merge(manifest, manifestJSON, { arrayMerge: unionMerge});
-  }  
-  if (manifestJS) {
-    manifest = merge(manifest, manifestJS, { arrayMerge: unionMerge });
-  }
+  let manifest = getManifestData(cwd);
     
-  // write the merged manifest to stdout
+  // write manifest to stdout
   console.log(JSON.stringify(manifest));
-}(process.cwd()));
+}( process.cwd()));

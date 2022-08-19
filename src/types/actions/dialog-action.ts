@@ -1,8 +1,8 @@
 /**
- * Dialogs were a way to trigger interactions with users in messaging. 
+ * Dialogs were a way to trigger interactions with users in messaging.
  * We now recommend using Block Kit in Modals.
  * https://api.slack.com/dialogs
- * 
+ *
  * A Slack dialog submit action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack dialogs.

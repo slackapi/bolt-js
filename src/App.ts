@@ -23,7 +23,10 @@ import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
 import { Subscription, SubscriptionOptions } from './Subscription';
-import { SlackFunction } from './SlackFunction';
+import {
+  CompleteFunction,
+  SlackFunction,
+} from './SlackFunction';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -538,17 +541,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
   /**
    * Register WorkflowStep middleware
-   * 
+   *
    * Not to be confused with next-gen platform Workflows + Functions
    *
    * @param workflowStep global workflow step middleware function
    */
-    public step(workflowStep: WorkflowStep): this {
+  public step(workflowStep: WorkflowStep): this {
     const m = workflowStep.getMiddleware();
     this.middleware.push(m);
     return this;
   }
-  
+
   /**
    * Process a subscription event
    *
@@ -615,27 +618,22 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
-   * Register a Slack Function handler
-   * 
-   * and other function-scoped 
-   * interactivity handlers
-   * (block_actions, view interaction payloads)
-   * 
-   * 
+   * Register a Slack Function
+   *
    * @param callbackId the id of the function as defined in manifest
-   * 
-   * @param fn a function to register
+   *
+   * @param slackFn a main function to register
+   *
    * */
-  public function(callbackId: string, fn: Middleware<SlackEventMiddlewareArgs>): this {
-    const slackFn = new SlackFunction(callbackId, fn);
+
+  public function(slackFn: SlackFunction): void {
     const m = slackFn.getMiddleware();
     this.middleware.push(m);
-    return this;
   }
 
   /**
-   * Process a message event 
-   * 
+   * Process a message event
+   *
    * @param listeners Middlewares that process and react to a message event
    */
   public message<
@@ -711,7 +709,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  /** 
+  /**
    * Process a shortcut event
   */
   public shortcut<
@@ -759,10 +757,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  /** 
+  /**
    * Process a block_action event
    * https://api.slack.com/reference/interaction-payloads/block-actions
-   * 
+   *
   */
   // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
   // https://web.archive.org/web/20210629110615/https://basarat.gitbook.io/typescript/type-system/generics#motivation-and-samples
@@ -987,8 +985,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
-    // set bot access token if it exists
-    let botAccessToken = body.bot_access_token ?? body.event.bot_access_token;
+    /**
+     * Set the Bot Access Token if it exists in event payload
+     * Sometimes the bot_access_token is located in the event
+     * Sometimes it is located directly in the body.
+     */
+    let botAccessToken = body.bot_access_token;
+    if (botAccessToken === undefined && 'event' in body) {
+      botAccessToken = body.event.bot_access_token;
+    }
 
     // Declare the event context
     const context: Context = {
@@ -1047,17 +1052,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         break;
     }
 
-    // NOTE: the following doesn't work because... distributive?
-    // const listenerArgs: Partial<AnyMiddlewareArgs> = {
-    const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
-      /** Say function might be set below */
-      say?: SayFn;
-      /** Respond function might be set below */
-      respond?: RespondFn;
-      /** Ack function might be set below */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ack?: AckFn<any>;
-    } = {
+    const listenerArgs: ListenerArgs = {
       body: bodyArg,
       payload,
     };
@@ -1108,7 +1103,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       await ack();
     }
 
-    // Get the client arg
+    // Get or create the client
     let { client } = this;
     const token = selectToken(context);
 
@@ -1614,11 +1609,11 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-/** 
+/**
  * Returns a bot token, bot access token or user token for client, say()
  * */
 function selectToken(context: Context): string | undefined {
-  return context.botAccessToken ?? context.botToken ?? context.userToken; 
+  return context.botAccessToken ?? context.botToken ?? context.userToken;
 }
 
 function buildRespondFn(
@@ -1642,3 +1637,16 @@ function isEventTypeToSkipAuthorize(eventType: string) {
 // Instrumentation
 // Don't change the position of the following code
 addAppMetadata({ name: packageJson.name, version: packageJson.version });
+
+// types
+export type ListenerArgs = Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+  /** Say function might be set below */
+  say?: SayFn;
+  /** Respond function might be set below */
+  respond?: RespondFn;
+  /** Ack function might be set below */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ack?: AckFn<any>;
+  /* Complete might be set below */
+  complete?: CompleteFunction;
+};
