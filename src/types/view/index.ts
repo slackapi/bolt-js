@@ -201,7 +201,7 @@ export type ViewResponseAction =
 
 /**
  * Type function which given a view action `VA` returns a corresponding type for the `ack()` function. The function is
- * used to acknowledge the receipt (and possibly signal failure) of an view submission or closure from a listener or
+ * used to acknowledge the receipt (and possibly signal failure) of a view submission or closure from a listener or
  * middleware.
  */
 type ViewAckFn<VA extends SlackViewAction = SlackViewAction> = VA extends ViewSubmitAction

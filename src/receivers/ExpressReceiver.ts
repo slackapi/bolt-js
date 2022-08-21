@@ -521,7 +521,7 @@ function verifyRequestSignature(
 /**
  * This request handler has two responsibilities:
  * - Verify the request signature
- * - Parse request.body and assign the successfully parsed object to it.
+ * - Parse `request.body` and assign the successfully parsed object to it.
  */
 export function verifySignatureAndParseBody(
   signingSecret: string,
@@ -566,6 +566,7 @@ export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
 
 function parseRequestBody(stringBody: string, contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
+    // TODO: querystring is deprecated since Node.js v17
     const parsedBody = querystring.parse(stringBody);
 
     if (typeof parsedBody.payload === 'string') {

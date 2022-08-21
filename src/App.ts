@@ -134,7 +134,7 @@ export interface AuthorizeResult {
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
   teamId?: string;
   enterpriseId?: string;
-  // TODO: for better type safety, we may want to reivit this
+  // TODO: for better type safety, we may want to revisit this
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
@@ -290,8 +290,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     extendedErrorHandler = false,
     deferInitialization = false,
   }: AppOptions = {}) {
-    // this.logLevel = logLevel;
-
     /* ------------------------ Developer mode ----------------------------- */
     this.developerMode = developerMode;
     if (developerMode) {
@@ -346,7 +344,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       httpAgent: agent,
       httpsAgent: agent,
       // disabling axios' automatic proxy support:
-      // axios would read from envvars to configure a proxy automatically, but it doesn't support TLS destinations.
+      // axios would read from env vars to configure a proxy automatically, but it doesn't support TLS destinations.
       // for compatibility with https://api.slack.com, and for a larger set of possible proxies (SOCKS or other
       // protocols), users of this package should use the `agent` option to configure a proxy.
       proxy: false,
@@ -363,7 +361,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     };
     if (socketMode && port !== undefined && this.installerOptions.port === undefined) {
       // SocketModeReceiver only uses a custom port number  when listening for the OAuth flow.
-      // Therefore only installerOptions.port is available in the constructor arguments.
+      // Therefore, only installerOptions.port is available in the constructor arguments.
       this.installerOptions.port = port;
     }
 
@@ -1091,7 +1089,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
               context,
               client,
               this.logger,
-              // When all of the listener middleware are done processing,
+              // When all the listener middleware are done processing,
               // `listener` here will be called without a `next` execution
               async () => listener({
                 ...(listenerArgs as AnyMiddlewareArgs),
@@ -1226,8 +1224,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       httpReceiver.installer !== undefined &&
       httpReceiver.installer.authorize !== undefined
     ) {
-      // This supports using the built in HTTPReceiver, declaring your own HTTPReceiver
-      // and theoretically, doing a fully custom (non express) receiver that implements OAuth
+      // This supports using the built-in HTTPReceiver, declaring your own HTTPReceiver
+      // and theoretically, doing a fully custom (non-Express.js) receiver that implements OAuth
       usingOauth = true;
     }
 

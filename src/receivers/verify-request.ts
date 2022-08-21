@@ -25,7 +25,7 @@ export interface SlackRequestVerificationOptions {
 
 /**
  * Verifies the signature of an incoming request from Slack.
- * If the requst is invalid, this method throws an exception with the erorr details.
+ * If the request is invalid, this method throws an exception with the error details.
  */
 export function verifySlackRequest(options: SlackRequestVerificationOptions): void {
   const requestTimestampSec = options.headers['x-slack-request-timestamp'];
@@ -67,7 +67,7 @@ export function verifySlackRequest(options: SlackRequestVerificationOptions): vo
 
 /**
  * Verifies the signature of an incoming request from Slack.
- * If the requst is invalid, this method returns false.
+ * If the request is invalid, this method returns false.
  */
 export function isValidSlackRequest(options: SlackRequestVerificationOptions): boolean {
   try {
@@ -82,7 +82,7 @@ export function isValidSlackRequest(options: SlackRequestVerificationOptions): b
 }
 
 // ------------------------------
-// legacy methods (depreacted)
+// legacy methods (deprecated)
 // ------------------------------
 
 const consoleLogger = new ConsoleLogger();

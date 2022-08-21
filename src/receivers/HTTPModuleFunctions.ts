@@ -71,7 +71,7 @@ export class HTTPModuleFunctions {
     const bufferedReq = await HTTPModuleFunctions.bufferIncomingMessage(req);
 
     if (options.enabled !== undefined && !options.enabled) {
-      // As the validation is disabled, immediately return the bufferred reuest
+      // As the validation is disabled, immediately return the buffered request
       return bufferedReq;
     }
     const textBody = bufferedReq.rawBody.toString();
