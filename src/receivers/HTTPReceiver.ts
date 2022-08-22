@@ -394,9 +394,9 @@ export default class HTTPReceiver implements Receiver {
       if (match) { return this.routes[path][method](req, res); }
     }
 
-    // If the request did not match the previous conditions, an error is thrown. The error can be caught by the
+    // If the request did not match the previous conditions, an error is thrown. The error can be caught by
     // the caller in order to defer to other routing logic (similar to calling `next()` in connect middleware).
-    // If you would like to customize the HTTP repsonse for this pattern,
+    // If you would like to customize the HTTP response for this pattern,
     // implement your own dispatchErrorHandler that handles an exception
     // with ErrorCode.HTTPReceiverDeferredRequestError.
     throw new HTTPReceiverDeferredRequestError(`Unhandled HTTP request (${method}) made to ${path}`, req, res);
@@ -412,7 +412,7 @@ export default class HTTPReceiver implements Receiver {
       try {
         bufferedReq = await httpFunc.parseAndVerifyHTTPRequest(
           {
-            // If enabled: false, this method returns bufferredReq without verification
+            // If enabled: false, this method returns bufferedReq without verification
             enabled: this.signatureVerification,
             signingSecret: this.signingSecret,
           },
@@ -431,7 +431,7 @@ export default class HTTPReceiver implements Receiver {
 
       // Parse request body
       // The object containing the parsed body is not exposed to the caller. It is preferred to reduce mutations to the
-      // req object, so that its as reusable as possible. Later, we should consider adding an option for assigning the
+      // req object, so that it's as reusable as possible. Later, we should consider adding an option for assigning the
       // parsed body to `req.body`, as this convention has been established by the popular `body-parser` package.
       try {
         body = httpFunc.parseHTTPRequestBody(bufferedReq);

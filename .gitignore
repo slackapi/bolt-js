@@ -12,3 +12,6 @@
 
 # macOS
 .DS_Store
+
+# WebStorm
+.idea/
