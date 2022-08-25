@@ -115,5 +115,3 @@ Then, we can talk about handlers and actions and all that good stuff.
 ---
 ### Views {#views}
 Finally, we can add in Sarah's example here of how to add in a view with an action (open modal example!)
-
----

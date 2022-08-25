@@ -6,7 +6,7 @@ lang: en
 layout: tutorial
 permalink: /run-on-slack/custom-functions
 ---
-# Custom functions
+# Custom functions <span class="label-beta">BETA</span>
 
 <div class="section-content">
 On the next-generation platform, you can build custom **Run On Slack functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [Workflows](/bolt-js/run-on-slack/workflows)&mdash;and Workflows are invoked by [Triggers](/bolt-js/run-on-slack/triggers).

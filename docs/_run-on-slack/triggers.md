@@ -6,7 +6,7 @@ lang: en
 layout: tutorial
 permalink: /run-on-slack/triggers
 ---
-# Triggers
+# Triggers <span class="label-beta">BETA</span>
 
 <div class="section-content">
 Triggers are but one of the three building blocks that make up next-generation Slack apps. You will encounter all three as you walk the path of building your Slack app:
@@ -475,5 +475,3 @@ To learn more about this, visit the guide [here](https://api.slack.com/future/tr
 And that's the end of our triumphant trek learning about Triggers!
 
 If you want to see Triggers in action with their pals, the Function and the Workflow, check out our sample [Time Off Request](https://github.com/slack-samples/bolt-js-take-your-time) app within our GitHub repository.
-
----

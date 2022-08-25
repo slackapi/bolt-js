@@ -6,7 +6,7 @@ lang: en
 layout: tutorial
 permalink: /run-on-slack/workflows
 ---
-# Workflows
+# Workflows <span class="label-beta">BETA</span>
 
 <div class="section-content">
 A Workflow is a set of processing steps that are executed in order. Each step in a Workflow is either a [custom function](/bolt-js/run-on-slack/custom-functions) that you define or a [built-in function](/bolt-js/run-on-slack/built-in-functions) that's part of `slack`. 
@@ -294,5 +294,3 @@ If a Workflow is invoked and the required input parameters are not provided, the
 ### Onward
 
 Once you have defined a Workflow, you're ready to [create a Trigger](/bolt-js/run-on-slack/triggers) that invokes it.
-
----

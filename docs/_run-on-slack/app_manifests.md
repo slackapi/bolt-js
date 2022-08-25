@@ -6,7 +6,7 @@ lang: en
 layout: tutorial
 permalink: /run-on-slack/app-manifest
 ---
-# App manifests
+# App manifests <span class="label-beta">BETA</span>
 
 <div class="section-content">
 An app's manifest is where you can configure its name and scopes, declare the functions your app will use, and more. 
@@ -98,4 +98,3 @@ features: {
   },
 },
 ```
----
