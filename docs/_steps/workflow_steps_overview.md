@@ -1,5 +1,5 @@
 ---
-title: Overview of Workflow Steps for apps
+title: Overview of Workflow Steps for apps <span class="label-legacy">LEGACY</span>
 lang: en
 slug: steps-overview
 order: 1

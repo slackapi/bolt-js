@@ -1,5 +1,5 @@
 ---
-title: Creating workflow steps
+title: Creating workflow steps <span class="label-legacy">LEGACY</span>
 lang: en
 slug: creating-steps
 order: 2

@@ -117,6 +117,28 @@ span.beta {
   font-weight: 600;
 }
 
+.panel .sidebar-content ul.sidebar-section .label-legacy {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--dark-grey);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.panel .sidebar-content ul.sidebar-section .label-beta {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--blue);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
 /* Main page */
 .header {
   width: 95%;
@@ -235,6 +257,30 @@ span.beta {
   padding-bottom: 1em;
 }
 
+.tutorial .label-legacy {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--dark-grey);
+  font-size: 0.45em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
+
+.tutorial .label-beta {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--blue);
+  font-size: 0.45em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
+
 .reference {
   width: 80%;
   margin: 1em auto 3em auto;
@@ -292,6 +338,19 @@ a code {
   border-top: 1px solid #DDD;
   width: 100%;
 }
+
+.content .section-wrapper .label-legacy {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--dark-grey);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
+
 
 a:hover {
   text-decoration: underline;
