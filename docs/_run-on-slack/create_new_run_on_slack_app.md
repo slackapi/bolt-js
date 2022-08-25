@@ -64,7 +64,7 @@ Then, run the following command to create a trigger using the `link-shortcut.jso
 slack triggers create --trigger-def="triggers/link-shortcut.json"      
 ```
 
-The above command will automatically install the trigger to your active workspace. Once the trigger is successfully created, you should see an output like this:
+The above command will automatically install the trigger to the selected workspace. Once the trigger is successfully created, you should see an output like this:
 ```
 ⚡ Trigger created
    Trigger ID:   [ID]
