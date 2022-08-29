@@ -253,15 +253,10 @@ export class SlackFunction {
    * the global event processing chain.
   */
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<void> => {
+    return (args): Promise<void> => {
       // handle function executed event
       if ((isFunctionExecutedEvent(args) && this.matchesFuncConstraints(args))) {
-        try {
-          this.logger.debug('🚀 Executing my main handler:', this.handler);
-          return await this.runHandler(args);
-        } catch (error) {
-          this.logger.error('⚠️ Something went wrong executing:', this.handler);
-        }
+        return this.runHandler(args);
       }
       // handle function interactivity events
       if (isFunctionInteractivityEvent(args)) {
@@ -273,8 +268,13 @@ export class SlackFunction {
   }
 
   public runHandler = async (args: AnyMiddlewareArgs & AllMiddlewareArgs): Promise<void> => {
-    const handlerArgs = this.prepareFnArgs(args);
-    this.handler(handlerArgs);
+    this.logger.debug('🚀 Executing my main handler:', this.handler);
+    try {
+      const handlerArgs = this.prepareFnArgs(args);
+      await this.handler(handlerArgs);
+    } catch (err) {
+      this.logger.error('⚠️ Something went wrong executing:', this.handler, '\n⚠️ Error Details:', err);
+    }
   };
 
   public runInteractivityHandlers = async (args: AnyMiddlewareArgs & AllMiddlewareArgs): Promise<void> => {

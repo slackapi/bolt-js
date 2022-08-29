@@ -138,6 +138,29 @@ describe('SlackFunction module', () => {
         await testFunc.runHandler(fakeArgs);
         assert(spyHandler.called);
       });
+      it('should gracefully handle errors if promise rejects', async () => {
+        // set up the slack function
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const spyHandler = sinon.spy((async () => {
+          throw new Error('BOOM!');
+        }) as unknown as Middleware<SlackEventMiddlewareArgs>);
+        const testFunc = new SlackFunction(mockFunctionCallbackId, spyHandler);
+
+        // set up event args
+        const fakeArgs = {
+          next: () => {},
+          payload: {
+            function_execution_id: '1234',
+          },
+          body: {},
+          client: {} as WebClient,
+        } as AnyMiddlewareArgs & AllMiddlewareArgs;
+
+        // ensure handler is called
+        const shouldNotThrow = async () => testFunc.runHandler(fakeArgs);
+        assert.doesNotThrow(shouldNotThrow);
+      });
     });
     describe('runInteractivityHandlers', () => {
       it('should execute all provided callbacks', async () => {
