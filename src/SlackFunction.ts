@@ -87,12 +87,14 @@ export interface ManifestDefinitionResult {
  *
  * *Completing your function*
  *
- * Call the supplied utility `complete` in any handler
- * with either outputs or an error or nothing when your
- * function is done. This tells Slack whether to proceed
+ * Call the supplied utility `complete` when your function is
+ * done executing. This tells Slack it can proceed
  * with any next steps in any workflow this function might
- * be included in. Your outputs should match what is defined
- * in your manifest.
+ * be included in.
+ *
+ * Supply outputs or an error or nothing when your
+ * function is done. Note, your outputs should match what you
+ * have defined in your in your manifest.
  *
  * Example:
  * ```
@@ -104,6 +106,12 @@ export interface ManifestDefinitionResult {
  *      complete({ error: {} });
  *   });
  * ```
+ *
+ * Call `complete()` from your main handler or
+ * an interactivity handler. Note, once a function is
+ * completed (either with outputs or an error), interactions
+ * from views generated in the course of function execution
+ * will no longer trigger associated handlers, so remember to clean those up.
  * */
 export class SlackFunction {
   /**
@@ -369,7 +377,7 @@ export class SlackFunction {
 /* Event handling validation */
 
 export function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
-  if (args.payload === undefined) {
+  if (args.payload === undefined || args.payload === null) {
     return false;
   }
   return (args.payload.type === 'function_executed');
@@ -378,7 +386,7 @@ export function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
 export function isFunctionInteractivityEvent(args: AnyMiddlewareArgs & AllMiddlewareArgs): boolean {
   const allowedInteractivityTypes = [
     'block_actions', 'view_submission', 'view_closed'];
-  if (args.body === undefined) return false;
+  if (args.body === undefined || args.body === null) return false;
   return (
     allowedInteractivityTypes.includes(args.body.type) &&
     ('function_data' in args.body)

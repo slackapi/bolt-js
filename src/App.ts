@@ -620,8 +620,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register a Slack Function
    *
-   * @param callbackId the id of the function as defined in manifest
-   *
    * @param slackFn a main function to register
    *
    * */
@@ -986,7 +984,20 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     /**
-     * Set the Bot Access Token if it exists in event payload
+     * Set the Bot Access Token if it exists in event payload to the context.
+     *
+     * A bot_access_token will exist in any payload that has been generated
+     * in the context of a Slack Function execution. This includes function_execution
+     * events themselves, as well as interactivity payloads (e.g. block_actions, views).
+     *
+     * This token must be used for further Slack API calls which are relevant to this
+     * Slack Function execution in order for any interactivity context data to be
+     * properly sent by Slack.
+     *
+     * Bolt will set this value in the event Context and
+     * use this token in place of any other token (for example the token
+     * that the App was configured with) to initialize the Web Client.
+     *
      * Sometimes the bot_access_token is located in the event
      * Sometimes it is located directly in the body.
      */
@@ -1610,7 +1621,7 @@ function isBlockActionOrInteractiveMessageBody(
 }
 
 /**
- * Returns a bot token, bot access token or user token for client, say()
+ * Returns in order of preference, a bot token, bot access token or user token for client, say()
  * */
 function selectToken(context: Context): string | undefined {
   return context.botAccessToken ?? context.botToken ?? context.userToken;
@@ -1639,7 +1650,7 @@ function isEventTypeToSkipAuthorize(eventType: string) {
 addAppMetadata({ name: packageJson.name, version: packageJson.version });
 
 // types
-export type ListenerArgs = Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+type ListenerArgs = Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
   /** Say function might be set below */
   say?: SayFn;
   /** Respond function might be set below */
