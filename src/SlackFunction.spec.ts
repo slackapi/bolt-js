@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assertNode from 'node:assert/strict';
+import * as assertNode from 'assert';
 import { assert } from 'chai';
 import { expectType } from 'tsd';
 import rewiremock from 'rewiremock';
