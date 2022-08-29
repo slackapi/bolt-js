@@ -1,15 +1,15 @@
 ---
-title: Create a new Run on Slack app
+title: Create a new app
 order: 0
-slug: create-new-run-on-slack-app
+slug: create-new-app
 lang: en
 layout: tutorial
-permalink: /run-on-slack/create-new-run-on-slack-app
+permalink: /future/create-new-app
 ---
-# Create a new Run on Slack app <span class="label-beta">BETA</span>
+# Create a new app <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through getting started with Run on Slack as well as how to create a Run on Slack app with Bolt JS.
+This guide will walk you through getting started with the Slack CLI as well as how to create a new app in the CLI with Bolt JS.
 
 The application built in this tutorial will be a "Time off Request" app that allows a user to submit a time off request, which then sends a message to their manager, who can either approve or deny the request. 
 </div>

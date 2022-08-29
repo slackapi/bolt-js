@@ -4,12 +4,12 @@ order: 2
 slug: built-in-functions
 lang: en
 layout: tutorial
-permalink: /run-on-slack/built-in-functions
+permalink: /future/built-in-functions
 ---
 # Built-in functions <span class="label-beta">BETA</span>
 
 <div class="section-content">
-Slack provides built-in functions you can use alongside your [custom functions](/bolt-js/run-on-slack/custom-functions) in a Workflow. Built-in functions are essentially Slack-native actions, like creating a channel or sending a message, that work hand-in-hand with your functions.
+Slack provides built-in functions you can use alongside your [custom functions](/bolt-js/future/custom-functions) in a Workflow. Built-in functions are essentially Slack-native actions, like creating a channel or sending a message, that work hand-in-hand with your functions.
 
 <p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon> Please note that some built-in functions may be restricted due to Workspace permission settings. Reach out to a Workspace owner if these aren't available to you.</p>
 

@@ -4,7 +4,7 @@ order: 5
 slug: triggers
 lang: en
 layout: tutorial
-permalink: /run-on-slack/triggers
+permalink: /future/triggers
 ---
 # Triggers <span class="label-beta">BETA</span>
 
@@ -15,7 +15,7 @@ Triggers are but one of the three building blocks that make up next-generation S
 2. Workflows are made up of Functions
 3. Triggers are how Workflows are executed (⬅️ you are here)
 
-Since Triggers are what trigger your Workflows, you need to have a Workflow before you can create a Trigger. Acquaint yourself with the [documentation on Workflows](/bolt-js/run-on-slack/workflows), then head back here. We'll wait!
+Since Triggers are what trigger your Workflows, you need to have a Workflow before you can create a Trigger. Acquaint yourself with the [documentation on Workflows](/bolt-js/future/workflows), then head back here. We'll wait!
 
 With the knowledge of Workflows within your noggin, let's take a look at the different types of Triggers, and how you can implement them into your new app. 
 
@@ -462,7 +462,7 @@ With your desired filter designed, set it within the `trigger` object when you `
 
 ### Manage Access {#manage-access}
 
-A newly created Run on Slack [Trigger](/bolt-js/run-on-slack/triggers) will only be accessible to others inside a workspace once its creator has granted access.
+A newly created [Trigger](/bolt-js/future/triggers) will only be accessible to others inside a workspace once its creator has granted access.
 
 To manage what user (or many users) have access to run your Triggers, you'll use the `access` command.
 

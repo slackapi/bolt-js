@@ -22,9 +22,9 @@ collections:
     permalink: /tutorials/:slug
   reference:
     output: true
-  run-on-slack:
+  future:
     output: true
-    permalink: /run-on-slack/:slug
+    permalink: /future/:slug
 
 defaults:
   -

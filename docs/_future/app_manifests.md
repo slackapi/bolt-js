@@ -4,7 +4,7 @@ order: 1
 slug: app-manifest
 lang: en
 layout: tutorial
-permalink: /run-on-slack/app-manifest
+permalink: /future/app-manifest
 ---
 # App manifests <span class="label-beta">BETA</span>
 
@@ -86,7 +86,7 @@ You will come back to the Manifest every time you create a new function or workf
 
 By default, apps created with `slack create` will include both a read-only Messages tab and an About tab within Slack.
 
-You can use the [Built-in function](/bolt-js/run-on-slack/built-in-functions) [`SendDm`](https://api.slack.com/future/functions#send-direct-message) to send users direct messages from your app&mdash;which will appear for them in the app's Messages tab.
+You can use the [Built-in function](/bolt-js/future/built-in-functions) [`SendDm`](https://api.slack.com/future/functions#send-direct-message) to send users direct messages from your app&mdash;which will appear for them in the app's Messages tab.
 
 Your app's Messages tab will be enabled and read-only by default. If you'd like to disable read-only mode and/or disable the Messages tab completely, update the `features` section of your `manifest.js` so it looks like this:
 ```javascript

@@ -4,14 +4,14 @@ order: 3
 slug: custom-functions
 lang: en
 layout: tutorial
-permalink: /run-on-slack/custom-functions
+permalink: /future/custom-functions
 ---
 # Custom functions <span class="label-beta">BETA</span>
 
 <div class="section-content">
-On the next-generation platform, you can build custom **Run On Slack functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [Workflows](/bolt-js/run-on-slack/workflows)&mdash;and Workflows are invoked by [Triggers](/bolt-js/run-on-slack/triggers).
+On the next-generation platform, you can build **custom functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [Workflows](/bolt-js/future/workflows)&mdash;and Workflows are invoked by [Triggers](/bolt-js/future/triggers).
 
-To create a Run On Slack function, we need to do three things: 
+To create a function, we need to do three things: 
 - [define the function](#define) in the Manifest;
 - [implement the function](#implement) in its respective source file;
 - [distribute the function](#distribute) so others can use it.
@@ -37,7 +37,7 @@ Implement functions in two steps:
 
 ### Distributing a function {#distribute}
 
-A newly created Run On Slack [Function](https://api.slack.com/future/functions) will only be accessible to it's creator until it is **distributed** to others.
+A newly created [Function](https://api.slack.com/future/functions) will only be accessible to it's creator until it is **distributed** to others.
 
 To distribute a Function so that another user (or many users) can build workflows that reference that function, you'll use the `distribute` command. At this time, Functions can be distributed to _everyone_ in a workspace, your app's _collaborators_, or _specific users_. 
 

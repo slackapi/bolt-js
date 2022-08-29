@@ -4,12 +4,12 @@ order: 4
 slug: workflows
 lang: en
 layout: tutorial
-permalink: /run-on-slack/workflows
+permalink: /future/workflows
 ---
 # Workflows <span class="label-beta">BETA</span>
 
 <div class="section-content">
-A Workflow is a set of processing steps that are executed in order. Each step in a Workflow is either a [custom function](/bolt-js/run-on-slack/custom-functions) that you define or a [built-in function](/bolt-js/run-on-slack/built-in-functions) that's part of `slack`. 
+A Workflow is a set of processing steps that are executed in order. Each step in a Workflow is either a [custom function](/bolt-js/future/custom-functions) that you define or a [built-in function](/bolt-js/future/built-in-functions) that's part of `slack`. 
 
 Workflows can be configured to run without any user input, or they can [wait for input via form](https://api.slack.com/future/forms) before continuing.
 </div>
@@ -18,7 +18,7 @@ Workflows can be configured to run without any user input, or they can [wait for
 
 ### Defining Workflows {#defining-workflows}
 
-Workflows are defined and implemented in your app's [Manifest](/bolt-js/run-on-slack/app-manifest).
+Workflows are defined and implemented in your app's [Manifest](/bolt-js/future/app-manifest).
 
 Before we begin, import `DefineWorkflow` at the top of your Manifest file:
 
@@ -48,7 +48,7 @@ Once you've defined your Workflow, you'll now have access to it's `addStep` meth
 
 #### Using built-in functions in a workflow {#workflow-builtin-functions}
 
-To use a [built-in function](/bolt-js/run-on-slack/built-in-functions), like `SendMessage`:
+To use a [built-in function](/bolt-js/future/built-in-functions), like `SendMessage`:
 
 1. Ensure that `Schema` from the SDK is imported in your Manifest file:
 
@@ -212,9 +212,9 @@ export default Manifest({
 });
 ```
 
-The above example uses the [Built-in function `SendDm`](https://api.slack.com/future/functions) to send a direct message. There are many other Built-in functions available to use, and you can also include [Custom functions](/bolt-js/run-on-slack/custom-functions) that you define. 
+The above example uses the [Built-in function `SendDm`](https://api.slack.com/future/functions) to send a direct message. There are many other Built-in functions available to use, and you can also include [Custom functions](/bolt-js/future/custom-functions) that you define. 
 
-To invoke a Workflow, you need to create a [Trigger](/bolt-js/run-on-slack/triggers).
+To invoke a Workflow, you need to create a [Trigger](/bolt-js/future/triggers).
 
 ---
 
@@ -293,4 +293,4 @@ If a Workflow is invoked and the required input parameters are not provided, the
 
 ### Onward
 
-Once you have defined a Workflow, you're ready to [create a Trigger](/bolt-js/run-on-slack/triggers) that invokes it.
+Once you have defined a Workflow, you're ready to [create a Trigger](/bolt-js/future/triggers) that invokes it.

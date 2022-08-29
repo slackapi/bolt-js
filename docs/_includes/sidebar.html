@@ -42,12 +42,12 @@
 
   <ul class="sidebar-section">
     <li class="title">
-      Building Run on Slack apps
+      Next generation platform
       <span class="label-beta">{{ site.t[page.lang].beta }}</span>
     </li>
-    {% assign run_on_slack_sections = site.run-on-slack | sort: "order" | where: "lang", page.lang %}
-    {% for section in run_on_slack_sections %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/run-on-slack/{{ section.slug }}">
+    {% assign future_sections = site.future | sort: "order" | where: "lang", page.lang %}
+    {% for section in future_sections %}
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/future/{{ section.slug }}">
         <li>{{section.title}}</li>
       </a>
     {% endfor %}
