@@ -5,15 +5,7 @@ export interface FunctionExecutionContext {
   execution_id: string,
   inputs: Record<string, unknown>,
   function: {
-    id: string,
     callback_id: string,
-    title: string,
-    description: string,
-    type: string,
-    input_parameters: any[],
-    output_parameters: any[],
-    app_id: string,
-    date_updated: number,
   }
 }
 

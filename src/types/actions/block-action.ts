@@ -242,9 +242,9 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
       };
     };
   };
-  token: string;
+  token?: string;
   response_url: string;
-  trigger_id: string;
+  trigger_id?: string;
   api_app_id: string;
 
   // TODO: we'll need to fill this out a little more carefully in the future, possibly using a generic parameter
