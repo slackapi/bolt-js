@@ -984,7 +984,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     /**
-     * Set the Bot Access Token if it exists in event payload to the context.
+     * Set the Slack Function Bot Access Token if it exists in event payload to the context.
      *
      * A bot_access_token will exist in any payload that has been generated
      * in the context of a Slack Function execution. This includes function_execution
