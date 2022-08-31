@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const merge = require('deepmerge');
 
 // helper array merge function
 function unionMerge(array1, array2) {
@@ -7,10 +8,10 @@ function unionMerge(array1, array2) {
 }
 
 // look for manifest.json in the current working directory
-function readManifestJSONFile(cwd, filename) {
+function readManifestJSONFile(searchDir, filename) {
   let jsonFilePath, manifestJSON;
   try {
-    jsonFilePath = find(cwd, filename);
+    jsonFilePath = find(searchDir, filename);
     if (fs.existsSync(jsonFilePath)) {
       manifestJSON = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
     }
@@ -21,11 +22,11 @@ function readManifestJSONFile(cwd, filename) {
 }
 
 // look for a manifest file in the current working directory
-function readImportedManifestFile(cwd, filename) {
+function readImportedManifestFile(searchDir, filename) {
   let importedManifestFilePath, manifestImported;
 
   try {
-    importedManifestFilePath = find(cwd, filename);
+    importedManifestFilePath = find(searchDir, filename);
     if (fs.existsSync(importedManifestFilePath)) {
       manifestImported = require(`${importedManifestFilePath}`);
       
@@ -77,7 +78,34 @@ function find(currentPath, targetFilename) {
   }
 }
 
+function getManifestData(searchDir) {
+  const file = 'manifest';
+  let manifest = {};
+
+  // look for a manifest JSON
+  const manifestJSON = readManifestJSONFile(searchDir, `${file}.json`);
+  
+  // look for manifest.js
+  // stringify and parses the JSON in order to ensure that objects with .toJSON() functions
+  // resolve properly. This is a known behavior for CustomType
+  const manifestJS = JSON.parse(JSON.stringify(readImportedManifestFile(searchDir, `${file}.js`)));
+
+  if (!hasManifest(manifestJS, manifestJSON)) {
+    throw new Error('Unable to find a manifest file in this project');
+  }
+
+  // manage manifest merge
+  if (manifestJSON) {
+    manifest = merge(manifest, manifestJSON, { arrayMerge: unionMerge});
+  }  
+  if (manifestJS) {
+    manifest = merge(manifest, manifestJS, { arrayMerge: unionMerge });
+  }
+  return manifest;
+} 
+
 module.exports = {
+  getManifestData,
   unionMerge,
   readManifestJSONFile,
   readImportedManifestFile,
