@@ -121,6 +121,7 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput
 /**
  * Middleware that checks for matches given constraints
  */
+
 export function matchConstraints(
   constraints: ActionConstraints | ViewConstraints | ShortcutConstraints,
 ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
