@@ -1001,16 +1001,16 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
      * Sometimes the bot_access_token is located in the event
      * Sometimes it is located directly in the body.
      */
-    let botAccessToken = body.bot_access_token;
-    if (botAccessToken === undefined && 'event' in body) {
-      botAccessToken = body.event.bot_access_token;
+    let slackFunctionBotAccessToken = body.bot_access_token;
+    if (slackFunctionBotAccessToken === undefined && 'event' in body) {
+      slackFunctionBotAccessToken = body.event.bot_access_token;
     }
 
     // Declare the event context
     const context: Context = {
       ...authorizeResult,
       ...event.customProperties,
-      botAccessToken,
+      slackFunctionBotAccessToken,
       isEnterpriseInstall,
       retryNum: event.retryNum,
       retryReason: event.retryReason,
@@ -1624,7 +1624,7 @@ function isBlockActionOrInteractiveMessageBody(
  * Returns in order of preference, a bot token, bot access token or user token for client, say()
  * */
 function selectToken(context: Context): string | undefined {
-  return context.botAccessToken ?? context.botToken ?? context.userToken;
+  return context.slackFunctionBotAccessToken ?? context.botToken ?? context.userToken;
 }
 
 function buildRespondFn(

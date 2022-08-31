@@ -13,4 +13,4 @@ const { getManifestData } = require('./hook-utils/manifest');
     
   // write manifest to stdout
   console.log(JSON.stringify(manifest));
-}( process.cwd()));
+}(process.cwd()));

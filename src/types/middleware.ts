@@ -57,7 +57,7 @@ export interface Context extends StringIndexed {
    *
    * Read about custom Slack Functions @ https://api.slack.com/future/functions
    * */
-  botAccessToken?: string;
+  slackFunctionBotAccessToken?: string;
   /**
    * A bot token, which starts with `xoxp-`.
    * This value can be used by `say` (overridden by botToken),

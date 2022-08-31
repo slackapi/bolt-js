@@ -103,7 +103,7 @@ export interface ManifestDefinitionResult {
  *
  *      complete() // or
  *      complete({ outputs: {} }); // or
- *      complete({ error: {} });
+ *      complete({ error: "error details here" });
  *   });
  * ```
  *
@@ -448,10 +448,12 @@ export function passConstraint(
   return pass;
 }
 
+// all tests to run
+const validations = [hasCallbackId, hasMatchingManifestDefinition, hasHandler];
+
 /* Initialization validators */
 export function validate(callbackId: string, handler: Middleware<SlackEventMiddlewareArgs>): void {
-  const tests = [hasCallbackId, hasMatchingManifestDefinition, hasHandler];
-  tests.forEach((test) => {
+  validations.forEach((test) => {
     const res = test(callbackId, handler);
     if (!res.pass) {
       throw new SlackFunctionInitializationError(res.msg);
@@ -494,7 +496,7 @@ export function hasMatchingManifestDefinition(
   const { matchFound, fnKeys } = findMatchingManifestDefinition(callbackId);
   if (!matchFound) {
     res.pass = false;
-    res.msg = `Provided SlackFunction callback_id: [${callbackId}] does not have a matching manifest ` +
+    res.msg = `Provided SlackFunction callback_id: "${callbackId}" does not have a matching manifest ` +
                 'definition. Please check your manifest file.\n' +
                 `Definitions we were able to find: ${fnKeys}`;
   }
