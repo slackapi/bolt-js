@@ -1,5 +1,6 @@
 import { Block, KnownBlock, PlainTextElement, View } from '@slack/types';
 import { AckFn, RespondFn } from '../utilities';
+import { FunctionContext } from '../functions';
 
 /**
  * Known view action types
@@ -39,7 +40,7 @@ export interface ViewResponseUrl {
  *
  * This describes the entire JSON-encoded body of a view_submission event.
  */
-export interface ViewSubmitAction {
+export interface ViewSubmitAction extends FunctionContext {
   type: 'view_submission';
   team: {
     id: string;
@@ -54,8 +55,8 @@ export interface ViewSubmitAction {
   };
   view: ViewOutput;
   api_app_id: string;
-  token: string;
-  trigger_id: string; // undocumented
+  token?: string;
+  trigger_id?: string; // undocumented
   // exists for enterprise installs
   is_enterprise_install?: boolean;
   enterprise?: {
@@ -70,7 +71,7 @@ export interface ViewSubmitAction {
  *
  * This describes the entire JSON-encoded body of a view_closed event.
  */
-export interface ViewClosedAction {
+export interface ViewClosedAction extends FunctionContext {
   type: 'view_closed';
   team: {
     id: string;
@@ -93,6 +94,7 @@ export interface ViewClosedAction {
     id: string;
     name: string;
   };
+
 }
 
 /**
