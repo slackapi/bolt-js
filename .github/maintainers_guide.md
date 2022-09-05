@@ -70,7 +70,7 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     -  Add a version tag (ie, `git tag @slack/bolt@3.6.0`)
     -  Push the new tag up to origin: `git push --tags origin`
 5. Publish the release to npm
-    - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your passsword generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
+    - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your password generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
     - Before publishing a new version, run `rm -rf node_modules/ dist/` to clean your module dependencies in the project first (usually this is not required but in some cases, `npm publish` cannot include all the required files in a package) 
     - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package contain, at a minimum: `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `dist/index.js`, `dist/App.js`
     - Run `npm publish --tag <dist-tag> . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password). 
