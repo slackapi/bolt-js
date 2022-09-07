@@ -11,14 +11,14 @@ permalink: /future/create-new-app
 <div class="section-content">
 This guide will walk you through getting started with the Slack CLI as well as how to create a new app in the CLI with Bolt JS.
 
-The application built in this tutorial will be a "Time off Request" app that allows a user to submit a time off request, which then sends a message to their manager, who can either approve or deny the request. 
+The application built in this tutorial will be a "Request Time Off" app that allows a user to submit a Request Time Off, which then sends a message to their manager, who can either approve or deny the request. 
 </div>
 
-When you’re finished, you’ll have this ⚡️[Bolt JS Time off Request app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Bolt JS Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
 
 ---
 
-### Prerequisites (#prerequisites)
+### Prerequisites {#prerequisites}
 Before getting started, you'll need to get the Slack CLI set up on your machine. You can follow the [Quickstart Guide](https://api.slack.com/future/quickstart) to get instructions on how to manually or automatically install it. 
 
 Since we won't be using Deno in this guide, you can skip any instructions related to installing Deno or creating an app - once you've logged into the CLI using `slack auth login` and verified your login using `slack auth list`, you can proceed with the tutorial below.
@@ -32,9 +32,9 @@ Before you start developing with Bolt, you'll want to create a Slack app.
 
 To create the app, you'll run the following command:
 ```
-slack create my-app -t slack-samples/bolt-js-take-your-time -b future
+slack create my-app -t slack-samples/bolt-js-request-time-off
 ```
-This command creates an app through the CLI using a template. In this case, it's using the Time Off Request application which can be found [here](https://github.com/slackapi/bolt-js-getting-started-app). 
+This command creates an app through the CLI using a template. In this case, it's using the Bolt JS Request Time Off application which can be found [here](https://github.com/slack-samples/bolt-js-request-time-off). 
 
 The application will take a few moments to set up. Once the app is successfully created, you should see a message like this:
 ```
@@ -57,7 +57,7 @@ You can now explore the `my-app` directory!
 
 ---
 ### Setup your trigger {#setup-trigger}
-In order to utilize any of the pre-existing functionality in the Time Off Request app, you'll need to create a trigger prior to running your app. Enter the project directory: `cd my-app`
+In order to utilize any of the pre-existing functionality in the Request Time Off app, you'll need to create a trigger prior to running your app. Enter the project directory: `cd my-app`
 
 Then, run the following command to create a trigger using the `link-shortcut.json` configuration file that initializes your trigger:
 ```
@@ -70,9 +70,9 @@ The above command will automatically install the trigger to the selected workspa
    Trigger ID:   [ID]
    Trigger Type: shortcut
    Trigger Name: Take Your Time
-   Shortcut URL: https://slack.com/shortcuts/[ID]/[Some ID]
+   URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
-The shortcut URL will be what you use to run your trigger. Copy the URL of the trigger for later.
+The URL will be what you use to run your trigger. Copy the URL of the trigger for later.
 
 ---
 ### Run your app {#run-your-app}
@@ -83,6 +83,8 @@ Run `slack run` to start up the app. You'll be prompted to select a workspace to
 Once the app is successfully run, you'll see output in your Terminal to indicate it's running similar to what you would see with any other Bolt JS app. You can search for the `⚡️ Bolt app is running! ⚡️` message to indicate that your app has successfully started up.
 
 With your app running, access your workspace and paste the Shortcut URL from your trigger into a public channel. Click the "Run" button that appears and a modal will appear prompting you to enter information to request time off. To test your app properly, we recommend entering your own Slack username in the "Manager" field.
+
+> Insert Screenshot here of form
 
 Then, submit the form. You should receive a message from the app with information about the requested time off as well as an "Approve" and "Deny" button. Once either button is selected, you should then receive a message from the app notifying you of the status of your request.
 
@@ -115,3 +117,9 @@ Then, we can talk about handlers and actions and all that good stuff.
 ---
 ### Views {#views}
 Finally, we can add in Sarah's example here of how to add in a view with an action (open modal example!)
+
+#### Opening modals
+[Modals](https://api.slack.com/block-kit/surfaces/modals) can be created by calling the `views.open` method. The method requires you to pass a valid [view payload](https://api.slack.com/reference/block-kit/views).
+
+To open or update a modal from a Slack Function [interactivity handler](https://api.slack.com/future/view-events), pass the `interactivity_pointer` you received from your event payload in your `views.open` method.
+

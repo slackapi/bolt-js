@@ -203,7 +203,7 @@ SayHelloWorkflow.addStep(Schema.slack.functions.SendDm, {
   message: "Hello, world!",
 });
 
-export default Manifest({
+module.exports = Manifest({
   name: "say-hello-app",
   description: "A demo of a Hello World workflow.",
   icon: "assets/icon.png",
@@ -288,6 +288,8 @@ export const SomeWorkflow = DefineWorkflow({
 ```
 
 If a Workflow is invoked and the required input parameters are not provided, the Workflow will not execute.
+
+> 🗣 Got 2 minutes to provide some feedback? Fill out our [Developer Survey](https://api.slack.com/future/survey) and let us know what we're doing well—and what you'd like to see us improve.
 
 ---
 
