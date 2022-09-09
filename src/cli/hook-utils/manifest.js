@@ -81,15 +81,15 @@ function find(currentPath, targetFilename) {
 function getManifestData(searchDir) {
   const file = 'manifest';
   let manifest = {};
-
+  
   // look for a manifest JSON
   const manifestJSON = readManifestJSONFile(searchDir, `${file}.json`);
-  
   // look for manifest.js
   // stringify and parses the JSON in order to ensure that objects with .toJSON() functions
   // resolve properly. This is a known behavior for CustomType
-  const manifestJS = JSON.parse(JSON.stringify(readImportedManifestFile(searchDir, `${file}.js`)));
-
+  let manifestJS = JSON.stringify(readImportedManifestFile(searchDir, `${file}.js`));
+  manifestJS = (manifestJS !== undefined) ? JSON.parse(manifestJS): undefined;
+  
   if (!hasManifest(manifestJS, manifestJSON)) {
     throw new Error('Unable to find a manifest file in this project');
   }
