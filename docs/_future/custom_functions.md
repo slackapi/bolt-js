@@ -1,6 +1,6 @@
 ---
 title: Custom functions
-order: 3
+order: 5
 slug: custom-functions
 lang: en
 layout: tutorial
@@ -88,7 +88,9 @@ When composing your functions, some things you can do include:
 You can also encapsulate your business logic separately from the function handler, then import what you need and build your functions that way.
 
 #### 3. Add function listener and handler(s)
-Once your function has been defined, you'll need to register a function listener to trigger the function's functionality as well as any other related events. To do this, you'll first create a file in `listeners/functions`. This file will use the defined function and also implement any needed additional logic - in this case, it'll send a message to greet someone based on what was submitted in the form from the greeting function in step 2. 
+Once your function has been defined, you'll need to register a function listener to trigger the function's functionality as well as any other related events.
+
+To do this, create a file in `listeners/functions`. This file will use the defined function and also implement any needed additional logic - in this case, it'll send a message to greet someone based on what is being passed in from the greeting function in step 2. 
 
 ```js
 // For more information about functions: https://api.slack.com/future/functions

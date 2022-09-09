@@ -1,6 +1,6 @@
 ---
 title: App manifest
-order: 1
+order: 3
 slug: app-manifest
 lang: en
 layout: tutorial

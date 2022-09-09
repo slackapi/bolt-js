@@ -1,6 +1,6 @@
 ---
 title: Deploy your app
-order: 7
+order: 9
 slug: deploy-your-app
 lang: en
 layout: tutorial
