@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5 
+    allow:
+      - dependency-name: "typescript"
+      - dependency-name: "@types/node"
+    ignore:
+      - dependency-name: "*" 
+        update-types: ["version-update:semver-patch", "version-update:semver-minor"] 
