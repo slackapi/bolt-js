@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5 
+    allow:
+      # allow updates for typescript
+      - dependency-name: "typescript"
+      # allow updates for node types
+      - dependency-name: "@types/node"
+      # allow updates for slack official libraries
+      - dependency-name: "@slack/*"
