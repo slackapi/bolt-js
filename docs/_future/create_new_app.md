@@ -9,15 +9,16 @@ permalink: /future/create-new-app
 # Create a new app <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through getting started with the Slack CLI as well as how to create a new app in the CLI with Bolt JS. If you already have a Bolt JS application built that you'd like to migrate to the new Slack Developer Beta experience, please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
+This guide will walk you through getting started with the Slack CLI as well as how to create a new app in the CLI with Bolt JS. If you already have a Bolt JS application built that you'd like to migrate to the new [next-generation platform](/bolt-js/future/getting-started#next-gen), please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
 
 The application built in this tutorial will be a "Request Time Off" app that allows a user to submit requests for time off, which then sends a message to their manager, who can either approve or deny the request.
 </div>
 
 When you’re finished, you’ll have this ⚡️[Bolt JS Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
 
----
+If you have an existing Bolt JS application that you are looking to migrate to the next-generation platform experience, check out the [Migration Guide](/bolt-js/future/migrate-existing-app).
 
+---
 ### Prerequisites {#prerequisites}
 In order to create your app, make sure you've first followed the steps to install all dependencies in the [Getting Started guide](/bolt-js/future/getting-started).
 
@@ -82,12 +83,12 @@ Once the app is successfully run, you'll see output in your Terminal to indicate
 
 With your app running, access your workspace and paste the URL from your trigger into a public channel. Click the "Run" button that appears and a modal will appear prompting you to enter information to request time off. To test your app properly, we recommend entering your own Slack username in the "Manager" field.
 
-> Insert Screenshot here of form
+![Request Time Off modal](../assets/take-your-time-modal.png "Request Time Off modal")
 
 Then, submit the form. You should receive a message from the app with information about the requested time off as well as an "Approve" and "Deny" button. Once either button is selected, you should then receive a message from the app notifying you of the status of your request.
 
 The full app flow can be seen here:
-> Insert GIF here of how the app flow will look
+![Request Time Off app](../assets/take-your-time-demo.gif "Request Time Off app")
 
 ---
 ### Workflows {#workflows}
@@ -475,7 +476,7 @@ const approveActionHandler = async ({ ack, client, body, complete }) => {
 module.exports = { approveActionHandler };
 ```
 
-This function acknowledges the request by using `ack()`, then uses `client.chat.postMessage` to send the user a message notifying them of their time off status as well as `client.chat.update` to update the original time off request sent to the manager to remove the approve and deny buttons and reflect the request state. The handler is then completed by calling `complete()`, which signifies that the full flow is done. 
+This handler first deconstructs necessary data from the request body's function data inputs, such as `manager`, `employee`, `start_date`, and `end_date`. It also pulls the `channel_id` and `message_ts` from the body's container to be able to update the needed message. Then, the function acknowledges the request by using `ack()` and uses `client.chat.postMessage` to send the user a message notifying them of their time off status as well as `client.chat.update` to update the original time off request sent to the manager to remove the approve and deny buttons and reflect the request state. The handler is then completed by calling `complete()`, which signifies that the full flow is done. 
 
 Once the handler has been initialized, it can be added in as additional functionality in the function listener in `listeners/functions/request-approval.js`. The action handlers are added in after the `SlackFunction` registration in this file to add additional interactivity handlers to this function instance.
 
@@ -582,11 +583,138 @@ module.exports = { requestApprovalFunc };
 To learn more about actions, visit the documentation [here](/bolt-js/concepts#action-listening).
 
 ---
-### Views {#views}
-Finally, we can add in Sarah's example here of how to add in a view with an action (open modal example!) - I have this ready to go with the new `interactivity_pointer`, just need to add it in!
+### Views and modals {#views-and-modals}
+Additional interactivity can be added in to your next-generation Slack app through using [modals](/bolt-js/concepts#creating-modals) and [views](/bolt-js/concepts#updating-pushing-views). Within the Request Time Off example, we can add an additional button to the time off request a manager receives that opens a new modal.
 
-#### Opening modals
+Having additional interactivity such as a modal could provide a pathway for more functionality in the request time off flow, such as allowing a manager to send a message to the requester to get additional information or clarification before approving or denying the request officially.
+
+Let's dive in to see how we can add a new button that launches a simple modal with a corresponding view!
+
+![Request Time Off demo with Open Modal button](../assets/take-your-time-open-modal.gif "Request Time Off demo with Open Modal button")
+
+#### Add in new button to message
+To start the flow, you'll first add a button to the time off request message that is sent to the manager when a request is submitted. In `listeners/functions/request-approval.js`, add in a new button block object to the end of the `blocks` array within the `client.chat.postMessage` request:
+```js
+  {
+    type: 'button',
+    text: {
+        type: 'plain_text',
+        text: 'Open a Modal',
+      },
+      action_id: 'open_modal',
+      style: 'danger',
+    },
+```
+
+Once this has been added in, when testing your app, you should now see a red "Open Modal" button on time off request messages sent to the selected manager:
+![Request Time Off message with Open Modal button](../assets/take-your-time-open-modal.png "Request Time Off message with Open Modal button")
+
+#### Open a modal
 [Modals](https://api.slack.com/block-kit/surfaces/modals) can be created by calling the `views.open` method. The method requires you to pass a valid [view payload](https://api.slack.com/reference/block-kit/views).
 
-To open or update a modal from a Slack Function [interactivity handler](https://api.slack.com/future/view-events), pass the `interactivity_pointer` you received from your event payload in your `views.open` method.
+To open or update a modal from a Slack Function [interactivity handler](https://api.slack.com/future/view-events), you will pass the `interactivity_pointer` within the `interactivity` object you received from your event payload in your `views.open` method.
 
+To get started with creating a modal, add a new [Action](#action) that will be triggered when the "Open Modal" button is selected. Create a new file in `listeners/functions/actions` called `open-modal-action.js`:
+```js
+const openModalActionHandler = async ({ ack, client, body, complete }) => {
+    ack();
+    const { manager } = body.function_data.inputs;
+    const { interactivity_pointer } = body.interactivity;
+    try {
+        await client.views.open({
+            interactivity_pointer,
+            view: {
+                "type": "modal",
+                "title": {
+                    "type": "plain_text",
+                    "text": "Random Modal",
+                    "emoji": true
+                },
+                "submit": {
+                    "type": "plain_text",
+                    "text": "Submit",
+                    "emoji": true
+                },
+                "notify_on_close": true,
+                "close": {
+                    "type": "plain_text",
+                    "text": "Cancel",
+                    "emoji": true
+                },
+                "callback_id": "submit_open_modal",
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `Hello <@${manager}>, you opened a random modal.`
+                        }
+                    }
+                ]
+            }
+        })
+    } catch (error) {
+        complete({ error });
+    }
+  };
+
+module.exports = { openModalActionHandler };
+```
+In this file, necessary data is deconstructed from the request body's function data inputs, such as the `manager` property. The `interactivity_pointer` property, which is required to make the [`client.views.open`](https://api.slack.com/methods/views.open) API call, is also taken from the body's `interactivity` property.
+
+With the necessary variables needed, the `client.views.open` API method is called, passing in the `interactivity_pointer` property as well as a [Block kit](https://api.slack.com/block-kit) that defines the appearance of the modal as well as the callback ID, which is `submit_open_modal`.
+
+![Opem Modal popup](../assets/take-your-time-open-modal-popup.png "Open Modal popup")
+
+With the handler for the "Open Modal" button now defined, it can be added as an action handler in `listeners/functions/request-approval.js`! In the section near the bottom of the file where the action interactivity handlers are called on `requestApprovalFunc`, import the `openModalActionHandler` and add an additional `.action()` for it:
+
+```js
+const { openModalActionHandler } = require('./actions/open-modal-action'); // add new import for open modal handler
+
+// Add additional interactivity handlers
+requestApprovalFunc
+  .action('approve_request', approveActionHandler) // Support Regex
+  .action({ action_id: /deny_*.+/ }, denyActionHandler) // Support constraint object
+  .action('open_modal', openModalActionHandler); // Add new open modal action handler
+```
+
+#### Add in view handler
+Now that the "Open Modal" button's action handler has been added in to the `request-approval.js` file, we can add in a view handler that will trigger additional functionality if the modal is submitted.
+
+Inside `listeners/functions`, create a new directory called `views` and within it, add a new file called `modal-submit.js`:
+```js
+const openModalSubmissionHandler = async ({ ack, body, complete }) => {
+    ack();
+    const { manager, employee } = body.function_data.inputs;
+    try {
+      // add functionality here using `client.chat.postMessage` to send the employee who
+      // submitted the request a message asking them for additional information on
+      // their time off request
+      complete();
+    } catch (error) {
+      complete({ error });
+    }
+  };
+
+module.exports = { openModalSubmissionHandler };
+```
+Within this file, you can additional functionality - for example, you could add an API call to [`client.chat.postMessage`](https://api.slack.com/methods/chat.postMessage) that will send a message to the requester of time off on behalf of the manager requesting that they DM the manager more information about wanting to take time off.
+
+Once the desired functionality has been added into the `openModalSubmissionHandler`, you can add it as an additional interactivity handler in `listeners/functions/request-approval.js`. To do so, import the view handler from `./views/modal-submit.js`:
+```js
+const { openModalSubmissionHandler } = require('./views/modal-submit');
+```
+
+Then, add a `.view()` handler to the `requestApprovalFunc` object that maps to the modal's callback ID, `submit_open_modal`:
+
+```js
+// Add additional interactivity handlers
+requestApprovalFunc
+  .action('approve_request', approveActionHandler) // Support Regex
+  .action({ action_id: /deny_*.+/ }, denyActionHandler) // Support constraint object
+  .action('open_modal', openModalActionHandler) // Support Regex
+  .view({ callback_id: "submit_open_modal"}, openModalSubmissionHandler); // support view with callback id
+```
+---
+### Conclusion
+Congratulations on setting up your next-generation Slack app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can continue your journey by learning about [App Manifests](bolt-js/future/app-manifest).

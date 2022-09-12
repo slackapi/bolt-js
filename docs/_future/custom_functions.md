@@ -144,15 +144,3 @@ module.exports.registerListeners = (app) => {
 ```
 #### 4. Add function to app through workflow or manifest
 To actually call the defined function, `SampleFunctionDefinition`, don't forget to add your function to a workflow! When you're finished defining and implementing your functions, the next step is to add them to [Workflows](/bolt-js/future/workflows). Once added as a step in a Workflow, your Function will run when that Workflow is invoked by a [Trigger](/bolt-js/future/triggers).
-
----
-
-### Distributing a function {#distribute}
-
-A newly created Function will only be accessible to its creator until it is **distributed** to others.
-
-To distribute a Function so that another user (or many users) can build workflows that reference that function, you'll use the `distribute` command. At this time, Functions can be distributed to _everyone_ in a workspace, your app's _collaborators_, or _specific users_. 
-
-In order to enable the `distribute` command, your app must have been [deployed](/bolt-js/future/deploy-your-app) _at least once before_ attempting to distribute your function to others.
-
-To learn more about distributing a function, you can visit the guide [here](https://api.slack.com/future/functions/custom#distribute).
