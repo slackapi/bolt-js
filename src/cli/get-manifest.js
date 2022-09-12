@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { getManifestData } = require('./hook-utils/manifest');
+const { getManifestData } = require('./hook-utils/get-manifest-data');
 
 /** 
  * Implements the get-manifest script hook required by the Slack CLI

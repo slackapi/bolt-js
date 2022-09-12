@@ -38,6 +38,8 @@ export enum ErrorCode {
   SlackFunctionInitializationError = 'slack_bolt_slack_function_initialization_error',
   SlackFunctionExecutionError = 'slack_bolt_slack_function_execution_error',
   SlackFunctionCompleteError = 'slack_bolt_slack_function_initialization_error',
+
+  AppManifestInitializationError = 'slack_bolt_app_manifest_initialization_error',
 }
 
 export class UnknownError extends Error implements CodedError {
@@ -62,6 +64,10 @@ export function asCodedError(error: CodedError | Error): CodedError {
 
 export class AppInitializationError extends Error implements CodedError {
   public code = ErrorCode.AppInitializationError;
+}
+
+export class AppManifestInitializationError extends Error implements CodedError {
+  public code = ErrorCode.AppManifestInitializationError;
 }
 
 export class AuthorizationError extends Error implements CodedError {
