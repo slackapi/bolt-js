@@ -5,6 +5,7 @@ const { fs } = require('memfs');
 const mockfs = require('mock-fs');
 const manifestUtils = require('./manifest');
 const { unionMerge, hasManifest, find } = manifestUtils;
+const rewiremock = require('rewiremock');
 
 describe('Slack CLI Script Hooks: get-manifest utilities', () => {
   describe('unionMerge', () => {
@@ -29,7 +30,10 @@ describe('Slack CLI Script Hooks: get-manifest utilities', () => {
     });
     it('should return false if all empty objects', () => {
       expect(hasManifest({}));
-    })
+    });
+    it('should handle an undefined or null objects', () => {
+      expect(hasManifest(undefined, null, { testKey: "testValue"})).to.be.true;
+    });
   });
   describe('find', () => {
     beforeEach(() => {
