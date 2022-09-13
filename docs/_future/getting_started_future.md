@@ -24,7 +24,7 @@ The next-generation platform is an exciting new way to develop apps for Slack! I
 
 Currently for Bolt JS, you can only create remote functions and apps which can be hosted and deployed on [Heroku](https://www.heroku.com/). Next-generation applications not built on Bolt frameworks (such as those built on [Deno](https://deno.land/)) can support non-remote functions and apps, meaning you can deploy them to secure and managed Slack infrastructure. Additionally, Bolt apps built on the next-generation platform currently do not support [Datastores](https://api.slack.com/future/datastores) that are hosted on Slack infrastructure.
 
-If you'd like to use non-remote functionality as well as Slack infrastructure Datastores, consider building your next-generation application with Deno instead! You can get started with that [here](https://api.slack.com/future/get-started).
+If you'd like to use non-remote functionality as well as Slack infrastructure Datastores, consider building your next-generation application with Deno. You can get started with that [here](https://api.slack.com/future/get-started).
 
 ---
 
@@ -45,5 +45,5 @@ Once the CLI is set up, make sure your machine has the most recent version of [N
 ---
 ### Next steps {#next-steps}
 
-Congratulations! You're now ready to start building using the [next-generation platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with either [creating a new app](/bolt-js/future/create-new-app) or [migrating an existing one](/bolt-js/future/migrate-existing-app).
+Congratulations! You're now ready to start building using the [next-generation platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with either [creating a new app](/bolt-js/future/create-new-app) or [migrating an existing app](/bolt-js/future/migrate-existing-app).
 
