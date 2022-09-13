@@ -40,8 +40,8 @@ The `callback_id` is a unique string that identifies this particular component o
 | Optional property | Description |
 | :---------------- | :---------- |
 | `description`     | An optional string description of this workflow |
-| `input_parameters` | Optional input parameters, covered in ["Defining input parameters"](https://api.slack.com/future/workflows#defining-input-parameters)
-| `output_parameters` | Optional output parameters, covered in ["Defining output parameters"](https://api.slack.com/future/workflows#defining-output-parameters)
+| `input_parameters` | Optional input parameters, covered in ["Defining input parameters"](/bolt-js/future/workflows#defining-input-parameters)
+| `output_parameters` | Optional output parameters (typically used to pass data from the workflow)
 
 Once you've defined your Workflow, you'll now have access to it's `addStep` method, which is how you can call Built-in and Custom functions. The `addStep` method takes two arguments: first, the function you want to call, and second, any inputs you want to pass to that function. We'll see examples of how to do both in the following sections.
 

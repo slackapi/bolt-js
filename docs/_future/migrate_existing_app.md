@@ -13,7 +13,7 @@ permalink: /future/migrate-existing-app
 If you already have an existing Bolt JS app that you'd like to migrate to the new [next-generation platform](/bolt-js/future/getting-started#next-gen), this guide is for you!
 </div>
 
-If you do not have an existing Bolt JS application but are looking to get started with the [next-generation platform](/bolt-js/future/getting-started#next-gen), check out the [Create New App Guide](/bolt-js/future/create-new-app).
+If you do not have an existing Bolt JS application but are looking to get started with the [next-generation platform](/bolt-js/future/getting-started#next-gen), check out the [Create a new app](/bolt-js/future/create-new-app) guide.
 
 ---
 ### Prerequisites {#prerequisites}
@@ -22,4 +22,4 @@ In order to get started with migrating your app, make sure you've first followed
 ---
 
 ### More steps here
-Sarah is currently testing migration steps - we'll add more here soon!
+Sarah is currently testing migration steps&mdash;we'll add more here soon!

@@ -39,11 +39,17 @@ const createChannelStep = myWorkflow.addStep(
 );
 ```
 
-Read the full documentation for Workflows to learn how to build Workflows.
+Read the full documentation for [Workflows](/bolt-js/future/workflows) to learn how to build out Workflows.
 
 ---
 
-### Built-in functions list
+### Built-in functions list {#list}
 
 You can view a full list of built-in functions [here](https://api.slack.com/future/functions#built-in-functions__built-in-functions).
+
+---
+
+### Next stpes {#next-steps}
+
+Now that you've taken a dive into built-in functions, you can explore [custom functions](/bolt-js/future/custom-functions) and what they have to offer. ✨
 

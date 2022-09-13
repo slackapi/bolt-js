@@ -11,10 +11,9 @@ permalink: /future/custom-functions
 <div class="section-content">
 On the next-generation platform, you can build **custom functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [Workflows](/bolt-js/future/workflows)&mdash;and Workflows are invoked by [Triggers](/bolt-js/future/triggers).
 
-To create a function, we need to do three things: 
+To create a function, we need to do the following: 
 - [define the function](#define) in the Manifest;
 - [implement the function](#implement) in its respective source file;
-- [distribute the function](#distribute) so others can use it.
 </div>
 
 ---
@@ -54,7 +53,7 @@ module.exports = { SampleFunctionDefinition };
 
 Note that we import `DefineFunction`, which is used for defining our function, and also `SlackFunction`, which we'll use to implement our function in the next section.
 
-Just like [Workflows](/bolt-js/future/workflows), Custom functions have a unique `callback_id` and also require a `title`. A third required field is `source_file`, which points to where the function is implemented. Additionally, you can set inputs and outputs just like you can with Workflows. 
+Just like [Workflows](/bolt-js/future/workflows), Custom functions have a unique `callback_id` and also require a `title`. Additionally, you can set inputs and outputs just like you can with Workflows. 
 
 Here's all the fields you can use when defining a Custom function:
 
@@ -63,7 +62,6 @@ Here's all the fields you can use when defining a Custom function:
 | `callback_id` | A required unique string identifier representing the function ("nothing" in the above example). It must be unique in your application; no other functions may share the same callback ID. Changing a function's callback ID is not recommended as it means that the function will be removed from the app and created under the new callback ID, which will break any workflows referencing the old function. | 
 | `title` | A required string to nicely identify the function. |
 | `description` | An _optional_ succinct summary of what your function does. |
-| `source_file` | The relative path from the project root to the function handler file (i.e., the source file). _Remember to update this if you start nesting your functions in folders._ |
 | `input_parameters` | An object which describes one or more input parameters that will be available to your function. Each top-level property of this object defines the name of one input parameter which will become available to your function. 
 | `output_parameters` | An object which describes one or more output parameters that will be returned by your function. This object follows the exact same pattern as `input_parameters`: top-level properties of the object define output parameter names, with the property values further describe the type and description of each individual output parameter. |
 
@@ -103,11 +101,11 @@ Once your function is defined in its own file in `manifest/function`, the next s
 
 Implement functions in just a few steps:
 
-#### 1. Create the source file in `manifest/function`
+#### 1. Create the function file in `manifest/function`
 Create a file for your function to live in and name it something that makes sense for your function. For example, if I'm writing a function that sends one of our engineers Brad a singing telegram, I might name the file `send-brad-some-singers.js`.
 
-#### 2. Write code in the source file to define your function
-The exported module of your function's source file should be the function handler. It can be either asynchronous (for example, if you're calling API methods) or sychronous.
+#### 2. Write code in the function file to define your function
+The exported module of your function's function file should be the function definition. It can be either asynchronous (for example, if you're calling API methods) or sychronous.
 
 The function takes a single argument called its "context", and returns an object that exactly matches the structure of function definition's `output_parameters`.
 
@@ -119,7 +117,6 @@ const SampleFunctionDefinition = DefineFunction({
   callback_id: 'sample_function_id',
   title: 'Send a greeting',
   description: 'Send greeting to channel',
-  source_file: 'functions/sample-function.js',
   input_parameters: {
     properties: {
       recipient: {
@@ -154,9 +151,10 @@ You can also encapsulate your business logic separately from the function handle
 #### 3. Add function listener and handler(s)
 Once your function has been defined, you'll need to register a function listener to trigger the function's functionality as well as any other related events.
 
-To do this, create a file in `listeners/functions`. This file will use the defined function and also implement any needed additional logic - in this case, it'll send a message to greet someone based on what is being passed in from the greeting function in step 2. 
+To do this, create a file in `listeners/functions` for your function registration (in this case, the file will be called `hello-world.js`). This file will use the defined function and also implement any needed additional logic&mdash;in this case, it'll send a message to greet someone based on what is being passed in from the greeting function in step 2. 
 
 ```js
+// listeners/functions/hello-world.js
 // For more information about functions: https://api.slack.com/future/functions
 const { SlackFunction } = require('@slack/bolt');
 
@@ -186,9 +184,16 @@ const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld
 
 module.exports = { helloWorldFunc };
 ```
+The above file declares a function handler, `helloWorld`, that takes in inputs from the `event`, which is the function being triggered. It executes logic within the handler to send a message with a random greeting to the specified recipient in the desired channel. Then, a new `SlackFunction` instance is declared that actually links the `helloWorld` handler to the function being run through its function ID (`SampleFunctionDefinition`):
+```js
+// Let's create a new Slack Function with helloWorld as its handler
+const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld);
+```
 
 Once this file has been created, the function handler can be registered in an `index.js` file within the `listeners/functions` directory:
 ```js
+// listeners/functions/index.js
+
 const { helloWorldFunc } = require('./hello-world');
 
 // Register a complete function
@@ -200,6 +205,8 @@ module.exports.register = (app) => {
 
 In order to make sure this handler is triggered, make sure the Function listeners are registered in your `listeners/index.js` file:
 ```js
+// listeners/index.js
+
 const functions = require('./functions');
 
 module.exports.registerListeners = (app) => {

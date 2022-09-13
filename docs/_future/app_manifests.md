@@ -18,10 +18,11 @@ An app's manifest is where you can configure its name and scopes, declare the fu
 
 Locate the file named `manifest.js` within your application. This will likely be in your project's root directory or a `manifest` folder. 
 
-Inside the manifest file, you will find an `export default Manifest` block that defines the app's configuration:
+Inside the manifest file, you will find an `module.exports = Manifest({})` block that defines the app's configuration:
 
 ```javascript
 // manifest/manifest.js
+
 const { Manifest } = require('@slack/bolt');
 const { TimeOffWorkflow } = require('./workflow/approval');
 
@@ -77,7 +78,7 @@ The properties in the Manifest are:
 | `datastores` | Array | (Optional) A list of all [Datastores](https://api.slack.com/future/datastores) your app will use |
 | `features` | Object | (Optional)  A configuration object of your app features |
 
-You will come back to the Manifest every time you create a new function or workflow, since each function your app uses must be declared in the manifest.
+You will come back to the Manifest every time you create a new workflow, since all workflows for your app need to be added to the Manifest in order to use them.
 
 ---
 
@@ -97,3 +98,9 @@ features: {
   },
 },
 ```
+
+---
+
+### Next steps {#next-steps}
+
+Now that you're acquainted with the Manifest, you can now dive into the world of [built-in functions](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions)!
