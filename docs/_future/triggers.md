@@ -71,7 +71,7 @@ The `create` method for runtime Triggers takes the form of `client.workflows.tri
 const triggerResponse = await client.workflows.triggers.create({
   type: "shortcut",
   name: "My Trigger",
-  workflow: "#/workflows/myworkflow",
+  workflow: "#/workflows/my_workflow",
   inputs: {
     input_name: {
       value: "value",

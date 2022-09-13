@@ -50,7 +50,7 @@ Once you've defined your Workflow, you'll now have access to it's `addStep` meth
 
 To use a [built-in function](/bolt-js/future/built-in-functions), like `SendMessage`:
 
-1. Ensure that `Schema` from the SDK is imported in your Manifest file:
+1. Ensure that `Schema` from the SDK is imported in your workflow file:
 
 ```javascript
 const { Schema } = require('@slack/bolt');
@@ -87,16 +87,15 @@ SayHelloWorkflow.addStep("#/functions/my_function_callback_id", {
 module.exports = { SayHelloWorkflow };
 ```
 
-4. Finally, declare your workflow in your app's manifest definition at the bottom of your Manifest file:
+4. Finally, declare your workflow in your app's manifest definition under the `workflow` property:
 
 ```javascript
 // manifest/manifest.js
-const { TimeOffWorkflow } = require('./workflow/say-hello-workflow');
+const { SayHelloWorkflow } = require('./workflow/say-hello-workflow');
 
 module.exports = Manifest({
     name: "sayhello",
     description: "An app with an example workflow",
-    icon: "assets/icon.png",
     workflows: [SayHelloWorkflow], // Add your workflow here
     botScopes: [
         "commands",
@@ -135,16 +134,16 @@ Visit [this guide](https://api.slack.com/future/forms) for more details and code
 
 To use a [custom function](/bolt-js/built-on-slack/custom-functions) that you define:
 
-1. Import the function in your Manifest, where you define the Workflow:
+1. Import the function in your workflow file where you are defining the Workflow:
 
 ```javascript
-import { SomeFunction } from "../functions/some_function.js";
+import { SomeFunction } from "../functions/some_function";
 ```
 
 2. Call your function, storing its output in a variable. Here you may also pass input parameters from the Workflow into the Function itself:
 
 ```javascript
-import { SomeFunction } from "../functions/some_function.js";
+import { SomeFunction } from "../functions/some_function";
 
 const SomeWorkflow = DefineWorkflow(
   callback_id: "some_workflow",
@@ -165,7 +164,7 @@ const SomeWorkflow = DefineWorkflow(
   }
 );
 
-const myFunctionResult = MyWorkflow.addStep(SomeFunction, {
+const myFunctionResult = SomeWorkflow.addStep(SomeFunction, {
     // ... Pass along workflow inputs via SomeWorkflow.inputs
     // ... For example, SomeWorkflow.inputs.someString
 });
@@ -185,8 +184,8 @@ SomeWorkflow.addStep(Schema.slack.functions.SendMessage, {
 
 ```javascript
 // Example: invoking a custom function as a step in a workflow
-MyWorkflow.addStep("#/functions/some_function", {
-    someInputVariable: MyWorkflow.inputs.someInput
+SomeWorkflow.addStep("#/functions/some_function", {
+    someInputVariable: SomeWorkflow.inputs.someInput
 });
 ```
 
@@ -194,7 +193,7 @@ MyWorkflow.addStep("#/functions/some_function", {
 
 ### Working example {#full-example}
 
-Let's take a look at a fully functional `say-hello.js` workflow and `manifest.js` file that contains one workflow definition, its implementation, and a completed manifest definition: 
+Let's take a look at a fully functional Say Hello workflow and `manifest.js` file that contains one workflow definition, its implementation, and a completed manifest definition: 
 
 ```javascript
 // manifest/workflow/say-hello.js
@@ -227,7 +226,6 @@ const { SayHelloWorkflow } = require('./workflows/say-hello');
 module.exports = Manifest({
   name: "say-hello-app",
   description: "A demo of a Hello World workflow.",
-  icon: "assets/icon.png",
   workflows: [SayHelloWorkflow],
   botScopes: ["commands", "chat:write", "chat:write.public"],
 });
