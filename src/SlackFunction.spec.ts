@@ -346,7 +346,7 @@ describe('SlackFunction utils', () => {
       };
       const getManifestSpy = sinon.spy(() => badManifestOutput);
       const { findMatchingManifestDefinition } = await importSlackFunctionModule({
-        './cli/hook-utils/manifest': {
+        './cli/hook-utils/get-manifest-data': {
           getManifestData: getManifestSpy,
         },
       });
@@ -363,7 +363,7 @@ describe('SlackFunction utils', () => {
         },
       };
       const { findMatchingManifestDefinition } = await importSlackFunctionModule({
-        './cli/hook-utils/manifest': {
+        './cli/hook-utils/get-manifest-data': {
           getManifestData: () => mockManifestOutput,
         },
       });
@@ -379,7 +379,7 @@ describe('SlackFunction utils', () => {
         },
       };
       const { findMatchingManifestDefinition } = await importSlackFunctionModule({
-        './cli/hook-utils/manifest': {
+        './cli/hook-utils/get-manifest-data': {
           getManifestData: () => mockManifestOutput,
         },
       });
