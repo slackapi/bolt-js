@@ -2,10 +2,10 @@ const {
   readManifestJSONFile,
   readImportedManifestFile,
   hasManifest,
-  merge,
-  unionMerge
+  unionMerge,
 } = require('./manifest.js');
-const { AppManifestInitializationError } = require('../../errors');
+const merge = require('deepmerge');
+
 
 /** 
  * Returns any manifest data, if it exists.
@@ -23,7 +23,7 @@ const { AppManifestInitializationError } = require('../../errors');
   
   if (!hasManifest(manifestJS, manifestJSON)) {
     const msg = 'Unable to find a manifest file in this project';
-    throw new AppManifestInitializationError(msg);
+    throw new Error(msg);
   }
 
   // manage manifest merge

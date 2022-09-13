@@ -4,7 +4,6 @@ const { expect, assert } = require('chai');
 const rewiremock = require('rewiremock/node');
 const { hasManifest } = require('./manifest');
 const merge = require('deepmerge');
-const { AppManifestInitializationError } = require('../../errors');
 
 async function importGetManifestDataMock(overrides) {
   return rewiremock.module(() => import('./get-manifest-data.js'), overrides);
@@ -93,6 +92,6 @@ describe('Slack CLI Script Hooks: get-manifest-data', () => {
    
     // doesnt error
     const shouldThrow = () => getManifestData('testSearchDir', 'testFilename');
-    assert.throws(shouldThrow, AppManifestInitializationError, 'Unable to find a manifest');
+    assert.throws(shouldThrow, Error, 'Unable to find a manifest');
   });
 });

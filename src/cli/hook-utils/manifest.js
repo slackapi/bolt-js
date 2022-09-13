@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const merge = require('deepmerge');
 
 /** 
  * Union merge of arrays
  */
-export function unionMerge(array1, array2) {
+function unionMerge(array1, array2) {
   return [...new Set(array1.concat(array2))];
 }
 
