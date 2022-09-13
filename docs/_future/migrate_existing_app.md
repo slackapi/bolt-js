@@ -50,11 +50,15 @@ module.exports = Manifest({
 });
 ``` 
 
-💡 `runOnSlack` is a required property of the manifest if you intend to use next-generation platform features - Functions, Workflows, Triggers. It means that any `Functions` defined on your app will be managed on your own 3rd-party infrastructure.
+<p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon> `runOnSlack` is a required property of the manifest if you intend to use next-generation platform features - Functions, Workflows, Triggers. 
 
-Bolt will handle merging properties defined in this `Manifest()` and in any `manifest.json` in the project, but we encourage you to begin to migrate other features into code.
+It means that your app will run on your own hosting solution and not on Slack and currently must be set to `false`</p>
 
-Run the Slack CLI command `slack manifest` to generate your merged manifest. It should contain at least these settings.  
+Bolt will handle merging properties defined in this `Manifest()` and in any `manifest.json` in the project, but we encourage you to begin to migrate other features into code. Check out our more detailed guide on [App Manifests](bolt-js/future/app-manifest).
+
+---
+
+Now let's run the Slack CLI command `slack manifest` to generate your merged manifest. It should contain at least these settings.  
 
 ```bash
 {
@@ -82,15 +86,15 @@ Run the Slack CLI command `slack run` to start your app in local development.
 
 The CLI will create and install a new development app for you with its own App ID, allowing you to keep your testing changes separate from your production App). It will also start your app in local development mode (SocketMode) and turn logging on. 
 
-Now you're ready to start adding (Functions)[bolt-js/future/built-in-functions] and (Workflows)[bolt-js/future/workflows] to your app!
+Now you're ready to start adding [Functions](bolt-js/future/built-in-functions) and [Workflows](bolt-js/future/workflows) to your app!
 
 ---
-### Updating your app configuration
+### Updating your app configuration {#update-app}
 
-You have probably made changes to your app’s configuration (adding a Function or a Workflow for example). To sync your production app’s configuration with the changes you’ve made in development:
+You have probably made changes to your app’s manifest (adding a Function or a Workflow, for example). To sync your production app’s configuration with the changes you’ve made in development:
 
-* Authenticated the Slack CLI with your production workspace using `slack login`.
-* Head over to `./slack/apps.json` and make sure an entry exists for your production workspace with the current `app_id` and `team_id` of the workspace. 
+* Authenticate the Slack CLI with your desired production workspace using `slack login`.
+* Head over to `./slack/apps.json` and make sure an entry exists for your workspace with the current `app_id` and `team_id` of the workspace. 
 
 ```bash
 {
