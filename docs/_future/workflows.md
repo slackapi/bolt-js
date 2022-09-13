@@ -18,9 +18,9 @@ Workflows can be configured to run without any user input, or they can [wait for
 
 ### Defining Workflows {#defining-workflows}
 
-Workflows are defined and implemented in your app's [Manifest](/bolt-js/future/app-manifest).
+Workflows are defined in the `manifest/workflow` directory and implemented in your app's [manifest](/bolt-js/future/app-manifest).
 
-Before we begin, import `DefineWorkflow` at the top of your Manifest file:
+To add a new workflow that sends a greeting to a member of a workspace, create a new file in `manifest/workflow` called `say-hello.js` and import `DefineWorkflow` and `Schema` at the top of your workflow file:
 
 ```javascript
 const { DefineWorkflow } = require('@slack/bolt');
@@ -29,7 +29,7 @@ const { DefineWorkflow } = require('@slack/bolt');
 Then, create a **workflow definition**. This is where we'll set, at a minimum, the workflow's title and its unique callback ID:
 
 ```javascript
-export const SayHelloWorkflow = DefineWorkflow({
+const SayHelloWorkflow = DefineWorkflow({
     callback_id: "say_hello_workflow",
     title: "Say Hello"
 });
@@ -40,8 +40,8 @@ The `callback_id` is a unique string that identifies this particular component o
 | Optional property | Description |
 | :---------------- | :---------- |
 | `description`     | An optional string description of this workflow |
-| `input_parameters` | Optional input parameters, covered in ["Defining input parameters"](#defining-input-parameters)
-| `output_parameters` | Optional output parameters, covered in ["Defining output parameters"](#defining-output-parameters)
+| `input_parameters` | Optional input parameters, covered in ["Defining input parameters"](https://api.slack.com/future/workflows#defining-input-parameters)
+| `output_parameters` | Optional output parameters, covered in ["Defining output parameters"](https://api.slack.com/future/workflows#defining-output-parameters)
 
 Once you've defined your Workflow, you'll now have access to it's `addStep` method, which is how you can call Built-in and Custom functions. The `addStep` method takes two arguments: first, the function you want to call, and second, any inputs you want to pass to that function. We'll see examples of how to do both in the following sections.
 
@@ -60,7 +60,7 @@ const { Schema } = require('@slack/bolt');
 
 ```javascript
 // Example: taking the string output from a function and passing it to SendMessage
-SomeWorkflow.addStep(Schema.slack.functions.SendMessage, {
+SayHelloWorkflow.addStep(Schema.slack.functions.SendMessage, {
   channel_id: SomeWorkflow.inputs.channelId,
   message: SomeWorkflow.inputs.someString,
 });
@@ -82,13 +82,20 @@ SayHelloWorkflow.addStep("#/functions/my_function_callback_id", {
 });
 ```
 
-Finally, declare your workflow in your app's manifest definition at the bottom of your Manifest file:
+3. Export your workflow at the bottom of the file to be imported into the manifest:
+```javascript
+module.exports = { SayHelloWorkflow };
+```
+
+4. Finally, declare your workflow in your app's manifest definition at the bottom of your Manifest file:
 
 ```javascript
-// manifest.ts
-export default Manifest({
+// manifest/manifest.js
+const { TimeOffWorkflow } = require('./workflow/say-hello-workflow');
+
+module.exports = Manifest({
     name: "sayhello",
-    description: "A deno app with an example workflow",
+    description: "An app with an example workflow",
     icon: "assets/icon.png",
     workflows: [SayHelloWorkflow], // Add your workflow here
     botScopes: [
@@ -106,7 +113,7 @@ The only Built-in function that has an additional requirement is [`OpenForm`](ht
 Here's an example of a basic Workflow definition using `interactivty`:
 
 ```javascript
-export const SayHelloWorkflow = DefineWorkflow({
+const SayHelloWorkflow = DefineWorkflow({
     callback_id: "say_hello_workflow",
     title: "Say Hello to a user",
     input_parameters: {
@@ -118,6 +125,8 @@ export const SayHelloWorkflow = DefineWorkflow({
         required: ["interactivity"]
     }
 });
+
+module.exports = { SayHelloWorkflow };
 ```
 
 Visit [this guide](https://api.slack.com/future/forms) for more details and code examples of using `OpenForm` in your app. 
@@ -137,7 +146,7 @@ import { SomeFunction } from "../functions/some_function.js";
 ```javascript
 import { SomeFunction } from "../functions/some_function.js";
 
-export const SomeWorkflow = DefineWorkflow(
+const SomeWorkflow = DefineWorkflow(
   callback_id: "some_workflow",
   title: "Some Workflow",
   input_parameters: {
@@ -160,6 +169,8 @@ const myFunctionResult = MyWorkflow.addStep(SomeFunction, {
     // ... Pass along workflow inputs via SomeWorkflow.inputs
     // ... For example, SomeWorkflow.inputs.someString
 });
+
+module.exports = { SomeWorkflow };
 ```
 
 3. Use your function in follow-on steps. For example:
@@ -183,16 +194,14 @@ MyWorkflow.addStep("#/functions/some_function", {
 
 ### Working example {#full-example}
 
-Let's take a look at a fully functional `manifest.js` file that contains one workflow definition, its implementation, and a completed manifest definition: 
+Let's take a look at a fully functional `say-hello.js` workflow and `manifest.js` file that contains one workflow definition, its implementation, and a completed manifest definition: 
 
 ```javascript
-// manifest.ts
-
-// Import DefineWorkflow:
-const { DefineWorkflow, Manifest, Schema } = require('@slack/bolt');
+// manifest/workflow/say-hello.js
+const { DefineWorkflow, Schema } = require('@slack/bolt');
 
 // Define the workflow:
-export const SayHelloWorkflow = DefineWorkflow({
+const SayHelloWorkflow = DefineWorkflow({
     callback_id: "say_hello_workflow",
     title: "Say Hello"
 });
@@ -202,6 +211,18 @@ SayHelloWorkflow.addStep(Schema.slack.functions.SendDm, {
   user_id: "U1234567890", // Put your user ID here and the app will DM you
   message: "Hello, world!",
 });
+
+module.exports = { SayHelloWorkflow };
+
+```
+
+Below in the Manifest, the `SayHelloWorkflow` is imported and passed in:
+```javascript
+// manifest/manifest.js
+
+// Import DefineWorkflow:
+const { Schema } = require('@slack/bolt');
+const { SayHelloWorkflow } = require('./workflows/say-hello');
 
 module.exports = Manifest({
   name: "say-hello-app",
@@ -232,7 +253,7 @@ Input parameters are listed in the `properties` property. Each input parameter m
 
 ```javascript
 // Workflow definition
-export const SomeWorkflow = DefineWorkflow({
+const SomeWorkflow = DefineWorkflow({
     callback_id: "some_workflow",
     title: "Some Workflow",
     input_parameters: { 
@@ -272,7 +293,7 @@ Required parameters can be indicated by listing their names as strings in the `r
 
 ```javascript
 // Workflow definition
-export const SomeWorkflow = DefineWorkflow({
+const SomeWorkflow = DefineWorkflow({
     callback_id: "some_workflow",
     title: "Some Workflow",
     input_parameters: { 

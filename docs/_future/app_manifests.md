@@ -21,7 +21,7 @@ Locate the file named `manifest.js` within your application. This will likely be
 Inside the manifest file, you will find an `export default Manifest` block that defines the app's configuration:
 
 ```javascript
-// manifest.js
+// manifest/manifest.js
 const { Manifest } = require('@slack/bolt');
 const { TimeOffWorkflow } = require('./workflow/approval');
 
@@ -50,7 +50,6 @@ module.exports = Manifest({
     interactivity: {
       is_enabled: true,
     },
-    org_deploy_enabled: false,
   },
   tokenRotationEnabled: false,
 });

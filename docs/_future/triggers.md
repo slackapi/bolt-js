@@ -61,9 +61,9 @@ Use `slack trigger --help`  to easily access information on the `trigger` comman
 
 #### Create a Trigger at runtime {#create_runtime}
 
-The logic of a runtime Trigger lies within a Function's TypeScript code. The specific payload is dependent on the [type of Trigger](#types) you use.
+The logic of a runtime Trigger lies within a Function's code. The specific payload is dependent on the [type of Trigger](#types) you use.
 
-Within your `functions` folder, you'll have the Functions that are the steps making up your Workflow. Within this folder is where you can create a Trigger within the relevant `<function>.js` file. 
+Within your `manifest/function` folder, you'll have the Functions that are the steps making up your Workflow. Within this folder is where you can create a Trigger within the relevant `<function>.js` file. 
 
 The `create` method for runtime Triggers takes the form of `client.workflows.triggers.create()`. Within that method you can leverage `inputs` acquired in previous steps (i.e. with Functions) within the Workflow.
 
@@ -86,7 +86,7 @@ Your response will include a `trigger.id`; be sure to store it! You use that to 
 
 #### Development and production Triggers
 
-The Triggers you create when you're running your app locally in a development environment (with the `slack run` command) will not work when you deploy your app in production (with `slack deploy`). You'll need to `create` any Triggers again with the CLI. 
+The Triggers you create when you're running your app locally in a development environment (with the `slack run` command) will not work when you [deploy your app](/bolt-js/future/deploy-your-app). You'll need to `create` any Triggers again with the CLI.
 
 ---
 

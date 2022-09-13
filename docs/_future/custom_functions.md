@@ -22,16 +22,80 @@ To create a function, we need to do three things:
 ### Defining a function {#define}
 Functions are defined in your app via the `DefineFunction` method, which is part of the SDK that gets included with every newly created project.
 
-Let's take a look at an empty function:
+Let's take a look at a simple function:
 ```js
-const NothingFunction = DefineFunction({
-  callback_id: "nothing_function",
-  title: "Do Nothing",
-  source_file: "functions/nothing.ts"
+const { DefineFunction, Schema } = require('@slack/bolt');
+
+const SampleFunctionDefinition = DefineFunction({
+  callback_id: 'sample_function_id',
+  title: 'Send a greeting',
+  description: 'Send greeting to channel',
+  input_parameters: {
+    properties: {
+      recipient: {
+        type: Schema.slack.types.user_id,
+        description: 'Send greeting to this recipient',
+      },
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: 'Channel to send message to',
+      },
+      message: {
+        type: Schema.types.string,
+        description: 'Message to the recipient',
+      },
+    },
+    required: ['message'],
+  },
 });
+
+module.exports = { SampleFunctionDefinition };
 ```
 
+Note that we import `DefineFunction`, which is used for defining our function, and also `SlackFunction`, which we'll use to implement our function in the next section.
 
+Just like [Workflows](/bolt-js/future/workflows), Custom functions have a unique `callback_id` and also require a `title`. A third required field is `source_file`, which points to where the function is implemented. Additionally, you can set inputs and outputs just like you can with Workflows. 
+
+Here's all the fields you can use when defining a Custom function:
+
+| Field | Expected value |
+| ---- | ------------------ |
+| `callback_id` | A required unique string identifier representing the function ("nothing" in the above example). It must be unique in your application; no other functions may share the same callback ID. Changing a function's callback ID is not recommended as it means that the function will be removed from the app and created under the new callback ID, which will break any workflows referencing the old function. | 
+| `title` | A required string to nicely identify the function. |
+| `description` | An _optional_ succinct summary of what your function does. |
+| `source_file` | The relative path from the project root to the function handler file (i.e., the source file). _Remember to update this if you start nesting your functions in folders._ |
+| `input_parameters` | An object which describes one or more input parameters that will be available to your function. Each top-level property of this object defines the name of one input parameter which will become available to your function. 
+| `output_parameters` | An object which describes one or more output parameters that will be returned by your function. This object follows the exact same pattern as `input_parameters`: top-level properties of the object define output parameter names, with the property values further describe the type and description of each individual output parameter. |
+
+The value for properties in `input_parameters` and `output_parameters` needs to be an object with further sub-properties:
+  * `type`: The type of the input parameter. This can be a [Built-in type](https://api.slack.com/future/types) or a [Custom type](https://api.slack.com/future/types/custom) that you define.
+  * `description`: A string description of the parameter.
+
+If you want to set a property as required, list its name in its respective input or output properties `required` property.
+
+For example, if you have an input parameter named `customer_id` that you want to be required, you can do so like this:
+
+```javascript
+input_parameters: {
+  properties: {
+    customer_id: {
+      type: Schema.types.string,
+      description: "The customer's ID"
+    }
+  },
+  required: ["customer_id"]
+}
+```
+
+Functions can (and generally should) declare inputs and outputs. 
+
+Inputs are declared in the `input_parameters` property, and outputs are declared in the `output_parameters` property. Each can contain either [Built-in types](https://api.slack.com/future/types) or [Custom types](https://api.slack.com/future/types/custom) that you define.
+
+While, strictly speaking, input and output parameters are optional, they are a common and standard way to pass data between functions and nearly any function you write will expect at least one input and pass along an output.
+
+Functions are similar in philosophy to Unix system commands: they should be minimalist, modular, and reusable. Expect the output of one function to eventually become the input of another, with no other frame of reference.
+
+Once your function is defined in its own file in `manifest/function`, the next steps are to add a function listener, register the listener, and implement the function in a workflow.
 
 ---
 
@@ -78,12 +142,12 @@ const SampleFunctionDefinition = DefineFunction({
 module.exports = { SampleFunctionDefinition };
 ```
 
-When using a [local development server](/future/run), you can use `console.log` to emit information to the console. When your app is [deployed to production](/future/deploy), any `console.log` commands are available via `slack activity`. Check out our [Logging](/future/logging) page for more.
+When using a [local development server](running your app with `slack run`), you can use `console.log` to emit information to your Bolt JS console. When your app is [deployed to production](/bolt-js/future/deploy-your-app), any `console.log` commands are available via `slack activity`.
 
 When composing your functions, some things you can do include:
 
-* leverage external APIs, and even store API credentials inside `env` using the CLI's [`slack env add` command](/future/tools/cli#var-add)
-* [call Slack API methods](/future/apicalls) or [third-party APIs](/future/apicalls/third-party)
+* leverage external APIs, and even store API credentials inside `env` using the CLI's [`slack env add` command](https://api.slack.com/future/tools/cli#var-add)
+* [call Slack API methods](https://api.slack.com/future/apicalls) or [third-party APIs](https://api.slack.com/future/apicalls/third-party)
 
 You can also encapsulate your business logic separately from the function handler, then import what you need and build your functions that way.
 
