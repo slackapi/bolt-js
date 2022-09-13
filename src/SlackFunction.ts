@@ -24,6 +24,8 @@ import {
 
 // eslint-disable-next-line
 export const manifestUtil = require('./cli/hook-utils/manifest');
+// eslint-disable-next-line
+export const getManifestDataUtil = require('./cli/hook-utils/get-manifest-data');
 
 /* Types */
 export interface SlackFunctionExecutedMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
@@ -506,7 +508,7 @@ export function hasMatchingManifestDefinition(
 export function findMatchingManifestDefinition(callbackId: string): ManifestDefinitionResult {
   const result: ManifestDefinitionResult = { matchFound: false, fnKeys: [] };
   // call the hook to get the manifest
-  const manifest = manifestUtil.getManifestData(process.cwd());
+  const manifest = getManifestDataUtil.getManifestData(process.cwd());
 
   // manifest file must exist in the project
   if (!('functions' in manifest)) {
