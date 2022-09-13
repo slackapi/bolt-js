@@ -1,4 +1,5 @@
 import { Block, KnownBlock, PlainTextElement, View } from '@slack/types';
+import type {WebClient} from '@slack/web-api'
 import { AckFn, RespondFn } from '../utilities';
 
 /**
@@ -19,6 +20,7 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
   body: ViewActionType;
   ack: ViewAckFn<ViewActionType>;
   respond: RespondFn;
+  client: InstanceType<typeof WebClient>;
 }
 
 interface PlainTextElementOutput {
