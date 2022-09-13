@@ -93,7 +93,7 @@ function withNoopAppMetadata(): Override {
 export default function withMockValidManifestUtil(functionCallbackId: string): Override {
   const mockManifestOutput = JSON.parse(`{"functions": {"${functionCallbackId}": {}}}`);
   return {
-    './cli/hook-utils/manifest': {
+    './cli/hook-utils/get-manifest-data': {
       getManifestData: () => mockManifestOutput,
     },
   };
