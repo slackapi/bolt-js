@@ -1,5 +1,5 @@
 ---
-title: Feedback on developer beta
+title: Submit feedback
 order: 10
 slug: feedback
 lang: en

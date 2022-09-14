@@ -59,29 +59,30 @@ You can now explore the `my-app` directory!
 ---
 ### Set up your trigger {#setup-trigger}
 
-In order to utilize the pre-existing functionality in the Request Time Off app, you'll need to create a trigger prior to running your app.
+This app comes with pre-existing functionality - Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
-Then, run the following command to create a trigger using the `triggers/link-shortcut.json` configuration file. This file was brought into your project from the Bolt for JavaScript Request Time Off template and is used to initialize your trigger:
+Then, run the following command to create a Trigger:
 ```
 slack triggers create --trigger-def "triggers/link-shortcut.json"      
 ```
 
 The above command will create a trigger for the selected workspace. Make sure to select the workspace you want and that it is appended by `(dev)`. This will create a dev instance of your app. Once the trigger is successfully created, you should see an output like this:
+
 ```
 ⚡ Trigger created
    Trigger ID:   [ID]
    Trigger Type: shortcut
    Trigger Name: Take Your Time
-   Shortcut URL: https://slack.com/shortcuts/[ID]/[Some ID]
+   URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
-The provided URL will be what you use to run your trigger. Copy this URL and save it somewhere; you'll need it for later.
+The provided URL will be what you use to run your Trigger. Copy this URL and save it somewhere; you'll need it for later.
 
 ---
 ### Run your app {#run-your-app}
 
-Now that your app and trigger are successfully created, let's try running it!
+Now that your app and Trigger are successfully created, let's try running it!
 
 Run `slack run` to start up the app. Executing `slack run` starts a local development server, syncing changes to your workspace's development version of your app.
 
@@ -90,10 +91,11 @@ You'll be prompted to select a workspace to install the app to&mdash;select the 
 > 💡 If you don't see the workspace you'd like to use in the list, you can `CTRL + C` out of the `slack run` command and run `slack auth login`. This will allow you to authenticate in your desired workspace to have it show up in the list for `slack run`.
 
 Once the app is successfully run, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt for JavaScript app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
+### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the the trigger you created in the previous step into a message in a public channel.
+With your app running, access your workspace and paste the URL from the the Trigger you created in the previous step into a message in a public channel.
 
-> 💡 To make the trigger URL more widely accessible, we recommend saving the trigger as a channel bookmark for easy access.
+> 💡 To make the trigger URL more widely accessible, we recommend saving the Trigger as a channel bookmark for easy access.
 
 Send the message and click the "Run" button that appears. A modal will appear prompting you to enter information to request time off. To test your app properly, we recommend entering your own Slack username in the "Manager" field.
 
@@ -104,7 +106,7 @@ Then, submit the form. You should receive a message from the app with informatio
 The full app flow can be seen here:
 ![Request Time Off app](../assets/take-your-time-demo.gif "Request Time Off app")
 
-Now that we have a working instance of the app in your workspace, let's dive into its components and how it works!
+Now we have a working instance of the app in your workspace and you've seen it in action! You can exploring on your own and dive into the code yourself here or follow along as we break down this app's next-gen components below to see how everything works!
 
 ---
 ### Workflows {#workflows}
@@ -132,9 +134,9 @@ const TimeOffWorkflow = DefineWorkflow({
 module.exports = { TimeOffWorkflow };
 ```
 
-In order to create a workflow that utilizes user input, such as one that uses a form, you'll need to pass in `interactivity` as one of the workflow's `input_parameters` under `properties`. This will allow the form to be interacted with.
+Here we want our workflow to take in user input, like form data. To do this we will need to pass in `interactivity` as one of the workflow's `input_parameters` under `properties`. This will allow the form to be interacted with.
 
-Now that the workflow has been defined, you can start adding steps underneath the definition, which will execute additional functionality in your workflow. Steps are executed in the order they appear. For the Time Off Request workflow, the first step will be a form that will allow the user to enter in their time off request.
+With our workflow defined, we can start by adding steps to it, which will execute additional functionality in your workflow. Steps are executed in the order you defined them. For the Time Off Request workflow, the first step will be a form that will allow the user to enter in their time off request.
 
 ```js
 const step1 = TimeOffWorkflow.addStep(
@@ -167,9 +169,12 @@ const step1 = TimeOffWorkflow.addStep(
   },
 );
 ```
+
+In the past, to open a form in a modal, you'd use our `client.views.open` method and pass it some custom Block Kit for formatting. Now you can simplify this step with a built-in function, OpenForm and Slack will take care of the formatting. 
+
 This step uses the built-in function [OpenForm](https://api.slack.com/future/functions#open-a-form) and initializes expected inputs of the form, which are defined by [Slack types](https://api.slack.com/future/types), such as the `timestamp` type, which represents dates and times. The Time Off Request form contains a `manager`, `start_date`, and `end_date` field, all of which are required inputs to submit the form.
 
-After the form is submitted, another workflow step can be added to handle the information that was submitted in this form. For the Time Off Request workflow, after the requester submits the request, it will send a message to the manager to notify them of the request and allow them to approve or deny the request through the message. Since this functionality does not exist as a built-in function, it requires a custom function in order to execute the desired functionality. In our workflow, we'll call it `ApprovalFunction`:
+After the form is submitted, another workflow step handles the information that was submitted in this form. In our example, after the requester submits, we want to send a message to their manager to notify them of the request and allow them to approve or deny the request through the message. Since this functionality does not exist as a built-in function, let's write our own custom function to do this work. In our workflow, we'll call it `ApprovalFunction`:
 
 ```js
 TimeOffWorkflow.addStep(ApprovalFunction, {
@@ -247,39 +252,18 @@ module.exports = { TimeOffWorkflow };
 To explore more about Workflows and dive into creating new ones, visit the guide [here](/bolt-js/future/workflows).
 
 ---
-### Triggers {#triggers}
+### Link Triggers {#link-triggers}
 
-Workflows are invoked by triggers. To allow for the Time Off Request workflow to be executed in a workspace, you'll need to create a trigger. Slack supports many different kinds of triggers, and for this application, we will use a [link trigger](https://api.slack.com/future/triggers/link). The definition for this link trigger is a JSON config file which can be found in `triggers/link-shortcut.json`.
+All workflows are invoked by triggers. We used a Trigger Config file defined at `triggers/link-shortcut.json`, and a CLI command to initialize it for our app. The next-gen platform supports many different kinds of triggers, and for this application, we use a simple [link trigger](https://api.slack.com/future/triggers/link).
 
-The `link-shortcut.json` file looks like this:
-```json
-{
-  "type": "shortcut",
-  "name": "Take Your Time",
-  "description": "Submit a request to take time off",
-  "workflow": "#/manifest/workflows/time_off_request_wf",
-  "shortcut": {},
-  "inputs": {
-    "interactivity": {
-      "value": "{{data.interactivity}}"
-    }
-  }
-}
-```
-This file acts as a configuration for your trigger that specifies which workflow is executed when the trigger is invoked (in this case, it maps the workflow to the `time_off_request_wf` callback ID from the Time Off Request Workflow initialized in `/manifest/workflows/time-off-request.js`).
-
-This file will also define how the trigger shows up in your application&mdash;for example, the `name` field will be the name of the trigger when it is surfaced as a link trigger in your workspace.
-
-In [Set up your trigger](#setup-trigger), you ran a command, `slack triggers create --trigger-def "triggers/link-shortcut.json"`. This created a link trigger connected to the Time Off Request workflow and generated a URL, which can be used to run the trigger in your workspace. You can either paste the link into a message and click on it to launch the trigger or add the URL as a link bookmark in a channel to create an easy way to run the trigger.
-
-> 💡 In order to run the trigger and launch the full workflow, your application must be running via `slack run`.
+Try adding this URL as a bookmark to a channel or posting it in a message somewhere public!
 
 To learn more about Triggers and create new ones, visit the guide [here](/bolt-js/future/triggers).
 
 ---
 ### Functions {#functions}
 
-Functions are building blocks of automation that accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [Workflows](/bolt-js/future/workflows).
+Functions are building blocks of automation that accept inputs, perform some calculations, and provide outputs. Functions are added as steps in [Workflows](/bolt-js/future/workflows).
 
 There are two types of functions: [built-in functions](/bolt-js/future/built-in-functions), which are Slack native actions defined in the Schema, such as sending messages, and [custom functions](/bolt-js/future/custom-functions), which are not built-in and are defined by the developer.
 
@@ -334,85 +318,7 @@ Parameters for the function are typed using [types from Slack's schema](https://
 
 Once the function is defined, we need to create a listener for it to perform any desired functionality. In this case, our desired functionality is to send the inputted manager the time off request as a message.
 
-The function listener is declared in `listeners/functions/request-approval.js`:
-```js
-// listeners/functions/request-approval.js
-// For more information about functions: https://api.slack.com/future/functions
-const { SlackFunction } = require('@slack/bolt');
-
-// Get our Approval Function from the manifest!
-const { ApprovalFunction } = require('../../manifest/functions/approval');
-
-// Here is the work we want to do!
-const notifyApprover = async ({ event, client, complete }) => {
-  const { manager, employee, end_date, start_date } = event.inputs;
-  const startDate = new Date(start_date * 1000).toDateString();
-  const endDate = new Date(end_date * 1000).toDateString();
-
-  try {
-    await client.chat.postMessage({
-      channel: manager,
-      text: 'A new time-off request has been submitted.',
-      blocks: [
-        {
-          type: 'header',
-          text: {
-            type: 'plain_text',
-            text: 'A new time-off request has been submitted',
-          },
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: `*From:* <@${employee}>`,
-          },
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: `*Dates:* ${startDate} to ${endDate}`,
-          },
-        },
-        {
-          type: 'actions',
-          block_id: 'approve-deny-buttons',
-          elements: [
-            {
-              type: 'button',
-              text: {
-                type: 'plain_text',
-                text: 'Approve',
-              },
-              action_id: 'approve_request',
-              style: 'primary',
-            },
-            {
-              type: 'button',
-              text: {
-                type: 'plain_text',
-                text: 'Deny',
-              },
-              action_id: 'deny_request',
-              style: 'danger',
-            },
-          ],
-        },
-      ],
-    });
-  } catch (err) {
-    // Complete function with an error
-    await complete({ error: `There was an issue: ${err}` });
-    throw (err);
-  }
-};
-
-// Let's register a new Slack Function with notifyApprover as its handler
-const requestApprovalFunc = new SlackFunction(ApprovalFunction.id, notifyApprover);
-
-module.exports = { requestApprovalFunc };
-```
+The function listener is declared in the file [`listeners/functions/request-approval.js`](https://github.com/slack-samples/bolt-js-request-time-off/blob/main/listeners/functions/request-approval.js).
 
 In the `request-approval.js` file, we are defining a handler function, `notifyApprover`, that our listener will run when the `ApprovalFunction` is invoked. `notifyApprover` takes in the provided parameters from the function and calls the API method [`client.chat.postMessage`](https://api.slack.com/methods/chat.postMessage) to send a [Block Kit](https://api.slack.com/block-kit) message with the submitted time off information to the manager. Additional buttons to approve or deny the request are also added in to the message Block Kit&mdash;these will be handled by [Action](#action) handlers that are covered in the next section.
 
@@ -529,7 +435,6 @@ The Approve and Deny action handlers are imported in and then added as actions t
 The full `request-approval.js` function will look like this:
 ```js
 // listeners/functions/request-approval.js
-// For more information about functions: https://api.slack.com/future/functions
 const { SlackFunction } = require('@slack/bolt');
 
 // Get our Approval Function from the manifest!
