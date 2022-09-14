@@ -1,10 +1,10 @@
 ---
 title: App manifest
 order: 3
-slug: app-manifest
+slug: app-manifests
 lang: en
 layout: tutorial
-permalink: /future/app-manifest
+permalink: /future/app-manifests
 ---
 # App manifests <span class="label-beta">BETA</span>
 
@@ -61,43 +61,25 @@ module.exports = Manifest({
 
 The properties in the Manifest are:
 
-|Property|Type|Description|
-|---|---|---|
-| `name` | String | This is the internal name for your app. It can contain spaces (e.g., "My App") |
-| `description` |String| A short sentence describing your application. A description of your app that will help users decide whether to use it |
-| `displayName` | String | (Optional) Allows a custom name for the app to be displayed that's different from the `name` |
-| `longDescription` | String | (Optional) A more detailed description of your application |
-| `icon` | String | A relative path to an image asset to use for the app's icon. Your app's profile picture that will appear in the Slack client |
-| `backgroundColor` | String | (Optional) A six digit combination of numbers and letters (the hexadecimal color code) that make up the color of your app background e.g., "#000000" is the color black |
-| `botScopes` | Array<string> | A list of [scopes](/scopes), or permissions, the app's Functions require |
-| `functions` | Array | (Optional) A list of all Functions your app will use |
-| `workflows` | Array | (Optional) A list of all Workflows your app will use |
-| `outgoingDomains` | Array<string> | (Optional) If your app communicates to any external domains, list them here. Note that the outgoing domains are only restricted if the workspace has Admin approved apps on e.g., myapp.tld |
-| `events` | Array | (Optional) A list of all Event structures that the app is expecting to be passed via [Message Metadata](/metadata/using) |
-| `types` | Array | (Optional) A list of all [custom types](https://api.slack.com/future/types/custom) your app will use | 
-| `datastores` | Array | (Optional) A list of all [Datastores](https://api.slack.com/future/datastores) your app will use |
-| `features` | Object | (Optional)  A configuration object of your app features |
+|Property|Type|Has Bolt support?|Description|
+|---|---|---|---|
+| `runOnSlack` | Boolean |  ✅ Yes | This is a property to indicate whether an app can be deployed to Slack infrastructure. **For Bolt apps, this must be set to `false`.** You can learn more [here](/bolt-js/future/getting-started#next-gen). |
+| `name` | String | ✅ Yes | This is the internal name for your app. It can contain spaces (e.g., "My App") |
+| `description` |String| ✅ Yes | A short sentence describing your application. A description of your app that will help users decide whether to use it |
+| `displayName` | String | ✅ Yes | (Optional) Allows a custom name for the app to be displayed that's different from the `name` |
+| `longDescription` | String | ✅ Yes | (Optional) A more detailed description of your application |
+| `icon` | String | ❌ No | A relative path to an image asset to use for the app's icon. Your app's profile picture that will appear in the Slack client |
+| `backgroundColor` | String | ✅ Yes | (Optional) A six digit combination of numbers and letters (the hexadecimal color code) that make up the color of your app background e.g., "#000000" is the color black |
+| `botScopes` | Array<string> | ✅ Yes | A list of [scopes](/scopes), or permissions, the app's Functions require |
+| `functions` | Array | ✅ Yes | (Optional) A list of all Functions your app will use |
+| `workflows` | Array | ✅ Yes | (Optional) A list of all Workflows your app will use |
+| `outgoingDomains` | Array<string> | ✅ Yes | (Optional) If your app communicates to any external domains, list them here. Note that the outgoing domains are only restricted if the workspace has Admin approved apps on e.g., myapp.tld |
+| `events` | Array | ✅ Yes | (Optional) A list of all Event structures that the app is expecting to be passed via [Message Metadata](/metadata/using) |
+| `types` | Array | ✅ Yes | (Optional) A list of all [custom types](https://api.slack.com/future/types/custom) your app will use |
+| `datastores` | Array | ❌ No | (Optional) A list of all [Datastores](https://api.slack.com/future/datastores) your app will use. This is currently only available for non-Bolt next-generation apps. You can learn more [here](/bolt-js/future/getting-started#next-gen).  |
+| `features` | Object | ✅ Yes | (Optional)  A configuration object of your app features |
 
 You will come back to the Manifest every time you create a new workflow, since all workflows for your app need to be added to the Manifest in order to use them.
-
----
-
-### The Messages tab {#messages-tab}
-
-By default, apps created with `slack create` will include both a read-only Messages tab and an About tab within Slack.
-
-You can use the [Built-in function](/bolt-js/future/built-in-functions) [`SendDm`](https://api.slack.com/future/functions#send-direct-message) to send users direct messages from your app&mdash;which will appear for them in the app's Messages tab.
-
-Your app's Messages tab will be enabled and read-only by default. If you'd like to disable read-only mode and/or disable the Messages tab completely, update the `features` section of your `manifest.js` so it looks like this:
-```javascript
-features: {
-  appHome: {
-    homeTabEnabled: true,
-    messagesTabEnabled: false,
-    messagesTabReadOnlyEnabled: false,
-  },
-},
-```
 
 ---
 

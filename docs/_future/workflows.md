@@ -18,7 +18,7 @@ Workflows can be configured to run without any user input, or they can [wait for
 
 ### Defining Workflows {#defining-workflows}
 
-Workflows are defined in the `manifest/workflow` directory and implemented in your app's [manifest](/bolt-js/future/app-manifest).
+Workflows are defined in the `manifest/workflow` directory and implemented in your app's [manifest](/bolt-js/future/app-manifests).
 
 To add a new workflow that sends a greeting to a member of a workspace, create a new file in `manifest/workflow` called `say-hello.js` and import `DefineWorkflow` and `Schema` at the top of your workflow file:
 

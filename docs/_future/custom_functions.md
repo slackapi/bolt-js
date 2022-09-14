@@ -109,7 +109,7 @@ The exported module of your function's function file should be the function defi
 
 The function takes a single argument called its "context", and returns an object that exactly matches the structure of function definition's `output_parameters`.
 
-Let's look at a sample function file, `sample-function.js`, from the `manifest/function` directory in our default [Bolt JS Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future). This function, `SampleFunctionDefinition`, defines its expected input parameters:
+Let's look at a sample function file, `sample-function.js`, from the `manifest/function` directory in our default [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future). This function, `SampleFunctionDefinition`, defines its expected input parameters:
 ```js
 const { DefineFunction, Schema } = require('@slack/bolt');
 
@@ -139,7 +139,7 @@ const SampleFunctionDefinition = DefineFunction({
 module.exports = { SampleFunctionDefinition };
 ```
 
-When using a [local development server](running your app with `slack run`), you can use `console.log` to emit information to your Bolt JS console. When your app is [deployed to production](/bolt-js/future/deploy-your-app), any `console.log` commands are available via `slack activity`.
+When using a [local development server](running your app with `slack run`), you can use `console.log` to emit information to your Bolt for JavaScript console. When your app is [deployed to production](/bolt-js/future/deploy-your-app), any `console.log` commands are available via `slack activity`.
 
 When composing your functions, some things you can do include:
 

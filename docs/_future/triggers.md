@@ -37,7 +37,7 @@ Triggers can be added to Workflows in two ways:
 
 **1. Create a Trigger File**
 
-Triggers created with the CLI are designed using Trigger Files. The Trigger File you create will supply the information about how you want your Trigger to work. For Bolt JS apps, you will need to create JSON trigger files.
+Triggers created with the CLI are designed using Trigger Files. The Trigger File you create will supply the information about how you want your Trigger to work. **For Bolt for Javascript apps, you will need to create JSON trigger files.**
 
 The specifics of the Trigger File's structure will depend on what [type of Trigger](#types) you want to use.
 
@@ -136,3 +136,5 @@ To learn more about this, visit the guide [here](https://api.slack.com/future/tr
 And that's the end of our triumphant trek learning about Triggers!
 
 If you want to see Triggers in action with their pals, the Function and the Workflow, check out our sample [Request Time Off](https://github.com/slack-samples/bolt-js-request-time-off) app within our GitHub repository.
+
+Once you've built out your next-generation app, you can proceed to the [Deploy](/bolt-js/future/deploy-your-app) guide to learn how to deploy your application on third-party infrastructure! 🤩

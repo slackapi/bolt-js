@@ -9,16 +9,16 @@ permalink: /future/create-new-app
 # Create a new app <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through how to create a new [next-generation](/bolt-js/future/getting-started#next-gen) app with Bolt JS. If you already have a Bolt JS application built that you'd like to migrate to the new next-generation platform, please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
+This guide will walk you through how to create a new [next-generation](/bolt-js/future/getting-started#next-gen) app with Bolt for JavaScript. If you already have a Bolt for JavaScript application built that you'd like to migrate to the new next-generation platform, please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
 
 The application built in this tutorial will be a "Request Time Off" app that allows a user to submit requests for time off, which then sends a message to their manager, who can either approve or deny the request.
 </div>
 
 ![Request Time Off app](../assets/take-your-time-demo.gif "Request Time Off app")
 
-When you’re finished, you’ll have this ⚡️[Bolt JS Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Bolt for JavaScript Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
 
-If you already have an existing Bolt JS application that you'd like to migrate to the next-generation platform, check out the [Migration guide](/bolt-js/future/migrate-existing-app) instead.
+If you already have an existing Bolt for JavaScript application that you'd like to migrate to the next-generation platform, check out the [Migration guide](/bolt-js/future/migrate-existing-app) instead.
 
 ---
 ### Prerequisites {#prerequisites}
@@ -35,7 +35,7 @@ To create the app, you'll run the following command:
 ```
 slack create my-app -t slack-samples/bolt-js-request-time-off
 ```
-This command creates an app through the CLI by cloning a specified template. In this case, the template is the [Bolt JS Request Time Off](https://github.com/slack-samples/bolt-js-request-time-off) application. 
+This command creates an app through the CLI by cloning a specified template. In this case, the template is the [Bolt for JavaScript Request Time Off](https://github.com/slack-samples/bolt-js-request-time-off) application. 
 
 The application will take a few moments to set up and clone the repository. Once the app is successfully created, you should see a message like this:
 ```
@@ -63,7 +63,7 @@ In order to utilize the pre-existing functionality in the Request Time Off app, 
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
-Then, run the following command to create a trigger using the `triggers/link-shortcut.json` configuration file. This file was brought into your project from the Bolt JS Request Time Off template and is used to initialize your trigger:
+Then, run the following command to create a trigger using the `triggers/link-shortcut.json` configuration file. This file was brought into your project from the Bolt for JavaScript Request Time Off template and is used to initialize your trigger:
 ```
 slack triggers create --trigger-def "triggers/link-shortcut.json"      
 ```
@@ -74,7 +74,7 @@ The above command will create a trigger for the selected workspace. Once the tri
    Trigger ID:   [ID]
    Trigger Type: shortcut
    Trigger Name: Take Your Time
-   URL: https://slack.com/shortcuts/[ID]/[Some ID]
+   Shortcut URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
 The provided URL will be what you use to run your trigger. Copy this URL and save it somewhere; you'll need it for later.
 
@@ -89,7 +89,7 @@ You'll be prompted to select a workspace to install the app to&mdash;select the 
 
 > 💡 If you don't see the workspace you'd like to use in the list, you can `CTRL + C` out of the `slack run` command and run `slack auth login`. This will allow you to authenticate in your desired workspace to have it show up in the list for `slack run`.
 
-Once the app is successfully run, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt JS app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
+Once the app is successfully run, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt for JavaScript app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
 
 With your app running, access your workspace and paste the URL from the the trigger you created in the previous step into a message in a public channel.
 
@@ -767,4 +767,4 @@ By adding the `.view()` handler, you'll now be able to execute its logic when su
 ---
 ### Conclusion
 
-Congratulations on setting up your next-generation Slack app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can continue your journey by learning about [App Manifests](bolt-js/future/app-manifest).
+Congratulations on setting up your next-generation Slack app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can continue your journey by learning about [App Manifests](/bolt-js/future/app-manifests).
