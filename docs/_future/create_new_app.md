@@ -439,7 +439,7 @@ To learn more about custom functions, you can view the documentation [here](/bol
 ---
 ### Actions {#actions}
 
-Now that our function listener has been initialized and registered, we can add in [action handlers](/bolt-js/concepts#action-listening) for our approve and deny buttons in the message sent to the manager.
+Now that our function listener has been initialized and registered, we can add in [action handlers](/bolt-js/concepts#action-listening) for our "Approve" and "Deny" buttons in the message sent to the manager.
 
 The action handlers will carry out the remaining functionality in the app. This will be to hide the "Approve" and "Deny" buttons once one is selected by the manager and also to send a message to the requester notifying them whether their time off has been approved.
 

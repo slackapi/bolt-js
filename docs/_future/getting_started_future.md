@@ -24,7 +24,8 @@ The next-generation platform is an exciting new way to develop apps for Slack! I
 
 #### Limitations
 
-Today, Bolt for Javascript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features. 
+Today, Bolt for Javascript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
+
 We do not yet support deployment to secure and managed Slack infrastructure or Datastores API [Datastores](https://api.slack.com/future/datastores) functionality.
 
 If you'd like to deploy your app with Slack infrastructure, consider building your next-generation application with the Deno Slack API. You can get started with that [here](https://api.slack.com/future/get-started).
