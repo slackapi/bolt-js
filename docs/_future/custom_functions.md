@@ -193,7 +193,6 @@ const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld
 Once this file has been created, the function handler can be registered in an `index.js` file within the `listeners/functions` directory:
 ```js
 // listeners/functions/index.js
-
 const { helloWorldFunc } = require('./hello-world');
 
 // Register a complete function
@@ -206,7 +205,6 @@ module.exports.register = (app) => {
 In order to make sure this handler is triggered, make sure the Function listeners are registered in your `listeners/index.js` file:
 ```js
 // listeners/index.js
-
 const functions = require('./functions');
 
 module.exports.registerListeners = (app) => {

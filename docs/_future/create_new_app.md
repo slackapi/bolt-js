@@ -187,7 +187,6 @@ Once the function step is executed, that will be the end of the workflow! All re
 The final workflow file will look like this:
 ```js
 // /manifest/workflow/time-off-request.js
-
 const { DefineWorkflow, Schema } = require('@slack/bolt');
 // this function will live in manifest/function/approval.js
 const { ApprovalFunction } = require('../function/approval');
@@ -289,7 +288,6 @@ In the Request Time Off application, we use one custom function, `ApprovalFuncti
 Our `ApprovalFunction` is defined in `manifest/function/approval.js`. Custom functions are defined using `DefineFunction`.
 ```js
 // manifest/function/approval.js
-
 const { DefineFunction, Schema } = require('@slack/bolt');
 
 const ApprovalFunction = DefineFunction({
@@ -450,7 +448,6 @@ We have two different handlers, one for each potential action&mdash;an Approval 
 The Approval Action looks like this:
 ```js
 // listeners/functions/actions/approve-action.js
-
 const approveActionHandler = async ({ ack, client, body, complete }) => {
   const { manager, employee, start_date, end_date } = body.function_data.inputs;
   const { channel_id, message_ts } = body.container;
@@ -658,7 +655,6 @@ To open or update a modal from a Slack Function [interactivity handler](https://
 To get started with creating a modal, add a new [Action](#action) that will be triggered when the "Open Modal" button is selected. Create a new file in `listeners/functions/actions` called `open-modal-action.js`:
 ```js
 // listeners/functions/actions/open-modal-action.js
-
 const openModalActionHandler = async ({ ack, client, body, complete }) => {
     ack();
     const { manager } = body.function_data.inputs;
@@ -728,7 +724,6 @@ Now that the "Open Modal" button's action handler has been added in to the `requ
 Inside `listeners/functions`, create a new directory called `views` and within it, add a new file called `modal-submit.js`:
 ```js
 // listeners/functions/views/modal-submit.js
-
 const openModalSubmissionHandler = async ({ ack, body, complete }) => {
     ack();
     const { manager, employee } = body.function_data.inputs;
