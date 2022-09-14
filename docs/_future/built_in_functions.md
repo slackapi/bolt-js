@@ -49,7 +49,7 @@ You can view a full list of built-in functions [here](https://api.slack.com/futu
 
 ---
 
-### Next stpes {#next-steps}
+### Next steps {#next-steps}
 
 Now that you've taken a dive into built-in functions, you can explore [custom functions](/bolt-js/future/custom-functions) and what they have to offer. ✨
 
