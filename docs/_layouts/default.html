@@ -31,17 +31,6 @@ sidebar_style: main
           {% endfor %}
         </div>
 
-        <div id="steps">
-          {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for section in
-          workflow_steps %}
-          <div class="section-wrapper">
-            <h3 id="{{section.slug}}">{{ section.title }}</h3>
-            {{ section.content | markdownify }}
-            <hr />
-          </div>
-          {% endfor %}
-        </div>
-
         <div id="advanced">
           {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %} {% for section in
           advanced_sections %}
@@ -50,6 +39,17 @@ sidebar_style: main
 
             {{ section.content | markdownify }}
 
+            <hr />
+          </div>
+          {% endfor %}
+        </div>
+
+        <div id="steps">
+          {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for section in
+          workflow_steps %}
+          <div class="section-wrapper">
+            <h3 id="{{section.slug}}">{{ section.title }}</h3>
+            {{ section.content | markdownify }}
             <hr />
           </div>
           {% endfor %}

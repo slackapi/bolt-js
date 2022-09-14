@@ -41,15 +41,15 @@
   </ul>
 
   <ul class="sidebar-section">
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#steps">
-      <li class="title">{{ site.t[page.lang].steps }}</li>
-    </a>
-    {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for step in workflow_steps %}
-      {% if step.slug != "steps-overview" %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
-        <li>{{step.title}}</li>
+    <li class="title">
+      Slack developer beta
+      <span class="label-beta">{{ site.t[page.lang].beta }}</span>
+    </li>
+    {% assign future_sections = site.future | sort: "order" | where: "lang", page.lang %}
+    {% for section in future_sections %}
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/future/{{ section.slug }}">
+        <li>{{section.title}}</li>
       </a>
-      {% endif %}
     {% endfor %}
   </ul>
 
@@ -76,6 +76,28 @@
       {% endfor %}
     </ul>
   {% endif %}
+
+  <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#steps">
+      <li class="title">
+        {{ site.t[page.lang].steps }}
+        <span class="label-legacy">
+          {{ site.t[page.lang].legacy }}
+        </span>
+      </li>
+    </a>
+    {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for step in workflow_steps %}
+      {% if step.slug != "steps-overview" %}
+      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ step.slug }}">
+        {% assign str = step.title %}
+        {% assign a = str | split: ' <span class="label-legacy">' %}
+        <li>
+          {{ a[0] }}
+        </li>
+      </a>
+      {% endif %}
+    {% endfor %}
+  </ul>
 
   <ul class="sidebar-section">
     {% assign tutorials = site.tutorials | where: "lang", page.lang | where_exp: "tutorial", "tutorial.order > 1" %}

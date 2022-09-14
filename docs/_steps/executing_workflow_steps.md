@@ -1,5 +1,5 @@
 ---
-title: Executing workflow steps
+title: Executing workflow steps <span class="label-legacy">LEGACY</span>
 lang: en
 slug: executing-steps
 order: 5
