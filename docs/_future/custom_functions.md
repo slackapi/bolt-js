@@ -19,9 +19,9 @@ To create a function, we need to do the following:
 ---
 
 ### Defining a function {#define}
-Functions are defined in your app via the `DefineFunction` method, which is part of the SDK that gets included with every newly created project.
+Functions are defined in your app via the `DefineFunction` method, which is part of the SDK that gets included with every newly created project. These function definitions are stored under the `manifest/functions/` directory.
 
-Let's take a look at a simple function:
+Let's go ahead and create a new function definition file under `manfiest/functions` directory. Name it something related to what the function does. In our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/function/sample-function.js), we name the file `sample-function.js`. Let's take a peak at it:
 ```js
 const { DefineFunction, Schema } = require('@slack/bolt');
 
@@ -51,7 +51,7 @@ const SampleFunctionDefinition = DefineFunction({
 module.exports = { SampleFunctionDefinition };
 ```
 
-Note that we import `DefineFunction`, which is used for defining our function, and also `SlackFunction`, which we'll use to implement our function in the next section.
+Note that we import `DefineFunction`, which is used for defining our function, and also `Schema`, which has information on supported [Built-in types](https://api.slack.com/future/types).
 
 Just like [Workflows](/bolt-js/future/workflows), Custom functions have a unique `callback_id` and also require a `title`. Additionally, you can set inputs and outputs just like you can with Workflows. 
 
@@ -97,61 +97,18 @@ Once your function is defined in its own file in `manifest/functions`, the next 
 
 ---
 
-### Implementing a Function {#implement}
+### Implementing a Function Listener {#implement}
 
 Implement functions in just a few steps:
 
-#### 1. Create the function file in `manifest/functions`
-Create a file for your function to live in and name it something that makes sense for your function. For example, if I'm writing a function that sends one of our engineers Brad a singing telegram, I might name the file `send-brad-some-singers.js`.
+#### 1. Create the function definition file in the `manifest/functions` directory
+If you haven't done so already, create a file for your function definition to live in and name it something that makes sense for your function. In the [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/function/sample-function.js), we named this file `sample-function.js`
 
-#### 2. Write code in the function file to define your function
-The exported module of your function's function file should be the function definition. It can be either asynchronous (for example, if you're calling API methods) or sychronous.
 
-The function takes a single argument called its "context", and returns an object that exactly matches the structure of function definition's `output_parameters`.
-
-Let's look at a sample function file, `sample-function.js`, from the `manifest/functions` directory in our default [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future). This function, `SampleFunctionDefinition`, defines its expected input parameters:
-```js
-const { DefineFunction, Schema } = require('@slack/bolt');
-
-const SampleFunctionDefinition = DefineFunction({
-  callback_id: 'sample_function_id',
-  title: 'Send a greeting',
-  description: 'Send greeting to channel',
-  input_parameters: {
-    properties: {
-      recipient: {
-        type: Schema.slack.types.user_id,
-        description: 'Send greeting to this recipient',
-      },
-      channel: {
-        type: Schema.slack.types.channel_id,
-        description: 'Channel to send message to',
-      },
-      message: {
-        type: Schema.types.string,
-        description: 'Message to the recipient',
-      },
-    },
-    required: ['message'],
-  },
-});
-
-module.exports = { SampleFunctionDefinition };
-```
-
-When using a [local development server](running your app with `slack run`), you can use `console.log` to emit information to your Bolt for JavaScript console. When your app is [deployed to production](/bolt-js/future/deploy-your-app), any `console.log` commands are available via `slack activity`.
-
-When composing your functions, some things you can do include:
-
-* leverage external APIs, and even store API credentials inside `env` using the CLI's [`slack env add` command](https://api.slack.com/future/tools/cli#var-add)
-* [call Slack API methods](https://api.slack.com/future/apicalls) or [third-party APIs](https://api.slack.com/future/apicalls/third-party)
-
-You can also encapsulate your business logic separately from the function handler, then import what you need and build your functions that way.
-
-#### 3. Add function listener and handler(s)
+#### 2. Add function listener and handler(s)
 Once your function has been defined, you'll need to register a function listener to trigger the function's functionality as well as any other related events.
 
-To do this, create a file in `listeners/functions` for your function registration (in this case, the file will be called `hello-world.js`). This file will use the defined function and also implement any needed additional logic&mdash;in this case, it'll send a message to greet someone based on what is being passed in from the greeting function in step 2. 
+To do this, create a file in `listeners/functions` directory for your function listener (in this case, the file will be called `hello-world.js`). This file will use the function definition you created earlier and also implement any needed additional logic&mdash;in this case, it'll send a message to greet someone based on what is being passed in as inputs. 
 
 ```js
 // listeners/functions/hello-world.js
@@ -184,7 +141,7 @@ const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld
 
 module.exports = { helloWorldFunc };
 ```
-The above file declares a function handler, `helloWorld`, that takes in inputs from the `event`, which is the function being triggered. It executes logic within the handler to send a message with a random greeting to the specified recipient in the desired channel. Then, a new `SlackFunction` instance is declared that actually links the `helloWorld` handler to the function being run through its function ID (`SampleFunctionDefinition`):
+The above file declares a function handler, `helloWorld`, that takes in inputs from the `event`, which is the payload received when your function is being executed. It executes logic within the handler to send a message with a random greeting to the specified recipient in the desired channel. Then, a new `SlackFunction` instance is declared that actually links the `helloWorld` handler to the function being run through its function ID (`SampleFunctionDefinition`):
 ```js
 // Let's create a new Slack Function with helloWorld as its handler
 const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld);
@@ -202,7 +159,9 @@ module.exports.register = (app) => {
 };
 ```
 
-In order to make sure this handler is triggered, make sure the Function listeners are registered in your `listeners/index.js` file:
+You can see the full completed `hello-world.js` function listener in our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/listeners/functions/hello-world.js).
+
+Lastly, in order to make sure this handler is triggered, make sure the Function listeners are registered in your `listeners/index.js` file:
 ```js
 // listeners/index.js
 const functions = require('./functions');
@@ -211,5 +170,5 @@ module.exports.registerListeners = (app) => {
   functions.register(app);
 };
 ```
-#### 4. Add function to app through workflow or manifest
+#### 3. Add the function as a step in your workflow
 To actually call the defined function, `SampleFunctionDefinition`, don't forget to add your function to a workflow! When you're finished defining and implementing your functions, the next step is to add them to [Workflows](/bolt-js/future/workflows). Once added as a step in a Workflow, your Function will run when that Workflow is invoked by a [Trigger](/bolt-js/future/triggers).
