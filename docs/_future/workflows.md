@@ -218,8 +218,7 @@ module.exports = { SayHelloWorkflow };
 Below in the Manifest, the `SayHelloWorkflow` is imported and passed in:
 ```javascript
 // manifest/manifest.js
-// Import DefineWorkflow:
-const { Schema } = require('@slack/bolt');
+const { Manifest } = require('@slack/bolt');
 const { SayHelloWorkflow } = require('./workflows/say-hello');
 
 module.exports = Manifest({

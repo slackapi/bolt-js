@@ -49,15 +49,8 @@ Use the `trigger create` command to create your desired Trigger by pointing to a
 slack trigger create --trigger-def "path/to/trigger.json"
 ```
 
-<div class="callout_card callout_info">
-  <i class="ts_icon c-icon c-icon--info-circle"></i>
-  <div>
-
-**Slack CLI built-in documentation**<br>
-Use `slack trigger --help`  to easily access information on the `trigger` command's flags and subcommands.
-
-  </div>
-</div>
+<p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>**Slack CLI built-in documentation**<br>
+Use `slack trigger --help`  to easily access information on the `trigger` command's flags and subcommands.</p>
 
 #### Create a Trigger at runtime {#create_runtime}
 
@@ -117,7 +110,7 @@ There are four types of Triggers, each one having its own specific implementatio
 | [Link Triggers](https://api.slack.com/future/triggers/link)           | Invoke a Workflow from anywhere in Slack                      |
 | [Scheduled Triggers](https://api.slack.com/future/triggers/scheduled) | Invoke a Workflow at specific time intervals                  |
 | [Event Triggers](https://api.slack.com/future/triggers/event)         | Invoke a Workflow when a specific event happens in Slack      |
-| [Webhook Triggers](#https://api.slack.com/future/triggers/webhook)     | Invoke a Workflow when a specific URL receives a POST request |
+| [Webhook Triggers](https://api.slack.com/future/triggers/webhook)     | Invoke a Workflow when a specific URL receives a POST request |
 
 ---
 
