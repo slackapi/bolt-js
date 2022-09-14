@@ -308,7 +308,7 @@ const SomeWorkflow = DefineWorkflow({
 
 If a Workflow is invoked and the required input parameters are not provided, the Workflow will not execute.
 
-> 🗣 Got 2 minutes to provide some feedback? Fill out our [Developer Survey](https://api.slack.com/future/survey) and let us know what we're doing well—and what you'd like to see us improve.
+> 🗣 Got 2 minutes to provide some feedback? Fill out our [Developer Survey](/bolt-js/future/feedback) and let us know what we're doing well—and what you'd like to see us improve.
 
 ---
 
