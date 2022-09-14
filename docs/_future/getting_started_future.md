@@ -10,13 +10,13 @@ permalink: /future/getting-started
 # Getting started <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through introducing you to the [next-generation platform](/bolt-js/future/getting-started#next-gen). It will also cover how to get started with your next-generation platform experience with Bolt for Javascript by setting up the Slack CLI and also installing the required dependencies.
+This guide will walk you through introducing you to the [next-generation platform](/bolt-js/future/getting-started#next-gen). It will also cover how to get started with your next-gen platform experience with Bolt for Javascript by setting up the Slack CLI and also installing the required dependencies.
 </div>
 
 ---
 ### What is the next-generation platform? {#next-gen}
 
-<p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>Our next generation platform is currently in beta. [Your feedback is most welcome](/bolt-js/future/feedback) - all feedback will help shape the future platform experience!</p>
+<p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>Our next-generation platform is currently in beta. [Your feedback is most welcome](/bolt-js/future/feedback) - all feedback will help shape the future platform experience!</p>
 
 The next-generation platform is an exciting new way to develop apps for Slack! It is focused on 2 components:
 1. **Flexible functionality**: You can now create modular, shareable, and remixable building blocks within your apps that make it easier than ever to connect and reuse functionlity. The primary components of this new functionality are [built-in](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions), [workflows](/bolt-js/future/workflows), and [triggers](/bolt-js/future/triggers).
@@ -24,9 +24,10 @@ The next-generation platform is an exciting new way to develop apps for Slack! I
 
 #### Limitations
 
-Currently for Bolt JS, you can only create remote functions and apps which can be hosted on third party infrastructure (such as [Heroku](https://www.heroku.com/)). Next-generation applications not built on Bolt frameworks (such as those built on [Deno](https://deno.land/)) can support non-remote functions and apps, meaning you can deploy them to secure and managed Slack infrastructure. Additionally, Bolt apps built on the next-generation platform currently do not support [Datastores](https://api.slack.com/future/datastores) that are hosted on Slack infrastructure.
+Today, Bolt for Javascript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features. 
+We do not yet support deployment to secure and managed Slack infrastructure or Datastores API [Datastores](https://api.slack.com/future/datastores) functionality.
 
-If you'd like to use non-remote functionality as well as Slack infrastructure Datastores, consider building your next-generation application with Deno. You can get started with that [here](https://api.slack.com/future/get-started).
+If you'd like to deploy your app with Slack infrastructure, consider building your next-generation application with the Deno Slack API. You can get started with that [here](https://api.slack.com/future/get-started).
 
 ---
 
@@ -57,5 +58,5 @@ In order to use the next-generation platform features, you'll need to accept a T
 ---
 ### Next steps {#next-steps}
 
-Congratulations! You're now ready to start building using the [next-generation platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with either [creating a new app](/bolt-js/future/create-new-app) or [migrating an existing app](/bolt-js/future/migrate-existing-app).
+Congratulations! You're now ready to start building using the [next-generation Platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with either [creating a new app](/bolt-js/future/create-new-app) or [migrating an existing app](/bolt-js/future/migrate-existing-app).
 

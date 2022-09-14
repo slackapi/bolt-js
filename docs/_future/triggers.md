@@ -136,5 +136,3 @@ To learn more about this, visit the guide [here](https://api.slack.com/future/tr
 And that's the end of our triumphant trek learning about Triggers!
 
 If you want to see Triggers in action with their pals, the Function and the Workflow, check out our sample [Request Time Off](https://github.com/slack-samples/bolt-js-request-time-off) app within our GitHub repository.
-
-Once you've built out your next-generation app, you can proceed to the [Deploy](/bolt-js/future/deploy-your-app) guide to learn how to deploy your application on third-party infrastructure! 🤩

@@ -9,7 +9,7 @@ permalink: /future/create-new-app
 # Create a new app <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through how to create a new [next-generation](/bolt-js/future/getting-started#next-gen) app with Bolt for JavaScript. If you already have a Bolt for JavaScript application built that you'd like to migrate to the new next-generation platform, please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
+This guide will walk you through how to create a new [next-generation](/bolt-js/future/getting-started#next-gen) app with Bolt for JavaScript. If you already have a Bolt for JavaScript application built that you'd like to migrate to the new next-gen platform, please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
 
 The application built in this tutorial will be a "Request Time Off" app that allows a user to submit requests for time off, which then sends a message to their manager, who can either approve or deny the request.
 </div>

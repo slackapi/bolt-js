@@ -13,7 +13,7 @@ permalink: /future/migrate-existing-app
 If you have an existing Slack app written with Bolt for Javascript that you'd like to migrate to the [next-generation platform](/bolt-js/future/getting-started#next-gen), this guide is for you!
 </div>
 
-If you do not have an existing Bolt for Javascript application but are looking to get started with the [next-generation platform](/bolt-js/future/getting-started#next-gen), check out the [Create a new app](/bolt-js/future/create-new-app) guide.
+If you do not have an existing Bolt for Javascript application but are looking to get started with the [next-gen platform](/bolt-js/future/getting-started#next-gen), check out the [Create a new app](/bolt-js/future/create-new-app) guide.
 
 ---
 ### Prerequisites {#prerequisites}
@@ -118,4 +118,4 @@ You have probably made changes to your app’s manifest (adding a Function or a 
 ---
 ### Conclusion
 
-Congratulations on migration your app to the your next-generation Slack platform! 🎉 You can continue your journey by learning about [App Manifests](/bolt-js/future/app-manifests) or looking into adding [Functions](/bolt-js/future/built-in-functions) and [Workflows](/bolt-js/future/workflows) to your app!
+Congratulations on migration your app to the your next-generation Slack Platform! 🎉 You can continue your journey by learning about [App Manifests](/bolt-js/future/app-manifests) or looking into adding [Functions](/bolt-js/future/built-in-functions) and [Workflows](/bolt-js/future/workflows) to your app!
