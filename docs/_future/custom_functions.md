@@ -108,7 +108,7 @@ If you haven't done so already, create a file for your function definition to li
 #### 2. Add function listener and handler(s)
 Once your function has been defined, you'll need to register a function listener to trigger the function's functionality as well as any other related events.
 
-To do this, create a file in `listeners/functions` directory for your function listener (in this case, the file will be called `hello-world.js`). This file will use the function definition you created earlier and also implement any needed additional logic&mdash;in this case, it'll send a message to greet someone based on what is being passed in as inputs. 
+To do this, create a file in `listeners/functions` directory for your function listener (in this case, the file will be called `hello-world.js`). This file will use the function definition you created earlier and also implement any needed additional logic&mdash;in this case, it'll send a message to greet someone based on what is being passed in as inputs. You can see the full completed `hello-world.js` function listener [here](https://github.com/slack-samples/bolt-js-starter-template/blob/future/listeners/functions/hello-world.js).
 
 ```js
 // listeners/functions/hello-world.js
@@ -141,7 +141,7 @@ const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld
 
 module.exports = { helloWorldFunc };
 ```
-The above file declares a function handler, `helloWorld`, that takes in inputs from the `event`, which is the payload received when your function is being executed. It executes logic within the handler to send a message with a random greeting to the specified recipient in the desired channel. Then, a new `SlackFunction` instance is declared that actually links the `helloWorld` handler to the function being run through its function ID (`SampleFunctionDefinition`):
+The `hello-world.js` file declares a function handler, `helloWorld`, that takes in inputs from the `event`, which is the payload received when your function is being executed. It executes logic within the handler to send a message with a random greeting to the specified recipient in the desired channel. Then, a new `SlackFunction` instance is declared that actually links the `helloWorld` handler to `SampleFunctionDefinition` through the function's ID:
 ```js
 // Let's create a new Slack Function with helloWorld as its handler
 const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld);
@@ -159,7 +159,6 @@ module.exports.register = (app) => {
 };
 ```
 
-You can see the full completed `hello-world.js` function listener in our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/listeners/functions/hello-world.js).
 
 Lastly, in order to make sure this handler is triggered, make sure the Function listeners are registered in your `listeners/index.js` file:
 ```js
