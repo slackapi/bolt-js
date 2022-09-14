@@ -23,7 +23,7 @@ Inside the manifest file, you will find an `module.exports = Manifest({})` block
 ```javascript
 // manifest/manifest.js
 const { Manifest } = require('@slack/bolt');
-const { TimeOffWorkflow } = require('./workflow/approval');
+const { TimeOffWorkflow } = require('./workflows/approval');
 
 module.exports = Manifest({
   runOnSlack: false,

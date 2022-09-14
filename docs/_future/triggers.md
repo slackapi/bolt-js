@@ -56,7 +56,7 @@ Use `slack trigger --help`  to easily access information on the `trigger` comman
 
 The logic of a runtime Trigger lies within a Function's code. The specific payload is dependent on the [type of Trigger](#types) you use.
 
-Within your `manifest/function` folder, you'll have the Functions that are the steps making up your Workflow. Within this folder is where you can create a Trigger within the relevant `<function>.js` file. 
+Within your `manifest/functions` folder, you'll have the Functions that are the steps making up your Workflow. Within this folder is where you can create a Trigger within the relevant `<function>.js` file. 
 
 The `create` method for runtime Triggers takes the form of `client.workflows.triggers.create()`. Within that method you can leverage `inputs` acquired in previous steps (i.e. with Functions) within the Workflow.
 

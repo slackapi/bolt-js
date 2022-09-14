@@ -111,7 +111,7 @@ Now that we have a working instance of the app in your workspace, let's dive int
 
 Workflows are a set of processing steps that are executed in order. Every workflow step consists of either a [built-in function](/bolt-js/future/built-in-functions) or [custom function](/bolt-js/future/custom-functions). Workflows can be configured to run without any user input, or they can wait for input via form before continuing.
 
-In the Request Time Off application, the Time Off Request workflow is defined in `manifest/workflow/time-off-request.js`. The general structure of a workflow is to first define it using the built in function `DefineWorkflow`:
+In the Request Time Off application, the Time Off Request workflow is defined in `manifest/workflows/time-off-request.js`. The general structure of a workflow is to first define it using the built in function `DefineWorkflow`:
 
 ```js
 const { DefineWorkflow, Schema } = require('@slack/bolt');
@@ -186,10 +186,10 @@ Once the function step is executed, that will be the end of the workflow! All re
 
 The final workflow file will look like this:
 ```js
-// /manifest/workflow/time-off-request.js
+// /manifest/workflows/time-off-request.js
 const { DefineWorkflow, Schema } = require('@slack/bolt');
-// this function will live in manifest/function/approval.js
-const { ApprovalFunction } = require('../function/approval');
+// this function will live in manifest/functions/approval.js
+const { ApprovalFunction } = require('../functions/approval');
 
 const TimeOffWorkflow = DefineWorkflow({
   callback_id: 'time_off_request_wf',
@@ -257,7 +257,7 @@ The `link-shortcut.json` file looks like this:
   "type": "shortcut",
   "name": "Take Your Time",
   "description": "Submit a request to take time off",
-  "workflow": "#/manifest/workflow/time_off_request_wf",
+  "workflow": "#/manifest/workflows/time_off_request_wf",
   "shortcut": {},
   "inputs": {
     "interactivity": {
@@ -266,7 +266,7 @@ The `link-shortcut.json` file looks like this:
   }
 }
 ```
-This file acts as a configuration for your trigger that specifies which workflow is executed when the trigger is invoked (in this case, it maps the workflow to the `time_off_request_wf` callback ID from the Time Off Request Workflow initialized in `/manifest/workflow/time-off-request.js`).
+This file acts as a configuration for your trigger that specifies which workflow is executed when the trigger is invoked (in this case, it maps the workflow to the `time_off_request_wf` callback ID from the Time Off Request Workflow initialized in `/manifest/workflows/time-off-request.js`).
 
 This file will also define how the trigger shows up in your application&mdash;for example, the `name` field will be the name of the trigger when it is surfaced as a link trigger in your workspace.
 
@@ -285,9 +285,9 @@ There are two types of functions: [built-in functions](/bolt-js/future/built-in-
 
 In the Request Time Off application, we use one custom function, `ApprovalFunction`, which we passed into our Time Off Workflow as the second step after a requester submits time off information. At this point, our custom function will take that information and then send it to the manager to approve or deny.
 
-Our `ApprovalFunction` is defined in `manifest/function/approval.js`. Custom functions are defined using `DefineFunction`.
+Our `ApprovalFunction` is defined in `manifest/functions/approval.js`. Custom functions are defined using `DefineFunction`.
 ```js
-// manifest/function/approval.js
+// manifest/functions/approval.js
 const { DefineFunction, Schema } = require('@slack/bolt');
 
 const ApprovalFunction = DefineFunction({
@@ -341,7 +341,7 @@ The function listener is declared in `listeners/functions/request-approval.js`:
 const { SlackFunction } = require('@slack/bolt');
 
 // Get our Approval Function from the manifest!
-const { ApprovalFunction } = require('../../manifest/function/approval');
+const { ApprovalFunction } = require('../../manifest/functions/approval');
 
 // Here is the work we want to do!
 const notifyApprover = async ({ event, client, complete }) => {
@@ -533,7 +533,7 @@ The full `request-approval.js` function will look like this:
 const { SlackFunction } = require('@slack/bolt');
 
 // Get our Approval Function from the manifest!
-const { ApprovalFunction } = require('../../manifest/function/approval');
+const { ApprovalFunction } = require('../../manifest/functions/approval');
 
 // Here is the work we want to do!
 const notifyApprover = async ({ event, client, complete }) => {

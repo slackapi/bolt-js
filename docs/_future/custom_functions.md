@@ -93,15 +93,15 @@ While, strictly speaking, input and output parameters are optional, they are a c
 
 Functions are similar in philosophy to Unix system commands: they should be minimalist, modular, and reusable. Expect the output of one function to eventually become the input of another, with no other frame of reference.
 
-Once your function is defined in its own file in `manifest/function`, the next steps are to add a function listener, register the listener, and implement the function in a workflow.
+Once your function is defined in its own file in `manifest/functions`, the next steps are to add a function listener, register the listener, and implement the function in a workflow.
 
 ---
 
-### Implementing a function {#implement}
+### Implementing a Function {#implement}
 
 Implement functions in just a few steps:
 
-#### 1. Create the function file in `manifest/function`
+#### 1. Create the function file in `manifest/functions`
 Create a file for your function to live in and name it something that makes sense for your function. For example, if I'm writing a function that sends one of our engineers Brad a singing telegram, I might name the file `send-brad-some-singers.js`.
 
 #### 2. Write code in the function file to define your function
@@ -109,7 +109,7 @@ The exported module of your function's function file should be the function defi
 
 The function takes a single argument called its "context", and returns an object that exactly matches the structure of function definition's `output_parameters`.
 
-Let's look at a sample function file, `sample-function.js`, from the `manifest/function` directory in our default [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future). This function, `SampleFunctionDefinition`, defines its expected input parameters:
+Let's look at a sample function file, `sample-function.js`, from the `manifest/functions` directory in our default [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future). This function, `SampleFunctionDefinition`, defines its expected input parameters:
 ```js
 const { DefineFunction, Schema } = require('@slack/bolt');
 
@@ -159,7 +159,7 @@ To do this, create a file in `listeners/functions` for your function registratio
 const { SlackFunction } = require('@slack/bolt');
 
 // Get our Function Definition from the manifest!
-const { SampleFunctionDefinition } = require('../../manifest/function/sample-function');
+const { SampleFunctionDefinition } = require('../../manifest/functions/sample-function');
 
 // Here is the work we want to do!
 const helloWorld = async ({ event, client, complete }) => {
