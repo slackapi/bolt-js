@@ -116,6 +116,6 @@ You have probably made changes to your app’s manifest (adding a Function or a 
 * Run `slack install` and select your app. Select your workspace from the list prompt to install.
 
 ---
-### Conclusion
+### Conclusion {#conclusion}
 
 Congratulations on migrating your app to the your next-generation Slack Platform! 🎉 You can continue your journey by learning about [App Manifests](/bolt-js/future/app-manifests) or looking into adding [Functions](/bolt-js/future/built-in-functions) and [Workflows](/bolt-js/future/workflows) to your app!
