@@ -49,6 +49,8 @@ Use the `trigger create` command to create your desired Trigger by pointing to a
 slack trigger create --trigger-def "path/to/trigger.json"
 ```
 
+> 💡 In order to run the trigger and launch the full workflow, your application must be running via `slack run`.
+
 <p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>**Slack CLI built-in documentation**<br>
 Use `slack trigger --help`  to easily access information on the `trigger` command's flags and subcommands.</p>
 

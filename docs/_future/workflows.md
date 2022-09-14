@@ -50,13 +50,13 @@ Once you've defined your Workflow, you'll now have access to it's `addStep` meth
 
 To use a [built-in function](/bolt-js/future/built-in-functions), like `SendMessage`:
 
-First, ensure that `Schema` from the SDK is imported in your workflow file:
+#### 1. Ensure that `Schema` from the SDK is imported in your workflow file: {#sdk-import}
 
 ```javascript
 const { Schema } = require('@slack/bolt');
 ```
 
-Then, call the function with your Workflow's `addStep` method:
+#### 2. Call the function with your Workflow's `addStep` method: {#add-step}
 
 ```javascript
 // Example: taking the string output from a function and passing it to SendMessage
@@ -66,7 +66,7 @@ SayHelloWorkflow.addStep(Schema.slack.functions.SendMessage, {
 });
 ```
 
-_Here's an example of adding a step that calls a Built-in function:_
+Here's an example of adding a step that calls a Built-in function:
 ```javascript
 SayHelloWorkflow.addStep(Schema.slack.functions.SendMessage, {
     channel_id: "C1234567",
@@ -74,19 +74,19 @@ SayHelloWorkflow.addStep(Schema.slack.functions.SendMessage, {
 });
 ```
 
-_Here's an example of a step that calls a Custom function with a callback ID of `my_function_callback_id`:_
+Here's an example of a step that calls a Custom function with a callback ID of `my_function_callback_id`:
 ```javascript
 SayHelloWorkflow.addStep("#/functions/my_function_callback_id", {
     some_input: 12345
 });
 ```
 
-Next, export your workflow at the bottom of the file to be imported into the manifest:
+#### 3. Export your workflow at the bottom of the file to be imported into the manifest: {#export}
 ```javascript
 module.exports = { SayHelloWorkflow };
 ```
 
-Finally, declare your workflow in your app's manifest definition under the `workflow` property:
+#### 4. Declare your workflow in your app's manifest definition under the `workflow` property: {#declare-workflow}
 
 ```javascript
 // manifest/manifest.js
@@ -133,13 +133,13 @@ Visit [this guide](https://api.slack.com/future/forms) for more details and code
 
 To use a [custom function](/bolt-js/built-on-slack/custom-functions) that you define:
 
-First, import the function in your workflow file where you are defining the Workflow:
+#### 1. Import the function in your workflow file where you are defining the Workflow: {#import}
 
 ```javascript
 import { SomeFunction } from "../functions/some_function";
 ```
 
-Then, call your Function, storing its output in a variable. Here you may also pass input parameters from the Workflow into the Function itself:
+#### 2. Call your Function, storing its output in a variable. Here you may also pass input parameters from the Workflow into the Function itself: {#call-function}
 
 ```javascript
 import { SomeFunction } from "../functions/some_function";
@@ -171,7 +171,7 @@ const myFunctionResult = SomeWorkflow.addStep(SomeFunction, {
 module.exports = { SomeWorkflow };
 ```
 
-Finally, use your Function in follow-on steps. For example:
+#### 3. Use your Function in follow-on steps. For example: {#use-function}
 
 ```javascript
 // Example: taking the string output from a function and passing it to SendMessage
