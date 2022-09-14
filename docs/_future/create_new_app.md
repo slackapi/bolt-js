@@ -68,7 +68,7 @@ Then, run the following command to create a trigger using the `triggers/link-sho
 slack triggers create --trigger-def "triggers/link-shortcut.json"      
 ```
 
-The above command will create a trigger for the selected workspace. Once the trigger is successfully created, you should see an output like this:
+The above command will create a trigger for the selected workspace. Make sure to select the workspace you want and that it is appended by `(dev)`. This will create a dev instance of your app. Once the trigger is successfully created, you should see an output like this:
 ```
 ⚡ Trigger created
    Trigger ID:   [ID]
