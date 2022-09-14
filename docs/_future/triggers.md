@@ -15,11 +15,9 @@ Triggers are but one of the three building blocks that make up next-generation S
 2. Workflows are made up of Functions
 3. Triggers are how Workflows are executed (⬅️ you are here)
 
-Since Triggers are what trigger your Workflows, you need to have a Workflow before you can create a Trigger. Acquaint yourself with the [documentation on Workflows](/bolt-js/future/workflows), then head back here. We'll wait!
+Since Triggers kick off Workflows, you need to have a Workflow before you can create a Trigger. Acquaint yourself with the [documentation on Workflows](/bolt-js/future/workflows), then head back here. We'll wait!
 
-With the knowledge of Workflows within your noggin, let's take a look at the different types of Triggers, and how you can implement them into your new app. 
-
-You will come to many forks in this metaphorical road that is Trigger implementation. There are no wrong choices; all roads lead to your own next-generation Slack app. 
+Once you've created a Workflow, you can dive into the guide below! 
 </div>
 
 
@@ -120,7 +118,7 @@ There are four types of Triggers, each one having its own specific implementatio
 
 A newly created Trigger will only be accessible to others inside a workspace once its creator has granted access.
 
-To manage what user (or many users) have access to run your Triggers, you'll use the `access` command.
+To manage what user (or many users) have access to run your Triggers, you'll use the `slack trigger access` command.
 
 To learn more about this, visit the guide [here](https://api.slack.com/future/triggers#manage-access).
 
