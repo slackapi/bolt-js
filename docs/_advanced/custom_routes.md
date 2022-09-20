@@ -9,6 +9,8 @@ order: 10
 As of `v3.7.0`, custom HTTP routes can be easily added by passing in an array of routes as `customRoutes` when initializing `App`. 
 
 Each `CustomRoute` object must contain three properties: `path`, `method`, and `handler`. `method`, which corresponds to the HTTP verb, can be either a string or an array of strings.
+
+To determine what port the custom HTTP route will be available on locally, you can specify an `installerOptions.port` property in the `App` constructor. Otherwise, it will default to port `3000`.
 </div>
 
 ```javascript
