@@ -1,6 +1,6 @@
 ---
 title: Workflows
-order: 6
+order: 4
 slug: workflows
 lang: en
 layout: tutorial

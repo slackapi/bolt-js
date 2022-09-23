@@ -1,6 +1,6 @@
 ---
 title: Migrate an existing app
-order: 2
+order: 9
 slug: migrate-existing-app
 lang: en
 layout: tutorial
@@ -13,12 +13,12 @@ permalink: /future/migrate-existing-app
 If you have an existing Slack app written with Bolt for Javascript that you'd like to migrate to the [next-generation platform](/bolt-js/future/getting-started#next-gen), this guide is for you!
 </div>
 
-If you do not have an existing Bolt for Javascript application but are looking to get started with the [next-gen platform](/bolt-js/future/getting-started#next-gen), check out the [Create a new app](/bolt-js/future/create-new-app) guide.
+If you do not have an existing Bolt for Javascript application but are looking to get started with the [next-gen platform](/bolt-js/future/getting-started#next-gen), check out the [Getting Started](/bolt-js/future/getting-started) guide.
 
 ---
 ### Prerequisites {#prerequisites}
 
-Before we get started, make sure you've followed the steps to install required dependencies in the [Getting Started guide](/bolt-js/future/getting-started).
+Before we get started, make sure you've followed the steps up to the "Accept the Beta Terms of Service" section to install required dependencies in the [Getting Started guide](/bolt-js/future/getting-started).
 
 ---
 
