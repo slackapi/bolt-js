@@ -42,7 +42,7 @@ The application will take a few moments to set up and clone the repository. Once
 ```
 ✨ my-app successfully created
 
-🧭 Explore your project's README.md for documentation and code samples, and at any time run hermes help to display a list of available commands
+🧭 Explore your project's README.md for documentation and code samples, and at any time run slack help to display a list of available commands
 
 🧑‍🚀 Follow the steps below to try out your new project
 
