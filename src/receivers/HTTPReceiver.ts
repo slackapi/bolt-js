@@ -262,7 +262,9 @@ export default class HTTPReceiver implements Receiver {
     portOrListenOptions: number | string | ListenOptions,
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
-    let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
+    let createServerFn:
+    typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
+    typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Decide which kind of server, HTTP or HTTPS, by searching for any keys in the serverOptions that are exclusive
     // to HTTPS

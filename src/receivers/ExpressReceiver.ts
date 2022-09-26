@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createServer, Server, ServerOptions } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
 import express, { Request, Response, Application, RequestHandler, Router, IRouter } from 'express';
@@ -352,7 +354,9 @@ export default class ExpressReceiver implements Receiver {
     portOrListenOptions: number | ListenOptions,
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
-    let createServerFn: typeof createServer | typeof createHttpsServer = createServer;
+    let createServerFn:
+    typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
+    typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
