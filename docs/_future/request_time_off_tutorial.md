@@ -1,29 +1,30 @@
 ---
-title: Create a new app
-order: 1
-slug: create-new-app
+title: Request time off app tutorial
+order: 10
+slug: request-time-off-tutorial
 lang: en
 layout: tutorial
-permalink: /future/create-new-app
+permalink: /future/request-time-off-tutorial
+redirect_from: /future/create-new-app
 ---
-# Create a new app <span class="label-beta">BETA</span>
+# Request time off app tutorial <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through how to create a new [next-generation](/bolt-js/future/getting-started#next-gen) app with Bolt for JavaScript. If you already have a Bolt for JavaScript application built that you'd like to migrate to the new next-gen platform, please follow the [Migration guide](/bolt-js/future/migrate-existing-app).
-
-The application built in this tutorial will be a "Request Time Off" app that allows a user to submit requests for time off, which then sends a message to their manager, who can either approve or deny the request.
-</div>
+This guide will walk you through how to create a new [next-generation](/bolt-js/future/getting-started#next-gen) app with Bolt for JavaScript. The application built in this tutorial will be a more complex "Request Time Off" app that allows a user to submit requests for time off, which then sends a message to their manager, who can either approve or deny the request.
 
 ![Request Time Off app](../assets/take-your-time-demo.gif "Request Time Off app")
 
 When you’re finished, you’ll have this ⚡️[Bolt for JavaScript Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
 
+If you'd like to create a simpler next-generation Bolt for Javascript application or are looking to quickstart with a simple template, follow the [Getting Started guide](/bolt-js/future/getting-started#create-app).
+
 If you already have an existing Bolt for JavaScript application that you'd like to migrate to the next-generation platform, check out the [Migration guide](/bolt-js/future/migrate-existing-app) instead.
+</div>
 
 ---
 ### Prerequisites {#prerequisites}
 
-In order to create your app, make sure you've first followed all steps in the [Getting Started guide](/bolt-js/future/getting-started) to set up and install the dependencies.
+In order to create your app, make sure you've first followed all steps up to the "Accept the Beta Terms of Service" section in the [Getting Started guide](/bolt-js/future/getting-started) to set up and install the dependencies.
 
 ---
 
@@ -41,7 +42,7 @@ The application will take a few moments to set up and clone the repository. Once
 ```
 ✨ my-app successfully created
 
-🧭 Explore your project's README.md for documentation and code samples, and at any time run hermes help to display a list of available commands
+🧭 Explore your project's README.md for documentation and code samples, and at any time run slack help to display a list of available commands
 
 🧑‍🚀 Follow the steps below to try out your new project
 
@@ -106,7 +107,7 @@ Then, submit the form. You should receive a message from the app with informatio
 The full app flow can be seen here:
 ![Request Time Off app](../assets/take-your-time-demo.gif "Request Time Off app")
 
-Now we have a working instance of the app in your workspace and you've seen it in action! You can exploring on your own and dive into the code yourself here or follow along as we break down this app's next-gen components below to see how everything works!
+Now we have a working instance of the app in your workspace and you've seen it in action! You can start exploring on your own and dive into the code yourself here or follow along as we break down this app's next-gen components below to see how everything works!
 
 ---
 ### Workflows {#workflows}
@@ -667,4 +668,4 @@ By adding the `.view()` handler, you'll now be able to execute its logic when su
 ---
 ### Conclusion {#conclusion}
 
-Congratulations on setting up your next-generation Slack app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can continue your journey by learning about [App Manifests](/bolt-js/future/app-manifests).
+Congratulations on setting up your next-generation Request Time Off app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can work on adding more to the application or jump on the learning track and start reading about [App Manifests](/bolt-js/future/app-manifests).

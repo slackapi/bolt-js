@@ -1,6 +1,6 @@
 ---
 title: Submit feedback
-order: 10
+order: 7
 slug: feedback
 lang: en
 layout: fullpage

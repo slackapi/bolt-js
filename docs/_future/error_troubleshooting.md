@@ -1,6 +1,6 @@
 ---
 title: Error troubleshooting
-order: 8
+order: 6
 slug: error-troubleshooting
 lang: en
 layout: fullpage

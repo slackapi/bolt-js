@@ -1,6 +1,6 @@
 ---
 title: Custom functions
-order: 5
+order: 3
 slug: custom-functions
 lang: en
 layout: tutorial

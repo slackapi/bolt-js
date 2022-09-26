@@ -1,6 +1,6 @@
 ---
 title: Triggers
-order: 7
+order: 5
 slug: triggers
 lang: en
 layout: tutorial

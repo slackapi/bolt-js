@@ -1,6 +1,6 @@
 ---
 title: Built-in functions
-order: 4
+order: 2
 slug: built-in-functions
 lang: en
 layout: tutorial
