@@ -108,7 +108,7 @@ The above command will create a trigger for the selected workspace. Make sure to
 ⚡ Trigger created
    Trigger ID:   [ID]
    Trigger Type: shortcut
-   Trigger Name: Take Your Time
+   Trigger Name: Sample Trigger
    URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
 The provided URL will be what you use to run your Trigger. Copy this URL and save it somewhere; you'll need it for later.
