@@ -668,4 +668,4 @@ By adding the `.view()` handler, you'll now be able to execute its logic when su
 ---
 ### Conclusion {#conclusion}
 
-Congratulations on setting up your next-generation Slack app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can continue your journey by learning about [App Manifests](/bolt-js/future/app-manifests).
+Congratulations on setting up your next-generation Request Time Off app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can work on adding more to the application or jump on the learning track and start reading about [App Manifests](/bolt-js/future/app-manifests).
