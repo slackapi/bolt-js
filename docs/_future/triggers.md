@@ -39,6 +39,8 @@ Triggers created with the CLI are designed using Trigger Files. The Trigger File
 
 The specifics of the Trigger File's structure will depend on what [type of Trigger](#types) you want to use.
 
+The Hello World app from the Bolt for JavaScript starter template uses a Link Trigger, which is one of the [Trigger types](#types). You can view its Trigger File [here](https://github.com/slack-samples/bolt-js-starter-template/blob/future/triggers/hello-world-trigger.json).
+
 **2. Run the** `trigger create` **command**
 
 Use the `trigger create` command to create your desired Trigger by pointing to a Trigger File. 
@@ -75,7 +77,7 @@ const triggerResponse = await client.workflows.triggers.create({
 
 The response will have a property called `ok`. If `true`, then the Trigger was created, and the `trigger` property will be populated.
 
-Your response will include a `trigger.id`; be sure to store it! You use that to `update` or `delete` the Trigger if need be.
+Your response will include a `trigger.id`; be sure to store it! You will use that to `update` or `delete` the Trigger if need be.
 
 #### Development and production Triggers
 
@@ -128,4 +130,4 @@ To learn more about this, visit the guide [here](https://api.slack.com/future/tr
 
 And that's the end of our triumphant trek learning about Triggers!
 
-If you want to see Triggers in action with their pals, the Function and the Workflow, check out our sample [Request Time Off](https://github.com/slack-samples/bolt-js-request-time-off) app within our GitHub repository.
+If you want to see Triggers in action with their pals, the Function and the Workflow, check out our sample [Hello World](https://github.com/slack-samples/bolt-js-starter-template/tree/future) app. For a more complex example, you can take a look at our [Request Time Off](https://github.com/slack-samples/bolt-js-request-time-off) app and its end-to-end [tutorial](/bolt-js/future/request-time-off-tutorial).

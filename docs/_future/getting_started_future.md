@@ -130,13 +130,13 @@ Once the app is successfully run, you'll see output in your Terminal to indicate
 
 With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
 
-> 💡 To make the trigger URL more widely accessible, we recommend saving the Trigger as a channel bookmark for easy access.
+> 💡 The Trigger will automatically be saved as a channel bookmark under "Workflows" for easy access.
 
 Send the message and click the "Run" button that appears. A modal will appear prompting you to enter information to greet someone in your Slack workspace. Fill out the requested information.
 
 ![Hello World modal](../assets/hello-world-modal.png "Hello World modal")
 
-Then, submit the form. In the specified channel submitted in the form, you should receive a message from the app tagging the submitted user. The message will also contain a randomly generated greeting and the message you wrote in the form..
+Then, submit the form. In the specified channel submitted in the form, you should receive a message from the app tagging the submitted user. The message will also contain a randomly generated greeting and the message you wrote in the form.
 
 The full app flow can be seen here:
 ![Hello World app](../assets/hello-world-demo.gif "Hello World app")

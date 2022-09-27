@@ -96,7 +96,7 @@ Once the app is successfully run, you'll see output in your Terminal to indicate
 
 With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
 
-> 💡 To make the trigger URL more widely accessible, we recommend saving the Trigger as a channel bookmark for easy access.
+> 💡 The Trigger will automatically be saved as a channel bookmark under "Workflows" for easy access.
 
 Send the message and click the "Run" button that appears. A modal will appear prompting you to enter information to request time off. To test your app properly, we recommend entering your own Slack username in the "Manager" field.
 
