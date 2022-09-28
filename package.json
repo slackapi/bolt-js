@@ -21,8 +21,8 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">=12.13.0",
-    "npm": ">=6.12.0"
+    "node": ">=16.7.1",
+    "npm": ">=8.15.0"
   },
   "scripts": {
     "prepare": "npm run build",
