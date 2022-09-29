@@ -6,7 +6,7 @@
 // module.exports = (robot) => {
 
 // =====================================
-// === Variable Declerations ===
+// === Variable Declarations ===
 // =====================================
 
 // Create a constant with Grettings you can add more to this if you like by putting more in if you wish
