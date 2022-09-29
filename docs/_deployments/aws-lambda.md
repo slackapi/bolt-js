@@ -185,7 +185,7 @@ plugins:
   - serverless-offline
 ```
 
-> 💡 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be enviornment variables on your local machine.
+> 💡 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be environment variables on your local machine.
 > You can [learn how to export Slack environment variables](/bolt-js/tutorial/getting-started#setting-up-your-project) in our Getting Started guide.
 
 **3. Install Serverless Offline**
