@@ -145,7 +145,7 @@ app.event('member_left_channel', async ({ say }) => { await say(randomLeaveReply
   //   res.send('Missing HUBOT_ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE_THE_UNIVERSE_AND_EVERYTHING in environment: please set and try again')
   // })
 
-// If you ask what i the the answer to the ulimate question of life it will resond with what is in your .env file
+// If you ask what is the the answer to the ulimate question of life it will resond with what is in your .env file
 app.message(
     directMention(),
     'what is the answer to the ultimate question of life',
