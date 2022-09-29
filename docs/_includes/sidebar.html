@@ -8,7 +8,7 @@
       Bolt
     </span>
 
-    <!-- Liquid has no ternary operator, so this is just meant to disclude 
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
       english sections since they are at the root URL -->
     {% assign localized_base_url = page.lang | prepend: "/" | remove_first: "/en" %}
 
