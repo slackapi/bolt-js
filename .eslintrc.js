@@ -247,7 +247,7 @@ module.exports = {
             '**/middleware/*', // the src/middleware directory doesn't export a module, it's just a namespace.
             '**/receivers/*', // the src/receivers directory doesn't export a module, it's just a namespace.
             '**/types/**/*',
-            '**/types/*', // type heirarchies should be used however one wants
+            '**/types/*', // type hierarchies should be used however one wants
           ],
         }],
 
