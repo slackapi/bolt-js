@@ -263,7 +263,7 @@ app.error(async (error) => {
 
 // NOTE: In a real application, you should provide a convoStore option to the App constructor. The default convoStore
 //       only persists data to memory, so its lost when the process terminates.
-// This example really does not work without a converstation store for me it just keeps saying Sure!
+// This example really does not work without a conversation store for me it just keeps saying Sure!
 // It should after 4 requests to have a soda it should say I'm to fizzy..
 
 app.message(directMention(), 'have a soda', async ({ context, say }) => {
