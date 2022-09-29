@@ -239,7 +239,7 @@ app.message('goodbye', async ({ message, say }) => {
 });
 ```
 
-Commit the changes to your local Git respository:
+Commit the changes to your local Git repository:
 
 ```shell
 git commit -am "Say 'goodbye' to a person"
