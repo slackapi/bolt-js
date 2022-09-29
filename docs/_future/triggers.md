@@ -35,7 +35,7 @@ Triggers can be added to Workflows in two ways:
 
 **1. Create a Trigger File**
 
-Triggers created with the CLI are designed using Trigger Files. The Trigger File you create will supply the information about how you want your Trigger to work. **For Bolt for Javascript apps, you will need to create JSON trigger files.**
+Triggers created with the CLI are designed using Trigger Files. The Trigger File you create will supply the information about how you want your Trigger to work. **For Bolt for JavaScript apps, you will need to create JSON trigger files.**
 
 The specifics of the Trigger File's structure will depend on what [type of Trigger](#types) you want to use.
 

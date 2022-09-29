@@ -16,7 +16,7 @@ This guide will walk you through how to create a new [next-generation](/bolt-js/
 
 When you’re finished, you’ll have this ⚡️[Bolt for JavaScript Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
 
-If you'd like to create a simpler next-generation Bolt for Javascript application or are looking to quickstart with a simple template, follow the [Getting Started guide](/bolt-js/future/getting-started#create-app).
+If you'd like to create a simpler next-generation Bolt for JavaScript application or are looking to quickstart with a simple template, follow the [Getting Started guide](/bolt-js/future/getting-started#create-app).
 
 If you already have an existing Bolt for JavaScript application that you'd like to migrate to the next-generation platform, check out the [Migration guide](/bolt-js/future/migrate-existing-app) instead.
 </div>

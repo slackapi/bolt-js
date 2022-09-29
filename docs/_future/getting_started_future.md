@@ -10,7 +10,7 @@ permalink: /future/getting-started
 # Getting started <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through introducing you to the [next-generation platform](/bolt-js/future/getting-started#next-gen). It will also cover how to get started with your next-gen platform experience with Bolt for Javascript by setting up the Slack CLI and also installing the required dependencies.
+This guide will walk you through introducing you to the [next-generation platform](/bolt-js/future/getting-started#next-gen). It will also cover how to get started with your next-gen platform experience with Bolt for JavaScript by setting up the Slack CLI and also installing the required dependencies.
 </div>
 
 ---
@@ -24,7 +24,7 @@ The next-generation platform is an exciting new way to develop apps for Slack! I
 
 #### Limitations
 
-Today, Bolt for Javascript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
+Today, Bolt for JavaScript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
 
 We do not yet support deployment to secure and managed Slack infrastructure or Datastores API [Datastores](https://api.slack.com/future/datastores) functionality.
 
@@ -34,7 +34,7 @@ If you'd like to deploy your app with Slack infrastructure, consider building yo
 
 ### Setting up the CLI {#setting-up-cli}
 
-To build a next-generation app with Bolt for Javascript, you'll first need to get the Slack CLI set up on your machine. You can follow the [Quickstart Guide](https://api.slack.com/future/quickstart) to get instructions on how to manually or automatically install it based on your operating system. 
+To build a next-generation app with Bolt for JavaScript, you'll first need to get the Slack CLI set up on your machine. You can follow the [Quickstart Guide](https://api.slack.com/future/quickstart) to get instructions on how to manually or automatically install it based on your operating system. 
 
 Since we won't be using Deno to build or migrate our next-generation app, you can skip any instructions related to installing Deno or creating an app using a Deno template. Once you've logged into the CLI using `slack login` and verified your login using `slack auth list`, you can proceed with the instructions in this guide.
 
@@ -88,7 +88,7 @@ The application will take a few moments to set up and clone the repository. Once
 🔔 If you leave the workspace, you won’t be able to manage any apps you’ve deployed to it. Apps you deploy will belong to the workspace even if you leave the workspace
 ```
 
-Your app has now been created in the `my-app` directory! This application can be used as a template for you to build your own next-generation Bolt for Javascript app with. However, if you'd like to test the "Hello World" example included in your template, read on! 📖
+Your app has now been created in the `my-app` directory! This application can be used as a template for you to build your own next-generation Bolt for JavaScript app with. However, if you'd like to test the "Hello World" example included in your template, read on! 📖
 
 ---
 ### Set up your trigger {#setup-trigger}
