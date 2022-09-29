@@ -120,7 +120,7 @@ serverless offline --noPrependStageInUrl
 Open another terminal session to proxy Slack API requests locally:
 
 ```zsh
-# -subdomain= is avalable only for paid accounts
+# -subdomain= is available only for paid accounts
 ngrok http 3000 -subdomain=my-unique-name
 ```
 
