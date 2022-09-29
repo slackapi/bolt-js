@@ -94,7 +94,7 @@ You'll be prompted to select a workspace to install the app to&mdash;select the 
 Once the app is successfully run, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt for JavaScript app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
 ### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the the Trigger you created in the previous step into a message in a public channel.
+With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
 
 > 💡 To make the trigger URL more widely accessible, we recommend saving the Trigger as a channel bookmark for easy access.
 

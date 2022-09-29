@@ -270,7 +270,7 @@ module.exports = {
         // shared state to Mocha's Context object, for example in setup and
         // teardown test methods. Assigning stub/mock objects to the Context
         // object via `this` is a common pattern in Mocha. As such, using
-        // `function` over the the arrow notation binds `this` appropriately and
+        // `function` over the arrow notation binds `this` appropriately and
         // should be used in tests. So: we turn off the prefer-arrow-callback
         // rule.
         // See https://github.com/slackapi/bolt-js/pull/1012#pullrequestreview-711232738
