@@ -204,7 +204,7 @@ export default class FastifyReceiver implements Receiver {
       try {
         bufferedReq = await httpFunc.parseAndVerifyHTTPRequest(
           {
-            // If enabled: false, this method returns bufferredReq without verification
+            // If enabled: false, this method returns bufferedReq without verification
             enabled: this.signatureVerification,
             signingSecret: await this.signingSecret(),
           },
