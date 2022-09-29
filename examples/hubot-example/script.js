@@ -55,7 +55,7 @@ const app = new App({
   //   res.send('Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS')
   // })
 
-// If someone says badgers the bot respondes with Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS
+// If someone says badgers the bot responds with Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS
 app.message('badger', async ({ say }) => { await say('Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS'); });
 
   // robot.respond(/open the (.*) doors/i, (res) => {
@@ -85,7 +85,7 @@ app.message(/open the (.*) doors/i, async ({ say, context }) => {
   //   res.emote('makes a freshly baked pie')
   // })
 
-// If you say I like pie the bot repondes with pie emoji
+// If you say I like pie the bot responds with pie emoji
 app.message('I like pie', async ({ message, context }) => {
     try {
       await app.client.reactions.add({
