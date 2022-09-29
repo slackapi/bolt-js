@@ -9,7 +9,7 @@
 // === Variable Declarations ===
 // =====================================
 
-// Create a constant with Grettings you can add more to this if you like by putting more in if you wish
+// Create a constant with Greetings you can add more to this if you like by putting more in if you wish
 // Just follow the syntax below
 const enterReplies = ['Hi', 'Target Acquired', 'Firing', 'Hello friend.', 'Gotcha', 'I see you']
 // Create a constant  with Leave Replies you can add more to this if you like by putting more in if you wish
