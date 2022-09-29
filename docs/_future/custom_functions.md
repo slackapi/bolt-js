@@ -21,7 +21,7 @@ To create a function, we need to do the following:
 ### Defining a function {#define}
 Functions are defined in your app via the `DefineFunction` method, which is part of the SDK that gets included with every newly created project. These function definitions are stored under the `manifest/functions/` directory.
 
-Let's go ahead and create a new function definition file under `manfiest/functions` directory. Name it something related to what the function does. In our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/function/sample-function.js), we name the file `sample-function.js`. Let's take a peek at it:
+Let's go ahead and create a new function definition file under `manifest/functions` directory. Name it something related to what the function does. In our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/function/sample-function.js), we name the file `sample-function.js`. Let's take a peek at it:
 ```js
 const { DefineFunction, Schema } = require('@slack/bolt');
 
