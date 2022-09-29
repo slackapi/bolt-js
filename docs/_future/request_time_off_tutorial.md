@@ -530,7 +530,7 @@ Additional interactivity can be added in to your next-generation Slack app throu
 
 Having additional interactivity such as a modal could create a pathway for more functionality in the Request Time Off flow, such as allowing a manager to send a message to the requester to get additional information or clarification before approving or denying the request officially.
 
-Let's dive in to see how we can add a new button that launches a simple modal with a corresponding view!
+Let's dive in and see how we can add a new button that launches a simple modal with a corresponding view!
 
 ![Request Time Off demo with Open Modal button](../assets/take-your-time-open-modal.gif "Request Time Off demo with Open Modal button")
 
