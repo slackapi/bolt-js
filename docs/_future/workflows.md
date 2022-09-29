@@ -108,7 +108,7 @@ module.exports = Manifest({
 
 The only Built-in function that has an additional requirement is [`OpenForm`](https://api.slack.com/future/functions#open-a-form). When creating a Workflow that will have a step to open a form, your workflow needs to include a required `interactivity` input parameter and the call to `OpenForm` must be the **first** step in the Workflow. 
 
-Here's an example of a basic Workflow definition using `interactivty`:
+Here's an example of a basic Workflow definition using `interactivity`:
 
 ```javascript
 const SayHelloWorkflow = DefineWorkflow({
