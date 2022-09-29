@@ -75,7 +75,7 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package contain, at a minimum: `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `dist/index.js`, `dist/App.js`
     - Run `npm publish --tag <dist-tag> . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password). 
     - `<dist-tag>` should be a label representative of the beta release. It could be feature-specific (i.e. `feat-token-rotation`) or it can be a generic release candidate (i.e. `2.5.0rc`). Whatever you decide: it must _not_ be `latest`, as that is reserved for non-beta releases. You can run `npm info` to see all dist tags. 
-6. Close Github Milestone
+6. Close GitHub Milestone
     - Close the relevant GitHub Milestone(s) for the release(s)
     - Check the existing GitHub Milestones to see if the next minor version exists. If it doesn't, then create a GitHub Milestone for new issues to live in. Typically, you'll create a new minor version - however, if there are any bugs that need to be carried over from the current GitHub Milestone, you could make a Milestone for a patch version to reflect those issues
     - Move any unfinished, open issues to the next GitHub Milestone
