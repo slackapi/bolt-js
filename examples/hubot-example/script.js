@@ -129,7 +129,7 @@ app.event('app_mention', ({ say }) => say(randomLulz()));
   // })
 
 
-// If a new user enters the chat respond with a random gretting
+// If a new user enters the chat respond with a random greeting
 app.event('member_joined_channel', async ({ say }) => { await say(randomEnterReply()); });
 
 // If a user leaves respond with a random Leave reply
