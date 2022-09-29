@@ -28,7 +28,7 @@ This guide is intended to detail the Bolt interface–including listeners and th
 Slack apps typically receive and/or respond to one to many incoming events from Slack. This can be something like listening to an Events API event (like when a link associated with your app is shared) or a user invoking one of your app's shortcuts. For each type of incoming request from Slack, there are distinct methods that you can pass **listener functions** to handle and respond to the event.
 
 ### Methods {#methods}
-Below is the current list of methods that accept listener functions. These methods handle specific event types coming from Slack, and typically include an identifing parameter before the listener function. The identifying parameter (included below) narrows the events to specific interactions that your listener function is intended to handle, such as a specific `callback_id`, or a certain substring within a message.
+Below is the current list of methods that accept listener functions. These methods handle specific event types coming from Slack, and typically include an identifying parameter before the listener function. The identifying parameter (included below) narrows the events to specific interactions that your listener function is intended to handle, such as a specific `callback_id`, or a certain substring within a message.
 
 | Method                          | Description |
 | :---: | :--- |
