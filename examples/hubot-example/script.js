@@ -186,7 +186,7 @@ app.message('you are a little slow', async ({ say, context }) => {
 
 // This example is quite annoying to say the least if you @botname annoy me
 // It will annoy you with AAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEIIIIIIIIHHHHHHHHHH
-// Until you tell it to stop wiht @botname unannoy me
+// Until you tell it to stop with @botname unannoy me
 
 app.message(directMention(), /(?<!un)annoy me/, async ({ say }) => {
     if (annoyIntervalId) {
