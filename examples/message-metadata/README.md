@@ -12,7 +12,7 @@ npm install
 
 ## Subscribe to Message Metadata events
 
-Go to the Events Subscription page from your app configuration, and subcribe to `message_metadata_deleted`, `message_metadata_posted`, and `message_metadata_updated` bot events. Additionally, go to the App Manifest page and update the `metadata subscriptions` like the following:
+Go to the Events Subscription page from your app configuration, and subscribe to `message_metadata_deleted`, `message_metadata_posted`, and `message_metadata_updated` bot events. Additionally, go to the App Manifest page and update the `metadata subscriptions` like the following:
 
 ```
 settings:
