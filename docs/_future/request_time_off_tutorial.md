@@ -60,7 +60,7 @@ You can now explore the `my-app` directory!
 ---
 ### Set up your trigger {#setup-trigger}
 
-This app comes with pre-existing functionality - Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+This app comes with preexisting functionality - Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
