@@ -647,7 +647,7 @@ module.exports = { openModalSubmissionHandler };
 ```
 Within this file, you can additional functionality&mdash;for example, you could add an API call to [`client.chat.postMessage`](https://api.slack.com/methods/chat.postMessage) that will send a message to the requester of time off on behalf of the manager requesting that they DM the manager more information about wanting to take time off.
 
-Once the desired functionality has been added into the `openModalSubmissionHandler`, you can add it as an additional interactivity handler in `listeners/functions/request-approval.js`. To do so, import the view handler from `./views/modal-submit.js`:
+Once the desired functionality has been added in to the `openModalSubmissionHandler`, you can add it as an additional interactivity handler in `listeners/functions/request-approval.js`. To do so, import the view handler from `./views/modal-submit.js`:
 ```js
 const { openModalSubmissionHandler } = require('./views/modal-submit');
 ```
