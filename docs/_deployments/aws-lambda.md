@@ -185,7 +185,7 @@ plugins:
   - serverless-offline
 ```
 
-> 💡 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be enviornment variables on your local machine.
+> 💡 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be environment variables on your local machine.
 > You can [learn how to export Slack environment variables](/bolt-js/tutorial/getting-started#setting-up-your-project) in our Getting Started guide.
 
 **3. Install Serverless Offline**
@@ -230,7 +230,7 @@ Next, visit your [Slack app's settings](https://api.slack.com/apps) to update yo
 
 > 💡 Your **Request URL** ends with `/slack/events`, such as `https://abc123.ngrok.io/slack/events`.
 
-First, select **Interativity & Shortcuts** from the side and update the **Request URL**:
+First, select **Interactivity & Shortcuts** from the side and update the **Request URL**:
 
 ![Interactivity & Shortcuts page](../assets/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
 
@@ -280,7 +280,7 @@ After your app is deployed, you'll be given an **endpoint** which you'll use as 
 Now we need to use your AWS Lambda **endpoint** as your **Request URL**, which is where Slack will send events and actions.
 With your endpoint copied, navigate to your [Slack app's configuration](https://api.slack.com/apps) to update your app's **Request URLs**.
 
-First, select **Interativity & Shortcuts** from the side and update the **Request URL**:
+First, select **Interactivity & Shortcuts** from the side and update the **Request URL**:
 
 ![Interactivity & Shortcuts page](../assets/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
 

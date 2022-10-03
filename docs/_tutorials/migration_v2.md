@@ -69,7 +69,7 @@ app.error(async (error) => {
 Other error related changes include:
 
 - When your listener doesn’t call `ack` within the 3 second time limit, we log the failure instead of throwing an error.
-- If multiple errors occur when processing multiple listeners for a single event, Bolt for Javascript will return a wrapper error with a `code` property of `ErrorCode.MultipleListenerError` and an `originals` property that contains an array of the individual errors. 
+- If multiple errors occur when processing multiple listeners for a single event, Bolt for JavaScript will return a wrapper error with a `code` property of `ErrorCode.MultipleListenerError` and an `originals` property that contains an array of the individual errors. 
 
 
 ### Message Shortcuts {#message-shortcuts}

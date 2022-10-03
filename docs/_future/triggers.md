@@ -35,7 +35,7 @@ Triggers can be added to Workflows in two ways:
 
 **1. Create a Trigger File**
 
-Triggers created with the CLI are designed using Trigger Files. The Trigger File you create will supply the information about how you want your Trigger to work. **For Bolt for Javascript apps, you will need to create JSON trigger files.**
+Triggers created with the CLI are designed using Trigger Files. The Trigger File you create will supply the information about how you want your Trigger to work. **For Bolt for JavaScript apps, you will need to create JSON trigger files.**
 
 The specifics of the Trigger File's structure will depend on what [type of Trigger](#types) you want to use.
 
@@ -85,7 +85,7 @@ The Triggers you create when you're running your app locally in a development en
 
 ### Update a Trigger {#update}
 
-Make an update to a pre-existing Trigger by using the `slack trigger update` command. Provide the same payload you used to create the trigger *in its entirety*, in addition to the Trigger ID.
+Make an update to a preexisting Trigger by using the `slack trigger update` command. Provide the same payload you used to create the trigger *in its entirety*, in addition to the Trigger ID.
 
 ```bash
 slack trigger update --trigger-id Ft123ABC --trigger-def "path/to/trigger.json"

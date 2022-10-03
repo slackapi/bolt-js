@@ -10,7 +10,7 @@ permalink: /future/getting-started
 # Getting started <span class="label-beta">BETA</span>
 
 <div class="section-content">
-This guide will walk you through introducing you to the [next-generation platform](/bolt-js/future/getting-started#next-gen). It will also cover how to get started with your next-gen platform experience with Bolt for Javascript by setting up the Slack CLI and also installing the required dependencies.
+This guide will walk you through introducing you to the [next-generation platform](/bolt-js/future/getting-started#next-gen). It will also cover how to get started with your next-gen platform experience with Bolt for JavaScript by setting up the Slack CLI and also installing the required dependencies.
 </div>
 
 ---
@@ -19,12 +19,12 @@ This guide will walk you through introducing you to the [next-generation platfor
 <p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>Our next-generation platform is currently in beta. [Your feedback is most welcome](/bolt-js/future/feedback) - all feedback will help shape the future platform experience!</p>
 
 The next-generation platform is an exciting new way to develop apps for Slack! It is focused on 2 components:
-1. **Flexible functionality**: You can now create modular, shareable, and remixable building blocks within your apps that make it easier than ever to connect and reuse functionlity. The primary components of this new functionality are [built-in](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions), [workflows](/bolt-js/future/workflows), and [triggers](/bolt-js/future/triggers).
+1. **Flexible functionality**: You can now create modular, shareable, and remixable building blocks within your apps that make it easier than ever to connect and reuse functionality. The primary components of this new functionality are [built-in](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions), [workflows](/bolt-js/future/workflows), and [triggers](/bolt-js/future/triggers).
 2. **Quick setup**: With our next-generation developer tools, you can quickly build secure, scalable apps. One of the tools is the [Slack CLI](https://api.slack.com/future/tools/cli), which allows faster development by allowing you to create and scaffold apps all from the command line. Another tool are [app manifests](/bolt-js/future/app-manifests), which are configuration files for your apps that can be shared and reused to quickly set up applications.
 
 #### Limitations
 
-Today, Bolt for Javascript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
+Today, Bolt for JavaScript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
 
 We do not yet support deployment to secure and managed Slack infrastructure or Datastores API [Datastores](https://api.slack.com/future/datastores) functionality.
 
@@ -34,7 +34,7 @@ If you'd like to deploy your app with Slack infrastructure, consider building yo
 
 ### Setting up the CLI {#setting-up-cli}
 
-To build a next-generation app with Bolt for Javascript, you'll first need to get the Slack CLI set up on your machine. You can follow the [Quickstart Guide](https://api.slack.com/future/quickstart) to get instructions on how to manually or automatically install it based on your operating system. 
+To build a next-generation app with Bolt for JavaScript, you'll first need to get the Slack CLI set up on your machine. You can follow the [Quickstart Guide](https://api.slack.com/future/quickstart) to get instructions on how to manually or automatically install it based on your operating system. 
 
 Since we won't be using Deno to build or migrate our next-generation app, you can skip any instructions related to installing Deno or creating an app using a Deno template. Once you've logged into the CLI using `slack login` and verified your login using `slack auth list`, you can proceed with the instructions in this guide.
 
@@ -88,12 +88,12 @@ The application will take a few moments to set up and clone the repository. Once
 🔔 If you leave the workspace, you won’t be able to manage any apps you’ve deployed to it. Apps you deploy will belong to the workspace even if you leave the workspace
 ```
 
-Your app has now been created in the `my-app` directory! This application can be used as a template for you to build your own next-generation Bolt for Javascript app with. However, if you'd like to test the "Hello World" example included in your template, read on! 📖
+Your app has now been created in the `my-app` directory! This application can be used as a template for you to build your own next-generation Bolt for JavaScript app with. However, if you'd like to test the "Hello World" example included in your template, read on! 📖
 
 ---
 ### Set up your trigger {#setup-trigger}
 
-As mentioned, this app comes with pre-existing functionality - it uses Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+As mentioned, this app comes with preexisting functionality - it uses Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
@@ -128,7 +128,7 @@ Once the app is successfully run, you'll see output in your Terminal to indicate
 
 ### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the the Trigger you created in the previous step into a message in a public channel.
+With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
 
 > 💡 To make the trigger URL more widely accessible, we recommend saving the Trigger as a channel bookmark for easy access.
 

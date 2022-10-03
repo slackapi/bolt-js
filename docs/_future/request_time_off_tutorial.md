@@ -16,7 +16,7 @@ This guide will walk you through how to create a new [next-generation](/bolt-js/
 
 When you’re finished, you’ll have this ⚡️[Bolt for JavaScript Request Time Off app](https://github.com/slack-samples/bolt-js-request-time-off) to run, modify, and make your own.
 
-If you'd like to create a simpler next-generation Bolt for Javascript application or are looking to quickstart with a simple template, follow the [Getting Started guide](/bolt-js/future/getting-started#create-app).
+If you'd like to create a simpler next-generation Bolt for JavaScript application or are looking to quickstart with a simple template, follow the [Getting Started guide](/bolt-js/future/getting-started#create-app).
 
 If you already have an existing Bolt for JavaScript application that you'd like to migrate to the next-generation platform, check out the [Migration guide](/bolt-js/future/migrate-existing-app) instead.
 </div>
@@ -60,7 +60,7 @@ You can now explore the `my-app` directory!
 ---
 ### Set up your trigger {#setup-trigger}
 
-This app comes with pre-existing functionality - Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+This app comes with preexisting functionality - Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
@@ -94,7 +94,7 @@ You'll be prompted to select a workspace to install the app to&mdash;select the 
 Once the app is successfully run, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt for JavaScript app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
 ### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the the Trigger you created in the previous step into a message in a public channel.
+With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
 
 > 💡 To make the trigger URL more widely accessible, we recommend saving the Trigger as a channel bookmark for easy access.
 
@@ -530,7 +530,7 @@ Additional interactivity can be added in to your next-generation Slack app throu
 
 Having additional interactivity such as a modal could create a pathway for more functionality in the Request Time Off flow, such as allowing a manager to send a message to the requester to get additional information or clarification before approving or denying the request officially.
 
-Let's dive in to see how we can add a new button that launches a simple modal with a corresponding view!
+Let's dive in and see how we can add a new button that launches a simple modal with a corresponding view!
 
 ![Request Time Off demo with Open Modal button](../assets/take-your-time-open-modal.gif "Request Time Off demo with Open Modal button")
 
@@ -647,7 +647,7 @@ module.exports = { openModalSubmissionHandler };
 ```
 Within this file, you can additional functionality&mdash;for example, you could add an API call to [`client.chat.postMessage`](https://api.slack.com/methods/chat.postMessage) that will send a message to the requester of time off on behalf of the manager requesting that they DM the manager more information about wanting to take time off.
 
-Once the desired functionality has been added into the `openModalSubmissionHandler`, you can add it as an additional interactivity handler in `listeners/functions/request-approval.js`. To do so, import the view handler from `./views/modal-submit.js`:
+Once the desired functionality has been added in to the `openModalSubmissionHandler`, you can add it as an additional interactivity handler in `listeners/functions/request-approval.js`. To do so, import the view handler from `./views/modal-submit.js`:
 ```js
 const { openModalSubmissionHandler } = require('./views/modal-submit');
 ```

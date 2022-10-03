@@ -158,15 +158,15 @@ export default class FastifyReceiver implements Receiver {
     }
   }
 
-  private _sigingSecret: string | undefined;
+  private _signingSecret: string | undefined;
 
   private async signingSecret(): Promise<string> {
-    if (this._sigingSecret === undefined) {
-      this._sigingSecret = typeof this.signingSecretProvider === 'string' ?
+    if (this._signingSecret === undefined) {
+      this._signingSecret = typeof this.signingSecretProvider === 'string' ?
         this.signingSecretProvider :
         await this.signingSecretProvider();
     }
-    return this._sigingSecret;
+    return this._signingSecret;
   }
 
   public init(app: App): void {
@@ -204,7 +204,7 @@ export default class FastifyReceiver implements Receiver {
       try {
         bufferedReq = await httpFunc.parseAndVerifyHTTPRequest(
           {
-            // If enabled: false, this method returns bufferredReq without verification
+            // If enabled: false, this method returns bufferedReq without verification
             enabled: this.signatureVerification,
             signingSecret: await this.signingSecret(),
           },

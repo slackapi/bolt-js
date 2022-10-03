@@ -6,10 +6,10 @@
 // module.exports = (robot) => {
 
 // =====================================
-// === Variable Declerations ===
+// === Variable Declarations ===
 // =====================================
 
-// Create a constant with Grettings you can add more to this if you like by putting more in if you wish
+// Create a constant with Greetings you can add more to this if you like by putting more in if you wish
 // Just follow the syntax below
 const enterReplies = ['Hi', 'Target Acquired', 'Firing', 'Hello friend.', 'Gotcha', 'I see you']
 // Create a constant  with Leave Replies you can add more to this if you like by putting more in if you wish
@@ -55,7 +55,7 @@ const app = new App({
   //   res.send('Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS')
   // })
 
-// If someone says badgers the bot respondes with Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS
+// If someone says badgers the bot responds with Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS
 app.message('badger', async ({ say }) => { await say('Badgers? BADGERS? WE DON’T NEED NO STINKIN BADGERS'); });
 
   // robot.respond(/open the (.*) doors/i, (res) => {
@@ -85,7 +85,7 @@ app.message(/open the (.*) doors/i, async ({ say, context }) => {
   //   res.emote('makes a freshly baked pie')
   // })
 
-// If you say I like pie the bot repondes with pie emoji
+// If you say I like pie the bot responds with pie emoji
 app.message('I like pie', async ({ message, context }) => {
     try {
       await app.client.reactions.add({
@@ -129,7 +129,7 @@ app.event('app_mention', ({ say }) => say(randomLulz()));
   // })
 
 
-// If a new user enters the chat respond with a random gretting
+// If a new user enters the chat respond with a random greeting
 app.event('member_joined_channel', async ({ say }) => { await say(randomEnterReply()); });
 
 // If a user leaves respond with a random Leave reply
@@ -145,7 +145,7 @@ app.event('member_left_channel', async ({ say }) => { await say(randomLeaveReply
   //   res.send('Missing HUBOT_ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE_THE_UNIVERSE_AND_EVERYTHING in environment: please set and try again')
   // })
 
-// If you ask what i the the answer to the ulimate question of life it will resond with what is in your .env file
+// If you ask what is the answer to the ultimate question of life it will respond with what is in your .env file
 app.message(
     directMention(),
     'what is the answer to the ultimate question of life',
@@ -186,7 +186,7 @@ app.message('you are a little slow', async ({ say, context }) => {
 
 // This example is quite annoying to say the least if you @botname annoy me
 // It will annoy you with AAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEIIIIIIIIHHHHHHHHHH
-// Until you tell it to stop wiht @botname unannoy me
+// Until you tell it to stop with @botname unannoy me
 
 app.message(directMention(), /(?<!un)annoy me/, async ({ say }) => {
     if (annoyIntervalId) {
@@ -263,7 +263,7 @@ app.error(async (error) => {
 
 // NOTE: In a real application, you should provide a convoStore option to the App constructor. The default convoStore
 //       only persists data to memory, so its lost when the process terminates.
-// This example really does not work without a converstation store for me it just keeps saying Sure!
+// This example really does not work without a conversation store for me it just keeps saying Sure!
 // It should after 4 requests to have a soda it should say I'm to fizzy..
 
 app.message(directMention(), 'have a soda', async ({ context, say }) => {

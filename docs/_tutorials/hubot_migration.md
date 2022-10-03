@@ -25,8 +25,8 @@ The default Bolt for JavaScript receiver is built to support the [Events API](ht
 
 There are a few other differences you may want to consider before creating a Bolt for JavaScript app:
 - The minimum version of Node for Bolt for JavaScript is `v10.0.0`. If the server you’re hosting your app from cannot support `v10`, it’s not possible to migrate your app to Bolt for JavaScript at the moment.
-- Bolt for JavaScript doesn’t have support for external scripts. If your Hubot app uses external scripts that are necessary to your app’s functionality or deployment, you probably want to stay with Hubot for now. If you aren’t sure whether your app has any external scripts, you can check the `external-scripts.json` file. As we continue to invest in Bolt for JavaScript, we are thinking about the future and how to make development and deployment of Slack apps easier. If there’s a valuable external script that your app uses, we’d love to hear what it is [in the dedicated Github issue](https://github.com/slackapi/bolt-js/issues/119).
-- Hubot apps are written in Coffeescript, which transpiles into Javascript. We decided to write Bolt in Typescript to give access to rich type information. Bolt apps can be developed using Typescript or Javascript. The [example script](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) shows you how your Coffeescript may translate to Javascript. If your app is more than a few simple scripts, it may be worth looking into projects like [Decaffeinate](https://github.com/decaffeinate/decaffeinate) to convert your CoffeeScript to Javascript.
+- Bolt for JavaScript doesn’t have support for external scripts. If your Hubot app uses external scripts that are necessary to your app’s functionality or deployment, you probably want to stay with Hubot for now. If you aren’t sure whether your app has any external scripts, you can check the `external-scripts.json` file. As we continue to invest in Bolt for JavaScript, we are thinking about the future and how to make development and deployment of Slack apps easier. If there’s a valuable external script that your app uses, we’d love to hear what it is [in the dedicated GitHub issue](https://github.com/slackapi/bolt-js/issues/119).
+- Hubot apps are written in Coffeescript, which transpiles into JavaScript. We decided to write Bolt in Typescript to give access to rich type information. Bolt apps can be developed using Typescript or JavaScript. The [example script](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) shows you how your Coffeescript may translate to JavaScript. If your app is more than a few simple scripts, it may be worth looking into projects like [Decaffeinate](https://github.com/decaffeinate/decaffeinate) to convert your CoffeeScript to JavaScript.
 
 ---
 
@@ -79,7 +79,7 @@ Bolt’s interface was designed to conform to the Slack API language as much as 
 
 Bolt for JavaScript doesn’t use `res` or expose the raw request from Slack. Instead, you can use the payload body from `payload`, or common functionality like sending a message using `say()`. 
 
-> ⚙️To make it easier, we’ve created a sample script on Github that [showcases Hubot’s core functionality using equivalent functionality written with Bolt for JavaScript](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
+> ⚙️To make it easier, we’ve created a sample script on GitHub that [showcases Hubot’s core functionality using equivalent functionality written with Bolt for JavaScript](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
 
 #### Listening to patterns using `message()`
 Hubot scripts use `hear()` listen to messages with a matching pattern. Bolt for JavaScript instead uses `message()` and accepts a `string` or `RegExp` for the pattern.
@@ -166,4 +166,4 @@ Now that you have your flashy new Bolt for JavaScript app, you can explore how t
 - Read [the documentation](/bolt-js/concepts) to explore what else is possible with Bolt for JavaScript.
 - Check out our [sample app](https://glitch.com/~slack-bolt) that shows you how to use events and interactive components.
 
-And if you have difficulties while developing, reach out to our developer support team to at [developers@slack.com](mailto:developers@slack.com), and if you run into a problem with the framework [open an issue on Github](https://github.com/slackapi/bolt-js/issues/new).
+And if you have difficulties while developing, reach out to our developer support team to at [developers@slack.com](mailto:developers@slack.com), and if you run into a problem with the framework [open an issue on GitHub](https://github.com/slackapi/bolt-js/issues/new).
