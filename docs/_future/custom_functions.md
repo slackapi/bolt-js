@@ -119,7 +119,6 @@ To do this, create a file in `listeners/functions` directory for your function l
 ```js
 // listeners/functions/hello-world.js
 // For more information about functions: https://api.slack.com/future/functions
-// For more information about functions: https://api.slack.com/future/functions
 const { SlackFunction } = require('@slack/bolt');
 
 // Get our Function Definition from the manifest!
