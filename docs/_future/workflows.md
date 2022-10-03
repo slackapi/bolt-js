@@ -108,7 +108,7 @@ module.exports = Manifest({
 
 The only Built-in function that has an additional requirement is [`OpenForm`](https://api.slack.com/future/functions#open-a-form). When creating a Workflow that will have a step to open a form, your workflow needs to include a required `interactivity` input parameter and the call to `OpenForm` must be the **first** step in the Workflow. 
 
-Here's an example of a basic Workflow definition using `interactivty`:
+Here's an example of a basic Workflow definition using `interactivity`:
 
 ```javascript
 const SayHelloWorkflow = DefineWorkflow({
@@ -236,7 +236,7 @@ To invoke a Workflow, you need to create a [Trigger](/bolt-js/future/triggers).
 
 ### Defining input parameters {#defining-input-parameters}
 
-Workflows can pass information into both Functions and other Workflows that are part of its Workflow steps. To do this, we define what information we want to bring in to the Workflow via its `input_parameters` property. 
+Workflows can pass information into both Functions and other Workflows that are part of its Workflow steps. To do this, we define what information we want to bring into the Workflow via its `input_parameters` property. 
 
 A Workflow's `input_parameters` property has two sub-properties: `required`, which is how you can ensure that a Workflow only executes if specific input parameters are provided, and `properties`, where you can list the specific parameters that your Workflow accounts for. Any [Built-in type](https://api.slack.com/future/types) or [Custom type](https://api.slack.com/future/types/custom) can be used.
 

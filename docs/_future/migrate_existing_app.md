@@ -10,10 +10,10 @@ permalink: /future/migrate-existing-app
 # Migrate an existing app <span class="label-beta">BETA</span>
 
 <div class="section-content">
-If you have an existing Slack app written with Bolt for Javascript that you'd like to migrate to the [next-generation platform](/bolt-js/future/getting-started#next-gen), this guide is for you!
+If you have an existing Slack app written with Bolt for JavaScript that you'd like to migrate to the [next-generation platform](/bolt-js/future/getting-started#next-gen), this guide is for you!
 </div>
 
-If you do not have an existing Bolt for Javascript application but are looking to get started with the [next-gen platform](/bolt-js/future/getting-started#next-gen), check out the [Getting Started](/bolt-js/future/getting-started) guide.
+If you do not have an existing Bolt for JavaScript application but are looking to get started with the [next-gen platform](/bolt-js/future/getting-started#next-gen), check out the [Getting Started](/bolt-js/future/getting-started) guide.
 
 ---
 ### Prerequisites {#prerequisites}

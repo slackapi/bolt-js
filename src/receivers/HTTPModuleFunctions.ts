@@ -161,7 +161,7 @@ export class HTTPModuleFunctions {
   // Error handlers for event processing
   // ------------------------------------------
 
-  // The default dispathErrorHandler implementation:
+  // The default dispatchErrorHandler implementation:
   // Developers can customize this behavior by passing dispatchErrorHandler to the constructor
   // Note that it was not possible to make this function async due to the limitation of http module
   public static defaultDispatchErrorHandler(args: ReceiverDispatchErrorHandlerArgs): void {

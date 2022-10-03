@@ -207,7 +207,7 @@ Head over to the [Slack App page](https://api.slack.com/apps) and select your ap
 
 > 💡 Your **Request URL** ends with `/slack/events`, such as `https://sharp-rain-871.herokuapp.com/slack/events`.
 
-First, select **Interativity & Shortcuts** from the side and update the **Request URL**:
+First, select **Interactivity & Shortcuts** from the side and update the **Request URL**:
 
 ![Interactivity & Shortcuts page](../assets/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
 
@@ -239,7 +239,7 @@ app.message('goodbye', async ({ message, say }) => {
 });
 ```
 
-Commit the changes to your local Git respository:
+Commit the changes to your local Git repository:
 
 ```shell
 git commit -am "Say 'goodbye' to a person"
