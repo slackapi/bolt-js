@@ -21,7 +21,7 @@ To create a function, we need to do the following:
 ### Defining a function {#define}
 Functions are defined in your app via the `DefineFunction` method, which is part of the SDK that gets included with every newly created project. These function definitions are stored under the `manifest/functions/` directory.
 
-Let's go ahead and create a new function definition file under `manifest/functions` directory. Name it something related to what the function does. In our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/function/sample-function.js), we name the file `sample-function.js`. Let's take a peek at it:
+Let's go ahead and create a new function definition file under `manifest/functions` directory. Name it something related to what the function does. In our [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/functions/sample-function.js), we name the file `sample-function.js`. Let's take a peek at it:
 ```js
 const { DefineFunction, Schema } = require('@slack/bolt');
 
@@ -29,7 +29,6 @@ const SampleFunctionDefinition = DefineFunction({
   callback_id: 'sample_function_id',
   title: 'Send a greeting',
   description: 'Send greeting to channel',
-  source_file: 'functions/sample-function.ts',
   input_parameters: {
     properties: {
       recipient: {
@@ -108,7 +107,7 @@ Once your function is defined in its own file in `manifest/functions`, the next 
 Implement functions in just a few steps:
 
 #### 1. Create the function definition file in the `manifest/functions` directory
-If you haven't done so already, create a file for your function definition to live in and name it something that makes sense for your function. In the [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/function/sample-function.js), we named this file `sample-function.js`
+If you haven't done so already, create a file for your function definition to live in and name it something that makes sense for your function. In the [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/functions/sample-function.js), we named this file `sample-function.js`
 
 
 #### 2. Add function listener and handler(s)
@@ -122,7 +121,7 @@ To do this, create a file in `listeners/functions` directory for your function l
 const { SlackFunction } = require('@slack/bolt');
 
 // Get our Function Definition from the manifest!
-const { SampleFunctionDefinition } = require('../../manifest/function/sample-function');
+const { SampleFunctionDefinition } = require('../../manifest/functions/sample-function');
 
 // Here is the work we want to do!
 const helloWorld = async ({ event, complete }) => {

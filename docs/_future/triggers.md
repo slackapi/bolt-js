@@ -39,7 +39,7 @@ Triggers created with the CLI are designed using Trigger Files. The Trigger File
 
 The specifics of the Trigger File's structure will depend on what [type of Trigger](#types) you want to use.
 
-The Hello World app from the Bolt for JavaScript starter template uses a Link Trigger, which is one of the [Trigger types](#types). You can view its Trigger File [here](https://github.com/slack-samples/bolt-js-starter-template/blob/future/triggers/hello-world-trigger.json).
+The Hello World app from the Bolt for JavaScript starter template uses a Link Trigger, which is one of several [Trigger types](#types). You can view its Trigger File [here](https://github.com/slack-samples/bolt-js-starter-template/blob/future/triggers/hello-world-trigger.json).
 
 **2. Run the** `trigger create` **command**
 
