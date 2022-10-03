@@ -9,7 +9,7 @@ permalink: /future/app-manifests
 # App manifests <span class="label-beta">BETA</span>
 
 <div class="section-content">
-An app's manifest is where you can configure its name and scopes, declare the functions your app will use, and more. 
+An app's manifest is where you can configure its name and scopes, declare the functions your app will use, and more.
 </div>
 
 ---
@@ -18,40 +18,53 @@ An app's manifest is where you can configure its name and scopes, declare the fu
 
 Locate the file named `manifest.js` within your application. This will likely be in your project's root directory or a `manifest` folder. 
 
-Inside the manifest file, you will find an `module.exports = Manifest({})` block that defines the app's configuration:
+Inside the manifest file, you will find an `module.exports = Manifest({})` block that defines the app's configuration. For the [Hello World application](https://github.com/slack-samples/bolt-js-starter-template/tree/future) in the Bolt for JavaScript Starter Template, it will look something like this:
 
 ```javascript
 // manifest/manifest.js
 const { Manifest } = require('@slack/bolt');
-const { TimeOffWorkflow } = require('./workflows/approval');
+const { SampleWorkflow } = require('./workflow/sample-workflow');
 
+/**
+ * The app manifest contains the app's configuration. This
+ * file defines attributes like app name and description.
+ * https://api.slack.com/future/manifest
+ */
 module.exports = Manifest({
   runOnSlack: false,
-    // This is the internal name for your app. 
-  // It can contain spaces (e.g., "My App")
-  name: 'take-your-time',
-  displayName: 'Take Your Time',
-  // A description of your app that will help users decide whether to use it.
-  description: 'Request and take time off.',
-  longDescription: 'Take your time off by using this application to request and take time off from your manager. Launch the workflow, put in your manager, requested PTO start and end date, and receive updates on your PTO request!',
-  botScopes: ['chat:write'],
-  tokenManagementEnabled: true,
+  name: 'Bolt Template App TEST',
+  displayName: 'Bolt Template App TEST',
+  description: 'A starter app template built with Bolt JS',
+  botScopes: ['channels:history', 'chat:write', 'commands', 'chat:write.public'],
+  eventSubscriptions: { bot_events: ['app_home_opened', 'message.channels'] },
   socketModeEnabled: true,
-  // A list of all workflows your app will use.
-  workflows: [TimeOffWorkflow],
+  workflows: [SampleWorkflow],
   features: {
     appHome: {
       homeTabEnabled: true,
-      messagesTabEnabled: true,
+      messagesTabEnabled: false,
       messagesTabReadOnlyEnabled: true,
     },
+    botUser: {
+      always_online: false,
+    },
+    shortcuts: [{
+      name: 'Run sample shortcut',
+      type: 'global',
+      callback_id: 'sample_shortcut_id',
+      description: 'Runs a sample shortcut',
+    }],
+    slashCommands: [{
+      command: '/sample-command',
+      description: 'Runs a sample command',
+      should_escape: false,
+    }],
   },
   settings: {
     interactivity: {
       is_enabled: true,
     },
   },
-  tokenRotationEnabled: false,
 });
 ```
 ---
@@ -84,4 +97,4 @@ You will come back to the Manifest every time you create a new workflow, since a
 
 ### Next steps {#next-steps}
 
-Now that you're acquainted with the Manifest, you can now dive into the world of [built-in functions](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions)!
+Now that you're acquainted with the Manifest, you can dive into the world of [built-in functions](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions)!

@@ -23,20 +23,19 @@ Built-in functions need to be imported from the standard library built into the 
 
 Built-in functions define their own inputs and outputs, as detailed for each built-in below.
 
-Here's an example of a Workflow that creates a new Slack channel using the `CreateChannel` built-in function:
+Here's an example of a Workflow that sends a message using the `SendMessage` built-in function:
 
 ```javascript
 const { DefineWorkflow, Schema } = require('@slack/bolt');
 
 ...
 
-const createChannelStep = myWorkflow.addStep(
-  Schema.slack.functions.CreateChannel,
-  {
-    channel_name: myWorkflow.inputs.channel_name,
-    is_private: false,
-  },
-);
+SampleWorkflow.addStep(Schema.slack.functions.SendMessage, {
+  channel_id: inputForm.outputs.fields.channel,
+  message: greetingFunctionStep.outputs.greeting,
+});
+
+module.exports = { SampleWorkflow };
 ```
 
 Read the full documentation for [Workflows](/bolt-js/future/workflows) to learn how to build out Workflows.
