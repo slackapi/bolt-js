@@ -1368,29 +1368,43 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       return (body as SlackCommandMiddlewareArgs['body']).team_id;
     }
 
-    if (
-      type === IncomingEventType.Action ||
-      type === IncomingEventType.Options ||
-      type === IncomingEventType.ViewAction ||
-      type === IncomingEventType.Shortcut
-    ) {
-      const bodyAsActionOrOptionsOrViewActionOrShortcut = body as (
-        | SlackActionMiddlewareArgs
-        | SlackOptionsMiddlewareArgs
-        | SlackViewMiddlewareArgs
-        | SlackShortcutMiddlewareArgs
-      )['body'];
-
+    const parseTeamId = (
+      bodyAs:
+      | SlackAction
+      | SlackViewAction
+      | SlackShortcut
+      | KnownOptionsPayloadFromType<OptionsSource>,
+    ): string | undefined => {
       // When the app is installed using org-wide deployment, team property will be null
-      if (
-        typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
-        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
-      ) {
-        return bodyAsActionOrOptionsOrViewActionOrShortcut.team.id;
+      if (typeof bodyAs.team !== 'undefined' && bodyAs.team !== null) {
+        return bodyAs.team.id;
       }
 
       // This is the only place where this function might return undefined
-      return bodyAsActionOrOptionsOrViewActionOrShortcut.user.team_id;
+      return bodyAs.user.team_id;
+    };
+
+    if (type === IncomingEventType.ViewAction) {
+      const bodyAsView = body as SlackViewMiddlewareArgs['body'];
+
+      if (bodyAsView.view.app_installed_team_id) {
+        return bodyAsView.view.app_installed_team_id;
+      }
+
+      return parseTeamId(bodyAsView);
+    }
+
+    if (
+      type === IncomingEventType.Action ||
+      type === IncomingEventType.Options ||
+      type === IncomingEventType.Shortcut
+    ) {
+      const bodyAsActionOrOptionsOrOrShortcut = body as (
+        | SlackActionMiddlewareArgs
+        | SlackOptionsMiddlewareArgs
+        | SlackShortcutMiddlewareArgs
+      )['body'];
+      return parseTeamId(bodyAsActionOrOptionsOrOrShortcut);
     }
 
     return assertNever(type);
