@@ -1150,11 +1150,67 @@ describe('App basic features', () => {
         ];
 
         // Act
-        await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
+        await Promise.all(
+          receiverEvents.map((event) => fakeReceiver.sendEvent(event)),
+        );
 
         // Assert
         assert.isTrue(fakeLogger.info.called);
         assert.isTrue(ackInMiddlewareCalled);
+      });
+    });
+
+    describe('context', () => {
+      it('should be able to use the app_installed_team_id when provided by the payload', async () => {
+        // Arrange
+        const fakeAxiosPost = sinon.fake.resolves({});
+        overrides = buildOverrides([
+          withNoopWebClient(),
+          withAxiosPost(fakeAxiosPost),
+        ]);
+        const MockApp = await importApp(overrides);
+
+        // Act
+        const app = new MockApp({
+          receiver: fakeReceiver,
+          authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        });
+
+        app.view('view-id', async ({ ack, context, view }) => {
+          assert.equal('T-installed-workspace', context.teamId);
+          assert.notEqual('T-installed-workspace', view.team_id);
+          await ack();
+        });
+        app.error(fakeErrorHandler);
+
+        let ackCalled = false;
+
+        const receiverEvent = {
+          ack: async () => {
+            ackCalled = true;
+          },
+          body: {
+            type: 'view_submission',
+            team: {},
+            user: {},
+            view: {
+              id: 'V111',
+              type: 'modal',
+              callback_id: 'view-id',
+              state: {},
+              title: {},
+              close: {},
+              submit: {},
+              app_installed_team_id: 'T-installed-workspace',
+            },
+          },
+        };
+
+        // Act
+        await fakeReceiver.sendEvent(receiverEvent);
+
+        // Assert
+        assert.isTrue(ackCalled);
       });
     });
   });
