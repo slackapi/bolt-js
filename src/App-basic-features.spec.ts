@@ -1176,8 +1176,9 @@ describe('App basic features', () => {
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
 
-        app.view('view-id', async ({ ack, context }) => {
+        app.view('view-id', async ({ ack, context, view }) => {
           assert.equal('T-installed-workspace', context.teamId);
+          assert.notEqual('T-installed-workspace', view.team_id);
           await ack();
         });
         app.error(fakeErrorHandler);
