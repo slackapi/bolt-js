@@ -1385,6 +1385,9 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     };
 
     if (type === IncomingEventType.ViewAction) {
+      // view_submission/closed payloads can have `view.app_installed_team_id` when a modal view that was opened
+      // in a different workspace via some operations inside a Slack Connect channel.
+
       const bodyAsView = body as SlackViewMiddlewareArgs['body'];
 
       if (bodyAsView.view.app_installed_team_id) {
