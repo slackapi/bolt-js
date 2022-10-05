@@ -1402,12 +1402,12 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       type === IncomingEventType.Options ||
       type === IncomingEventType.Shortcut
     ) {
-      const bodyAsActionOrOptionsOrOrShortcut = body as (
+      const bodyAsActionOrOptionsOrShortcut = body as (
         | SlackActionMiddlewareArgs
         | SlackOptionsMiddlewareArgs
         | SlackShortcutMiddlewareArgs
       )['body'];
-      return parseTeamId(bodyAsActionOrOptionsOrOrShortcut);
+      return parseTeamId(bodyAsActionOrOptionsOrShortcut);
     }
 
     return assertNever(type);
