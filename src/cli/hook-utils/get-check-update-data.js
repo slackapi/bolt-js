@@ -1,13 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 const SLACK_JSON_SDKS = ['@slack/bolt', '@slack/deno-slack-sdk'];
 
 /**
  * Checks for available SDK updates for specified dependencies, creates a version map,
  * and then wraps everything up into a response to be passed to the CLI.
- * @param cwd the current working directory 
+ * @param cwd the current working directory
  */
 async function checkForSDKUpdates(cwd) {
   const { versionMap, inaccessibleFiles } = await createVersionMap(cwd);
@@ -67,7 +68,7 @@ async function readProjectDependencies(cwd) {
   for (const fileName of dependencyFiles) {
     try {
       const fileJSON = await getJSON(`${cwd}/${fileName}`);
-      const fileDependencies = extractDependencies(fileJSON, fileName);
+      const fileDependencies = await extractDependencies(fileJSON, fileName);
 
       // For each dependency found, compare to SDK-related dependency
       // list and, if known, update the versionMap with version information
@@ -110,7 +111,7 @@ async function getJSON(filePath) {
 }
 
 /**
- * Gathers all related dependency files for the CLI project (package.json, package-lock.json).
+ * Gathers all related dependency files for the CLI project (package.json).
  * @param cwd the current working directory of the CLI project
  */
 async function gatherDependencyFiles(cwd) {
@@ -120,11 +121,11 @@ async function gatherDependencyFiles(cwd) {
 }
 
 /**
- * Gets the needed files that contain dependency info (package.json, package-lock.json).
+ * Gets the needed files that contain dependency info (package.json).
  * @param cwd the current working directory of the CLI project
  */
 async function getJSONFiles(cwd) {
-  const jsonFiles = ['package-lock.json', 'package.json'];
+  const jsonFiles = ['package.json'];
   const jsonDepFiles = [];
   const inaccessibleFiles = [];
 
@@ -152,24 +153,45 @@ async function getJSONFiles(cwd) {
  * @param json JSON information that includes dependencies
  * @param fileName name of the file that the dependency list is coming from
  */
-function extractDependencies(json, fileName) {
+async function extractDependencies(json, fileName) {
   // Determine if the JSON passed is an object
   const jsonIsParsable =
     json !== null && typeof json === 'object' && !Array.isArray(json);
 
   if (jsonIsParsable) {
-    if (fileName === 'package-lock.json') {
-      return json.dependencies ? Object.entries(json.dependencies) : [];
-    } else if (fileName === 'package.json') {
-      // TODO: how do we get exact versions from here if package.json?
-      // use this to reformulate object except swap out approx version with real version
-      // create a mapping that looks similar to package-lock.json for this
+    const boltCurrentVersionOutput = JSON.parse(await getBoltCurrentVersion());
+    let boltCurrentVersion;
+    if (boltCurrentVersionOutput !== '') {
+      boltCurrentVersion =
+        boltCurrentVersionOutput['dependencies']['@slack/bolt']['version'];
     }
+    const denoCurrentVersionOutput = JSON.parse(await getDenoCurrentVersion());
+    let denoCurrentVersion;
+    if (denoCurrentVersionOutput !== '') {
+      denoCurrentVersion =
+        denoCurrentVersionOutput['dependencies']['@slack/deno-slack-sdk'][
+          'version'
+        ];
+    }
+
+    return [
+      [
+        '@slack/bolt',
+        {
+          version: boltCurrentVersion,
+        },
+      ],
+      [
+        '@slack/deno-slack-sdk',
+        {
+          version: denoCurrentVersion,
+        },
+      ],
+    ];
   }
 
   return [];
 }
-
 
 /**
  * Gets the latest module version from NPM.
@@ -203,7 +225,6 @@ async function fetchLatestModuleVersion(moduleName) {
  * @param latest most up-to-date dependency version available on NPM
  */
 function hasBreakingChange(current, latest) {
-  // How are we classifying breaking changes' for Bolt JS since we have the beta version?
   const currMajor = current.split('.')[0];
   const latestMajor = latest.split('.')[0];
   return +latestMajor - +currMajor >= 1;
@@ -264,15 +285,29 @@ function createFileErrorMsg(inaccessibleFiles) {
 
   // There were issues with reading some of the files that were found
   for (const file of inaccessibleFiles) {
-    // Skip surfacing error to user if supported file was merely not found
-    if (file.error.cause instanceof Deno.errors.NotFound) continue;
-
     fileErrorMsg += fileErrorMsg
       ? `\n   ${file.name}: ${file.error.message}`
       : `An error occurred while reading the following files: \n\n   ${file.name}: ${file.error.message}`;
   }
 
   return fileErrorMsg;
+}
+/**
+ * Queries for current Deno version of the project.
+ */
+async function getDenoCurrentVersion() {
+  const { stdout } = await exec(
+    'npm list @slack/deno-slack-sdk --depth=0 --json'
+  );
+  return stdout ? stdout : '';
+}
+
+/**
+ * Queries for current Bolt version of the project.
+ */
+async function getBoltCurrentVersion() {
+  const { stdout } = await exec('npm list @slack/bolt --depth=0 --json');
+  return stdout ? stdout : '';
 }
 
 module.exports = { checkForSDKUpdates };
