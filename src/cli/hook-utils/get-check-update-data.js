@@ -4,7 +4,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 const SLACK_JSON_SDKS = ['@slack/bolt', '@slack/deno-slack-sdk'];
-
+let currentVersionFunctions = {};
 /**
  * Checks for available SDK updates for specified dependencies, creates a version map,
  * and then wraps everything up into a response to be passed to the CLI.
@@ -68,7 +68,8 @@ async function readProjectDependencies(cwd) {
   for (const fileName of dependencyFiles) {
     try {
       const fileJSON = await getJSON(`${cwd}/${fileName}`);
-      const fileDependencies = await extractDependencies(fileJSON, fileName);
+      const fileDependencies =
+        await currentVersionFunctions.extractDependencies(fileJSON, fileName);
 
       // For each dependency found, compare to SDK-related dependency
       // list and, if known, update the versionMap with version information
@@ -77,7 +78,7 @@ async function readProjectDependencies(cwd) {
           if (key !== '' && key === sdk) {
             versionMap[sdk] = {
               name: sdk,
-              current: val.version,
+              current: val.version ? val.version : '',
             };
           }
         }
@@ -145,6 +146,7 @@ async function getJSONFiles(cwd) {
       inaccessibleFiles.push({ name: fileName, error: err });
     }
   }
+
   return { jsonDepFiles, inaccessibleFiles };
 }
 
@@ -153,25 +155,35 @@ async function getJSONFiles(cwd) {
  * @param json JSON information that includes dependencies
  * @param fileName name of the file that the dependency list is coming from
  */
-async function extractDependencies(json, fileName) {
+currentVersionFunctions.extractDependencies = async (json, fileName) => {
   // Determine if the JSON passed is an object
   const jsonIsParsable =
     json !== null && typeof json === 'object' && !Array.isArray(json);
 
   if (jsonIsParsable) {
-    const boltCurrentVersionOutput = JSON.parse(await getBoltCurrentVersion());
-    let boltCurrentVersion;
-    if (boltCurrentVersionOutput !== '') {
-      boltCurrentVersion =
-        boltCurrentVersionOutput['dependencies']['@slack/bolt']['version'];
+    let boltCurrentVersion = '';
+    let denoCurrentVersion = '';
+    if (json['dependencies']['@slack/bolt']) {
+      const boltCurrentVersionOutput = JSON.parse(
+        await currentVersionFunctions.getBoltCurrentVersion()
+      );
+
+      if (boltCurrentVersionOutput !== '') {
+        boltCurrentVersion =
+          boltCurrentVersionOutput['dependencies']['@slack/bolt']['version'];
+      }
     }
-    const denoCurrentVersionOutput = JSON.parse(await getDenoCurrentVersion());
-    let denoCurrentVersion;
-    if (denoCurrentVersionOutput !== '') {
-      denoCurrentVersion =
-        denoCurrentVersionOutput['dependencies']['@slack/deno-slack-sdk'][
-          'version'
-        ];
+    if (json['dependencies']['@slack/deno-slack-sdk']) {
+      const denoCurrentVersionOutput = JSON.parse(
+        await currentVersionFunctions.getDenoCurrentVersion()
+      );
+
+      if (denoCurrentVersionOutput !== '') {
+        denoCurrentVersion =
+          denoCurrentVersionOutput['dependencies']['@slack/deno-slack-sdk'][
+            'version'
+          ];
+      }
     }
 
     return [
@@ -191,7 +203,7 @@ async function extractDependencies(json, fileName) {
   }
 
   return [];
-}
+};
 
 /**
  * Gets the latest module version from NPM.
@@ -295,19 +307,26 @@ function createFileErrorMsg(inaccessibleFiles) {
 /**
  * Queries for current Deno version of the project.
  */
-async function getDenoCurrentVersion() {
+currentVersionFunctions.getDenoCurrentVersion = async () => {
   const { stdout } = await exec(
     'npm list @slack/deno-slack-sdk --depth=0 --json'
   );
   return stdout ? stdout : '';
-}
+};
 
 /**
  * Queries for current Bolt version of the project.
  */
-async function getBoltCurrentVersion() {
-  const { stdout } = await exec('npm list @slack/bolt --depth=0 --json');
+currentVersionFunctions.getBoltCurrentVersion = async () => {
+  const { stdout, stderr } = await exec(
+    'npm list @slack/bolt --depth=0 --json'
+  );
   return stdout ? stdout : '';
-}
+};
 
-module.exports = { checkForSDKUpdates };
+module.exports = {
+  checkForSDKUpdates,
+  getJSON,
+  getJSONFiles,
+  currentVersionFunctions,
+};
