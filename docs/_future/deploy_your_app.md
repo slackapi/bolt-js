@@ -170,7 +170,7 @@ If you are using the Bolt JS Starter Template and want to see a change in action
 
 ```js
 // listeners/functions/hello-world.js
-const greeting = `${salutation}, <@${recipient}>! :sparkles: A mysterous message has arrived for you: \n\n>${message}`;
+const greeting = `${salutation}, <@${recipient}>! :sparkles: A mysterious message has arrived for you: \n\n>${message}`;
 ```
 
 Then add, commit, and push your code to deploy this change to Heroku:
