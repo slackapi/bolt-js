@@ -152,7 +152,7 @@ describe("Slack CLI Script Hooks: check-update", () => {
   });
 
   // Test for successful version map that needs upgrade
-  it("returns a version map indicating it needs upgrades if it can access package.json and finds all dependences", async () => {
+  it("returns a version map indicating it needs upgrades if it can access package.json and finds all dependencies", async () => {
     const output = await importCheckUpdateDataMock({});
     // Mock Bolt JS file system
     mockfs({
@@ -195,7 +195,7 @@ describe("Slack CLI Script Hooks: check-update", () => {
       "name": "bolt-js-template",
       "dependencies": {
         "@slack/bolt": {
-          "version": "4.0.0-nextGen.2",
+          "version": "4.0.0-nextGen.6",
           "overridden": false
         }
       }
@@ -220,7 +220,7 @@ describe("Slack CLI Script Hooks: check-update", () => {
     const versionMap = await output.checkForSDKUpdates(`${cwd}`);
     assert.isNotEmpty(versionMap);
     assert.equal(versionMap.releases[0].name, "@slack/bolt");
-    assert.equal(versionMap.releases[0].current, "4.0.0-nextGen.2");
+    assert.equal(versionMap.releases[0].current, "4.0.0-nextGen.6");
     assert.equal(versionMap.releases[0].update, true);
     assert.equal(versionMap.releases[0].breaking, false);
     assert.equal(versionMap.releases[1].name, "@slack/deno-slack-sdk");
