@@ -219,6 +219,7 @@ describe("Slack CLI Script Hooks: check-update", () => {
 
     // call check for SDK updates
     const versionMap = await output.checkForSDKUpdates(`${cwd}`);
+    console.log(versionMap);
     assert.isNotEmpty(versionMap);
     assert.equal(versionMap.releases[0].name, "@slack/bolt", "has Bolt dependency");
     assert.equal(versionMap.releases[0].current, "4.0.0-nextGen.2", "has current Bolt version");
