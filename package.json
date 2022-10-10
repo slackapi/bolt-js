@@ -63,7 +63,6 @@
     "deepmerge": "^4.2.2",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
-    "node-fetch": "^3.2.10",
     "please-upgrade-node": "^3.2.0",
     "promise.allsettled": "^1.0.2",
     "raw-body": "^2.3.3",
