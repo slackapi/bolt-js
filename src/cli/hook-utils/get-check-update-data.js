@@ -4,7 +4,8 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 const SLACK_JSON_SDKS = ['@slack/bolt', '@slack/deno-slack-sdk'];
-let currentVersionFunctions = {};
+let dependencyExports = {};
+
 /**
  * Checks for available SDK updates for specified dependencies, creates a version map,
  * and then wraps everything up into a response to be passed to the CLI.
@@ -23,7 +24,9 @@ async function checkForSDKUpdates(cwd) {
  * @param cwd the current working directory of the CLI project
  */
 async function createVersionMap(cwd) {
-  const { versionMap, inaccessibleFiles } = await readProjectDependencies(cwd);
+  const { versionMap, inaccessibleFiles } = await readProjectDependencies(cwd).catch((err) => {
+    throw new Error(err);
+  });
 
   // Iterate through each dependency for updates
   for (const [sdk, value] of Object.entries(versionMap)) {
@@ -68,7 +71,7 @@ async function readProjectDependencies(cwd) {
     try {
       const fileJSON = await getJSON(`${cwd}/${fileName}`);
       const fileDependencies =
-        await currentVersionFunctions.extractDependencies(fileJSON, fileName);
+        await dependencyExports.extractDependencies(fileJSON, fileName);
 
       // For each dependency found, compare to SDK-related dependency
       // list and, if known, update the versionMap with version information
@@ -86,6 +89,7 @@ async function readProjectDependencies(cwd) {
       inaccessibleFiles.push({ name: fileName, error: err });
     }
   }
+
   return { versionMap, inaccessibleFiles };
 }
 
@@ -100,12 +104,10 @@ async function getJSON(filePath) {
     if (fs.existsSync(filePath)) {
       fileContents = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } else {
-      throw new Error('Cannot find a file at path ' + filePath, {
-        cause: 'Cannot find a file at path ' + filePath,
-      });
+      throw new Error('Cannot find a file at path ' + filePath);
     }
   } catch (err) {
-    throw new Error(err.message, { cause: err });
+    throw new Error(err);
   }
   return fileContents;
 }
@@ -154,7 +156,7 @@ async function getJSONFiles(cwd) {
  * @param json JSON information that includes dependencies
  * @param fileName name of the file that the dependency list is coming from
  */
-currentVersionFunctions.extractDependencies = async (json, fileName) => {
+dependencyExports.extractDependencies = async (json, fileName) => {
   // Determine if the JSON passed is an object
   const jsonIsParsable =
     json !== null && typeof json === 'object' && !Array.isArray(json);
@@ -164,7 +166,7 @@ currentVersionFunctions.extractDependencies = async (json, fileName) => {
     let denoCurrentVersion = '';
     if (json['dependencies']['@slack/bolt']) {
       const boltCurrentVersionOutput = JSON.parse(
-        await currentVersionFunctions.getBoltCurrentVersion()
+        await dependencyExports.getBoltCurrentVersion()
       );
 
       if (boltCurrentVersionOutput !== '') {
@@ -174,7 +176,7 @@ currentVersionFunctions.extractDependencies = async (json, fileName) => {
     }
     if (json['dependencies']['@slack/deno-slack-sdk']) {
       const denoCurrentVersionOutput = JSON.parse(
-        await currentVersionFunctions.getDenoCurrentVersion()
+        await dependencyExports.getDenoCurrentVersion()
       );
 
       if (denoCurrentVersionOutput !== '') {
@@ -216,9 +218,7 @@ async function fetchLatestModuleVersion(moduleName) {
     command = `npm info ${moduleName} version --tag latest`;
   }
   const { stdout } = await exec(command).catch((err) => {
-    throw new Error(err, {
-      cause: err
-    });
+    throw new Error(err);
   });
 
   return stdout ? stdout.replace(/\n$/, '') : '';
@@ -301,13 +301,11 @@ function createFileErrorMsg(inaccessibleFiles) {
 /**
  * Queries for current Deno version of the project.
  */
-currentVersionFunctions.getDenoCurrentVersion = async () => {
+dependencyExports.getDenoCurrentVersion = async () => {
   const { stdout } = await exec(
     'npm list @slack/deno-slack-sdk --depth=0 --json'
   ).catch((err) => {
-    throw new Error(err, {
-      cause: err
-    });
+    throw new Error(err);
   });
 
   return stdout ? stdout : '';
@@ -316,7 +314,7 @@ currentVersionFunctions.getDenoCurrentVersion = async () => {
 /**
  * Queries for current Bolt version of the project.
  */
-currentVersionFunctions.getBoltCurrentVersion = async () => {
+dependencyExports.getBoltCurrentVersion = async () => {
   const { stdout } = await exec(
     'npm list @slack/bolt --depth=0 --json'
   ).catch((err) => {
@@ -332,5 +330,5 @@ module.exports = {
   checkForSDKUpdates,
   getJSON,
   getJSONFiles,
-  currentVersionFunctions,
+  dependencyExports,
 };
