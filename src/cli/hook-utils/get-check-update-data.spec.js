@@ -5,6 +5,7 @@ const rewiremock = require("rewiremock/node");
 const mockfs = require("mock-fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
+const { fetch } = require("node-fetch");
 
 async function importCheckUpdateDataMock(overrides) {
   return rewiremock.module(
