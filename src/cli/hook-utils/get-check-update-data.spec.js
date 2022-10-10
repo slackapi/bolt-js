@@ -152,8 +152,9 @@ describe("Slack CLI Script Hooks: check-update", () => {
   });
 
   // Test for successful version map that needs upgrade
+  // TODO: getting error here, will need to add messaging to assert messages
   it("returns a version map indicating it needs upgrades if it can access package.json and finds all dependencies", async () => {
-    const output = await importCheckUpdateDataMock({});
+    const output = await importCheckUpdateDataMock();
     // Mock Bolt JS file system
     mockfs({
       "test-project": {
@@ -195,7 +196,7 @@ describe("Slack CLI Script Hooks: check-update", () => {
       "name": "bolt-js-template",
       "dependencies": {
         "@slack/bolt": {
-          "version": "4.0.0-nextGen.6",
+          "version": "4.0.0-nextGen.2",
           "overridden": false
         }
       }
@@ -219,14 +220,14 @@ describe("Slack CLI Script Hooks: check-update", () => {
     // call check for SDK updates
     const versionMap = await output.checkForSDKUpdates(`${cwd}`);
     assert.isNotEmpty(versionMap);
-    assert.equal(versionMap.releases[0].name, "@slack/bolt");
-    assert.equal(versionMap.releases[0].current, "4.0.0-nextGen.6");
-    assert.equal(versionMap.releases[0].update, true);
-    assert.equal(versionMap.releases[0].breaking, false);
-    assert.equal(versionMap.releases[1].name, "@slack/deno-slack-sdk");
-    assert.equal(versionMap.releases[1].current, "1.1.9");
-    assert.equal(versionMap.releases[1].update, true);
-    assert.equal(versionMap.releases[1].breaking, false);
+    assert.equal(versionMap.releases[0].name, "@slack/bolt", "has Bolt dependency");
+    assert.equal(versionMap.releases[0].current, "4.0.0-nextGen.2", "has current Bolt version");
+    assert.equal(versionMap.releases[0].update, true, "can be updated");
+    assert.equal(versionMap.releases[0].breaking, false, "is not breaking change");
+    assert.equal(versionMap.releases[1].name, "@slack/deno-slack-sdk", "has Deno dependency");
+    assert.equal(versionMap.releases[1].current, "1.1.9", "has current Deno version");
+    assert.equal(versionMap.releases[1].update, true, "can be updated");
+    assert.equal(versionMap.releases[1].breaking, false, "is not breaking change");
 
     mockfs.restore();
   });
