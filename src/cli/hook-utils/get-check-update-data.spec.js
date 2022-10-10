@@ -176,7 +176,6 @@ describe('Slack CLI Script Hooks: check-update', () => {
   });
 
   // Test for successful version map that needs upgrade
-  // TODO: getting error here, will need to add messaging to assert messages
   it('returns a version map indicating it needs upgrades if it can access package.json and finds all dependencies', async () => {
     const output = await importCheckUpdateDataMock();
     // Mock Bolt JS file system
