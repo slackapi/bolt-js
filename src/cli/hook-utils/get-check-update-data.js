@@ -37,7 +37,6 @@ async function createVersionMap(cwd) {
       } catch (err) {
         error = err;
       }
-
       const update = !!current && !!latest && current !== latest;
       const breaking = hasBreakingChange(current, latest);
 
@@ -206,28 +205,23 @@ currentVersionFunctions.extractDependencies = async (json, fileName) => {
 };
 
 /**
- * Gets the latest module version from NPM.
+ * Gets the latest module version.
  * @param moduleName the module that the latest version is being queried for
  */
 async function fetchLatestModuleVersion(moduleName) {
-  const res = await fetch(`https://registry.npmjs.org/${moduleName}`, {
-    method: 'GET',
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => {
-      throw new Error(`${moduleName} not found on NPM!`);
-    });
-  if (res['dist-tags']) {
-    if (moduleName === '@slack/deno-slack-sdk') {
-      return res['dist-tags']['latest'];
-    } else if (moduleName === '@slack/bolt') {
-      return res['dist-tags']['next-gen'];
-    }
+  let command = "";
+  if (moduleName === '@slack/bolt') {
+    command = `npm info ${moduleName} version --tag next-gen`;
+  } else if (moduleName === '@slack/deno-slack-sdk') {
+    command = `npm info ${moduleName} version --tag latest`;
   }
+  const { stdout } = await exec(command).catch((err) => {
+    throw new Error(err, {
+      cause: err
+    });
+  });
 
-  return '';
+  return stdout ? stdout.replace(/\n$/, '') : '';
 }
 
 /**
@@ -310,7 +304,12 @@ function createFileErrorMsg(inaccessibleFiles) {
 currentVersionFunctions.getDenoCurrentVersion = async () => {
   const { stdout } = await exec(
     'npm list @slack/deno-slack-sdk --depth=0 --json'
-  );
+  ).catch((err) => {
+    throw new Error(err, {
+      cause: err
+    });
+  });
+
   return stdout ? stdout : '';
 };
 
@@ -318,9 +317,14 @@ currentVersionFunctions.getDenoCurrentVersion = async () => {
  * Queries for current Bolt version of the project.
  */
 currentVersionFunctions.getBoltCurrentVersion = async () => {
-  const { stdout, stderr } = await exec(
+  const { stdout } = await exec(
     'npm list @slack/bolt --depth=0 --json'
-  );
+  ).catch((err) => {
+    throw new Error(err, {
+      cause: err
+    });
+  });;
+
   return stdout ? stdout : '';
 };
 
