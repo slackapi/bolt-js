@@ -7,6 +7,15 @@ const SLACK_JSON_SDKS = ['@slack/bolt', '@slack/deno-slack-sdk'];
 let dependencyExports = {};
 
 /**
+ * Wraps and parses the output of the exec() function
+ * @param command the command being run by the exec() function
+ */
+async function execWrapper (command) {
+  const { stdout } = await exec(command);
+  return stdout.replace(/\n$/, '');
+}
+
+/**
  * Checks for available SDK updates for specified dependencies, creates a version map,
  * and then wraps everything up into a response to be passed to the CLI.
  * @param cwd the current working directory
@@ -24,9 +33,7 @@ async function checkForSDKUpdates(cwd) {
  * @param cwd the current working directory of the CLI project
  */
 async function createVersionMap(cwd) {
-  const { versionMap, inaccessibleFiles } = await readProjectDependencies(cwd).catch((err) => {
-    throw new Error(err);
-  });
+  const { versionMap, inaccessibleFiles } = await readProjectDependencies(cwd);
 
   // Iterate through each dependency for updates
   for (const [sdk, value] of Object.entries(versionMap)) {
@@ -63,31 +70,28 @@ async function createVersionMap(cwd) {
  */
 async function readProjectDependencies(cwd) {
   const versionMap = {};
-  const { dependencyFiles, inaccessibleFiles } = await gatherDependencyFiles(
+  const { dependencyFile, inaccessibleFiles } = await gatherDependencyFiles(
     cwd
   );
 
-  for (const fileName of dependencyFiles) {
-    try {
-      const fileJSON = await getJSON(`${cwd}/${fileName}`);
-      const fileDependencies =
-        await dependencyExports.extractDependencies(fileJSON, fileName);
+  try {
+    const fileDependencies =
+      await dependencyExports.extractDependencies(dependencyFile.body, dependencyFile.name);
 
-      // For each dependency found, compare to SDK-related dependency
-      // list and, if known, update the versionMap with version information
-      for (const [key, val] of fileDependencies) {
-        for (const sdk of SLACK_JSON_SDKS) {
-          if (key !== '' && key === sdk) {
-            versionMap[sdk] = {
-              name: sdk,
-              current: val.version ? val.version : '',
-            };
-          }
+    // For each dependency found, compare to SDK-related dependency
+    // list and, if known, update the versionMap with version information
+    for (const [key, val] of fileDependencies) {
+      for (const sdk of SLACK_JSON_SDKS) {
+        if (key !== '' && key === sdk) {
+          versionMap[sdk] = {
+            name: sdk,
+            current: val.version,
+          };
         }
       }
-    } catch (err) {
-      inaccessibleFiles.push({ name: fileName, error: err });
     }
+  } catch (err) {
+    inaccessibleFiles.push({ name: file.name, error: err });
   }
 
   return { versionMap, inaccessibleFiles };
@@ -117,9 +121,9 @@ async function getJSON(filePath) {
  * @param cwd the current working directory of the CLI project
  */
 async function gatherDependencyFiles(cwd) {
-  const { jsonDepFiles, inaccessibleFiles } = await getJSONFiles(cwd);
-  const dependencyFiles = jsonDepFiles;
-  return { dependencyFiles, inaccessibleFiles };
+  const { jsonDepFile, inaccessibleFiles } = await getJSONFiles(cwd);
+  const dependencyFile = jsonDepFile;
+  return { dependencyFile, inaccessibleFiles };
 }
 
 /**
@@ -127,28 +131,27 @@ async function gatherDependencyFiles(cwd) {
  * @param cwd the current working directory of the CLI project
  */
 async function getJSONFiles(cwd) {
-  const jsonFiles = ['package.json'];
-  const jsonDepFiles = [];
+  const packageJSON = 'package.json';
+  const jsonDepFile = {};
   const inaccessibleFiles = [];
 
-  for (const fileName of jsonFiles) {
-    try {
-      const jsonFile = await getJSON(`${cwd}/${fileName}`);
-      const jsonIsParsable =
-        jsonFile &&
-        typeof jsonFile === 'object' &&
-        !Array.isArray(jsonFile) &&
-        jsonFile.dependencies;
+  try {
+    const jsonFile = await getJSON(`${cwd}/${packageJSON}`);
+    const jsonIsParsable =
+      jsonFile &&
+      typeof jsonFile === 'object' &&
+      !Array.isArray(jsonFile) &&
+      jsonFile.dependencies;
 
-      if (jsonIsParsable) {
-        jsonDepFiles.push(fileName);
-      }
-    } catch (err) {
-      inaccessibleFiles.push({ name: fileName, error: err });
+    if (jsonIsParsable) {
+      jsonDepFile.name = packageJSON;
+      jsonDepFile.body= jsonFile;
     }
+  } catch (err) {
+    inaccessibleFiles.push({ name: packageJSON, error: err });
   }
 
-  return { jsonDepFiles, inaccessibleFiles };
+  return { jsonDepFile, inaccessibleFiles };
 }
 
 /**
@@ -211,17 +214,15 @@ dependencyExports.extractDependencies = async (json, fileName) => {
  * @param moduleName the module that the latest version is being queried for
  */
 async function fetchLatestModuleVersion(moduleName) {
-  let command = "";
+  let command = '';
   if (moduleName === '@slack/bolt') {
     command = `npm info ${moduleName} version --tag next-gen`;
   } else if (moduleName === '@slack/deno-slack-sdk') {
     command = `npm info ${moduleName} version --tag latest`;
   }
-  const { stdout } = await exec(command).catch((err) => {
-    throw new Error(err);
-  });
+  const stdout = await execWrapper(command);
 
-  return stdout ? stdout.replace(/\n$/, '') : '';
+  return stdout;
 }
 
 /**
@@ -302,28 +303,16 @@ function createFileErrorMsg(inaccessibleFiles) {
  * Queries for current Deno version of the project.
  */
 dependencyExports.getDenoCurrentVersion = async () => {
-  const { stdout } = await exec(
-    'npm list @slack/deno-slack-sdk --depth=0 --json'
-  ).catch((err) => {
-    throw new Error(err);
-  });
-
-  return stdout ? stdout : '';
+  const stdout = await execWrapper('npm list @slack/deno-slack-sdk --depth=0 --json');
+  return stdout;
 };
 
 /**
  * Queries for current Bolt version of the project.
  */
 dependencyExports.getBoltCurrentVersion = async () => {
-  const { stdout } = await exec(
-    'npm list @slack/bolt --depth=0 --json'
-  ).catch((err) => {
-    throw new Error(err, {
-      cause: err
-    });
-  });;
-
-  return stdout ? stdout : '';
+  const stdout = await execWrapper('npm list @slack/bolt --depth=0 --json');
+  return stdout;
 };
 
 module.exports = {
