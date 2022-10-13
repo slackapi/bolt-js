@@ -202,9 +202,7 @@ async function fetchLatestModuleVersion(moduleName) {
  * @param latest most up-to-date dependency version available on NPM
  */
 function hasBreakingChange(current, latest) {
-  const currMajor = current.split('.')[0];
-  const latestMajor = latest.split('.')[0];
-  return +latestMajor - +currMajor >= 1;
+  return current !== latest;
 }
 
 /**
@@ -215,12 +213,12 @@ function hasBreakingChange(current, latest) {
 function createUpdateResp(versionMap, inaccessibleFiles) {
   const name = 'the Slack SDK';
   const releases = [];
-  const message = '';
   const url = 'https://api.slack.com/future/changelog';
   const fileErrorMsg = createFileErrorMsg(inaccessibleFiles);
 
   let error = null;
   let errorMsg = '';
+  let message = '';
 
 
   // Output information for each dependency
@@ -236,6 +234,11 @@ function createUpdateResp(versionMap, inaccessibleFiles) {
           : `An error occurred fetching updates for the following packages: ${sdk.name}`;
       }
     }
+  }
+
+  // Surface release notes for breaking changes
+  if (releases && releases[0] && releases[0].breaking) {
+    message = `Learn more about the breaking change at https://github.com/slackapi/bolt-js/releases/tag/@slack/bolt@${releases[0].latest}`
   }
 
   // If there were issues accessing dependency files, append error message(s)

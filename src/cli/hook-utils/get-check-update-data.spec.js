@@ -271,40 +271,7 @@ describe('Slack CLI Script Hooks: check-update', () => {
     assert.equal(versionMap.releases[0].name, '@slack/bolt', 'has Bolt dependency');
     assert.equal(versionMap.releases[0].current, '4.0.0-nextGen.2', 'has a current Bolt version');
     assert.equal(versionMap.releases[0].update, true, 'Bolt can be updated');
-    assert.equal(versionMap.releases[0].breaking, false, 'Bolt update is not breaking change');
-
-    mockfs.restore();
-  });
-
-  // Test for breaking changes in version map
-  it('returns a version map indicating breaking changes', async () => {
-    const output = await importCheckUpdateDataMock();
-    // Mock Bolt JS file system
-    mockfs(fileSystem);
-
-    const cwd = 'test-project';
-
-    var stubBoltFunc = sinon.stub(
-      output.checkUpdateExports,
-      'getBoltCurrentVersion'
-    );
-    stubBoltFunc.returns(`{
-      "version": "1.0.0",
-      "name": "bolt-js-template",
-      "dependencies": {
-        "@slack/bolt": {
-          "version": "3.0.0-nextGen.6",
-          "overridden": false
-        }
-      }
-    }`);
-
-    // call check for SDK updates
-    const versionMap = await output.checkForSDKUpdates(`${cwd}`);
-    assert.isNotEmpty(versionMap);
-    assert.equal(versionMap.releases[0].name, '@slack/bolt', 'has Bolt dependency');
-    assert.equal(versionMap.releases[0].current, '3.0.0-nextGen.6', 'has a current Bolt version');
-    assert.equal(versionMap.releases[0].update, true, 'Bolt can be updated');
+    // All Bolt JS beta versions are breaking changes
     assert.equal(versionMap.releases[0].breaking, true, 'Bolt update is breaking change');
 
     mockfs.restore();
