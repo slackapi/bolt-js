@@ -220,7 +220,7 @@ describe('Slack CLI Script Hooks: check-update', () => {
     const cwd = 'test-project';
 
     var stubBoltFunc = sinon.stub(
-      output.dependencyExports,
+      output.checkUpdateExports,
       'getBoltCurrentVersion'
     );
     stubBoltFunc.returns(`{
@@ -229,21 +229,6 @@ describe('Slack CLI Script Hooks: check-update', () => {
       "dependencies": {
         "@slack/bolt": {
           "version": "4.0.0-nextGen.2",
-          "overridden": false
-        }
-      }
-    }`);
-
-    var stubDenoFunc = sinon.stub(
-      output.dependencyExports,
-      'getDenoCurrentVersion'
-    );
-    stubDenoFunc.returns(`{
-      "version": "1.0.0",
-      "name": "bolt-js-template",
-      "dependencies": {
-        "@slack/deno-slack-sdk": {
-          "version": "1.1.9",
           "overridden": false
         }
       }
@@ -266,7 +251,7 @@ describe('Slack CLI Script Hooks: check-update', () => {
     const cwd = 'test-project';
 
     var stubBoltFunc = sinon.stub(
-      output.dependencyExports,
+      output.checkUpdateExports,
       'getBoltCurrentVersion'
     );
     stubBoltFunc.returns(`{
@@ -280,32 +265,13 @@ describe('Slack CLI Script Hooks: check-update', () => {
       }
     }`);
 
-    var stubDenoFunc = sinon.stub(
-      output.dependencyExports,
-      'getDenoCurrentVersion'
-    );
-    stubDenoFunc.returns(`{
-      "version": "1.0.0",
-      "name": "bolt-js-template",
-      "dependencies": {
-        "@slack/deno-slack-sdk": {
-          "version": "1.1.9",
-          "overridden": false
-        }
-      }
-    }`);
-
     // call check for SDK updates
     const versionMap = await output.checkForSDKUpdates(`${cwd}`);
     assert.isNotEmpty(versionMap);
     assert.equal(versionMap.releases[0].name, '@slack/bolt', 'has Bolt dependency');
-    assert.equal(versionMap.releases[0].current, '4.0.0-nextGen.2', 'has current Bolt version');
+    assert.equal(versionMap.releases[0].current, '4.0.0-nextGen.2', 'has a current Bolt version');
     assert.equal(versionMap.releases[0].update, true, 'Bolt can be updated');
     assert.equal(versionMap.releases[0].breaking, false, 'Bolt update is not breaking change');
-    assert.equal(versionMap.releases[1].name, '@slack/deno-slack-sdk', 'has Deno dependency');
-    assert.equal(versionMap.releases[1].current, '1.1.9', 'has current Deno version');
-    assert.equal(versionMap.releases[1].update, true, 'Deno can be updated');
-    assert.equal(versionMap.releases[1].breaking, false, 'Deno update is not breaking change');
 
     mockfs.restore();
   });
@@ -319,7 +285,7 @@ describe('Slack CLI Script Hooks: check-update', () => {
     const cwd = 'test-project';
 
     var stubBoltFunc = sinon.stub(
-      output.dependencyExports,
+      output.checkUpdateExports,
       'getBoltCurrentVersion'
     );
     stubBoltFunc.returns(`{
@@ -333,117 +299,13 @@ describe('Slack CLI Script Hooks: check-update', () => {
       }
     }`);
 
-    var stubDenoFunc = sinon.stub(
-      output.dependencyExports,
-      'getDenoCurrentVersion'
-    );
-    stubDenoFunc.returns(`{
-      "version": "1.0.0",
-      "name": "bolt-js-template",
-      "dependencies": {
-        "@slack/deno-slack-sdk": {
-          "version": "0.2.0",
-          "overridden": false
-        }
-      }
-    }`);
-
     // call check for SDK updates
     const versionMap = await output.checkForSDKUpdates(`${cwd}`);
     assert.isNotEmpty(versionMap);
     assert.equal(versionMap.releases[0].name, '@slack/bolt', 'has Bolt dependency');
-    assert.equal(versionMap.releases[0].current, '3.0.0-nextGen.6', 'has current Bolt version');
+    assert.equal(versionMap.releases[0].current, '3.0.0-nextGen.6', 'has a current Bolt version');
     assert.equal(versionMap.releases[0].update, true, 'Bolt can be updated');
     assert.equal(versionMap.releases[0].breaking, true, 'Bolt update is breaking change');
-    assert.equal(versionMap.releases[1].name, '@slack/deno-slack-sdk', 'has Deno dependency');
-    assert.equal(versionMap.releases[1].current, '0.2.0', 'has current Deno version');
-    assert.equal(versionMap.releases[1].update, true, 'Deno can be updated');
-    assert.equal(versionMap.releases[1].breaking, true, 'Deno update is breaking change');
-
-    mockfs.restore();
-  });
-
-  // Test if only @slack/bolt is found
-  // Test for breaking changes in version map
-  it('returns a version map without a Deno SDK version', async () => {
-    const output = await importCheckUpdateDataMock();
-    // Mock Bolt JS file system
-    mockfs(fileSystem);
-
-    const cwd = 'test-project';
-
-    var stubExtractDependencies = sinon.stub(
-      output.dependencyExports,
-      'extractDependencies'
-    );
-    stubExtractDependencies.returns([
-      [
-        '@slack/bolt',
-        {
-          version: '4.0.0-nextGen.6',
-        },
-      ],
-      [
-        '@slack/deno-slack-sdk',
-        {
-          version: '',
-        },
-      ],
-    ]);
-
-    // call check for SDK updates
-    const versionMap = await output.checkForSDKUpdates(`${cwd}`);
-    assert.isNotEmpty(versionMap);
-    assert.equal(versionMap.releases[0].name, '@slack/bolt', 'has Bolt dependency');
-    assert.equal(versionMap.releases[0].current, '4.0.0-nextGen.6', 'has current Bolt version');
-    assert.equal(versionMap.releases[0].update, false, `Bolt can't be updated`);
-    assert.equal(versionMap.releases[0].breaking, false, 'Bolt update is breaking change');
-    assert.equal(versionMap.releases[1].name, '@slack/deno-slack-sdk', 'has Deno dependency');
-    assert.equal(versionMap.releases[1].current, '', 'has no current Deno version');
-    assert.equal(versionMap.releases[1].update, false, `Deno can't be updated`);
-    assert.equal(versionMap.releases[1].breaking, true, 'Deno update is breaking change');
-
-    mockfs.restore();
-  });
-
-  // Test if only @slack/deno-slack-sdk is found
-  it('returns a version map without a Bolt version', async () => {
-    const output = await importCheckUpdateDataMock();
-    // Mock Bolt JS file system
-    mockfs(fileSystem);
-
-    const cwd = 'test-project';
-
-    var stubExtractDependencies = sinon.stub(
-      output.dependencyExports,
-      'extractDependencies'
-    );
-    stubExtractDependencies.returns([
-      [
-        '@slack/bolt',
-        {
-          version: '',
-        },
-      ],
-      [
-        '@slack/deno-slack-sdk',
-        {
-          version: '1.2.0',
-        },
-      ],
-    ]);
-
-    // call check for SDK updates
-    const versionMap = await output.checkForSDKUpdates(`${cwd}`);
-    assert.isNotEmpty(versionMap);
-    assert.equal(versionMap.releases[0].name, '@slack/bolt', 'has Bolt dependency');
-    assert.equal(versionMap.releases[0].current, '', 'has no current Bolt version');
-    assert.equal(versionMap.releases[0].update, false, `Bolt can't be updated`);
-    assert.equal(versionMap.releases[0].breaking, true, 'Bolt update is breaking change');
-    assert.equal(versionMap.releases[1].name, '@slack/deno-slack-sdk', 'has Deno dependency');
-    assert.equal(versionMap.releases[1].current, '1.2.0', 'has current Deno version');
-    assert.equal(versionMap.releases[1].update, false, `Deno can't be updated`);
-    assert.equal(versionMap.releases[1].breaking, false, 'Deno update is not breaking change');
 
     mockfs.restore();
   });

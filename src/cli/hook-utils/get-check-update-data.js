@@ -3,8 +3,8 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const SLACK_JSON_SDKS = ['@slack/bolt', '@slack/deno-slack-sdk'];
-let dependencyExports = {};
+const SLACK_BOLT_SDK = '@slack/bolt';
+let checkUpdateExports = {};
 
 /**
  * Wraps and parses the output of the exec() function
@@ -12,7 +12,7 @@ let dependencyExports = {};
  */
 async function execWrapper (command) {
   const { stdout } = await exec(command);
-  return stdout.replace(/\n$/, '');
+  return stdout.trim();
 }
 
 /**
@@ -35,29 +35,26 @@ async function checkForSDKUpdates(cwd) {
 async function createVersionMap(cwd) {
   const { versionMap, inaccessibleFiles } = await readProjectDependencies(cwd);
 
-  // Iterate through each dependency for updates
-  for (const [sdk, value] of Object.entries(versionMap)) {
-    if (value) {
-      const current = versionMap[sdk].current || '';
-      let latest = '',
-        error = null;
+  if (versionMap && versionMap[SLACK_BOLT_SDK]) {
+    const current = versionMap[SLACK_BOLT_SDK].current || '';
+    let latest = '',
+      error = null;
 
-      try {
-        latest = await fetchLatestModuleVersion(sdk);
-      } catch (err) {
-        error = err;
-      }
-      const update = !!current && !!latest && current !== latest;
-      const breaking = hasBreakingChange(current, latest);
-
-      versionMap[sdk] = {
-        ...versionMap[sdk],
-        latest,
-        update,
-        breaking,
-        error,
-      };
+    try {
+      latest = await fetchLatestModuleVersion(SLACK_BOLT_SDK);
+    } catch (err) {
+      error = err;
     }
+    const update = !!current && !!latest && current !== latest;
+    const breaking = hasBreakingChange(current, latest);
+
+    versionMap[SLACK_BOLT_SDK] = {
+      ...versionMap[SLACK_BOLT_SDK],
+      latest,
+      update,
+      breaking,
+      error,
+    };
   }
 
   return { versionMap, inaccessibleFiles };
@@ -75,23 +72,17 @@ async function readProjectDependencies(cwd) {
   );
 
   try {
-    const fileDependencies =
-      await dependencyExports.extractDependencies(dependencyFile.body, dependencyFile.name);
+    const [sdk, value] =
+      await checkUpdateExports.extractDependencies(dependencyFile.body, dependencyFile.name);
 
-    // For each dependency found, compare to SDK-related dependency
-    // list and, if known, update the versionMap with version information
-    for (const [key, val] of fileDependencies) {
-      for (const sdk of SLACK_JSON_SDKS) {
-        if (key !== '' && key === sdk) {
-          versionMap[sdk] = {
-            name: sdk,
-            current: val.version,
-          };
-        }
-      }
+    if (sdk !== '' && sdk === SLACK_BOLT_SDK) {
+      versionMap[SLACK_BOLT_SDK] = {
+        name: sdk,
+        current: value.version,
+      };
     }
   } catch (err) {
-    inaccessibleFiles.push({ name: file.name, error: err });
+    inaccessibleFiles.push({ name: dependencyFile.name, error: err });
   }
 
   return { versionMap, inaccessibleFiles };
@@ -159,17 +150,16 @@ async function getJSONFiles(cwd) {
  * @param json JSON information that includes dependencies
  * @param fileName name of the file that the dependency list is coming from
  */
-dependencyExports.extractDependencies = async (json, fileName) => {
+checkUpdateExports.extractDependencies = async (json, fileName) => {
   // Determine if the JSON passed is an object
   const jsonIsParsable =
     json !== null && typeof json === 'object' && !Array.isArray(json);
 
   if (jsonIsParsable) {
     let boltCurrentVersion = '';
-    let denoCurrentVersion = '';
     if (json['dependencies']['@slack/bolt']) {
       const boltCurrentVersionOutput = JSON.parse(
-        await dependencyExports.getBoltCurrentVersion()
+        await checkUpdateExports.getBoltCurrentVersion()
       );
 
       if (boltCurrentVersionOutput !== '') {
@@ -177,32 +167,12 @@ dependencyExports.extractDependencies = async (json, fileName) => {
           boltCurrentVersionOutput['dependencies']['@slack/bolt']['version'];
       }
     }
-    if (json['dependencies']['@slack/deno-slack-sdk']) {
-      const denoCurrentVersionOutput = JSON.parse(
-        await dependencyExports.getDenoCurrentVersion()
-      );
-
-      if (denoCurrentVersionOutput !== '') {
-        denoCurrentVersion =
-          denoCurrentVersionOutput['dependencies']['@slack/deno-slack-sdk'][
-            'version'
-          ];
-      }
-    }
 
     return [
-      [
-        '@slack/bolt',
-        {
-          version: boltCurrentVersion,
-        },
-      ],
-      [
-        '@slack/deno-slack-sdk',
-        {
-          version: denoCurrentVersion,
-        },
-      ],
+      '@slack/bolt',
+      {
+        version: boltCurrentVersion,
+      },
     ];
   }
 
@@ -252,6 +222,7 @@ function createUpdateResp(versionMap, inaccessibleFiles) {
   let error = null;
   let errorMsg = '';
 
+
   // Output information for each dependency
   for (const sdk of Object.values(versionMap)) {
     // Dependency has an update OR the fetch of update failed
@@ -272,7 +243,9 @@ function createUpdateResp(versionMap, inaccessibleFiles) {
     errorMsg += errorMsg ? `\n\n   ${fileErrorMsg}` : fileErrorMsg;
   }
 
-  if (errorMsg) error = { message: errorMsg };
+  if (errorMsg) {
+    error = { message: errorMsg };
+  }
 
   return {
     name,
@@ -299,18 +272,11 @@ function createFileErrorMsg(inaccessibleFiles) {
 
   return fileErrorMsg;
 }
-/**
- * Queries for current Deno version of the project.
- */
-dependencyExports.getDenoCurrentVersion = async () => {
-  const stdout = await execWrapper('npm list @slack/deno-slack-sdk --depth=0 --json');
-  return stdout;
-};
 
 /**
  * Queries for current Bolt version of the project.
  */
-dependencyExports.getBoltCurrentVersion = async () => {
+checkUpdateExports.getBoltCurrentVersion = async () => {
   const stdout = await execWrapper('npm list @slack/bolt --depth=0 --json');
   return stdout;
 };
@@ -319,5 +285,5 @@ module.exports = {
   checkForSDKUpdates,
   getJSON,
   getJSONFiles,
-  dependencyExports,
+  checkUpdateExports,
 };
