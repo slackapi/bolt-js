@@ -2,6 +2,7 @@
 console.log(JSON.stringify({
   hooks: {
     'get-manifest': 'npx -q --no-install -p @slack/bolt slack-cli-get-manifest',
+    'check-update': 'npx -q --no-install -p @slack/bolt slack-cli-check-update',
     start: 'npx -q --no-install -p @slack/bolt slack-cli-start',
   },
   config: {
