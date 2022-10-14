@@ -41,7 +41,8 @@
     "slack-cli-start": "./src/cli/start.js",
     "slack-cli-hook-utils": "./src/cli/hook-utils/manifest.js",
     "slack-cli-hook-utils-get-manifest-data": "./src/cli/hook-utils/get-manifest-data.js",
-    "slack-cli-check-update": "./src/cli/check-update.js"
+    "slack-cli-check-update": "./src/cli/check-update.js",
+    "slack-cli-hook-utils-get-check-update-data": "./src/cli/hook-utils/get-check-update-data.js"
   },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",
