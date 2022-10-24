@@ -70,7 +70,7 @@ These tokens and variables don't necessarily have to match those used in develop
 
 For a successful deployment, you'll need to set up a few additional things in your app.
 
-#### Add a Procfile
+#### Add a Procfile {#procfile}
 
 To specify the start command of your app for Heroku, [a special file called **Procfile**](https://devcenter.heroku.com/articles/procfile) must be created.
 
@@ -172,7 +172,9 @@ Sometimes problems arise in the deployment process that can be difficult to spot
 
 ### Updating the code {#update-code}
 
-New features, functionalities, or other updates to your app can be deployed by committing a change and pushing it to Heroku. Your app will automatically be rebuilt to reflect the latest changes on your `main` branch, with the option to roll back to any previous version using `heroku releases:rollback [RELEASE]`.
+New features, functionalities, or other updates to your app are _automatically_ deployed after being committed and pushed to the `main` branch on your Heroku remote! This is all possible thanks to [the `Procfile` made earlier](#procfile).
+
+> 🎞 Different deployments of your app can be displayed with `heroku releases`, and you can rollback to a specific release using `heroku releases:rollback v12`.
 
 If you are using the Bolt for JavaScript Starter Template and want to see a change in action, update the greeting in `listeners/functions/hello-world.js` like so:
 
