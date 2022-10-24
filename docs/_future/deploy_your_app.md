@@ -19,7 +19,7 @@ In this guide, you will find the steps needed to prepare and deploy your app to 
 
 ### Before you begin {#before-you-begin}
 
-Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](https://slack.dev/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](https://slack.dev/bolt-js/future/migrate-existing-app). Once your app is set up, you can use the `slack run` command to make sure your app starts successfully.
+Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](/bolt-js/future/migrate-existing-app). Once your app is set up, you can use the `slack run` command to make sure your app starts successfully.
 
 Since we're deploying to Heroku, having a Heroku account will also be useful. If you don't have one, [create one here](https://signup.heroku.com/).
 
@@ -217,9 +217,9 @@ Congratulations! You've just deployed, updated, and inspected your next-generati
 
 You can now go forth to explore and customize your app using the different capabilities of the next-generation Platform! Check out some of these features that will help you build the next-generation app of your dreams:
 
-* [Built-in functions](https://slack.dev/bolt-js/future/built-in-functions), a collection of Slack-native actions like sending a message or creating a channel.
-* [Custom functions](https://slack.dev/bolt-js/future/custom-functions) for creating your own building blocks that accepts inputs, does something, and provides outputs.
-* [Workflows](https://slack.dev/bolt-js/future/workflows) that combine functions into a sequence of steps that are executed in order.
-* [Triggers](https://slack.dev/bolt-js/future/triggers) for invoking a workflow in response to a link click, scheduled time, or another event.
+* [Built-in functions](/bolt-js/future/built-in-functions), a collection of Slack-native actions like sending a message or creating a channel.
+* [Custom functions](/bolt-js/future/custom-functions) for creating your own building blocks that accepts inputs, does something, and provides outputs.
+* [Workflows](/bolt-js/future/workflows) that combine functions into a sequence of steps that are executed in order.
+* [Triggers](/bolt-js/future/triggers) for invoking a workflow in response to a link click, scheduled time, or another event.
 
 <p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>Our next-generation platform is currently in beta. [Your feedback is most welcome](/bolt-js/future/feedback) - all feedback will help shape the future platform experience!</p>
