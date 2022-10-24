@@ -72,16 +72,17 @@ For a successful deployment, you'll need to set up a few additional things in yo
 
 #### Add a Procfile {#procfile}
 
-To specify the start command of your app for Heroku, [a special file called **Procfile**](https://devcenter.heroku.com/articles/procfile) must be created.
+To specify the start command of your app for Heroku, [a special file called `Procfile`](https://devcenter.heroku.com/articles/procfile) must be created in your app's root directory.
 
-The contents of this file will vary depending if you are using Socket Mode or not, but in both cases it will be named `Procfile` and live in your app's root directory.
+The contents of this file will vary depending on if you have [Socket Mode](/bolt-js/concepts#socket-mode) enabled or not (which you can check for in your [Manifest](/bolt-js/future/app-manifests)) since apps using default web connections use HTTP requests when communicating with Slack.
 
 If you are using Socket Mode, your `Procfile` should contain the following:
+
 ```sh
 worker: node app.js
 ```
 
-A Slack app using default web connections will have the following `Procfile`:
+While apps using default web connections will have the following `Procfile`:
 
 ```sh
 web: node app.js
@@ -162,7 +163,7 @@ branch 'main' set up to track 'heroku/main'.
 
 To kick things off on your Heroku app, you might have to scale up the dyno that runs your app.
 
-For socket mode, this can be done by stopping the `web` dyno and starting the `worker` dyno:
+With Socket Mode, this can be done by stopping the `web` dyno and starting the `worker` dyno:
 
 ```sh
 $ heroku ps:scale web=0 worker=1
