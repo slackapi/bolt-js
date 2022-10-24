@@ -82,7 +82,7 @@ If you are using Socket Mode, your `Procfile` should contain the following:
 worker: node app.js
 ```
 
-While apps using default web connections will have the following `Procfile`:
+While those using default web connections will have the following `Procfile`:
 
 ```sh
 web: node app.js
