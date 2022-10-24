@@ -10,20 +10,20 @@ permalink: /future/deploy-your-app
 # Deploy your app to Heroku<span class="label-beta">BETA</span>
 
 <div class="section-content">
-Deploy your Bolt app to [the Heroku platform](https://dashboard.heroku.com/) to keep your app running at all hours of the day, not just during your development sessions!
+Currently, Bolt applications cannot be deployed on Slack infrastructure. However, never fear - you can deploy your Bolt app to [the Heroku platform](https://dashboard.heroku.com/) to keep your app running at all hours of the day, not just during your development sessions!
 
 In this guide, you will find the steps needed to prepare and deploy your app to Heroku, as well as how to inspect your activity logs and make updates to your app.
 </div>
 
 ---
 
-### Before you begin {#prerequisites}
+### Before you begin {#before-you-begin}
 
-Before you can deploy a Bolt app to Heroku, you'll need a Bolt app that successfully starts with `slack run`. If you haven't created an app yet, [go ahead and make one](https://slack.dev/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt JS migration guide](https://slack.dev/bolt-js/future/migrate-existing-app).
+Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](https://slack.dev/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](https://slack.dev/bolt-js/future/migrate-existing-app). Once your app is set up, you can use the `slack run` command to make sure your app starts successfully.
 
 Since we're deploying to Heroku, having a Heroku account will also be useful. If you don't have one, [create one here](https://signup.heroku.com/).
 
-To help manage, deploy, and debug your app on Heroku, you'll additionally need to [install the Heroku CLI](https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up) onto your machine and authenticate using `heroku login`.
+In order to manage, deploy, and debug your app on Heroku, you'll also need to [install the Heroku CLI](https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up) onto your machine and authenticate using `heroku login`.
 
 And lastly, to manage the version of your project being deployed, you'll need to [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and initialize your app's repository using `git init` if you have not already done so.
 
@@ -31,7 +31,7 @@ And lastly, to manage the version of your project being deployed, you'll need to
 
 ### Create a Heroku app {#create-a-heroku-app}
 
-With a Bolt app ready to go and Heroku tools installed, you're ready to establish a presence on Heroku!
+With a Bolt app ready to go and Heroku tools installed, you're now ready to start deploying your Bolt app on Heroku!
 
 #### Create a new app
 
@@ -60,15 +60,15 @@ After your Heroku app is created, you'll be given app-specific information for u
 The tokens being used for your app (and any other environment variables) can be added to your deployed environment using the following commands:
 
 ```sh
-$ heroku config:set SLACK_APP_TOKEN=xapp-1-70k3n-h3r312xdp
-$ heroku config:set SLACK_BOT_TOKEN=xoxb-2b07-4pp5hv3f3ll85
+$ heroku config:set SLACK_APP_TOKEN=xapp-your-app-level-token
+$ heroku config:set SLACK_BOT_TOKEN=xoxb-your-bot-token
 ```
 
 These tokens and variables don't necessarily have to match those used in development. For instance, you may want to use tokens for a different app or a more verbose logging output in production. This is where you would set that.
 
 ### Prepare your app for Heroku {#prepare-your-app}
 
-No changes to your app should be needed to deploy, but a few configurations must be made to make a deployment successful.
+For a successful deployment, you'll need to set up a few additional things in your app.
 
 #### Add a Procfile
 
@@ -122,7 +122,14 @@ After creating and configuring your Bolt and Heroku app, you're ready for deploy
 
 But before you can deploy, you should ensure that you have committed all of the source code your app needs to run!
 
-You can see unstaged changes using `git status` and commit any changes using the same commands used for **Procfile**.
+You can view your unstaged changes using `git status` and commit those changes using the following flow:
+
+```sh
+# Adds all remaining unstaged changes
+git add .
+
+# Commit the added files
+git commit -m "Add in any final unstaged changes"
 
 After adding and committing the source code of your app to the `main` branch of your repo, push it to your Heroku remote to start a deployment:
 
@@ -158,7 +165,7 @@ For this, we will use the "Web URL" found from `heroku info` to update the **Req
 
 At this step your app should be live, listening for messages, events, or whatever you have coded up! Go ahead and jump into a workspace with your app to test things out!
 
-If you are using the [Bolt JS Starter Template `future` branch](https://github.com/slack-samples/bolt-js-starter-template/tree/future), now would be a good time to try out a link trigger and workflow. Sending a "hello" message to a channel that your bot is a member of should also elicit a response from your app.
+If you are using the [Bolt for JavaScript Starter Template `future` branch](https://github.com/slack-samples/bolt-js-starter-template/tree/future), now would be a good time to try out a link trigger and workflow. Sending a "hello" message to a channel that your bot is a member of should also elicit a response from your app.
 
 Sometimes problems arise in the deployment process that can be difficult to spot. If your app isn't working, [inspecting the activity logs](#activity-logs) may reveal the source of the problem.
 
@@ -166,7 +173,7 @@ Sometimes problems arise in the deployment process that can be difficult to spot
 
 New features, functionalities, or other updates to your app can be deployed by committing a change and pushing it to Heroku. Your app will automatically be rebuilt to reflect the latest changes on your `main` branch, with the option to roll back to any previous version using `heroku releases:rollback [RELEASE]`.
 
-If you are using the Bolt JS Starter Template and want to see a change in action, update the greeting in `listeners/functions/hello-world.js` like so:
+If you are using the Bolt for JavaScript Starter Template and want to see a change in action, update the greeting in `listeners/functions/hello-world.js` like so:
 
 ```js
 // listeners/functions/hello-world.js
@@ -206,9 +213,9 @@ Here, you will find outputs and errors from your new Heroku app, giving you insi
 
 ### Next steps {#next-steps}
 
-With all of this, you have just deployed, updated, and inspected your next-generation Bolt JS app on Heroku! 🎉
+Congratulations! You've just deployed, updated, and inspected your next-generation Bolt for JavaScript app on Heroku! 🎉
 
-You can now go forth to explore and customize your app using the different capabilities of the next-generation Platform if you please! Check out:
+You can now go forth to explore and customize your app using the different capabilities of the next-generation Platform! Check out some of these features that will help you build the next-generation app of your dreams:
 
 * [Built-in functions](https://slack.dev/bolt-js/future/built-in-functions), a collection of Slack-native actions like sending a message or creating a channel.
 * [Custom functions](https://slack.dev/bolt-js/future/custom-functions) for creating your own building blocks that accepts inputs, does something, and provides outputs.
