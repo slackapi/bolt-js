@@ -125,11 +125,12 @@ But before you can deploy, you should ensure that you have committed all of the 
 You can view your unstaged changes using `git status` and commit those changes using the following flow:
 
 ```sh
-# Adds all remaining unstaged changes
-git add .
+# Add all remaining unstaged changes
+$ git add .
 
 # Commit the added files
-git commit -m "Add in any final unstaged changes"
+$ git commit -m "Add in any final unstaged changes"
+```
 
 After adding and committing the source code of your app to the `main` branch of your repo, push it to your Heroku remote to start a deployment:
 
