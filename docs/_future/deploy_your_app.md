@@ -138,6 +138,26 @@ After adding and committing the source code of your app to the `main` branch of 
 $ git push -u heroku main
 ```
 
+Logs showing the process of your app being built by Heroku will then begin to stream in. After a moment for installing dependencies, messages indicating a successful deployment should follow as so:
+
+```sh
+remote: -----> Build succeeded!
+remote: -----> Discovering process types
+remote:        Procfile declares types     -> worker
+remote:        Default types for buildpack -> web
+
+remote: -----> Compressing...
+remote:        Done: 44.2M
+remote: -----> Launching...
+remote:        Released v6
+remote:        https://aqueous-escarpment-85734.herokuapp.com/ deployed to Heroku
+
+remote: Verifying deploy... done.
+To https://git.heroku.com/aqueous-escarpment-85734.git
+   5856f44..e322699  main -> main
+branch 'main' set up to track 'heroku/main'.
+```
+
 #### Start your app
 
 To kick things off on your Heroku app, you might have to scale up the dyno that runs your app.
@@ -190,7 +210,7 @@ $ git commit -am "Add mystery to the greeting message"
 $ git push -u heroku main
 ```
 
-After a "Build succeeded!" and "Verifying deploy... done." message appears, your app will have this newfound functionality!
+After the "Build succeeded!" and "Verifying deploy... done." messages appear, your app will have this newfound functionality!
 
 ### Inspecting the activity logs {#activity-logs}
 
