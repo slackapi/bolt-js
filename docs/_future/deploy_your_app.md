@@ -19,7 +19,11 @@ In this guide, you will find the steps needed to prepare and deploy your app to 
 
 ### Before you begin {#before-you-begin}
 
-Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](/bolt-js/future/migrate-existing-app). Once your app is set up, you can use the `slack run` command to make sure your app starts successfully.
+Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](/bolt-js/future/migrate-existing-app).
+
+To test that your deploy is successful, having a Trigger that is easily invoked will be handy! Check out [the different types of Triggers](/future/triggers#types) and [the different ways to create a Trigger](/future/triggers#create) for tapping into your Workflows, creating one if necessary.
+
+With these set up, you can use the `slack run` command to make sure your app starts successfully and appropriately responds to Triggers from your machine.
 
 Since we're deploying to Heroku, having a Heroku account will also be useful. If you don't have one, [create one here](https://signup.heroku.com/).
 
@@ -185,11 +189,11 @@ For this, we will use the "Web URL" found from `heroku info` to update the **Req
 
 #### Test your Slack app
 
-At this step your app should be live, listening for messages, events, or whatever you have coded up! Go ahead and jump into a workspace with your app to test things out!
+At this step your app should be live, listening for messages, events, or whatever else you have coded up! Go ahead and jump into a workspace with your app to test things out! 🚀
 
-If you are using the [Bolt for JavaScript Starter Template `future` branch](https://github.com/slack-samples/bolt-js-starter-template/tree/future), now would be a good time to try out a link trigger and workflow. Sending a "hello" message to a channel that your bot is a member of should also elicit a response from your app.
+Now would be a terrific time to try tripping your Trigger to test that your Workflows are executing as expected - though check that you're not running the app locally!
 
-Sometimes problems arise in the deployment process that can be difficult to spot. If your app isn't working, [inspecting the activity logs](#activity-logs) may reveal the source of the problem.
+And sometimes problems arise in the deployment process that can be difficult to spot. If your app doesn't seem to be running, [inspecting the activity logs](#activity-logs) may reveal the source of the problem.
 
 ### Updating the code {#update-code}
 
