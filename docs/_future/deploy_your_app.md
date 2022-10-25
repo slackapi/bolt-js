@@ -123,7 +123,7 @@ $ git remote add heroku https://git.heroku.com/aqueous-escarpment-85734.git
 
 After creating and configuring your Bolt and Heroku app, you're ready for deployment!
 
-> 💾 Any [triggers created with the CLI](https://api.slack.com/future/triggers#create_cli) for the local "(dev)" version of your app will continue to fire after deploying your app!
+> 💾 The [triggers created with the CLI](https://api.slack.com/future/triggers#create_cli) for the local "(dev)" version of your app will continue to fire after deploying your app!
 
 #### Push your code
 
