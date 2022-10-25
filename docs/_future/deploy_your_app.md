@@ -7,7 +7,7 @@ layout: tutorial
 permalink: /future/deploy-your-app
 ---
 
-# Deploy your app to Heroku<span class="label-beta">BETA</span>
+# Deploy your app<span class="label-beta">BETA</span>
 
 <div class="section-content">
 Currently, Bolt applications cannot be deployed on Slack infrastructure. However, never fear - you can deploy your Bolt app to [the Heroku platform](https://dashboard.heroku.com/) to keep your app running at all hours of the day, not just during your development sessions!
