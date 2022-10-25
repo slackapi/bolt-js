@@ -80,10 +80,12 @@ For a successful deployment, you'll need to set up a few additional things in yo
 
 To specify the start command of your app for Heroku, [a special file called `Procfile`](https://devcenter.heroku.com/articles/procfile) must be created in your app's root directory.
 
-The contents of this file will vary depending on if you have [Socket Mode](https://api.slack.com/apis/connections/socket) enabled or not. Socket Mode allows for your app to receive payloads through a private [WebSocket](https://tools.ietf.org/html/rfc6455) URL that's generated at runtime rather than a public HTTP endpoint. To confirm whether Socket Mode is enabled with your application, you can either:
-* Check your app's [Manifest](/bolt-js/future/app-manifests) to see if the `socketModeEnabled` property has been added and equals `true`, or
-* Visit the [App Config page](https://api.slack.com/apps) for your application and check out the "Socket Mode" section to ensure the toggle is turned on:
-<img width="670" alt="Screen Shot 2022-10-25 at 3 49 42 PM" src="https://user-images.githubusercontent.com/12901850/197868321-63fff839-a3a2-4926-ae45-93c9d88cfd41.png">
+The contents of this file will vary depending on if your app connects with [Socket Mode](https://api.slack.com/apis/connections/socket) or uses public HTTP endpoints to handle requests. To check whether Socket Mode is enabled for your application, you can either:
+
+* Check your app's [Manifest](/bolt-js/future/app-manifests) to see if `socketModeEnabled: true`, or
+* Visit the "Socket Mode" section on your app's [App Config page](https://api.slack.com/apps) to check if Socket Mode has been enabled:
+
+<img width="670" alt="The toggle for connecting with Socket Mode on the App Config page is enabled" src="https://user-images.githubusercontent.com/12901850/197868321-63fff839-a3a2-4926-ae45-93c9d88cfd41.png">
 
 If you are using Socket Mode, your `Procfile` should contain the following:
 
