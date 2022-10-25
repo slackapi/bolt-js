@@ -68,7 +68,7 @@ $ heroku config:set SLACK_APP_TOKEN=xapp-your-app-level-token
 $ heroku config:set SLACK_BOT_TOKEN=xoxb-your-bot-token
 ```
 
-These tokens can be collected from the "Basic Information" and "OAuth & Permissions" sections of [your App Config page](https://api.slack.com/apps) if ever misplaced.
+These tokens can be collected from [your App Config page](https://api.slack.com/apps) if ever misplaced. The app-level token can be found on the "Basic Information" page, while the bot-level token can be found under "OAuth & Permissions".
 
 Note that these tokens and variables don't necessarily have to match those used in development! For instance, you may want to use tokens for a different app or a more verbose logging output in production. This is where you would set that.
 
