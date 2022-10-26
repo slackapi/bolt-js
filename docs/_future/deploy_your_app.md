@@ -172,9 +172,11 @@ branch 'main' set up to track 'heroku/main'.
 
 #### Start your app
 
-To kick things off on your Heroku app, you might have to scale up the dyno that runs your app.
+To kick things off on Heroku, you might have to scale up a dyno! Unlike the ancient creatures of an earlier era, these [dynos are lightweight containers](https://www.heroku.com/dynos) for running your app on the Heroku platform.
 
-With Socket Mode, this can be done by stopping the `web` dyno and starting the `worker` dyno:
+The [type of dyno you scale](https://devcenter.heroku.com/articles/dynos#dyno-configurations) will depend on your connection type, but should be similar to what you used in your `Procfile` since the dyno type determines which process is run.
+
+Apps connecting with Socket Mode must stop the automatically created `web` dyno and start a `worker` dyno:
 
 ```sh
 $ heroku ps:scale web=0 worker=1
