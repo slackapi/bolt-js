@@ -78,6 +78,24 @@ These tokens can be collected from [your App Config page](https://api.slack.com/
 
 For a successful deployment, you'll need to set up a few additional things in your app.
 
+#### Add the Git remote
+
+Code is deployed to Heroku by pushing code from your local repository to the Git remote from when [you created an app](#create-a-heroku-app).
+
+You can check if this remote was automatically added by the Heroku CLI when your app was created like so:
+
+```sh
+$ git remote -v
+# heroku  https://git.heroku.com/aqueous-escarpment-85734.git (fetch)
+# heroku  https://git.heroku.com/aqueous-escarpment-85734.git (push)
+```
+
+But if there is no `heroku` remote, you can add one as follows:
+
+```sh
+$ git remote add heroku https://git.heroku.com/aqueous-escarpment-85734.git
+```
+
 #### Add a Procfile {#procfile}
 
 To specify the start command of your app for Heroku, [a special file called `Procfile`](https://devcenter.heroku.com/articles/procfile) must be created in your app's root directory.
@@ -106,24 +124,6 @@ With this new file saved, go ahead and commit it to your Git repository:
 ```sh
 $ git add Procfile
 $ git commit -m "Add Procfile"
-```
-
-#### Add the Git remote
-
-Code is deployed to Heroku by pushing code from your local repository to the Git remote from when [you created an app](#create-a-heroku-app).
-
-You can check if this remote was automatically added by the Heroku CLI when your app was created like so:
-
-```sh
-$ git remote -v
-# heroku  https://git.heroku.com/aqueous-escarpment-85734.git (fetch)
-# heroku  https://git.heroku.com/aqueous-escarpment-85734.git (push)
-```
-
-But if there is no `heroku` remote, you can add one as follows:
-
-```sh
-$ git remote add heroku https://git.heroku.com/aqueous-escarpment-85734.git
 ```
 
 ### Deploy your app {#deploy-your-app}
