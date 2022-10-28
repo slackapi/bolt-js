@@ -21,7 +21,9 @@ In this guide, you will find the steps needed to prepare and deploy your app to 
 
 Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](/bolt-js/future/migrate-existing-app).
 
-To test that your deploy is successful, having a Trigger that is easily invoked will be handy! Check out [the different types of Triggers](/bolt-js/future/triggers#types) and [the different ways to create a Trigger](/bolt-js/future/triggers#create) for tapping into your Workflows, creating one if necessary.
+Additionally, you will need to have at least one Trigger created for your application to allow you to confirm your application has successfully deployed to Heroku. You can learn about [the different types of Triggers](/bolt-js/future/triggers#types) and [how to create a Trigger](/bolt-js/future/triggers#create) for tapping into your Workflows. If an application has not already been installed to a workspace, it will be installed automatically to the selected workspace during the Trigger creation process.
+
+> 💡 To check if your application has any existing triggers, you can run `slack triggers create` in the directory for your project and select the workspace where it is installed, if applicable. If the app has already been installed and at least one Trigger has been created in the workspace, you'll be able to view a list of all Triggers that have been created for your workspace installation.
 
 With your app and Trigger created, you can now use the `slack run` command to make sure your app starts successfully and appropriately responds to Triggers from your machine.
 
