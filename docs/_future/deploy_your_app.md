@@ -63,11 +63,11 @@ After your Heroku app is created, you'll be given app-specific information for u
 
 #### Add environment variables
 
-The tokens being used for your app (and any other environment variables) can be added to your deployed environment using the following commands:
+The tokens and environment variables used by your app can be added to your new Heroku app using the following commands:
 
 ```sh
-$ heroku config:set SLACK_APP_TOKEN=xapp-your-app-level-token
-$ heroku config:set SLACK_BOT_TOKEN=xoxb-your-bot-token
+$ heroku config:set --app HEROKU_APP_NAME SLACK_APP_TOKEN=xapp-your-app-level-token
+$ heroku config:set --app HEROKU_APP_NAME SLACK_BOT_TOKEN=xoxb-your-bot-token
 ```
 
 These tokens can be collected from [your App Config page](https://api.slack.com/apps). The app-level token can be found on the "Basic Information" page, while the bot-level token can be found under "OAuth & Permissions".
