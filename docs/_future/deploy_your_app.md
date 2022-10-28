@@ -200,9 +200,9 @@ For this, we will use the "Web URL" found from `heroku info` to update the **Req
 
 At this step your app should be live, listening for messages, events, or whatever else you have coded up! Go ahead and jump into a workspace with your app to test things out! 🚀
 
-Now would be a terrific time to try tripping your Trigger to test that your Workflows are executing as expected - though check that you're not running the app locally!
+Now would be a terrific time to try tripping your Trigger to test that your Workflows are executing as expected - however, make sure to confirm that you're not running the app locally! A successfully deployed Heroku app is one that is not running locally and will still fully execute your Trigger and all functionality associated with it.
 
-And sometimes problems arise in the deployment process that can be difficult to spot. If your app doesn't seem to be running, [inspecting the activity logs](#activity-logs) may reveal the source of the problem.
+> 💡 Sometimes problems arise in the deployment process that can be difficult to spot. If your app doesn't seem to be running or executing functionality from your Triggers, [inspecting the activity logs](#activity-logs) may reveal the source of the problem.
 
 ### Updating the code {#update-code}
 
@@ -224,7 +224,7 @@ $ git commit -am "Add mystery to the greeting message"
 $ git push -u heroku main
 ```
 
-After the "Build succeeded!" and "Verifying deploy... done." messages appear, your app will have this newfound functionality!
+After the "Build succeeded!" and "Verifying deploy... done." messages appear, your app will have this newfound functionality! You can now test your Trigger again to verify the new change.
 
 ### Inspecting the activity logs {#activity-logs}
 
