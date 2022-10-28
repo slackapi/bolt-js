@@ -190,9 +190,9 @@ While apps using web connections can be started with just the `web` dyno:
 $ heroku ps:scale web=1
 ```
 
-#### Using a public web address
+#### Settings for apps not using Socket Mode
 
-Apps using not using Socket Mode require that the **Request URL** is set to an address that can receive events and actions from Slack.
+Apps that use a  **Request URL** to receive events and actions from Slack should update this URL to match the web address of your new Heroku dyno. Apps that connect over Socket Mode can skip this step.
 
 For this, we will use the "Web URL" found from `heroku info` to update the **Request URL** on both the **Interactivity & Shortcuts** page and the **Event Subscriptions** page for [your Slack app](https://api.slack.com/apps).
 
