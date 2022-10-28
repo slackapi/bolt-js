@@ -23,7 +23,7 @@ Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If y
 
 To test that your deploy is successful, having a Trigger that is easily invoked will be handy! Check out [the different types of Triggers](/bolt-js/future/triggers#types) and [the different ways to create a Trigger](/bolt-js/future/triggers#create) for tapping into your Workflows, creating one if necessary.
 
-With these set up, you can use the `slack run` command to make sure your app starts successfully and appropriately responds to Triggers from your machine.
+With your app and Trigger created, you can now use the `slack run` command to make sure your app starts successfully and appropriately responds to Triggers from your machine.
 
 Since we're deploying to Heroku, having a Heroku account will also be useful. If you don't have one, [create one here](https://signup.heroku.com/).
 
@@ -68,9 +68,9 @@ $ heroku config:set SLACK_APP_TOKEN=xapp-your-app-level-token
 $ heroku config:set SLACK_BOT_TOKEN=xoxb-your-bot-token
 ```
 
-These tokens can be collected from [your App Config page](https://api.slack.com/apps) if ever misplaced. The app-level token can be found on the "Basic Information" page, while the bot-level token can be found under "OAuth & Permissions".
+These tokens can be collected from [your App Config page](https://api.slack.com/apps). The app-level token can be found on the "Basic Information" page, while the bot-level token can be found under "OAuth & Permissions".
 
-Note that these tokens and variables don't necessarily have to match those used in development! For instance, you may want to use tokens for a different app or a more verbose logging output in production. This is where you would set that.
+> 💡 Note that these tokens and variables don't necessarily have to match those used in development! For instance, you may want to use tokens for a different app or a more verbose logging output in production. This is where you would set that.
 
 ### Prepare your app for Heroku {#prepare-your-app}
 
@@ -128,7 +128,7 @@ $ git remote add heroku https://git.heroku.com/aqueous-escarpment-85734.git
 
 After creating and configuring your Bolt and Heroku app, you're ready for deployment!
 
-> 💾 The [triggers created with the CLI](https://api.slack.com/future/triggers#create_cli) for the local "(dev)" version of your app will continue to fire after deploying your app!
+> 💾 The [triggers created with the CLI](https://api.slack.com/future/triggers#create_cli) for the local "(dev)" version of your app will continue to work after the app is deployed!
 
 #### Push your code
 
@@ -190,7 +190,7 @@ $ heroku ps:scale web=1
 
 #### Using a public web address
 
-Apps using web connections (and not Socket Mode) require that the **Request URL** is set to an address that can receive events and actions from Slack.
+Apps using not using Socket Mode require that the **Request URL** is set to an address that can receive events and actions from Slack.
 
 For this, we will use the "Web URL" found from `heroku info` to update the **Request URL** on both the **Interactivity & Shortcuts** page and the **Event Subscriptions** page for [your Slack app](https://api.slack.com/apps).
 
@@ -210,7 +210,7 @@ New features, functionalities, or other updates to your app are _automatically_ 
 
 > 🎞 Different deployments of your app can be displayed with `heroku releases`, and you can rollback to a specific release using `heroku releases:rollback v12`.
 
-If you are using the Bolt for JavaScript Starter Template and want to see a change in action, update the greeting in `listeners/functions/hello-world.js` like so:
+If you are using the Bolt for JavaScript Starter Template and want to see a change in action, you can update the `greeting` variable declaration in `listeners/functions/hello-world.js` like so:
 
 ```js
 // listeners/functions/hello-world.js
@@ -252,7 +252,7 @@ Here, you will find outputs and errors from your new Heroku app, giving you insi
 
 Congratulations! You've just deployed, updated, and inspected your next-generation Bolt for JavaScript app on Heroku! 🎉
 
-You can now go forth to explore and customize your app using the different capabilities of the next-generation Platform! Check out some of these features that will help you build the next-generation app of your dreams:
+You can now go forth to explore and customize your app using the different capabilities of the next-generation platform! Check out some of these features that will help you build the next-gen app of your dreams:
 
 * [Built-in functions](/bolt-js/future/built-in-functions), a collection of Slack-native actions like sending a message or creating a channel.
 * [Custom functions](/bolt-js/future/custom-functions) for creating your own building blocks that accepts inputs, does something, and provides outputs.
