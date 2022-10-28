@@ -63,7 +63,7 @@ After your Heroku app is created, you'll be given app-specific information for u
 
 #### Add environment variables
 
-The tokens and environment variables used by your app can be added to your new Heroku app using the following commands:
+The tokens and environment variables used by your Bolt app can be added to your Heroku app environment using the following commands:
 
 ```sh
 $ heroku config:set --app HEROKU_APP_NAME SLACK_APP_TOKEN=xapp-your-app-level-token
