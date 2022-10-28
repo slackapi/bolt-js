@@ -204,7 +204,27 @@ At this step your app should be live, listening for messages, events, or whateve
 
 Now would be a terrific time to try tripping your Trigger to test that your Workflows are executing as expected - however, make sure to confirm that you're not running the app locally! A successfully deployed Heroku app is one that is not running locally and will still fully execute your Trigger and all functionality associated with it.
 
-> 💡 Sometimes problems arise in the deployment process that can be difficult to spot. If your app doesn't seem to be running or executing functionality from your Triggers, [inspecting the activity logs](#activity-logs) may reveal the source of the problem.
+### Inspecting the activity logs {#activity-logs}
+
+Sometimes problems arise in the deployment process that can be difficult to spot. If your app doesn't seem to be running as expected, inspecting the activity logs may reveal the source of the problem.
+
+To inspect the live activity logs of your deployed app, run `heroku logs --tail`.
+
+```
+2022-10-07T17:47:59.026002+00:00 app[api]: Scaled to web@0:Free worker@1:Free by user you@email.com
+2022-10-07T17:48:01.606472+00:00 heroku[worker.1]: Starting process with command `node app.js`
+2022-10-07T17:48:02.353986+00:00 heroku[worker.1]: State changed from starting to up
+...
+2022-10-07T17:48:03.620821+00:00 app[worker.1]: [DEBUG]  web-api:WebClient:1 apiCall('apps.connections.open') start
+2022-10-07T17:48:03.621182+00:00 app[worker.1]: [DEBUG]  web-api:WebClient:1 will perform http request
+2022-10-07T17:48:03.662470+00:00 app[worker.1]: [DEBUG]  web-api:WebClient:1 http response received
+2022-10-07T17:48:03.663064+00:00 app[worker.1]: [DEBUG]  socket-mode:SocketModeClient:0 Transitioning to state: connecting:authenticated
+2022-10-07T17:48:03.666960+00:00 app[worker.1]: ⚡️ Bolt app is running! ⚡️
+...
+2022-10-07T17:48:03.692653+00:00 app[worker.1]: [DEBUG]  socket-mode:SocketModeClient:0 Transitioning to state: connected:ready
+```
+
+Here, you will find outputs and errors from your new Heroku app, giving you insight into your app's activity!
 
 ### Updating the code {#update-code}
 
@@ -227,26 +247,6 @@ $ git push -u heroku main
 ```
 
 After the "Build succeeded!" and "Verifying deploy... done." messages appear, your app will have this newfound functionality! You can now test your Trigger again to verify the new change.
-
-### Inspecting the activity logs {#activity-logs}
-
-To inspect the live activity logs of your deployed app, run `heroku logs --tail`.
-
-```
-2022-10-07T17:47:59.026002+00:00 app[api]: Scaled to web@0:Free worker@1:Free by user you@email.com
-2022-10-07T17:48:01.606472+00:00 heroku[worker.1]: Starting process with command `node app.js`
-2022-10-07T17:48:02.353986+00:00 heroku[worker.1]: State changed from starting to up
-...
-2022-10-07T17:48:03.620821+00:00 app[worker.1]: [DEBUG]  web-api:WebClient:1 apiCall('apps.connections.open') start
-2022-10-07T17:48:03.621182+00:00 app[worker.1]: [DEBUG]  web-api:WebClient:1 will perform http request
-2022-10-07T17:48:03.662470+00:00 app[worker.1]: [DEBUG]  web-api:WebClient:1 http response received
-2022-10-07T17:48:03.663064+00:00 app[worker.1]: [DEBUG]  socket-mode:SocketModeClient:0 Transitioning to state: connecting:authenticated
-2022-10-07T17:48:03.666960+00:00 app[worker.1]: ⚡️ Bolt app is running! ⚡️
-...
-2022-10-07T17:48:03.692653+00:00 app[worker.1]: [DEBUG]  socket-mode:SocketModeClient:0 Transitioning to state: connected:ready
-```
-
-Here, you will find outputs and errors from your new Heroku app, giving you insight into your app's activity!
 
 ---
 
