@@ -389,4 +389,5 @@ describe('SlackFunction utils', () => {
       assert.equal(res.fnKeys?.includes('reverse_approval'), false);
     });
   });
+  // TODO: Add unit tests for options
 });

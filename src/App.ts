@@ -61,6 +61,7 @@ import {
   WorkflowStepEdit,
   SubscriptionInteraction,
   FunctionExecutedEvent,
+  SlackOptions,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -167,6 +168,12 @@ export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
 export interface ViewConstraints {
   callback_id?: string | RegExp;
   type?: 'view_closed' | 'view_submission';
+}
+
+export interface OptionsConstraints<C extends SlackOptions = SlackOptions> {
+  type?: C['type'];
+  block_id?: C extends SlackOptions ? string | RegExp : never;
+  action_id?: C extends SlackOptions ? string | RegExp : never;
 }
 
 // Passed internally to the handleError method
@@ -1540,8 +1547,11 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       // When the app is installed using org-wide deployment, team property will be null
       if (
         typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
-        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
+        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null &&
+        'enterprise_id' in bodyAsActionOrOptionsOrViewActionOrShortcut.team
       ) {
+        // TODO: Added null check in if statement, but check
+        // if there's a better way to bypass this Typescript error for enterprise_id
         return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
       }
 
