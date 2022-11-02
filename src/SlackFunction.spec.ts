@@ -192,7 +192,7 @@ describe('SlackFunction module', () => {
           action_id: '',
         };
         const mockHandler = async () => {};
-        // expect that the return value of action is a Slack function
+        // expect that the return value of blockSuggestion is a Slack function
         assert.instanceOf(testFunc.blockSuggestion(goodConstraints, mockHandler), SlackFunction);
         // chained valid handlers should not error
         const shouldNotThrow = () => testFunc.blockSuggestion(goodConstraints, mockHandler)
