@@ -275,7 +275,7 @@ describe('SlackFunction module', () => {
         const mockHandler = async () => Promise.resolve();
         const spy = sinon.spy(mockHandler);
         const spy2 = sinon.spy(mockHandler);
-        // add an action handlers
+        // add blockSuggestion handlers
         testFunc.blockSuggestion(goodConstraints, spy).blockSuggestion(goodConstraints, spy2);
 
         // set up event args
@@ -308,7 +308,7 @@ describe('SlackFunction module', () => {
         };
         const mockHandler = async () => Promise.reject();
         const spy = sinon.spy(mockHandler);
-        // add an action handlers
+        // add a blockSuggestion handler
         testFunc.blockSuggestion(goodConstraints, spy);
 
         // set up event args
