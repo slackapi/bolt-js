@@ -121,7 +121,7 @@ Update the [source code that imports your modules](https://github.com/slackapi/b
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-> 💡  If you are planning on implementing authentication with OAuth, as of today you need to use the [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts). When using other receivers with that are not the AwsLambdaReceiver, please note that the `processBeforeResponse: true` property is required to be passed in to your receiver initialization.
+> 💡  If you are planning on implementing authentication with OAuth, as of today you need to use the [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts). Additionally, when using other receivers with that are not the AwsLambdaReceiver, please note that the `processBeforeResponse: true` property is required to be passed in to your receiver initialization.
 
 Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
 
