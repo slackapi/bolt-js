@@ -81,6 +81,7 @@ export interface BlockSuggestion extends StringIndexed {
     enterprise_id?: string;
     enterprise_name?: string;
   } | null;
+  token?: string; // legacy verification token
   user: {
     id: string;
     name: string;
