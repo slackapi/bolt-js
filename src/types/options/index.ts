@@ -47,7 +47,7 @@ export interface BlockSuggestion extends StringIndexed {
   enterprise?: {
     id: string;
     name: string;
-  } | null;
+  };
   message?: {
     app_id: string;
     blocks: {
