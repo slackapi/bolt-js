@@ -261,7 +261,8 @@ describe('SlackFunction module', () => {
           client: {} as WebClient,
         } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
 
-        // ensure handlers are not
+        // ensure handler call rejects
+
         const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
         assertNode.rejects(shouldReject);
       });
@@ -325,7 +326,8 @@ describe('SlackFunction module', () => {
           client: {} as WebClient,
         } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
 
-        // ensure handlers are not
+        // ensure handler call rejects
+
         const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
         assertNode.rejects(shouldReject);
       });
