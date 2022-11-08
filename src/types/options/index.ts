@@ -32,7 +32,10 @@ export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromTy
 export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
 
 /**
- * external data source in blocks
+ * external data source in blocks - this BlockSuggestion differs from
+ * the new Block Suggestion type defined in src/types/block-suggestion,
+ * as this one is intended for legacy use, while the new type is intended
+ * for next-gen interactivity handler use.
  */
 export interface BlockSuggestion extends StringIndexed {
   type: 'block_suggestion';
