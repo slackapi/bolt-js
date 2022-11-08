@@ -36,63 +36,36 @@ export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions
  */
 export interface BlockSuggestion extends StringIndexed {
   type: 'block_suggestion';
-  action_id: string;
-  api_app_id: string;
   block_id: string;
-  channel?: {
-    id: string;
-    name: string;
-  };
-  is_enterprise_install?: boolean;
-  enterprise?: {
-    id: string;
-    name: string;
-  };
-  message?: {
-    app_id: string;
-    blocks: {
-      block_id: string;
-      type: string;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [key: string]: any;
-    }[];
-    is_locked: boolean;
-    latest_reply?: string;
-    metadata?: {
-      event_type: string;
-      event_payload: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
-      };
-    };
-    reply_count: number;
-    reply_users: string[];
-    reply_users_count: number;
-    team: string;
-    text: string;
-    thread_ts: string;
-    ts: string;
-    type: 'message';
-    user: string;
-  };
+  action_id: string;
+  value: string;
+
+  api_app_id: string;
   team: {
     id: string;
     domain: string;
     enterprise_id?: string;
     enterprise_name?: string;
   } | null;
-  token?: string; // legacy verification token
+  channel?: {
+    id: string;
+    name: string;
+  };
   user: {
     id: string;
     name: string;
     team_id?: string;
   };
-  value: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  token: string; // legacy verification token
   container: StringIndexed;
   // exists for blocks in either a modal or a home tab
   view?: ViewOutput;
+  // exists for enterprise installs
+  is_enterprise_install?: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+  };
 }
 
 /**

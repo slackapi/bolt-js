@@ -25,7 +25,7 @@ import {
 
 import { FunctionExecutionContext } from './types/functions';
 import { SlackFunctionInitializationError } from './errors';
-import { ActionConstraints, OptionsConstraints, ViewConstraints } from './App';
+import { ActionConstraints, BlockSuggestionConstraints, ViewConstraints } from './App';
 
 export default async function importSlackFunctionModule(overrides: Override = {}): Promise<typeof import('./SlackFunction')> {
   return rewiremock.module(() => import('./SlackFunction'), overrides);
@@ -167,7 +167,7 @@ describe('SlackFunction module', () => {
         const mockFunctionCallbackId = 'reverse_approval';
         const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
         const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
-        const goodConstraints: OptionsConstraints = {
+        const goodConstraints: BlockSuggestionConstraints = {
           action_id: '',
         };
         const shouldNotThrow = () => testFunc.blockSuggestion(goodConstraints, async () => {});
@@ -180,7 +180,7 @@ describe('SlackFunction module', () => {
         const badConstraints = {
           bad_id: '',
           action_id: '',
-        } as OptionsConstraints;
+        } as BlockSuggestionConstraints;
         const shouldThrow = () => testFunc.blockSuggestion(badConstraints, async () => {});
         assert.throws(shouldThrow, SlackFunctionInitializationError);
       });
@@ -188,7 +188,7 @@ describe('SlackFunction module', () => {
         const mockFunctionCallbackId = 'reverse_approval';
         const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
         const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
-        const goodConstraints: OptionsConstraints = {
+        const goodConstraints: BlockSuggestionConstraints = {
           action_id: '',
         };
         const mockHandler = async () => {};
@@ -270,7 +270,7 @@ describe('SlackFunction module', () => {
         const mockFunctionCallbackId = 'reverse_approval';
         const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
         const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
-        const goodConstraints: OptionsConstraints = {
+        const goodConstraints: BlockSuggestionConstraints = {
           action_id: 'my-action',
         };
         const mockHandler = async () => Promise.resolve();
@@ -304,7 +304,7 @@ describe('SlackFunction module', () => {
         const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
         const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
         const action_id = 'my-action';
-        const goodConstraints: OptionsConstraints = {
+        const goodConstraints: BlockSuggestionConstraints = {
           action_id,
         };
         const mockHandler = async () => Promise.reject();

@@ -8,3 +8,4 @@ export * from './view';
 export * from './receiver';
 export * from './shortcuts';
 export * from './subscription';
+export * from './block-suggestion';

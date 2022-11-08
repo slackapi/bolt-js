@@ -61,7 +61,7 @@ import {
   WorkflowStepEdit,
   SubscriptionInteraction,
   FunctionExecutedEvent,
-  SlackOptions,
+  SlackBlockSuggestion,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -170,10 +170,10 @@ export interface ViewConstraints {
   type?: 'view_closed' | 'view_submission';
 }
 
-export interface OptionsConstraints<C extends SlackOptions = SlackOptions> {
-  type?: C['type'];
-  block_id?: C extends SlackOptions ? string | RegExp : never;
-  action_id?: C extends SlackOptions ? string | RegExp : never;
+export interface BlockSuggestionConstraints<B extends SlackBlockSuggestion = SlackBlockSuggestion> {
+  type?: B['type'];
+  block_id?: B extends SlackBlockSuggestion ? string | RegExp : never;
+  action_id?: B extends SlackBlockSuggestion ? string | RegExp : never;
 }
 
 // Passed internally to the handleError method
@@ -1547,11 +1547,8 @@ function buildSource<IsEnterpriseInstall extends boolean>(
       // When the app is installed using org-wide deployment, team property will be null
       if (
         typeof bodyAsActionOrOptionsOrViewActionOrShortcut.team !== 'undefined' &&
-        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null &&
-        'enterprise_id' in bodyAsActionOrOptionsOrViewActionOrShortcut.team
+        bodyAsActionOrOptionsOrViewActionOrShortcut.team !== null
       ) {
-        // TODO: Added null check in if statement, but check
-        // if there's a better way to bypass this Typescript error for enterprise_id
         return bodyAsActionOrOptionsOrViewActionOrShortcut.team.enterprise_id;
       }
 

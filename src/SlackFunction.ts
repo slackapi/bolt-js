@@ -9,14 +9,14 @@ import {
   SlackEventMiddlewareArgs,
   SlackViewAction,
   SlackViewMiddlewareArgs,
-  SlackOptions,
-  SlackOptionsMiddlewareArgs,
+  SlackBlockSuggestion,
+  SlackBlockSuggestionsMiddlewareArgs,
 } from './types';
 
 import {
   ActionConstraints,
   ViewConstraints,
-  OptionsConstraints,
+  BlockSuggestionConstraints,
 } from './App';
 
 import {
@@ -48,21 +48,21 @@ export interface CompleteFunctionArgs {
 export type AllSlackFunctionExecutedMiddlewareArgs =
 SlackFunctionExecutedMiddlewareArgs &
 SlackActionMiddlewareArgs &
-SlackOptionsMiddlewareArgs &
+SlackBlockSuggestionsMiddlewareArgs &
 AllMiddlewareArgs;
 
 interface FunctionInteractivityMiddleware {
   constraints: FunctionInteractivityConstraints,
   handler: Middleware<SlackActionMiddlewareArgs> |
   Middleware<SlackViewMiddlewareArgs> |
-  Middleware<SlackOptionsMiddlewareArgs>;
+  Middleware<SlackBlockSuggestionsMiddlewareArgs>;
 }
 
-type FunctionInteractivityConstraints = ActionConstraints | ViewConstraints | OptionsConstraints;
+type FunctionInteractivityConstraints = ActionConstraints | ViewConstraints | BlockSuggestionConstraints;
 // an array of Action constraints keys as strings
 type ActionConstraintsKeys = Extract<(keyof ActionConstraints), string>[];
 type ViewConstraintsKeys = Extract<(keyof ViewConstraints), string>[];
-type OptionsConstraintsKeys = Extract<(keyof OptionsConstraints), string>[];
+type BlockSuggestionConstraintsKeys = Extract<(keyof BlockSuggestionConstraints), string>[];
 
 interface SlackFnValidateResult { pass: boolean, msg?: string }
 export interface ManifestDefinitionResult {
@@ -208,18 +208,15 @@ export class SlackFunction {
    * @param handler Provide a handler function
    * @returns SlackFunction instance
    */
-  // TODO: Slack Options pass in here
-  // Examine Options middleware
-  // and define options constraints that are similar to ActionConstraints
   public blockSuggestion<
-    Options extends SlackOptions = SlackOptions,
-    Constraints extends OptionsConstraints<Options> = OptionsConstraints<Options>,
+    BlockSuggestion extends SlackBlockSuggestion = SlackBlockSuggestion,
+    Constraints extends BlockSuggestionConstraints<BlockSuggestion> = BlockSuggestionConstraints<BlockSuggestion>,
   >(
     actionIdOrConstraints: string | RegExp | Constraints,
-    handler: Middleware<SlackOptionsMiddlewareArgs>,
+    handler: Middleware<SlackBlockSuggestionsMiddlewareArgs>,
   ): this {
     // normalize constraints
-    const constraints: OptionsConstraints = (
+    const constraints: BlockSuggestionConstraints = (
       typeof actionIdOrConstraints === 'string' ||
       util.types.isRegExp(actionIdOrConstraints)
     ) ?
@@ -227,7 +224,7 @@ export class SlackFunction {
       actionIdOrConstraints;
 
     // declare our valid constraints keys
-    const validConstraintsKeys: OptionsConstraintsKeys = ['action_id', 'block_id', 'type'];
+    const validConstraintsKeys: BlockSuggestionConstraintsKeys = ['action_id', 'block_id', 'type'];
     // cast to string array for convenience
     const validConstraintsKeysAsStrings = validConstraintsKeys as string[];
 
@@ -511,7 +508,7 @@ export function errorIfInvalidConstraintKeys(
   validKeys: string[],
   handler: Middleware<SlackActionMiddlewareArgs> |
   Middleware<SlackViewMiddlewareArgs<SlackViewAction>> |
-  Middleware<SlackOptionsMiddlewareArgs>,
+  Middleware<SlackBlockSuggestionsMiddlewareArgs>,
 ): void {
   const invalidKeys = Object.keys(constraints).filter(
     (key) => !validKeys.includes(key),
