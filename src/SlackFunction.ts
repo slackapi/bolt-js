@@ -9,11 +9,14 @@ import {
   SlackEventMiddlewareArgs,
   SlackViewAction,
   SlackViewMiddlewareArgs,
+  SlackBlockSuggestion,
+  SlackBlockSuggestionsMiddlewareArgs,
 } from './types';
 
 import {
   ActionConstraints,
   ViewConstraints,
+  BlockSuggestionConstraints,
 } from './App';
 
 import {
@@ -45,17 +48,21 @@ export interface CompleteFunctionArgs {
 export type AllSlackFunctionExecutedMiddlewareArgs =
 SlackFunctionExecutedMiddlewareArgs &
 SlackActionMiddlewareArgs &
+SlackBlockSuggestionsMiddlewareArgs &
 AllMiddlewareArgs;
 
 interface FunctionInteractivityMiddleware {
   constraints: FunctionInteractivityConstraints,
-  handler: Middleware<SlackActionMiddlewareArgs> | Middleware<SlackViewMiddlewareArgs>
+  handler: Middleware<SlackActionMiddlewareArgs> |
+  Middleware<SlackViewMiddlewareArgs> |
+  Middleware<SlackBlockSuggestionsMiddlewareArgs>;
 }
 
-type FunctionInteractivityConstraints = ActionConstraints | ViewConstraints;
+type FunctionInteractivityConstraints = ActionConstraints | ViewConstraints | BlockSuggestionConstraints;
 // an array of Action constraints keys as strings
 type ActionConstraintsKeys = Extract<(keyof ActionConstraints), string>[];
 type ViewConstraintsKeys = Extract<(keyof ViewConstraints), string>[];
+type BlockSuggestionConstraintsKeys = Extract<(keyof BlockSuggestionConstraints), string>[];
 
 interface SlackFnValidateResult { pass: boolean, msg?: string }
 export interface ManifestDefinitionResult {
@@ -185,6 +192,39 @@ export class SlackFunction {
 
     // declare our valid constraints keys
     const validConstraintsKeys: ActionConstraintsKeys = ['action_id', 'block_id', 'callback_id', 'type'];
+    // cast to string array for convenience
+    const validConstraintsKeysAsStrings = validConstraintsKeys as string[];
+
+    errorIfInvalidConstraintKeys(constraints, validConstraintsKeysAsStrings, handler);
+
+    this.interactivityHandlers.push({ constraints, handler });
+    return this;
+  }
+
+  /**
+   * Attach a block_suggestion interactivity handler to your SlackFunction
+   *
+   * ```
+   * @param handler Provide a handler function
+   * @returns SlackFunction instance
+   */
+  public blockSuggestion<
+    BlockSuggestion extends SlackBlockSuggestion = SlackBlockSuggestion,
+    Constraints extends BlockSuggestionConstraints<BlockSuggestion> = BlockSuggestionConstraints<BlockSuggestion>,
+  >(
+    actionIdOrConstraints: string | RegExp | Constraints,
+    handler: Middleware<SlackBlockSuggestionsMiddlewareArgs>,
+  ): this {
+    // normalize constraints
+    const constraints: BlockSuggestionConstraints = (
+      typeof actionIdOrConstraints === 'string' ||
+      util.types.isRegExp(actionIdOrConstraints)
+    ) ?
+      { action_id: actionIdOrConstraints } :
+      actionIdOrConstraints;
+
+    // declare our valid constraints keys
+    const validConstraintsKeys: BlockSuggestionConstraintsKeys = ['action_id', 'block_id', 'type'];
     // cast to string array for convenience
     const validConstraintsKeysAsStrings = validConstraintsKeys as string[];
 
@@ -387,7 +427,7 @@ export function isFunctionExecutedEvent(args: AnyMiddlewareArgs): boolean {
 
 export function isFunctionInteractivityEvent(args: AnyMiddlewareArgs & AllMiddlewareArgs): boolean {
   const allowedInteractivityTypes = [
-    'block_actions', 'view_submission', 'view_closed'];
+    'block_actions', 'view_submission', 'view_closed', 'block_suggestion'];
   if (args.body === undefined || args.body === null) return false;
   return (
     allowedInteractivityTypes.includes(args.body.type) &&
@@ -466,7 +506,9 @@ export function validate(callbackId: string, handler: Middleware<SlackEventMiddl
 export function errorIfInvalidConstraintKeys(
   constraints: FunctionInteractivityConstraints,
   validKeys: string[],
-  handler: Middleware<SlackActionMiddlewareArgs> | Middleware<SlackViewMiddlewareArgs<SlackViewAction>>,
+  handler: Middleware<SlackActionMiddlewareArgs> |
+  Middleware<SlackViewMiddlewareArgs<SlackViewAction>> |
+  Middleware<SlackBlockSuggestionsMiddlewareArgs>,
 ): void {
   const invalidKeys = Object.keys(constraints).filter(
     (key) => !validKeys.includes(key),

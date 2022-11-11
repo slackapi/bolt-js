@@ -25,7 +25,7 @@ import {
 
 import { FunctionExecutionContext } from './types/functions';
 import { SlackFunctionInitializationError } from './errors';
-import { ActionConstraints, ViewConstraints } from './App';
+import { ActionConstraints, BlockSuggestionConstraints, ViewConstraints } from './App';
 
 export default async function importSlackFunctionModule(overrides: Override = {}): Promise<typeof import('./SlackFunction')> {
   return rewiremock.module(() => import('./SlackFunction'), overrides);
@@ -162,8 +162,46 @@ describe('SlackFunction module', () => {
         assert.doesNotThrow(shouldNotThrow);
       });
     });
+    describe('app.function.blockSuggestion() adds a handler to interactivity handlers', () => {
+      it('should not error when valid handler constraints supplied', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const goodConstraints: BlockSuggestionConstraints = {
+          action_id: '',
+        };
+        const shouldNotThrow = () => testFunc.blockSuggestion(goodConstraints, async () => {});
+        assert.doesNotThrow(shouldNotThrow, SlackFunctionInitializationError);
+      });
+      it('should error when invalid handler constraints supplied', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const badConstraints = {
+          bad_id: '',
+          action_id: '',
+        } as BlockSuggestionConstraints;
+        const shouldThrow = () => testFunc.blockSuggestion(badConstraints, async () => {});
+        assert.throws(shouldThrow, SlackFunctionInitializationError);
+      });
+      it('should return the instance of slackfunction', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const goodConstraints: BlockSuggestionConstraints = {
+          action_id: '',
+        };
+        const mockHandler = async () => {};
+        // expect that the return value of blockSuggestion is a Slack function
+        assert.instanceOf(testFunc.blockSuggestion(goodConstraints, mockHandler), SlackFunction);
+        // chained valid handlers should not error
+        const shouldNotThrow = () => testFunc.blockSuggestion(goodConstraints, mockHandler)
+          .blockSuggestion(goodConstraints, mockHandler);
+        assert.doesNotThrow(shouldNotThrow, SlackFunctionInitializationError);
+      });
+    });
     describe('runInteractivityHandlers', () => {
-      it('should execute all provided callbacks', async () => {
+      it('app.function.action() should execute all provided callbacks', async () => {
         const mockFunctionCallbackId = 'reverse_approval';
         const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
         const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
@@ -196,7 +234,7 @@ describe('SlackFunction module', () => {
         assert(spy.calledOnce);
         assert(spy2.calledOnce);
       });
-      it('should error if a promise rejects', async () => {
+      it('app.function.action() should error if a promise rejects', async () => {
         const mockFunctionCallbackId = 'reverse_approval';
         const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
         const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
@@ -223,7 +261,73 @@ describe('SlackFunction module', () => {
           client: {} as WebClient,
         } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
 
-        // ensure handlers are not
+        // ensure handler call rejects
+
+        const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
+        assertNode.rejects(shouldReject);
+      });
+      it('app.function.blockSuggestion() should execute all provided callbacks', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const goodConstraints: BlockSuggestionConstraints = {
+          action_id: 'my-action',
+        };
+        const mockHandler = async () => Promise.resolve();
+        const spy = sinon.spy(mockHandler);
+        const spy2 = sinon.spy(mockHandler);
+        // add blockSuggestion handlers
+        testFunc.blockSuggestion(goodConstraints, spy).blockSuggestion(goodConstraints, spy2);
+
+        // set up event args
+        const fakeArgs = {
+          next: () => {},
+          payload: {
+            action_id: 'my-action',
+          },
+          body: {
+            function_data: {
+              execution_id: 'asdasdas',
+            },
+          },
+          client: {} as WebClient,
+        } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
+
+        // ensure handlers are both called
+
+        await testFunc.runInteractivityHandlers(fakeArgs);
+        assert(spy.calledOnce);
+        assert(spy2.calledOnce);
+      });
+      it('app.function.blockSuggestion() should error if a promise rejects', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const action_id = 'my-action';
+        const goodConstraints: BlockSuggestionConstraints = {
+          action_id,
+        };
+        const mockHandler = async () => Promise.reject();
+        const spy = sinon.spy(mockHandler);
+        // add a blockSuggestion handler
+        testFunc.blockSuggestion(goodConstraints, spy);
+
+        // set up event args
+        const fakeArgs = {
+          next: () => {},
+          payload: {
+            action_id,
+          },
+          body: {
+            function_data: {
+              execution_id: 'asdasdas',
+            },
+          },
+          client: {} as WebClient,
+        } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
+
+        // ensure handler call rejects
+
         const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
         assertNode.rejects(shouldReject);
       });

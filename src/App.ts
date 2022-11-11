@@ -61,6 +61,7 @@ import {
   WorkflowStepEdit,
   SubscriptionInteraction,
   FunctionExecutedEvent,
+  SlackBlockSuggestion,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -167,6 +168,12 @@ export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
 export interface ViewConstraints {
   callback_id?: string | RegExp;
   type?: 'view_closed' | 'view_submission';
+}
+
+export interface BlockSuggestionConstraints<B extends SlackBlockSuggestion = SlackBlockSuggestion> {
+  type?: B['type'];
+  block_id?: B extends SlackBlockSuggestion ? string | RegExp : never;
+  action_id?: B extends SlackBlockSuggestion ? string | RegExp : never;
 }
 
 // Passed internally to the handleError method
