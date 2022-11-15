@@ -8,6 +8,8 @@ permalink: /deployments/heroku
 ---
 # Deploying to Heroku
 
+> ⚠️ Using Heroku dynos to complete this tutorial counts towards your usage. [Delete your app](https://devcenter.heroku.com/articles/heroku-cli-commands#heroku-apps-destroy) as soon as you are done to control costs.
+
 <div class="section-content">
 This guide will walk you through preparing and deploying a Slack app using [Bolt for JavaScript](/bolt-js) and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 </div>
@@ -46,7 +48,7 @@ Before you can deploy your app to Heroku, you'll need a Git repository. If you a
 
 **2. Add a Procfile**
 
-Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. The contents of the file will depend on whether or not you are using Socket Mode. 
+Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. The contents of the file will depend on whether or not you are using Socket Mode.
 
 Create a new file called `Procfile` (without any extension) in your app's root directory and paste in one of the following, depending on how you're running your app.
 
@@ -118,7 +120,10 @@ You should now be set up with the Heroku tools! Let's move on to the exciting st
 
 It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
 
-> 💡 You can [rename a Heroku app](https://devcenter.heroku.com/articles/renaming-apps) at any time, but you may change your Git remote and public web address.
+Creating new Heroku apps will use your Heroku subscription. When getting started or deploying many small apps, we recommend starting with the low-cost Eco Dyno plan subscription. [Learn more about Heroku's low-cost plans](https://blog.heroku.com/new-low-cost-plans).
+
+> 💡 Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).
+
 
 **1. Create an app on Heroku**
 
@@ -135,6 +140,8 @@ heroku create
 # Creating sharp-rain-871... done, stack is heroku-18
 # https://sharp-rain-871.herokuapp.com/ | https://git.heroku.com/sharp-rain-871.git
 ```
+
+> 💡 You can [rename a Heroku app](https://devcenter.heroku.com/articles/renaming-apps) at any time, but you may change your Git remote and public web address.
 
 After your app is created, you'll be given some information that we'll use in the upcoming sections. In the example above:
 
@@ -154,7 +161,7 @@ git remote -v
 
 **3. Set environment variables on Heroku**
 
-Now you'll need to add your Slack app credentials to your Heroku app: 
+Now you'll need to add your Slack app credentials to your Heroku app:
 
 ```shell
 heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
@@ -215,7 +222,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 ![Event Subscriptions page](../assets/event-subscriptions-page.png "Event Subscriptions page")
 
-> 💡 Free Heroku apps sleep when inactive. 💤 If your verification fails, please try it again immediately.
+> 💡 Eco Heroku apps sleep when inactive. 💤 If your verification fails, please try it again immediately.
 
 **3. Test your Slack app**
 
@@ -261,7 +268,7 @@ You just deployed your first ⚡️[Bolt for JavaScript app to Heroku][deploy-he
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
-- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works) and understand the [limitations of a free Heroku app](https://devcenter.heroku.com/articles/free-dyno-hours).
+- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works) and understand the [limitations of an Eco Heroku app](https://devcenter.heroku.com/articles/eco-dyno-hours).
 - Extend your app with [Bolt's Basic Concepts](/bolt-js/concepts#basic) and [Heroku's Add-ons](https://elements.heroku.com/addons).
 - Learn about logging in [Bolt's Advanced Concepts](/bolt-js/concepts#logging) and how to [view log messages in Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
 - Get ready for primetime with [how to scale your Heroku app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
