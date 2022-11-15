@@ -2,7 +2,7 @@ import { Option } from '@slack/types';
 import { StringIndexed, XOR } from '../helpers';
 import { AckFn } from '../utilities';
 import { ViewOutput } from '../view/index';
-import { FunctionExecutionContext } from '../functions';
+import { FunctionContext } from '../functions';
 
 /**
  * Arguments which listeners and middleware receive to process a Block Suggestions request from Slack
@@ -35,9 +35,8 @@ export type KnownBlockSuggestionsPayloadFromType<T extends string> = Extract<Sla
 /**
  * Block Suggestion payload model for next-gen interactivity
  */
-export interface BlockSuggestionPayload extends StringIndexed {
+export interface BlockSuggestionPayload extends FunctionContext {
   api_app_id: string;
-  bot_access_token?: string;
   channel?: {
     id: string;
     name: string;
@@ -46,7 +45,6 @@ export interface BlockSuggestionPayload extends StringIndexed {
     id: string;
     name: string;
   } | null;
-  function_data?: FunctionExecutionContext;
   message?: {
     app_id: string;
     blocks: {
