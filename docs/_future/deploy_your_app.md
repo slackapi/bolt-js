@@ -9,6 +9,8 @@ permalink: /future/deploy-your-app
 
 # Deploy your app<span class="label-beta">BETA</span>
 
+> ⚠️ Using Heroku dynos to complete this tutorial counts towards your usage. [Delete your app](https://devcenter.heroku.com/articles/heroku-cli-commands#heroku-apps-destroy) as soon as you are done to control costs.
+
 <div class="section-content">
 Currently, Bolt applications cannot be deployed on Slack infrastructure. However, never fear - you can deploy your Bolt app to [the Heroku platform](https://dashboard.heroku.com/) to keep your app running at all hours of the day, not just during your development sessions!
 
@@ -38,6 +40,10 @@ And lastly, to manage the version of your project being deployed, you'll need to
 ### Create a Heroku app {#create-a-heroku-app}
 
 With a Bolt app ready to go and Heroku tools installed, you're now ready to start deploying your Bolt app on Heroku!
+
+Creating new Heroku apps will use your existing Heroku plan subscription. When getting started or deploying many small apps, we recommend starting with [Heroku's low-cost Eco Dyno plan](https://blog.heroku.com/new-low-cost-plans).
+
+> 💡 Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).
 
 #### Create a new app
 
