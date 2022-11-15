@@ -41,7 +41,7 @@ And lastly, to manage the version of your project being deployed, you'll need to
 
 With a Bolt app ready to go and Heroku tools installed, you're now ready to start deploying your Bolt app on Heroku!
 
-Creating new Heroku apps will use your existing Heroku plan subscription. When getting started or deploying many small apps, we recommend starting with [Heroku's low-cost Eco Dyno plan subscription](https://blog.heroku.com/new-low-cost-plans).
+Creating new Heroku apps will use your existing Heroku plan subscription. When getting started or deploying many small apps, we recommend starting with [Heroku's low-cost Eco Dyno plan](https://blog.heroku.com/new-low-cost-plans).
 
 > 💡 Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).
 
