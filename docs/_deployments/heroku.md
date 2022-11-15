@@ -268,7 +268,7 @@ You just deployed your first ⚡️[Bolt for JavaScript app to Heroku][deploy-he
 
 Now that you've deployed a basic app, you can start exploring how to customize and monitor it. Here are some ideas of what to explore next:
 
-- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works) and understand the [limitations of an Heroku Eco Dyno app](https://devcenter.heroku.com/articles/eco-dyno-hours).
+- Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works) and understand the [limitations of a Heroku Eco Dyno app](https://devcenter.heroku.com/articles/eco-dyno-hours).
 - Extend your app with [Bolt's Basic Concepts](/bolt-js/concepts#basic) and [Heroku's Add-ons](https://elements.heroku.com/addons).
 - Learn about logging in [Bolt's Advanced Concepts](/bolt-js/concepts#logging) and how to [view log messages in Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
 - Get ready for primetime with [how to scale your Heroku app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).
