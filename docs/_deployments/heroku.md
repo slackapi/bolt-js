@@ -120,7 +120,7 @@ You should now be set up with the Heroku tools! Let's move on to the exciting st
 
 It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
 
-Creating new Heroku apps will use your Heroku subscription. When getting started or deploying many small apps, we recommend starting with the low-cost Eco Dyno plan subscription. [Learn more about Heroku's low-cost plans](https://blog.heroku.com/new-low-cost-plans).
+Creating new Heroku apps will use your Heroku subscription's plan. When getting started or deploying many small apps, we recommend starting with the low-cost Eco Dyno plan subscription. [Learn more about Heroku's low-cost plans](https://blog.heroku.com/new-low-cost-plans).
 
 > 💡 Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).
 
