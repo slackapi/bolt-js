@@ -156,6 +156,9 @@ export class SlackFunction {
   /**
    * Attach a block_actions interactivity handler to your SlackFunction
    *
+   * NOTE: blockActions() in this fileis a direct copy of this function
+   * and any changes made here should also be made to that function.
+   *
    * ```
    * Example:
    * const actionHandler = async () => {};
@@ -202,13 +205,18 @@ export class SlackFunction {
   }
 
   /**
-   * Attach a block_actions interactivity handler to your SlackFunction
+   * Attach a block_actions interactivity handler to your SlackFunction.
+   * This function is added as an alias for the action() function to create
+   * consistency with having a blockSuggestion() function.
+   *
+   * NOTE: This function is a direct copy of the action() function and
+   * any changes made here should also be made to this function.
    *
    * ```
    * Example:
    * const actionHandler = async () => {};
    * const actionHandler1 = async () => {};
-   * myFunc.blockAction("id", actionHandler).action("id1", actionHandler1);
+   * myFunc.blockAction("id", actionHandler).blockAction("id1", actionHandler1);
    * ```
    *
    * @param actionIdOrConstraints Provide an action_id string
@@ -252,7 +260,6 @@ export class SlackFunction {
   /**
    * Attach a block_suggestion interactivity handler to your SlackFunction
    *
-   * ```
    * @param handler Provide a handler function
    * @returns SlackFunction instance
    */
