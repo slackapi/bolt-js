@@ -156,7 +156,7 @@ export class SlackFunction {
   /**
    * Attach a block_actions interactivity handler to your SlackFunction
    *
-   * NOTE: blockActions() in this fileis a direct copy of this function
+   * NOTE: blockActions() in this file is a direct copy of this function
    * and any changes made here should also be made to that function.
    *
    * ```
@@ -210,7 +210,7 @@ export class SlackFunction {
    * consistency with having a blockSuggestion() function.
    *
    * NOTE: This function is a direct copy of the action() function and
-   * any changes made here should also be made to this function.
+   * any changes made there should also be made to this function.
    *
    * ```
    * Example:
