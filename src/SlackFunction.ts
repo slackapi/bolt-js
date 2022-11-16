@@ -202,6 +202,54 @@ export class SlackFunction {
   }
 
   /**
+   * Attach a block_actions interactivity handler to your SlackFunction
+   *
+   * ```
+   * Example:
+   * const actionHandler = async () => {};
+   * const actionHandler1 = async () => {};
+   * myFunc.blockAction("id", actionHandler).action("id1", actionHandler1);
+   * ```
+   *
+   * @param actionIdOrConstraints Provide an action_id string
+   * corresponding to the value supplied in your blocks or a
+   * constraint object of type ActionConstraints<SlackAction>
+   *
+   * ```
+   * Example:
+   * myFunc.blockAction({ type: "action_submission" });
+   * myFunc.blockAction({ action_id: "id" }, actionHandler);
+   * ```
+   * @param handler Provide a handler function
+   * @returns SlackFunction instance
+   */
+  public blockAction<
+     Action extends SlackAction = SlackAction,
+     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
+   >(
+    actionIdOrConstraints: string | RegExp | Constraints,
+    handler: Middleware<SlackActionMiddlewareArgs>,
+  ): this {
+    // normalize constraints
+    const constraints: ActionConstraints = (
+      typeof actionIdOrConstraints === 'string' ||
+       util.types.isRegExp(actionIdOrConstraints)
+    ) ?
+      { action_id: actionIdOrConstraints } :
+      actionIdOrConstraints;
+
+    // declare our valid constraints keys
+    const validConstraintsKeys: ActionConstraintsKeys = ['action_id', 'block_id', 'callback_id', 'type'];
+    // cast to string array for convenience
+    const validConstraintsKeysAsStrings = validConstraintsKeys as string[];
+
+    errorIfInvalidConstraintKeys(constraints, validConstraintsKeysAsStrings, handler);
+
+    this.interactivityHandlers.push({ constraints, handler });
+    return this;
+  }
+
+  /**
    * Attach a block_suggestion interactivity handler to your SlackFunction
    *
    * ```
