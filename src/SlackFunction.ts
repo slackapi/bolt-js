@@ -156,9 +156,6 @@ export class SlackFunction {
   /**
    * Attach a block_actions interactivity handler to your SlackFunction
    *
-   * NOTE: blockActions() in this file is a direct copy of this function
-   * and any changes made here should also be made to that function.
-   *
    * ```
    * Example:
    * const actionHandler = async () => {};
@@ -209,9 +206,6 @@ export class SlackFunction {
    * This function is added as an alias for the action() function to create
    * consistency with having a blockSuggestion() function.
    *
-   * NOTE: This function is a direct copy of the action() function and
-   * any changes made there should also be made to this function.
-   *
    * ```
    * Example:
    * const actionHandler = async () => {};
@@ -238,23 +232,7 @@ export class SlackFunction {
     actionIdOrConstraints: string | RegExp | Constraints,
     handler: Middleware<SlackActionMiddlewareArgs>,
   ): this {
-    // normalize constraints
-    const constraints: ActionConstraints = (
-      typeof actionIdOrConstraints === 'string' ||
-       util.types.isRegExp(actionIdOrConstraints)
-    ) ?
-      { action_id: actionIdOrConstraints } :
-      actionIdOrConstraints;
-
-    // declare our valid constraints keys
-    const validConstraintsKeys: ActionConstraintsKeys = ['action_id', 'block_id', 'callback_id', 'type'];
-    // cast to string array for convenience
-    const validConstraintsKeysAsStrings = validConstraintsKeys as string[];
-
-    errorIfInvalidConstraintKeys(constraints, validConstraintsKeysAsStrings, handler);
-
-    this.interactivityHandlers.push({ constraints, handler });
-    return this;
+    return this.action.apply(this, [actionIdOrConstraints, handler]);
   }
 
   /**

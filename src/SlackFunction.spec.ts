@@ -369,71 +369,71 @@ describe('SlackFunction module', () => {
         const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
         assertNode.rejects(shouldReject);
       });
-    });
-    it('app.function.blockAction() should execute all provided callbacks', async () => {
-      const mockFunctionCallbackId = 'reverse_approval';
-      const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
-      const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
-      const goodConstraints: ActionConstraints = {
-        action_id: 'my-action',
-      };
-      const mockHandler = async () => Promise.resolve();
-      const spy = sinon.spy(mockHandler);
-      const spy2 = sinon.spy(mockHandler);
-      // add blockAction handlers
-      testFunc.blockAction(goodConstraints, spy).blockAction(goodConstraints, spy2);
-
-      // set up event args
-      const fakeArgs = {
-        next: () => {},
-        payload: {
+      it('app.function.blockAction() should execute all provided callbacks', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const goodConstraints: ActionConstraints = {
           action_id: 'my-action',
-        },
-        body: {
-          function_data: {
-            execution_id: 'asdasdas',
+        };
+        const mockHandler = async () => Promise.resolve();
+        const spy = sinon.spy(mockHandler);
+        const spy2 = sinon.spy(mockHandler);
+        // add blockAction handlers
+        testFunc.blockAction(goodConstraints, spy).blockAction(goodConstraints, spy2);
+
+        // set up event args
+        const fakeArgs = {
+          next: () => {},
+          payload: {
+            action_id: 'my-action',
           },
-        },
-        client: {} as WebClient,
-      } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
+          body: {
+            function_data: {
+              execution_id: 'asdasdas',
+            },
+          },
+          client: {} as WebClient,
+        } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
 
-      // ensure handlers are both called
+        // ensure handlers are both called
 
-      await testFunc.runInteractivityHandlers(fakeArgs);
-      assert(spy.calledOnce);
-      assert(spy2.calledOnce);
-    });
-    it('app.function.blockAction() should error if a promise rejects', async () => {
-      const mockFunctionCallbackId = 'reverse_approval';
-      const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
-      const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
-      const action_id = 'my-action';
-      const goodConstraints: ActionConstraints = {
-        action_id,
-      };
-      const mockHandler = async () => Promise.reject();
-      const spy = sinon.spy(mockHandler);
-      // add a blockAction handlers
-      testFunc.blockAction(goodConstraints, spy);
-
-      // set up event args
-      const fakeArgs = {
-        next: () => {},
-        payload: {
+        await testFunc.runInteractivityHandlers(fakeArgs);
+        assert(spy.calledOnce);
+        assert(spy2.calledOnce);
+      });
+      it('app.function.blockAction() should error if a promise rejects', async () => {
+        const mockFunctionCallbackId = 'reverse_approval';
+        const { SlackFunction } = await importSlackFunctionModule(withMockValidManifestUtil(mockFunctionCallbackId));
+        const testFunc = new SlackFunction(mockFunctionCallbackId, async () => {});
+        const action_id = 'my-action';
+        const goodConstraints: ActionConstraints = {
           action_id,
-        },
-        body: {
-          function_data: {
-            execution_id: 'asdasdas',
+        };
+        const mockHandler = async () => Promise.reject();
+        const spy = sinon.spy(mockHandler);
+        // add a blockAction handlers
+        testFunc.blockAction(goodConstraints, spy);
+
+        // set up event args
+        const fakeArgs = {
+          next: () => {},
+          payload: {
+            action_id,
           },
-        },
-        client: {} as WebClient,
-      } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
+          body: {
+            function_data: {
+              execution_id: 'asdasdas',
+            },
+          },
+          client: {} as WebClient,
+        } as unknown as AnyMiddlewareArgs & AllMiddlewareArgs;
 
-      // ensure handler call rejects
+        // ensure handler call rejects
 
-      const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
-      assertNode.rejects(shouldReject);
+        const shouldReject = async () => testFunc.runInteractivityHandlers(fakeArgs);
+        assertNode.rejects(shouldReject);
+      });
     });
   });
   describe('isFunctionExecutedEvent()', () => {
