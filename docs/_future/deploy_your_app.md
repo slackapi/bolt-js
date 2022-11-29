@@ -21,7 +21,7 @@ In this guide, you will find the steps needed to prepare and deploy your app to 
 
 ### Before you begin {#before-you-begin}
 
-Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript migration guide](/bolt-js/future/migrate-existing-app).
+Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript setup guide](/bolt-js/future/setup-existing-app).
 
 Additionally, you will need to have at least one Trigger created for your application to confirm that your application has successfully deployed to Heroku. If you haven't created one yet, you can learn about [the different types of Triggers](/bolt-js/future/triggers#types) and [how to create a Trigger](/bolt-js/future/triggers#create) for tapping into your Workflows.
 
