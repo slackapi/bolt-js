@@ -202,9 +202,42 @@ export class SlackFunction {
   }
 
   /**
-   * Attach a block_suggestion interactivity handler to your SlackFunction
+   * Attach a block_actions interactivity handler to your SlackFunction.
+   * This function is added as an alias for the action() function to create
+   * consistency with having a blockSuggestion() function.
    *
    * ```
+   * Example:
+   * const actionHandler = async () => {};
+   * const actionHandler1 = async () => {};
+   * myFunc.blockAction("id", actionHandler).blockAction("id1", actionHandler1);
+   * ```
+   *
+   * @param actionIdOrConstraints Provide an action_id string
+   * corresponding to the value supplied in your blocks or a
+   * constraint object of type ActionConstraints<SlackAction>
+   *
+   * ```
+   * Example:
+   * myFunc.blockAction({ type: "action_submission" });
+   * myFunc.blockAction({ action_id: "id" }, actionHandler);
+   * ```
+   * @param handler Provide a handler function
+   * @returns SlackFunction instance
+   */
+  public blockAction<
+     Action extends SlackAction = SlackAction,
+     Constraints extends ActionConstraints<Action> = ActionConstraints<Action>,
+   >(
+    actionIdOrConstraints: string | RegExp | Constraints,
+    handler: Middleware<SlackActionMiddlewareArgs>,
+  ): this {
+    return this.action.apply(this, [actionIdOrConstraints, handler]);
+  }
+
+  /**
+   * Attach a block_suggestion interactivity handler to your SlackFunction
+   *
    * @param handler Provide a handler function
    * @returns SlackFunction instance
    */
