@@ -4,6 +4,7 @@ order: 9
 slug: setup-existing-app
 lang: en
 layout: tutorial
+redirect_from: /future/migrate-existing-app
 permalink: /future/setup-existing-app
 ---
 

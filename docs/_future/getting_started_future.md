@@ -36,7 +36,7 @@ If you'd like to deploy your app with Slack infrastructure, consider building yo
 
 To build a next-generation app with Bolt for JavaScript, you'll first need to get the Slack CLI set up on your machine. You can follow the [Quickstart Guide](https://api.slack.com/future/quickstart) to get instructions on how to manually or automatically install it based on your operating system. 
 
-Since we won't be using Deno to build or migrate our next-generation app, you can skip any instructions related to installing Deno or creating an app using a Deno template. Once you've logged into the CLI using `slack login` and verified your login using `slack auth list`, you can proceed with the instructions in this guide.
+Since we won't be using Deno to build or setup an existing next-generation app, you can skip any instructions related to installing Deno or creating an app using a Deno template. Once you've logged into the CLI using `slack login` and verified your login using `slack auth list`, you can proceed with the instructions in this guide.
 
 > 💡 When logging into a workspace using the CLI, we recommend using a workspace where you won't disrupt real work getting done. Currently the new Slack Platform beta is only available for workspaces on a paid plan.
 
@@ -57,7 +57,7 @@ In order to use the next-generation platform features, you'll need to accept a T
 > 💡 You must be an admin of your workspace to be able to access the Workspace Settings and accept the Terms of Service.
 
 
-Congratulations! You're now ready to start building using the [next-generation Platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with either creating a new app by following the instructions below or [migrating an existing app](/bolt-js/future/migrate-existing-app).
+Congratulations! You're now ready to start building using the [next-generation Platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with either creating a new app by following the instructions below or [setting up an existing app](/bolt-js/future/setup-existing-app).
 
 ---
 
