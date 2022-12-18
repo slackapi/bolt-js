@@ -26,16 +26,16 @@ app.options('external_action', async ({ options, ack }) => {
     // Collect information in options array to send in Slack ack response
     for (const result of results) {
       options.push({
-        "text": {
-          "type": "plain_text",
-          "text": result.label
+        text: {
+          type: "plain_text",
+          text: result.label
         },
-        "value": result.value
+        value: result.value
       });
     }
 
     await ack({
-      "options": options
+      options: options
     });
   } else {
     await ack();
