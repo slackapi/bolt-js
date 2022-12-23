@@ -30,6 +30,7 @@ const app = new App({
   installationStore: new FileInstallationStore(),
 });
 ```
+
 :warning: This is **_not_** recommended for use in production - you should implement your own production store. Please see the example code to the right and [our other examples](https://github.com/slackapi/bolt-js/tree/main/examples/oauth).
 
 ---
@@ -49,7 +50,9 @@ const app = new App({
 
 
 ---
+
 ##### Redirect URI
+
 Bolt for JavaScript provides a **Redirect URI Path** `/slack/oauth_redirect`. Slack uses the Redirect URI to redirect users after they complete an app's installation flow. 
 
 💡 You will need to add the full **Redirect URI** including your app domain in your Slack app configuration settings under **OAuth and Permissions**, e.g. `https://example.com/slack/oauth_redirect`. 
@@ -71,7 +74,9 @@ const app = new App({
 ```
 
 ---
+
 ##### Installation object
+
 Bolt will pass your `installationStore`'s `storeInstallation` handler an `installation`. This can be a source of confusion for developers who aren't sure what shape of object to expect. The `installation` object should resemble:
 
 ```javascript
@@ -93,6 +98,7 @@ Bolt will pass your `installationStore`'s `storeInstallation` handler an `instal
   }
 }
 ```
+
 Bolt will pass your `fetchInstallation` and `deleteInstallation` handlers an `installQuery` object:
 
 ```javascript
@@ -106,7 +112,9 @@ Bolt will pass your `fetchInstallation` and `deleteInstallation` handlers an `in
 ```
 
 ---
+
 ##### Org-wide installation
+
 To add support for [org-wide installations](https://api.slack.com/enterprise/apps), you will need Bolt for JavaScript version `3.0.0` or later. Make sure you have enabled org-wide installation in your app configuration settings under **Org Level Apps**.
 
 Installing an [org-wide](https://api.slack.com/enterprise/apps) app from admin pages requires additional configuration to work with Bolt. In that scenario, the recommended `state` parameter is not supplied. Bolt will try to verify `state` and stop the installation from progressing. 
