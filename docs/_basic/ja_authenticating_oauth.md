@@ -45,7 +45,25 @@ const app = new App({
 
 ##### Redirect URI
 
-Bolt for JavaScript は、アプリのインストールフローを完了した後の遷移先の URL である **Redirect URL** のためのパスとして `slack/oauth_redirect` を有効にします。この URL を Slack アプリの設定画面の **OAuth and Permissions** セクション内で **Redirect URL** として指定してください。この設定のカスタマイズは以下で説明する `installerOptions` を指定することで可能です。
+Bolt for JavaScript は、アプリのインストールフローを完了した後の遷移先の URL である **Redirect URL** のためのパスとして `slack/oauth_redirect` を有効にします。
+
+💡 アプリのドメインを含んだ **Redirect URI** （絶対 URI）を Slack アプリの設定画面の **OAuth and Permissions** セクション内で設定してください。（例 `https://example.com/slack/oauth_redirect` ）。
+
+独自の **Redirect URI** を使う場合、 App クラスの引数 `redirectUri` と `installerOptions.redirectUriPath` にも設定してください。 両方とも設定する必要があり、矛盾のない絶対 URI である必要があります。
+
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: 'my-state-secret',
+  scopes: ['chat:write'],
+  redirectUri: 'https://example.com/slack/redirect', // ココ
+  installerOptions: {
+    redirectUriPath: '/slack/redirect', // そして、ココ！
+  },
+});
+```
 
 ##### Installation object
 
