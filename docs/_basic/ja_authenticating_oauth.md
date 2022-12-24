@@ -106,6 +106,22 @@ Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `instal
 
 [Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
 
+管理者画面からの [Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps) の場合、 Bolt で動作させようとすると追加設定が必要です。この場合、推奨されている `state` パラメータが提供されません。 Bolt では `state` による認証を実行しようとし、インストールが止まります。
+
+Bolt では、App の `stateVerification` オプションを false にすることで、 state による認証を無効にできます。以下の例を参考にしてください。
+
+```javascript
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  scopes: ['chat:write'],
+  installerOptions: {
+    stateVerification: false,
+  },
+});
+```
+
 Slack の OAuth インストールフローについてもっと知りたい場合は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
 
 </div>
