@@ -103,7 +103,7 @@ Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `instal
 ```
 
 
-##### Org-wide installation
+##### OrG 全体へのインストール
 
 [Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
 
