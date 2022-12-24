@@ -6,7 +6,7 @@ order: 15
 ---
 
 <div class="section-content">
-複数のワークスペースにインストールされる Slack アプリは OAuth フローを実装し、アクセストークンなどのインストール時に取得した情報をセキュアな方法で保存しておく必要があります。Bolt for JavaScript では、`clientId`、`clientSecret`、`stateSecret`、`scopes` を `App` 初期化時に指定すると OAuth フローのためのルートのセットアップや state パラメーターを検証する機能が有効になります。組み込みの OAuth サポートモジュールは `ExpressReceiver` を使用している場合のみ利用可能です。もしカスタムのレシーバーを実装して利用している場合は、私たちが提供している [OAuth ライブラリ](https://slack.dev/node-slack-sdk/oauth#slack-oauth)を利用していください。 Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
+複数のワークスペースにインストールされる Slack アプリは OAuth フローを実装し、アクセストークンなどのインストール時に取得した情報をセキュアな方法で保存しておく必要があります。Bolt for JavaScript では、`clientId`、`clientSecret`、`stateSecret`、`scopes` を `App` 初期化時に指定すると OAuth フローのためのルートのセットアップや state パラメーターを検証する機能が有効になります。
 
 OAuth を有効にするために必要なもの:
 * `clientId`, `clientSecret`, `stateSecret`, `scopes` _(必須)_
@@ -41,7 +41,7 @@ const app = new App({
 
 * アプリはすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳細は [OAuth ライブラリのドキュメント](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
-* 💡 Bolt for JavaScript は [カスタムのレシーバー](#receiver) による OAuth をサポートしていません。もしカスタムのレシーバーを実装したいのであれば、既に検証された [Slack OAuth library](https://slack.dev/node-slack-sdk/oauth#slack-oauth) を使うこともできます。
+* 💡 Bolt for JavaScript は [カスタムのレシーバー](#receiver) による OAuth をサポートしていません。もしカスタムのレシーバーを実装したいのであれば、私たちが提供している [OAuth ライブラリ](https://slack.dev/node-slack-sdk/oauth#slack-oauth) を使うこともできます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
 
 ##### Redirect URI
 
