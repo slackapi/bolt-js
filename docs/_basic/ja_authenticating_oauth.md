@@ -8,6 +8,10 @@ order: 15
 <div class="section-content">
 複数のワークスペースにインストールされる Slack アプリは OAuth フローを実装し、アクセストークンなどのインストール時に取得した情報をセキュアな方法で保存しておく必要があります。Bolt for JavaScript では、`clientId`、`clientSecret`、`stateSecret`、`scopes` を `App` 初期化時に指定すると OAuth フローのためのルートのセットアップや state パラメーターを検証する機能が有効になります。組み込みの OAuth サポートモジュールは `ExpressReceiver` を使用している場合のみ利用可能です。もしカスタムのレシーバーを実装して利用している場合は、私たちが提供している [OAuth ライブラリ](https://slack.dev/node-slack-sdk/oauth#slack-oauth)を利用していください。 Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
 
+OAuth を有効にするために必要なもの:
+* `clientId`, `clientSecret`, `stateSecret`, `scopes` _(必須)_
+* `installationStore` は、データベースへのアプリ情報の読み込みと書き込みをするハンドラーのオプションです *(任意、プロダクションコードにおいては強く推奨)*
+
 ##### 開発とテスト
 
 開発とテストにおいて利用可能な `installationStore` オプションの実装 `FileInstallationStore` を Bolt は既に用意しています。
