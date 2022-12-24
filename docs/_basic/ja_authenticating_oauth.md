@@ -65,8 +65,41 @@ const app = new App({
 });
 ```
 
-##### Installation object
+##### Installation オブジェクト
 
+Bolt は `installationStore` の `storeInstallation` ハンドラーに `installation` オブジェクトを渡します。開発者にはオブジェクトの定義が想像しがたく不明瞭かもしれないので、 `installation` オブジェクトのサンプルを載せます:
+
+```javascript
+{
+  team: { id: 'T012345678', name: 'example-team-name' },
+  enterprise: undefined,
+  user: { token: undefined, scopes: undefined, id: 'U01234567' },
+  tokenType: 'bot',
+  isEnterpriseInstall: false,
+  appId: 'A01234567',
+  authVersion: 'v2',
+  bot: {
+    scopes: [
+      'chat:write',
+    ],
+    token: 'xoxb-244493-28*********-********************',
+    userId: 'U012345678',
+    id: 'B01234567'
+  }
+}
+```
+
+Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `installQuery` オブジェクトを渡します:
+
+```javascript
+{
+  userId: 'U012345678',
+  isEnterpriseInstall: false,
+  teamId: 'T012345678',
+  enterpriseId: undefined,
+  conversationId: 'D02345678'
+}
+```
 
 
 ##### Org-wide installation
