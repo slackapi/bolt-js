@@ -46,7 +46,7 @@ const app = new App({
 
 ##### Redirect URI
 
-Bolt for JavaScript は、アプリのインストールフローを完了した後の遷移先の URL である **Redirect URL** のためのパスとして `slack/oauth_redirect` を有効にします。
+Bolt for JavaScript は、アプリのインストールフローを完了した後の遷移先の URL である **Redirect URI** のためのパスとして `/slack/oauth_redirect` を有効にします。
 
 💡 アプリのドメインを含んだ **Redirect URI** （絶対 URI）を Slack アプリの設定画面の **OAuth and Permissions** セクション内で設定してください。（例 `https://example.com/slack/oauth_redirect` ）。
 
