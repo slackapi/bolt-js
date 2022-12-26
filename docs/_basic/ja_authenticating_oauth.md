@@ -50,7 +50,7 @@ Bolt for JavaScript は、アプリのインストールフローを完了した
 
 💡 アプリのドメインを含んだ **Redirect URI** （絶対 URI）を Slack アプリの設定画面の **OAuth and Permissions** セクション内で設定してください。（例 `https://example.com/slack/oauth_redirect` ）。
 
-独自の **Redirect URI** を使う場合、 App クラスの引数 `redirectUri` と `installerOptions.redirectUriPath` にも設定してください。 両方とも設定する必要があり、矛盾のない絶対 URI である必要があります。
+カスタムの **Redirect URI** を使う場合、 App クラスの引数 `redirectUri` と `installerOptions.redirectUriPath` にも設定してください。 両方とも設定する必要があり、また、矛盾のないフル URI である必要があります。
 
 ```javascript
 const app = new App({
