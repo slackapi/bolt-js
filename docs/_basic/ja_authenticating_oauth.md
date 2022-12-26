@@ -90,7 +90,7 @@ Bolt は `installationStore` の `storeInstallation` ハンドラーに `install
 }
 ```
 
-Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `installQuery` オブジェクトを渡します:
+Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `installQuery` オブジェクトを渡します：
 
 ```javascript
 {
