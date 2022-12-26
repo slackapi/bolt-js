@@ -15,7 +15,7 @@ OAuth を有効にするために必要なもの:
 
 ##### 開発とテスト
 
-開発とテストにおいて利用可能な `installationStore` オプションの実装 `FileInstallationStore` を Bolt は既に用意しています。
+開発・テストの際に利用することを想定して `installationStore` オプションのデフォルト実装である `FileInstallationStore` を提供しています。
 
 ```javascript
 const { App } = require('@slack/bolt');
