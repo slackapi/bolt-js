@@ -7,7 +7,7 @@ order: 15
 
 <div class="section-content">
 Slack アプリの配布を行うには Bolt による OAuth フローを実装し、インストール時に取得した情報をセキュアな方法で保存しておく必要があります。
-Bolt は OAuth による認証そのものと、OAuth ルーティング、 state にる認証、保存すべきインストール情報の受け渡しなどの周辺機能もサポートしています。
+Bolt は OAuth フローそのものに加えて OAuth のためのルーティング、 state パラメーターの検証、保存するためのインストール情報をアプリに受け渡す、などの処理をハンドリングします。
 
 OAuth を有効にするために、以下を提供する必要があります：
 * `clientId`, `clientSecret`, `stateSecret`, `scopes` _(必須)_
