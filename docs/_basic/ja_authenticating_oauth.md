@@ -29,7 +29,7 @@ const app = new App({
   installationStore: new FileInstallationStore(),
 });
 ```
-:warning: プロダクションコードとしての利用は **推奨しません** ので、自前で実装する必要があります。サンプルコードとして [OAuth の別の実装例](https://github.com/slackapi/bolt-js/tree/main/examples/oauth)を参照してください。
+:warning: 本番運用での利用は **推奨しません** ので、本番向けのデータストアはご自身で実装する必要があります。サンプルコードとして [OAuth の他の実装例](https://github.com/slackapi/bolt-js/tree/main/examples/oauth)を参照してください。
 
 ##### アプリのインストール
 
