@@ -38,7 +38,7 @@ const app = new App({
 
 * **Add to Slack (Slack へ追加)**: `Add to Slack` ボタンを押すと Slack との OAuth プロセスを開始します。ユーザーがアプリへの権限付与を許可すると、Slack はアプリの **Redirect URI** （あらかじめ設定されています）へユーザーを誘導し、処理が正常に完了したらユーザーに **Slack で開く** よう促します。これらの設定をカスタマイズする方法については、後述の **Redirect URI** セクションを参照してください。
 
-* **Slack で開く**: ユーザーが **Open Slack** した後、 and here after as your app processes events from Slack, your provided `installationStore`'s `fetchInstallation` と `storeInstallation` ハンドラーが実行されます。ハンドラーに渡す引数についてもっと詳細が知りたい場合、 **Installation Object** セクションを参照してください。
+* **Slack で開く**: ユーザーが **Slack で開く** を選択した後、アプリが Slack からのイベントをするときに `installationStore` の `fetchInstallation` や `storeInstallation` ハンドラーが実行されます。ハンドラーに渡す引数に関するより詳しい情報は  **Installation Object** セクションを参照してください。
 
 * アプリはすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳細は [OAuth ライブラリのドキュメント](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
