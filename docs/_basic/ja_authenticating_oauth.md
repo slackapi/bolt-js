@@ -61,7 +61,7 @@ const app = new App({
   scopes: ['chat:write'],
   redirectUri: 'https://example.com/slack/redirect', // ここに設定します
   installerOptions: {
-    redirectUriPath: '/slack/redirect', // そして、ココ！
+    redirectUriPath: '/slack/redirect', // ここにも！
   },
 });
 ```
