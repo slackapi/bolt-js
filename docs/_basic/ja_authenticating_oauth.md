@@ -123,7 +123,7 @@ const app = new App({
 });
 ```
 
-Slack の OAuth インストールフローについてもっと知りたい場合は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
+Slack の OAuth インストールフローについてのより詳細な情報は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
 
 </div>
 
