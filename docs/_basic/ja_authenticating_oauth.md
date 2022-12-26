@@ -34,7 +34,7 @@ const app = new App({
 ##### アプリのインストール
 
 * **インストールの開始**: Bolt for JavaScript は `/slack/install` という **インストール用のパス** を生成します。これは、有効な `state` パラメータを生成した上で Slack アプリの直接のインストールを開始するための `Add to Slack` ボタンを含むページを応答する URL です。 _www.example.com_ でホスティングされているアプリの場合、インストールページは _www.example.com/slack/install_ となります。
-  * 💡 `App` コンストラクタ内で `installerOptions.directInstall: true` と設定することで、デフォルトのウェブページを描画しない代わりに、ユーザーへ Slack の認証 URL を出すことができます（[例](https://github.com/slackapi/bolt-js/blob/5b4d9ceb65e6bf5cf29dfa58268ea248e5466bfb/examples/oauth/app.js#L58-L64)）。
+  * 💡 `App` コンストラクタ内で `installerOptions.directInstall: true` を設定すると、デフォルトのウェブページを描画する代わりに、ユーザーを直接 Slack の authorize URL に誘導することができます（[例](https://github.com/slackapi/bolt-js/blob/5b4d9ceb65e6bf5cf29dfa58268ea248e5466bfb/examples/oauth/app.js#L58-L64)）。
 
 * **Slack へ追加**: `Add to Slack` ボタンを押すと Slack との OAuth プロセスを開始します。ユーザーがアプリへの権限付与を許可した後、 Slack はアプリの **Redirect URI** （既に設定済み）を呼び出し, ユーザーに **Open Slack** を促します。詳細に設定を変えたい場合は **Redirect URI** セクションを参照してください。
 
