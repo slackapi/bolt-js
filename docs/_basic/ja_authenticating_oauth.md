@@ -68,7 +68,7 @@ const app = new App({
 
 ##### Installation オブジェクト
 
-Bolt は `installationStore` の `storeInstallation` ハンドラーに `installation` オブジェクトを渡します。開発者にはオブジェクトの定義が想像しがたく不明瞭かもしれないので、 `installation` オブジェクトのサンプルを載せます:
+Bolt は `installationStore` の `storeInstallation` ハンドラーに `installation` オブジェクトを渡します。どのようなオブジェクトの形式となるか想像しづらいと開発時に混乱の元になるかもしれません。`installation` オブジェクトはこのような形式となります：
 
 ```javascript
 {
