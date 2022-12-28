@@ -13,6 +13,9 @@ Actions can be filtered on an `action_id` of type string or RegExp object. `acti
 You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](#acknowledge).
 
 *Note: Since v2, message shortcuts (previously message actions) now use the `shortcut()` method instead of the `action()` method. View the [migration guide for V2](https://slack.dev/bolt/tutorial/migration-v2) to learn about the changes.*
+
+Learn more about the `block_actions` payload, [here](https://api.slack.com/reference/interaction-). To access the full payload of a view from within a listener, reference the `body` argument within your callback function.
+
 </div>
 
 ```javascript
