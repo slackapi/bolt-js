@@ -146,7 +146,7 @@ const app = new App({
 });
 ```
 
-最後に、アプリのソースコードの末尾にある [HTTP サーバーを起動する部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L40-L45)を編集して、AWS Lambda 関数のイベントに応答するようにします。
+最後に、アプリのソースコードの末尾にある [HTTP サーバーを起動する部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L47-L52)を編集して、AWS Lambda 関数のイベントに応答するようにします。
 
 ```javascript
 // Lambda 関数のイベントを処理します
@@ -211,6 +211,7 @@ npm install --save-dev serverless-offline
 ```zsh
 serverless offline --noPrependStageInUrl
 ```
+
 > 🏌️ Pro-tip: 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
 
 次に、ngrok を使って Slack のイベントをローカルマシンに転送します。
