@@ -147,7 +147,7 @@ const app = new App({
 });
 ```
 
-Finally, at the bottom of your app, update the [source code that starts the HTTP server](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L40-L45) to now respond to an AWS Lambda function event:
+Finally, at the bottom of your app, update the [source code that starts the HTTP server](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L47-L52) to now respond to an AWS Lambda function event:
 
 ```javascript
 // Handle the Lambda function event
