@@ -24,7 +24,7 @@ The next-generation platform is an exciting new way to develop apps for Slack! I
 
 #### Limitations
 
-Today, Bolt for JavaScript supports app development using next-gen platform features like Functions and Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
+Today, Bolt for JavaScript supports app development using next-gen platform features like functions and workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
 
 We do not yet support deployment to secure and managed Slack infrastructure or Datastores API [Datastores](https://api.slack.com/future/datastores) functionality.
 
@@ -69,7 +69,7 @@ To create the app, you'll run the following command:
 ```
 slack create my-app -t slack-samples/bolt-js-starter-template -b future
 ```
-This command creates an app through the CLI by cloning a specified template. In this case, the template is the [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future) on the `future` branch. This starter template includes a "Hello World" example that demonstrates how to use [built-in](/bolt-js/future/built-in-functions) and [custom](/bolt-js/future/custom-functions) Functions, [Triggers](/bolt-js/future/triggers), and [Workflows](/bolt-js/future/workflows).
+This command creates an app through the CLI by cloning a specified template. In this case, the template is the [Bolt for JavaScript Starter Template](https://github.com/slack-samples/bolt-js-starter-template/tree/future) on the `future` branch. This starter template includes a "Hello World" example that demonstrates how to use [built-in](/bolt-js/future/built-in-functions) and [custom](/bolt-js/future/custom-functions) functions, [triggers](/bolt-js/future/triggers), and [workflows](/bolt-js/future/workflows).
 
 The application will take a few moments to set up and clone the repository. Once the app is successfully created, you should see a message like this:
 ```
@@ -93,11 +93,11 @@ Your app has now been created in the `my-app` directory! This application can be
 ---
 ### Set up your trigger {#setup-trigger}
 
-As mentioned, this app comes with preexisting functionality - it uses Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+As mentioned, this app comes with preexisting functionality - it uses functions, workflows and a trigger set up to kick things off. Let's run a command to initialize that trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
-Then, run the following command to create a Trigger:
+Then, run the following command to create a trigger:
 ```
 slack triggers create --trigger-def "triggers/hello-world-trigger.json"      
 ```
@@ -111,12 +111,12 @@ The above command will create a trigger for the selected workspace. Make sure to
    Trigger Name: Sample Trigger
    URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
-The provided URL will be what you use to run your Trigger. Copy this URL and save it somewhere; you'll need it for later.
+The provided URL will be what you use to run your trigger. Copy this URL and save it somewhere; you'll need it for later.
 
 ---
 ### Run your app {#run-your-app}
 
-Now that your app and Trigger are successfully created, let's try running it!
+Now that your app and trigger are successfully created, let's try running it!
 
 Run `slack run` to start up the app. Executing `slack run` starts a local development server, syncing changes to your workspace's development version of your app.
 
@@ -128,9 +128,9 @@ Once the app is successfully run, you'll see output in your Terminal to indicate
 
 ### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
+With your app running, access your workspace and paste the URL from the trigger you created in the previous step into a message in a public channel.
 
-> 💡 App Triggers are automatically saved as a channel bookmark under "Workflows" for easy access.
+> 💡 App triggers are automatically saved as a channel bookmark under "Workflows" for easy access.
 
 Send the message and click the "Run" button that appears. A modal will appear prompting you to enter information to greet someone in your Slack workspace. Fill out the requested information.
 
@@ -145,5 +145,5 @@ The full app flow can be seen here:
 
 ### Next steps {#next-steps}
 
-Now we have a working instance of a next-generation app in your workspace and you've seen it in action! You can explore on your own and dive into the code yourself here or continue your learning journey by diving into [App Manifests](/bolt-js/future/app-manifests) or looking into adding more [Functions](/bolt-js/future/built-in-functions), [Workflows](/bolt-js/future/workflows), and [Triggers]() to your app!
+Now we have a working instance of a next-generation app in your workspace and you've seen it in action! You can explore on your own and dive into the code yourself here or continue your learning journey by diving into [app manifests](/bolt-js/future/app-manifests) or looking into adding more [functions](/bolt-js/future/built-in-functions), [workflows](/bolt-js/future/workflows), and [triggers]() to your app!
 

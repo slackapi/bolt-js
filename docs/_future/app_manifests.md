@@ -82,9 +82,9 @@ The properties in the Manifest are:
 | `longDescription` | String | ✅ Yes | (Optional) A more detailed description of your application |
 | `icon` | String | ❌ No | A relative path to an image asset to use for the app's icon. Your app's profile picture that will appear in the Slack client |
 | `backgroundColor` | String | ✅ Yes | (Optional) A six digit combination of numbers and letters (the hexadecimal color code) that make up the color of your app background e.g., "#000000" is the color black |
-| `botScopes` | Array<string> | ✅ Yes | A list of [scopes](/scopes), or permissions, the app's Functions require |
-| `functions` | Array | ✅ Yes | (Optional) A list of all Functions your app will use |
-| `workflows` | Array | ✅ Yes | (Optional) A list of all Workflows your app will use |
+| `botScopes` | Array<string> | ✅ Yes | A list of [scopes](/scopes), or permissions, the app's functions require |
+| `functions` | Array | ✅ Yes | (Optional) A list of all functions your app will use |
+| `workflows` | Array | ✅ Yes | (Optional) A list of all workflows your app will use |
 | `outgoingDomains` | Array<string> | ✅ Yes | (Optional) If your app communicates to any external domains, list them here. Note that the outgoing domains are only restricted if the workspace has Admin approved apps on e.g., myapp.tld |
 | `events` | Array | ✅ Yes | (Optional) A list of all Event structures that the app is expecting to be passed via [Message Metadata](/metadata/using) |
 | `types` | Array | ✅ Yes | (Optional) A list of all [custom types](https://api.slack.com/future/types/custom) your app will use |

@@ -9,7 +9,7 @@ permalink: /future/custom-functions
 # Custom functions <span class="label-beta">BETA</span>
 
 <div class="section-content">
-On the next-generation platform, you can build **custom functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [Workflows](/bolt-js/future/workflows)&mdash;and Workflows are invoked by [Triggers](/bolt-js/future/triggers).
+On the next-generation platform, you can build **custom functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [workflows](/bolt-js/future/workflows)&mdash;and workflows are invoked by [triggers](/bolt-js/future/triggers).
 
 To create a function, we need to do the following: 
 - [define the function](#define) in the Manifest;
@@ -56,11 +56,11 @@ const SampleFunctionDefinition = DefineFunction({
 module.exports = { SampleFunctionDefinition };
 ```
 
-Note that we import `DefineFunction`, which is used for defining our function, and also `Schema`, which has information on supported [Built-in types](https://api.slack.com/future/types).
+Note that we import `DefineFunction`, which is used for defining our function, and also `Schema`, which has information on supported [built-in types](https://api.slack.com/future/types).
 
-Just like [Workflows](/bolt-js/future/workflows), Custom functions have a unique `callback_id` and also require a `title`. Additionally, you can set inputs and outputs just like you can with Workflows. 
+Just like [workflows](/bolt-js/future/workflows), custom functions have a unique `callback_id` and also require a `title`. Additionally, you can set inputs and outputs just like you can with workflows. 
 
-Here's all the fields you can use when defining a Custom function:
+Here's all the fields you can use when defining a custom function:
 
 | Field | Expected value |
 | ---- | ------------------ |
@@ -71,7 +71,7 @@ Here's all the fields you can use when defining a Custom function:
 | `output_parameters` | An object which describes one or more output parameters that will be returned by your function. This object follows the exact same pattern as `input_parameters`: top-level properties of the object define output parameter names, with the property values further describe the type and description of each individual output parameter. |
 
 The value for properties in `input_parameters` and `output_parameters` needs to be an object with further sub-properties:
-  * `type`: The type of the input parameter. This can be a [Built-in type](https://api.slack.com/future/types) or a [Custom type](https://api.slack.com/future/types/custom) that you define.
+  * `type`: The type of the input parameter. This can be a [built-in type](https://api.slack.com/future/types) or a [custom type](https://api.slack.com/future/types/custom) that you define.
   * `description`: A string description of the parameter.
 
 If you want to set a property as required, list its name in its respective input or output properties as a `required` property.
@@ -92,7 +92,7 @@ input_parameters: {
 
 Functions can (and generally should) declare inputs and outputs. 
 
-Inputs are declared in the `input_parameters` property, and outputs are declared in the `output_parameters` property. Each can contain either [Built-in types](https://api.slack.com/future/types) or [Custom types](https://api.slack.com/future/types/custom) that you define.
+Inputs are declared in the `input_parameters` property, and outputs are declared in the `output_parameters` property. Each can contain either [built-in types](https://api.slack.com/future/types) or [custom types](https://api.slack.com/future/types/custom) that you define.
 
 While, strictly speaking, input and output parameters are optional, they are a common and standard way to pass data between functions and nearly any function you write will expect at least one input and pass along an output.
 
@@ -102,7 +102,7 @@ Once your function is defined in its own file in `manifest/functions`, the next 
 
 ---
 
-### Implementing a Function Listener {#implement}
+### Implementing a function listener {#implement}
 
 Implement functions in just a few steps:
 
@@ -120,7 +120,7 @@ To do this, create a file in `listeners/functions` directory for your function l
 // For more information about functions: https://api.slack.com/future/functions
 const { SlackFunction } = require('@slack/bolt');
 
-// Get our Function Definition from the manifest!
+// Get our function Definition from the manifest!
 const { SampleFunctionDefinition } = require('../../manifest/functions/sample-function');
 
 // Here is the work we want to do!
@@ -138,14 +138,14 @@ const helloWorld = async ({ event, complete }) => {
   }
 };
 
-// Let's create a new Slack Function with helloWorld as its handler
+// Let's create a new Slack function with helloWorld as its handler
 const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld);
 
 module.exports = { helloWorldFunc };
 ```
 The `hello-world.js` file declares a function handler, `helloWorld`, that takes in inputs from the `event`, which is the payload received when your function is being executed. It executes logic within the handler to return a message with a random greeting. This message is the function's output. In addition to the function handler, a new `SlackFunction` instance is declared that actually links the `helloWorld` handler to `SampleFunctionDefinition` through the function's ID:
 ```js
-// Let's create a new Slack Function with helloWorld as its handler
+// Let's create a new Slack function with helloWorld as its handler
 const helloWorldFunc = new SlackFunction(SampleFunctionDefinition.id, helloWorld);
 ```
 
@@ -162,7 +162,7 @@ module.exports.register = (app) => {
 ```
 
 
-Lastly, in order to make sure this handler is triggered, make sure the Function listeners are registered in your `listeners/index.js` file:
+Lastly, in order to make sure this handler is triggered, make sure the function listeners are registered in your `listeners/index.js` file:
 ```js
 // listeners/index.js
 const functions = require('./functions');
@@ -172,8 +172,8 @@ module.exports.registerListeners = (app) => {
 };
 ```
 #### 3. Add the function as a step in your workflow
-To actually call the defined function, `SampleFunctionDefinition`, don't forget to add your function to a workflow! When you're finished defining and implementing your functions, the next step is to add them to [Workflows](/bolt-js/future/workflows). Once added as a step in a Workflow, your Function will run when that Workflow is invoked by a [Trigger](/bolt-js/future/triggers).
+To actually call the defined function, `SampleFunctionDefinition`, don't forget to add your function to a workflow! When you're finished defining and implementing your functions, the next step is to add them to [workflows](/bolt-js/future/workflows). Once added as a step in a workflow, your function will run when that workflow is invoked by a [trigger](/bolt-js/future/triggers).
 
 ---
 ### Next steps
-You've learned about built-in and custom functions - now it's time to jump into [Workflows](/bolt-js/future/workflows) and learn about how they work with Functions. 🎉
+You've learned about built-in and custom functions - now it's time to jump into [workflows](/bolt-js/future/workflows) and learn about how they work with functions. 🎉
