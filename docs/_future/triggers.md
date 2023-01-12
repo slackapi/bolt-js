@@ -11,9 +11,9 @@ permalink: /future/triggers
 <div class="section-content">
 Triggers are but one of the three building blocks that make up next-generation Slack apps. You will encounter all three as you walk the path of building your Slack app:
 
-1. Functions are what define the actions of your app
-2. Workflows are made up of functions
-3. Triggers are how workflows are executed (⬅️ you are here)
+1. Functions define the actions of your app
+2. Workflows group functions into ordered steps
+3. Triggers invoke workflows (⬅️ you are here)
 
 Since triggers kick off workflows, you need to have a workflow before you can create a trigger. Acquaint yourself with the [documentation on workflows](/bolt-js/future/workflows), then head back here. We'll wait!
 

@@ -108,7 +108,7 @@ To specify the start command of your app for Heroku, [a special file called `Pro
 
 The contents of this file will vary depending on if your app connects with [Socket Mode](https://api.slack.com/apis/connections/socket) or uses public HTTP endpoints to handle requests. To check whether Socket Mode is enabled for your application, you can either:
 
-* Check your app's [Manifest](/bolt-js/future/app-manifests) to see if `socketModeEnabled: true`, or
+* Check your app's [manifest](/bolt-js/future/app-manifests) to see if `socketModeEnabled: true`, or
 * Visit the "Socket Mode" section on your app's [App Config page](https://api.slack.com/apps) to check if Socket Mode has been enabled:
 
 <img width="670" alt="The toggle for connecting with Socket Mode on the App Config page is enabled" src="https://user-images.githubusercontent.com/12901850/197868321-63fff839-a3a2-4926-ae45-93c9d88cfd41.png">

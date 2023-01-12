@@ -214,7 +214,7 @@ module.exports = { SayHelloWorkflow };
 
 ```
 
-Below in the Manifest, the `SayHelloWorkflow` is imported and passed in:
+Below in the manifest, the `SayHelloWorkflow` is imported and passed in:
 ```javascript
 // manifest/manifest.js
 const { Manifest } = require('@slack/bolt');

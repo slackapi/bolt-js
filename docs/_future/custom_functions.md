@@ -12,7 +12,7 @@ permalink: /future/custom-functions
 On the next-generation platform, you can build **custom functions**, reusable building blocks of automation that are deployed to our infrastructure and accept inputs, perform some calculations, and provide outputs. Functions can be used as steps in [workflows](/bolt-js/future/workflows)&mdash;and workflows are invoked by [triggers](/bolt-js/future/triggers).
 
 To create a function, we need to do the following: 
-- [define the function](#define) in the Manifest;
+- [define the function](#define) in the manifest;
 - [implement the function](#implement) in its respective source file;
 </div>
 

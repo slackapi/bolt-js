@@ -71,7 +71,7 @@ module.exports = Manifest({
 
 ### Manifest properties {#manifest-properties}
 
-The properties in the Manifest are:
+The properties in the manifest are:
 
 |Property|Type|Has Bolt support?|Description|
 |---|---|---|---|
@@ -86,15 +86,15 @@ The properties in the Manifest are:
 | `functions` | Array | ✅ Yes | (Optional) A list of all functions your app will use |
 | `workflows` | Array | ✅ Yes | (Optional) A list of all workflows your app will use |
 | `outgoingDomains` | Array<string> | ✅ Yes | (Optional) If your app communicates to any external domains, list them here. Note that the outgoing domains are only restricted if the workspace has Admin approved apps on e.g., myapp.tld |
-| `events` | Array | ✅ Yes | (Optional) A list of all Event structures that the app is expecting to be passed via [Message Metadata](/metadata/using) |
+| `events` | Array | ✅ Yes | (Optional) A list of all event structures that the app is expecting to be passed via [Message Metadata](/metadata/using) |
 | `types` | Array | ✅ Yes | (Optional) A list of all [custom types](https://api.slack.com/future/types/custom) your app will use |
-| `datastores` | Array | ❌ No | (Optional) A list of all [Datastores](https://api.slack.com/future/datastores) your app will use. This is currently only available for non-Bolt next-generation apps. You can learn more [here](/bolt-js/future/getting-started#next-gen).  |
+| `datastores` | Array | ❌ No | (Optional) A list of all [datastores](https://api.slack.com/future/datastores) your app will use. This is currently only available for non-Bolt next-generation apps. You can learn more [here](/bolt-js/future/getting-started#next-gen).  |
 | `features` | Object | ✅ Yes | (Optional)  A configuration object of your app features |
 
-You will come back to the Manifest every time you create a new workflow, since all workflows for your app need to be added to the Manifest in order to use them.
+You will come back to the manifest every time you create a new workflow, since all workflows for your app need to be added to the manifest in order to use them.
 
 ---
 
 ### Next steps {#next-steps}
 
-Now that you're acquainted with the Manifest, you can dive into the world of [built-in functions](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions)!
+Now that you're acquainted with the manifest, you can dive into the world of [built-in functions](/bolt-js/future/built-in-functions) and [custom functions](/bolt-js/future/custom-functions)!

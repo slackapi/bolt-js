@@ -24,7 +24,7 @@ Bolt for JavaScript supports app development using next-gen platform features li
 
 #### Bolt for JavaScript does not yet support:
 - [Deployment](https://api.slack.com/future/deploy) of your next-gen app to secure and managed Slack infrastructure
-- The Datastores API [Datastores](https://api.slack.com/future/datastores) and related Datastores functionality
+- The Datastores API [datastores](https://api.slack.com/future/datastores) and related datastores functionality
 
 > ⚠️ If you'd like to deploy your app with Slack infrastructure, consider building your next-generation application with the Deno Slack API. You can get started with that [here](https://api.slack.com/future/get-started).
 
@@ -58,15 +58,15 @@ If the TOS has been accepted, you will see this view under the "Slack Platform B
 
 ![Beta Terms of Service](../assets/beta-tos-future.png "Beta Terms of Service")
 
-Congratulations! You're now ready to start building using the [next-generation platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with creating a new app by following the instructions below or explore how to [set up an existing app](/bolt-js/future/setup-existing-app) on the next-gen platform.
+Congratulations! You're now ready to start building using the [next-generation platform](/bolt-js/future/getting-started#next-gen). 🎉 You can now proceed with creating a new app by following the instructions below or explore how to [set up an existing app](/bolt-js/future/setup-existing-app).
 
 ---
 
 ### Create a new app {#create-app}
 
-To get started with development, you'll need to create a Slack app. 
+To start, you'll need to create a Slack app. 
 
-Run the following command to create a starter next-generation app:
+Create a starter next-generation app with the CLI:
 ```
 slack create my-app -t slack-samples/bolt-js-starter-template -b future
 ```
@@ -94,18 +94,20 @@ At this point, your app is now ready to go in the `my-app` directory!
 The starter template your app is based off of includes a "Hello World" example that demonstrates how to use the three main building blocks of next-generation Slack apps: [built-in](/bolt-js/future/built-in-functions) and [custom](/bolt-js/future/custom-functions) functions, [triggers](/bolt-js/future/triggers), and [workflows](/bolt-js/future/workflows).
 
 **At a quick glance:**
-1. **Functions** are what define the actions of your app
-2. **Workflows** are made up of **functions**
-3. **Triggers** are how **workflows** are executed
+1. **Functions** define the actions of your app
+2. **Workflows** group **functions** into ordered steps
+3. **Triggers** invoke **workflows**
 
 If you'd like to test the "Hello World" example included in your template and see how functions, workflows, and triggers all tie together, read on! 📖
 
-> 💡 Now that it's been set up, this application can be used as starting point for you to build your own next-generation features. You can explore on your own and dive into the code yourself [here](https://github.com/slack-samples/bolt-js-starter-template/tree/future), or continue your journey by diving into [app manifests](/bolt-js/future/app-manifests) or learning how to add more [functions](/bolt-js/future/built-in-functions), [workflows](/bolt-js/future/workflows), and [triggers]() to your app!
+> 💡 This application can be the starting point for you to build your own app features. Explore on your own and dive into the code [here](https://github.com/slack-samples/bolt-js-starter-template/tree/future), or continue your journey by learning about [app manifests](/bolt-js/future/app-manifests), and how to add more [functions](/bolt-js/future/built-in-functions), [workflows](/bolt-js/future/workflows), and [triggers](/bolt-js/future/triggers) to your app!
 
 ---
 ### Set up your trigger {#setup-trigger}
 
-Your app comes with a pre-built [workflow](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/workflows/sample-workflow.js) that uses a pre-written [function](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/functions/sample-function.js). This workflow is executed by a trigger defined in [this trigger configuration file](https://github.com/slack-samples/bolt-js-starter-template/blob/future/triggers/hello-world-trigger.json). We can run a command via the CLI to initialize this trigger so that we can run the workflow.
+Your app comes with a sample [workflow](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/workflows/sample-workflow.js) that uses a [function](https://github.com/slack-samples/bolt-js-starter-template/blob/future/manifest/functions/sample-function.js).
+
+Kick off this workflow using the trigger defined in [this trigger configuration file](https://github.com/slack-samples/bolt-js-starter-template/blob/future/triggers/hello-world-trigger.json). We can run a command via the CLI to initialize this trigger so that we can run the workflow.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
@@ -114,7 +116,7 @@ Then, run the following command to create a trigger:
 slack trigger create --trigger-def "triggers/hello-world-trigger.json"      
 ```
 
-The above command will create a link trigger, which is run by clicking on a given URL, for the selected workspace. Make sure to select the workspace you want and that it is appended by `(dev)`. This will create a dev instance of your app. Once the trigger is successfully created, you should see an output like this:
+The above command will create a link trigger belonging to the selected workspace. Make sure to select the workspace you want and that it is appended by `(dev)`. This will create a dev instance of your app. Once the trigger is successfully created, you should see an output like this:
 
 ```
 ⚡ Trigger created
@@ -123,7 +125,7 @@ The above command will create a link trigger, which is run by clicking on a give
    Trigger Name: Sample Trigger
    URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
-The provided URL will be what you use to run your trigger. Copy this URL and save it somewhere; you'll need it for later.
+Copy this URL and paste it in your selected workspace as a message in a public channel. We'll be using the trigger to kick off our workflow later. 
 
 ---
 ### Run your app {#run-your-app}
@@ -138,11 +140,11 @@ You'll see output in your Terminal to indicate it's running, similar to what you
 
 ### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the trigger you created in a [previous step](/bolt-js/future/getting-started#setup-trigger) into a message in a public channel.
+With your app running, access your workspace and navigate to the message you sent containing the link trigger URL in [this previous step](/bolt-js/future/getting-started#setup-trigger).
 
 > 💡 App triggers are automatically saved as a channel bookmark under "Workflows" for easy access.
 
-Send the message and click the "Run" button that appears. A modal will appear prompting you to enter information to greet someone in your Slack workspace. Fill out the requested information.
+Click the "Run" button that appears on the message. A modal will appear prompting you to enter information to greet someone in your Slack workspace. Fill out the requested information.
 
 ![Hello World modal](../assets/hello-world-modal.png "Hello World modal")
 
@@ -155,7 +157,7 @@ The full app flow can be seen here:
 
 ### Next steps {#next-steps}
 
-Now we have a working instance of a next-generation app in your workspace and you've seen it in action! You can explore on your own and dive into the code yourself [here](https://github.com/slack-samples/bolt-js-starter-template/tree/future) or continue your learning journey by diving into [app manifests](/bolt-js/future/app-manifests) or looking into adding more [functions](/bolt-js/future/built-in-functions), [workflows](/bolt-js/future/workflows), and [triggers]() to your app!
+Now we have a working instance of a next-generation app in your workspace and you've seen it in action! You can explore on your own and dive into the code yourself [here](https://github.com/slack-samples/bolt-js-starter-template/tree/future) or continue your learning journey by diving into [app manifests](/bolt-js/future/app-manifests) or looking into adding more [functions](/bolt-js/future/built-in-functions), [workflows](/bolt-js/future/workflows), and [triggers](/bolt-js/future/triggers) to your app!
 
 <p class="alert alert_info"><ts-icon class="ts_icon_info_circle"></ts-icon>Our next-generation platform is currently in beta. [Your feedback is most welcome](/bolt-js/future/feedback) - all feedback will help shape the future platform experience!</p>
 
