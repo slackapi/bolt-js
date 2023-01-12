@@ -60,11 +60,11 @@ You can now explore the `my-app` directory!
 ---
 ### Set up your trigger {#setup-trigger}
 
-This app comes with preexisting functionality - Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+This app comes with preexisting functionality - functions, workflows and a trigger set up to kick things off. Let's run a command to initialize that trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
-Then, run the following command to create a Trigger:
+Then, run the following command to create a trigger:
 ```
 slack triggers create --trigger-def "triggers/link-shortcut.json"      
 ```
@@ -78,12 +78,12 @@ The above command will create a trigger for the selected workspace. Make sure to
    Trigger Name: Take Your Time
    URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
-The provided URL will be what you use to run your Trigger. Copy this URL and save it somewhere; you'll need it for later.
+The provided URL will be what you use to run your trigger. Copy this URL and save it somewhere; you'll need it for later.
 
 ---
 ### Run your app {#run-your-app}
 
-Now that your app and Trigger are successfully created, let's try running it!
+Now that your app and trigger are successfully created, let's try running it!
 
 Run `slack run` to start up the app. Executing `slack run` starts a local development server, syncing changes to your workspace's development version of your app.
 
@@ -94,9 +94,9 @@ You'll be prompted to select a workspace to install the app to&mdash;select the 
 Once the app is successfully run, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt for JavaScript app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
 ### Trigger your app's workflow {#trigger-workflow}
 
-With your app running, access your workspace and paste the URL from the Trigger you created in the previous step into a message in a public channel.
+With your app running, access your workspace and paste the URL from the trigger you created in the previous step into a message in a public channel.
 
-> 💡 App Triggers are automatically saved as a channel bookmark under "Workflows" for easy access.
+> 💡 App triggers are automatically saved as a channel bookmark under "Workflows" for easy access.
 
 Send the message and click the "Run" button that appears. A modal will appear prompting you to enter information to request time off. To test your app properly, we recommend entering your own Slack username in the "Manager" field.
 
@@ -188,7 +188,7 @@ TimeOffWorkflow.addStep(ApprovalFunction, {
 
 This step passes in a custom `ApprovalFunction` as well as inputs from the form in the first workflow step: `manager`, `start_date`, and `end_date`. It also passes in the `employee` ID by using the `interactivity` property's `interactor` ID, which comes from the initial definition of the `TimeOffWorkflow`.
 
-Once the function step is executed, that will be the end of the workflow! All remaining functionality, such as notifying the requester whether their request was approved or denied, will be executed using the `ApprovalFunction` and its related action handlers. The `ApprovalFunction` definition and implementation will be covered in the [Functions](#functions) section below.
+Once the function step is executed, that will be the end of the workflow! All remaining functionality, such as notifying the requester whether their request was approved or denied, will be executed using the `ApprovalFunction` and its related action handlers. The `ApprovalFunction` definition and implementation will be covered in the [functions](#functions) section below.
 
 The final workflow file will look like this:
 ```js
@@ -250,25 +250,25 @@ TimeOffWorkflow.addStep(ApprovalFunction, {
 module.exports = { TimeOffWorkflow };
 ```
 
-To explore more about Workflows and dive into creating new ones, visit the guide [here](/bolt-js/future/workflows).
+To explore more about workflows and dive into creating new ones, visit the guide [here](/bolt-js/future/workflows).
 
 ---
-### Link Triggers {#link-triggers}
+### Link triggers {#link-triggers}
 
-All workflows are invoked by triggers. We used a Trigger Config file defined at `triggers/link-shortcut.json`, and a CLI command to initialize it for our app. The next-gen platform supports many different kinds of triggers, and for this application, we use a simple [link trigger](https://api.slack.com/future/triggers/link).
+All workflows are invoked by triggers. We used a trigger config file defined at `triggers/link-shortcut.json`, and a CLI command to initialize it for our app. The next-gen platform supports many different kinds of triggers, and for this application, we use a simple [link trigger](https://api.slack.com/future/triggers/link).
 
 Try adding this URL as a bookmark to a channel or posting it in a message somewhere public!
 
-To learn more about Triggers and create new ones, visit the guide [here](/bolt-js/future/triggers).
+To learn more about triggers and create new ones, visit the guide [here](/bolt-js/future/triggers).
 
 ---
 ### Functions {#functions}
 
-Functions are building blocks of automation that accept inputs, perform some calculations, and provide outputs. Functions are added as steps in [Workflows](/bolt-js/future/workflows).
+Functions are building blocks of automation that accept inputs, perform some calculations, and provide outputs. Functions are added as steps in [workflows](/bolt-js/future/workflows).
 
 There are two types of functions: [built-in functions](/bolt-js/future/built-in-functions), which are Slack native actions defined in the Schema, such as sending messages, and [custom functions](/bolt-js/future/custom-functions), which are not built-in and are defined by the developer.
 
-In the Request Time Off application, we use one custom function, `ApprovalFunction`, which we passed into our Time Off Workflow as the second step after a requester submits time off information. At this point, our custom function will take that information and then send it to the manager to approve or deny.
+In the Request Time Off application, we use one custom function, `ApprovalFunction`, which we passed into our Time Off workflow as the second step after a requester submits time off information. At this point, our custom function will take that information and then send it to the manager to approve or deny.
 
 Our `ApprovalFunction` is defined in `manifest/functions/approval.js`. Custom functions are defined using `DefineFunction`.
 ```js
@@ -438,7 +438,7 @@ The full `request-approval.js` function will look like this:
 // listeners/functions/request-approval.js
 const { SlackFunction } = require('@slack/bolt');
 
-// Get our Approval Function from the manifest!
+// Get our Approval function from the manifest!
 const { ApprovalFunction } = require('../../manifest/functions/approval');
 
 // Here is the work we want to do!
@@ -506,7 +506,7 @@ const notifyApprover = async ({ event, client, complete }) => {
   }
 };
 
-// Let's register a new Slack Function with notifyApprover as its handler
+// Let's register a new Slack function with notifyApprover as its handler
 const requestApprovalFunc = new SlackFunction(ApprovalFunction.id, notifyApprover);
 
 // Get our action handlers
@@ -556,7 +556,7 @@ Once this has been added in, when submitting a new time off request within your 
 
 [Modals](https://api.slack.com/block-kit/surfaces/modals) can be created by calling the `views.open` method. The method requires you to pass a valid [view payload](https://api.slack.com/reference/block-kit/views).
 
-To open or update a modal from a Slack Function [interactivity handler](https://api.slack.com/future/view-events), you will also need to pass the `interactivity_pointer` within the `interactivity` object you received from your event payload in your `views.open` method.
+To open or update a modal from a Slack function [interactivity handler](https://api.slack.com/future/view-events), you will also need to pass the `interactivity_pointer` within the `interactivity` object you received from your event payload in your `views.open` method.
 
 To get started with creating a modal, add a new [Action](#action) that will be triggered when the "Open Modal" button is selected. Create a new file in `listeners/functions/actions` called `open-modal-action.js`:
 ```js
@@ -668,4 +668,4 @@ By adding the `.view()` handler, you'll now be able to execute its logic when su
 ---
 ### Conclusion {#conclusion}
 
-Congratulations on setting up your next-generation Request Time Off app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can work on adding more to the application or jump on the learning track and start reading about [App Manifests](/bolt-js/future/app-manifests).
+Congratulations on setting up your next-generation Request Time Off app! 🎉 Now that you understand its inner workings and have added in your own additional button that launches a modal, you can work on adding more to the application or jump on the learning track and start reading about [app manifests](/bolt-js/future/app-manifests).

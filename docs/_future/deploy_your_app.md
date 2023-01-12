@@ -23,11 +23,11 @@ In this guide, you will find the steps needed to prepare and deploy your app to 
 
 Before you can deploy a Bolt app to Heroku, you'll need a working Bolt app. If you haven't created one yet, [go ahead and make one](/bolt-js/future/getting-started#create-app)! If you already have an app and want features of the next-generation platform, check out the [Bolt for JavaScript setup guide](/bolt-js/future/setup-existing-app).
 
-Additionally, you will need to have at least one Trigger created for your application to confirm that your application has successfully deployed to Heroku. If you haven't created one yet, you can learn about [the different types of Triggers](/bolt-js/future/triggers#types) and [how to create a Trigger](/bolt-js/future/triggers#create) for tapping into your Workflows.
+Additionally, you will need to have at least one trigger created for your application to confirm that your application has successfully deployed to Heroku. If you haven't created one yet, you can learn about [the different types of triggers](/bolt-js/future/triggers#types) and [how to create a trigger](/bolt-js/future/triggers#create) for tapping into your workflows.
 
 > 💡 List your application's existing triggers by running `slack triggers list` in your project directory and selecting a workspace where it is installed!
 
-With your app and Trigger created, you can now use the `slack run` command to make sure your app starts successfully and appropriately responds to Triggers from your machine.
+With your app and trigger created, you can now use the `slack run` command to make sure your app starts successfully and appropriately responds to triggers from your machine.
 
 Since we're deploying to Heroku, having a Heroku account will also be useful. If you don't have one, [create one here](https://signup.heroku.com/).
 
@@ -108,7 +108,7 @@ To specify the start command of your app for Heroku, [a special file called `Pro
 
 The contents of this file will vary depending on if your app connects with [Socket Mode](https://api.slack.com/apis/connections/socket) or uses public HTTP endpoints to handle requests. To check whether Socket Mode is enabled for your application, you can either:
 
-* Check your app's [Manifest](/bolt-js/future/app-manifests) to see if `socketModeEnabled: true`, or
+* Check your app's [manifest](/bolt-js/future/app-manifests) to see if `socketModeEnabled: true`, or
 * Visit the "Socket Mode" section on your app's [App Config page](https://api.slack.com/apps) to check if Socket Mode has been enabled:
 
 <img width="670" alt="The toggle for connecting with Socket Mode on the App Config page is enabled" src="https://user-images.githubusercontent.com/12901850/197868321-63fff839-a3a2-4926-ae45-93c9d88cfd41.png">
@@ -208,7 +208,7 @@ For this, we will use the "Web URL" found from `heroku info` to update the **Req
 
 At this step your app should be live, listening for messages, events, or whatever else you have coded up! Go ahead and jump into a workspace with your app to test things out! 🚀
 
-Now would be a terrific time to try tripping your Trigger to test that your Workflows are executing as expected - however, make sure to confirm that you're not running the app locally! A successfully deployed Heroku app is one that is not running locally and will still fully execute your Trigger and all functionality associated with it.
+Now would be a terrific time to try tripping your trigger to test that your workflows are executing as expected - however, make sure to confirm that you're not running the app locally! A successfully deployed Heroku app is one that is not running locally and will still fully execute your trigger and all functionality associated with it.
 
 ### Inspecting the activity logs {#activity-logs}
 
@@ -252,7 +252,7 @@ $ git commit -am "Add mystery to the greeting message"
 $ git push -u heroku main
 ```
 
-After the "Build succeeded!" and "Verifying deploy... done." messages appear, your app will have this newfound functionality! You can now test your Trigger again to verify the new change.
+After the "Build succeeded!" and "Verifying deploy... done." messages appear, your app will have this newfound functionality! You can now test your trigger again to verify the new change.
 
 ---
 
