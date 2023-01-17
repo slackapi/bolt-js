@@ -50,7 +50,7 @@ Make sure your machine has the most recent version of [Node](https://nodejs.org/
 
 #### Accept the Beta Terms of Service {#accept-tos}
 
-In order to use the next-generation platform features, you'll need to accept a Terms of Service (TOS) for Slack Platform Beta in your Workspace Settings [here](https://slack.com/admin/settings#hermes_permissionfs).
+In order to use the next-generation platform features, you'll need to accept a Terms of Service (TOS) for Slack Platform Beta in your Workspace Settings [here](https://slack.com/admin/settings#hermes_permissions).
 
 > 💡 You must be an admin of your workspace to be able to access the Workspace Settings and accept the Terms of Service.
 
