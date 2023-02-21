@@ -134,6 +134,7 @@ export interface ViewStateValue {
   value?: string | null;
   selected_date?: string | null;
   selected_time?: string | null;
+  selected_date_time?: number | null; // UNIX timestamp value
   selected_conversation?: string | null;
   selected_channel?: string | null;
   selected_user?: string | null;
