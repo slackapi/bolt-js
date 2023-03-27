@@ -534,6 +534,32 @@ describe('HTTPReceiver', function () {
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
       });
 
+      it('should call custom route handler only if request matches route path and method including params', async function () {
+        const HTTPReceiver = await importHTTPReceiver();
+        const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
+        const receiver = new HTTPReceiver({
+          clientSecret: 'my-client-secret',
+          signingSecret: 'secret',
+          customRoutes,
+        });
+
+        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+        fakeReq.url = '/test/123';
+
+        fakeReq.method = 'GET';
+        receiver.requestListener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+
+        fakeReq.method = 'UNHANDLED_METHOD';
+        assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+      });
+
       it("should throw an error if customRoutes don't have the required keys", async function () {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [{ path: '/test' }] as any;
