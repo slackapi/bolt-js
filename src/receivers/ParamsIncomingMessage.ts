@@ -1,13 +1,8 @@
-import http from 'http';
+import { IncomingMessage } from 'http';
+import { ParamsDictionary } from 'express-serve-static-core';
 
-declare module 'http' {
-  interface IncomingMessage {
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    params?: { [key: string]: string } | string[] | object | undefined;
-  }
-}
-
-export interface ParamsIncomingMessage extends http.IncomingMessage {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ParamsIncomingMessage extends IncomingMessage {
   /**
    * **Only valid for requests with path parameters.**
    *
@@ -16,5 +11,5 @@ export interface ParamsIncomingMessage extends http.IncomingMessage {
    * then `request.params` will be `{ id: '123' }`.
    */
   // eslint-disable-next-line @typescript-eslint/ban-types
-  params: { [key: string]: string } | string[] | object | undefined;
+  params?: ParamsDictionary;
 }

@@ -6,7 +6,8 @@ import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { URL } from 'url';
 import { match } from 'path-to-regexp';
-
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types';
@@ -395,16 +396,19 @@ export default class HTTPReceiver implements Receiver {
     if (Object.keys(this.routes).length) {
       // Check if the request matches any of the custom routes
       let pathMatch : string | boolean = false;
+      let params : ParamsDictionary = {};
       Object.keys(this.routes).forEach((route) => {
         const matchRegex = match(route, { decode: decodeURIComponent });
         const tempMatch = matchRegex(path);
         if (tempMatch) {
           pathMatch = route;
-          req.params = tempMatch.params;
+          params = tempMatch.params as ParamsDictionary;
         }
       });
       const urlMatch = pathMatch && this.routes[pathMatch][method] !== undefined;
-      if (urlMatch && pathMatch) { return this.routes[pathMatch][method](req, res); }
+      if (urlMatch && pathMatch) {
+        return this.routes[pathMatch][method]({ ...req, params } as ParamsIncomingMessage, res);
+      }
     }
 
     // If the request did not match the previous conditions, an error is thrown. The error can be caught by

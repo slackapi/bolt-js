@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from 'http';
+import { ServerResponse } from 'http';
 import { CustomRouteInitializationError } from '../errors';
 import { ParamsIncomingMessage } from './ParamsIncomingMessage';
 
@@ -10,7 +10,7 @@ export interface CustomRoute {
 
 export interface ReceiverRoutes {
   [url: string]: {
-    [method: string]: (req: IncomingMessage, res: ServerResponse) => void;
+    [method: string]: (req: ParamsIncomingMessage, res: ServerResponse) => void;
   };
 }
 

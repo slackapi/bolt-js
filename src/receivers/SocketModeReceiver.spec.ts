@@ -5,6 +5,8 @@ import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
 import { EventEmitter } from 'events';
 import { IncomingMessage, ServerResponse } from 'http';
+import { match } from 'path-to-regexp';
+import { ParamsDictionary } from 'express-serve-static-core';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
 import { Override, mergeOverrides } from '../test-helpers';
@@ -432,6 +434,7 @@ describe('SocketModeReceiver', function () {
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+        const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
         const receiver = new SocketModeReceiver({
           appToken: 'my-secret',
@@ -444,15 +447,18 @@ describe('SocketModeReceiver', function () {
         const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
 
         fakeReq.url = '/test';
+        const tempMatch = matchRegex(fakeReq.url);
+        if (!tempMatch) throw new Error('match failed');
+        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
         await this.listener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
 
         fakeReq.method = 'POST';
         await this.listener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await this.listener(fakeReq, fakeRes);
@@ -469,6 +475,7 @@ describe('SocketModeReceiver', function () {
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+        const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
         const receiver = new SocketModeReceiver({
           appToken: 'my-secret',
@@ -481,15 +488,18 @@ describe('SocketModeReceiver', function () {
         const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
 
         fakeReq.url = '/test?hello=world';
+        const tempMatch = matchRegex('/test');
+        if (!tempMatch) throw new Error('match failed');
+        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
         await this.listener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
 
         fakeReq.method = 'POST';
         await this.listener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await this.listener(fakeReq, fakeRes);
@@ -506,6 +516,7 @@ describe('SocketModeReceiver', function () {
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
+        const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
         const receiver = new SocketModeReceiver({
           appToken: 'my-secret',
@@ -518,15 +529,18 @@ describe('SocketModeReceiver', function () {
         const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
 
         fakeReq.url = '/test/123';
+        const tempMatch = matchRegex(fakeReq.url);
+        if (!tempMatch) throw new Error('match failed');
+        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
         await this.listener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
 
         fakeReq.method = 'POST';
         await this.listener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith(fakeReq, fakeRes));
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await this.listener(fakeReq, fakeRes);

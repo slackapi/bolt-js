@@ -6,13 +6,14 @@ import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
 import { match } from 'path-to-regexp';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import App from '../App';
 import { CodedError } from '../errors';
 import { Receiver, ReceiverEvent } from '../types';
 import { StringIndexed } from '../types/helpers';
 import { buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
-import { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import {
   SocketModeFunctions as socketModeFunc,
   SocketModeReceiverProcessEventErrorHandlerArgs,
@@ -188,18 +189,19 @@ export default class SocketModeReceiver implements Receiver {
           // The URL object is only used to safely obtain the path to match
           const { pathname: path } = new URL(req.url as string, 'http://localhost');
           let pathMatch : string | boolean = false;
+          let params : ParamsDictionary = {};
           Object.keys(this.routes).forEach((route) => {
             const matchRegex = match(route, { decode: decodeURIComponent });
             const tempMatch = matchRegex(path);
             if (tempMatch) {
               pathMatch = route;
-              req.params = tempMatch.params;
+              params = tempMatch.params as ParamsDictionary;
             }
           });
 
           const urlMatch = pathMatch && this.routes[pathMatch][method] !== undefined;
           if (urlMatch && pathMatch) {
-            this.routes[pathMatch][method](req, res);
+            this.routes[pathMatch][method]({ ...req, params } as ParamsIncomingMessage, res);
             return;
           }
         }
