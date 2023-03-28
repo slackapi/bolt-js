@@ -9,6 +9,5 @@ export interface ParamsIncomingMessage extends IncomingMessage {
    * `/users/123`, and the route definition is `/users/:id`
    * then `request.params` will be `{ id: '123' }`.
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
   params?: ParamsDictionary;
 }
