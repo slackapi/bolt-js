@@ -191,6 +191,7 @@ export default class SocketModeReceiver implements Receiver {
           let pathMatch : string | boolean = false;
           let params : ParamsDictionary = {};
           Object.keys(this.routes).forEach((route) => {
+            if (pathMatch) return;
             const matchRegex = match(route, { decode: decodeURIComponent });
             const tempMatch = matchRegex(path);
             if (tempMatch) {

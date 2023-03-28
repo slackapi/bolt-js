@@ -1,7 +1,6 @@
 import { IncomingMessage } from 'http';
 import { ParamsDictionary } from 'express-serve-static-core';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ParamsIncomingMessage extends IncomingMessage {
   /**
    * **Only valid for requests with path parameters.**
