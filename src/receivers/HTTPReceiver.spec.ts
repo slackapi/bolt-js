@@ -576,8 +576,10 @@ describe('HTTPReceiver', function () {
 
       it('should call custom route handler only if request matches multiple route paths and method including params', async function () {
         const HTTPReceiver = await importHTTPReceiver();
-        const customRoutes = [{ path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
-          { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake.throws('Should not be used.') }];
+        const customRoutes = [
+          { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
+          { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
+        ];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
         const receiver = new HTTPReceiver({
           clientSecret: 'my-client-secret',
@@ -596,6 +598,41 @@ describe('HTTPReceiver', function () {
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
         assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        assert(customRoutes[1].handler.notCalled);
+
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+
+        fakeReq.method = 'UNHANDLED_METHOD';
+        assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+      });
+
+      it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async function () {
+        const HTTPReceiver = await importHTTPReceiver();
+        const customRoutes = [
+          { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
+          { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
+        ];
+        const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
+        const receiver = new HTTPReceiver({
+          clientSecret: 'my-client-secret',
+          signingSecret: 'secret',
+          customRoutes,
+        });
+
+        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+        fakeReq.url = '/test/123';
+        const tempMatch = matchRegex(fakeReq.url);
+        if (!tempMatch) throw new Error('match failed');
+        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+
+        fakeReq.method = 'GET';
+        receiver.requestListener(fakeReq, fakeRes);
+        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
