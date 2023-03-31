@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { URL } from 'url';
 import { SocketModeClient } from '@slack/socket-mode';
-import { createServer, IncomingMessage, ServerResponse, Server } from 'http';
+import { createServer, ServerResponse, Server } from 'http';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';
+import { match } from 'path-to-regexp';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import App from '../App';
 import { CodedError } from '../errors';
 import { Receiver, ReceiverEvent } from '../types';
@@ -37,7 +40,7 @@ export interface SocketModeReceiverOptions {
 export interface CustomRoute {
   path: string;
   method: string | string[];
-  handler: (req: IncomingMessage, res: ServerResponse) => void;
+  handler: (req: ParamsIncomingMessage, res: ServerResponse) => void;
 }
 
 // Additional Installer Options
@@ -185,10 +188,21 @@ export default class SocketModeReceiver implements Receiver {
           // NOTE: the domain and scheme are irrelevant here.
           // The URL object is only used to safely obtain the path to match
           const { pathname: path } = new URL(req.url as string, 'http://localhost');
-          const match = this.routes[path] && this.routes[path][method] !== undefined;
+          let pathMatch : string | boolean = false;
+          let params : ParamsDictionary = {};
+          Object.keys(this.routes).forEach((route) => {
+            if (pathMatch) return;
+            const matchRegex = match(route, { decode: decodeURIComponent });
+            const tempMatch = matchRegex(path);
+            if (tempMatch) {
+              pathMatch = route;
+              params = tempMatch.params as ParamsDictionary;
+            }
+          });
 
-          if (match) {
-            this.routes[path][method](req, res);
+          const urlMatch = pathMatch && this.routes[pathMatch][method] !== undefined;
+          if (urlMatch && pathMatch) {
+            this.routes[pathMatch][method]({ ...req, params } as ParamsIncomingMessage, res);
             return;
           }
         }
