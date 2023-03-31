@@ -103,7 +103,7 @@ expectType<void>(
       }
 
       await ack({
-        "options": options 
+        "options": options
       });
     } else {
       await ack();
