@@ -40,6 +40,9 @@ const app = new App({
       },
     },
   ],
+  installerOptions: {
+    port: 3001,
+  },
 });
 
 (async () => {
