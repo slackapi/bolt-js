@@ -31,6 +31,14 @@ const app = new App({
         res.end('Health check information displayed here!');
       },
     },
+    {
+      path: '/music/:genre',
+      method: ['GET'],
+      handler: (req, res) => {
+        res.writeHead(200);
+        res.end(`Oh? ${req.params.genre}? That slaps!`);
+      },
+    },
   ],
 });
 
