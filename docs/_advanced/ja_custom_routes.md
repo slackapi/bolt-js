@@ -10,7 +10,7 @@ order: 10
 
 各 `CustomRoute` オブジェクトには `path` 、 `method`、 `handler` という三つのプロパティが含まれていなければなりません。 HTTP メソッドに相当する `method` は文字列または文字列の配列です。
 
-`v3.12.3` からデフォルトの組み込みレシーバーである `HTTPReceiver` と `SocketModeReceiver` が、[Express.js](https://expressjs.com/en/guide/routing.html#route-parameters) が提供するものと同様な動的なルートパラメーターをサポートするようになりました。これによって URL 内に含まれる値を `req.params` の値として利用できるようになりました。
+`v3.13.0` からデフォルトの組み込みレシーバーである `HTTPReceiver` と `SocketModeReceiver` が、[Express.js](https://expressjs.com/en/guide/routing.html#route-parameters) が提供するものと同様な動的なルートパラメーターをサポートするようになりました。これによって URL 内に含まれる値を `req.params` の値として利用できるようになりました。
 
 カスタムの HTTP ルートがローカル環境でどのポートからアクセスできるかを指定するために `App` コンストラクターに `installerOptions.port` というプロパティを渡すことができます。指定しない場合は、デフォルトの `3000` ポートとなります。
 </div>
