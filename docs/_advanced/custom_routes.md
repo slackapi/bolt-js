@@ -10,7 +10,7 @@ As of `v3.7.0`, custom HTTP routes can be easily added by passing in an array of
 
 Each `CustomRoute` object must contain three properties: `path`, `method`, and `handler`. `method`, which corresponds to the HTTP verb, can be either a string or an array of strings.
 
-Since `v3.13.0`, the default built-in receivers (`HTTPReceiver` and `SocketModeReceiver`) support dynamic route parameters like [Express.js does](https://expressjs.com/en/guide/routing.html#route-parameters). With this, you can capture positional values in the URL for use in your route's handler via `req.params`.
+Since `v3.12.3`, the default built-in receivers (`HTTPReceiver` and `SocketModeReceiver`) support dynamic route parameters like [Express.js does](https://expressjs.com/en/guide/routing.html#route-parameters). With this, you can capture positional values in the URL for use in your route's handler via `req.params`.
 
 To determine what port the custom HTTP route will be available on locally, you can specify an `installerOptions.port` property in the `App` constructor. Otherwise, it will default to port `3000`.
 </div>
