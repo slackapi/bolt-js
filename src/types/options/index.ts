@@ -1,4 +1,4 @@
-import { Option } from '@slack/types';
+import { Option, PlainTextElement } from '@slack/types';
 import { StringIndexed, XOR } from '../helpers';
 import { AckFn } from '../utilities';
 import { ViewOutput } from '../view/index';
@@ -146,16 +146,13 @@ type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggesti
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
     ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
-    : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
+    : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
 export interface BlockOptions {
   options: Option[];
 }
 export interface MessageOptions {
-  options: {
-    text: string;
-    value: string;
-  }[];
+  options: Option[];
 }
 export interface DialogOptions {
   options: {
@@ -164,6 +161,11 @@ export interface DialogOptions {
   }[];
 }
 export interface OptionGroups<Options> {
+  option_groups: ({
+    label: PlainTextElement
+  } & Options)[];
+}
+export interface DialogOptionGroups<Options> {
   option_groups: ({
     label: string;
   } & Options)[];
