@@ -146,7 +146,7 @@ type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggesti
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
     ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
-    : AckFn<XOR<DialogOptions, OptionGroups<DialogOptions>>>;
+    : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
 export interface BlockOptions {
   options: Option[];
@@ -155,11 +155,19 @@ export interface MessageOptions {
   options: Option[];
 }
 export interface DialogOptions {
-  options: Option[];
+  options: {
+    label: string;
+    value: string;
+  }[];
 }
 export interface OptionGroups<Options> {
   option_groups: ({
-    label: PlainTextElement;
+    label: PlainTextElement
+  } & Options)[];
+}
+export interface DialogOptionGroups<Options> {
+  option_groups: ({
+    label: string;
   } & Options)[];
 }
 

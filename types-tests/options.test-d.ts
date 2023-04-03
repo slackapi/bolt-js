@@ -1,4 +1,4 @@
-import { expectType } from 'tsd';
+import { expectType, expectError } from 'tsd';
 import {
   App,
   SlackOptions,
@@ -60,7 +60,7 @@ expectType<void>(
     // FIXME: the type should be OptionsRequest<'interactive_message'>
     expectType<SlackOptions>(options);
     // https://github.com/slackapi/bolt-js/issues/720
-    ack({ options: blockSuggestionOptions });
+    expectError(ack({ options: blockSuggestionOptions }));
     await Promise.resolve(options);
   }),
 );
@@ -70,7 +70,7 @@ expectType<void>(
   app.options<'dialog_suggestion'>({ callback_id: 'a' }, async ({ options, ack }) => {
     expectType<DialogSuggestion>(options);
     // https://github.com/slackapi/bolt-js/issues/720
-    ack({ options: blockSuggestionOptions });
+    expectError(ack({ options: blockSuggestionOptions }));
     await Promise.resolve(options);
   }),
 );
