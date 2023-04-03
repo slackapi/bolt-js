@@ -49,7 +49,6 @@ expectType<void>(
 expectType<void>(
   app.options<'interactive_message'>({ callback_id: 'a' }, async ({ options, ack }) => {
     expectType<InteractiveMessageSuggestion>(options);
-    // https://github.com/slackapi/bolt-js/issues/720
     ack({ options: blockSuggestionOptions });
     await Promise.resolve(options);
   }),
