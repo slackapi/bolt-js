@@ -28,10 +28,21 @@ const app = new App({
       method: ['GET'],
       handler: (req, res) => {
         res.writeHead(200);
-        res.end('Health check information displayed here!');
+        res.end('Things are going just fine!');
+      },
+    },
+    {
+      path: '/music/:genre',
+      method: ['GET'],
+      handler: (req, res) => {
+        res.writeHead(200);
+        res.end(`Oh? ${req.params.genre}? That slaps!`);
       },
     },
   ],
+  installerOptions: {
+    port: 3001,
+  },
 });
 
 (async () => {
