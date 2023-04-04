@@ -1,5 +1,5 @@
 ---
-title: Adding or editing workflow steps <span class="label-legacy">LEGACY</span>
+title: Adding or editing workflow steps
 lang: en
 slug: adding-editing-steps
 order: 3
