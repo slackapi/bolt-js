@@ -73,6 +73,9 @@ google_tag_manager: GTM-KFZ5MK7
 markdown: kramdown
 kramdown:
   parse_block_html: true
+  syntax_highlighter_opts:
+    block:
+      line_numbers: true
 plugins:
   - jemoji
   - jekyll-redirect-from
