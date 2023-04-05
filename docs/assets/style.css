@@ -300,25 +300,43 @@ span.beta {
 pre {
   background-color: var(--light-grey) !important;
   background-image: none;
-  padding: 2em;
+  padding: 1em 1.5em;
   border: 1px solid var(--soft-grey);
+  margin: 0;
   border-radius: 1em;
 }
 
-code {
-  border-radius: 8px;
-  background-color: var(--light-grey);
-  padding: 2px 7px;
-  border: 1px solid var(--soft-grey);
+/* Code block with column numbers */
+pre.highlight {
+  line-height: 2em;
+  overflow-x: auto;
 }
 
-pre code {
-  font-size: 0.85em !important;
+pre.highlight code span {
+  padding: 0;
+  margin: 0;
+  height: 0;
 }
 
-a code {
-  color: var(--blue);
+pre.highlight code pre {
+  padding: 0;
+  border: 0;
+  font-size: 0.9em;
+  overflow: visible;
 }
+
+table.rouge-table, td.rouge-code, td.rouge-gutter  {
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+
+td.rouge-gutter {
+  padding-right: 1em;
+  user-select: none;
+  color: var(--dark-grey);
+}
+/* End Code block with column numbers */
 
 .content .section-wrapper .section-content {
   grid-area: body;
