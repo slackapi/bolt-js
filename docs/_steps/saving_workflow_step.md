@@ -1,5 +1,5 @@
 ---
-title: Saving step configurations <span class="label-legacy">LEGACY</span>
+title: Saving step configurations
 lang: en
 slug: saving-steps
 order: 4
