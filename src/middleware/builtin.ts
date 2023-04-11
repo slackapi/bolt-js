@@ -206,16 +206,27 @@ export function matchConstraints(
   };
 }
 
+const messagePostedEventSubtypesAsArray = [undefined, 'bot_message', 'file_share', 'thread_broadcast'];
+
 /*
  * Middleware that filters out messages that don't match pattern
  */
-export function matchMessage(
+export function matchMessage<
+  Subtypes extends string | undefined = string | undefined,
+>(
   pattern: string | RegExp,
-): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
+  onlyMessagePosted: boolean = false, // false for backward compatibility
+): Middleware<SlackEventMiddlewareArgs<'message', Subtypes>> {
   return async ({ event, context, next }) => {
     let tempMatches: RegExpMatchArray | null;
 
     if (!('text' in event) || event.text === undefined) {
+      return;
+    }
+    // Since version 3.14, handling only message posted events are allowed
+    if (onlyMessagePosted &&
+      event.type === 'message' &&
+      !messagePostedEventSubtypesAsArray.includes(event.subtype)) {
       return;
     }
 

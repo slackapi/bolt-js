@@ -26,8 +26,11 @@ export {
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
  */
-export interface SlackEventMiddlewareArgs<EventType extends string = string> {
-  payload: EventFromType<EventType>;
+export interface SlackEventMiddlewareArgs<
+  EventType extends string = string,
+  EventSubtype extends string | undefined | never = string | undefined | never,
+> {
+  payload: EventFromType<EventType, EventSubtype>;
   event: this['payload'];
   message: EventType extends 'message' ? this['payload'] : never;
   body: EnvelopedEvent<this['payload']>;
@@ -71,10 +74,20 @@ interface Authorization {
  * When the string matches known event(s) from the `SlackEvent` union, only those types are returned (also as a union).
  * Otherwise, the `BasicSlackEvent<T>` type is returned.
  */
-export type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
+export type EventFromType<
+  T extends string,
+  ST extends string | undefined | never,
+> = KnownEventFromType<T, ST> extends never ?
   BasicSlackEvent<T> :
-  KnownEventFromType<T>;
-export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
+  KnownEventFromType<T, ST>;
+
+export type KnownEventFromType<
+  T extends string,
+  ST extends string | undefined | never = string | undefined | never,
+> = Extract<SlackEvent, {
+  type: T,
+  subtype?: ST extends never ? never : ST,
+}>;
 
 /**
  * Type function which tests whether or not the given `Event` contains a channel ID context for where the event

@@ -17,7 +17,7 @@ import {
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
 import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
-import { GenericMessageEvent } from '../types/events/message-events';
+import { GenericMessageEvent, MessagePostedEvent } from '../types/events/message-events';
 
 // Test fixtures
 const validCommandPayload: SlashCommand = {
@@ -92,7 +92,7 @@ describe('Built-in global middleware', () => {
     function matchesPatternTestCase(
       pattern: string | RegExp,
       matchingText: string,
-      buildFakeEvent: (content: string) => SlackEvent,
+      buildFakeEvent: (content: string) => MessagePostedEvent | AppMentionEvent,
     ): Mocha.AsyncFunc {
       return async () => {
         // Arrange
@@ -859,7 +859,10 @@ interface MiddlewareCommonArgs {
   logger: Logger;
   client: WebClient;
 }
-type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
+type MessageMiddlewareArgs = SlackEventMiddlewareArgs<
+'message' | 'app_mention',
+undefined | 'bot_message' | 'file_share' | 'thread_broadcast' | never
+> & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
 type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'> & MiddlewareCommonArgs;
@@ -870,7 +873,7 @@ async function importBuiltin(overrides: Override = {}): Promise<typeof import('.
   return rewiremock.module(() => import('./builtin'), overrides);
 }
 
-function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] = ''): MessageEvent {
+function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] = ''): MessagePostedEvent {
   const event: Partial<GenericMessageEvent> = {
     type: 'message',
     channel: 'CHANNEL_ID',
@@ -882,7 +885,7 @@ function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] 
   } else {
     event.blocks = content;
   }
-  return event as MessageEvent;
+  return event as MessagePostedEvent;
 }
 
 function createFakeAppMentionEvent(text: string = ''): AppMentionEvent {
