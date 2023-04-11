@@ -4,6 +4,7 @@ import { SayFn } from '../utilities';
 
 export * from './base-events';
 export {
+  MessagePostedEvent,
   GenericMessageEvent,
   BotMessageEvent,
   ChannelArchiveMessageEvent,
@@ -84,10 +85,9 @@ export type EventFromType<
 export type KnownEventFromType<
   T extends string,
   ST extends string | undefined | never = string | undefined | never,
-> = Extract<SlackEvent, {
-  type: T,
-  subtype?: ST extends never ? never : ST,
-}>;
+> = T extends 'message' | 'emoji_changed'
+  ? Extract<SlackEvent, { type: T, subtype: ST }>
+  : Extract<SlackEvent, { type: T }>;
 
 /**
  * Type function which tests whether or not the given `Event` contains a channel ID context for where the event

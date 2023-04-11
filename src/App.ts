@@ -544,7 +544,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   >(
     eventName: EventType,
     ...listeners: Middleware<
-    SlackEventMiddlewareArgs,
+    SlackEventMiddlewareArgs<EventType>,
     AppCustomContext & MiddlewareCustomContext
     >[]
   ): void;
