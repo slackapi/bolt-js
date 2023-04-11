@@ -17,7 +17,7 @@ import {
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
 import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
-import { GenericMessageEvent, MessagePostedEvent } from '../types/events/message-events';
+import { GenericMessageEvent } from '../types/events/message-events';
 
 // Test fixtures
 const validCommandPayload: SlashCommand = {
@@ -92,7 +92,7 @@ describe('Built-in global middleware', () => {
     function matchesPatternTestCase(
       pattern: string | RegExp,
       matchingText: string,
-      buildFakeEvent: (content: string) => MessagePostedEvent | AppMentionEvent,
+      buildFakeEvent: (content: string) => AppMentionEvent | MessageEvent,
     ): Mocha.AsyncFunc {
       return async () => {
         // Arrange
@@ -860,8 +860,8 @@ interface MiddlewareCommonArgs {
   client: WebClient;
 }
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<
-'message' | 'app_mention',
-undefined | 'bot_message' | 'file_share' | 'thread_broadcast' | never
+'message',
+undefined | 'bot_message' | 'file_share' | 'thread_broadcast'
 > & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
@@ -873,7 +873,7 @@ async function importBuiltin(overrides: Override = {}): Promise<typeof import('.
   return rewiremock.module(() => import('./builtin'), overrides);
 }
 
-function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] = ''): MessagePostedEvent {
+function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] = ''): MessageEvent {
   const event: Partial<GenericMessageEvent> = {
     type: 'message',
     channel: 'CHANNEL_ID',
@@ -885,7 +885,7 @@ function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] 
   } else {
     event.blocks = content;
   }
-  return event as MessagePostedEvent;
+  return event as MessageEvent;
 }
 
 function createFakeAppMentionEvent(text: string = ''): AppMentionEvent {
