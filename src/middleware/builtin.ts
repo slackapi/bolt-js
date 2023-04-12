@@ -223,10 +223,10 @@ export function matchMessage<
     if (!('text' in event) || event.text === undefined) {
       return;
     }
-    // Since version 3.14, handling only message posted events are allowed
     if (onlyMessagePosted &&
       event.type === 'message' &&
       !messagePostedEventSubtypesAsArray.includes(event.subtype)) {
+      // Handle only message posted events
       return;
     }
 
