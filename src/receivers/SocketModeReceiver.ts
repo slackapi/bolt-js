@@ -188,22 +188,17 @@ export default class SocketModeReceiver implements Receiver {
           // NOTE: the domain and scheme are irrelevant here.
           // The URL object is only used to safely obtain the path to match
           const { pathname: path } = new URL(req.url as string, 'http://localhost');
-          let pathMatch : string | boolean = false;
-          let params : ParamsDictionary = {};
-          Object.keys(this.routes).forEach((route) => {
-            if (pathMatch) return;
+          const routes = Object.keys(this.routes);
+          for (let i = 0; i < routes.length; i += 1) {
+            const route = routes[i];
             const matchRegex = match(route, { decode: decodeURIComponent });
-            const tempMatch = matchRegex(path);
-            if (tempMatch) {
-              pathMatch = route;
-              params = tempMatch.params as ParamsDictionary;
+            const pathMatch = matchRegex(path);
+            if (pathMatch && this.routes[route][method] !== undefined) {
+              const params = pathMatch.params as ParamsDictionary;
+              const message: ParamsIncomingMessage = Object.assign(req, { params });
+              this.routes[route][method](message, res);
+              return;
             }
-          });
-
-          const urlMatch = pathMatch && this.routes[pathMatch][method] !== undefined;
-          if (urlMatch && pathMatch) {
-            this.routes[pathMatch][method]({ ...req, params } as ParamsIncomingMessage, res);
-            return;
           }
         }
 
