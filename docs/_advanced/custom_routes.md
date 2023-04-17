@@ -28,7 +28,7 @@ const app = new App({
       method: ['GET'],
       handler: (req, res) => {
         res.writeHead(200);
-        res.end('Things are going just fine!');
+        res.end(`Things are going just fine at ${req.headers.host}!`);
       },
     },
     {
