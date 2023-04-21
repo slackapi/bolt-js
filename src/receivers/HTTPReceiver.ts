@@ -393,22 +393,15 @@ export default class HTTPReceiver implements Receiver {
     }
 
     // Handle custom routes
-    if (Object.keys(this.routes).length) {
-      // Check if the request matches any of the custom routes
-      let pathMatch : string | boolean = false;
-      let params : ParamsDictionary = {};
-      Object.keys(this.routes).forEach((route) => {
-        if (pathMatch) return;
-        const matchRegex = match(route, { decode: decodeURIComponent });
-        const tempMatch = matchRegex(path);
-        if (tempMatch) {
-          pathMatch = route;
-          params = tempMatch.params as ParamsDictionary;
-        }
-      });
-      const urlMatch = pathMatch && this.routes[pathMatch][method] !== undefined;
-      if (urlMatch && pathMatch) {
-        return this.routes[pathMatch][method]({ ...req, params } as ParamsIncomingMessage, res);
+    const routes = Object.keys(this.routes);
+    for (let i = 0; i < routes.length; i += 1) {
+      const route = routes[i];
+      const matchRegex = match(route, { decode: decodeURIComponent });
+      const pathMatch = matchRegex(path);
+      if (pathMatch && this.routes[route][method] !== undefined) {
+        const params = pathMatch.params as ParamsDictionary;
+        const message: ParamsIncomingMessage = Object.assign(req, { params });
+        return this.routes[route][method](message, res);
       }
     }
 

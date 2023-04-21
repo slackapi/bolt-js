@@ -504,11 +504,13 @@ describe('HTTPReceiver', function () {
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        let expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -534,11 +536,13 @@ describe('HTTPReceiver', function () {
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        let expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -564,11 +568,13 @@ describe('HTTPReceiver', function () {
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        let expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -597,12 +603,14 @@ describe('HTTPReceiver', function () {
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        let expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -631,12 +639,14 @@ describe('HTTPReceiver', function () {
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        let expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
-        assert(customRoutes[0].handler.calledWith({ ...fakeReq, params }, fakeRes));
+        expectedMessage = Object.assign(fakeReq, { params });
+        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
