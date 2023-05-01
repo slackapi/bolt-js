@@ -9,6 +9,7 @@ type ChatPostMessageArgumentsKnownKeys =
   | 'as_user'
   | 'attachments'
   | 'blocks'
+  | 'metadata'
   | 'icon_emoji'
   | 'icon_url'
   | 'link_names'

@@ -12,4 +12,15 @@ describe('RespondArguments', () => {
     };
     assert.exists(args);
   });
+  it('has metadata', () => {
+    const args: RespondArguments = {
+      response_type: 'in_channel',
+      text: 'Hey!',
+      metadata: {
+        event_type: 'test-event',
+        event_payload: { foo: 'bar' },
+      },
+    };
+    assert.exists(args);
+  });
 });
