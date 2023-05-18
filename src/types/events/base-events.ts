@@ -651,6 +651,7 @@ export interface ReactionMessageItem {
   ts: string;
 }
 
+// This type is deprecated.
 export interface ReactionFileItem {
   type: 'file';
   channel: string;
@@ -671,7 +672,7 @@ export interface ReactionAddedEvent {
   user: string;
   reaction: string;
   item_user: string;
-  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
+  item: ReactionMessageItem;
   event_ts: string;
 }
 
@@ -680,7 +681,7 @@ export interface ReactionRemovedEvent {
   user: string;
   reaction: string;
   item_user: string;
-  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
+  item: ReactionMessageItem;
   event_ts: string;
 }
 
