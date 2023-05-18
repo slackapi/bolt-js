@@ -20,7 +20,7 @@ app.view('ticket_submit', async ({ ack, view }) => {
   const email = view.state.values['email_address']['input_a'].value;
 
   // if it’s a valid email, accept the submission
-  if (isEmail.test(email)) {
+  if (email && isEmail.test(email)) {
     await ack();
   } else {
     // if it isn’t a valid email, acknowledge with an error

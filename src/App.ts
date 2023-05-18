@@ -386,7 +386,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         failure: (error, _installOptions, _req, res) => {
           this.logger.debug(error);
           res.writeHead(500, { 'Content-Type': 'text/html' });
-          res.end(`<html><body><h1>OAuth failed!</h1><div>${error}</div></body></html>`);
+          res.end(`<html><body><h1>OAuth failed!</h1><div>${escapeHtml(error.code)}</div></body></html>`);
         },
       };
     }
@@ -1644,6 +1644,17 @@ function buildRespondFn(
 const eventTypesToSkipAuthorize = ['app_uninstalled', 'tokens_revoked'];
 function isEventTypeToSkipAuthorize(eventType: string) {
   return eventTypesToSkipAuthorize.includes(eventType);
+}
+
+function escapeHtml(input: string | undefined | null): string {
+  if (input) {
+    return input.replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+  }
+  return '';
 }
 
 // ----------------------------

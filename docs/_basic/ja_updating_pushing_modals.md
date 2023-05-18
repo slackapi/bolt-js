@@ -25,6 +25,9 @@ app.action('button_abc', async ({ ack, body, client, logger }) => {
   await ack();
 
   try {
+    if (body.type !== 'block_actions' || !body.view) {
+      return;
+    }
     const result = await client.views.update({
       // リクエストに含まれる view_id を渡す
       view_id: body.view.id,

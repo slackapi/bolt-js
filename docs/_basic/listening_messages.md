@@ -14,7 +14,13 @@ To listen to messages that [your app has access to receive](https://api.slack.co
 ```javascript
 // This will match any message that contains 👋
 app.message(':wave:', async ({ message, say }) => {
-  await say(`Hello, <@${message.user}>`);
+  // Handle only newly posted messages here
+  if (message.subtype === undefined
+    || message.subtype === 'bot_message'
+    || message.subtype === 'file_share'
+    || message.subtype === 'thread_broadcast') {
+    await say(`Hello, <@${message.user}>`);
+  }
 });
 ```
 
