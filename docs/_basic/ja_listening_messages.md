@@ -14,7 +14,13 @@ order: 1
 ```javascript
 // 特定の文字列、この場合 👋絵文字を含むメッセージと一致
 app.message(':wave:', async ({ message, say }) => {
-  await say(`Hello, <@${message.user}>`);
+  // 新しく投稿されたメッセージだけを処理
+  if (message.subtype === undefined
+    || message.subtype === 'bot_message'
+    || message.subtype === 'file_share'
+    || message.subtype === 'thread_broadcast') {
+    await say(`Hello, <@${message.user}>`);
+  }
 });
 ```
 

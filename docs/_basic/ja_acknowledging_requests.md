@@ -20,7 +20,7 @@ app.view('ticket_submit', async ({ ack, view }) => {
   const email = view.state.values['email_address']['input_a'].value;
 
   // メールアドレスが有効。モーダルを受信
-  if (isEmail.test(email)) {
+  if (email && isEmail.test(email)) {
     await ack();
   } else {
     // メールアドレスが無効。エラーを確認

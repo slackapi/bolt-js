@@ -33,7 +33,9 @@ Since `respond()` is a utility for calling the `response_url`, it behaves in the
 // Listens to actions triggered with action_id of “user_select”
 app.action('user_select', async ({ action, ack, respond }) => {
   await ack();
-  await respond(`You selected <@${action.selected_user}>`);
+  if (action.type === 'users_select') {
+    await respond(`You selected <@${action.selected_user}>`);
+  }
 });
 ```
 

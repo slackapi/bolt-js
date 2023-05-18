@@ -22,38 +22,38 @@ order: 1
 </div>
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App, HTTPReceiver } from '@slack/bolt';
 
 const app = new App({
   receiver: new HTTPReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
-    // より詳細で特化したエラーハンドラー
-    dispatchErrorHandler: ({ error, logger, response }) => {
+    // より特定のパターンに特化したエラーハンドラー
+    dispatchErrorHandler: async ({ error, logger, response }) => {
       logger.error(`dispatch error: ${error}`);
       response.writeHead(404);
       response.write("Something is wrong!");
       response.end();
     },
-    processEventErrorHandler: ({ error, logger, response }) => {
+    processEventErrorHandler: async ({ error, logger, response }) => {
       logger.error(`processEvent error: ${error}`);
-      // とにかく ack する場合の方法！
+      // とにかく ack する
       response.writeHead(200);
       response.end();
       return true;
     },
     unhandledRequestHandler: async ({ logger, response }) => {
       logger.info('Acknowledging this incoming request because 2 seconds already passed...');
-      // とにかく ack する場合の方法！
+      // とにかく ack する
       response.writeHead(200);
       response.end();
     },
-    unhandledRequestTimeoutMillis: 2000, // デフォルト値は 3001
+    unhandledRequestTimeoutMillis: 2000, // デフォルトは 3001
   }),
 });
 
-// より一般的でグローバルなエラーハンドラー
-app.error((error) => {
-  // メッセージ再送信もしくはアプリを停止するかの判断をするためにエラーの詳細を出力して確認
+// より一般的なグローバルのエラーハンドラー
+app.error(async (error) => {
+  // メッセージ送信をリトライすべきか、アプリを停止すべきか判断するためにエラーの詳細を確認
   console.error(error);
 });
 ```
@@ -80,7 +80,7 @@ const app = new App({
   extendedErrorHandler: true,
 });
 
-app.error(({ error, logger, context, body }) => {
+app.error(async ({ error, logger, context, body }) => {
   // Bolt で指定した logger を使ってエラー内容をログ出力
   logger.error(error);
 
