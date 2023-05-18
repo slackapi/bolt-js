@@ -47,7 +47,12 @@ const { App, subtype } = require('@slack/bolt');
 
 // user からのメッセージの編集と一致
 app.message(subtype('message_changed'), ({ event, logger }) => {
-  logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+  // この if 文は TypeScript でコードを書く際に必要
+  if (event.subtype === 'message_changed'
+    && !event.message.subtype
+    && !event.previous_message.subtype) {
+    logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+  }
 });
 ```
 

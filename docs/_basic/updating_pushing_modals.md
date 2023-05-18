@@ -24,6 +24,9 @@ app.action('button_abc', async ({ ack, body, client, logger }) => {
   await ack();
 
   try {
+    if (body.type !== 'block_actions' || !body.view) {
+      return;
+    }
     // Call views.update with the built-in client
     const result = await client.views.update({
       // Pass the view_id

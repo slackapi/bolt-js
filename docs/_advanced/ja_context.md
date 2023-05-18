@@ -20,7 +20,7 @@ async function addTimezoneContext({ payload, client, context, next }) {
 
   // ユーザのタイムゾーン情報を追加
   context.tz_offset = user.tz_offset;
-  
+
   // 制御とリスナー関数を次のミドルウェアに引き渡し
   await next();
 }
@@ -29,24 +29,24 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
   // コマンドリクエストの確認
   await ack();
   // リクエスト時のローカル時間を取得
-  const local_hour = (Date.UTC() + context.tz_offset).getHours();
+  const localHour = (Date.UTC(2020, 3, 31) + context.tz_offset).getHours();
 
-  // チャンネル ID のリクエスト
+  // リクエストに使用するチャンネル ID
   const requestChannel = 'C12345';
 
   const requestText = `:large_blue_circle: *New request from <@${command.user_id}>*: ${command.text}`;
 
   // 午前 9 時〜午後 5 時以外のリクエストの場合は明日
-  if (local_hour > 17 || local_hour < 9) {
+  if (localHour > 17 || localHour < 9) {
     // ローカル時間の明日午前 9 時までの差分を取得する関数があると仮定
-    const local_tomorrow = getLocalTomorrow(context.tz_offset);
+    const localTomorrow = getLocalTomorrow(context.tz_offset);
 
     try {
       // メッセージ送信スケジュールを調整
       const result = await client.chat.scheduleMessage({
         channel: requestChannel,
         text: requestText,
-        post_at: local_tomorrow
+        post_at: localTomorrow
       });
     }
     catch (error) {
@@ -55,12 +55,11 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
   } else {
     try {
       // 送信
-      const result = client.chat.postMessage({
+      const result = await client.chat.postMessage({
         channel: requestChannel,
         text: requestText
       });
-    }
-    catch (error) {
+    } catch (error) {
       logger.error(error);
     }
   }

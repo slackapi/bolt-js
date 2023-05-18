@@ -195,6 +195,12 @@ const app = new App({
 </div>
 
 ```javascript
+const database = {
+  async get(key) {},
+  async delete(key) {},
+  async set(key, value) {}
+};
+
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,

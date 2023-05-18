@@ -21,19 +21,19 @@ You can also define more focussed and specific error handlers for a variety of e
 </div>
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App, HTTPReceiver } from '@slack/bolt';
 
 const app = new App({
   receiver: new HTTPReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     // more specific, focussed error handlers
-    dispatchErrorHandler: ({ error, logger, response }) => {
+    dispatchErrorHandler: async ({ error, logger, response }) => {
       logger.error(`dispatch error: ${error}`);
       response.writeHead(404);
       response.write("Something is wrong!");
       response.end();
     },
-    processEventErrorHandler: ({ error, logger, response }) => {
+    processEventErrorHandler: async ({ error, logger, response }) => {
       logger.error(`processEvent error: ${error}`);
       // acknowledge it anyway!
       response.writeHead(200);
@@ -51,7 +51,7 @@ const app = new App({
 });
 
 // A more generic, global error handler
-app.error((error) => {
+app.error(async (error) => {
   // Check the details of the error to handle cases where you should retry sending a message or stop the app
   console.error(error);
 });
@@ -79,7 +79,7 @@ const app = new App({
   extendedErrorHandler: true,
 });
 
-app.error(({ error, logger, context, body }) => {
+app.error(async ({ error, logger, context, body }) => {
   // Log the error using the logger passed into Bolt
   logger.error(error);
 
