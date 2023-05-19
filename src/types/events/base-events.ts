@@ -651,7 +651,9 @@ export interface ReactionMessageItem {
   ts: string;
 }
 
-// This type is deprecated.
+/**
+ * @deprecated Slack applications no longer receive reaction events for files and file comments.
+ */
 export interface ReactionFileItem {
   type: 'file';
   channel: string;
