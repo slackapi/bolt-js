@@ -31,7 +31,7 @@ expectType<void>(app.shortcut<MessageShortcut>({}, async ({ shortcut, say }) => 
   await Promise.resolve(shortcut);
 }));
 
-// If shortcut is parameterized with GlobalShortcut, say argument in callback should be type never
+// If shortcut is parameterized with GlobalShortcut, say argument in callback should be type undefined
 expectType<void>(app.shortcut<GlobalShortcut>({}, async ({ shortcut, say }) => {
   expectType<undefined>(say);
   await Promise.resolve(shortcut);
