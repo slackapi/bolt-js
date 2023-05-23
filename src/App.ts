@@ -132,6 +132,7 @@ export interface AuthorizeResult {
   userToken?: string; // used by `say` (overridden by botToken)
   botId?: string; // required for `ignoreSelf` global middleware
   botUserId?: string; // optional but allows `ignoreSelf` global middleware be more filter more than just message events
+  userId?: string;
   teamId?: string;
   enterpriseId?: string;
   // TODO: for better type safety, we may want to revisit this
@@ -901,6 +902,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           },
         });
       }
+    }
+
+    // Try to set userId from AuthorizeResult before using one from source
+    if (authorizeResult.userId === undefined && source.userId !== undefined) {
+      authorizeResult.userId = source.userId;
     }
 
     // Try to set teamId from AuthorizeResult before using one from source
