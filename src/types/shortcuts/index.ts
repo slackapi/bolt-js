@@ -20,7 +20,7 @@ export interface SlackShortcutMiddlewareArgs<Shortcut extends SlackShortcut = Sl
   payload: Shortcut;
   shortcut: this['payload'];
   body: this['payload'];
-  say: SayFn;
+  say: Shortcut extends MessageShortcut ? SayFn : undefined;
   respond: RespondFn;
   ack: AckFn<void>;
 }

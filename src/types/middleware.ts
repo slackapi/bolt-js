@@ -57,6 +57,10 @@ export interface Context extends StringIndexed {
    */
   botUserId?: string;
   /**
+   * User ID.
+   */
+  userId?: string;
+  /**
    * Workspace ID.
    */
   teamId?: string;
