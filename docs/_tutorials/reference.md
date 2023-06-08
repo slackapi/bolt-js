@@ -98,6 +98,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `unhandledRequestHandler` | Error handler triggered when a request from Slack goes unacknowledged. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
 | `unhandledRequestTimeoutMillis` | How long to wait, in milliseconds, from the time a request is received to when the `unhandledRequestHandler` should be triggered. Default is `3001`. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
 | `signatureVerification` | `boolean` that determines whether Bolt should [verify Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack). Defaults to `true`. |
+| `customPropertiesExtractor` | Optional `function` that can extract custom properties from a request -- for example, extracting custom headers to propagate to other services. More details available in the [Customizing a receiver documentation](/bolt-js/concepts#receiver). |
 
 ### App options {#app-options}
 App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialize either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
