@@ -9,7 +9,7 @@ order: 9
 
 #### Writing a custom receiver
 
-A receiver is responsible for handling and parsing any incoming requests from Slack then sending it to the app, so that the app can add context and pass the request to your listeners. Receivers must conform to the Receiver interface:
+A receiver is responsible for handling and parsing any incoming requests from Slack then sending it to the app, so that the app can add context and pass the request to your listeners. Receivers must conform to the [Receiver interface](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.13.1/src/types/receiver.ts#L27-L31):
 
 | Method       | Parameters                       | Return type |
 |--------------|----------------------------------|-------------|
@@ -28,11 +28,13 @@ For a more in-depth look at a receiver, [read the source code for the built-in `
 
 #### Customizing built-in receivers
 
-The built-in `HTTPReceiver`, `ExpressReceiver`, and `SocketModeReceiver` accept several configuration options. For a full list of options, see the [Receiver options reference](/bolt-js/reference#receiver-options).
+The built-in `HTTPReceiver`, `ExpressReceiver`, `AwsLambdaReceiver` and `SocketModeReceiver` accept several configuration options. For a full list of options, see the [Receiver options reference](/bolt-js/reference#receiver-options).
 
 ##### Extracting custom properties
 
-Use the `customPropertiesExtractor` option to extract custom properties from requests. This is particularly useful for extracting HTTP headers that you want to propagate to other services, for example, if you need to propagate a header for distributed tracing.
+Use the `customPropertiesExtractor` option to extract custom properties from incoming events. The event type depends on the type of receiver you are using, e.g. HTTP requests for `HTTPReceiver`s, websocket messages for `SocketModeReceiver`s.
+
+This is particularly useful for extracting HTTP headers that you want to propagate to other services, for example, if you need to propagate a header for distributed tracing.
 
 ```javascript
 const { App, HTTPReceiver } = require('@slack/bolt');
@@ -63,7 +65,7 @@ app.use(async ({ logger, context, next }) => {
 })();
 ```
 
-You can find [more examples of extracting custom properties](https://github.com/slackapi/bolt-js/tree/main/examples/custom-properties) here.
+You can find [more examples of extracting custom properties](https://github.com/slackapi/bolt-js/tree/%40slack/bolt%403.13.1/examples/custom-properties) from different types of receivers here.
 </div>
 
 ```javascript
@@ -79,7 +81,7 @@ class SimpleReceiver  {
       this.app.post(endpoint, this.requestHandler.bind(this));
     }
   }
-  
+
   init(app) {
     this.bolt = app;
   }
@@ -116,13 +118,13 @@ class SimpleReceiver  {
     const event = {
       body: parsedReq.body,
       // Receivers are responsible for handling acknowledgements
-      // `ack` should be prepared to be called multiple times and 
+      // `ack` should be prepared to be called multiple times and
       // possibly with `response` as an error
       ack: (response) => {
         if (ackCalled) {
           return;
         }
-        
+
         if (response instanceof Error) {
           res.status(500).send();
         } else if (!response) {
@@ -130,7 +132,7 @@ class SimpleReceiver  {
         } else {
           res.send(response);
         }
-        
+
         ackCalled = true;
       }
     };

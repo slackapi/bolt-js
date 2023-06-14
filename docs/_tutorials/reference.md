@@ -10,17 +10,20 @@ permalink: /reference
 
 <div class="section-content">
 This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️[Getting Started guide](/bolt-js/tutorial/getting-started) to learn the basics of building Bolt for JavaScript apps.
-</div> 
+</div>
 
-- [Listener functions](#listener-functions)
-  - [Methods](#methods)
-  - [Function arguments](#listener-function-arguments)
-  - [Difference from listener middleware](#difference-from-listener-middleware)
-- [Initialization options](#initialization-options)
-  - [Receiver options](#receiver-options)
-  - [App options](#app-options)
-- [Error types](#framework-error-types)
-  - [Client errors](#client-errors)
+- [App interface and configuration](#app-interface-and-configuration)
+  - [Listener functions {#listener-functions}](#listener-functions-listener-functions)
+    - [Methods {#methods}](#methods-methods)
+      - [Constraint objects](#constraint-objects)
+    - [Listener function arguments {#listener-function-arguments}](#listener-function-arguments-listener-function-arguments)
+      - [Body and payload references](#body-and-payload-references)
+    - [Difference from listener middleware {#difference-from-listener-middleware}](#difference-from-listener-middleware-difference-from-listener-middleware)
+  - [Initialization options  {#initialization-options}](#initialization-options--initialization-options)
+    - [Receiver options {#receiver-options}](#receiver-options-receiver-options)
+    - [App options {#app-options}](#app-options-app-options)
+  - [Framework error types {#framework-error-types}](#framework-error-types-framework-error-types)
+    - [Client errors {#client-errors}](#client-errors-client-errors)
 
 ---
 
@@ -32,8 +35,8 @@ Below is the current list of methods that accept listener functions. These metho
 
 | Method                          | Description |
 | :---: | :--- |
-| `app.event(eventType, fn);`     | Listens for Events API events. The `eventType` is a `string` to identify a [specific event](https://api.slack.com/events) to handle (which must be subscribed to in your app's configuration).   | 
-| `app.message([pattern ,] fn);`  | Convenience method to listen specifically to the [`message` event](https://api.slack.com/events/message). The pattern parameter can be any substring (`string`) or `RegExp` expression, which will be used to identify the incoming message. | 
+| `app.event(eventType, fn);`     | Listens for Events API events. The `eventType` is a `string` to identify a [specific event](https://api.slack.com/events) to handle (which must be subscribed to in your app's configuration).   |
+| `app.message([pattern ,] fn);`  | Convenience method to listen specifically to the [`message` event](https://api.slack.com/events/message). The pattern parameter can be any substring (`string`) or `RegExp` expression, which will be used to identify the incoming message. |
 | `app.action(actionId, fn);`     | Listens for an action event from a Block Kit element, such as a user interaction with a button, select menu, or datepicker. The `actionId` identifier is a `string` that should match the unique `action_id` included when your app sends the element to a view. Note that a view can be a message, modal, or app home. Note that action elements included in an `input` block do not trigger any events.
 | `app.shortcut(callbackId, fn);` | Listens for global or message shortcut invocation. The `callbackId` is a `string` or `RegExp` that must match a shortcut `callback_id` specified within your app's configuration.
 | `app.view(callbackId, fn);`     | Listens for `view_submission` and `view_closed` events. `view_submission` events are sent when a user submits a modal that your app opened. `view_closed` events are sent when a user closes the modal rather than submits it.
@@ -42,7 +45,7 @@ Below is the current list of methods that accept listener functions. These metho
 | `app.options(actionId, fn);`    | Listens for options requests (from select menus with an external data source). This isn't often used, and shouldn't be mistaken with `app.action`. The `actionId` identifier is a `string` that matches the unique `action_id` included when you app sends a [select with an external data source](https://api.slack.com/reference/block-kit/block-elements#external_select).
 
 #### Constraint objects
-There are a collection of constraint objects that some methods have access to. These can be used to narrow the event your listener function handles, or to handle special cases. Constraint objects can be passed in lieu of the identifiers outlined above. Below is a collection of constraint objects and the methods they can be passed to. 
+There are a collection of constraint objects that some methods have access to. These can be used to narrow the event your listener function handles, or to handle special cases. Constraint objects can be passed in lieu of the identifiers outlined above. Below is a collection of constraint objects and the methods they can be passed to.
 
 | Method                                         | Options | Details |
 | :---: | :--- | :--- |
@@ -98,7 +101,7 @@ Bolt includes a collection of initialization options to customize apps. There ar
 | `unhandledRequestHandler` | Error handler triggered when a request from Slack goes unacknowledged. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
 | `unhandledRequestTimeoutMillis` | How long to wait, in milliseconds, from the time a request is received to when the `unhandledRequestHandler` should be triggered. Default is `3001`. More details available in the [Error Handling documentation](/bolt-js/concepts#error-handling). |
 | `signatureVerification` | `boolean` that determines whether Bolt should [verify Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack). Defaults to `true`. |
-| `customPropertiesExtractor` | Optional `function` that can extract custom properties from a request -- for example, extracting custom headers to propagate to other services. More details available in the [Customizing a receiver documentation](/bolt-js/concepts#receiver). |
+| `customPropertiesExtractor` | Optional `function` that can extract custom properties from an incoming receiver event -- for example, extracting custom headers to propagate to other services. The function receives one argument that will have the type of the event received by your receiver (e.g. an HTTP request or websocket message) and should return an object with string keys containing your custom properties. More details available in the [Customizing a receiver documentation](/bolt-js/concepts#receiver). |
 
 ### App options {#app-options}
 App options are passed into the `App` constructor. When the `receiver` argument is `undefined` the `App` constructor also accepts the [above `Receiver` options](#receiver-options) to initialize either a `HttpReceiver` or a `SocketModeReceiver` depending on the value of the `socketMode` argument.
@@ -118,8 +121,8 @@ App options are passed into the `App` constructor. When the `receiver` argument 
 | `extendedErrorHandler` | Option that accepts a `boolean` value. When set to `true`, the global error handler is passed an object with additional request context. Available from version 3.8.0, defaults to `false`. More information on advanced error handling can be found [in the documentation](/bolt-js/concepts#error-handling). |
 | `ignoreSelf` | `boolean` to enable a middleware function that ignores any messages coming from your app. Requires a `botId`. Defaults to `true`.  |
 | `clientOptions.slackApiUrl` | Allows setting a custom endpoint for the Slack API. Used most often for testing. |
-| `socketMode` | Option that accepts a `boolean` value. When set to `true` the app is started in [Socket Mode](/bolt-js/concepts#socket-mode), i.e. it allows your app to connect and receive data from Slack via a WebSocket connection. Defaults to `false`. 
-| `developerMode` | `boolean` to activate the developer mode. When set to `true` the `logLevel` is automatically set to `DEBUG` and `socketMode` is set to `true`. However, explicitly setting these two properties takes precedence over implicitly setting them via `developerMode`. Furthermore, a custom OAuth failure handler is provided to help debugging. Finally, the body of all incoming requests are logged and thus sensitive information like tokens might be contained in the logs. Defaults to `false`.  | 
+| `socketMode` | Option that accepts a `boolean` value. When set to `true` the app is started in [Socket Mode](/bolt-js/concepts#socket-mode), i.e. it allows your app to connect and receive data from Slack via a WebSocket connection. Defaults to `false`.
+| `developerMode` | `boolean` to activate the developer mode. When set to `true` the `logLevel` is automatically set to `DEBUG` and `socketMode` is set to `true`. However, explicitly setting these two properties takes precedence over implicitly setting them via `developerMode`. Furthermore, a custom OAuth failure handler is provided to help debugging. Finally, the body of all incoming requests are logged and thus sensitive information like tokens might be contained in the logs. Defaults to `false`.  |
 | `deferInitialization` | `boolean` to defer initialization of the app and places responsibility for manually calling the `async` `App#init()` method on the developer. `init()` must be called before `App#start()`. Defaults to `false`. |
 | `signatureVerification` | `boolean` that determines whether Bolt should [verify Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack). Defaults to `true`. |
 
