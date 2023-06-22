@@ -890,6 +890,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const e = error as any;
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
+        await ack();
         e.code = ErrorCode.AuthorizationError;
         // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
         // eslint-disable-next-line consistent-return
