@@ -86,6 +86,7 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
     - From the repository, navigate to the **Releases** section and draft a new release
     - When creating the release notes, select the tag you generated earlier for your release and title the release the same name as the tag
     - Release notes should mention contributors, issues and PRs ([Example](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.6.0))
+        - Related changes should be grouped together, such as enhancements, bug fixes, documentation, dependencies, or others.
     - Once the release notes are ready, click the "Publish Release" button to make them public
 
 8. Communicate the release (as appropriate)
