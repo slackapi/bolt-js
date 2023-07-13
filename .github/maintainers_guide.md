@@ -72,9 +72,12 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
 5. Publish the release to npm
     - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your password generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
     - Before publishing a new version, run `rm -rf node_modules/ dist/` to clean your module dependencies in the project first (usually this is not required but in some cases, `npm publish` cannot include all the required files in a package) 
-    - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package contain, at a minimum: `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `dist/index.js`, `dist/App.js`
-    - Run `npm publish --tag <dist-tag> . --otp YOUR_OTP_CODE`. To generate an OTP (One Time Password), use your password generator of choice (Duo, 1Password). 
-    - `<dist-tag>` should be a label representative of the beta release. It could be feature-specific (i.e. `feat-token-rotation`) or it can be a generic release candidate (i.e. `2.5.0rc`). Whatever you decide: it must _not_ be `latest`, as that is reserved for non-beta releases. You can run `npm info` to see all dist tags. 
+    - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package contain, at a minimum: `package.json`, `README.md`, `LICENSE`, `dist/index.js`, `dist/App.js`
+    - Publish the release by running `npm publish --tag <dist-tag> . --otp YOUR_OTP_CODE`.
+        - Stable releases should use `latest` for the `<dist-tag>`. This label is reserved only for the latest non-beta release!
+        - Beta releases should use a representative label for `<dist-tag>`. It could be feature-specific (e.g. `feat-token-rotation`) or it can be a generic release candidate (e.g. `2.5.0rc`). As long as it's _not_ `latest`.
+        - All current dist tags can be viewed by running `npm info`.
+        - An OTP (One Time Password) can be generated for `YOUR_OTP_CODE` with the password generator of your choice (Duo, 1Password).
 6. Close GitHub Milestone
     - Close the relevant GitHub Milestone(s) for the release(s)
     - Check the existing GitHub Milestones to see if the next minor version exists. If it doesn't, then create a GitHub Milestone for new issues to live in. Typically, you'll create a new minor version - however, if there are any bugs that need to be carried over from the current GitHub Milestone, you could make a Milestone for a patch version to reflect those issues
@@ -82,7 +85,8 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
 7. Create GitHub Release(s) with release notes
     - From the repository, navigate to the **Releases** section and draft a new release
     - When creating the release notes, select the tag you generated earlier for your release and title the release the same name as the tag
-    - Release notes should mention contributors, issues and PRs ([Example](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.6.0))
+    - Release notes should mention contributors, issues and PRs ([Example](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.13.2))
+        - Related changes should be grouped together, such as enhancements, bug fixes, documentation, dependencies, or others.
     - Once the release notes are ready, click the "Publish Release" button to make them public
 
 8. Communicate the release (as appropriate)
