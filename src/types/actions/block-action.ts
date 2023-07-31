@@ -55,7 +55,7 @@ export interface StaticSelectAction extends BasicElementAction<'static_select'> 
   selected_option: {
     text: PlainTextElement;
     value: string;
-  };
+  } | null;
   initial_option?: Option;
   placeholder?: PlainTextElement;
   confirm?: Confirmation;
@@ -199,7 +199,7 @@ export interface CheckboxesAction extends BasicElementAction<'checkboxes'> {
  *  An action from a plain_text_input element (must use dispatch_action: true)
  */
 export interface PlainTextInputAction extends BasicElementAction<'plain_text_input'> {
-  value: string;
+  value: string | null;
 }
 
 /**
