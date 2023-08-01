@@ -1,10 +1,10 @@
 import 'mocha';
+import { EventEmitter } from 'events';
+import { IncomingMessage, ServerResponse } from 'http';
 import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
-import { EventEmitter } from 'events';
-import { IncomingMessage, ServerResponse } from 'http';
 import { match } from 'path-to-regexp';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { InstallProvider } from '@slack/oauth';

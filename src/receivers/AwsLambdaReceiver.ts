@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import querystring from 'querystring';
 import crypto from 'crypto';
+import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import tsscmp from 'tsscmp';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types/receiver';

@@ -1,7 +1,7 @@
 import 'mocha';
+import { IncomingMessage, ServerResponse } from 'http';
 import sinon from 'sinon';
 import { assert } from 'chai';
-import { IncomingMessage, ServerResponse } from 'http';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import { HTTPModuleFunctions } from './HTTPModuleFunctions';
 import { ReceiverMultipleAckError } from '../errors';

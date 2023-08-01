@@ -1,8 +1,8 @@
 import 'mocha';
-import sinon from 'sinon';
-import { assert } from 'chai';
 import { IncomingMessage, ServerResponse } from 'http';
 import { createHmac } from 'crypto';
+import sinon from 'sinon';
+import { assert } from 'chai';
 
 import {
   ReceiverMultipleAckError,

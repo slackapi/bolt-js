@@ -14,7 +14,7 @@ describe('Interactivity payload types', () => {
         type: 'block_actions',
         user: {
           id: 'W111',
-          name: 'seratch',
+          username: 'seratch',
           team_id: 'T111',
         },
         api_app_id: 'A02',

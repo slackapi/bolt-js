@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { URL } from 'url';
-import { SocketModeClient } from '@slack/socket-mode';
 import { createServer, ServerResponse, Server } from 'http';
+import { SocketModeClient } from '@slack/socket-mode';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
 import { AppsConnectionsOpenResponse } from '@slack/web-api';

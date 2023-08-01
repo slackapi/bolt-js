@@ -1,6 +1,6 @@
 import 'mocha';
-import { assert } from 'chai';
 import { createHmac } from 'crypto';
+import { assert } from 'chai';
 import { isValidSlackRequest, verifySlackRequest } from './verify-request';
 
 describe('Request verification', async () => {
