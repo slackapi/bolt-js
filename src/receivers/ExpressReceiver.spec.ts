@@ -1,11 +1,11 @@
 import 'mocha';
+import { Readable } from 'stream';
+import { EventEmitter } from 'events';
 import sinon, { SinonFakeTimers, SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { Logger, LogLevel } from '@slack/logger';
 import { Application, IRouter, Request, Response } from 'express';
-import { Readable } from 'stream';
-import { EventEmitter } from 'events';
 import { Override, mergeOverrides, createFakeLogger } from '../test-helpers';
 import { ErrorCode, CodedError, ReceiverInconsistentStateError, AppInitializationError, AuthorizationError } from '../errors';
 import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';

@@ -218,9 +218,12 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   } | null;
   user: {
     id: string;
-    name: string;
+    /**
+     * name will be present if the block_action originates from the Home tab
+     */
+    name?: string;
     username: string;
-    team_id?: string; // undocumented
+    team_id?: string;
   };
   channel?: {
     id: string;

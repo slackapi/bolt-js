@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { parse as qsParse } from 'querystring';
+import type { IncomingMessage, ServerResponse } from 'http';
 import rawBody from 'raw-body';
 import type { Logger } from '@slack/logger';
-import type { IncomingMessage, ServerResponse } from 'http';
 import { CodedError, ErrorCode } from '../errors';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { verifySlackRequest } from './verify-request';
