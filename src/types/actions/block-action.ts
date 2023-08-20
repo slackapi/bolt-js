@@ -21,6 +21,7 @@ export type BlockElementAction =
   | MultiExternalSelectAction
   | OverflowAction
   | DatepickerAction
+  | TimepickerAction
   | RadioButtonsAction
   | CheckboxesAction
   | PlainTextInputAction;
@@ -178,6 +179,16 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
 }
 
 /**
+ * An action from a time picker element
+ */
+export interface TimepickerAction extends BasicElementAction<'timepicker'> {
+  selected_time: string | null;
+  initial_time?: string;
+  placeholder?: PlainTextElement;
+  confirm?: Confirmation;
+}
+
+/**
  * An action from a radio button element
  */
 export interface RadioButtonsAction extends BasicElementAction<'radio_buttons'> {
@@ -276,6 +287,7 @@ export type BlockChannelsSelectAction = BlockAction<ChannelsSelectAction>;
 export type BlockExternalSelectAction = BlockAction<ExternalSelectAction>;
 export type BlockOverflowAction = BlockAction<OverflowAction>;
 export type BlockDatepickerAction = BlockAction<DatepickerAction>;
+export type BlockTimepickerAction = BlockAction<TimepickerAction>;
 export type BlockRadioButtonsAction = BlockAction<RadioButtonsAction>;
 export type BlockCheckboxesAction = BlockAction<CheckboxesAction>;
 export type BlockPlainTextInputAction = BlockAction<PlainTextInputAction>;
