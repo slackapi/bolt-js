@@ -32,7 +32,6 @@
     "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
     "test": "npm run lint && npm run mocha && npm run test:types",
     "test:types": "tsd",
-    "coverage": "codecov",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": "slackapi/bolt",
@@ -65,7 +64,6 @@
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.0",
     "chai": "^4.2.0",
-    "codecov": "^3.2.0",
     "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",

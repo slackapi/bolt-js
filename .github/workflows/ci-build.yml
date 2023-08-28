@@ -29,4 +29,3 @@ jobs:
       run: ./node_modules/.bin/eslint -v
     - run: npm run build
     - run: npm test
-    - run: npm run coverage
