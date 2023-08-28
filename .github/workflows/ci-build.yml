@@ -30,6 +30,7 @@ jobs:
     - run: npm run build
     - run: npm test
     - name: Upload coverage to Codecov
+      if: matrix.node-version == '20.x'
       uses: codecov/codecov-action@v3
       with:
         directory: coverage
