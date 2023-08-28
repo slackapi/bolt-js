@@ -29,3 +29,9 @@ jobs:
       run: ./node_modules/.bin/eslint -v
     - run: npm run build
     - run: npm test
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: coverage
+        fail_ci_if_error: true
+        verbose: true
