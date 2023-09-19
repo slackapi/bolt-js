@@ -54,7 +54,7 @@ import {
   SlashCommand,
   WorkflowStepEdit,
 } from './types';
-import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
+import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
 import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
@@ -878,7 +878,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
     let authorizeResult: AuthorizeResult;
-    if (type === IncomingEventType.Event && isEventTypeToSkipAuthorize(event.body.event.type)) {
+    if (type === IncomingEventType.Event && isEventTypeToSkipAuthorize(event)) {
       authorizeResult = {
         enterpriseId: source.enterpriseId,
         teamId: source.teamId,
@@ -1522,25 +1522,6 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   };
 }
 
-function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: IncomingEventType): boolean {
-  if (type === IncomingEventType.Event) {
-    const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
-    if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
-      return !!bodyAsEvent.authorizations[0].is_enterprise_install;
-    }
-  }
-  // command payloads have this property set as a string
-  if (typeof body.is_enterprise_install === 'string') {
-    return body.is_enterprise_install === 'true';
-  }
-  // all remaining types have a boolean property
-  if (body.is_enterprise_install !== undefined) {
-    return body.is_enterprise_install;
-  }
-  // as a fallback we assume it's a single team installation (but this should never happen)
-  return false;
-}
-
 function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
@@ -1560,13 +1541,6 @@ function buildRespondFn(
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
     return axiosInstance.post(responseUrl, normalizedArgs);
   };
-}
-
-// token revocation use cases
-// https://github.com/slackapi/bolt-js/issues/674
-const eventTypesToSkipAuthorize = ['app_uninstalled', 'tokens_revoked'];
-function isEventTypeToSkipAuthorize(eventType: string) {
-  return eventTypesToSkipAuthorize.includes(eventType);
 }
 
 function escapeHtml(input: string | undefined | null): string {
