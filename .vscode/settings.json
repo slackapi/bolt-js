@@ -15,7 +15,7 @@ Happy linting! 💖
   "editor.rulers": [120],
   "typescript.tsdk": "node_modules/typescript/lib",
   // TODO: re-enable format on save once ESLint rules are more stable
-  "editor.formatOnSave": false,
+  // "editor.formatOnSave": false,
   // "[javascript]": {
   // 	"editor.formatOnSave": true
   // },

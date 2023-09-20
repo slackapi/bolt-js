@@ -141,7 +141,7 @@ export function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'],
  * https://github.com/slackapi/bolt-js/issues/674
  */
 export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
-  return eventTypesToSkipAuthorize.includes(event.body.event.type);
+  return eventTypesToSkipAuthorize.includes(event.body.event?.type);
 }
 
 /* istanbul ignore next */

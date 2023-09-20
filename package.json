@@ -73,7 +73,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.29.3",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "mocha": "^9.2.2",
+    "mocha": "^9.1.3",
     "nyc": "^15.1.0",
     "rewiremock": "^3.13.4",
     "shx": "^0.3.2",
