@@ -12,16 +12,16 @@ https://github.com/typescript-eslint/tslint-to-eslint-config/blob/master/docs/FA
 Happy linting! 💖
 */
 {
-  "editor.rulers": [120],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  // TODO: re-enable format on save once ESLint rules are more stable
-  // "editor.formatOnSave": false,
-  // "[javascript]": {
-  // 	"editor.formatOnSave": true
+	"editor.rulers": [120],
+	"typescript.tsdk": "node_modules/typescript/lib",
+	// TODO: re-enable format on save once ESLint rules are more stable
+	// "editor.formatOnSave": false,
+	// "[javascript]": {
+	// 	"editor.formatOnSave": true
+	// },
+	// "[typescript]": {
+	// 	"editor.formatOnSave": true
   // },
-  // "[typescript]": {
-  // 	"editor.formatOnSave": true
-  // },
-  "editor.tabSize": 2,
-  "eslint.enable": true
+	"editor.tabSize": 2,
+	"eslint.enable": true,
 }
