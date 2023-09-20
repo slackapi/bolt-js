@@ -1,6 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
-import { getTypeAndConversation, IncomingEventType } from './helpers';
+import { isBodyWithTypeEnterpriseInstall, getTypeAndConversation, IncomingEventType, isEventTypeToSkipAuthorize } from './helpers';
+import { AnyMiddlewareArgs, ReceiverEvent, SlackEventMiddlewareArgs } from './types';
 
 describe('Helpers', () => {
   describe('getTypeAndConversation()', () => {
@@ -107,6 +108,109 @@ describe('Helpers', () => {
 
         // Assert
         assert.isEmpty(typeAndConversation);
+      });
+    });
+  });
+
+  describe(`${isBodyWithTypeEnterpriseInstall.name}()`, () => {
+    describe('with body of event type', () => {
+      // Arrange
+      const dummyEventBody: SlackEventMiddlewareArgs['body'] = {
+        token: '',
+        team_id: '',
+        api_app_id: '',
+        event_id: '',
+        event_time: 0,
+        type: 'event_callback',
+        event: {
+          type: 'app_home_opened',
+          user: '',
+          channel: '',
+          event_ts: '',
+        },
+        authorizations: [{
+          enterprise_id: '',
+          is_bot: true,
+          team_id: '',
+          user_id: '',
+          is_enterprise_install: true,
+        }],
+      };
+
+      it('should resolve the is_enterprise_install field', () => {
+        // Act
+        const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(dummyEventBody);
+        // Assert
+        assert(isEnterpriseInstall === true);
+      });
+
+      it('should resolve the is_enterprise_install with provided event type', () => {
+        // Act
+        const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(dummyEventBody, IncomingEventType.Event);
+        // Assert
+        assert(isEnterpriseInstall === true);
+      });
+    });
+
+    describe('with is_enterprise_install as a string value', () => {
+      // Arrange
+      const dummyEventBody = {
+        is_enterprise_install: 'true',
+      } as AnyMiddlewareArgs['body'];
+
+      it('should resolve is_enterprise_install as truthy', () => {
+        // Act
+        const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(dummyEventBody);
+        // Assert
+        assert(isEnterpriseInstall === true);
+      });
+    });
+
+    describe('with is_enterprise_install as boolean value', () => {
+      // Arrange
+      const dummyEventBody = {
+        is_enterprise_install: true,
+      } as AnyMiddlewareArgs['body'];
+
+      it('should resolve is_enterprise_install as truthy', () => {
+        // Act
+        const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(dummyEventBody);
+        // Assert
+        assert(isEnterpriseInstall === true);
+      });
+    });
+
+    describe('with is_enterprise_install undefined', () => {
+      // Arrange
+      const dummyEventBody = {} as AnyMiddlewareArgs['body'];
+
+      it('should resolve is_enterprise_install as falsy', () => {
+        // Act
+        const isEnterpriseInstall = isBodyWithTypeEnterpriseInstall(dummyEventBody);
+        // Assert
+        assert(isEnterpriseInstall === false);
+      });
+    });
+  });
+
+  describe(`${isEventTypeToSkipAuthorize.name}()`, () => {
+    describe('receiver events that can be skipped', () => {
+      it('should return truthy when event can be skipped', () => {
+        // Arrange
+        const dummyEventBody = { ack: async () => {}, body: { event: { type: 'app_uninstalled' } } } as ReceiverEvent;
+        // Act
+        const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
+        // Assert
+        assert(isEnterpriseInstall === true);
+      });
+
+      it('should return falsy when event can not be skipped', () => {
+        // Arrange
+        const dummyEventBody = { ack: async () => {}, body: { event: { type: '' } } } as ReceiverEvent;
+        // Act
+        const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
+        // Assert
+        assert(isEnterpriseInstall === false);
       });
     });
   });
