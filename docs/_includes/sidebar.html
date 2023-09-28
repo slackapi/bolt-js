@@ -41,19 +41,6 @@
   </ul>
 
   <ul class="sidebar-section">
-    <li class="title">
-      Slack developer beta
-      <span class="label-beta">{{ site.t[page.lang].beta }}</span>
-    </li>
-    {% assign future_sections = site.future | sort: "order" | where: "lang", page.lang %}
-    {% for section in future_sections %}
-      <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/future/{{ section.slug }}">
-        <li>{{section.title}}</li>
-      </a>
-    {% endfor %}
-  </ul>
-
-  <ul class="sidebar-section">
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#advanced">
       <li class="title">{{ site.t[page.lang].advanced }}</li>
     </a>
