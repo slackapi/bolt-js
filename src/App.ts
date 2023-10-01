@@ -53,6 +53,7 @@ import {
   KnownEventFromType,
   SlashCommand,
   WorkflowStepEdit,
+  SlackOptions,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -148,6 +149,7 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
 
+// TODO: more strict typing to allow block/action_id for block_suggestion etc.
 export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
   type?: A["type"];
   block_id?: A extends BlockAction ? string | RegExp : never;
