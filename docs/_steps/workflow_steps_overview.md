@@ -7,7 +7,7 @@ order: 1
 
 <div class="section-content">
 
-<!--UNCOMMENT AFTER GA **⚠️ Workflow Steps from Apps are a legacy feature, not to be confused with workflows that are part of the next-gen beta. They are not interchangeable features. We encourage those who are currently publishing Workflow Steps from apps to join the beta - you can learn more about getting started with it [here](/bolt-js/future/getting-started).** -->
+**⚠️ Workflow Steps from Apps are a legacy feature, not to be confused with workflows that are part of the next generation Slack platform. They are not interchangeable features. We encourage those who are currently publishing Workflow Steps from apps to consider the new [automation features](https://api.slack.com/automation).**
 
 Workflow Steps from apps allow your app to create and process custom workflow steps that users can add using [Workflow Builder](https://api.slack.com/workflows).
 
