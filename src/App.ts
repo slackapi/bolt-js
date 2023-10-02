@@ -152,8 +152,8 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
 // TODO: more strict typing to allow block/action_id for block_suggestion etc.
 export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
   type?: A["type"];
-  block_id?: A extends BlockAction ? string | RegExp : never;
-  action_id?: A extends BlockAction ? string | RegExp : never; 
+  block_id?: A extends SlackOptions ? string | RegExp : never;
+  action_id?: A extends SlackOptions ? string | RegExp : never; 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
