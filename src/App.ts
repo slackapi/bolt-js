@@ -53,6 +53,7 @@ import {
   KnownEventFromType,
   SlashCommand,
   WorkflowStepEdit,
+  SlackOptions,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -144,6 +145,15 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
   type?: A['type'];
   block_id?: A extends BlockAction ? string | RegExp : never;
   action_id?: A extends BlockAction ? string | RegExp : never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
+}
+
+// TODO: more strict typing to allow block/action_id for block_suggestion etc.
+export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
+  type?: A["type"];
+  block_id?: A extends SlackOptions ? string | RegExp : never;
+  action_id?: A extends SlackOptions ? string | RegExp : never; 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
@@ -772,7 +782,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     Source extends OptionsSource = OptionsSource,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    constraints: ActionConstraints,
+    constraints: OptionsConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   // TODO: reflect the type in constraints to Source
@@ -780,12 +790,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     Source extends OptionsSource = OptionsSource,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    actionIdOrConstraints: string | RegExp | ActionConstraints,
+    actionIdOrConstraints: string | RegExp | OptionsConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
-      { action_id: actionIdOrConstraints } :
-      actionIdOrConstraints;
+    const constraints: OptionsConstraints =
+      typeof actionIdOrConstraints === "string" ||
+      util.types.isRegExp(actionIdOrConstraints)
+        ? { action_id: actionIdOrConstraints }
+        : actionIdOrConstraints;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes

@@ -557,7 +557,19 @@ describe('App event routing', () => {
       app.options('external_select_action_id', async () => {
         await optionsFn();
       });
+      app.options({
+        type: 'block_suggestion',
+        action_id: 'external_select_action_id',
+      }, async () => {
+        await optionsFn();
+      });
       app.options({ callback_id: 'dialog_suggestion_callback_id' }, async () => {
+        await optionsFn();
+      });
+      app.options({
+        type: 'dialog_suggestion',
+        callback_id: 'dialog_suggestion_callback_id',
+      }, async () => {
         await optionsFn();
       });
 
@@ -593,7 +605,7 @@ describe('App event routing', () => {
       assert.equal(actionFn.callCount, 3);
       assert.equal(shortcutFn.callCount, 4);
       assert.equal(viewFn.callCount, 5);
-      assert.equal(optionsFn.callCount, 2);
+      assert.equal(optionsFn.callCount, 4);
       assert.equal(ackFn.callCount, dummyReceiverEvents.length);
       assert(fakeErrorHandler.notCalled);
     });

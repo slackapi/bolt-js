@@ -703,7 +703,7 @@ describe('context typing', () => {
     });
 
     // Options with constraint is aware of global context and passes context to all middleware
-    app.options({ type: 'block_actions' }, async ({ context }) => {
+    app.options({ type: 'block_suggestion' }, async ({ context }) => {
       const globalCheck = {} as IfAnyThenElse<typeof context['globalContextKey'], never, valid>;
       globalCheck.valid = true;
     }, async ({ context }) => {
@@ -712,7 +712,7 @@ describe('context typing', () => {
     });
 
     // Options with constraint is aware of global and middleware context and passes context to all middleware
-    app.options<OptionsSource, MiddlewareContext>({ type: 'block_actions' }, async ({ context }) => {
+    app.options<OptionsSource, MiddlewareContext>({ type: 'block_suggestion' }, async ({ context }) => {
       const globalCheck = {} as IfAnyThenElse<typeof context['globalContextKey'], never, valid>;
       globalCheck.valid = true;
 
@@ -750,7 +750,7 @@ describe('context typing', () => {
     });
 
     // Options with constraint is aware of middleware context and passes context to all middleware
-    app.options<OptionsSource, MiddlewareContext>({ type: 'block_actions' }, async ({ context }) => {
+    app.options<OptionsSource, MiddlewareContext>({ type: 'block_suggestion' }, async ({ context }) => {
       const middlewareCheck = {} as IfAnyThenElse<typeof context['middlewareContextKey'], never, valid>;
       middlewareCheck.valid = true;
     }, async ({ context }) => {
