@@ -151,9 +151,9 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
 
 // TODO: more strict typing to allow block/action_id for block_suggestion etc.
 export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
-  type?: A["type"];
+  type?: A['type'];
   block_id?: A extends SlackOptions ? string | RegExp : never;
-  action_id?: A extends SlackOptions ? string | RegExp : never; 
+  action_id?: A extends SlackOptions ? string | RegExp : never;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
@@ -793,11 +793,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     actionIdOrConstraints: string | RegExp | OptionsConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    const constraints: OptionsConstraints =
-      typeof actionIdOrConstraints === "string" ||
-      util.types.isRegExp(actionIdOrConstraints)
-        ? { action_id: actionIdOrConstraints }
-        : actionIdOrConstraints;
+    const constraints: OptionsConstraints = typeof actionIdOrConstraints === 'string' ||
+      util.types.isRegExp(actionIdOrConstraints) ?
+      { action_id: actionIdOrConstraints } :
+      actionIdOrConstraints;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
