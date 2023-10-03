@@ -1,4 +1,4 @@
-import { PlainTextElement, Confirmation, Option } from '@slack/types';
+import { PlainTextElement, Confirmation, Option, RichTextBlock } from '@slack/types';
 import { StringIndexed } from '../helpers';
 import { ViewOutput, ViewStateValue } from '../view';
 
@@ -24,7 +24,8 @@ export type BlockElementAction =
   | TimepickerAction
   | RadioButtonsAction
   | CheckboxesAction
-  | PlainTextInputAction;
+  | PlainTextInputAction
+  | RichTextInputAction;
 
 /**
  * Any action from Slack's interactive elements
@@ -207,10 +208,17 @@ export interface CheckboxesAction extends BasicElementAction<'checkboxes'> {
 }
 
 /**
- *  An action from a plain_text_input element (must use dispatch_action: true)
+ * An action from a plain_text_input element (must use dispatch_action: true)
  */
 export interface PlainTextInputAction extends BasicElementAction<'plain_text_input'> {
   value: string;
+}
+
+/**
+ * An action from a rich_text_input element (must use dispatch_action: true)
+ */
+export interface RichTextInputAction extends BasicElementAction<'rich_text_input'> {
+  rich_text_value: RichTextBlock;
 }
 
 /**

@@ -43,7 +43,7 @@
     "@slack/logger": "^4.0.0",
     "@slack/oauth": "^2.6.1",
     "@slack/socket-mode": "^1.3.2",
-    "@slack/types": "^2.8.0",
+    "@slack/types": "^2.9.0",
     "@slack/web-api": "^6.7.1",
     "@types/express": "^4.16.1",
     "@types/promise.allsettled": "^1.0.3",
