@@ -1,4 +1,4 @@
-import { Block, KnownBlock, PlainTextElement, View } from '@slack/types';
+import { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
 import { AckFn, RespondFn } from '../utilities';
 
 /**
@@ -143,6 +143,7 @@ export interface ViewStateValue {
   selected_channels?: string[];
   selected_users?: string[];
   selected_options?: ViewStateSelectedOption[];
+  rich_text_value?: RichTextBlock;
 }
 
 export interface ViewOutput {
