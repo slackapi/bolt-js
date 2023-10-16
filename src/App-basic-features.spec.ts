@@ -14,6 +14,7 @@ import {
 } from './types';
 import { ConversationStore } from './conversation-store';
 import App from './App';
+import SocketModeReceiver from './receivers/SocketModeReceiver';
 
 // Utility functions
 const noop = () => Promise.resolve(undefined);
@@ -264,7 +265,7 @@ describe('App basic features', () => {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
     });
-    it('should fail when both socketMode and receiver are specified', async () => {
+    it('should fail when both socketMode and a custom receiver are specified', async () => {
       // Arrange
       const fakeReceiver = new FakeReceiver();
       const MockApp = await importApp();
@@ -277,6 +278,23 @@ describe('App basic features', () => {
         // Assert
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
+    });
+    it('should succeed when both socketMode and SocketModeReceiver are specified', async () => {
+      // Arrange
+      const fakeBotId = 'B_FAKE_BOT_ID';
+      const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
+      const overrides = mergeOverrides(
+        withNoopAppMetadata(),
+        withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+      );
+      const MockApp = await importApp(overrides);
+      const socketModeReceiver = new SocketModeReceiver({ appToken: '' });
+
+      // Act
+      const app = new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
+
+      // Assert
+      assert.instanceOf(app, MockApp);
     });
     it('should initialize MemoryStore conversation store by default', async () => {
       // Arrange

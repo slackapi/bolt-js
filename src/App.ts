@@ -1177,10 +1177,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): Receiver {
     if (receiver !== undefined) {
       // Custom receiver supplied
-      if (this.socketMode === true) {
-        // socketMode = true should result in SocketModeReceiver being used as receiver
-        // TODO: Add case for when socketMode = true and receiver = SocketModeReceiver
-        // as this should not result in an error
+      if (this.socketMode === true && !(receiver instanceof SocketModeReceiver)) {
         throw new AppInitializationError('You cannot supply a custom receiver when socketMode is set to true.');
       }
       return receiver;
