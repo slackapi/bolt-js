@@ -57,7 +57,7 @@ const app = new App({
 </summary>
 
 <div class="secondary-content" markdown="0">
-Adding custom HTTP routes is quite straightforward when using Bolt’s built-in ExpressReceiver. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which additional routes can be added.
+Adding custom HTTP routes is quite straightforward when using Bolt’s built-in ExpressReceiver. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which additional routes and middleware can be added.
 </div>
 
 ```javascript
@@ -76,6 +76,12 @@ const app = new App({
 app.event('message', async ({ event, client }) => {
   // Do some slack-specific stuff here
   await client.chat.postMessage(...);
+});
+
+// Middleware methods execute on every web request
+receiver.router.use((req, res, next) => {
+  console.log(`Request time: ${Date.now()}`);
+  next();
 });
 
 // Other web requests are methods on receiver.router

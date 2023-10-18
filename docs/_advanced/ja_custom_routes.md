@@ -78,6 +78,11 @@ app.event('message', async ({ event, client }) => {
   await client.chat.postMessage(...);
 });
 
+receiver.router.use((req, res, next) => {
+  console.log(`Request time: ${Date.now()}`);
+  next();
+});
+
 // それ以外の Web リクエストの処理は receiver.router のメソッドで定義
 receiver.router.post('/secret-page', (req, res) => {
   // ここでは Express のリクエストやレスポンスをそのまま扱う
@@ -86,7 +91,7 @@ receiver.router.post('/secret-page', (req, res) => {
 
 (async () => {
   await app.start();
-  console.log('⚡️ Bolt app started'');
+  console.log('⚡️ Bolt app started');
 })();
 ```
 </details>
