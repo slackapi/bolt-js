@@ -61,6 +61,7 @@ import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
+import { WorkflowFunction, WorkflowFunctionMiddleware } from './WorkflowFunction';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -513,6 +514,16 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    */
   public step(workflowStep: WorkflowStep): this {
     const m = workflowStep.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+
+  /**
+ * Register WorkflowFunction middleware
+ */
+  public function(callbackId: string, ...listeners: WorkflowFunctionMiddleware): this {
+    const fn = new WorkflowFunction(callbackId, listeners);
+    const m = fn.getMiddleware();
     this.middleware.push(m);
     return this;
   }
