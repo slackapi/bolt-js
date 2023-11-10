@@ -38,7 +38,7 @@ export interface FunctionFailFn {
 }
 
 export interface WorkflowFunctionExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
-  function: FunctionExecutedEvent;
+  definition: FunctionExecutedEvent;
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
 }
@@ -208,7 +208,7 @@ export function prepareFunctionArgs(args: any): AllWorkflowFunctionMiddlewareArg
   const preparedArgs: any = { ...functionArgs };
 
   // Utility args
-  preparedArgs.function = preparedArgs.event.function; // ie, function definition
+  preparedArgs.definition = preparedArgs.event.function; // ie, function definition
   preparedArgs.inputs = preparedArgs.event.inputs;
   preparedArgs.complete = createFunctionComplete(preparedArgs);
   preparedArgs.fail = createFunctionFail(preparedArgs);
