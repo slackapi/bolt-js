@@ -289,12 +289,6 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/hiya';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        const setHeader = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
-        fakeRes.setHeader = setHeader;
         await receiver.requestListener(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
@@ -332,10 +326,6 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/hiya';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
         /* eslint-disable-next-line @typescript-eslint/await-thenable */
         await receiver.requestListener(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
@@ -374,10 +364,6 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/hiya';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
         await receiver.requestListener(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
@@ -421,10 +407,6 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/heyo';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
         /* eslint-disable-next-line @typescript-eslint/await-thenable */
         await receiver.requestListener(fakeReq, fakeRes);
         assert(installProviderStub.handleCallback.calledWith(fakeReq, fakeRes, callbackOptions));
@@ -475,12 +457,9 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/heyo';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        fakeRes.writeHead = sinon.fake();
-        fakeRes.end = sinon.fake();
         await receiver.requestListener(fakeReq, fakeRes);
-        sinon.assert.calledWith(
-          installProviderStub.handleCallback, fakeReq, fakeRes, callbackOptions, installUrlOptions,
-        );
+        // eslint-disable-next-line max-len
+        sinon.assert.calledWith(installProviderStub.handleCallback, fakeReq, fakeRes, callbackOptions, installUrlOptions);
       });
     });
     describe('custom route handling', async function () {
@@ -704,8 +683,6 @@ describe('HTTPReceiver', function () {
       fakeReq.method = 'GET';
 
       const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-      fakeRes.writeHead = sinon.fake();
-      fakeRes.end = sinon.fake();
 
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
     });

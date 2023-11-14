@@ -148,6 +148,7 @@ export default class AwsLambdaReceiver implements Receiver {
       ) {
         return Promise.resolve({
           statusCode: 200,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ challenge: body.challenge }),
         });
@@ -194,6 +195,7 @@ export default class AwsLambdaReceiver implements Receiver {
           }
           return {
             statusCode: 200,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(storedResponse),
           };

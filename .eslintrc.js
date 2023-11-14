@@ -212,6 +212,10 @@ module.exports = {
             leadingUnderscore: 'allow',
           },
           {
+            selector: 'import',
+            format: null, // do not force naming conventions on imports because we may not control imports from third parties
+          },
+          {
             selector: 'parameter',
             format: ['camelCase'],
             leadingUnderscore: 'allow',
@@ -226,7 +230,7 @@ module.exports = {
             format: ['snake_case', 'camelCase'],
           },
           {
-            'selector': 'objectLiteralProperty',
+            selector: 'objectLiteralProperty',
             format: ['camelCase', 'snake_case', 'PascalCase'],
           },
           {
@@ -284,6 +288,13 @@ module.exports = {
           assertionStyle: 'as',
           objectLiteralTypeAssertions: 'allow',
         }],
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'objectLiteralProperty',
+            format: null, // disable object property naming conventions, as we override property names in tests all the time (e.g. header names, import names when mocking)
+          },
+        ],
         // Using any types is so useful for mock objects, we are fine with disabling this rule
         '@typescript-eslint/no-explicit-any': 'off',
         // Some parts in Bolt (e.g., listener arguments) are unnecessarily optional.

@@ -237,7 +237,11 @@ export async function processStepMiddleware(
 
   if (lastCallback !== undefined) {
     await processMiddleware(
-      callbacks, args, context, client, logger,
+      callbacks,
+      args,
+      context,
+      client,
+      logger,
       async () => lastCallback({ ...args, context, client, logger }),
     );
   }

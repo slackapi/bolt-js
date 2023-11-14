@@ -16,7 +16,9 @@ export interface SlackRequestVerificationOptions {
   signingSecret: string;
   body: string;
   headers: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     'x-slack-signature': string,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     'x-slack-request-timestamp': number,
   };
   nowMilliseconds?: number;

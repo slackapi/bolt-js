@@ -388,6 +388,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       this.installerOptions.callbackOptions = {
         failure: (error, _installOptions, _req, res) => {
           this.logger.debug(error);
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           res.writeHead(500, { 'Content-Type': 'text/html' });
           res.end(`<html><body><h1>OAuth failed!</h1><div>${escapeHtml(error.code)}</div></body></html>`);
         },
@@ -755,11 +756,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.listeners.push([onlyActions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
+  // eslint-disable-next-line function-paren-newline
   public command<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    commandName: string | RegExp, ...listeners: Middleware<
-    SlackCommandMiddlewareArgs,
-    AppCustomContext & MiddlewareCustomContext
-    >[]
+    commandName: string | RegExp,
+    ...listeners: Middleware<SlackCommandMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
@@ -1339,9 +1339,8 @@ function singleAuthorization(
   if (tokenVerificationEnabled) {
     // call auth.test immediately
     cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
-    return async ({ isEnterpriseInstall }) => buildAuthorizeResult(
-      isEnterpriseInstall, cachedAuthTestResult, authorization,
-    );
+    // eslint-disable-next-line max-len
+    return async ({ isEnterpriseInstall }) => buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
   }
   return async ({ isEnterpriseInstall }) => {
     // hold off calling auth.test API until the first access to authorize function

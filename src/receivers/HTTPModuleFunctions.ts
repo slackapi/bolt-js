@@ -92,7 +92,9 @@ export class HTTPModuleFunctions {
       signingSecret,
       body: textBody,
       headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         'x-slack-signature': signature,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         'x-slack-request-timestamp': requestTimestampSec,
       },
       logger: options.logger,
@@ -134,6 +136,7 @@ export class HTTPModuleFunctions {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static buildUrlVerificationResponse(res: ServerResponse, body: any): void {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ challenge: body.challenge }));
   }
@@ -152,6 +155,7 @@ export class HTTPModuleFunctions {
       res.writeHead(200);
       res.end(body);
     } else {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(body));
     }

@@ -529,7 +529,7 @@ describe('App basic features', () => {
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
       const MockApp = await importApp();
-      fakeReceiver.stop = sinon.fake.returns(dummyReturn);
+      fakeReceiver.stop = sinon.fake.returns(dummyReturn as unknown as Promise<unknown>);
 
       // Act
       const app = new MockApp({ receiver: fakeReceiver, authorize: noopAuthorize });

@@ -412,8 +412,6 @@ describe('SocketModeReceiver', function () {
         fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        fakeRes.writeHead = sinon.fake();
-        fakeRes.end = sinon.fake();
         await this.listener(fakeReq, fakeRes);
         sinon.assert.calledWith(
           installProviderStub.handleCallback,
