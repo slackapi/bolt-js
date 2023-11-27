@@ -226,11 +226,16 @@ module.exports = {
             format: ['snake_case', 'camelCase'],
           },
           {
-            'selector': 'objectLiteralProperty',
+            selector: 'objectLiteralProperty',
             format: ['camelCase', 'snake_case', 'PascalCase'],
           },
           {
-            selector: ['enumMember'],
+            selector: ['objectLiteralProperty', 'typeProperty'],
+            format: null,
+            modifiers: ['requiresQuotes'],
+          },
+          {
+            selector: 'enumMember',
             format: ['PascalCase'],
           },
         ],
