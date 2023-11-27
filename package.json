@@ -61,8 +61,8 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "20.10.0",
     "@types/sinon": "^7.0.11",
-    "@typescript-eslint/eslint-plugin": "^4.4.1",
-    "@typescript-eslint/parser": "^4.4.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
     "chai": "^4.2.0",
     "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -79,8 +79,8 @@
     "shx": "^0.3.2",
     "sinon": "^7.3.1",
     "source-map-support": "^0.5.12",
-    "ts-node": "^8.1.0",
-    "tsd": "^0.22.0",
+    "ts-node": "^10.9.1",
+    "tsd": "^0.29.0",
     "typescript": "5.3.2"
   },
   "tsd": {
