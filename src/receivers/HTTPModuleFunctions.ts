@@ -228,7 +228,7 @@ export class HTTPModuleFunctions {
     // Check if the response has already been sent
     if (!response.headersSent) {
       // If not, set the status code and end the response to close the connection
-      response.writeHead(503); // Service Unavailable
+      response.writeHead(404); // Not Found
       response.end();
     }
   }

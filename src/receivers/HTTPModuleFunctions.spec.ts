@@ -318,7 +318,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response,
         });
-        assert.isTrue(writeHead.calledWith(503));
+        assert.isTrue(writeHead.calledWith(404));
       });
     });
   });
