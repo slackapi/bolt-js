@@ -318,6 +318,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response,
         });
+        assert.isTrue(writeHead.calledWith(404));
       });
     });
   });

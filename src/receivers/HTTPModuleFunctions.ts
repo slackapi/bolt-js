@@ -219,11 +219,18 @@ export class HTTPModuleFunctions {
   // Developers can customize this behavior by passing unhandledRequestHandler to the constructor
   // Note that this method cannot be an async function to align with the implementation using setTimeout
   public static defaultUnhandledRequestHandler(args: ReceiverUnhandledRequestHandlerArgs): void {
-    const { logger } = args;
+    const { logger, response } = args;
     logger.error(
       'An incoming event was not acknowledged within 3 seconds. ' +
       'Ensure that the ack() argument is called in a listener.',
     );
+
+    // Check if the response has already been sent
+    if (!response.headersSent) {
+      // If not, set the status code and end the response to close the connection
+      response.writeHead(404); // Not Found
+      response.end();
+    }
   }
 }
 
