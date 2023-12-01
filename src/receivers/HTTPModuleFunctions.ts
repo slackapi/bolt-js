@@ -193,7 +193,8 @@ export class HTTPModuleFunctions {
 
     // Check if the response headers have already been sent
     if (response.headersSent) {
-      logger.error('Headers already sent, cannot send another response');
+      logger.error('An unhandled error occurred after ack() called in a listener');
+      logger.debug(`Error details: ${error}, storedResponse: ${storedResponse}`);
       return false;
     }
 
