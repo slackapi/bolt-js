@@ -190,6 +190,13 @@ export class HTTPModuleFunctions {
     args: ReceiverProcessEventErrorHandlerArgs,
   ): Promise<boolean> {
     const { error, response, logger, storedResponse } = args;
+
+    // Check if the response headers have already been sent
+    if (response.headersSent) {
+      logger.error('Headers already sent, cannot send another response');
+      return false;
+    }
+
     if ('code' in error) {
     // CodedError has code: string
       const errorCode = (error as CodedError).code;
