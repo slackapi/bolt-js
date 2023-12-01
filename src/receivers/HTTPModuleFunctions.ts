@@ -190,6 +190,14 @@ export class HTTPModuleFunctions {
     args: ReceiverProcessEventErrorHandlerArgs,
   ): Promise<boolean> {
     const { error, response, logger, storedResponse } = args;
+
+    // Check if the response headers have already been sent
+    if (response.headersSent) {
+      logger.error('An unhandled error occurred after ack() called in a listener');
+      logger.debug(`Error details: ${error}, storedResponse: ${storedResponse}`);
+      return false;
+    }
+
     if ('code' in error) {
     // CodedError has code: string
       const errorCode = (error as CodedError).code;
