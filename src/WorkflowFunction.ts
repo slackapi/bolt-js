@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  WorkflowsStepCompletedResponse,
-  WorkflowsStepFailedResponse,
-  // FunctionCompleteErrorResponse,
-  // FunctionCompleteSuccessResponse,
+  WebClient,
+  FunctionsCompleteErrorResponse,
+  FunctionsCompleteSuccessResponse,
 } from '@slack/web-api';
 import {
   Middleware,
   AllMiddlewareArgs,
   AnyMiddlewareArgs,
   SlackEventMiddlewareArgs,
-  FunctionExecutedEvent,
+  Context,
 } from './types';
 import processMiddleware from './middleware/process';
 import { WorkflowFunctionInitializationError } from './errors';
@@ -28,17 +27,14 @@ export interface FunctionFailArguments {
 }
 
 export interface FunctionCompleteFn {
-  // TODO :: import FunctionCompleteErrorResponse from @slack/web-api
-  (params?: FunctionCompleteArguments): Promise<WorkflowsStepCompletedResponse>;
+  (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
 }
 
 export interface FunctionFailFn {
-  // TODO :: import FunctionCompleteErrorResponse from @slack/web-api
-  (params: FunctionFailArguments): Promise<WorkflowsStepFailedResponse>;
+  (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
 }
 
 export interface WorkflowFunctionExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
-  definition: FunctionExecutedEvent;
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
 }
@@ -64,7 +60,6 @@ export class WorkflowFunction {
   /** Function callback_id */
   public callbackId: string;
 
-  /** Function definition */
   private middleware: WorkflowFunctionMiddleware;
 
   public constructor(
@@ -110,8 +105,13 @@ export function validate(callbackId: string, listeners: WorkflowFunctionMiddlewa
     throw new WorkflowFunctionInitializationError(errorMsg);
   }
 
-  // TODO: Validate that all array members are functions
-  console.log(listeners);
+  // Ensure all listeners are functions
+  listeners.forEach((listener) => {
+    if (!(listener instanceof Function)) {
+      const errorMsg = 'All WorkflowFunction listeners must be functions';
+      throw new WorkflowFunctionInitializationError(errorMsg);
+    }
+  });
 }
 
 /**
@@ -138,62 +138,59 @@ export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllWorkflowFun
   return VALID_PAYLOAD_TYPES.has(args.payload.type);
 }
 
-// TODO :: might be important for upcoming CLI compatability. Remove if not.
-// function selectToken(context: Context): string | undefined {
-//   return context.botToken !== undefined ? context.botToken : context.userToken;
-// }
+function selectToken(context: Context): string | undefined {
+  return context.functionBotToken ? context.functionBotToken : context.botToken || context.userToken;
+}
 
 /**
  * Factory for `complete()` utility
  * @param args function_executed event
  */
-function createFunctionComplete(
+export function createFunctionComplete(
   args: AllWorkflowFunctionMiddlewareArgs<WorkflowFunctionExecuteMiddlewareArgs>,
 ): FunctionCompleteFn {
   const {
-    // context,  // TODO : remove if not helpful for CLI
+    context,
     client,
     payload: { function_execution_id },
   } = args;
-  // const token = selectToken(context); // TODO : remove if not helpful for CLI
+  const token = selectToken(context);
 
   return (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
-    outputs: params.outputs,
+    // TODO :: Possible to change to context.functionBotToken, but need
+    // to establish if there will ever be a case where botToken would be used instead
+    // as a fallback
+    token,
+    outputs: params.outputs || {},
     function_execution_id,
   });
-
-  // return (params: Parameters<FunctionCompleteFn>[0] = {}) => client.apiCall('functions.completeSuccess', {
-  //   outputs: params.outputs,
-  //   function_execution_id,
-  // });
 }
 
 /**
  * Factory for `fail()` utility
  * @param args function_executed event
  */
-function createFunctionFail(
+export function createFunctionFail(
   args: AllWorkflowFunctionMiddlewareArgs<WorkflowFunctionExecuteMiddlewareArgs>,
 ): FunctionFailFn {
   const {
-    // context,  // TODO : remove if not helpful for CLI
+    context,
     client,
     payload: { function_execution_id },
   } = args;
-  // const token = selectToken(context);  // TODO : remove if not helpful for CLI
+  const token = selectToken(context);
 
   return (params: Parameters<FunctionFailFn>[0]) => {
     const { error } = params ?? {};
 
     return client.functions.completeError({
+      // TODO :: Possible to change to context.functionBotToken, but need
+      // to establish if there will ever be a case where botToken would be used instead
+      // as a fallback
+      token,
       error,
       function_execution_id,
     });
-
-    // return client.apiCall('functions.completeError', {
-    //   function_execution_id,
-    //   error,
-    // });
   };
 }
 
@@ -207,8 +204,12 @@ export function prepareFunctionArgs(args: any): AllWorkflowFunctionMiddlewareArg
   const { next: _next, ...functionArgs } = args;
   const preparedArgs: any = { ...functionArgs };
 
+  // The use of a functionBotToken establishes continuity between
+  // a function_executed event and subsequent interactive events
+  const client = new WebClient(preparedArgs.context.functionBotToken, { ...functionArgs.client });
+  preparedArgs.client = client;
+
   // Utility args
-  preparedArgs.definition = preparedArgs.event.function; // ie, function definition
   preparedArgs.inputs = preparedArgs.event.inputs;
   preparedArgs.complete = createFunctionComplete(preparedArgs);
   preparedArgs.fail = createFunctionFail(preparedArgs);

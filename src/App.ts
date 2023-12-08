@@ -61,7 +61,7 @@ import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
-import { WorkflowFunction, WorkflowFunctionMiddleware } from './WorkflowFunction';
+import { FunctionCompleteFn, FunctionFailFn, WorkflowFunction, WorkflowFunctionMiddleware } from './WorkflowFunction';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -949,12 +949,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
+    const { functionExecutionId, functionBotToken } = extractFunctionContext(body);
+
     const context: Context = {
       ...authorizeResult,
       ...event.customProperties,
       isEnterpriseInstall,
       retryNum: event.retryNum,
       retryReason: event.retryReason,
+      // Only add function-related props to context if truthy
+      ...(functionExecutionId && { functionExecutionId }),
+      ...(functionBotToken && { functionBotToken }),
     };
 
     // Factory for say() utility
@@ -1012,6 +1017,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       /** Ack function might be set below */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ack?: AckFn<any>;
+      complete?: FunctionCompleteFn;
+      fail?: FunctionFailFn;
     } = {
       body: bodyArg,
       payload,
@@ -1066,6 +1073,25 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
+
+    // TODO :: WorkflowFunction owns these same utilities. Rework TS to allow for reuse.
+    // Set complete() and fail() utilities for function-related interactivity
+    if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
+      listenerArgs.complete = (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
+        token: context.functionBotToken,
+        outputs: params.outputs || {},
+        function_execution_id: context.functionExecutionId,
+      });
+      listenerArgs.fail = (params: Parameters<FunctionFailFn>[0]) => {
+        const { error } = params ?? {};
+
+        return client.functions.completeError({
+          token: context.functionBotToken,
+          error,
+          function_execution_id: context.functionExecutionId,
+        });
+      };
+    }
 
     if (token !== undefined) {
       let pool;
@@ -1571,6 +1597,25 @@ function escapeHtml(input: string | undefined | null): string {
       .replace(/'/g, '&#x27;');
   }
   return '';
+}
+
+function extractFunctionContext(body: StringIndexed) {
+  let functionExecutionId;
+  let functionBotToken;
+
+  // function_executed event
+  if (body.event && body.event.function_execution_id) {
+    functionExecutionId = body.event.function_execution_id;
+    functionBotToken = body.event.bot_access_token;
+  }
+
+  // interactivity (block_actions)
+  if (body.function_data) {
+    functionExecutionId = body.function_data.execution_id;
+    functionBotToken = body.bot_access_token;
+  }
+
+  return { functionExecutionId, functionBotToken };
 }
 
 // ----------------------------
