@@ -139,6 +139,7 @@ export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllWorkflowFun
 }
 
 function selectToken(context: Context): string | undefined {
+  // If attachFunctionToken = false, fallback to botToken or userToken
   return context.functionBotToken ? context.functionBotToken : context.botToken || context.userToken;
 }
 
@@ -157,9 +158,6 @@ export function createFunctionComplete(
   const token = selectToken(context);
 
   return (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
-    // TODO :: Possible to change to context.functionBotToken, but need
-    // to establish if there will ever be a case where botToken would be used instead
-    // as a fallback
     token,
     outputs: params.outputs || {},
     function_execution_id,
@@ -184,9 +182,6 @@ export function createFunctionFail(
     const { error } = params ?? {};
 
     return client.functions.completeError({
-      // TODO :: Possible to change to context.functionBotToken, but need
-      // to establish if there will ever be a case where botToken would be used instead
-      // as a fallback
       token,
       error,
       function_execution_id,
@@ -203,10 +198,11 @@ export function createFunctionFail(
 export function prepareFunctionArgs(args: any): AllWorkflowFunctionMiddlewareArgs {
   const { next: _next, ...functionArgs } = args;
   const preparedArgs: any = { ...functionArgs };
+  const token = selectToken(functionArgs.context);
 
-  // The use of a functionBotToken establishes continuity between
-  // a function_executed event and subsequent interactive events
-  const client = new WebClient(preparedArgs.context.functionBotToken, { ...functionArgs.client });
+  // Making calls with a functionBotToken establishes continuity between
+  // a function_executed event and subsequent interactive events (actions)
+  const client = new WebClient(token, { ...functionArgs.client });
   preparedArgs.client = client;
 
   // Utility args

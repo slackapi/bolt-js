@@ -109,6 +109,7 @@ export interface AppOptions {
   tokenVerificationEnabled?: boolean;
   deferInitialization?: boolean;
   extendedErrorHandler?: boolean;
+  attachFunctionToken?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -269,6 +270,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
   private initialized: boolean;
 
+  private attachFunctionToken: boolean;
+
   public constructor({
     signingSecret = undefined,
     endpoints = undefined,
@@ -301,6 +304,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     tokenVerificationEnabled = true,
     extendedErrorHandler = false,
     deferInitialization = false,
+    attachFunctionToken = true,
   }: AppOptions = {}) {
     /* ------------------------ Developer mode ----------------------------- */
     this.developerMode = developerMode;
@@ -332,6 +336,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.hasCustomErrorHandler = false;
     this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
     this.extendedErrorHandler = extendedErrorHandler;
+
+    // Override token with functionBotToken in function-related handlers
+    this.attachFunctionToken = attachFunctionToken;
 
     /* ------------------------ Set client options ------------------------*/
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
@@ -949,18 +956,19 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
-    const { functionExecutionId, functionBotToken } = extractFunctionContext(body);
-
     const context: Context = {
       ...authorizeResult,
       ...event.customProperties,
       isEnterpriseInstall,
       retryNum: event.retryNum,
       retryReason: event.retryReason,
-      // Only add function-related props to context if truthy
-      ...(functionExecutionId && { functionExecutionId }),
-      ...(functionBotToken && { functionBotToken }),
     };
+
+    if (this.attachFunctionToken) {
+      const { functionExecutionId, functionBotToken } = extractFunctionContext(body);
+      if (functionExecutionId) { context.functionExecutionId = functionExecutionId; }
+      if (functionBotToken) { context.functionBotToken = functionBotToken; }
+    }
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
@@ -1604,7 +1612,7 @@ function extractFunctionContext(body: StringIndexed) {
   let functionBotToken;
 
   // function_executed event
-  if (body.event && body.event.function_execution_id) {
+  if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
     functionExecutionId = body.event.function_execution_id;
     functionBotToken = body.event.bot_access_token;
   }
