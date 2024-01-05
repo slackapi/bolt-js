@@ -34,12 +34,6 @@
     "test:types": "tsd",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
-  "bin": {
-    "slack-cli-get-hooks": "./bin/cli/get-hooks.js",
-    "slack-cli-get-manifest": "./bin/cli/get-manifest.js",
-    "slack-cli-check-update": "./bin/cli/check-update.js",
-    "slack-cli-start": "./bin/cli/start.js"
-  },
   "repository": "slackapi/bolt",
   "homepage": "https://slack.dev/bolt-js",
   "bugs": {
