@@ -63,7 +63,7 @@
     "@types/sinon": "^7.0.11",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.0",
-    "chai": "^4.3.0",
+    "chai": "~4.3.0",
     "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
