@@ -10,6 +10,7 @@ import {
   AnyMiddlewareArgs,
   SlackEventMiddlewareArgs,
   Context,
+  FunctionExecutedEvent,
 } from './types';
 import processMiddleware from './middleware/process';
 import { CustomFunctionInitializationError } from './errors';
@@ -35,6 +36,7 @@ export interface FunctionFailFn {
 }
 
 export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
+  inputs: FunctionExecutedEvent['inputs'];
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
 }
@@ -43,9 +45,9 @@ export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewar
 
 export type SlackCustomFunctionMiddlewareArgs = CustomFunctionExecuteMiddlewareArgs;
 
-type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>;
+type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
 
-export type CustomFunctionMiddleware = CustomFunctionExecuteMiddleware[];
+export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
 
 export type AllCustomFunctionMiddlewareArgs
   <T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs> = T & AllMiddlewareArgs;
@@ -64,7 +66,7 @@ export class CustomFunction {
 
   public constructor(
     callbackId: string,
-    middleware: CustomFunctionMiddleware,
+    middleware: CustomFunctionExecuteMiddleware,
   ) {
     validate(callbackId, middleware);
 
@@ -86,12 +88,12 @@ export class CustomFunction {
   }
 
   private async processEvent(args: AllCustomFunctionMiddlewareArgs): Promise<void> {
-    const functionArgs = prepareFunctionArgs(args);
-    const stepMiddleware = this.getStepMiddleware();
-    return processStepMiddleware(functionArgs, stepMiddleware);
+    const functionArgs = enrichFunctionArgs(args);
+    const functionMiddleware = this.getFunctionMiddleware();
+    return processFunctionMiddleware(functionArgs, functionMiddleware);
   }
 
-  private getStepMiddleware(): CustomFunctionMiddleware {
+  private getFunctionMiddleware(): CustomFunctionMiddleware {
     return this.middleware;
   }
 
@@ -131,28 +133,35 @@ export class CustomFunction {
 }
 
 /** Helper Functions */
-
-export function validate(callbackId: string, listeners: CustomFunctionMiddleware): void {
+export function validate(callbackId: string, middleware: CustomFunctionExecuteMiddleware): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'CustomFunction expects a callback_id as the first argument';
     throw new CustomFunctionInitializationError(errorMsg);
   }
 
-  // Ensure all listeners are functions
-  listeners.forEach((listener) => {
-    if (!(listener instanceof Function)) {
-      const errorMsg = 'All CustomFunction listeners must be functions';
-      throw new CustomFunctionInitializationError(errorMsg);
-    }
-  });
+  // Ensure middleware argument is either a function or an array
+  if (typeof middleware !== 'function' && !Array.isArray(middleware)) {
+    const errorMsg = 'CustomFunction expects a function or array of functions as the second argument';
+    throw new CustomFunctionInitializationError(errorMsg);
+  }
+
+  // Ensure array includes only functions
+  if (Array.isArray(middleware)) {
+    middleware.forEach((fn) => {
+      if (!(fn instanceof Function)) {
+        const errorMsg = 'All CustomFunction middleware must be functions';
+        throw new CustomFunctionInitializationError(errorMsg);
+      }
+    });
+  }
 }
 
 /**
- * `processStepMiddleware()` invokes each callback for lifecycle event
+ * `processFunctionMiddleware()` invokes each callback for lifecycle event
  * @param args workflow_step_edit action
  */
-export async function processStepMiddleware(
+export async function processFunctionMiddleware(
   args: AllCustomFunctionMiddlewareArgs,
   middleware: CustomFunctionMiddleware,
 ): Promise<void> {
@@ -168,7 +177,7 @@ export async function processStepMiddleware(
   }
 }
 
-function isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
+export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
   return VALID_PAYLOAD_TYPES.has(args.payload.type);
 }
 
@@ -178,25 +187,25 @@ function selectToken(context: Context): string | undefined {
 }
 
 /**
- * `prepareFunctionArgs()` takes in a function's args and:
+ * `enrichFunctionArgs()` takes in a function's args and:
  *  1. removes the next() passed in from App-level middleware processing
  *    - events will *not* continue down global middleware chain to subsequent listeners
  *  2. augments args with step lifecycle-specific properties/utilities
  * */
-function prepareFunctionArgs(args: any): AllCustomFunctionMiddlewareArgs {
+export function enrichFunctionArgs(args: any): AllCustomFunctionMiddlewareArgs {
   const { next: _next, ...functionArgs } = args;
-  const preparedArgs: any = { ...functionArgs };
+  const enrichedArgs: any = { ...functionArgs };
   const token = selectToken(functionArgs.context);
 
   // Making calls with a functionBotAccessToken establishes continuity between
   // a function_executed event and subsequent interactive events (actions)
   const client = new WebClient(token, { ...functionArgs.client });
-  preparedArgs.client = client;
+  enrichedArgs.client = client;
 
   // Utility args
-  preparedArgs.inputs = preparedArgs.event.inputs;
-  preparedArgs.complete = CustomFunction.createFunctionComplete(preparedArgs.context, client);
-  preparedArgs.fail = CustomFunction.createFunctionFail(preparedArgs.context, client);
+  enrichedArgs.inputs = enrichedArgs.event.inputs;
+  enrichedArgs.complete = CustomFunction.createFunctionComplete(enrichedArgs.context, client);
+  enrichedArgs.fail = CustomFunction.createFunctionFail(enrichedArgs.context, client);
 
-  return preparedArgs;
+  return enrichedArgs;
 }
