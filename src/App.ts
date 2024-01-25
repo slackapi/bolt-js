@@ -61,7 +61,7 @@ import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
-import { FunctionCompleteFn, FunctionFailFn, WorkflowFunction, WorkflowFunctionMiddleware } from './WorkflowFunction';
+import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -337,7 +337,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
     this.extendedErrorHandler = extendedErrorHandler;
 
-    // Override token with functionBotToken in function-related handlers
+    // Override token with functionBotAccessToken in function-related handlers
     this.attachFunctionToken = attachFunctionToken;
 
     /* ------------------------ Set client options ------------------------*/
@@ -526,10 +526,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
- * Register WorkflowFunction middleware
+ * Register CustomFunction middleware
  */
-  public function(callbackId: string, ...listeners: WorkflowFunctionMiddleware): this {
-    const fn = new WorkflowFunction(callbackId, listeners);
+  public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
+    const fn = new CustomFunction(callbackId, listeners);
     const m = fn.getMiddleware();
     this.middleware.push(m);
     return this;
@@ -964,10 +964,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       retryReason: event.retryReason,
     };
 
+    // Extract function-related information and augment to context
+    const { functionExecutionId, functionBotAccessToken } = extractFunctionContext(body);
+    if (functionExecutionId) { context.functionExecutionId = functionExecutionId; }
+
     if (this.attachFunctionToken) {
-      const { functionExecutionId, functionBotToken } = extractFunctionContext(body);
-      if (functionExecutionId) { context.functionExecutionId = functionExecutionId; }
-      if (functionBotToken) { context.functionBotToken = functionBotToken; }
+      if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
     }
 
     // Factory for say() utility
@@ -1082,23 +1084,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     let { client } = this;
     const token = selectToken(context);
 
-    // TODO :: WorkflowFunction owns these same utilities. Rework TS to allow for reuse.
-    // Set complete() and fail() utilities for function-related interactivity
+    // Add complete() and fail() utilities for function-related interactivity
     if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
-      listenerArgs.complete = (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
-        token: context.functionBotToken,
-        outputs: params.outputs || {},
-        function_execution_id: context.functionExecutionId,
-      });
-      listenerArgs.fail = (params: Parameters<FunctionFailFn>[0]) => {
-        const { error } = params ?? {};
-
-        return client.functions.completeError({
-          token: context.functionBotToken,
-          error,
-          function_execution_id: context.functionExecutionId,
-        });
-      };
+      listenerArgs.complete = CustomFunction.createFunctionComplete(context, client);
+      listenerArgs.fail = CustomFunction.createFunctionFail(context, client);
     }
 
     if (token !== undefined) {
@@ -1609,21 +1598,21 @@ function escapeHtml(input: string | undefined | null): string {
 
 function extractFunctionContext(body: StringIndexed) {
   let functionExecutionId;
-  let functionBotToken;
+  let functionBotAccessToken;
 
   // function_executed event
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
     functionExecutionId = body.event.function_execution_id;
-    functionBotToken = body.event.bot_access_token;
+    functionBotAccessToken = body.event.bot_access_token;
   }
 
   // interactivity (block_actions)
   if (body.function_data) {
     functionExecutionId = body.function_data.execution_id;
-    functionBotToken = body.bot_access_token;
+    functionBotAccessToken = body.bot_access_token;
   }
 
-  return { functionExecutionId, functionBotToken };
+  return { functionExecutionId, functionBotAccessToken };
 }
 
 // ----------------------------

@@ -427,37 +427,39 @@ export interface FileUnsharedEvent {
 }
 
 export interface FunctionParams {
-  type?: string,
-  name?: string,
-  description?: string,
-  title?: string,
-  is_required?: boolean,
+  type?: string;
+  name?: string;
+  description?: string;
+  title?: string;
+  is_required?: boolean;
 }
 
-export interface FunctionInputValues {
+export interface FunctionInputs {
   [key: string]: unknown;
 }
 
-export type FunctionOutputValues = FunctionInputValues;
+export type FunctionOutputValues = FunctionInputs;
 
-// TODO :: Update this with new payload info
 export interface FunctionExecutedEvent {
-  type: 'function_executed',
+  type: 'function_executed';
   function: {
-    id: string,
-    callback_id: string,
-    title: string,
-    description: string,
-    type: string,
-    input_parameters: FunctionParams[],
-    output_parameters: FunctionParams[],
-    app_id: string,
-    date_updated: number,
-  },
-  function_execution_id: string,
-  inputs: FunctionInputValues,
-  workflow_token: string, // xwfp-xxxxxxxxxxx
-  event_ts: string,
+    id: string;
+    callback_id: string;
+    title: string;
+    description: string;
+    type: string;
+    input_parameters: FunctionParams[];
+    output_parameters: FunctionParams[];
+    app_id: string;
+    date_created: number;
+    date_updated: number;
+    date_deleted: number
+  };
+  inputs: FunctionInputs;
+  function_execution_id: string;
+  workflow_execution_id: string;
+  event_ts: string;
+  bot_access_token: string;
 }
 
 export interface GridMigrationFinishedEvent {
