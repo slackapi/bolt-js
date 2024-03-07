@@ -2,9 +2,9 @@
 import { createServer, Server, ServerOptions, RequestListener, IncomingMessage, ServerResponse } from 'http';
 import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
 import { ListenOptions } from 'net';
+import { URL } from 'url';
 import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
 import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
-import { URL } from 'url';
 import { match } from 'path-to-regexp';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParamsIncomingMessage } from './ParamsIncomingMessage';

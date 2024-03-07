@@ -22,9 +22,6 @@ collections:
     permalink: /tutorials/:slug
   reference:
     output: true
-  future:
-    output: true
-    permalink: /future/:slug
 
 defaults:
   -
@@ -45,7 +42,6 @@ t:
     deployments: Deployments
     contribute: Contributing
     legacy: LEGACY
-    beta: BETA
   ja-jp:
     basic: 基本的な概念
     advanced: 応用コンセプト
@@ -57,7 +53,6 @@ t:
     contribute: 貢献
     # TODO: translate these titles
     legacy: LEGACY
-    beta: BETA
 
 # Metadata
 repo_name: bolt-js

@@ -53,8 +53,9 @@ import {
   SlashCommand,
   WorkflowStepEdit,
   KnownEventFromType,
+  SlackOptions,
 } from './types';
-import { IncomingEventType, getTypeAndConversation, assertNever } from './helpers';
+import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
 import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
@@ -144,6 +145,15 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
   type?: A['type'];
   block_id?: A extends BlockAction ? string | RegExp : never;
   action_id?: A extends BlockAction ? string | RegExp : never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
+}
+
+// TODO: more strict typing to allow block/action_id for block_suggestion etc.
+export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
+  type?: A['type'];
+  block_id?: A extends SlackOptions ? string | RegExp : never;
+  action_id?: A extends SlackOptions ? string | RegExp : never;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
@@ -848,7 +858,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     Source extends OptionsSource = OptionsSource,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    constraints: ActionConstraints,
+    constraints: OptionsConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   // TODO: reflect the type in constraints to Source
@@ -856,10 +866,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     Source extends OptionsSource = OptionsSource,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    actionIdOrConstraints: string | RegExp | ActionConstraints,
+    actionIdOrConstraints: string | RegExp | OptionsConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
+    const constraints: OptionsConstraints = typeof actionIdOrConstraints === 'string' ||
+      util.types.isRegExp(actionIdOrConstraints) ?
       { action_id: actionIdOrConstraints } :
       actionIdOrConstraints;
 
@@ -954,7 +965,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     const source = buildSource(type, conversationId, bodyArg, isEnterpriseInstall);
 
     let authorizeResult: AuthorizeResult;
-    if (type === IncomingEventType.Event && isEventTypeToSkipAuthorize(event.body.event.type)) {
+    if (type === IncomingEventType.Event && isEventTypeToSkipAuthorize(event)) {
       authorizeResult = {
         enterpriseId: source.enterpriseId,
         teamId: source.teamId,
@@ -1249,10 +1260,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): Receiver {
     if (receiver !== undefined) {
       // Custom receiver supplied
-      if (this.socketMode === true) {
-        // socketMode = true should result in SocketModeReceiver being used as receiver
-        // TODO: Add case for when socketMode = true and receiver = SocketModeReceiver
-        // as this should not result in an error
+      if (this.socketMode === true && !(receiver instanceof SocketModeReceiver)) {
         throw new AppInitializationError('You cannot supply a custom receiver when socketMode is set to true.');
       }
       return receiver;
@@ -1605,25 +1613,6 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   };
 }
 
-function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type: IncomingEventType): boolean {
-  if (type === IncomingEventType.Event) {
-    const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
-    if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
-      return !!bodyAsEvent.authorizations[0].is_enterprise_install;
-    }
-  }
-  // command payloads have this property set as a string
-  if (typeof body.is_enterprise_install === 'string') {
-    return body.is_enterprise_install === 'true';
-  }
-  // all remaining types have a boolean property
-  if (body.is_enterprise_install !== undefined) {
-    return body.is_enterprise_install;
-  }
-  // as a fallback we assume it's a single team installation (but this should never happen)
-  return false;
-}
-
 function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
@@ -1643,13 +1632,6 @@ function buildRespondFn(
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
     return axiosInstance.post(responseUrl, normalizedArgs);
   };
-}
-
-// token revocation use cases
-// https://github.com/slackapi/bolt-js/issues/674
-const eventTypesToSkipAuthorize = ['app_uninstalled', 'tokens_revoked'];
-function isEventTypeToSkipAuthorize(eventType: string) {
-  return eventTypesToSkipAuthorize.includes(eventType);
 }
 
 function escapeHtml(input: string | undefined | null): string {

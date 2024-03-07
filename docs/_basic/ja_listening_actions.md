@@ -14,7 +14,7 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 *注: Bolt 2.x からメッセージショートカット（以前はメッセージアクションと呼ばれていました）は `action()` ではなく `shortcut()` メソッドを使用するようになりました。この変更については [2.x マイグレーションガイド](https://slack.dev/bolt/ja-jp/tutorial/migration-v2)を参照してください。*
 
-`block_actions` ペイロードの詳細については、[こちら](https://api.slack.com/reference/interaction-) をご覧ください。リスナー内からビューの完全なペイロードにアクセスするには、コールバック関数内で `body` 引数を参照します。
+`block_actions` ペイロードの詳細については、[こちら](https://api.slack.com/reference/interaction-payloads) をご覧ください。リスナー内からビューの完全なペイロードにアクセスするには、コールバック関数内で `body` 引数を参照します。
 </div>
 
 ```javascript

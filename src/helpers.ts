@@ -8,6 +8,8 @@ import {
   SlackAction,
   OptionsSource,
   MessageShortcut,
+  AnyMiddlewareArgs,
+  ReceiverEvent,
 } from './types';
 
 /**
@@ -21,6 +23,11 @@ export enum IncomingEventType {
   ViewAction,
   Shortcut,
 }
+
+// ----------------------------
+// For skipping authorize with event
+
+const eventTypesToSkipAuthorize = ['app_uninstalled', 'tokens_revoked'];
 
 /**
  * Helper which finds the type and channel (if any) that any specific incoming event is related to.
@@ -99,6 +106,42 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
     };
   }
   return {};
+}
+
+/**
+ * Helper which determines if the body of a request is enterprise install.
+ *
+ * Providing the type is optional but if you do the execution will be faster
+ */
+export function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'], type?: IncomingEventType): boolean {
+  const _type = type !== undefined ? type : getTypeAndConversation(body).type;
+
+  if (_type === IncomingEventType.Event) {
+    const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+    if (Array.isArray(bodyAsEvent.authorizations) && bodyAsEvent.authorizations[0] !== undefined) {
+      return !!bodyAsEvent.authorizations[0].is_enterprise_install;
+    }
+  }
+  // command payloads have this property set as a string
+  if (typeof body.is_enterprise_install === 'string') {
+    return body.is_enterprise_install === 'true';
+  }
+  // all remaining types have a boolean property
+  if (body.is_enterprise_install !== undefined) {
+    return body.is_enterprise_install;
+  }
+  // as a fallback we assume it's a single team installation (but this should never happen)
+  return false;
+}
+
+/**
+ * Helper which determines if the event type will skip Authorize.
+ *
+ * Token revocation use cases
+ * https://github.com/slackapi/bolt-js/issues/674
+ */
+export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
+  return eventTypesToSkipAuthorize.includes(event.body.event?.type);
 }
 
 /* istanbul ignore next */

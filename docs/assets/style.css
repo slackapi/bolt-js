@@ -21,18 +21,6 @@ body {
   grid-area: content;
 }
 
-span.beta {
-  background-color: #E8F5FA;
-  color: #1264A3;
-  padding: 4px 9px;
-  margin-right: 2px;
-  border-radius: 16px;
-  border: 1px solid #D4ECF6;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 0.7em;
-}
-
 /* Sidebar */
 .panel {
   position: fixed;
@@ -122,17 +110,6 @@ span.beta {
   vertical-align: middle;
   color: var(--white);
   background-color: var(--dark-grey);
-  font-size: 0.5em;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 12px;
-}
-
-.panel .sidebar-content ul.sidebar-section .label-beta {
-  line-height: 1em;
-  vertical-align: middle;
-  color: var(--white);
-  background-color: var(--blue);
   font-size: 0.5em;
   font-weight: 800;
   padding: 4px 10px;
@@ -262,18 +239,6 @@ span.beta {
   vertical-align: middle;
   color: var(--white);
   background-color: var(--dark-grey);
-  font-size: 0.45em;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 12px;
-  margin-left: 10px;
-}
-
-.tutorial .label-beta {
-  line-height: 1em;
-  vertical-align: middle;
-  color: var(--white);
-  background-color: var(--blue);
   font-size: 0.45em;
   font-weight: 800;
   padding: 4px 10px;

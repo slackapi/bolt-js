@@ -1,5 +1,5 @@
-import { ConsoleLogger } from '@slack/logger';
 import { IncomingMessage } from 'http';
+import { ConsoleLogger } from '@slack/logger';
 import { HTTPModuleFunctions } from './HTTPModuleFunctions';
 
 const logger = new ConsoleLogger();

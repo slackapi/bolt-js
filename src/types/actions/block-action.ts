@@ -1,4 +1,4 @@
-import { PlainTextElement, Confirmation, Option } from '@slack/types';
+import { PlainTextElement, Confirmation, Option, RichTextBlock } from '@slack/types';
 import { StringIndexed } from '../helpers';
 import { ViewOutput, ViewStateValue } from '../view';
 
@@ -21,9 +21,11 @@ export type BlockElementAction =
   | MultiExternalSelectAction
   | OverflowAction
   | DatepickerAction
+  | TimepickerAction
   | RadioButtonsAction
   | CheckboxesAction
-  | PlainTextInputAction;
+  | PlainTextInputAction
+  | RichTextInputAction;
 
 /**
  * Any action from Slack's interactive elements
@@ -178,6 +180,16 @@ export interface DatepickerAction extends BasicElementAction<'datepicker'> {
 }
 
 /**
+ * An action from a time picker element
+ */
+export interface TimepickerAction extends BasicElementAction<'timepicker'> {
+  selected_time: string | null;
+  initial_time?: string;
+  placeholder?: PlainTextElement;
+  confirm?: Confirmation;
+}
+
+/**
  * An action from a radio button element
  */
 export interface RadioButtonsAction extends BasicElementAction<'radio_buttons'> {
@@ -196,10 +208,17 @@ export interface CheckboxesAction extends BasicElementAction<'checkboxes'> {
 }
 
 /**
- *  An action from a plain_text_input element (must use dispatch_action: true)
+ * An action from a plain_text_input element (must use dispatch_action: true)
  */
 export interface PlainTextInputAction extends BasicElementAction<'plain_text_input'> {
   value: string;
+}
+
+/**
+ * An action from a rich_text_input element (must use dispatch_action: true)
+ */
+export interface RichTextInputAction extends BasicElementAction<'rich_text_input'> {
+  rich_text_value: RichTextBlock;
 }
 
 /**
@@ -218,8 +237,12 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   } | null;
   user: {
     id: string;
-    name: string;
-    team_id?: string; // undocumented
+    /**
+     * name will be present if the block_action originates from the Home tab
+     */
+    name?: string;
+    username: string;
+    team_id?: string;
   };
   channel?: {
     id: string;
@@ -272,6 +295,7 @@ export type BlockChannelsSelectAction = BlockAction<ChannelsSelectAction>;
 export type BlockExternalSelectAction = BlockAction<ExternalSelectAction>;
 export type BlockOverflowAction = BlockAction<OverflowAction>;
 export type BlockDatepickerAction = BlockAction<DatepickerAction>;
+export type BlockTimepickerAction = BlockAction<TimepickerAction>;
 export type BlockRadioButtonsAction = BlockAction<RadioButtonsAction>;
 export type BlockCheckboxesAction = BlockAction<CheckboxesAction>;
 export type BlockPlainTextInputAction = BlockAction<PlainTextInputAction>;

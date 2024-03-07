@@ -1,8 +1,8 @@
 // Deprecated: this function will be removed in the near future. Use HTTPModuleFunctions instead.
-import { ConsoleLogger, Logger } from '@slack/logger';
 import { createHmac } from 'crypto';
-import tsscmp from 'tsscmp';
 import type { IncomingMessage, ServerResponse } from 'http';
+import { ConsoleLogger, Logger } from '@slack/logger';
+import tsscmp from 'tsscmp';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { HTTPModuleFunctions, RequestVerificationOptions } from './HTTPModuleFunctions';
 

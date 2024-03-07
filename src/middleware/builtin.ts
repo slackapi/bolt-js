@@ -26,7 +26,7 @@ import {
   EventTypePattern,
   ViewOutput,
 } from '../types';
-import { ActionConstraints, ViewConstraints, ShortcutConstraints } from '../App';
+import { ActionConstraints, ViewConstraints, ShortcutConstraints, OptionsConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
 
 /**
@@ -122,7 +122,7 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput
  * Middleware that checks for matches given constraints
  */
 export function matchConstraints(
-  constraints: ActionConstraints | ViewConstraints | ShortcutConstraints,
+  constraints: ActionConstraints | ViewConstraints | ShortcutConstraints | OptionsConstraints,
 ): Middleware<SlackActionMiddlewareArgs | SlackOptionsMiddlewareArgs | SlackViewMiddlewareArgs> {
   return async ({ payload, body, next, context }) => {
     // TODO: is putting matches in an array actually helpful? there's no way to know which of the regexps contributed

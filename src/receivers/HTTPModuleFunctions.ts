@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { parse as qsParse } from 'querystring';
+import type { IncomingMessage, ServerResponse } from 'http';
 import rawBody from 'raw-body';
 import type { Logger } from '@slack/logger';
-import type { IncomingMessage, ServerResponse } from 'http';
 import { CodedError, ErrorCode } from '../errors';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { verifySlackRequest } from './verify-request';
@@ -190,6 +190,14 @@ export class HTTPModuleFunctions {
     args: ReceiverProcessEventErrorHandlerArgs,
   ): Promise<boolean> {
     const { error, response, logger, storedResponse } = args;
+
+    // Check if the response headers have already been sent
+    if (response.headersSent) {
+      logger.error('An unhandled error occurred after ack() called in a listener');
+      logger.debug(`Error details: ${error}, storedResponse: ${storedResponse}`);
+      return false;
+    }
+
     if ('code' in error) {
     // CodedError has code: string
       const errorCode = (error as CodedError).code;
@@ -211,11 +219,18 @@ export class HTTPModuleFunctions {
   // Developers can customize this behavior by passing unhandledRequestHandler to the constructor
   // Note that this method cannot be an async function to align with the implementation using setTimeout
   public static defaultUnhandledRequestHandler(args: ReceiverUnhandledRequestHandlerArgs): void {
-    const { logger } = args;
+    const { logger, response } = args;
     logger.error(
       'An incoming event was not acknowledged within 3 seconds. ' +
       'Ensure that the ack() argument is called in a listener.',
     );
+
+    // Check if the response has already been sent
+    if (!response.headersSent) {
+      // If not, set the status code and end the response to close the connection
+      response.writeHead(404); // Not Found
+      response.end();
+    }
   }
 }
 
