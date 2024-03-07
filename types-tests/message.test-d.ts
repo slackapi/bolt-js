@@ -1,5 +1,5 @@
 import { expectNotType, expectType, expectError } from 'tsd';
-import { App, MessageEvent, GenericMessageEvent, BotMessageEvent, MessageRepliedEvent, MeMessageEvent, MessageDeletedEvent, ThreadBroadcastMessageEvent, MessageChangedEvent, EKMAccessDeniedMessageEvent } from '..';
+import { App, MessageEvent, GenericMessageEvent, BotMessageEvent, MessageRepliedEvent, MeMessageEvent, MessageDeletedEvent, ThreadBroadcastMessageEvent, MessageChangedEvent, EKMAccessDeniedMessageEvent, MessagePostedEvent } from '..';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -7,6 +7,40 @@ expectType<void>(
   // TODO: Resolve the event type when having subtype in a listener constraint
   // app.message({pattern: 'foo', subtype: 'message_replied'}, async ({ message }) => {});
   app.message(async ({ message }) => {
+    expectType<MessagePostedEvent>(message);
+
+    message.channel; // the property access should compile
+    message.user; // the property access should compile
+
+    if (message.subtype === undefined) {
+      expectType<GenericMessageEvent>(message);
+      expectNotType<MessageEvent>(message);
+      message.user; // the property access should compile
+      message.channel; // the property access should compile
+      message.team; // the property access should compile
+    }
+    if (message.subtype === 'bot_message') {
+      expectType<BotMessageEvent>(message);
+      expectNotType<MessageEvent>(message);
+      message.user; // the property access should compile
+      message.channel; // the property access should compile
+    }
+    if (message.subtype === 'thread_broadcast') {
+      expectType<ThreadBroadcastMessageEvent>(message);
+      expectNotType<MessageEvent>(message);
+      message.channel; // the property access should compile
+      message.thread_ts; // the property access should compile
+      message.ts; // the property access should compile
+      message.root; // the property access should compile
+    }
+
+    await Promise.resolve(message);
+  })
+);
+
+
+expectType<void>(
+  app.allMessageSubtypes(async ({ message }) => {
     expectType<MessageEvent>(message);
 
     message.channel; // the property access should compile
@@ -68,5 +102,5 @@ expectType<void>(
     }
 
     await Promise.resolve(message);
-  }),
+  })
 );

@@ -95,8 +95,12 @@ export type EventTypePattern = string | RegExp;
  * this interface. That condition isn't enforced, since we're not interested in factoring out common properties from the
  * known event types.
  */
-export interface BasicSlackEvent<Type extends string = string> {
+export interface BasicSlackEvent<
+  Type extends string = string,
+  Subtype extends string | undefined = string | undefined,
+> {
   type: Type;
+  subtype: Type extends 'message' | 'emoji_changed' ? Subtype : never;
 }
 
 interface BotProfile {

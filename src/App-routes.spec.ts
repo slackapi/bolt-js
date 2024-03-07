@@ -840,6 +840,22 @@ describe('App event routing', () => {
       ack: noop,
     });
 
+    const fakeSubtypedMessageEvent = (
+      receiver: FakeReceiver,
+      subtype: string,
+      message: string,
+    ): Promise<void> => receiver.sendEvent({
+      body: {
+        type: 'event_callback',
+        event: {
+          type: 'message',
+          subtype,
+          text: message,
+        },
+      },
+      ack: noop,
+    });
+
     const controlledMiddleware = (shouldCallNext: boolean) => async ({ next }: { next?: NextFn }) => {
       if (next && shouldCallNext) {
         await next();
@@ -1023,6 +1039,84 @@ describe('App event routing', () => {
 
       // Assert
       assertMiddlewaresNotCalled();
+    });
+
+    it('should handle bot_message events', async () => {
+      // Act
+      app.message(PASS_STRING, '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'bot_message', message);
+      // Assert
+      assertMiddlewaresCalledOnce();
+      assertMiddlewaresCalledOrder();
+    });
+    it('should not handle bot_message events when the constraints do not match', async () => {
+      // Act
+      app.message('foo-bar', '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'bot_message', message);
+      // Assert
+      assert.isFalse(fakeMiddleware1.calledOnce);
+    });
+    it('should handle file_share events', async () => {
+      // Act
+      app.message(PASS_STRING, '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'file_share', message);
+      // Assert
+      assertMiddlewaresCalledOnce();
+      assertMiddlewaresCalledOrder();
+    });
+    it('should not handle file_share events when the constraints do not match', async () => {
+      // Act
+      app.message('foo-bar', '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'file_share', message);
+      // Assert
+      assert.isFalse(fakeMiddleware1.calledOnce);
+    });
+    it('should handle thread_broadcast events', async () => {
+      // Act
+      app.message(PASS_STRING, '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'thread_broadcast', message);
+      // Assert
+      assertMiddlewaresCalledOnce();
+      assertMiddlewaresCalledOrder();
+    });
+    it('should not handle message_changed events', async () => {
+      // Act
+      app.message(PASS_STRING, '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'message_changed', message);
+      // Assert
+      assert.isFalse(fakeMiddleware1.calledOnce);
+    });
+    it('should handle message_changed events when using allMessageSubtypes', async () => {
+      // Act
+      app.allMessageSubtypes(PASS_STRING, '- val', ...fakeMiddlewares);
+      await fakeSubtypedMessageEvent(fakeReceiver, 'message_changed', message);
+      // Assert
+      assertMiddlewaresCalledOnce();
+      assertMiddlewaresCalledOrder();
+    });
+
+    it('should provide better typed payloads', async () => {
+      app.message(async ({ payload }) => {
+        // verify it compiles
+        assert.isNotNull(payload.channel);
+        assert.isNotNull(payload.ts);
+        assert.isNotNull(payload.text);
+        assert.isNotNull(payload.blocks);
+        assert.isNotNull(payload.attachments);
+      });
+      app.allMessageSubtypes(async ({ payload }) => {
+        // verify it compiles
+        if ((!payload.subtype ||
+          payload.subtype === 'bot_message' ||
+          payload.subtype === 'file_share' ||
+          payload.subtype === 'thread_broadcast')) {
+          assert.isNotNull(payload.channel);
+          assert.isNotNull(payload.ts);
+          assert.isNotNull(payload.text);
+          assert.isNotNull(payload.blocks);
+          assert.isNotNull(payload.attachments);
+        }
+      });
     });
   });
 

@@ -1,5 +1,11 @@
 import { MessageAttachment, KnownBlock, Block, MessageMetadata } from '@slack/types';
 
+export type MessagePostedEvent =
+  | GenericMessageEvent
+  | BotMessageEvent
+  | FileShareMessageEvent
+  | ThreadBroadcastMessageEvent;
+
 export type MessageEvent =
   | GenericMessageEvent
   | BotMessageEvent
