@@ -99,7 +99,7 @@ describe('App basic features', () => {
         // Act
         const app = new MockApp({
           socketMode: true,
-          appToken: '',
+          appToken: 'xapp-',
           port: 9999,
           clientId: '',
           clientSecret: '',
@@ -117,7 +117,7 @@ describe('App basic features', () => {
         // Act
         const app = new MockApp({
           socketMode: true,
-          appToken: '',
+          appToken: 'xapp-',
           port: 7777,
           clientId: '',
           clientSecret: '',
@@ -288,7 +288,7 @@ describe('App basic features', () => {
         withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
       );
       const MockApp = await importApp(overrides);
-      const socketModeReceiver = new SocketModeReceiver({ appToken: '' });
+      const socketModeReceiver = new SocketModeReceiver({ appToken: 'xapp-' });
 
       // Act
       const app = new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
@@ -487,7 +487,7 @@ describe('App basic features', () => {
         const fakeLogger = createFakeLogger();
         const MockApp = await importApp(overrides);
         // Act
-        const app = new MockApp({ logger: fakeLogger, token: '', appToken: '', developerMode: true });
+        const app = new MockApp({ logger: fakeLogger, token: '', appToken: 'xapp-', developerMode: true });
         // Assert
         assert.equal((app as any).logLevel, LogLevel.DEBUG);
         assert.equal((app as any).socketMode, true);
@@ -812,13 +812,13 @@ describe('App basic features', () => {
           },
         });
         app.use(async ({ client, next }) => {
-          await client.auth.test();
+          await client.auth.test({});
           await next();
         });
         const clients: WebClient[] = [];
         app.event('app_home_opened', async ({ client }) => {
           clients.push(client);
-          await client.auth.test();
+          await client.auth.test({});
         });
 
         const event = {
@@ -990,7 +990,8 @@ describe('App basic features', () => {
         app.use(async (args) => {
           // By definition, these events should all produce a say function, so we cast args.say into a SayFn
           const say = (args as any).say as SayFn;
-          await say(dummyMessage);
+          // TODO: fix this type assertion by addressing the TODO in src/types/utilities.ts
+          await say(dummyMessage as any);
         });
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
@@ -1090,7 +1091,8 @@ describe('App basic features', () => {
         app.use(async (args) => {
           // By definition, these events should all produce a say function, so we cast args.say into a SayFn
           const say = (args as any).say as SayFn;
-          await say(dummyMessage);
+          // TODO: fix this type assertion by addressing the TODO in src/types/utilities.ts
+          await say(dummyMessage as any);
         });
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));

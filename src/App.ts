@@ -1546,6 +1546,7 @@ function buildRespondFn(
   responseUrl: string,
 ): (response: string | RespondArguments) => Promise<AxiosResponse> {
   return async (message: string | RespondArguments) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
     return axiosInstance.post(responseUrl, normalizedArgs);
   };
