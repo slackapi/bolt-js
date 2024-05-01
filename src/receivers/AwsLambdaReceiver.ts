@@ -40,9 +40,10 @@ export interface AwsResponse {
 export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
-  signingSecret: string;
+  signingSecret?: string;
   logger?: Logger;
   logLevel?: LogLevel;
+  signatureVerification?: boolean;
   customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
 }
 
@@ -59,16 +60,20 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private logger: Logger;
 
+  private signatureVerification: boolean;
+
   private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
 
   public constructor({
-    signingSecret,
+    signingSecret = '',
     logger = undefined,
     logLevel = LogLevel.INFO,
+    signatureVerification = true,
     customPropertiesExtractor = (_) => ({}),
   }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
+    this.signatureVerification = signatureVerification;
     this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
@@ -130,12 +135,14 @@ export default class AwsLambdaReceiver implements Receiver {
         return Promise.resolve({ statusCode: 200, body: '' });
       }
 
-      // request signature verification
-      const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
-      const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
-      if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
-        this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
-        return Promise.resolve({ statusCode: 401, body: '' });
+      if (this.signatureVerification) {
+        // request signature verification
+        const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
+        const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
+        if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
+          this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
+          return Promise.resolve({ statusCode: 401, body: '' });
+        }
       }
 
       // url_verification (Events API)
