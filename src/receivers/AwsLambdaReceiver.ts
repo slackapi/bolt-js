@@ -44,6 +44,9 @@ export interface AwsLambdaReceiverOptions {
    * The Slack Signing secret to be used as an input to signature verification to ensure that requests are coming from
    * Slack.
    *
+   * If the {@link signatureVerification} flag is set to `false`, this can be set to any value as signature verification
+   * using this secret will not be performed.
+   *
    * @see {@link https://api.slack.com/authentication/verifying-requests-from-slack#about} for details about signing secrets
    */
   signingSecret: string;
