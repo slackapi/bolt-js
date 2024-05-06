@@ -3,7 +3,7 @@ import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
-import { ErrorCode, UnknownError, AuthorizationError, CodedError } from './errors';
+import { ErrorCode, UnknownError, AuthorizationError, CodedError, isCodedError } from './errors';
 import {
   Receiver,
   ReceiverEvent,
@@ -354,9 +354,10 @@ describe('App built-in middleware and mechanism', () => {
       // Assert
       assert(fakeErrorHandler.calledOnce);
       const error = fakeErrorHandler.firstCall.args[0];
-      assert.instanceOf(error, Error);
+      assert.ok(isCodedError(error));
       assert(error.code === ErrorCode.MultipleListenerError);
-      assert.sameMembers(error.originals, errorsToThrow);
+      assert.isArray(error.originals);
+      if (error.originals) assert.sameMembers(error.originals, errorsToThrow);
     });
 
     it('should detect invalid event names', async () => {
