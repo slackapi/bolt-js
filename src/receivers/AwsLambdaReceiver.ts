@@ -40,9 +40,41 @@ export interface AwsResponse {
 export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
+  /**
+   * The Slack Signing secret to be used as an input to signature verification to ensure that requests are coming from
+   * Slack.
+   *
+   * If the {@link signatureVerification} flag is set to `false`, this can be set to any value as signature verification
+   * using this secret will not be performed.
+   *
+   * @see {@link https://api.slack.com/authentication/verifying-requests-from-slack#about} for details about signing secrets
+   */
   signingSecret: string;
+  /**
+   * The {@link Logger} for the receiver
+   *
+   * @default ConsoleLogger
+   */
   logger?: Logger;
+  /**
+   * The {@link LogLevel} to be used for the logger.
+   *
+   * @default LogLevel.INFO
+   */
   logLevel?: LogLevel;
+  /**
+   * Flag that determines whether Bolt should {@link https://api.slack.com/authentication/verifying-requests-from-slack|verify Slack's signature on incoming requests}.
+   *
+   * @default true
+   */
+  signatureVerification?: boolean;
+  /**
+   * Optional `function` that can extract custom properties from an incoming receiver event
+   * @param request The API Gateway event {@link AwsEvent}
+   * @returns An object containing custom properties
+   *
+   * @default noop
+   */
   customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
 }
 
@@ -59,16 +91,20 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private logger: Logger;
 
+  private signatureVerification: boolean;
+
   private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
 
   public constructor({
     signingSecret,
     logger = undefined,
     logLevel = LogLevel.INFO,
+    signatureVerification = true,
     customPropertiesExtractor = (_) => ({}),
   }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
+    this.signatureVerification = signatureVerification;
     this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
@@ -130,12 +166,14 @@ export default class AwsLambdaReceiver implements Receiver {
         return Promise.resolve({ statusCode: 200, body: '' });
       }
 
-      // request signature verification
-      const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
-      const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
-      if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
-        this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
-        return Promise.resolve({ statusCode: 401, body: '' });
+      if (this.signatureVerification) {
+        // request signature verification
+        const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
+        const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
+        if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
+          this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
+          return Promise.resolve({ statusCode: 401, body: '' });
+        }
       }
 
       // url_verification (Events API)
