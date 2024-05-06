@@ -10,6 +10,11 @@ export interface CodedError extends Error {
   res?: ServerResponse; // HTTPReceiverDeferredRequestError
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isCodedError(err: any): err is CodedError {
+  return 'code' in err;
+}
+
 export enum ErrorCode {
   AppInitializationError = 'slack_bolt_app_initialization_error',
   AuthorizationError = 'slack_bolt_authorization_error',
