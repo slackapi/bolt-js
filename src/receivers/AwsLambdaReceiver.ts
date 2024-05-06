@@ -40,10 +40,38 @@ export interface AwsResponse {
 export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
-  signingSecret?: string;
+  /**
+   * The Slack Signing secret to be used as an input to signature verification to ensure that requests are coming from
+   * Slack.
+   *
+   * @see {@link https://api.slack.com/authentication/verifying-requests-from-slack#about} for details about signing secrets
+   */
+  signingSecret: string;
+  /**
+   * The {@link Logger} for the receiver
+   *
+   * @default ConsoleLogger
+   */
   logger?: Logger;
+  /**
+   * The {@link LogLevel} to be used for the logger.
+   *
+   * @default LogLevel.INFO
+   */
   logLevel?: LogLevel;
+  /**
+   * Flag that determines whether Bolt should {@link https://api.slack.com/authentication/verifying-requests-from-slack|verify Slack's signature on incoming requests}.
+   *
+   * @default true
+   */
   signatureVerification?: boolean;
+  /**
+   * Optional `function` that can extract custom properties from an incoming receiver event
+   * @param request The API Gateway event {@link AwsEvent}
+   * @returns An object containing custom properties
+   *
+   * @default noop
+   */
   customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
 }
 
@@ -65,7 +93,7 @@ export default class AwsLambdaReceiver implements Receiver {
   private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
 
   public constructor({
-    signingSecret = '',
+    signingSecret,
     logger = undefined,
     logLevel = LogLevel.INFO,
     signatureVerification = true,
