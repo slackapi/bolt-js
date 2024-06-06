@@ -13,7 +13,7 @@ import {
   FunctionExecutedEvent,
 } from './types';
 import processMiddleware from './middleware/process';
-import { CustomFunctionInitializationError } from './errors';
+import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';
 
 /** Interfaces */
 
@@ -105,6 +105,11 @@ export class CustomFunction {
     const token = selectToken(context);
     const { functionExecutionId } = context;
 
+    if (!functionExecutionId) {
+      const errorMsg = 'No function_execution_id found';
+      throw new CustomFunctionCompleteSuccessError(errorMsg);
+    }
+
     return (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
       token,
       outputs: params.outputs || {},
@@ -122,6 +127,11 @@ export class CustomFunction {
     return (params: Parameters<FunctionFailFn>[0]) => {
       const { error } = params ?? {};
       const { functionExecutionId } = context;
+
+      if (!functionExecutionId) {
+        const errorMsg = 'No function_execution_id found';
+        throw new CustomFunctionCompleteFailError(errorMsg);
+      }
 
       return client.functions.completeError({
         token,
@@ -158,8 +168,8 @@ export function validate(callbackId: string, middleware: CustomFunctionExecuteMi
 }
 
 /**
- * `processFunctionMiddleware()` invokes each callback for lifecycle event
- * @param args workflow_step_edit action
+ * `processFunctionMiddleware()` invokes each listener middleware
+ * @param args function_executed event
  */
 export async function processFunctionMiddleware(
   args: AllCustomFunctionMiddlewareArgs,
