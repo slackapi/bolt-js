@@ -41,7 +41,7 @@ t:
     steps: Workflow steps
     deployments: Deployments
     contribute: Contributing
-    legacy: LEGACY
+    deprecated: Deprecated
   ja-jp:
     basic: 基本的な概念
     advanced: 応用コンセプト
@@ -51,8 +51,7 @@ t:
     deployments: Deployments
     reference: リファレンス
     contribute: 貢献
-    # TODO: translate these titles
-    legacy: LEGACY
+    deprecated: 非推奨
 
 # Metadata
 repo_name: bolt-js
