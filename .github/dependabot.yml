@@ -4,7 +4,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5 
+    open-pull-requests-limit: 5
     allow:
       # allow updates for typescript
       - dependency-name: "typescript"
@@ -12,3 +12,7 @@ updates:
       - dependency-name: "@types/node"
       # allow updates for slack official libraries
       - dependency-name: "@slack/*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"

@@ -9,25 +9,19 @@ assignees: ''
 
 (Filling out the following with as much detail as you can provide will help us solve your issue sooner.)
 
-### Reproducible in:
+### `@slack/bolt` version
 
-#### The Slack SDK version
+Refer to your `package.json`
 
-(Paste the output of)
-```bash
-npm ls | grep -o "\S\+@\S\+$" | tr @ ' ' | awk -v q='"' '{print q$1q": "q"^"$2q","}' | grep slack
-```
-or refer to your `package.json`
+### Your `App` and Receiver Configuration
 
-#### Node.js runtime version
+e.g. `const myApp = new App({ ... what options are you using? })`
+
+### Node.js runtime version
 
 (Paste the output of `node --version`)
 
-#### OS info
-
-(Paste the output of `sw_vers && uname -v` on macOS/Linux or `ver` on Windows OS)
-
-#### Steps to reproduce:
+### Steps to reproduce:
 
 (Share the commands to run, source code, and project settings)
 

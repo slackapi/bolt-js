@@ -190,12 +190,16 @@ export interface AppMentionEvent {
   subtype?: string;
   bot_id?: string;
   bot_profile?: BotProfile;
-  username: string;
+  username?: string;
   team?: string;
   user?: string;
   text: string;
   attachments?: MessageAttachment[];
   blocks?: (KnownBlock | Block)[];
+  // TODO: Add more properties once the types library has a file object definition
+  files?: { id: string }[];
+  upload?: boolean;
+  display_as_bot?: boolean;
   edited?: {
     user: string;
     ts: string;
@@ -204,6 +208,7 @@ export interface AppMentionEvent {
   channel: string;
   event_ts: string;
   thread_ts?: string;
+  client_msg_id?: string;
 }
 
 export interface AppRateLimitedEvent {
