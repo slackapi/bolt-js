@@ -542,6 +542,42 @@ describe('AwsLambdaReceiver', function () {
     );
     assert.equal(response.statusCode, 401);
   });
+
+  it('does not perform signature verification if signature verification flag is set to false', async () => {
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: '',
+      signatureVerification: false,
+      logger: noopLogger,
+    });
+    const handler = awsReceiver.toHandler();
+    const awsEvent = {
+      resource: '/slack/events',
+      path: '/slack/events',
+      httpMethod: 'POST',
+      headers: {
+        Accept: 'application/json,*/*',
+        'Content-Type': 'application/json',
+        Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+        'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+        'X-Slack-Request-Timestamp': 'far back dude',
+        'X-Slack-Signature': 'very much invalid',
+      },
+      multiValueHeaders: {},
+      queryStringParameters: null,
+      multiValueQueryStringParameters: null,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {},
+      body: urlVerificationBody,
+      isBase64Encoded: false,
+    };
+    const response = await handler(
+      awsEvent,
+      {},
+      (_error, _result) => {},
+    );
+    assert.equal(response.statusCode, 200);
+  });
 });
 
 // Composable overrides

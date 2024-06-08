@@ -13,7 +13,7 @@ order: 7
 
 ```javascript
 // Regex でメールアドレスが有効かチェック
-let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+let isEmail = /^[\w\-\.]+@([\w\-]+\.)+[\w\-]+$/;
 // 制約付きのオブジェクト を使用して ticket_submit という callback_id を持つモーダル送信をリッスン
 app.view('ticket_submit', async ({ ack, view }) => {
   // block_id が `email_address` の input ブロックからメールアドレスを取得
