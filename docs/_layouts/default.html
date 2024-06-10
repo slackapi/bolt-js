@@ -48,7 +48,12 @@ sidebar_style: main
           {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for section in
           workflow_steps %}
           <div class="section-wrapper">
-            <h3 id="{{section.slug}}">{{ section.title }}</h3>
+            <h3 id="{{section.slug}}">
+              {{ section.title }}
+              <span class="label-deprecated">
+                {{ site.t[page.lang].deprecated }}
+              </span>
+            </h3>
             {{ section.content | markdownify }}
             <hr />
           </div>
