@@ -44,7 +44,7 @@ export interface BasicElementAction<T extends string = string> {
  * An action from a button element
  */
 export interface ButtonAction extends BasicElementAction<'button'> {
-  value: string;
+  value?: string;
   text: PlainTextElement;
   url?: string;
   confirm?: Confirmation;
