@@ -19,6 +19,7 @@ This guide is intended to detail the Bolt interface–including listeners and th
     - [Listener function arguments](#listener-function-arguments)
       - [Body and payload references](#body-and-payload-references)
     - [Difference from listener middleware](#difference-from-listener-middleware)
+  - [Built-in listener middleware functions](#built-in-listener-middleware-functions)
   - [Initialization options](#initialization-options)
     - [Receiver options](#receiver-options)
     - [App options](#app-options)
@@ -78,6 +79,38 @@ The structure of the `payload` and `body` is detailed on the API site:
 
 ### Difference from listener middleware
 Listener middleware is used to implement logic across many listener functions (though usually not all of them). Listener middleware has the same arguments as the above listener functions, with one distinction: they also have a `next()` function that **must** be called in order to pass the chain of execution. Learn more about listener middleware [in the documentation](/bolt-js/concepts#listener-middleware).
+
+## Built-in listener middleware functions
+
+Bolt offers a variety of built-in listener middleware functions to help simplify development of your Slack applications. These middleware functions implement common patterns to help filter out or focus your own listener function implementations.
+
+These middleware functions are exported from the main `@slack/bolt` package for you to easily `import` in your applications:
+
+```javascript
+import { matchMessage } from '@slack/bolt';
+app.message(matchMessage('hello'), async ({ message, logger }) => {
+  // this function will now only execute if "hello" is present in the message
+});
+```
+
+A complete list of supported listener middleware functions follows.
+
+- `directMention()`: Filters out any message event whose text does not start with an @-mention of the handling app.
+- `ignoreSelf()`: Filters out any event that originates from the app.
+- `matchCommandName(pattern)`: Filters out any command whose name does not match the provided `pattern`; `pattern` can be a string or regular expression.
+- `matchConstraints(constraint)`: Filters out any event that does not match the properties of the provided `constraint` object. Supported `constraint` object properties include:
+  - `block_id` and `action_id`: for filtering out `block_action` events that do not match the provided IDs.
+  - `callback_id`: for filtering out `view_*` events not matching the provided `callback_id`.
+  - `type`: for filtering out any event `type`s not matching the provided `type`.
+- `matchEventType(pattern)`: filters out any event whose `type` does not match the provided `pattern`. `pattern` can be a string or regular expression.
+- `matchMessage(pattern)`: filters out any `message` or `app_mention` events whose message contents do not match the provided `pattern`. `pattern` can be a string or regular expression.
+- `onlyActions`: Filters out any event that isn't an action.
+- `onlyCommands`: Filters out any event that isn't a command.
+- `onlyEvents`: Allows for only events to propagate down the middleware chain.
+- `onlyOptions`: Filters out any event that isn't a drop-down-options event.
+- `onlyShortcuts`: Filters out any event that isn't a shortcut.
+- `onlyViewActions`: Filters out any event that isn't a `view_submission` or `view_closed` event.
+- `subtype(type)`: Filters out any message event whose `subtype` does not exactly equal the provided `type`.
 
 ## Initialization options
 Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `HTTPReceiver` (so they'll work as long as you aren't using a custom receiver).
