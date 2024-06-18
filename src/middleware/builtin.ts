@@ -288,6 +288,11 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
   };
 }
 
+// TODO: breaking change: why does this method have to be invoked as a function with no args, while other similar
+// method like the `only*` ones do not require that? should make this consistent.
+/**
+ * Filters out any event originating from the handling app.
+ */
 export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   return async (args) => {
     const botId = args.context.botId as string;
@@ -321,6 +326,9 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
   };
 }
 
+/**
+ * Filters out any message events whose subtype does not match the provided subtype.
+ */
 export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return async ({ message, next }) => {
     if (message.subtype === subtype1) {
@@ -331,6 +339,11 @@ export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'
 
 const slackLink = /<(?<type>[@#!])?(?<link>[^>|]+)(?:\|(?<label>[^>]+))?>/;
 
+// TODO: breaking change: why does this method have to be invoked as a function with no args, while other similar
+// method like the `only*` ones do not require that? should make this consistent.
+/**
+ * Filters out any message event whose text does not start with an @-mention of the handling app.
+ */
 export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return async ({ message, context, next }) => {
     // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
