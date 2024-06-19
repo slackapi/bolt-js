@@ -54,6 +54,7 @@ import {
   SlashCommand,
   WorkflowStepEdit,
   SlackOptions,
+  FunctionInputs,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -964,9 +965,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       retryReason: event.retryReason,
     };
 
-    // Extract function-related information and augment to context
-    const { functionExecutionId, functionBotAccessToken } = extractFunctionContext(body);
-    if (functionExecutionId) { context.functionExecutionId = functionExecutionId; }
+    // Extract function-related information and augment context
+    const { functionExecutionId, functionBotAccessToken, functionInputs } = extractFunctionContext(body);
+    if (functionExecutionId) {
+      context.functionExecutionId = functionExecutionId;
+      if (functionInputs) { context.functionInputs = functionInputs; }
+    }
 
     if (this.attachFunctionToken) {
       if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
@@ -1029,6 +1033,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       ack?: AckFn<any>;
       complete?: FunctionCompleteFn;
       fail?: FunctionFailFn;
+      inputs?: FunctionInputs;
     } = {
       body: bodyArg,
       payload,
@@ -1088,6 +1093,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
       listenerArgs.complete = CustomFunction.createFunctionComplete(context, client);
       listenerArgs.fail = CustomFunction.createFunctionFail(context, client);
+      listenerArgs.inputs = context.functionInputs;
     }
 
     if (token !== undefined) {
@@ -1599,6 +1605,7 @@ function escapeHtml(input: string | undefined | null): string {
 function extractFunctionContext(body: StringIndexed) {
   let functionExecutionId;
   let functionBotAccessToken;
+  let functionInputs;
 
   // function_executed event
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
@@ -1610,9 +1617,10 @@ function extractFunctionContext(body: StringIndexed) {
   if (body.function_data) {
     functionExecutionId = body.function_data.execution_id;
     functionBotAccessToken = body.bot_access_token;
+    functionInputs = body.function_data.inputs;
   }
 
-  return { functionExecutionId, functionBotAccessToken };
+  return { functionExecutionId, functionBotAccessToken, functionInputs };
 }
 
 // ----------------------------
