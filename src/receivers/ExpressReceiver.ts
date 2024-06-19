@@ -221,9 +221,9 @@ export default class ExpressReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-       (installerOptions.stateVerification === false || // state store not needed
-         stateSecret !== undefined ||
-          installerOptions.stateStore !== undefined) // user provided state store
+      (installerOptions.stateVerification === false || // state store not needed
+        stateSecret !== undefined ||
+        installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -355,8 +355,8 @@ export default class ExpressReceiver implements Receiver {
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn:
-    typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
-    typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
+      typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
+      typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
