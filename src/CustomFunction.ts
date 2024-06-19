@@ -1,221 +1,222 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  WebClient,
   FunctionsCompleteErrorResponse,
   FunctionsCompleteSuccessResponse,
+  WebClient,
 } from '@slack/web-api';
 import {
-  Middleware,
-  AllMiddlewareArgs,
+  CustomFunctionInitializationError,
+  CustomFunctionRuntimeError,
+} from './errors';
+import {
+  AllCustomFunctionMiddlewareArgs,
   AnyMiddlewareArgs,
-  SlackEventMiddlewareArgs,
   Context,
-  FunctionExecutedEvent,
+  CustomFunctionContext,
+  CustomFunctionMiddleware,
+  CustomFunctionMiddlewareArgs,
+  FunctionCompleteArguments,
+  FunctionFailArguments,
+  Middleware,
 } from './types';
 import processMiddleware from './middleware/process';
-import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';
+import { StringIndexed } from './types/helpers';
 
-/** Interfaces */
-
-interface FunctionCompleteArguments {
-  outputs?: {
-    [key: string]: any;
-  };
-}
-
-export interface FunctionCompleteFn {
-  (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
-}
-
-interface FunctionFailArguments {
-  error: string;
-}
-
-export interface FunctionFailFn {
-  (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
-}
-
-export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
-  inputs: FunctionExecutedEvent['inputs'];
-  complete: FunctionCompleteFn;
-  fail: FunctionFailFn;
-}
-
-/** Types */
-
-export type SlackCustomFunctionMiddlewareArgs = CustomFunctionExecuteMiddlewareArgs;
-
-type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
-
-export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
-
-export type AllCustomFunctionMiddlewareArgs
-  <T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs> = T & AllMiddlewareArgs;
-
-/** Constants */
-
+/** Payload event types related to custom functions. */
 const VALID_PAYLOAD_TYPES = new Set(['function_executed']);
 
-/** Class */
-
-export class CustomFunction {
+export default class CustomFunction {
   /** Function callback_id */
   public callbackId: string;
 
   private middleware: CustomFunctionMiddleware;
 
+  private client: WebClient;
+
+  /**
+   * Builds a custom function listener for the callback_id function.
+   * @param callbackId - the function callback ID.
+   * @param middleware - an array of function middleware.
+   * @param client - custom configurations for a  web client.
+   */
   public constructor(
     callbackId: string,
-    middleware: CustomFunctionExecuteMiddleware,
+    middleware: CustomFunctionMiddleware,
+    client: WebClient,
   ) {
-    validate(callbackId, middleware);
-
+    CustomFunction.validateCustomFunctionHandler(callbackId, middleware);
     this.callbackId = callbackId;
     this.middleware = middleware;
-  }
-
-  public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => {
-      if (isFunctionEvent(args) && this.matchesConstraints(args)) {
-        return this.processEvent(args);
-      }
-      return args.next();
-    };
-  }
-
-  private matchesConstraints(args: SlackCustomFunctionMiddlewareArgs): boolean {
-    return args.payload.function.callback_id === this.callbackId;
-  }
-
-  private async processEvent(args: AllCustomFunctionMiddlewareArgs): Promise<void> {
-    const functionArgs = enrichFunctionArgs(args);
-    const functionMiddleware = this.getFunctionMiddleware();
-    return processFunctionMiddleware(functionArgs, functionMiddleware);
-  }
-
-  private getFunctionMiddleware(): CustomFunctionMiddleware {
-    return this.middleware;
+    this.client = client;
   }
 
   /**
-   * Factory for `complete()` utility
-   * @param args function_executed event
+   * Ensure arguments provided to the `function()` handler match expected types.
+   * A valid callback ID and a middleware function or functions are required.
+   * @param callbackId - the function callback ID.
+   * @param middleware - an array of function middleware.
+   * @throws whenever an input is invalid.
    */
-  public static createFunctionComplete(context: Context, client: WebClient): FunctionCompleteFn {
-    const token = selectToken(context);
-    const { functionExecutionId } = context;
+  private static validateCustomFunctionHandler(callbackId: string, middleware: CustomFunctionMiddleware): void {
+    if (typeof callbackId !== 'string') {
+      const errorMsg = 'CustomFunction expects a callback_id as the first argument';
+      throw new CustomFunctionInitializationError(errorMsg);
+    }
+    if (typeof middleware !== 'function' && !Array.isArray(middleware)) {
+      const errorMsg = 'CustomFunction expects a function or array of functions as the second argument';
+      throw new CustomFunctionInitializationError(errorMsg);
+    }
+    if (Array.isArray(middleware)) {
+      middleware.forEach((fn, idx) => {
+        if (typeof fn !== 'function') {
+          const errorMsg = `CustomFunction middleware argument ${idx} is not a function but should be a function`;
+          throw new CustomFunctionInitializationError(errorMsg);
+        }
+      });
+    }
+  }
 
-    if (!functionExecutionId) {
-      const errorMsg = 'No function_execution_id found';
-      throw new CustomFunctionCompleteSuccessError(errorMsg);
+  /**
+   * Gather information related to the function and augment event context values
+   * for function executions.
+   * @param body - the received event.
+   * @param withToken - if the function bot access token should be included.
+   * @returns included context values.
+   */
+  public static extractContext(body: StringIndexed, withToken: boolean): CustomFunctionContext {
+    const context: CustomFunctionContext = {};
+
+    // function_executed event
+    if (body.event && body.event.type === 'function_executed') {
+      if (body.event.function_execution_id) {
+        context.functionExecutionId = body.event.function_execution_id;
+      }
+      if (body.event.inputs) {
+        context.functionInputs = body.event.inputs;
+      }
+      if (withToken && body.event.bot_access_token) {
+        context.functionBotAccessToken = body.event.bot_access_token;
+      }
     }
 
-    return (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
-      token,
-      outputs: params.outputs || {},
-      function_execution_id: functionExecutionId,
-    });
+    // interactivity (block_actions)
+    if (body.function_data) {
+      if (body.function_data.execution_id) {
+        context.functionExecutionId = body.function_data.execution_id;
+      }
+      if (body.function_data.inputs) {
+        context.functionInputs = body.function_data.inputs;
+      }
+      if (withToken && body.bot_access_token) {
+        context.functionBotAccessToken = body.bot_access_token;
+      }
+    }
+
+    return context;
   }
 
   /**
- * Factory for `fail()` utility
- * @param args function_executed event
- */
-  public static createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
-    const token = selectToken(context);
-
-    return (params: Parameters<FunctionFailFn>[0]) => {
-      const { error } = params ?? {};
-      const { functionExecutionId } = context;
-
-      if (!functionExecutionId) {
-        const errorMsg = 'No function_execution_id found';
-        throw new CustomFunctionCompleteFailError(errorMsg);
+   * Process the event using function arguments as middleware when matching
+   * function constraints are found.
+   * @returns function that is evaluated or skipped with given arguments.
+   */
+  public getMiddleware(): Middleware<AnyMiddlewareArgs> {
+    return async (args): Promise<void> => {
+      if (!CustomFunction.isFunctionEvent(args) || this.callbackId !== args.payload.function.callback_id) {
+        return args.next();
       }
-
-      return client.functions.completeError({
-        token,
-        error,
-        function_execution_id: functionExecutionId,
-      });
+      const middlewareArgs = CustomFunction.middlewareArgs(args.context, this.client);
+      Object.assign(args, middlewareArgs);
+      return CustomFunction.processFunctionMiddleware(args, this.middleware);
     };
   }
-}
 
-/** Helper Functions */
-export function validate(callbackId: string, middleware: CustomFunctionExecuteMiddleware): void {
-  // Ensure callbackId is valid
-  if (typeof callbackId !== 'string') {
-    const errorMsg = 'CustomFunction expects a callback_id as the first argument';
-    throw new CustomFunctionInitializationError(errorMsg);
+  /**
+   * Determine if the arguments represent a function_executed event.
+   * @param args - the inputs received as middleware of an event.
+   * @returns if args is a function_executed event via payload.
+   */
+  private static isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
+    return VALID_PAYLOAD_TYPES.has(args.payload.type);
   }
 
-  // Ensure middleware argument is either a function or an array
-  if (typeof middleware !== 'function' && !Array.isArray(middleware)) {
-    const errorMsg = 'CustomFunction expects a function or array of functions as the second argument';
-    throw new CustomFunctionInitializationError(errorMsg);
+  /**
+   * Gather function callbacks as middleware to invoke each one as part of the
+   * event lifecycle.
+   * @param args - contains arguments include as middleware inputs.
+   * @param middleware - holds a list of middleware to execute.
+   */
+  private static async processFunctionMiddleware(
+    args: AllCustomFunctionMiddlewareArgs,
+    middleware: CustomFunctionMiddleware,
+  ): Promise<void> {
+    const { context, client, logger } = args;
+    const callbacks = [...middleware] as Middleware<AnyMiddlewareArgs>[];
+    const lastCallback = callbacks.pop();
+
+    if (lastCallback !== undefined) {
+      await processMiddleware(
+        callbacks,
+        args,
+        context,
+        client,
+        logger,
+        async () => lastCallback({ ...args, context, client, logger }),
+      );
+    }
   }
 
-  // Ensure array includes only functions
-  if (Array.isArray(middleware)) {
-    middleware.forEach((fn) => {
-      if (!(fn instanceof Function)) {
-        const errorMsg = 'All CustomFunction middleware must be functions';
-        throw new CustomFunctionInitializationError(errorMsg);
-      }
-    });
+  /**
+   * Configure middleware arguments to provide to function listeners.
+   * @param context - the function execution context.
+   * @param client - a configured web client.
+   * @returns listener arguments configured for the function execution.
+   * @throws when function_execution_id is not included in arguments.
+   */
+  public static middlewareArgs(context: Context, client: WebClient): CustomFunctionMiddlewareArgs {
+    const { functionExecutionId, functionInputs } = context;
+    if (functionExecutionId === undefined) {
+      throw new CustomFunctionRuntimeError('No function_execution_id was found in the context');
+    }
+    const token = CustomFunction.selectToken(context);
+    return {
+      inputs: functionInputs ?? {},
+      complete: (params: FunctionCompleteArguments = {}): Promise<FunctionsCompleteSuccessResponse> => (
+        client.functions.completeSuccess({
+          token,
+          outputs: params.outputs ?? {},
+          function_execution_id: functionExecutionId,
+        })
+      ),
+      fail: (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse> => (
+        client.functions.completeError({
+          token,
+          error: params.error,
+          function_execution_id: functionExecutionId,
+        })
+      ),
+    };
   }
-}
 
-/**
- * `processFunctionMiddleware()` invokes each listener middleware
- * @param args function_executed event
- */
-export async function processFunctionMiddleware(
-  args: AllCustomFunctionMiddlewareArgs,
-  middleware: CustomFunctionMiddleware,
-): Promise<void> {
-  const { context, client, logger } = args;
-  const callbacks = [...middleware] as Middleware<AnyMiddlewareArgs>[];
-  const lastCallback = callbacks.pop();
-
-  if (lastCallback !== undefined) {
-    await processMiddleware(
-      callbacks, args, context, client, logger,
-      async () => lastCallback({ ...args, context, client, logger }),
-    );
+  /**
+   * Gather a token matching the function context set during app initialization.
+   * This is either from the function execution context or a bot or user token and
+   * is the token used in `function()` handlers.
+   *
+   * The functionBotAccessToken is set to context during `App` initialization if
+   * configured during setup so that continuity between a function_executed event
+   * and subsequent interactive events (actions) is preserved.
+   *
+   * The botToken and userToken remain available in context regardless of this but
+   * the functionBotAccess token cannot be switched between functions. Middleware
+   * granularity for this decision is left TODO.
+   *
+   * @param context - the incoming payload context.
+   * @link https://github.com/slackapi/bolt-js/pull/2026#discussion_r1467123047
+   */
+  private static selectToken(context: Context): string | undefined {
+    if (context.functionBotAccessToken) {
+      return context.functionBotAccessToken;
+    }
+    return context.botToken ?? context.userToken;
   }
-}
-
-export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
-  return VALID_PAYLOAD_TYPES.has(args.payload.type);
-}
-
-function selectToken(context: Context): string | undefined {
-  // If attachFunctionToken = false, fallback to botToken or userToken
-  return context.functionBotAccessToken ? context.functionBotAccessToken : context.botToken || context.userToken;
-}
-
-/**
- * `enrichFunctionArgs()` takes in a function's args and:
- *  1. removes the next() passed in from App-level middleware processing
- *    - events will *not* continue down global middleware chain to subsequent listeners
- *  2. augments args with step lifecycle-specific properties/utilities
- * */
-export function enrichFunctionArgs(args: any): AllCustomFunctionMiddlewareArgs {
-  const { next: _next, ...functionArgs } = args;
-  const enrichedArgs: any = { ...functionArgs };
-  const token = selectToken(functionArgs.context);
-
-  // Making calls with a functionBotAccessToken establishes continuity between
-  // a function_executed event and subsequent interactive events (actions)
-  const client = new WebClient(token, { ...functionArgs.client });
-  enrichedArgs.client = client;
-
-  // Utility args
-  enrichedArgs.inputs = enrichedArgs.event.inputs;
-  enrichedArgs.complete = CustomFunction.createFunctionComplete(enrichedArgs.context, client);
-  enrichedArgs.fail = CustomFunction.createFunctionFail(enrichedArgs.context, client);
-
-  return enrichedArgs;
 }

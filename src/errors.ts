@@ -41,8 +41,7 @@ export enum ErrorCode {
   WorkflowStepInitializationError = 'slack_bolt_workflow_step_initialization_error',
 
   CustomFunctionInitializationError = 'slack_bolt_custom_function_initialization_error',
-  CustomFunctionCompleteSuccessError = 'slack_bolt_custom_function_complete_success_error',
-  CustomFunctionCompleteFailError = 'slack_bolt_custom_function_complete_fail_error',
+  CustomFunctionRuntimeError = 'slack_bolt_custom_function_runtime_error',
 }
 
 export class UnknownError extends Error implements CodedError {
@@ -152,10 +151,6 @@ export class CustomFunctionInitializationError extends Error implements CodedErr
   public code = ErrorCode.CustomFunctionInitializationError;
 }
 
-export class CustomFunctionCompleteSuccessError extends Error implements CodedError {
-  public code = ErrorCode.CustomFunctionCompleteSuccessError;
-}
-
-export class CustomFunctionCompleteFailError extends Error implements CodedError {
-  public code = ErrorCode.CustomFunctionCompleteFailError;
+export class CustomFunctionRuntimeError extends Error implements CodedError {
+  public code = ErrorCode.CustomFunctionRuntimeError;
 }

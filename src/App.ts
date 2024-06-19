@@ -54,6 +54,9 @@ import {
   SlashCommand,
   WorkflowStepEdit,
   SlackOptions,
+  CustomFunctionMiddleware,
+  FunctionCompleteFn,
+  FunctionFailFn,
   FunctionInputs,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
@@ -62,7 +65,7 @@ import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
-import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
+import CustomFunction from './CustomFunction';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -110,6 +113,12 @@ export interface AppOptions {
   tokenVerificationEnabled?: boolean;
   deferInitialization?: boolean;
   extendedErrorHandler?: boolean;
+  /**
+   * Option to decides if `App#function()` handlers use a just-in-time (JIT)
+   * `token` created within the context of the executing function or if the the
+   * bot or user `token` should be used. Defaults to `true` for the JIT token.
+   * @link https://api.slack.com/authentication/token-types#wfb
+   */
   attachFunctionToken?: boolean;
 }
 
@@ -527,10 +536,26 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
- * Register CustomFunction middleware
- */
+   * Custom function listener and middleware that executes for a matching function callbackId.
+   * @param callbackId a unique string identifier representing the function.
+   * @param listeners middleware that processes matching function exections.
+   * @example
+   * app.function('reverse_string', ({ inputs, complete, fail }) => {
+   *   if (inputs.original.length <= 0) {
+   *     await fail({ error: 'No string was provided!' });
+   *     return;
+   *   }
+   *   await complete({
+   *     outputs: {
+   *       reversed: inputs.original.split('').reverse().join(''),
+   *     },
+   *   });
+   *   return;
+   * });
+   * @link https://api.slack.com/automation/functions/custom
+   */
   public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
-    const fn = new CustomFunction(callbackId, listeners);
+    const fn = new CustomFunction(callbackId, listeners, this.client);
     const m = fn.getMiddleware();
     this.middleware.push(m);
     return this;
@@ -963,18 +988,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       isEnterpriseInstall,
       retryNum: event.retryNum,
       retryReason: event.retryReason,
+      ...CustomFunction.extractContext(body, this.attachFunctionToken),
     };
-
-    // Extract function-related information and augment context
-    const { functionExecutionId, functionBotAccessToken, functionInputs } = extractFunctionContext(body);
-    if (functionExecutionId) {
-      context.functionExecutionId = functionExecutionId;
-      if (functionInputs) { context.functionInputs = functionInputs; }
-    }
-
-    if (this.attachFunctionToken) {
-      if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
-    }
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
@@ -1085,16 +1100,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       await ack();
     }
 
+    // Set custom function complete(), fail(), and inputs argument for action listeners
+    if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
+      const middlewareArgs = CustomFunction.middlewareArgs(context, this.client);
+      Object.assign(listenerArgs, middlewareArgs);
+    }
+
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
-
-    // Add complete() and fail() utilities for function-related interactivity
-    if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
-      listenerArgs.complete = CustomFunction.createFunctionComplete(context, client);
-      listenerArgs.fail = CustomFunction.createFunctionFail(context, client);
-      listenerArgs.inputs = context.functionInputs;
-    }
 
     if (token !== undefined) {
       let pool;
@@ -1576,8 +1590,11 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-// Returns either a bot token or a user token for client, say()
+// Returns a context token depending on app settings and presence for client, say()
 function selectToken(context: Context): string | undefined {
+  if (context.functionBotAccessToken) {
+    return context.functionBotAccessToken;
+  }
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
@@ -1600,27 +1617,6 @@ function escapeHtml(input: string | undefined | null): string {
       .replace(/'/g, '&#x27;');
   }
   return '';
-}
-
-function extractFunctionContext(body: StringIndexed) {
-  let functionExecutionId;
-  let functionBotAccessToken;
-  let functionInputs;
-
-  // function_executed event
-  if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
-    functionExecutionId = body.event.function_execution_id;
-    functionBotAccessToken = body.event.bot_access_token;
-  }
-
-  // interactivity (block_actions)
-  if (body.function_data) {
-    functionExecutionId = body.function_data.execution_id;
-    functionBotAccessToken = body.bot_access_token;
-    functionInputs = body.function_data.inputs;
-  }
-
-  return { functionExecutionId, functionBotAccessToken, functionInputs };
 }
 
 // ----------------------------
