@@ -68,9 +68,9 @@
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#steps">
       <li class="title">
         {{ site.t[page.lang].steps }}
-        <!--UNCOMMENT AFTER GA <span class="label-legacy">
-          {{ site.t[page.lang].legacy }}
-        </span> -->
+        <span class="label-deprecated">
+          {{ site.t[page.lang].deprecated }}
+        </span>
       </li>
     </a>
     {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for step in workflow_steps %}
