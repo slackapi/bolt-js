@@ -221,9 +221,9 @@ export default class ExpressReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-       (installerOptions.stateVerification === false || // state store not needed
-         stateSecret !== undefined ||
-          installerOptions.stateStore !== undefined) // user provided state store
+      (installerOptions.stateVerification === false || // state store not needed
+        stateSecret !== undefined ||
+        installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -355,8 +355,8 @@ export default class ExpressReceiver implements Receiver {
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn:
-    typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
-    typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
+      typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
+      typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
@@ -443,7 +443,7 @@ function buildVerificationBodyParserMiddleware(
   logger: Logger,
   signingSecret: string | (() => PromiseLike<string>),
 ): RequestHandler {
-  return async (req, res, next) => {
+  return async (req, res, next): Promise<void> => {
     let stringBody: string;
     // On some environments like GCP (Google Cloud Platform),
     // req.body can be pre-parsed and be passed as req.rawBody here
@@ -470,15 +470,17 @@ function buildVerificationBodyParserMiddleware(
       if (error) {
         if (error instanceof ReceiverAuthenticityError) {
           logError(logger, 'Request verification failed', error);
-          return res.status(401).send();
+          res.status(401).send();
+          return;
         }
 
         logError(logger, 'Parsing request body failed', error);
-        return res.status(400).send();
+        res.status(400).send();
+        return;
       }
     }
 
-    return next();
+    next();
   };
 }
 
@@ -545,7 +547,7 @@ export function verifySignatureAndParseBody(
 }
 
 export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
-  return async (req, res, next) => {
+  return async (req, res, next): Promise<void> => {
     let stringBody: string;
     // On some environments like GCP (Google Cloud Platform),
     // req.body can be pre-parsed and be passed as req.rawBody here
@@ -561,10 +563,11 @@ export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
     } catch (error) {
       if (error) {
         logError(logger, 'Parsing request body failed', error);
-        return res.status(400).send();
+        res.status(400).send();
+        return;
       }
     }
-    return next();
+    next();
   };
 }
 
