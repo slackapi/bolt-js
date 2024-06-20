@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon, { SinonSpy } from 'sinon';
-import { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse, WebClientOptions } from '@slack/web-api';
+import { WebClientOptions } from '@slack/web-api';
 import App from './App';
 import { Override, mergeOverrides } from './test-helpers';
 import { FunctionInputs, Receiver, ReceiverEvent } from './types';
@@ -63,7 +63,6 @@ describe('App CustomFunction middleware', () => {
 
   it('completes a function with success using values from the execution event', async () => {
     const dummyFunctionExecutionEvent = createFunctionExecutionEvent();
-    let response: FunctionsCompleteSuccessResponse | undefined;
 
     const app = new MockApp({
       authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
@@ -71,7 +70,7 @@ describe('App CustomFunction middleware', () => {
     });
 
     app.function(MOCK_FUNCTION_CALLBACK_ID, async ({ client, complete, inputs }) => {
-      response = await complete({ outputs: inputs });
+      const response = await complete({ outputs: inputs });
       assert(response?.ok);
       assert.equal(client.token, MOCK_FUNCTION_BOT_ACCESS_TOKEN);
     });
@@ -90,7 +89,6 @@ describe('App CustomFunction middleware', () => {
 
   it('completes a function with error after middleware using application settings', async () => {
     const dummyFunctionExecutionEvent = createFunctionExecutionEvent();
-    let response: FunctionsCompleteErrorResponse | undefined;
 
     const app = new MockApp({
       authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
@@ -104,7 +102,7 @@ describe('App CustomFunction middleware', () => {
         await next();
       },
       async ({ client, context, fail }) => {
-        response = await fail({ error: context.example });
+        const response = await fail({ error: context.example });
         assert(response?.ok);
         assert.equal(client.token, MOCK_BOT_TOKEN);
       });
@@ -140,7 +138,6 @@ describe('App CustomFunction middleware', () => {
 
   it('extracts function execution context for use in block action events', async () => {
     const dummyBlockActionEvent = createBlockActionEvent();
-    let response: FunctionsCompleteSuccessResponse | undefined;
 
     const app = new MockApp({
       authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
@@ -153,7 +150,7 @@ describe('App CustomFunction middleware', () => {
 
     app.action(MOCK_BLOCK_ACTION_ID, async (args) => {
       const { context, complete } = args as any;
-      response = await complete();
+      const response = await complete();
       assert(response?.ok);
       assert.strictEqual(context.functionBotAccessToken, MOCK_FUNCTION_BOT_ACCESS_TOKEN);
       assert.strictEqual(context.functionExecutionId, MOCK_FUNCTION_EXECUTION_ID);
