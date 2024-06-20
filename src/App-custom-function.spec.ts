@@ -71,7 +71,7 @@ describe('App CustomFunction middleware', () => {
 
     app.function(MOCK_FUNCTION_CALLBACK_ID, async ({ client, complete, inputs }) => {
       const response = await complete({ outputs: inputs });
-      assert(response?.ok);
+      assert(response.ok);
       assert.equal(client.token, MOCK_FUNCTION_BOT_ACCESS_TOKEN);
     });
 
@@ -87,13 +87,12 @@ describe('App CustomFunction middleware', () => {
     }));
   });
 
-  it('completes a function with error after middleware using application settings', async () => {
+  it('completes a function with error after running listener middleware', async () => {
     const dummyFunctionExecutionEvent = createFunctionExecutionEvent();
 
     const app = new MockApp({
       authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
       receiver: fakeReceiver,
-      attachFunctionToken: false,
     });
 
     app.function(MOCK_FUNCTION_CALLBACK_ID,
@@ -101,10 +100,9 @@ describe('App CustomFunction middleware', () => {
         context.example = '12';
         await next();
       },
-      async ({ client, context, fail }) => {
+      async ({ context, fail }) => {
         const response = await fail({ error: context.example });
-        assert(response?.ok);
-        assert.equal(client.token, MOCK_BOT_TOKEN);
+        assert(response.ok);
       });
 
     assert(fakeFunctionsError.notCalled);
@@ -113,9 +111,44 @@ describe('App CustomFunction middleware', () => {
     assert(fakeFunctionsSuccess.notCalled);
     assert(fakeFunctionsError.calledOnce);
     assert(fakeFunctionsError.calledWith({
-      token: MOCK_BOT_TOKEN,
+      token: MOCK_FUNCTION_BOT_ACCESS_TOKEN,
       function_execution_id: MOCK_FUNCTION_EXECUTION_ID,
       error: '12',
+    }));
+  });
+
+  it('uses the application bot token when not attaching the function token', async () => {
+    const dummyFunctionExecutionEvent = createFunctionExecutionEvent();
+
+    const app = new MockApp({
+      authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
+      receiver: fakeReceiver,
+      attachFunctionToken: false,
+    });
+
+    app.function(MOCK_FUNCTION_CALLBACK_ID, async ({ client, complete, fail }) => {
+      const completed = await complete();
+      assert(completed.ok);
+      const failed = await fail({ error: 'ohno' });
+      assert(failed.ok);
+      assert.equal(client.token, MOCK_BOT_TOKEN);
+    });
+
+    assert(fakeFunctionsError.notCalled);
+    assert(fakeFunctionsSuccess.notCalled);
+    await fakeReceiver.sendEvent(dummyFunctionExecutionEvent);
+    assert(fakeFunctionsSuccess.calledOnce);
+    assert(fakeFunctionsSuccess.calledBefore(fakeFunctionsError));
+    assert(fakeFunctionsSuccess.calledWith({
+      token: MOCK_BOT_TOKEN,
+      function_execution_id: MOCK_FUNCTION_EXECUTION_ID,
+      outputs: {},
+    }));
+    assert(fakeFunctionsError.calledOnce);
+    assert(fakeFunctionsError.calledWith({
+      token: MOCK_BOT_TOKEN,
+      function_execution_id: MOCK_FUNCTION_EXECUTION_ID,
+      error: 'ohno',
     }));
   });
 
@@ -151,7 +184,7 @@ describe('App CustomFunction middleware', () => {
     app.action(MOCK_BLOCK_ACTION_ID, async (args) => {
       const { context, complete } = args as any;
       const response = await complete();
-      assert(response?.ok);
+      assert(response.ok);
       assert.strictEqual(context.functionBotAccessToken, MOCK_FUNCTION_BOT_ACCESS_TOKEN);
       assert.strictEqual(context.functionExecutionId, MOCK_FUNCTION_EXECUTION_ID);
       assert.deepEqual(context.functionInputs, MOCK_FUNCTION_INPUT);
@@ -184,7 +217,7 @@ describe('App CustomFunction middleware', () => {
     app.action(MOCK_BLOCK_ACTION_ID, async (args) => {
       const { context, fail, inputs } = args as any;
       const response = await fail({ error: inputs.message });
-      assert(response?.ok);
+      assert(response.ok);
       assert.strictEqual(context.functionBotAccessToken, MOCK_FUNCTION_BOT_ACCESS_TOKEN);
       assert.strictEqual(context.functionExecutionId, MOCK_FUNCTION_EXECUTION_ID);
       assert.deepEqual(context.functionInputs, MOCK_FUNCTION_INPUT);
