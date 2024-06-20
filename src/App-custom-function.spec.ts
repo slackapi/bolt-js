@@ -136,7 +136,7 @@ describe('App CustomFunction middleware', () => {
     await fakeReceiver.sendEvent(dummyFunctionExecutionEvent);
   });
 
-  it('extracts function execution context for use in block action events', async () => {
+  it('extracts function execution context for success in block actions', async () => {
     const dummyBlockActionEvent = createBlockActionEvent();
 
     const app = new MockApp({
@@ -145,7 +145,7 @@ describe('App CustomFunction middleware', () => {
     });
 
     app.function(MOCK_FUNCTION_CALLBACK_ID, async () => {
-      assert(false);
+      assert.fail(`function handler for "${MOCK_FUNCTION_CALLBACK_ID}" was executed`);
     });
 
     app.action(MOCK_BLOCK_ACTION_ID, async (args) => {
@@ -166,6 +166,39 @@ describe('App CustomFunction middleware', () => {
       token: MOCK_FUNCTION_BOT_ACCESS_TOKEN,
       function_execution_id: MOCK_FUNCTION_EXECUTION_ID,
       outputs: {},
+    }));
+  });
+
+  it('extracts function execution context for failure in block actions', async () => {
+    const dummyBlockActionEvent = createBlockActionEvent();
+
+    const app = new MockApp({
+      authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
+      receiver: fakeReceiver,
+    });
+
+    app.function(MOCK_FUNCTION_CALLBACK_ID, async () => {
+      assert.fail(`function handler for "${MOCK_FUNCTION_CALLBACK_ID}" was executed`);
+    });
+
+    app.action(MOCK_BLOCK_ACTION_ID, async (args) => {
+      const { context, fail, inputs } = args as any;
+      const response = await fail({ error: inputs.message });
+      assert(response?.ok);
+      assert.strictEqual(context.functionBotAccessToken, MOCK_FUNCTION_BOT_ACCESS_TOKEN);
+      assert.strictEqual(context.functionExecutionId, MOCK_FUNCTION_EXECUTION_ID);
+      assert.deepEqual(context.functionInputs, MOCK_FUNCTION_INPUT);
+    });
+
+    assert(fakeFunctionsError.notCalled);
+    assert(fakeFunctionsSuccess.notCalled);
+    await fakeReceiver.sendEvent(dummyBlockActionEvent);
+    assert(fakeFunctionsSuccess.notCalled);
+    assert(fakeFunctionsError.called);
+    assert(fakeFunctionsError.calledWith({
+      token: MOCK_FUNCTION_BOT_ACCESS_TOKEN,
+      function_execution_id: MOCK_FUNCTION_EXECUTION_ID,
+      error: MOCK_FUNCTION_INPUT.message,
     }));
   });
 });
