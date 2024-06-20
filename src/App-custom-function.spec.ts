@@ -130,7 +130,7 @@ describe('App CustomFunction middleware', () => {
     });
 
     app.function(MOCK_FUNCTION_CALLBACK_ID, async () => {
-      assert.fail('function handler for "${MOCK_FUNCTION_CALLBACK_ID}" should not execute');
+      assert.fail(`function handler for "${MOCK_FUNCTION_CALLBACK_ID}" was executed`);
     });
 
     await fakeReceiver.sendEvent(dummyFunctionExecutionEvent);
