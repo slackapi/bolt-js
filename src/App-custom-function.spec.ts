@@ -33,19 +33,20 @@ const MOCK_FUNCTION_INPUT: FunctionInputs = { message: 'hello world' };
 const MOCK_TEAM_ID = 'T0123456789';
 const MOCK_USER_ID = 'U0123456789';
 
-describe('App CustomFunction middleware', () => {
-  const fakeReceiver: FakeReceiver = new FakeReceiver();
-  const dummyAuthorizationResult = {
-    botToken: MOCK_BOT_TOKEN,
-    botId: MOCK_BOT_ID,
-    teamId: MOCK_TEAM_ID,
-  };
+const MOCK_AUTHORIZATION_RESULT = {
+  botToken: MOCK_BOT_TOKEN,
+  botId: MOCK_BOT_ID,
+  teamId: MOCK_TEAM_ID,
+};
 
+describe('App CustomFunction middleware', () => {
+  let fakeReceiver: FakeReceiver;
   let MockApp: typeof App;
   let fakeFunctionsSuccess: SinonSpy;
   let fakeFunctionsError: SinonSpy;
 
   beforeEach(async () => {
+    fakeReceiver = new FakeReceiver();
     fakeFunctionsSuccess = sinon.fake.resolves({ ok: true });
     fakeFunctionsError = sinon.fake.resolves({ ok: true });
 
@@ -65,7 +66,7 @@ describe('App CustomFunction middleware', () => {
     let response: FunctionsCompleteSuccessResponse | undefined;
 
     const app = new MockApp({
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
       receiver: fakeReceiver,
     });
 
@@ -92,7 +93,7 @@ describe('App CustomFunction middleware', () => {
     let response: FunctionsCompleteErrorResponse | undefined;
 
     const app = new MockApp({
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
       receiver: fakeReceiver,
       attachFunctionToken: false,
     });
@@ -126,7 +127,7 @@ describe('App CustomFunction middleware', () => {
     });
 
     const app = new MockApp({
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
       receiver: fakeReceiver,
     });
 
@@ -142,7 +143,7 @@ describe('App CustomFunction middleware', () => {
     let response: FunctionsCompleteSuccessResponse | undefined;
 
     const app = new MockApp({
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: sinon.fake.resolves(MOCK_AUTHORIZATION_RESULT),
       receiver: fakeReceiver,
     });
 
