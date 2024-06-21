@@ -14,11 +14,11 @@ import {
   SlackActionMiddlewareArgs,
   SlackViewMiddlewareArgs,
   WorkflowStepEdit,
-  Context,
   SlackEventMiddlewareArgs,
   ViewWorkflowStepSubmitAction,
   WorkflowStepExecuteEvent,
 } from './types';
+import { selectToken } from './middleware/context';
 import processMiddleware from './middleware/process';
 import { WorkflowStepInitializationError } from './errors';
 
@@ -245,10 +245,6 @@ export async function processStepMiddleware(
 
 export function isStepEvent(args: AnyMiddlewareArgs): args is AllWorkflowStepMiddlewareArgs {
   return VALID_PAYLOAD_TYPES.has(args.payload.type);
-}
-
-function selectToken(context: Context): string | undefined {
-  return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
 /**

@@ -18,6 +18,7 @@ import {
   FunctionFailArguments,
   Middleware,
 } from './types';
+import { selectToken } from './middleware/context';
 import processMiddleware from './middleware/process';
 import { StringIndexed } from './types/helpers';
 
@@ -177,7 +178,7 @@ export default class CustomFunction {
     if (functionExecutionId === undefined) {
       throw new CustomFunctionRuntimeError('No function_execution_id was found in the context');
     }
-    const token = CustomFunction.selectToken(context);
+    const token = selectToken(context);
     return {
       inputs: functionInputs ?? {},
       complete: (params: FunctionCompleteArguments = {}): Promise<FunctionsCompleteSuccessResponse> => (
@@ -195,28 +196,5 @@ export default class CustomFunction {
         })
       ),
     };
-  }
-
-  /**
-   * Gather a token matching the function context set during app initialization.
-   * This is either from the function execution context or a bot or user token and
-   * is the token used in `function()` handlers.
-   *
-   * The functionBotAccessToken is set to context during `App` initialization if
-   * configured during setup so that continuity between a function_executed event
-   * and subsequent interactive events (actions) is preserved.
-   *
-   * The botToken and userToken remain available in context regardless of this but
-   * the functionBotAccess token cannot be switched between functions. Middleware
-   * granularity for this decision is left TODO.
-   *
-   * @param context - the incoming payload context.
-   * @link https://github.com/slackapi/bolt-js/pull/2026#discussion_r1467123047
-   */
-  private static selectToken(context: Context): string | undefined {
-    if (context.functionBotAccessToken) {
-      return context.functionBotAccessToken;
-    }
-    return context.botToken ?? context.userToken;
   }
 }

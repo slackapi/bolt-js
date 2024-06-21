@@ -19,6 +19,7 @@ import {
   matchMessage,
   onlyViewActions,
 } from './middleware/builtin';
+import { selectToken } from './middleware/context';
 import processMiddleware from './middleware/process';
 import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import { WorkflowStep } from './WorkflowStep';
@@ -1588,14 +1589,6 @@ function isBlockActionOrInteractiveMessageBody(
   body: SlackActionMiddlewareArgs['body'],
 ): body is SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'] {
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
-}
-
-// Returns a context token depending on app settings and presence for client, say()
-function selectToken(context: Context): string | undefined {
-  if (context.functionBotAccessToken) {
-    return context.functionBotAccessToken;
-  }
-  return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
 function buildRespondFn(
