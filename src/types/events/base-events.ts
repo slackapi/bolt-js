@@ -1,4 +1,5 @@
 import { View, MessageAttachment, KnownBlock, Block } from '@slack/types';
+import { FunctionInputs, FunctionParams } from '../functions';
 import { MessageEvent as AllMessageEvents, MessageMetadataEvent as AllMessageMetadataEvents } from './message-events';
 
 /**
@@ -431,34 +432,20 @@ export interface FileUnsharedEvent {
   event_ts: string;
 }
 
-export interface FunctionParams {
-  type?: string;
-  name?: string;
-  description?: string;
-  title?: string;
-  is_required?: boolean;
-}
-
-export interface FunctionInputs {
-  [key: string]: unknown;
-}
-
-export type FunctionOutputValues = FunctionInputs;
-
 export interface FunctionExecutedEvent {
   type: 'function_executed';
   function: {
     id: string;
     callback_id: string;
     title: string;
-    description: string;
+    description?: string;
     type: string;
     input_parameters: FunctionParams[];
     output_parameters: FunctionParams[];
     app_id: string;
     date_created: number;
     date_updated: number;
-    date_deleted: number
+    date_deleted: number;
   };
   inputs: FunctionInputs;
   function_execution_id: string;

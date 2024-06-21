@@ -21,8 +21,8 @@ export default async function processMiddleware(
     if (toCallMiddlewareIndex < middleware.length) {
       lastCalledMiddlewareIndex = toCallMiddlewareIndex;
       return middleware[toCallMiddlewareIndex]({
-        next: () => invokeMiddleware(toCallMiddlewareIndex + 1),
         ...initialArgs,
+        next: () => invokeMiddleware(toCallMiddlewareIndex + 1),
         context,
         client,
         logger,
