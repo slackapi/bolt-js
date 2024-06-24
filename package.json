@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/slackapi/bolt-js/issues"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@slack/logger": "^4.0.0",
     "@slack/oauth": "^2.6.2",
     "@slack/socket-mode": "^1.3.3",
