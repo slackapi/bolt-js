@@ -13,6 +13,8 @@ collections:
     output: false
   advanced:
     output: false
+  functions:
+    output: false
   steps:
     output: false
   deployments:
@@ -38,6 +40,7 @@ t:
     advanced: Advanced concepts
     start: Getting started
     reference: Reference
+    functions: Custom functions
     steps: Workflow steps
     deployments: Deployments
     contribute: Contributing

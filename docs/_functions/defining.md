@@ -11,6 +11,8 @@ To make a custom function available for use in Workflow Builder, the app’s man
 
 A function’s definition contains information about the function, including its `callback_id`, `input_parameters`, `output_parameters`, as well as display information.
 
+To learn more about defining a function, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#define-function).
+
 </div>
 
 ```json
@@ -40,5 +42,3 @@ A function’s definition contains information about the function, including its
     }
 }
 ```
-
-To learn more about defining a function, see the API documentation.

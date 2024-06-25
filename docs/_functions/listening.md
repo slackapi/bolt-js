@@ -13,6 +13,9 @@ The callback is where you can access `inputs`, make third-party API calls, save 
 
 Your app must call `complete()` to indicate that the function’s execution was successful, or `fail()` to signal that the function failed to complete.
 
+To learn more about listening to custom function executions, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#listener).
+
+
 </div>
 
 ```js
