@@ -234,7 +234,7 @@ body {
   padding-bottom: 1em;
 }
 
-.tutorial .label-deprecated {
+.label-deprecated {
   line-height: 1em;
   vertical-align: middle;
   color: var(--white);
