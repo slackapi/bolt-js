@@ -7,7 +7,7 @@ order: 1
 
 <div class="section-content">
 
-**⚠️ Workflow Steps from Apps are a deprecated feature.dd**
+**⚠️ Workflow Steps from Apps are a deprecated feature.**
 
 **Workflow Steps from Apps are different than, and not interchangable with, Slack automation workflows. We encourage those who are currently publishing Workflow Steps from Apps to consider the new [Slack automation features](https://api.slack.com/automation), such as [custom functions for Bolt](#functions).**
 

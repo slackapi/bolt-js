@@ -48,10 +48,12 @@ sidebar_style: main
           {% assign functions_sections = site.functions | sort: "order" | where: "lang", page.lang %} {% for section in
           functions_sections %}
           <div class="section-wrapper">
-            <h3 id="{{section.slug}}">{{ section.title }}</h3>
-
+            <h3 id="{{section.slug}}">{{ section.title }}
+              <span class="label-warning">
+                {{ site.t[page.lang].beta }}
+              </span>
+            </h3>
             {{ section.content | markdownify }}
-
             <hr />
           </div>
           {% endfor %}
@@ -63,7 +65,7 @@ sidebar_style: main
           <div class="section-wrapper">
             <h3 id="{{section.slug}}">
               {{ section.title }}
-              <span class="label-deprecated">
+              <span class="label-warning">
                 {{ site.t[page.lang].deprecated }}
               </span>
             </h3>
