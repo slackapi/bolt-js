@@ -470,9 +470,11 @@ describe('AwsLambdaReceiver', function () {
   });
 
   it('should detect invalid signature', async (): Promise<void> => {
+    const spy = sinon.spy();
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
+      invalidRequestSignatureHandler: spy,
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000);
@@ -504,6 +506,7 @@ describe('AwsLambdaReceiver', function () {
       (_error, _result) => {},
     );
     assert.equal(response.statusCode, 401);
+    assert(spy.calledOnce);
   });
 
   it('should detect too old request timestamp', async (): Promise<void> => {
