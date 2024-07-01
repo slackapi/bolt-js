@@ -65,10 +65,25 @@
   {% endif %}
 
   <ul class="sidebar-section">
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#functions"
+      ><li class="title">{{ site.t[page.lang].functions }}
+      <span class="label-warning">
+        {{ site.t[page.lang].beta }}
+      </span>
+    </li></a>
+    {% assign functions_sections = site.functions | sort: "order" | where: "lang", page.lang %} {% for section in functions_sections
+    %}
+    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#{{ section.slug }}">
+      <li>{{section.title}}</li>
+    </a>
+    {% endfor %}
+  </ul>
+
+  <ul class="sidebar-section">
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#steps">
       <li class="title">
         {{ site.t[page.lang].steps }}
-        <span class="label-deprecated">
+        <span class="label-warning">
           {{ site.t[page.lang].deprecated }}
         </span>
       </li>

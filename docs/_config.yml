@@ -13,6 +13,8 @@ collections:
     output: false
   advanced:
     output: false
+  functions:
+    output: false
   steps:
     output: false
   deployments:
@@ -38,10 +40,12 @@ t:
     advanced: Advanced concepts
     start: Getting started
     reference: Reference
+    functions: Custom functions
     steps: Workflow steps
     deployments: Deployments
     contribute: Contributing
     deprecated: Deprecated
+    beta: Beta
   ja-jp:
     basic: 基本的な概念
     advanced: 応用コンセプト
@@ -52,6 +56,7 @@ t:
     reference: リファレンス
     contribute: 貢献
     deprecated: 非推奨
+    beta: Beta
 
 # Metadata
 repo_name: bolt-js
