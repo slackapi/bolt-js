@@ -7,7 +7,7 @@ order: 3
 
 <div class="section-content"> 
 
-When your custom function is executed as a step in a workflow, your app will receive a `function_executed` event. The callback provided to the `function()` method will be run when this event is received.
+When your custom function is executed as a step in a workflow, your app will receive a [`function_executed`](https://api.slack.com/events/function_executed) event. The callback provided to the `function()` method will be run when this event is received.
 
 The callback is where you can access `inputs`, make third-party API calls, or set the output values that will be available to subsequent workflow steps by mapping values to the `outputs` object.
 
