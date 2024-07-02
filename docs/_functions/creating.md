@@ -6,7 +6,7 @@ order: 1
 ---
 
 <div class="section-content">
-Custom functions allow your app to create and process workflow steps that users can add in Workflow Builder. 
+Custom functions allow your app to create and process workflow steps that users can add in [Workflow Builder](https://api.slack.com/workflows). 
 
 We recommend using custom functions as a replacement for the [deprecated Workflow Steps from Apps](#steps).
 
