@@ -7,7 +7,7 @@ order: 4
 
 <div class="section-content">
 
-Interactive elements provided to the user from within the `function()` method’s callback are associated with that unique `function_executed` event. This association allows for the completion of functions at a later time, like once the user has clicked a button.
+Interactive elements provided to the user, via message or modal, from within the `function()` method’s callback are associated with that unique `function_executed` event. This association allows for the completion of functions at a later time, like once the user has clicked a button.
 
 Incoming actions that are associated with a function have the same `inputs`, `complete`, and `fail` utilities as offered by the `function()` method.
 
