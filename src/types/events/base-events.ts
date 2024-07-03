@@ -785,7 +785,10 @@ export interface SharedChannelInviteAcceptedEvent {
   accepting_user: SharedChannelUserItem;
   event_ts: string;
 }
-// for backward-compatibility
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteAcceptedEvent` interface instead.
+ */
 export type SharedChannelInviteAccepted = SharedChannelInviteAcceptedEvent;
 
 export interface SharedChannelInviteApprovedEvent {
@@ -797,7 +800,10 @@ export interface SharedChannelInviteApprovedEvent {
   approving_user: SharedChannelUserItem;
   event_ts: string;
 }
-// for backward-compatibility
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteApprovedEvent` interface instead.
+ */
 export type SharedChannelInviteApproved = SharedChannelInviteApprovedEvent;
 
 export interface SharedChannelInviteDeclinedEvent {
@@ -809,7 +815,10 @@ export interface SharedChannelInviteDeclinedEvent {
   declining_user: SharedChannelUserItem;
   event_ts: string;
 }
-// for backward-compatibility
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteDeclinedEvent` interface instead.
+ */
 export type SharedChannelInviteDeclined = SharedChannelInviteDeclinedEvent;
 
 export interface SharedChannelInviteReceivedEvent {
@@ -818,7 +827,10 @@ export interface SharedChannelInviteReceivedEvent {
   channel: SharedChannelItem;
   event_ts: string;
 }
-// for backward-compatibility
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteReceivedEvent` interface instead.
+ */
 export type SharedChannelInviteReceived = SharedChannelInviteReceivedEvent;
 
 export interface SharedChannelInviteRequestedEvent {
@@ -903,7 +915,10 @@ export interface SubteamCreatedEvent {
   subteam: Subteam;
   event_ts: string;
 }
-// for backward-compatibility
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SubteamCreatedEvent` interface instead.
+ */
 export type SubteamCreated = SubteamCreatedEvent;
 
 export interface SubteamMembersChangedEvent {
@@ -918,7 +933,10 @@ export interface SubteamMembersChangedEvent {
   removed_users_count?: number;
   event_ts: string;
 }
-// for backward-compatibility
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SubteamMembersChangedEvent` interface instead.
+ */
 export type SubteamMembersChanged = SubteamMembersChangedEvent;
 
 export interface SubteamSelfAddedEvent {
