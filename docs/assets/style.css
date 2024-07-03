@@ -105,7 +105,7 @@ body {
   font-weight: 600;
 }
 
-.panel .sidebar-content ul.sidebar-section .label-deprecated {
+.panel .sidebar-content ul.sidebar-section .label-warning {
   line-height: 1em;
   vertical-align: middle;
   color: var(--white);
@@ -234,7 +234,7 @@ body {
   padding-bottom: 1em;
 }
 
-.tutorial .label-deprecated {
+.label-warning {
   line-height: 1em;
   vertical-align: middle;
   color: var(--white);
