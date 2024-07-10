@@ -232,13 +232,13 @@ export interface AppMentionEvent {
   user_team?: string;
   source_team?: string;
   user_profile?: {
-    name: string,
-    first_name: string,
-    real_name: string,
-    display_name: string,
-    team: string,
-    is_restricted?: boolean,
-    is_ultra_restricted?: boolean
+    name: string;
+    first_name: string;
+    real_name: string;
+    display_name: string;
+    team: string;
+    is_restricted?: boolean;
+    is_ultra_restricted?: boolean;
     avatar_hash?: string;
     image_72?: string;
   };
