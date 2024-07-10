@@ -227,6 +227,21 @@ export interface AppMentionEvent {
   bot_profile?: BotProfile;
   username?: string;
   team?: string;
+  // user_team, source_team, and user_profile
+  // can exist when the user who mentioned this bot is in a different workspace/org
+  user_team?: string;
+  source_team?: string;
+  user_profile?: {
+    name: string;
+    first_name: string;
+    real_name: string;
+    display_name: string;
+    team: string;
+    is_restricted?: boolean;
+    is_ultra_restricted?: boolean;
+    avatar_hash?: string;
+    image_72?: string;
+  };
   user?: string;
   text: string;
   attachments?: MessageAttachment[];
