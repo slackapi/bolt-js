@@ -297,6 +297,7 @@ export interface ChannelArchiveEvent {
 
 export interface ChannelCreatedEvent {
   type: 'channel_created';
+  event_ts: string;
   channel: {
     id: string;
     is_channel: boolean;
@@ -306,6 +307,16 @@ export interface ChannelCreatedEvent {
     creator: string; // user ID
     is_shared: boolean;
     is_org_shared: boolean;
+    context_team_id: string,
+    is_archived: boolean;
+    is_frozen: boolean,
+    is_general: boolean,
+    is_group: boolean,
+    is_private: boolean,
+    is_ext_shared: boolean,
+    is_im: boolean,
+    is_mpim: boolean,
+    is_pending_ext_shared: boolean,
   };
 }
 
