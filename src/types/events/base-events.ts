@@ -657,6 +657,7 @@ export interface PinnedMessageItem {
   blocks?: (KnownBlock | Block)[];
   pinned_to?: string[];
   permalink: string;
+  ts: string
 }
 export interface PinnedFileItem {
   id: string;
