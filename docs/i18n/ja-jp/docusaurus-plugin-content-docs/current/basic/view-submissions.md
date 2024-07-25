@@ -1,11 +1,10 @@
 ---
 title: モーダルでの送信のリスニング
 lang: ja-jp
-slug: view-submissions
-order: 12
+slug: /concepts/view-submissions
 ---
 
-<div class="section-content">
+
 
 `view` メソッドを使うと、ユーザーのビューとのインタラクションをリッスンすることができます。
 
@@ -50,7 +49,7 @@ app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, vie
   // close リクエストについて何らかの処理
 });
 ```
-</div>
+
 
 ```javascript
 // モーダルでのデータ送信リクエストを処理します

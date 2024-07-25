@@ -1,18 +1,16 @@
 ---
 title: Migrating to V2
-order: 2
 slug: migration-v2
-lang: en
-layout: tutorial
-permalink: /tutorial/migration-v2
+lang: en---
 ---
-# Migrating to v2.x
 
-<div class="section-content">
 This guide will walk you through the process of updating your app from using `@slack/bolt@1.x` to `@slack/bolt@2.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes.
 
-*Note: Make sure to checkout our [support schedule](#slackbolt1x-support-schedule) for `@slack/bolt@1.x` if you don't plan on upgrading right away*
-</div> 
+:::info 
+
+Make sure to checkout our [support schedule](#slackbolt1x-support-schedule) for `@slack/bolt@1.x` if you don't plan on upgrading right away*
+
+:::
 
 ---
 
@@ -39,11 +37,11 @@ app.action('some-action-id', async ({action, ack, say}) => {
 ```
 
 
-### Error Handling {#error-handling}
+### Error handling {#error-handling}
 
 The recent changes in Bolt for JavaScript V2 have improved our ability to catch errors and filter them to the global error handler.  It is still recommended to manage errors in the listeners themselves instead of letting them propagate to the global handler when possible.
 
-#### Handling Errors in Listeners with `try`/`catch`
+#### Handling errors in listeners with `try`/`catch`
 
 ```javascript
 app.action('some-action-id', async ({action, ack, say, logger}) => { 
@@ -57,7 +55,7 @@ app.action('some-action-id', async ({action, ack, say, logger}) => {
 })
 ```
 
-#### Handling Errors with the Global Error Handler
+#### Handling errors with the global error handler
 
 ```javascript
 app.error(async (error) => {
@@ -72,7 +70,7 @@ Other error related changes include:
 - If multiple errors occur when processing multiple listeners for a single event, Bolt for JavaScript will return a wrapper error with a `code` property of `ErrorCode.MultipleListenerError` and an `originals` property that contains an array of the individual errors. 
 
 
-### Message Shortcuts {#message-shortcuts}
+### Message shortcuts {#message-shortcuts}
 
 [Message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts) (previously referred to as message actions) now use the `shortcut()` method instead of the `action()` method.
 
@@ -94,7 +92,7 @@ app.shortcut('message-action-callback', async ({shortcut, ack, context}) => {
 })
 ```
 
-### Upgrading Middleware {#upgrading-middleware}
+### Upgrading middleware {#upgrading-middleware}
 
 If you wrote a custom middleware, adjust your function to `async`  and update `next()` to `await next()`. If your middleware does some post processing, instead of passing a function to `next()`, you can now run it after `await next()`.
 
@@ -127,6 +125,6 @@ async function noBotMessages({ message, next }) {
 
 `@slack/bolt@1.x` will be deprecated on **June 30th, 2020**. We plan on continuing to implement bug fixes and will also consider back-porting new features on a case by case basis up until then. Once `@slack/bolt@1.x` has been deprecated, we will only implement **critical bug fixes** until the official end of life date and close non critical issues and pull requests. End of life is slated for **April 30th, 2021**. At this time, development will fully stop for `@slack/bolt@1.x` and all remaining open issues and pull requests will be closed. 
 
-### Minimum TypeScript Version {#minimum-typescript-version}
+### Minimum TypeScript version {#minimum-typescript-version}
 
-As outlined in our [using TypeScript guide](https://slack.dev/bolt/tutorial/using-typescript), `@slack/bolt@2.x` requires a minimum TypeScript version of 3.7.
+`@slack/bolt@2.x` requires a minimum TypeScript version of 3.7.

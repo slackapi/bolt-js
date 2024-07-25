@@ -1,18 +1,15 @@
 ---
 title: 3.x マイグレーションガイド
-order: 2
 slug: migration-v3
 lang: ja-jp
-layout: tutorial
-permalink: /ja-jp/tutorial/migration-v3
 ---
 # 3.x マイグレーションガイド
 
-<div class="section-content">
+
 このガイドは Bolt 2.x を利用しているアプリを 3.x にアップグレードするための手順について説明します。いくつかの変更が必要とはなりますが、ほとんどのアプリの場合で、おそらく対応に必要な時間は 5 〜 15 分程度です。
 
 *注: もしすぐにアップグレードをしない場合は、[Bolt 2.x に関するサポートスケジュール](#slackbolt2x-support-schedule)をご確認ください*
-</div> 
+ 
 
 ---
 
@@ -100,7 +97,7 @@ const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => {
 
 ### デフォルトのレシーバーを HTTPReceiver に変更 {#http-receiver-as-default}
 
-3.x から新しい [`HTTPReceiver`](https://github.com/slackapi/bolt-js/issues/670) というレシーバーを導入し、デフォルトのレシーバー実装を、これまでの `ExpressReceiver` からこのレシーバーに変更します。この変更は、Bolt for JavaScript を Express.js 以外の人気のある Web フレームワーク（Hapi.js や Koa など）とともに動作させることを容易にします。`ExpressReceiver` は引き続き Bolt for JavaScript のリリースに含まれます。また、`HTTPReceiver` は `ExpressReceiver` が提供する全ての機能を提供するわけではありません。例えば、一つのユースケースとしては、`HTTPReceiver` ではカスタムの HTTP ルート（例: ヘルスチェックのための URL を追加する）を追加する機能はサポートされていません。このようなユースケースに対応するためには、引き続き `ExpressReceiver` を利用することを推奨します。その場合はクラスを import して、インスタンス化したものを `App` のコンストラクタに渡してください。詳細は[カスタム HTTP ルートの追加](https://slack.dev/bolt-js/ja-jp/concepts#custom-routes)を参考にしてください。
+3.x から新しい [`HTTPReceiver`](https://github.com/slackapi/bolt-js/issues/670) というレシーバーを導入し、デフォルトのレシーバー実装を、これまでの `ExpressReceiver` からこのレシーバーに変更します。この変更は、Bolt for JavaScript を Express.js 以外の人気のある Web フレームワーク（Hapi.js や Koa など）とともに動作させることを容易にします。`ExpressReceiver` は引き続き Bolt for JavaScript のリリースに含まれます。また、`HTTPReceiver` は `ExpressReceiver` が提供する全ての機能を提供するわけではありません。例えば、一つのユースケースとしては、`HTTPReceiver` ではカスタムの HTTP ルート（例: ヘルスチェックのための URL を追加する）を追加する機能はサポートされていません。このようなユースケースに対応するためには、引き続き `ExpressReceiver` を利用することを推奨します。その場合はクラスを import して、インスタンス化したものを `App` のコンストラクタに渡してください。詳細は[カスタム HTTP ルートの追加](/concepts/custom-routes)を参考にしてください。
 
 ### Bolt 2.x のサポートスケジュール {#slackbolt2x-support-schedule}
 
@@ -112,4 +109,4 @@ const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => {
 
 ### TypeScript の最低必須バージョン {#minimum-typescript-version}
 
-[TypeScript 利用ガイド]({{ site.url | append: site.baseurl }}/ja-jp/tutorial/using-typescript) でも説明していますが、`@slack/bolt@3.x` は TypeScirpt 4.1 以上が必須バージョンです。
+TypeScript 利用ガイド でも説明していますが、`@slack/bolt@3.x` は TypeScript 4.1 以上が必須バージョンです。

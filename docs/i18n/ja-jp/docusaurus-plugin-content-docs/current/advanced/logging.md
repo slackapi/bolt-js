@@ -1,13 +1,12 @@
 ---
 title: ログの表示
 lang: ja-jp
-slug: logging
-order: 8
+slug: /concepts/logging
 ---
 
-<div class="section-content">
+
 Bolt はデフォルトの設定では、標準出力のコンソールにログを出力します。どれくらいのログが出力されるかは、コンストラクターの引数の `logLevel` を指定して、カスタマイズできます。使用可能なログレベルは、頻度の高い方から順に、`DEBUG`、`INFO`、`WARN`、`ERROR` です。
-</div>
+
 
 ```javascript
 // パッケージから LogLevel をインポート
@@ -21,12 +20,11 @@ const app = new App({
 });
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">コンソール以外へのログ出力の送信</h4>
+<details>
+<summary>
+コンソール以外へのログ出力の送信
 </summary>
 
-<div class="secondary-content" markdown="0">
 ログの送信先をコンソール以外に設定したり、よりロガーを細かくコントロールしたい場合は、カスタムロガーを実装します。カスタムロガーは、以下のメソッド (`Logger` インターフェイスに定義されているもの) を実装する必要があります。
 
 | メソッド      | パラメーター        | 戻り値の型    |
@@ -40,7 +38,7 @@ const app = new App({
 | `error()`    | `...msgs: any[]`  | `void`      |
 
 非常に単純なカスタム logger では、名前やレベルが無視され、すべてのメッセージがファイルに書き込まれることがあります。
-</div>
+
 
 ```javascript
 const { App } = require('@slack/bolt');

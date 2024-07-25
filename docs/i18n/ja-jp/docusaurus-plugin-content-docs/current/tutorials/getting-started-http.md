@@ -1,18 +1,13 @@
 ---
 title: Bolt 入門ガイド (HTTP)
-order: 5
 slug: getting-started-http
 lang: ja-jp
-layout: tutorial
-permalink: /ja-jp/tutorial/getting-started-http
-redirect_from:
-  - /ja-jp/getting-started-http
 ---
 # Bolt 入門ガイド (HTTP)
 
-<div class="section-content">
+
 このガイドでは、Bolt を使用して Slack アプリを起動し実行する方法について説明します。その過程で、新しい Slack アプリを作成し、ローカル環境を設定し、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発します。
-</div>
+
 
 このガイドが終わったら、あなたはこの⚡️[Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app)を実行したり、修正したり、自分で作ったりすることができます。
 
@@ -21,13 +16,17 @@ redirect_from:
 ### アプリを作成する {#create-an-app}
 最初にやるべきこと: Bolt で開発を始める前に、 [Slack アプリを作成](https://api.slack.com/apps/new)します。
 
-> 💡 いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをおすすめします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
+:::tip 
+
+いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをおすすめします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
+
+:::
 
 アプリ名を入力し (後で変更可能)、インストール先のワークスペースを選択したら、`Create App`  ボタンをクリックすると、アプリの  **Basic Information**  ページが表示されます。
 
 このページには、後で必要になる重要な認証情報 (**App Credentials**  ヘッダーの下の  `Signing Secret`  など) に加えて、アプリケーションの概要が表示されます。
 
-![Basic Information page](../../assets/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 ひと通り確認し、アプリのアイコンと説明を追加してから、アプリの設定 🔩 を始めましょう。
 
@@ -51,9 +50,13 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 4. インストールを承認すると、**OAuth & Permissions** ページが表示され、**Bot User OAuth Access Token** を確認することができるはずです。
 
-![OAuth Tokens](../../assets/bot-token.png "OAuth Tokens")
+![OAuth Tokens](/img/bot-token.png "OAuth Tokens")
 
-> 💡 トークンは、パスワードのように大切に扱い、[安全に保管](https://api.slack.com/docs/oauth-safety)してください。アプリではそのトークンを使用して、Slack ワークスペースからの情報を投稿および取得します。
+:::tip 
+
+トークンは、パスワードのように大切に扱い、[安全に保管](https://api.slack.com/docs/oauth-safety)してください。アプリではそのトークンを使用して、Slack ワークスペースからの情報を投稿および取得します。
+
+:::
 
 ---
 
@@ -187,9 +190,13 @@ app.message('hello', async ({ message, say }) => {
 
 アプリ設定ページに戻り、左側の  **Interactivity & Shortcuts**  をクリックします。**Request URL**  ボックスがもう 1 つあることがわかります。
 
-> 💡 デフォルトでは、Bolt はイベントに使用しているのと同じエンドポイントをインタラクティブコンポーネントに使用するように設定されているため、上記と同じリクエスト URL (この例では `https://8e8ec2d7.ngrok.io/slack/events`) を使用します。右下隅にある  **Save Changes**  ボタンを押してください。これでアプリのインタラクティブなコンポーネントを利用する設定が有効になりました!
+:::tip 
 
-![Configuring a Request URL](../../assets/request-url-config.png "Configuring a Request URL")
+デフォルトでは、Bolt はイベントに使用しているのと同じエンドポイントをインタラクティブコンポーネントに使用するように設定されているため、上記と同じリクエスト URL (この例では `https://8e8ec2d7.ngrok.io/slack/events`) を使用します。右下隅にある  **Save Changes**  ボタンを押してください。これでアプリのインタラクティブなコンポーネントを利用する設定が有効になりました!
+
+:::
+
+![Configuring a Request URL](/img/request-url-config.png "Configuring a Request URL")
 
 インタラクティブ機能を有効にすると、ショートカット、モーダル、インタラクティブコンポーネント（ボタン、セレクトメニュー、データピッカーなど）とのやり取りがイベントとしてアプリに送信されます。
 
@@ -244,7 +251,11 @@ app.message('hello', async ({ message, say }) => {
 
 このボタン `accessory` オブジェクトには、`action_id` が割り当てられています。これはボタンの一意の識別子として機能するため、アプリはどのアクションに応答するかを指定できます。
 
-> 💡 [Block Kit ビルダー](https://app.slack.com/block-kit-builder)を使うとインタラクティブメッセージを簡単にプロトタイプすることができます。ビルダーを使用すると、ユーザー (またはそのチームメンバー) はメッセージをモックアップして、対応する JSON を生成し、それをアプリに直接貼り付けることができます。
+:::tip 
+
+[Block Kit ビルダー](https://app.slack.com/block-kit-builder)を使うとインタラクティブメッセージを簡単にプロトタイプすることができます。ビルダーを使用すると、ユーザー (またはそのチームメンバー) はメッセージをモックアップして、対応する JSON を生成し、それをアプリに直接貼り付けることができます。
+
+:::
 
 これで、アプリを再起動し、アプリが登録されているチャンネルで `hello` と入力すると、ボタン付きのメッセージが表示されます。ただしこのボタンをクリックしても、まだ何も起こりません。
 
@@ -306,10 +317,10 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 基本的なアプリの作成ができましたので、次回は是非もっといろいろな、 Bolt の機能を使ってアプリを作ってみましょう。下記のリンクを辿っていろいろアイデアを模索してみてください！
 
-* [基本的な概念](/bolt-js/ja-jp/concepts#basic)をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
+* 基本的な概念 をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
 
-* ボットが[`events()` メソッド](/bolt-js/ja-jp/concepts#event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
+* ボットが[`events()` メソッド](/concepts/event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
 
-* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/bolt-js/ja-jp/concepts#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
+* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/concepts/web-api)ことができます。API サイトに [200 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
 
-* 異なるトークンの種類については、[APIサイト](https://api.slack.com/docs/token-types)を参照してください。アプリケーションが実行したいアクションに応じて、異なるトークンが必要になる場合があります。HTTPではなく[Socket Mode](/bolt-js/ja-jp/tutorial/getting-started)を使用している場合は、`connections:write`スコープを持つ追加の(`xapp`)トークンが必要です。
+* 異なるトークンの種類については、[APIサイト](https://api.slack.com/docs/token-types)を参照してください。アプリケーションが実行したいアクションに応じて、異なるトークンが必要になる場合があります。HTTPではなく[Socket Mode](/getting-started)を使用している場合は、`connections:write`スコープを持つ追加の(`xapp`)トークンが必要です。

@@ -1,18 +1,16 @@
 ---
 title: 2.x マイグレーションガイド
-order: 2
 slug: migration-v2
 lang: ja-jp
-layout: tutorial
-permalink: /ja-jp/tutorial/migration-v2
 ---
+
 # 2.x マイグレーションガイド
 
-<div class="section-content">
+
 このガイドは Bolt 1.x を利用しているアプリを 2.x にアップグレードするための手順について説明します。いくつかの変更が必要とはなりますが、ほとんどのアプリの場合で、おそらく対応に必要な時間は 5 〜 15 分程度です。
 
 *注: もしすぐにアップグレードをしない場合は、[Bolt 1.x に関するサポートスケジュール](#bolt-1x-%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%82%B9%E3%82%B1%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)をご確認ください*
-</div> 
+ 
 
 ---
 
@@ -127,4 +125,4 @@ async function noBotMessages({message, next }) {
 
 ### TypeScript の最低必須バージョン {#minimum-typescript-version}
 
-[TypeScript 利用ガイド]({{ site.url | append: site.baseurl }}/ja-jp/tutorial/using-typescript) でも説明していますが、`@slack/bolt@2.x` は TypeScirpt 3.7 以上が必須バージョンです。
+TypeScript 利用ガイド でも説明していますが、`@slack/bolt@2.x` は TypeScript 3.7 以上が必須バージョンです。

@@ -1,11 +1,9 @@
 ---
 title: ステップの定義
 lang: ja-jp
-slug: creating-steps
-order: 2
+slug: /concepts/creating-steps
 ---
 
-<div class='section-content'>
 
 ワークフローステップを作るための手段として Bolt は `WorkflowStep` というクラスを提供しています。
 
@@ -15,7 +13,7 @@ order: 2
 
 `WorkflowStep` インスタンスを生成したら、それを `app.step()` メソッドに渡します。これによって、Bolt アプリは対象のワークフローステップのイベントをリッスンしたり、設定オブジェクトが提供するコールバック関数を使ってイベントに応答したりすることができるようになります。
 
-</div>
+
 
 ```javascript
 const { App, WorkflowStep } = require('@slack/bolt');

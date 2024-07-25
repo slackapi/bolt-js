@@ -1,15 +1,14 @@
 ---
 title: Listening to events
 lang: en
-slug: event-listening
-order: 3
+slug: /concepts/event-listening
 ---
 
-<div class="section-content">
+
 You can listen to [any Events API event](https://api.slack.com/events) using the `event()` method after subscribing to it in your app configuration. This allows your app to take action when something happens in Slack, like a user reacting to a message or joining a channel.
 
 The `event()` method requires an `eventType` of type string.
-</div>
+
 
 ```javascript
 const welcomeChannelId = 'C12345';
@@ -31,15 +30,15 @@ app.event('team_join', async ({ event, client, logger }) => {
 ```
 
 <details class="secondary-wrapper" >
-<summary class="section-head" markdown="0">
-<h4 class="section-head">Filtering on message subtypes</h4>
+<summary>
+Filtering on message subtypes
 </summary>
 
-<div class="secondary-content" markdown="0">
+
 A `message()` listener is equivalent to `event('message')`
 
 You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
-</div>
+
 
 ```javascript
 // Import subtype from the package

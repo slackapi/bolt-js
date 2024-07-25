@@ -1,32 +1,36 @@
 ---
 title: AWS Lambda へのデプロイ
-order: 0
-slug: aws-lambda
 lang: ja-jp
-layout: tutorial
-permalink: /ja-jp/deployments/aws-lambda
 ---
+
 # AWS Lambda へのデプロイ
 
-<div class="section-content">
-このガイドでは、[Bolt for JavaScript][bolt-js]、[Serverless Framework][serverless-framework]、[AWS Lambda][aws-lambda] を使った Slack アプリの準備とデプロイの方法について説明します。
-</div>
+このガイドでは、Bolt for JavaScript、[Serverless Framework](https://serverless.com/)、[AWS Lambda](https://aws.amazon.com/lambda/) を使った Slack アプリの準備とデプロイの方法について説明します。
 
-この手順を全て終わらせたら、あなたはきっと⚡️ [Deploying to AWS Lambda][deploy-aws-lambda-app] のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
+
+この手順を全て終わらせたら、あなたはきっと⚡️ [Deploying to AWS Lambda](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda) のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
 
 ---
 
 ### AWS Lambda のセットアップ {#set-up-aws-lambda}
 
-[AWS Lambda][aws-lambda] はサーバーレスの Function-as-a-Service（FaaS）プラットフォームです。AWS Lambda を利用すると、サーバーを管理することなく、コードを実行することができます。このセクションでは、ローカルマシンから AWS Lambda にアクセスするための設定を行います。
+[AWS Lambda](https://aws.amazon.com/lambda/) はサーバーレスの Function-as-a-Service（FaaS）プラットフォームです。AWS Lambda を利用すると、サーバーを管理することなく、コードを実行することができます。このセクションでは、ローカルマシンから AWS Lambda にアクセスするための設定を行います。
 
-> 💡 すでにローカルマシンから AWS Lambda へのアクセスに必要な[プロファイルの構成][aws-profiles]が済んでいる場合、このセクションはスキップできます。
+:::tip
+
+すでにローカルマシンから AWS Lambda へのアクセスに必要な[プロファイルの構成](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles)が済んでいる場合、このセクションはスキップできます。
+
+:::
 
 **1. AWS アカウントを作成する**
 
-AWS アカウントをまだ持っていない場合は、[アカウントを作成][aws-sign-up]する必要があります。画面に表示される案内に沿って作成しましょう。
+AWS アカウントをまだ持っていない場合は、[アカウントを作成](https://aws.amazon.com/)する必要があります。画面に表示される案内に沿って作成しましょう。
 
-> 💡 作成手順の中で請求情報の入力を求められる場合がありますが、ご心配なく。このガイドでは[無料利用枠][aws-pricing]のみを使用します。
+:::tip 
+
+作成手順の中で請求情報の入力を求められる場合がありますが、ご心配なく。このガイドでは[無料利用枠](https://aws.amazon.com/lambda/pricing/)のみを使用します。
+
+:::
 
 **2. AWS のアクセスキーを作成する**
 
@@ -34,11 +38,15 @@ Lambda へのデプロイでは、プログラムから AWS アカウントに�
 
 🍿 [IAM ユーザーを作成してアクセスキーをダウンロードする手順](https://www.youtube.com/watch?v=KngM5bfpttA)を紹介する短い動画を参考にしてみてください。
 
-> 💡 **すでに IAM ユーザーの作成が完了している場合は、**AWS の公式ガイドに従って [IAM ユーザーのアクセスキーを作成][aws-iam-user]してください。
+:::tip 
+
+**すでに IAM ユーザーの作成が完了している場合は、**AWS の公式ガイドに従って [IAM ユーザーのアクセスキーを作成](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds)してください。
+
+:::
 
 **3. AWS CLI をインストールする**
 
-AWS では [macOS、Windows、Linux][aws-cli-install] にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。
+AWS では [macOS、Windows、Linux](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。
 
 macOS では、[最新の .pkg インストーラーをダウンロード](https://awscli.amazonaws.com/AWSCLIV2.pkg)して AWS CLI をインストールできます。
 
@@ -46,7 +54,7 @@ macOS では、[最新の .pkg インストーラーをダウンロード](https
 
 AWS CLI を使ってプロファイルを構成します。プロファイルはローカルマシンに置かれ、アクセスキーのペアを保管します。この CLI やその他のツールは、このプロファイルを使って AWS にアクセスします。
 
-[プロファイルを構成][aws-cli-configure]する最も簡単な方法は、次のコマンドを実行し、プロンプトに従って入力する方法です。
+[プロファイルを構成](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config)する最も簡単な方法は、次のコマンドを実行し、プロンプトに従って入力する方法です。
 
 ```zsh
 aws configure
@@ -56,7 +64,11 @@ aws configure
 # Default output format [None]: json
 ```
 
-> 💡 [Default region name][aws-cli-region] と [Default output format][aws-cli-output-format] は最も望ましい設定でカスタマイズしてください。
+:::tip 
+
+[Default region name](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region) と [Default output format](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format) は最も望ましい設定でカスタマイズしてください。
+
+:::
 
 これでローカルマシンから AWS にアクセスするための設定が完了しました。👏 次は、同じように Serverless Framework も設定していきましょう。
 
@@ -64,7 +76,7 @@ aws configure
 
 ### Serverless Framework をセットアップする {#set-up-serverless-framework}
 
-[Serverless Framework][serverless-framework] では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
+[Serverless Framework](https://serverless.com/) では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
 
 **1. Serverless Framework CLI をインストールする**
 
@@ -82,7 +94,7 @@ Serverless のツールのセットアップが完了しました。次に、AWS
 
 ### Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
-まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド][getting-started-guide]を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
+まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド](/getting-started)を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -113,7 +125,7 @@ const app = new App({
 });
 ```
 
-次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](/bolt-js/ja-jp/concepts#receiver) をカスタマイズします。
+次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](/concepts/receiver) をカスタマイズします。
 
 `app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
@@ -121,7 +133,11 @@ const app = new App({
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-> 💡  OAuth フローを実装するなら、現時点では [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts) を使用する必要があります。
+:::tip 
+
+OAuth フローを実装するなら、現時点では [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts) を使用する必要があります。
+
+:::
 
 その後、[ソースコードの中で Bolt アプリの初期化を行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14)を編集して、`AwsLambdaReceiver` を使ったカスタムのレシーバーを作成します。
 
@@ -156,7 +172,7 @@ module.exports.handler = async (event, context, callback) => {
 }
 ```
 
-完成したアプリのソースコードは、⚡️[deploy-aws-lambda][deploy-aws-lambda-app/app.js] のサンプルのようになります。
+完成したアプリのソースコードは、⚡️[deploy-aws-lambda](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js) のサンプルのようになります。
 
 **2. serverless.yml を追加する**
 
@@ -184,7 +200,11 @@ plugins:
   - serverless-offline
 ```
 
-> 💡 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/ja-jp/tutorial/getting-started#setting-up-your-project)を入門ガイドで参照してください。
+:::tip 
+
+`SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/getting-started#setting-up-your-project)を入門ガイドで参照してください。
+
+:::
 
 **3. serverless-offline モジュールをインストールする**
 
@@ -212,7 +232,11 @@ npm install --save-dev serverless-offline
 serverless offline --noPrependStageInUrl
 ```
 
-> 🏌️ Pro-tip: 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
+:::tip
+ 
+ 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
+
+:::
 
 次に、ngrok を使って Slack のイベントをローカルマシンに転送します。
 
@@ -220,32 +244,44 @@ serverless offline --noPrependStageInUrl
 ngrok http 3000
 ```
 
-> 💡 パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方][getting-started-guide-setting-up-events]を参照してください。
+:::tip 
+
+パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](https://slack.dev/bolt-js/getting-started#setting-up-events)を参照してください。
+
+:::
 
 **2. リクエスト URL を変更する**
 
 次に、[Slack アプリの設定](https://api.slack.com/apps)を開き、**リクエスト URL** を ngrok のウェブアドレスに変更します。
 
-> 💡 **リクエスト URL** は `/slack/events` で終わる文字列で、例えば `https://abc123.ngrok.io/slack/events` のようになります。
+:::tip
+
+**リクエスト URL** は `/slack/events` で終わる文字列で、例えば `https://abc123.ngrok.io/slack/events` のようになります。
+
+:::
 
 まず、サイドバーの「**Interactivity & Shortcuts**」を選択し、**リクエスト URL** を更新します。
 
-![「Interactivity & Shortcuts」ページ](../../assets/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
+![「Interactivity & Shortcuts」ページ](/img/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
 
 次に、サイドバーの「**Event Subscriptions**」を選択し、**リクエスト URL** を更新します。
 
-![「Event Subscriptions」ページ](../../assets/event-subscriptions-page.png "「Event Subscriptions」ページ")
+![「Event Subscriptions」ページ](/img/event-subscriptions-page.png "「Event Subscriptions」ページ")
 
 **3. Slack アプリをテストする**
 
-Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド][getting-started-guide]のとおり、アプリから応答があるはずです。
+Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド](/getting-started)のとおり、アプリから応答があるはずです。
 
 > 👩‍💻 hello<br/>
 > 🤖 Hey there @Jane!
 
 応答がない場合、**リクエスト URL** を確認してからもう一度試してみてください。
 
-> 💡 **動作の仕組み** : ngrok と Serverless のコマンドは同じポートを使用するように設定されています（デフォルトでは「3000」）。**リクエスト URL** に向けて送信された Slack イベントは、ローカルマシンの ngrok で受信されます。このリクエストはさらに Serverless Offline に転送されます。Serverless Offline は AWS Lambda 関数のイベントをエミュレートしていて、Bolt アプリのレシーバーをトリガーさせます。 🛫🛬 長旅ですね。
+:::tip 
+
+**動作の仕組み** : ngrok と Serverless のコマンドは同じポートを使用するように設定されています（デフォルトでは「3000」）。**リクエスト URL** に向けて送信された Slack イベントは、ローカルマシンの ngrok で受信されます。このリクエストはさらに Serverless Offline に転送されます。Serverless Offline は AWS Lambda 関数のイベントをエミュレートしていて、Bolt アプリのレシーバーをトリガーさせます。 🛫🛬 長旅ですね。
+
+:::
 
 ---
 
@@ -270,7 +306,11 @@ serverless deploy
 
 アプリのデプロイが成功すると、**エンドポイント**が発行されます。これをアプリの**リクエスト URL** に指定します。発行された**エンドポイント**をコピーして、次のセクションで使います。
 
-> 💡 **エンドポイント**は、`/slack/events` で終わる文字列です。
+:::tip 
+
+**エンドポイント**は、`/slack/events` で終わる文字列です。
+
+:::
 
 **2. Slack アプリの設定を更新する**
 
@@ -278,11 +318,11 @@ Slack からのイベントやアクションの送信先となる**リクエス
 
 まず、サイドバーの「**Interactivity & Shortcuts**」を選択し、**リクエスト URL** を更新します。
 
-![「Interactivity & Shortcuts」ページ](../../assets/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
+![「Interactivity & Shortcuts」ページ](/img/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
 
 次に、サイドバーの「**Event Subscriptions**」を選択し、**リクエスト URL** を更新します。
 
-![「Event Subscriptions」ページ](../../assets/event-subscriptions-page.png "「Event Subscriptions」ページ")
+![「Event Subscriptions」ページ](/img/event-subscriptions-page.png "「Event Subscriptions」ページ")
 
 **3. Slack アプリをテストする**
 
@@ -297,7 +337,7 @@ Slack からのイベントやアクションの送信先となる**リクエス
 
 Slack アプリの開発を継続していくなら、更新したアプリをデプロイする必要が出てくるでしょう。それをやってみるために、「goodbye」というメッセージに応答するようにアプリを変更してみましょう。
 
-次のコードを `app.js` に追加します（[GitHub でソースコードを確認できます][deploy-aws-lambda-app/app.js]）。
+次のコードを `app.js` に追加します（[GitHub でソースコードを確認できます](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js)）。
 
 ```javascript
 // 「goodbye」というメッセージの着信をリッスンします
@@ -321,27 +361,11 @@ serverless deploy
 
 ### 次のステップ {#next-steps}
 
-⚡️[AWS Lambda を使った最初の Bolt for JavaScript アプリ][deploy-aws-lambda-app]をデプロイできました。🚀
+⚡️[AWS Lambda を使った最初の Bolt for JavaScript アプリ](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda)をデプロイできました。🚀
 
 基本的なアプリのデプロイができましたので、次はアプリのカスタマイズやモニタリングを行う方法を調べてみましょう。
 
 - [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) と [Serverless Framework](https://www.serverless.com/framework/docs/providers/aws/guide/intro/) の理解を深める。
-- [Bolt の基本的な概念](/bolt-js/ja-jp/concepts#basic)と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
-- [Bolt の応用コンセプト](/bolt-js/ja-jp/concepts#logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
+- Bolt の基本的な概念と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
+- [Bolt の応用コンセプト](/concepts/logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
 - Serverless の [AWS Lambda のテスト環境](https://www.serverless.com/framework/docs/providers/aws/guide/testing/)や[デプロイ環境](https://www.serverless.com/framework/docs/providers/aws/guide/deploying/)を本格的に活用する。
-
-[aws-cli-configure]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config
-[aws-cli-install]: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
-[aws-cli-output-format]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format
-[aws-cli-region]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region
-[aws-iam-user]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds
-[aws-lambda]: https://aws.amazon.com/lambda/
-[aws-pricing]: https://aws.amazon.com/lambda/pricing/
-[aws-profiles]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles
-[aws-sign-up]: https://aws.amazon.com/
-[bolt-js]: /bolt-js
-[deploy-aws-lambda-app]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
-[deploy-aws-lambda-app/app.js]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js
-[getting-started-guide-setting-up-events]: https://slack.dev/bolt-js/ja-jp/tutorial/getting-started#setting-up-events
-[getting-started-guide]: /bolt-js/ja-jp/tutorial/getting-started
-[serverless-framework]: https://serverless.com/

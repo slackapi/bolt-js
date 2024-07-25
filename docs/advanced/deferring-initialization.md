@@ -1,15 +1,16 @@
 ---
-title: Deferring App initialization
+title: Deferring app initialization
 lang: en
-slug: deferring-initialization
-order: 8
+slug: /concepts/deferring-initialization
 ---
 
-<div class="section-content">
 Bolt offers a way to defer full initialization via the `deferInitialization` option and to call the equivalent `App#init()` in your code, putting more control over asynchronous execution required for initialization into your hands as the developer.
 
-_Note: If you call `start()` before `init()`, Bolt will raise an exception._
-</div>
+:::info
+
+If you call `start()` before `init()`, Bolt will raise an exception._
+
+:::
 
 ```javascript
 const { App } = require('@slack/bolt');

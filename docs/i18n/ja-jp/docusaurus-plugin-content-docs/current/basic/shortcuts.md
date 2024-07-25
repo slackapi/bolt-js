@@ -1,11 +1,10 @@
 ---
 title: ショートカットのリスニング
 lang: ja-jp
-slug: shortcuts
-order: 8
+slug: /concepts/shortcuts
 ---
 
-<div class="section-content">
+
 `shortcut()` メソッドは、[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)と[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)の両方をサポートします。
 
 ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのリクエストをリッスンすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
@@ -14,11 +13,11 @@ order: 8
 
 グローバルショートカットのリクエストは Slack へリクエストを受信したことを知らせるために `ack()` メソッドで確認する必要があります。
 
-グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](#creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
+グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](/concepts/creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
 
 ⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを使用できます。
 メッセージショートカットのペイロードはチャンネル ID を含みます。
-</div>
+
 
 ```javascript
 // open_modal というグローバルショートカットはシンプルなモーダルを開く
@@ -71,15 +70,14 @@ app.shortcut('open_modal', async ({ shortcut, ack, context, logger }) => {
 });
 ```
 
-<details class="secondary-wrapper">
-  <summary class="section-head" markdown="0">
-  <h4 class="section-head">制約付きオブジェクトを使用したショートカットのリスニング</h4>
+<details>
+  <summary>
+  制約付きオブジェクトを使用したショートカットのリスニング
   </summary>
 
-  <div class="secondary-content" markdown="0">
-  制約付きオブジェクトを使って `callback_id` や `type` によるリスニングができます。オブジェクト内の制約は文字列型または RegExp オブジェクトを使用できます。
+    制約付きオブジェクトを使って `callback_id` や `type` によるリスニングができます。オブジェクト内の制約は文字列型または RegExp オブジェクトを使用できます。
 
-  </div>
+  
 
   ```javascript
   // callback_id が 'open_modal' と一致し type が 'message_action' と一致する場合のみミドルウェアが呼び出される

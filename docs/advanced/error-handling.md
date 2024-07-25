@@ -1,12 +1,14 @@
 ---
 title: Handling errors
 lang: en
-slug: error-handling
-order: 1
+slug: /concepts/error-handling
 ---
 
-<div class="section-content">
-*Note: Since v2, error handling has improved! View the [migration guide for V2](https://slack.dev/bolt/tutorial/migration-v2) to learn about the changes.*
+:::info
+
+Since v2, error handling has improved! View the [migration guide for V2](/tutorial/migration-v2) to learn about the changes.
+
+:::
 
 If an error occurs in a listener, it’s recommended you handle it directly with a `try`/`catch`. However, there still may be cases where errors slip through the cracks. By default, these errors will be logged to the console. To handle them yourself, you can attach a global error handler to your app with the `app.error(fn)` method.
 
@@ -17,8 +19,11 @@ You can also define more focussed and specific error handlers for a variety of e
 - `unhandledRequestHandler`: triggered when a request from Slack goes unacknowledged.
 - `unhandledRequestTimeoutMillis`: the amount of time in milliseconds to wait for request acknowledgement from the application before triggering the `unhandledRequestHandler`. Default is `3001`.
 
-*NOTE*: It is imperative that any custom Error Handlers defined in your app respond to the underlying Slack request that led to the error, using `response.writeHead()` to set the HTTP status code of the response and `response.end()` to dispatch the response back to Slack. See the example for details.
-</div>
+:::info
+
+It is imperative that any custom Error Handlers defined in your app respond to the underlying Slack request that led to the error, using `response.writeHead()` to set the HTTP status code of the response and `response.end()` to dispatch the response back to Slack. See the example for details.
+
+:::
 
 ```javascript
 import { App, HTTPReceiver } from '@slack/bolt';
@@ -57,18 +62,16 @@ app.error(async (error) => {
 });
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">Accessing more data in the error handler</h4>
+<details>
+<summary>
+Accessing more data in the error handler
 </summary>
 
-<div class="secondary-content" markdown="0">
 There may be cases where you need to log additional data from a request in the global error handler. Or you may simply wish to have access to the `logger` you've passed into Bolt.
 
 Starting with version 3.8.0, when passing `extendedErrorHandler: true` to the constructor, the error handler will receive an object with `error`, `logger`, `context`, and the `body` of the request.
 
 It is recommended to check whether a property exists on the `context` or `body` objects before accessing its value, as the data available in the `body` object differs from event to event, and because errors can happen at any point in a request's lifecycle (i.e. before a certain property of `context` has been set).
-</div>
 
 ```javascript
 const { App } = require('@slack/bolt');

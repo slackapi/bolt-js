@@ -1,11 +1,10 @@
 ---
 title: Listening to views
 lang: en
-slug: view-submissions
-order: 12
+slug: /concepts/view-submissions
 ---
 
-<div class="section-content">
+
 
 You may listen for user interactions with views using the `view` method. 
 
@@ -17,7 +16,7 @@ To listen to either a `view_submission` request or `view_closed` request, you ca
 
 ---
 
-##### Update views on submission
+## Update views on submission
 
 To update a view in response to a `view_submission` request, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
 
@@ -36,7 +35,7 @@ Read more about view submissions in our [API documentation](https://api.slack.co
 
 ---
 
-##### Handling views on close
+## Handling views on close
 
 💡 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this:
 
@@ -50,7 +49,7 @@ app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, vie
   // react on close request
 });
 ```
-</div>
+
 
 ```javascript
 // Handle a view_submission request

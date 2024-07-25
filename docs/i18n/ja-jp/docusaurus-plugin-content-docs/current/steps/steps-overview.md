@@ -1,11 +1,10 @@
 ---
 title: ワークフローステップの概要
 lang: ja-jp
-slug: steps-overview
-order: 1
+slug: /concepts/steps-overview
 ---
 
-<div class="section-content">
+
 （アプリによる）ワークフローステップ（Workflow Steps from Apps) は、[ワークフロービルダー](https://api.slack.com/workflows)におけるワークフローに組み込み可能なカスタムのワークフローステップを任意の Slack アプリが提供することを可能とします。
 
 ワークフローステップは、三つの異なるユーザーイベントから構成されます:
@@ -18,4 +17,4 @@ order: 1
 
 ワークフローステップのさらなる詳細については [API ドキュメント](https://api.slack.com/workflows/steps)を参考にしてください。
 
-</div>
+

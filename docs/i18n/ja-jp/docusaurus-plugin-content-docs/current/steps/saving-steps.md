@@ -1,11 +1,9 @@
 ---
 title: ステップの設定の保存
 lang: ja-jp
-slug: saving-steps
-order: 4
+slug: /concepts/saving-steps
 ---
 
-<div class='section-content'>
 
 ワークフローステップの設定モーダルが開いたら、アプリはワークフロー作成者がモーダルを送信するイベントである `view_submission` イベントを待ち受けます。このイベントを受信すると `WorkflowStep` 設定オブジェクト内の `save` コールバック関数が実行されます。
 
@@ -18,7 +16,7 @@ order: 4
 
 これら引数をどのように構成するかの詳細は、[ドキュメント](https://api.slack.com/reference/workflows/workflow_step)を参考にしてください。
 
-</div>
+
 
 ```javascript
 const ws = new WorkflowStep('add_task', {

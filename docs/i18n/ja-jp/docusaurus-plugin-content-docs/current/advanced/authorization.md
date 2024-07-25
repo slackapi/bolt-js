@@ -1,21 +1,20 @@
 ---
 title: 認可（Authorization）
 lang: ja-jp
-slug: authorization
-order: 2
+slug: /concepts/authorization
 ---
 
-<div class="section-content">
+
 認可（Authorization）は、Slack からのリクエストを処理するにあたって、どの Slack クレデンシャル (ボットトークンなど) を使用可能にするかを決定するプロセスです。
 
 1 つだけのワークスペースにインストールされたカスタムアプリであれば `App` 初期化時に単に `token` オプションを使用するだけで OK です。一方で、複数のワークスペースにインストールされる、複数のユーザートークンを使用するといったケースのように、アプリが複数のトークンを処理しなければならない場合があります。このようなケースでは `token` の代わりに `authorize` オプションを使用する必要があります。
 
 `authorize` オプションには、イベントソースを入力値として受け取り、許可された認可されたクレデンシャルを含むオブジェクトを Promise の値として返す関数を指定します。このイベントソースの情報には、 `teamId` (常に存在します)、 `userId`、`conversationId`、`enterpriseId` のような、リクエストが誰によって発生させられたか、どこで発生したかに関する情報が含まれます。
 
-許可されたクレデンシャルには、`botToken`、`userToken`、`botId` (アプリがボット自体からのメッセージを無視するために必要です)、 `botUserId` が含まれます。[`context`](#context) オブジェクトに、これ以外の他のプロパティを自由に設定することもできます。
+許可されたクレデンシャルには、`botToken`、`userToken`、`botId` (アプリがボット自体からのメッセージを無視するために必要です)、 `botUserId` が含まれます。[`context`](/concepts/context) オブジェクトに、これ以外の他のプロパティを自由に設定することもできます。
 
 `botToken` と `userToken` は、どちらか、またはその両方を必ず設定してください。`say()` のようなユーティリティを動作させるには、どちらか一方が存在している必要があります。両方指定した場合、`say()` では `botToken` が優先されます。
-</div>
+
 
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });

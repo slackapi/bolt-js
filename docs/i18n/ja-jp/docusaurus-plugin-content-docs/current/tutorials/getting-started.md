@@ -1,34 +1,36 @@
 ---
 title: Bolt 入門ガイド
-order: 0
+sidebar_label: 入門ガイド
 slug: getting-started
 lang: ja-jp
-layout: tutorial
-permalink: /ja-jp/tutorial/getting-started
-redirect_from:
-  - /ja-jp/getting-started
-  - /getting-started/ja-jp
 ---
+
 # Bolt 入門ガイド
 
-<div class="section-content">
 このガイドでは、Bolt を使用して Slack アプリを起動し実行する方法について説明します。その過程で、新しい Slack アプリを作成し、ローカル環境を設定し、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発します。
-</div>
 
-> 💡 このガイドでは[ソケットモード](https://api.slack.com/apis/connections/socket) を利用します。ソケットモードは、Slack アプリ開発をとりあえず始めてみるときやあなたのチームだけのためのアプリをつくるときにおすすめのやり方です。もしすでに HTTP をアプリのコミュニケーションプロトコルとしてするとわかっているなら、HTTP の方式に対応した同様のドキュメントである [Bolt 入門ガイド（HTTP）](/bolt-js/ja-jp/tutorial/getting-started-http) を参照してください。
+:::tip 
+
+このガイドでは[ソケットモード](https://api.slack.com/apis/connections/socket) を利用します。ソケットモードは、Slack アプリ開発をとりあえず始めてみるときやあなたのチームだけのためのアプリをつくるときにおすすめのやり方です。もしすでに HTTP をアプリのコミュニケーションプロトコルとしてするとわかっているなら、HTTP の方式に対応した同様のドキュメントである [Bolt 入門ガイド（HTTP）](/tutorial/getting-started-http) を参照してください。
+
+:::
 
 ---
 
 ### アプリを作成する {#create-an-app}
 最初にやるべきこと: Bolt で開発を始める前に、 [Slack アプリを作成](https://api.slack.com/apps/new)します。
 
-> 💡 いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをおすすめします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
+:::tip 
+
+いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをおすすめします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
+
+:::
 
 アプリ名を入力し (後で変更可能)、インストール先のワークスペースを選択したら、`Create App`  ボタンをクリックすると、アプリの  **Basic Information**  ページが表示されます。
 
 このページには、後で必要になる重要な認証情報 (**App Credentials**  ヘッダーの下の  `Signing Secret`  など) に加えて、アプリケーションの概要が表示されます。
 
-![Basic Information page](../../assets/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 ひと通り確認し、アプリのアイコンと説明を追加してから、アプリの設定 🔩 を始めましょう。
 
@@ -52,9 +54,13 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 4. インストールを承認すると、**OAuth & Permissions** ページが表示され、**Bot User OAuth Access Token** を確認することができるはずです。
 
-![OAuth Tokens](../../assets/bot-token.png "OAuth Tokens")
+![OAuth Tokens](/img/bot-token.png "OAuth Tokens")
 
-> 💡 トークンは、パスワードのように大切に扱い、[安全に保管](https://api.slack.com/docs/oauth-safety)してください。アプリではそのトークンを使用して、Slack ワークスペースからの情報を投稿および取得します。
+:::tip 
+
+トークンは、パスワードのように大切に扱い、[安全に保管](https://api.slack.com/docs/oauth-safety)してください。アプリではそのトークンを使用して、Slack ワークスペースからの情報を投稿および取得します。
+
+:::
 
 ---
 
@@ -126,8 +132,11 @@ node app.js
 
 Slack ワークスペースで発生するイベント（メッセージが投稿されたときや、メッセージに対するリアクションがつけられたときなど）をリッスンするには、[Events API を使って特定の種類のイベントをサブスクライブします](https://api.slack.com/events-api)。このチュートリアルでは、[ソケットモード](https://api.slack.com/apis/connections/socket)を使用します。 Socket モードは、チームのために何かを作り始めたばかりの人にお勧めのオプションです。
 
-> 💡 ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/bolt-js/ja-jp/deployments/aws-lambda) or [Heroku](/bolt-js/ja-jp/deployments/heroku)など）にデプロイするアプリや Slack App Directory で配布されるアプリに適しています。 HTTP での情報については[こちらのドキュメント](/bolt-js/ja-jp/tutorial/getting-started-http#setting-up-events-with-http)を参照してください。
+:::tip 
 
+ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku)など）にデプロイするアプリや Slack App Directory で配布されるアプリに適しています。 HTTP での情報については[こちらのドキュメント](/tutorial/getting-started-http#setting-up-events-with-http)を参照してください。
+
+:::
 
 それではソケットモードを有効にします。
 
@@ -191,7 +200,11 @@ app.message('hello', async ({ message, say }) => {
 
 ボタン、選択メニュー、日付ピッカー、モーダルなどの機能を使用するには、インタラクティブ機能を有効にする必要があります。イベントと同様に、Slack の URL を指定してアクション ( 「ボタン・クリック」など) を送信する必要があります。
 
-> 💡 ソケットモードを有効にしているとき、デフォルトで基本的なインタラクティブ機能が有効になっていため、ここでは特に何もする必要はいありません。もし HTTP を使っている場合、Slack からのイベント送信先である Request URL を設定する必要があります。
+:::tip 
+
+ソケットモードを有効にしているとき、デフォルトで基本的なインタラクティブ機能が有効になっていため、ここでは特に何もする必要はいありません。もし HTTP を使っている場合、Slack からのイベント送信先である Request URL を設定する必要があります。
+
+:::
 
 インタラクティブ機能が有効化されていると、ショートカット、モーダル、インタラクティブコンポーネント (例：ボタン、選択メニュー、日付ピッカーなど) とのインタラクションがイベントとしてあなたのアプリに送信されます。
 
@@ -251,7 +264,11 @@ app.message('hello', async ({ message, say }) => {
 
 このボタン `accessory` オブジェクトには、`action_id` が割り当てられています。これはボタンの一意の識別子として機能するため、アプリはどのアクションに応答するかを指定できます。
 
-> 💡 [Block Kit ビルダー](https://app.slack.com/block-kit-builder)を使うとインタラクティブメッセージを簡単にプロトタイプすることができます。ビルダーを使用すると、ユーザー (またはそのチームメンバー) はメッセージをモックアップして、対応する JSON を生成し、それをアプリに直接貼り付けることができます。
+:::tip 
+
+[Block Kit ビルダー](https://app.slack.com/block-kit-builder)を使うとインタラクティブメッセージを簡単にプロトタイプすることができます。ビルダーを使用すると、ユーザー (またはそのチームメンバー) はメッセージをモックアップして、対応する JSON を生成し、それをアプリに直接貼り付けることができます。
+
+:::
 
 これで、アプリを再起動し、アプリが登録されているチャンネルで `hello` と入力すると、ボタン付きのメッセージが表示されます。ただしこのボタンをクリックしても、まだ何も起こりません。
 
@@ -318,10 +335,10 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 基本的なアプリの作成ができましたので、次回は是非もっといろいろな、 Bolt の機能を使ってアプリを作ってみましょう。下記のリンクを辿っていろいろアイデアを模索してみてください！
 
-* [基本的な概念](/bolt-js/ja-jp/concepts#basic)をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
+* 基本的な概念 をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
 
-* ボットが[`events()` メソッド](/bolt-js/ja-jp/concepts#event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
+* ボットが[`events()` メソッド](/concepts/event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](https://api.slack.com/events)にリストされています。
 
-* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/bolt-js/ja-jp/concepts#web-api)ことができます。API サイトに [220 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
+* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/concepts/web-api)ことができます。API サイトに [200 を超えるメソッド](https://api.slack.com/methods)を用意してあります。
 
-* [API サイト](https://api.slack.com/docs/token-types)では、様々なトークンタイプの詳細を確認することができます。アプリには、実行するアクションに応じて異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。ソケットモードを使わない場合の例については、 HTTP 方式のやり方としてこのチュートリアルと対になっている [Bolt 入門ガイド（HTTP）](/bolt-js/ja-jp/tutorial/getting-started-http)を参照してください。
+* [API サイト](https://api.slack.com/docs/token-types)では、様々なトークンタイプの詳細を確認することができます。アプリには、実行するアクションに応じて異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。ソケットモードを使わない場合の例については、 HTTP 方式のやり方としてこのチュートリアルと対になっている [Bolt 入門ガイド（HTTP）](/tutorial/getting-started-http)を参照してください。

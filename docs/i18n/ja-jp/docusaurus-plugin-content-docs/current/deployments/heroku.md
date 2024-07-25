@@ -1,24 +1,20 @@
 ---
 title: Heroku へのデプロイ
-order: 0
-slug: heroku
 lang: ja-jp
-layout: tutorial
-permalink: /ja-jp/deployments/heroku
 ---
+
 # Heroku へのデプロイ
 
-<div class="section-content">
-このガイドでは、[Bolt for JavaScript](/bolt-js/ja-jp)と[Heroku プラットフォーム](https://heroku.com/)を使ってSlack アプリを用意して、デプロイするまでの手順を説明します。全体の流れとしては、Bolt Slack アプリをダウンロードし、Heroku 用の準備を済ませ、デプロイする流れになります。
-</div>
+このガイドでは、Bolt for JavaScriptと[Heroku プラットフォーム](https://heroku.com/)を使ってSlack アプリを用意して、デプロイするまでの手順を説明します。全体の流れとしては、Bolt Slack アプリをダウンロードし、Heroku 用の準備を済ませ、デプロイする流れになります。
 
-この手順を全て終わらせたら、あなたはきっと️⚡️[getting-started-with-heroku][deploy-heroku-app]のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
+
+この手順を全て終わらせたら、あなたはきっと️⚡️[getting-started-with-heroku](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-heroku)のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
 
 ---
 
 ### Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
-Bolt アプリを作るのが初めてという場合は、まず[Bolt 入門ガイド][getting-started-guide]に沿って進めてみましょう。または、以下のテンプレートアプリをクローンしてもよいでしょう。
+Bolt アプリを作るのが初めてという場合は、まず[Bolt 入門ガイド](/getting-started)に沿って進めてみましょう。または、以下のテンプレートアプリをクローンしてもよいでしょう。
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -42,7 +38,11 @@ Heroku は、作ったアプリをホストできる柔軟性の高いプラッ�
 
 Heroku にアプリをデプロイするには、まずGit リポジトリが必要です。まだGit を使ったことがない場合は、[Git をインストール](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)し、[Git リポジトリを作成](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)します
 
-> 💡 前のセクションで`git clone`を使用した場合、Git リポジトリはすでに存在しますので、この手順はスキップできます
+:::tip
+
+前のセクションで`git clone`を使用した場合、Git リポジトリはすでに存在しますので、この手順はスキップできます
+
+:::
 
 **2. Procfile を追加する**
 
@@ -69,7 +69,11 @@ git add Procfile
 git commit -m "Add Procfile"
 ```
 
-> 💡 既存のBolt アプリを使ってこのガイドに沿って進めている場合は、[Preparing a Codebase for Heroku Deployment](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port)のガイドを参考に、適切なポートをリッスンするようにしてください。
+:::tip 
+
+既存のBolt アプリを使ってこのガイドに沿って進めている場合は、[Preparing a Codebase for Heroku Deployment](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port)のガイドを参考に、適切なポートをリッスンするようにしてください。
+
+:::
 
 ---
 
@@ -91,7 +95,11 @@ brew install heroku/brew/heroku
 heroku help
 ```
 
-> 💡 `heroku`コマンドが見つからない場合は、パスを更新するため新しいターミナルセッションまたはターミナルタブを開いてください。
+:::tip 
+
+`heroku`コマンドが見つからない場合は、パスを更新するため新しいターミナルセッションまたはターミナルタブを開いてください。
+
+:::
 
 **2. Heroku CLI にログインする**
 
@@ -100,7 +108,11 @@ Heroku CLI では、ローカルマシンからHeroku アカウントに接続�
 ```shell
 heroku login
 ```
-> 💡 ファイアウォールを使っている場合、Heroku CLI で使用される[プロキシ環境変数](https://devcenter.heroku.com/articles/using-the-cli#using-an-http-proxy)の設定が必要なことがあります。
+:::tip 
+
+ファイアウォールを使っている場合、Heroku CLI で使用される[プロキシ環境変数](https://devcenter.heroku.com/articles/using-the-cli#using-an-http-proxy)の設定が必要なことがあります。
+
+:::
 
 **3. Heroku CLI へのログインが成功したか確認する**
 
@@ -119,7 +131,11 @@ heroku auth:whoami
 先ほどインストールしたツールを使って、[Heroku アプリを作成](https://devcenter.heroku.com/articles/creating-apps)します。アプリを作成するときは、ユニークな名前を自分で指定するか、ランダムな名前を生成することができます。
 
 
-> 💡 [Heroku アプリはあとから名前を変更することもできます](https://devcenter.heroku.com/articles/renaming-apps)が、リモートのGit アドレスとパブリックのWeb アドレスも変更になります。
+:::tip 
+
+[Heroku アプリはあとから名前を変更することもできます](https://devcenter.heroku.com/articles/renaming-apps)が、リモートのGit アドレスとパブリックのWeb アドレスも変更になります。
+
+:::
 
 **1. Heroku アプリを作成する**
 
@@ -162,7 +178,11 @@ heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
 heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-> 💡 認証情報の入手場所がわからない場合、Bolt 入門ガイドで[署名シークレットとトークンのエクスポート](/bolt-js/ja-jp/tutorial/getting-started#トークンとアプリのインストール)について参照してください。
+:::tip 
+
+認証情報の入手場所がわからない場合、Bolt 入門ガイドで[署名シークレットとトークンのエクスポート](/getting-started)について参照してください。
+
+:::
 
 ローカルでのアプリの準備と、Heroku アプリの作成が完了しました。次のステップは、デプロイです。
 
@@ -183,7 +203,11 @@ git push heroku main
 ```
 Heroku でデプロイされるのは、[master またはmain ブランチ](https://devcenter.heroku.com/articles/git-branches)のコードです。それ以外のブランチにプッシュした場合、デプロイ処理はトリガーされません
 
-> 💡 Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches will not trigger a deployment.
+:::tip 
+
+Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches will not trigger a deployment.
+
+:::
 
 最後に、Heroku CLI を使ってWeb サーバーインスタンスを起動します。
 
@@ -207,23 +231,31 @@ heroku info
 
 [Slack アプリのページ](https://api.slack.com/apps)を開き、アプリ名を選択します。次に、リクエストURLを自分で確認したWeb アドレスに変更します。設定する場所は2 か所あります。
 
-> 💡 リクエストURL の末尾は`/slack/events`です。例えば`https://sharp-rain-871.herokuapp.com/slack/events`のようになります。
+:::tip 
+
+リクエストURL の末尾は`/slack/events`です。例えば`https://sharp-rain-871.herokuapp.com/slack/events`のようになります。
+
+:::
 
 つ目の場所は、サイドパネルの「**Interactivity & Shortcuts**」です。これを選択し、リクエスト**URLを**更新します。
 
-![Interactivity & Shortcuts page](../../assets/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts")
+![Interactivity & Shortcuts page](/img/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts")
 
 2 つ目の場所は、サイドパネルの「**Event Subscriptions**」です。これを選択し、リクエスト**URLを**更新します。
 
-![Event Subscriptions page](../../assets/event-subscriptions-page.png "Event Subscriptions")
+![Event Subscriptions page](/img/event-subscriptions-page.png "Event Subscriptions")
 
-> 💡 無料プランで使用するHeroku アプリは、非アクティブな状態が続くとスリープします。💤 認証が失敗した場合、すぐに再試行してみてください。
+:::tip 
+
+無料プランで使用するHeroku アプリは、非アクティブな状態が続くとスリープします。💤 認証が失敗した場合、すぐに再試行してみてください。
+
+:::
 
 **3. Slack アプリをテストする**
 
 アプリのデプロイが完了し、Slack の設定変更も行いました。アプリを試してみましょう。
 
-アプリが参加しているSlack チャンネルを開き、半角の小文字で"hello" と書き込みます。[Bolt 入門ガイド](/bolt-js/ja-jp/tutorial/getting-started#アクションの送信と応答)のとおり、アプリから応答があるはずです。応答がない場合、リクエスト**URLを**確認し、もう一度試してください。
+アプリが参加しているSlack チャンネルを開き、半角の小文字で"hello" と書き込みます。[Bolt 入門ガイド](/getting-started)のとおり、アプリから応答があるはずです。応答がない場合、リクエスト**URLを**確認し、もう一度試してください。
 
 ---
 
@@ -264,9 +296,6 @@ git push heroku main
 基本的なアプリのデプロイができましたので、次はアプリのカスタマイズやモニタリングを行う方法を調べてみましょう。おすすめのステップをいくつか紹介します。
 
 - [How Heroku Works](https://devcenter.heroku.com/articles/how-heroku-works)を読んでHeroku の動作の理解を深めたり、[Heroku アプリを無料で使う場合の制限](https://devcenter.heroku.com/articles/free-dyno-hours)をチェックしたりする。
-- [Bolt の基本的な概念](/bolt-js/ja-jp/concepts#basic)を参考にしてアプリを拡張したり、[Heroku Add-ons](https://elements.heroku.com/addons)をアプリに取り入れたりする
-- [Bolt の応用コンセプト](/bolt-js/ja-jp/concepts#advanced)でログの表示について学習し、[Heroku でのログメッセージの確認方法](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs)を把握する。
+- Bolt の基本的な概念を参考にしてアプリを拡張したり、[Heroku Add-ons](https://elements.heroku.com/addons)をアプリに取り入れたりする
+- Bolt の応用コンセプトでログの表示について学習し、[Heroku でのログメッセージの確認方法](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs)を把握する。
 - [Heroku アプリのスケール方法](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app)に従って、アクセスの増加に対処する。
-
-[deploy-heroku-app]: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-heroku
-[getting-started-guide]: /bolt-js/ja-jp/tutorial/getting-started

@@ -1,19 +1,11 @@
 ---
-title: Getting started with HTTP
-order: 5
+title: Getting started with Bolt for JavaScript and HTTP
 slug: getting-started-http
 lang: en
-layout: tutorial
-permalink: /tutorial/getting-started-http
-redirect_from:
-  - /getting-started-http
 ---
-# Getting started with Bolt for JavaScript and HTTP
 
-<div class="section-content">
 This guide is meant to walk you through getting up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
-</div> 
-
+ 
 When you’re finished, you’ll have this ⚡️[Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own.
 
 ---
@@ -21,13 +13,17 @@ When you’re finished, you’ll have this ⚡️[Getting Started app](https://g
 ### Create an app {#create-an-app}
 First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new). 
 
-> 💡 We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
+:::tip 
+
+We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
+
+:::
 
 After you fill out an app name (_you can change it later_) and pick a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
 
 This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header. 
 
-![Basic Information page](../assets/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 Look around, add an app icon and description, and then let's start configuring your app. 🔩
 
@@ -51,9 +47,13 @@ For brevity, we're going to use bot tokens for this guide.
 
 4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
-![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
+![OAuth Tokens](/img/bot-token.png "Bot OAuth Token")
 
-> 💡 Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
+:::tip 
+
+Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
+
+:::
 
 ---
 
@@ -73,6 +73,7 @@ You’ll be prompted with a series of questions to describe your new project (yo
 Before we install the Bolt for JavaScript package to your new project, let's save the **bot token** and **Signing Secret** that were generated when you configured your app. 
 
 1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
+
 ```shell
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
@@ -82,8 +83,11 @@ export SLACK_SIGNING_SECRET=<your-signing-secret>
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-> 🔒 Remember to keep your token and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Checkout the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
+:::warning 
 
+Remember to keep your token and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Checkout the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
+
+:::
 
 Now, let's create your app. Install the `@slack/bolt` package and save it to your `package.json` dependencies using the following command:
 
@@ -131,7 +135,11 @@ Let's enable events for your app:
 
 2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡
 
-> 💡 For local development, you can use a proxy service like [ngrok](https://ngrok.com/) to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel.
+:::info 
+
+For local development, you can use a proxy service like [ngrok](https://ngrok.com/) to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel.
+
+:::
 
  
 Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**. 
@@ -184,7 +192,11 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a Request URL for Slack to send the action (such as *user clicked a button*). Head over to **Interactivity & Shortcuts** in your app configuration. 
 
-> 💡 By default, Bolt uses the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
+:::info 
+
+By default, Bolt uses the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
+
+:::
 
 When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events. 
 
@@ -239,7 +251,11 @@ The value inside of `say()` is now an object that contains an array of `blocks`.
 
 You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
-> 💡 The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+:::tip 
+
+The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+
+:::
 
 Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (*yet!*).
 
@@ -301,10 +317,10 @@ You just built your first [Bolt for JavaScript app](https://github.com/slackapi/
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
-* Read through the [Basic concepts](/bolt-js/concepts#basic) to learn about the different methods and features your Bolt app has access to.
+* Read through the Basic concepts to learn about the different methods and features your Bolt app has access to.
 
-* Explore the different events your bot can listen to with the [`events()` method](/bolt-js/concepts#event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
+* Explore the different events your bot can listen to with the [`events()` method](/concepts/event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
 
-* Bolt allows you to [call Web API methods](/bolt-js/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
+* Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 200 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. If you are using [Socket Mode](/bolt-js/tutorial/getting-started) instead of HTTP, an additional (`xapp`) token with `connections:write` scopes is required. 
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. If you are using [Socket Mode](/getting-started) instead of HTTP, an additional (`xapp`) token with `connections:write` scopes is required. 

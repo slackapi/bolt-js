@@ -1,20 +1,14 @@
 ---
-title: Migrating Hubot apps
-order: 3
+title: Migrating apps from Hubot to Bolt for JavaScript
 slug: hubot-migration
 lang: en
 layout: tutorial
-permalink: /tutorial/hubot-migration
-redirect_from:
-  - /hubot-migration
 ---
-# Migrating apps from Hubot to Bolt for JavaScript
 
-<div class="section-content">
 Bolt was created to reduce the time and complexity it takes to build Slack apps. It provides Slack developers a single interface to build using modern features and best practices. This guide is meant to step you through the process of migrating your app from using [Hubot](https://hubot.github.com/docs/) to Bolt for JavaScript.
 
 If you already have an [app with a bot user](https://api.slack.com/bot-users#getting-started) or if you’re looking for code samples that translate Hubot code to Bolt for JavaScript code, you may find it valuable to start by reading through the [example script in the Bolt for JavaScript repository](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
-</div> 
+ 
 
 ---
 
@@ -37,7 +31,11 @@ If you have access to an existing Slack app with a bot user, you can [jump ahead
 
 The first thing you’ll want to do is [create a Slack app](https://api.slack.com/apps/new).
 
-> 💡We recommend using a workspace where you won’t disrupt real work getting done — you can create a new one for free.
+:::tip
+
+We recommend using a workspace where you won’t disrupt real work getting done — you can create a new one for free.
+
+:::
 
 After you fill out your app’s name and pick a workspace to install it to, hit the `Create App` button and you’ll land on your app’s **Basic Information** page.
  
@@ -53,12 +51,16 @@ To add a bot user to your new app, click **Bot Users** on the left sidebar and t
 ### Configure what your bot will hear {#configure-what-your-bot-will-hear}
 The [Events API](https://api.slack.com/bot-users#app-mentions-response) is a bot's equivalent of eyes and ears. It gives a bot a way to react to posted messages, changes to channels, and other activities that happen in Slack.
 
-> ⚠️Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](https://slack.dev/bolt/tutorial/getting-started#setting-up-your-local-project) and [setting up events](https://slack.dev/bolt/tutorial/getting-started#setting-up-events) in the Getting Started guide.
+:::info
+
+Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/getting-started) and [setting up events](https://slack.dev/getting-started#setting-up-events) in the Getting Started guide.
+
+:::
 
 #### Listening for messages
 All Hubot apps can listen to messages by default, so we need to configure your bot user to do the same.
 
-After walking through [setting up events](https://slack.dev/bolt/tutorial/getting-started#setting-up-events), your Request URL should be verified. Scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
+After walking through [setting up events](/getting-started#setting-up-events), your Request URL should be verified. Scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
 
 If you only want your bot to listen to messages in channels, you can listen to `message.channels` and `message.groups`. Or if you want your bot to listen to messages from everywhere it is, choose all four message events.
 
@@ -70,7 +72,11 @@ Your Hubot app may have responded to other events depending on what functionalit
 - If your app uses `react`, subscribe to the `reaction_added` event. This listens for any time a reaction is added to a message in channels your bot user is in.
 - If your app uses `presenceChange`, there is no corresponding event. If this event is important to your bot’s functionality, you may have to continue using Hubot or modify the app’s logic.
 
-> 💡An added benefit to Bolt is you can listen to any [Events API event](https://api.slack.com/events). So after you’re done migrating, you can listen to more events like [when a user joins the workspace](https://api.slack.com/events/team_join) or [when a user opens a DM with your app](https://api.slack.com/events/app_home_opened).
+:::info
+
+An added benefit to Bolt is you can listen to any [Events API event](https://api.slack.com/events). So after you’re done migrating, you can listen to more events like [when a user joins the workspace](https://api.slack.com/events/team_join) or [when a user opens a DM with your app](https://api.slack.com/events/app_home_opened).
+
+:::
 
 After you added events that correspond to your app’s functionality, click **Save Changes**.
 
@@ -79,14 +85,18 @@ Bolt’s interface was designed to conform to the Slack API language as much as 
 
 Bolt for JavaScript doesn’t use `res` or expose the raw request from Slack. Instead, you can use the payload body from `payload`, or common functionality like sending a message using `say()`. 
 
-> ⚙️To make it easier, we’ve created a sample script on GitHub that [showcases Hubot’s core functionality using equivalent functionality written with Bolt for JavaScript](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
+:::info
+
+To make it easier, we’ve created a sample script on GitHub that [showcases Hubot’s core functionality using equivalent functionality written with Bolt for JavaScript](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
+
+:::
 
 #### Listening to patterns using `message()`
 Hubot scripts use `hear()` listen to messages with a matching pattern. Bolt for JavaScript instead uses `message()` and accepts a `string` or `RegExp` for the pattern.
 
-> 👨‍💻👩‍💻Anywhere where you use `hear()` in your code, change it to use `message()`
+👨‍💻👩‍💻 Anywhere where you use `hear()` in your code, change it to use `message()`
 
-[Read more about listening to messages](https://slack.dev/bolt/concepts#message-listening).
+[Read more about listening to messages](/concepts/message-listening).
 
 #### Responding with a message using `say()` and `respond()`
 Hubot scripts use `send()` to send a message to the same conversation and `reply()` to send a message to the same conversation with an @-mention to the user that sent the original message.
@@ -95,9 +105,9 @@ Bolt for JavaScript uses `await say()` in place of `send()`, or `await respond()
 
 The arguments for Hubot’s `send()` and Bolt for JavaScript's `say()` are mostly the same, although `say()` allows you to send messages with [interactive components like buttons, select menus, and datepickers](https://api.slack.com/messaging/interactivity#interaction).
 
-> 👨‍💻👩‍💻Anywhere where you use `send()` in your code, change it to use `await say()`
+👨‍💻👩‍💻 Anywhere where you use `send()` in your code, change it to use `await say()`
 
-[Read more about responding to messages](https://slack.dev/bolt/concepts#message-sending).
+[Read more about responding to messages](/concepts/message-sending).
 
 #### `respond` and `react`
 
@@ -105,9 +115,9 @@ In the previous section, you should have subscribed your app to the `app_mention
 
 Bolt for JavaScript uses a method called `event()` that allows you to listen to any [Events API event](https://api.slack.com/events). To change your code, you’ll just change any `respond()` to `app.event(‘app_mention’)` and any `react()` to `app.event(‘reaction_added’)`. This is detailed more [in the example script](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
 
-> 👨‍💻👩‍💻Anywhere where you use `respond()` in your code, change it to use `app.event(‘app_mention’)`. Anywhere you use `react`, change it to `app.event(‘reaction_added’)`.
+👨‍💻👩‍💻 Anywhere where you use `respond()` in your code, change it to use `app.event(‘app_mention’)`. Anywhere you use `react`, change it to `app.event(‘reaction_added’)`.
 
-[Read more about listening to events](https://slack.dev/bolt/concepts#event-listening).
+[Read more about listening to events](/concepts/event-listening).
 
 ### Using Web API methods with Bolt for JavaScript {#using-web-api-methods-with-bolt-for-javascript}
 In Hubot, you needed to import the `WebClient` package from `@slack/client`. Bolt for JavaScript imports a `WebClient` instance for you by default, and exposes it as the `client` argument available on all listeners.
@@ -130,16 +140,16 @@ app.message('react', async ({ message, context, client, logger }) => {
 });
 ```
 
-> 👨‍💻👩‍💻Change your Web API calls to use one the `client` argument.
+👨‍💻👩‍💻 Change your Web API calls to use one the `client` argument.
 
-[Read more about using the Web API with Bolt](https://slack.dev/bolt/concepts#web-api).
+[Read more about using the Web API with Bolt](/concepts/web-api).
 
 ### Using middleware with Bolt for JavaScript {#using-middleware-with-bolt-for-javascript}
 Hubot has three kinds of middleware: receive (runs before any listeners are called), listener (runs for every matching listener), and response (runs for every response sent).
 
 Bolt for JavaScript only has two kinds of middleware — global and listener:
-- Global middleware runs before any listener middleware is called. It’s attached to the Bolt for JavaScript app itself. [Read more about Bolt for JavaScript's global middleware](https://slack.dev/bolt/concepts#global-middleware).
-- Listener middleware only runs for listener functions it’s attached to. [Read more about Bolt for JavaScript's listener middleware](https://slack.dev/bolt/concepts#listener-middleware).
+- Global middleware runs before any listener middleware is called. It’s attached to the Bolt for JavaScript app itself. [Read more about Bolt for JavaScript's global middleware](/concepts/global-middleware).
+- Listener middleware only runs for listener functions it’s attached to. [Read more about Bolt for JavaScript's listener middleware](/concepts/listener-middleware).
 
 In Bolt for JavaScript, both kinds of middleware must call `await next()` to pass control of execution from one middleware to the next. If your middleware encounters an error during execution, you can `throw` it and the error will be bubbled up through the previously-executed middleware chain.
 
@@ -156,14 +166,14 @@ The default, built-in conversation store uses an in-memory store similar to Hubo
 
 If there is more than one instance of your app running, the built-in conversation store will not be shared among the processes so you’ll want to implement a conversation store that fetches conversation state from a database.
 
-[Read more about conversation stores](https://slack.dev/bolt/concepts#conversation-store).
+[Read more about conversation stores](/concepts/conversation-store).
 
 ### Next steps {#next-steps}
 If you’ve made it this far, it means you’ve likely converted your Hubot app into a Bolt for JavaScript app! ✨⚡
 
 Now that you have your flashy new Bolt for JavaScript app, you can explore how to power it up:
 - Consider adding interactivity [like buttons and select menus](https://api.slack.com/messaging/interactivity#interaction). These weren’t supported by Hubot and will allow your app to include contextual actions when sending messages to Slack.
-- Read [the documentation](/bolt-js/concepts) to explore what else is possible with Bolt for JavaScript.
+- Read the rest of the documentation to explore what else is possible with Bolt for JavaScript.
 - Check out our [sample app](https://glitch.com/~slack-bolt) that shows you how to use events and interactive components.
 
 And if you have difficulties while developing, reach out to our developer support team to at [developers@slack.com](mailto:developers@slack.com), and if you run into a problem with the framework [open an issue on GitHub](https://github.com/slackapi/bolt-js/issues/new).

@@ -10,6 +10,8 @@ Incoming actions that are associated with a function have the same `inputs`, `co
 
 To learn more about responding to interactivity, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#interactivity).
 
+
+
 ```js
 // If associated with a function, function-specific utilities are made available 
 app.action('approve_button', async ({ complete, fail }) => {

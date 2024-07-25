@@ -1,17 +1,18 @@
 ---
-title: Overview of Workflow Steps for apps
+title: Overview of Workflow Steps from Apps
 lang: en
-slug: steps-overview
-order: 1
+slug: /concepts/steps-overview
 ---
 
-<div class="section-content">
+:::danger
 
-**⚠️ Workflow Steps from Apps are a deprecated feature.**
+Workflow Steps from Apps are a deprecated feature.
 
-**Workflow Steps from Apps are different than, and not interchangable with, Slack automation workflows. We encourage those who are currently publishing Workflow Steps from Apps to consider the new [Slack automation features](https://api.slack.com/automation), such as [custom functions for Bolt](#functions).**
+Workflow Steps from Apps are different than, and not interchangable with, Slack automation workflows. We encourage those who are currently publishing Workflow Steps from Apps to consider the new [Slack automation features](https://api.slack.com/automation), such as [custom functions for Bolt](/concepts/creating-custom-functions).
 
-**Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.**
+Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.
+
+:::
 
 ---
 
@@ -26,5 +27,3 @@ A workflow step is made up of three distinct user events:
 All three events must be handled for a workflow step to function.
 
 Read more about Workflow Steps from Apps in the [API documentation](https://api.slack.com/legacy/workflows/steps).
-
-</div>

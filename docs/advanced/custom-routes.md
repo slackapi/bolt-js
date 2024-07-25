@@ -1,11 +1,10 @@
 ---
-title: Adding Custom HTTP routes 
+title: Adding custom HTTP routes 
 lang: en
-slug: custom-routes
-order: 10
+slug: /concepts/custom-routes
 ---
 
-<div class="section-content">
+
 As of `v3.7.0`, custom HTTP routes can be easily added by passing in an array of routes as `customRoutes` when initializing `App`. 
 
 Each `CustomRoute` object must contain three properties: `path`, `method`, and `handler`. `method`, which corresponds to the HTTP verb, can be either a string or an array of strings.
@@ -13,7 +12,7 @@ Each `CustomRoute` object must contain three properties: `path`, `method`, and `
 Since `v3.13.0`, the default built-in receivers (`HTTPReceiver` and `SocketModeReceiver`) support dynamic route parameters like [Express.js does](https://expressjs.com/en/guide/routing.html#route-parameters). With this, you can capture positional values in the URL for use in your route's handler via `req.params`.
 
 To determine what port the custom HTTP route will be available on locally, you can specify an `installerOptions.port` property in the `App` constructor. Otherwise, it will default to port `3000`.
-</div>
+
 
 ```javascript
 const { App } = require('@slack/bolt');
@@ -51,14 +50,14 @@ const app = new App({
 })();
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">Custom ExpressReceiver routes</h4>
+<details>
+<summary>
+Custom ExpressReceiver routes
 </summary>
 
-<div class="secondary-content" markdown="0">
+
 Adding custom HTTP routes is quite straightforward when using Bolt’s built-in ExpressReceiver. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which additional routes and middleware can be added.
-</div>
+
 
 ```javascript
 const { App, ExpressReceiver } = require('@slack/bolt');

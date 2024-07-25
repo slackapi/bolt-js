@@ -1,11 +1,10 @@
 ---
 title: OAuth フローの実装
 lang: ja-jp
-slug: authenticating-oauth
-order: 15
+slug: /concepts/authenticating-oauth
 ---
 
-<div class="section-content">
+
 Slack アプリの配布を行うには Bolt による OAuth フローを実装し、インストール時に取得した情報をセキュアな方法で保存しておく必要があります。
 Bolt は OAuth フローそのものに加えて OAuth のためのルーティング、 state パラメーターの検証、保存するためのインストール情報をアプリに受け渡す、などの処理をハンドリングします。
 
@@ -42,7 +41,7 @@ const app = new App({
 
 * アプリがすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳しくは [OAuth ライブラリのドキュメント](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
-* 💡 Bolt for JavaScript は [カスタムのレシーバー](#receiver)での OAuth をサポートしていません。カスタムのレシーバーで OAuth フローを実装したい場合は、私たちが提供している [OAuth ライブラリ](https://slack.dev/node-slack-sdk/oauth#slack-oauth) を使うことができます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
+* 💡 Bolt for JavaScript は [カスタムのレシーバー](/concepts/receiver)での OAuth をサポートしていません。カスタムのレシーバーで OAuth フローを実装したい場合は、私たちが提供している [OAuth ライブラリ](https://slack.dev/node-slack-sdk/oauth#slack-oauth) を使うことができます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
 
 ##### Redirect URI
 
@@ -125,7 +124,7 @@ const app = new App({
 
 Slack の OAuth インストールフローについてのより詳細な情報は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
 
-</div>
+
 
 ```javascript
 const app = new App({
@@ -175,12 +174,11 @@ const app = new App({
 });
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">OAuth デフォルト設定をカスタマイズ</h4>
+<details>
+<summary>
+OAuth デフォルト設定をカスタマイズ
 </summary>
 
-<div class="secondary-content" markdown="0">
 
 `installerOptions` を使って OAuth モジュールのデフォルト設定を上書きすることができます。このカスタマイズされた設定は `App` の初期化時に渡します。以下の情報を変更可能です:
 
@@ -192,7 +190,7 @@ const app = new App({
 - `stateStore`: 組み込みの `ClearStateStore` の代わりにカスタムのデータストアを有効にするために使用
 - `userScopes`: 親の階層にある `scopes` プロパティと同様、ユーザがアプリをインストールする際に必要となるユーザスコープのリストの指定に使用
 
-</div>
+
 
 ```javascript
 const database = {

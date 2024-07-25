@@ -1,13 +1,12 @@
 ---
 title: Customizing a receiver
 lang: en
-slug: receiver
-order: 9
+slug: /concepts/receiver
 ---
 
-<div class="section-content">
 
-#### Writing a custom receiver
+
+## Writing a custom receiver
 
 A receiver is responsible for handling and parsing any incoming requests from Slack then sending it to the app, so that the app can add context and pass the request to your listeners. Receivers must conform to the [Receiver interface](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.13.1/src/types/receiver.ts#L27-L31):
 
@@ -26,11 +25,11 @@ For a more in-depth look at a receiver, [read the source code for the built-in `
 
 ---
 
-#### Customizing built-in receivers
+## Customizing built-in receivers
 
-The built-in `HTTPReceiver`, `ExpressReceiver`, `AwsLambdaReceiver` and `SocketModeReceiver` accept several configuration options. For a full list of options, see the [Receiver options reference](/bolt-js/reference#receiver-options).
+The built-in `HTTPReceiver`, `ExpressReceiver`, `AwsLambdaReceiver` and `SocketModeReceiver` accept several configuration options. For a full list of options, see the [Receiver options reference](/reference#receiver-options).
 
-##### Extracting custom properties
+### Extracting custom properties
 
 Use the `customPropertiesExtractor` option to extract custom properties from incoming events. The event type depends on the type of receiver you are using, e.g. HTTP requests for `HTTPReceiver`s, websocket messages for `SocketModeReceiver`s.
 
@@ -66,7 +65,7 @@ app.use(async ({ logger, context, next }) => {
 ```
 
 You can find [more examples of extracting custom properties](https://github.com/slackapi/bolt-js/tree/%40slack/bolt%403.13.1/examples/custom-properties) from different types of receivers here.
-</div>
+
 
 ```javascript
 import { createServer } from 'http';

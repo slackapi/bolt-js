@@ -1,21 +1,20 @@
 ---
 title: Authorization
 lang: en
-slug: authorization
-order: 2
+slug: /concepts/authorization
 ---
 
-<div class="section-content">
+
 Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming request.
 
-Custom apps installed on a single workspace can simply use the `token` option at the time of `App` initialization. However, when your app needs to handle several tokens, such as cases where it will be installed on multiple workspaces or needs access to more than one user token, the `authorize` option should be used instead. <b>If you're using the [built-in OAuth support](#authenticating-oauth) authorization is handled by default, so you do not need to pass in an `authorize` option.</b>
+Custom apps installed on a single workspace can simply use the `token` option at the time of `App` initialization. However, when your app needs to handle several tokens, such as cases where it will be installed on multiple workspaces or needs access to more than one user token, the `authorize` option should be used instead. <b>If you're using the [built-in OAuth support](/concepts/authenticating-oauth) authorization is handled by default, so you do not need to pass in an `authorize` option.</b>
 
 The `authorize` option can be set to a function that takes an event source as its input, and should return a Promise for an object containing the authorized credentials. The source contains information about who and where the request is coming from by using properties like `teamId` (always available), `userId`, `conversationId`, and `enterpriseId`.
 
-The authorized credentials should also have a few specific properties: `botToken`, `userToken`, `botId` (required for an app to ignore messages from itself), and `botUserId`. You can also include any other properties you'd like to make available on the [`context`](#context) object.
+The authorized credentials should also have a few specific properties: `botToken`, `userToken`, `botId` (required for an app to ignore messages from itself), and `botUserId`. You can also include any other properties you'd like to make available on the [`context`](/concepts/context) object.
 
 You should always provide either one or both of the `botToken` and `userToken` properties. At least one of them is necessary to make helpers like `say()` work. If they are both given, then `botToken` will take precedence.
-</div>
+
 
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });

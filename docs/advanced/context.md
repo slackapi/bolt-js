@@ -1,15 +1,14 @@
 ---
 title: Adding context
 lang: en
-slug: context
-order: 7
+slug: /concepts/context
 ---
 
-<div class="section-content">
+
 All listeners have access to a `context` object, which can be used to enrich requests with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
 
 `context` is just an object, so you can add to it by setting it to a modified version of itself.
-</div>
+
 
 ```javascript
 async function addTimezoneContext({ payload, client, context, next }) {
@@ -36,7 +35,7 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
 
   const requestText = `:large_blue_circle: *New request from <@${command.user_id}>*: ${command.text}`;
 
-  // If request not inbetween 9AM and 5PM, send request tomorrow
+  // If request not in between 9AM and 5PM, send request tomorrow
   if (localHour > 17 || localHour < 9) {
     // Assume function exists to get local tomorrow 9AM from offset
     const localTomorrow = getLocalTomorrow(context.tz_offset);

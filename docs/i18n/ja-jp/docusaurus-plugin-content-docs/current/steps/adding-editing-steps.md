@@ -1,11 +1,8 @@
 ---
 title: ステップの追加・編集
 lang: ja-jp
-slug: adding-editing-steps
-order: 3
+slug: /concepts/adding-editing-steps
 ---
-
-<div class='section-content'>
 
 ワークフローの作成者が、アプリが提供するステップをワークフローに追加（またはその設定を変更）するタイミングで、アプリは [`workflow_step_edit`](https://api.slack.com/reference/workflows/workflow_step_edit) というイベントを受信します。このイベントの受信時に `WorkflowStep` 設定オブジェクト内の `edit` コールバック関数が実行されます。
 
@@ -14,8 +11,6 @@ order: 3
 `edit` コールバック関数の中では モーダルの view のうち `blocks` だけを渡すだけで簡単にステップ設定モーダルをオープンすることができる `configure()` というユーティリティ関数が利用できます。これは、必要な入力内容が揃うまで設定の保存を無効にする `submit_disabled` というオプションを `true` に設定します。
 
 設定モーダルを開く処理に関するさらなる詳細は、[ドキュメント](https://api.slack.com/workflows/steps#handle_config_view)を参考にしてください。
-
-</div>
 
 ```javascript
 const ws = new WorkflowStep('add_task', {

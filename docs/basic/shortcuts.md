@@ -1,27 +1,34 @@
 ---
 title: Listening and responding to shortcuts
 lang: en
-slug: shortcuts
-order: 8
+slug: /concepts/shortcuts
 ---
 
-<div class="section-content">
+
 
 The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
-Shortcuts are invokable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut requests. The method requires a `callback_id` parameter of type `string` or `RegExp`.
+Shortcuts are invocable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut requests. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
-⚠️ Note that if you use `shortcut()` multiple times with overlapping RegExp matches, _all_ matching listeners will run. Design your regular expressions to avoid this possibility.
+:::warning 
+
+If you use `shortcut()` multiple times with overlapping RegExp matches, _all_ matching listeners will run. Design your regular expressions to avoid this possibility.
+
+:::
 
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the request.
 
-Shortcuts include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking. 
+Shortcuts include a `trigger_id` which an app can use to [open a modal](/concepts/creating-modals) that confirms the action the user is taking. 
 
 When configuring shortcuts within your app configuration, you'll continue to append `/slack/events` to your request URL.
 
-⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include channel ID.
+:::warning
 
-</div>
+Global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include channel ID.
+
+:::
+
+
 
 ```javascript
 // The open_modal shortcut opens a plain old modal
@@ -73,14 +80,14 @@ app.shortcut('open_modal', async ({ shortcut, ack, client, logger }) => {
 });
 ```
 
-<details class="secondary-wrapper">
-  <summary class="section-head" markdown="0">
-  <h4 class="section-head">Listening to shortcuts using a constraint object</h4>
+<details>
+  <summary>
+  Listening to shortcuts using a constraint object
   </summary>
 
-  <div class="secondary-content" markdown="0">
-  You can use a constraints object to listen to `callback_id`s, and `type`s. Constraints in the object can be of type string or RegExp object.
-  </div>
+  
+  You can use a constraints object to listen to `callback_id` and `type` values. Constraints in the object can be of type string or RegExp object.
+  
 
   ```javascript
   // Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'

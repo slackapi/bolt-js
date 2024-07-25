@@ -1,15 +1,14 @@
 ---
 title: Acknowledging requests
 lang: en
-slug: acknowledge
-order: 7
+slug: /concepts/acknowledge
 ---
 
-<div class="section-content">
+
 Actions, commands, and options requests must **always** be acknowledged using the `ack()` function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of request, your acknowledgement may be different. For example, when acknowledging a modal submission you will call `ack()` with validation errors if the submission contains errors, or with no parameters if the submission is valid.
 
 We recommend calling `ack()` right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.
-</div>
+
 
 ```javascript
 // Regex to determine if this is a valid email

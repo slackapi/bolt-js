@@ -1,11 +1,18 @@
 ---
 title: Saving step configurations
 lang: en
-slug: saving-steps
-order: 4
+slug: /concepts/saving-steps
 ---
 
-<div class='section-content'>
+:::danger
+
+Workflow Steps from Apps are a deprecated feature.
+
+Workflow Steps from Apps are different than, and not interchangable with, Slack automation workflows. We encourage those who are currently publishing Workflow Steps from Apps to consider the new [Slack automation features](https://api.slack.com/automation), such as [custom functions for Bolt](/concepts/creating-custom-functions).
+
+Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.
+
+:::
 
 After the configuration modal is opened, your app will listen for the `view_submission` event. The `save` callback in your `WorkflowStep` configuration will be run when this event is received.
 
@@ -17,8 +24,6 @@ Within the `save` callback, the `update()` method can be used to save the builde
 - `step_image_url` overrides the default Step image
 
 To learn more about how to structure these parameters, [read the documentation](https://api.slack.com/reference/workflows/workflow_step).
-
-</div>
 
 ```javascript
 const ws = new WorkflowStep('add_task', {
