@@ -4,7 +4,7 @@
     "description": "The title in the navbar"
   },
   "item.label.SDKs": {
-    "message": "SDK",
+    "message": "SDKs",
     "description": "Navbar item with label SDKs"
   },
   "item.label.Java": {

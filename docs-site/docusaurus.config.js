@@ -49,10 +49,6 @@ const config = {
     ],
   ],
 
-  scripts: [
-    'redirects.js',
-  ],
-
   clientModules: [
     require.resolve('./redirects.js'),
 ],
