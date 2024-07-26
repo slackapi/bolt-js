@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/view-submissions
 ---
 
-
-
 `view` メソッドを使うと、ユーザーのビューとのインタラクションをリッスンすることができます。
 
 ユーザーがモーダルからデータ送信したとき、Slack から `view_submission` のリクエストが送信されます。送信された `input` ブロックの値は `state` オブジェクトから取得できます。`state` 内には `values` というオブジェクトがあり、これは `block_id` と一意な `action_id` に紐づける形で入力値を保持しています。
@@ -31,7 +29,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 ```
 この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
 
-より詳細な情報は <a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API ドキュメント</a>を参照してください。
+より詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#handling_submissions)を参照してください。
 
 ---
 
@@ -49,7 +47,6 @@ app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, vie
   // close リクエストについて何らかの処理
 });
 ```
-
 
 ```javascript
 // モーダルでのデータ送信リクエストを処理します

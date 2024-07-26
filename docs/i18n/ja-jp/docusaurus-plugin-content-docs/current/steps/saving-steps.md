@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/saving-steps
 ---
 
-
 ワークフローステップの設定モーダルが開いたら、アプリはワークフロー作成者がモーダルを送信するイベントである `view_submission` イベントを待ち受けます。このイベントを受信すると `WorkflowStep` 設定オブジェクト内の `save` コールバック関数が実行されます。
 
 `save` コールバック関数の中では、以下の引数を渡してステップの設定を保存するための `update()` 関数を利用できます。
@@ -15,8 +14,6 @@ slug: /concepts/saving-steps
 - `step_image_url` は、デフォルトのステップのイメージ画像を上書きするために使用します
 
 これら引数をどのように構成するかの詳細は、[ドキュメント](https://api.slack.com/reference/workflows/workflow_step)を参考にしてください。
-
-
 
 ```javascript
 const ws = new WorkflowStep('add_task', {

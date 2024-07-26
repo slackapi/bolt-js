@@ -8,7 +8,6 @@ permalink: /reference
 
 このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
 
-
 - [リスナー関数](#listener-functions)
   - [メソッド](#methods)
   - [リスナー関数の引数](#listener-function-arguments)

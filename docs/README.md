@@ -5,15 +5,15 @@ This website is built using [Docusaurus](https://docusaurus.io/). 'Tis cool.
 Each Bolt/SDK has its own Docusaurus website, with matching CSS and nav/footer. There is also be a Docusaurus website of just the homepage and community tools. 
 
 ```
-website/
-├── docs/ (the good stuff. md and mdx files supported)
+docs/
+├── content/ (the good stuff. md and mdx files supported)
 │   ├── getting-started.md
 │   └── concepts
 │       └── sending-message.md
 ├── i18n/ja/ (the japanese translations)
 │   ├──docusaurus-theme-classic/ (footer/navbar translations)
 │   └──docusaurus-plugin-content-docs/
-│       └── current/ (this folder's file names need to exactly match **/docs/, but japanese content)
+│       └── current/ (this folder's file names need to exactly match **/content/, but japanese content)
 │           ├── getting-started.md
 │           └── concepts
 │               └── sending-message.md
@@ -24,15 +24,15 @@ website/
 │       ├── rory.png 
 │       └── oslo.svg 
 ├── src/
-│   ├── pages/ (stuff that isn't docs. This is empty for every repo but homepage)
+│   ├── pages/ (stuff that isn't docs content. This is empty for every repo but homepage)
 │   └── theme (only contains the 404 page)
 ├── docusaurus.config.js (main config file. also where to set navbar/footer)
 └── redirects.js (a redirects script because the old site used # as pages which docusaurus can't handle)
-└── sidebar.js (manually set where the docs are in the sidebar.)
+└── sidebar.js (manually set where the content docs are in the sidebar.)
 ```
 
 A cheat-sheet:
-* _I want to edit a doc._ `docs/*/*.md`
+* _I want to edit a doc._ `content/*/*.md`
 * _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`
 * _I want to change the docs sidebar._ `sidebar.js`
 * _I want to change the css._ Don't use this repo, use the home repo and the changes will propagate here.
@@ -43,8 +43,8 @@ A cheat-sheet:
 ## Adding a doc
 
 1. Make a markdown file. Add a `# Title` or use [front matter](https://docusaurus.io/docs/next/create-doc) with `title:`. 
-2. Save it in `docs/folder/title.md` or `docs/title.md`, depending on if it's in a sidebar category. The nuance is just for internal organization.
-3. There needs to be 1:1 docs for the sidebar. Copy the folder/file and put it in the Japanese docs: `i18n/ja/docusaurus-plugin-content-docs/current/*`. Just leave it in English if you don't speak Japanese. 
+2. Save it in `content/folder/title.md` or `content/title.md`, depending on if it's in a sidebar category. The nuance is just for internal organization.
+3. There needs to be 1:1 docs content for the sidebar. Copy the folder/file and put it in the Japanese docs: `i18n/ja/docusaurus-plugin-content-docs/current/*`. Just leave it in English if you don't speak Japanese. 
 4. Add the doc's path to the sidebar within `docusaurus.config.js`. Where ever makes most sense for you.
 5. Test the changes ↓
 
@@ -81,7 +81,7 @@ npm run start
 
 Edits to pages are reflected live — no restarting the server or reloading the page. (I'd say... 95% of the time, and 100% time if you're just editing a markdown file)
 
-Remember — you're only viewing the Bolt-JS docs right now. The links to the other docs won't show you the new version until deployment
+Remember — you're only viewing the Bolt-JS docs right now.
 
 #### Running locally in Japanese
 

@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/shortcuts
 ---
 
-
 `shortcut()` メソッドは、[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)と[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)の両方をサポートします。
 
 ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのリクエストをリッスンすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
@@ -17,7 +16,6 @@ slug: /concepts/shortcuts
 
 ⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを使用できます。
 メッセージショートカットのペイロードはチャンネル ID を含みます。
-
 
 ```javascript
 // open_modal というグローバルショートカットはシンプルなモーダルを開く

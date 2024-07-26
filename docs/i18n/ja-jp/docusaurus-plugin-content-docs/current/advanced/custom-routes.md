@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/custom-routes
 ---
 
-
 `v3.7.0` から `App` を初期化する際に `customRoutes` というルートの配列を渡すことでカスタムの HTTP ルートを簡単に追加できるようになりました。
 
 各 `CustomRoute` オブジェクトには `path` 、 `method`、 `handler` という三つのプロパティが含まれていなければなりません。 HTTP メソッドに相当する `method` は文字列または文字列の配列です。
@@ -12,7 +11,6 @@ slug: /concepts/custom-routes
 `v3.13.0` からデフォルトの組み込みレシーバーである `HTTPReceiver` と `SocketModeReceiver` が、[Express.js](https://expressjs.com/en/guide/routing.html#route-parameters) が提供するものと同様な動的なルートパラメーターをサポートするようになりました。これによって URL 内に含まれる値を `req.params` の値として利用できるようになりました。
 
 カスタムの HTTP ルートがローカル環境でどのポートからアクセスできるかを指定するために `App` コンストラクターに `installerOptions.port` というプロパティを渡すことができます。指定しない場合は、デフォルトの `3000` ポートとなります。
-
 
 ```javascript
 const { App } = require('@slack/bolt');
@@ -56,7 +54,6 @@ const app = new App({
 </summary>
 
 Bolt の組み込みの `ExpressReceiver` を使っているなら、カスタムの HTTP ルートを追加するのはとても簡単です。`v2.1.0` から `ExpressReceiver` には `router` というプロパティが追加されています。これは、さらにルートを追加できるように `App` 内部で保持している Express の [Router](http://expressjs.com/en/4x/api.html#router) を public にしたものです。
-
 
 ```javascript
 const { App, ExpressReceiver } = require('@slack/bolt');

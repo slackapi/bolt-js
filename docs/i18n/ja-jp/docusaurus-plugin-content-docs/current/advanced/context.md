@@ -4,11 +4,9 @@ lang: ja-jp
 slug: /concepts/context
 ---
 
-
 `context` オブジェクトは、受信リクエストに付加情報を提供するために使用されるもので、全てのリスナーがこれを使用できます。例えば、3rd party のシステムからユーザー情報を追加したり、ミドルウェアのチェインの中で次のミドルウェアが必要とする一時的な状態を追加したりといった用途に利用できます。
 
 `context` は、ただのオブジェクトなので、いくらでも属性を追加、編集することができます。
-
 
 ```javascript
 async function addTimezoneContext({ payload, client, context, next }) {

@@ -3,11 +3,10 @@ title: Bolt 入門ガイド (HTTP)
 slug: getting-started-http
 lang: ja-jp
 ---
+
 # Bolt 入門ガイド (HTTP)
 
-
 このガイドでは、Bolt を使用して Slack アプリを起動し実行する方法について説明します。その過程で、新しい Slack アプリを作成し、ローカル環境を設定し、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発します。
-
 
 このガイドが終わったら、あなたはこの⚡️[Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app)を実行したり、修正したり、自分で作ったりすることができます。
 
@@ -124,7 +123,6 @@ node app.js
 アプリはボットとしてチームメンバーのように動作し、メッセージを投稿したり、絵文字リアクションを追加したりすることができます。
 
 Slack ワークスペースで発生するイベント (メッセージが投稿されたときや、メッセージに対するリアクションが投稿されたときなど) をリッスンするには、[Events API を使用してイベントタイプに登録](https://api.slack.com/events-api)します。
-
 
 アプリのイベントを有効にしましょう。
 

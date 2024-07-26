@@ -4,11 +4,9 @@ lang: ja-jp
 slug: /concepts/publishing-views
 ---
 
+[ホームタブ](https://api.slack.com/surfaces/tabs/using)は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、[`views.publish`](https://api.slack.com/methods/views.publish) API メソッドの呼び出しで `user_id` と[ビューのペイロード](https://api.slack.com/reference/block-kit/views)を指定して、ホームタブを公開・更新することができるようになります。
 
-<a href="https://api.slack.com/surfaces/tabs/using">ホームタブ</a>は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、<a href="https://api.slack.com/methods/views.publish">`views.publish`</a> API メソッドの呼び出しで `user_id` と<a href="https://api.slack.com/reference/block-kit/views">ビューのペイロード</a>を指定して、ホームタブを公開・更新することができるようになります。
-
-エンドユーザーが App Home（ホームタブやアプリとの DM など）にアクセスしたことを知るために、<a href="https://api.slack.com/events/app_home_opened">`app_home_opened`</a> イベントをサブスクライブすることができます。
-
+エンドユーザーが App Home（ホームタブやアプリとの DM など）にアクセスしたことを知るために、[`app_home_opened`](https://api.slack.com/events/app_home_opened) イベントをサブスクライブすることができます。
 
 ```javascript
 // ユーザーが App Home にアクセスしたことを伝えるイベントをリッスン

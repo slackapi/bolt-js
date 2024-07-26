@@ -4,13 +4,11 @@ lang: en
 slug: /concepts/global-middleware
 ---
 
-
 Global middleware is run for all incoming requests before any [listener middleware](/concepts/listener-middleware). You can add any number of global middleware to your app by utilizing `app.use(fn)`. The middleware function `fn` is called with the same arguments as listeners and an additional `next` function.
 
 Both global and [listener middleware](/concepts/listener-middleware) must call `await next()` to pass control of the execution chain to the next middleware, or call `throw` to pass an error back up the previously-executed middleware chain.
 
 As an example, let's say your app should only respond to users identified with a corresponding internal authentication service (an SSO provider or LDAP, for example). You may define a global middleware that looks up a user record in the authentication service and errors if the user is not found.
-
 
 ```javascript
 // Authentication middleware that associates incoming request with user in Acme identity provider

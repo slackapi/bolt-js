@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/authenticating-oauth
 ---
 
-
 Slack アプリの配布を行うには Bolt による OAuth フローを実装し、インストール時に取得した情報をセキュアな方法で保存しておく必要があります。
 Bolt は OAuth フローそのものに加えて OAuth のためのルーティング、 state パラメーターの検証、保存するためのインストール情報をアプリに受け渡す、などの処理をハンドリングします。
 
@@ -47,7 +46,7 @@ const app = new App({
 
 Bolt for JavaScript は、アプリのインストールフローを完了した後の遷移先の URL である **Redirect URI** のためのパスとして `/slack/oauth_redirect` を有効にします。
 
-💡 アプリのドメインを含んだ **Redirect URI** （絶対 URI）を Slack アプリの設定画面の **OAuth and Permissions** セクション内で設定してください。（例 `https://example.com/slack/oauth_redirect` ）。
+アプリのドメインを含んだ **Redirect URI** （絶対 URI）を Slack アプリの設定画面の **OAuth and Permissions** セクション内で設定してください。（例 `https://example.com/slack/oauth_redirect` ）。
 
 カスタムの **Redirect URI** を使う場合、 App クラスの引数 `redirectUri` と `installerOptions.redirectUriPath` にも設定してください。 両方とも設定する必要があり、また、矛盾のないフル URI である必要があります。
 
@@ -101,7 +100,6 @@ Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `instal
 }
 ```
 
-
 ##### OrG 全体へのインストール
 
 [Enterprise Grid の OrG 全体へのインストール](https://api.slack.com/enterprise/apps)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
@@ -123,8 +121,6 @@ const app = new App({
 ```
 
 Slack の OAuth インストールフローについてのより詳細な情報は [API ドキュメント](https://api.slack.com/authentication/oauth-v2)を参照してください。
-
-
 
 ```javascript
 const app = new App({
@@ -179,7 +175,6 @@ const app = new App({
 OAuth デフォルト設定をカスタマイズ
 </summary>
 
-
 `installerOptions` を使って OAuth モジュールのデフォルト設定を上書きすることができます。このカスタマイズされた設定は `App` の初期化時に渡します。以下の情報を変更可能です:
 
 - `authVersion`: 新しい Slack アプリとクラシック Slack アプリの切り替えに使用
@@ -189,8 +184,6 @@ OAuth デフォルト設定をカスタマイズ
 - `callbackOptions`: OAuth フロー完了時の成功・エラー完了画面をカスタマイズするために使用
 - `stateStore`: 組み込みの `ClearStateStore` の代わりにカスタムのデータストアを有効にするために使用
 - `userScopes`: 親の階層にある `scopes` プロパティと同様、ユーザがアプリをインストールする際に必要となるユーザスコープのリストの指定に使用
-
-
 
 ```javascript
 const database = {
@@ -245,5 +238,4 @@ const app = new App({
   }
 });
 ```
-
 </details>

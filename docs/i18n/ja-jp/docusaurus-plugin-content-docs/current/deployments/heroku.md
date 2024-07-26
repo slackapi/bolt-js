@@ -130,7 +130,6 @@ heroku auth:whoami
 
 先ほどインストールしたツールを使って、[Heroku アプリを作成](https://devcenter.heroku.com/articles/creating-apps)します。アプリを作成するときは、ユニークな名前を自分で指定するか、ランダムな名前を生成することができます。
 
-
 :::tip 
 
 [Heroku アプリはあとから名前を変更することもできます](https://devcenter.heroku.com/articles/renaming-apps)が、リモートのGit アドレスとパブリックのWeb アドレスも変更になります。

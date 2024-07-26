@@ -4,19 +4,17 @@ lang: ja-jp
 slug: /concepts/updating-pushing-views
 ---
 
+モーダルでは、複数のモーダルをスタックのように積み重ねて表示できます。[`views.open`](https://api.slack.com/methods/views.open) という API を呼び出すと、まず親の（最初の）モーダルが表示されます。この最初の呼び出しの後、[`views.update`](https://api.slack.com/methods/views.update) を実行することでそのビューを書き換えることもできますし、最初に述べたように [`views.push`](https://api.slack.com/methods/views.push) で新しいモーダルを積み重ねて表示することもできます。
 
-モーダルでは、複数のモーダルをスタックのように積み重ねて表示できます。<a href="https://api.slack.com/methods/views.open">`views.open`</a> という API を呼び出すと、まず親の（最初の）モーダルが表示されます。この最初の呼び出しの後、<a href="https://api.slack.com/methods/views.update">`views.update`</a> を実行することでそのビューを書き換えることもできますし、最初に述べたように <a href="https://api.slack.com/methods/views.push">`views.push`</a> で新しいモーダルを積み重ねて表示することもできます。
+**`views.update`**
 
-<strong><code>views.update</code></strong>
+モーダルの更新には、組み込みの API クライアントを使って `views.update` を呼び出します。この API 呼び出しには、そのモーダルを開いたときに生成された `view_id` と、更新後の内容を表現する `blocks` の配列を含む新しい `view` を渡します。ユーザーが既存のモーダル内の要素とインタラクションを行なった（例：ボタンを押す、メニューから選択する）ことをトリガーにビューを更新する場合、そのリクエストの `body` に `view_id` が含まれます。
 
-モーダルの更新には、組み込みの API クライアントを使って <code>views.update</code> を呼び出します。この API 呼び出しには、そのモーダルを開いたときに生成された <code>view_id</code> と、更新後の内容を表現する <code>blocks</code> の配列を含む新しい <code>view</code> を渡します。ユーザーが既存のモーダル内の要素とインタラクションを行なった（例：ボタンを押す、メニューから選択する）ことをトリガーにビューを更新する場合、そのリクエストの <code>body</code> に <code>view_id</code> が含まれます。
+**`views.push`**
 
-<strong><code>views.push</code></strong>
+モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて `views.push` を呼び出します。この API 呼び出しには、有効な `trigger_id` と、新しく生成する [ビュー部分のペイロード](https://api.slack.com/reference/block-kit/views)を渡します。`views.push` の引数は <a href="#creating-modals">モーダルを開始するとき</a>と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
 
-モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて <code>views.push</code> を呼び出します。この API 呼び出しには、有効な <code>trigger_id</code> と、新しく生成する <a href="https://api.slack.com/reference/block-kit/views">ビュー部分のペイロード</a>を渡します。`views.push` の引数は <a href="#creating-modals">モーダルを開始するとき</a>と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
-
-より詳細な情報は <a href="/concepts/view_submissions">API ドキュメント</a>を参照してください。
-
+より詳細な情報は [API ドキュメント](/concepts/view_submissions)を参照してください。
 
 ```javascript
 // action_id: button_abc のボタンを押すイベントをリッスン

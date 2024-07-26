@@ -2,6 +2,7 @@
 title: Heroku Platform
 lang: en
 ---
+
 # Deploying to Heroku
 
 :::warning
@@ -9,7 +10,6 @@ lang: en
  Using Heroku dynos to complete this tutorial counts towards your usage. [Delete your app](https://devcenter.heroku.com/articles/heroku-cli-commands#heroku-apps-destroy) as soon as you are done to control costs.
 
  :::
-
 
 This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 
@@ -143,7 +143,6 @@ Creating new Heroku apps will use your existing Heroku plan subscription. When g
 Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).
 
 :::
-
 
 **1. Create an app on Heroku**
 

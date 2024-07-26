@@ -4,9 +4,7 @@ lang: en
 slug: /concepts/logging
 ---
 
-
 By default, Bolt for JavaScript will log information from your app to the console. You can customize how much logging occurs by passing a `logLevel` in the constructor. The available log levels in order of most to least logs are `DEBUG`, `INFO`, `WARN`, and `ERROR`.
-
 
 ```javascript
 // Import LogLevel from the package
@@ -25,7 +23,6 @@ const app = new App({
 Sending log output somewhere besides the console
 </summary>
 
-
 If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a custom logger. A custom logger must implement specific methods (known as the `Logger` interface):
 
 | Method       | Parameters        | Return type |
@@ -39,7 +36,6 @@ If you want to send logs to somewhere besides the console or want more control o
 | `error()`    | `...msgs: any[]`  | `void`      |
 
 A very simple custom logger might ignore the name and level, and write all messages to a file.
-
 
 ```javascript
 const { App } = require('@slack/bolt');
@@ -61,5 +57,4 @@ const app = new App({
   },
 });
 ```
-
 </details>

@@ -4,11 +4,9 @@ lang: ja-jp
 slug: /concepts/event-listening
 ---
 
-
 [Events API イベント](https://api.slack.com/events)のリスニングは、Slack アプリの設定画面でサブスクリプション設定を行った上で `event()` メソッドを使用します。これにより、Slack で何かが発生した (例：ユーザーがメッセージにリアクションした、チャンネルに参加した) ときに Bolt アプリ側で処理を実行できます。
 
 `event()` メソッドは、文字列型の `eventType` を指定する必要があります。
-
 
 ```javascript
 const welcomeChannelId = 'C12345';
@@ -29,7 +27,7 @@ app.event('team_join', async ({ event, client, logger }) => {
 });
 ```
 
-<details class="secondary-wrapper" >
+<details>
 <summary>
 メッセージのサブタイプのフィルタリング
 </summary>
@@ -37,7 +35,6 @@ app.event('team_join', async ({ event, client, logger }) => {
 `message()` リスナーは `event('message')` と等価の機能を提供します。
 
 イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `message_changed` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
-
 
 ```javascript
 // パッケージから subtype をインポート
@@ -53,5 +50,4 @@ app.message(subtype('message_changed'), ({ event, logger }) => {
   }
 });
 ```
-
 </details>

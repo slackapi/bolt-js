@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/action-listening
 ---
 
-
 Bolt アプリは `action` メソッドを用いて、ボタンのクリック、メニューの選択、メッセージショートカットなどのユーザーのアクションをリッスンすることができます。
 
 アクションは文字列型の `action_id` または RegExp オブジェクトでフィルタリングできます。 `action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントの一意の識別子として機能します。 
@@ -14,7 +13,6 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 *注: Bolt 2.x からメッセージショートカット（以前はメッセージアクションと呼ばれていました）は `action()` ではなく `shortcut()` メソッドを使用するようになりました。この変更については [2.x マイグレーションガイド](/tutorial/migration-v2)を参照してください。*
 
 `block_actions` ペイロードの詳細については、[こちら](https://api.slack.com/reference/interaction-payloads) をご覧ください。リスナー内からビューの完全なペイロードにアクセスするには、コールバック関数内で `body` 引数を参照します。
-
 
 ```javascript
 // action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される

@@ -4,8 +4,6 @@ lang: en
 slug: /concepts/receiver
 ---
 
-
-
 ## Writing a custom receiver
 
 A receiver is responsible for handling and parsing any incoming requests from Slack then sending it to the app, so that the app can add context and pass the request to your listeners. Receivers must conform to the [Receiver interface](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.13.1/src/types/receiver.ts#L27-L31):

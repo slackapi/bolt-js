@@ -5,12 +5,10 @@ lang: ja-jp
 ---
 # Hubot のアプリを Bolt に移行する方法
 
-
 Bolt は、Slack アプリを構築する時間と手間を減らすために作成されたフレームワークで、Slack 開発者のみなさんに最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot で作成されたアプリを Bolt アプリに](https://hubot.github.com/docs/)移行するプロセスを順を追って説明します。
 
 すでに [ボットユーザーがいるアプリ](https://api.slack.com/bot-users#getting-started) を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに[Bolt リポジトリのサンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) を読むとよいでしょう。
  
-
 ---
 
 ### まずはじめに {#setting-the-stage}

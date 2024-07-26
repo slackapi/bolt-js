@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/creating-steps
 ---
 
-
 ワークフローステップを作るための手段として Bolt は `WorkflowStep` というクラスを提供しています。
 
 新しい `WorkflowStep` インスタンスの生成には、そのステップの `callback_id` と設定オブジェクトを渡します。
@@ -13,7 +12,6 @@ slug: /concepts/creating-steps
 
 `WorkflowStep` インスタンスを生成したら、それを `app.step()` メソッドに渡します。これによって、Bolt アプリは対象のワークフローステップのイベントをリッスンしたり、設定オブジェクトが提供するコールバック関数を使ってイベントに応答したりすることができるようになります。
 
-
 
 ```javascript
 const { App, WorkflowStep } = require('@slack/bolt');

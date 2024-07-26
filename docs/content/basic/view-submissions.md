@@ -4,8 +4,6 @@ lang: en
 slug: /concepts/view-submissions
 ---
 
-
-
 You may listen for user interactions with views using the `view` method. 
 
 Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in [view](https://api.slack.com/reference/interaction-payloads/views) input blocks, you can access the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
@@ -41,6 +39,8 @@ Read more about view submissions in our [API documentation](https://api.slack.co
 
 See the [API documentation](https://api.slack.com/surfaces/modals/using#modal_cancellations) for more information about `view_closed`.
 
+#### Handle a `view_closed` request
+
 ```javascript
 // Handle a view_closed request
 app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, view, client }) => {
@@ -50,6 +50,7 @@ app.view({ callback_id: 'view_b', type: 'view_closed' }, async ({ ack, body, vie
 });
 ```
 
+#### Handle a `view_submission` request
 
 ```javascript
 // Handle a view_submission request
