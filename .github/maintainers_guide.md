@@ -19,30 +19,58 @@ Test code should be written in syntax that runs on the oldest supported Node.js 
 
 A useful trick for debugging inside tests is to use the Chrome Debugging Protocol feature of Node.js to set breakpoints and interactively debug. In order to do this you must run mocha directly. This means that you should have already linted the source (`npm run lint`), manually. You then run the tests using the following command: `./node_modules/.bin/mocha test/{test-name}.js --debug-brk --inspect` (replace {test-name} with an actual test file).
 
-### Generating Documentation
+### Managing Documentation
 
-The documentation is built using [Jekyll](https://jekyllrb.com/) and hosted with GitHub Pages.
-The source files are contained in the `docs` directory. They are broken up into the `_basic`, `_advanced`, and `_tutorials` directories depending on content's nature.
+The documentation is built using [Docusaurus](https://docusaurus.io/) and hosted with GitHub Pages.
+The source files are contained in the `concepts` directory. They are then broken up according to general category. The full file structure is explained in the `/docs` README. 
 
-All documentation contains [front matter](https://jekyllrb.com/docs/front-matter/) that indicates the section's title, slug (for header), respective language, and if it's not a tutorial it contains the order it should appear within its respective section (basic or advanced).
+A cheat-sheet:
+* _I want to edit a doc._ `content/*/*.md`
+* _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`
+* _I want to change the docs sidebar._ `sidebar.js`
+* _I want to change the css._ Don't use this repo, use the home repo and the changes will propagate here.
+* _I want to change anything else._ `docusaurus.config.js`
 
-To build the docs locally, you must have [Ruby](https://www.ruby-lang.org/en/) installed. To easily install and manage different Ruby versions, you can use [`rbenv`](https://github.com/rbenv/rbenv). If you use macOS, you can install it via `brew install rbenv`. Hook it up to your shell by running `rbenv init` and following the instructions. Finally, install the required version for building the docs (this version is stored in the `.ruby-version` file) via `rbenv install <version>`.
+#### Adding a doc
 
-To build the docs, navigate to the `docs` folder and run `bundle install` to install necessary gems (Ruby dependencies). Run `bundle exec jekyll serve` to start up a local server which will compile documentation source and serve its contents.
+1. Make a markdown file. Add a `# Title` or use [front matter](https://docusaurus.io/docs/next/create-doc) with `title:`. 
 
-_(zsh users)_: If you are running into issues with permissions to install ruby gems during `bundle install`, you may need to add `eval "$(rbenv init - zsh)"` to your ~/.zshrc then run `source ~/.zshrc`. 
+2. Save it in `content/folder/title.md` or `content/title.md`, depending on if it's in a sidebar category. The nuance is just for internal organization.
 
-#### Adding beta documentation
-When documentation is in a beta state, it requires a new, distinct collection of docs. The process is a little nuanced, so make sure to build the documentation locally to make sure it appears how you expect. To create a new collection:
-1. Add content
-* Add a new folder to docs with an underscore (ex: `_steps`).
-* Add documentation sections to that folder, with similar front matter to the `_advanced` and `_basic` sections.
-* Add an overview section that explains the beta state of the category. This should always be `order: 1` in the front matter.
+3. There needs to be 1:1 docs content for the sidebar. Copy the folder/file and put it in the Japanese docs: `i18n/ja/docusaurus-plugin-content-docs/current/*`. Just leave it in English if you don't speak Japanese. 
 
-2. Configure layout
-* Update `docs`>`_config.yml` with the new collection you created under `collections` (the same as the folder name - ex: `steps`). While you're there, add the sidebar title under `t`.
-* In `docs`>`_layouts`>`default.html` make a copy of the `basic` or `advanced` section, and modify the div ID and content to correspond to your beta collection. This step requires you to use variables from `_config.yml`.
-* Now in `docs`>`_includes`>`sidebar.html`, create a new section after the basic and advanced sections. Again, copy the `basic` or `advanced` section to use as a template. Be careful with the variable naming—it's a little more complex than in `default.html`, and requires you to use variables from `_config.yml`.
+4. Add the doc's path to the sidebar within `docusaurus.config.js`. Where ever makes most sense for you.
+
+5. Test the changes ↓
+
+#### Running locally
+
+1. Docusaurus requires at least Node 18. You can update Node however you want. `nvm` is one way. Install `nvm` if you don't have it: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash`
+
+2. Then grab the latest version of Node. `nvm install node`
+
+3. If you are running this project locally for the first time, you'll need to install the packages with the following command: `npm install`
+
+4. The following command starts a local development server and opens up a browser window. `npm run start`. 
+
+    For local runs, Docusaurus treats each language as a different instance of the website. You'll want to specify the language to run the japanese site locally `npm run start -- --locale ja`. Don't worry - both languages will be built/served on deployment. 
+
+5. Edit the desired markdown file. Edits to pages are reflected live — no restarting the server or reloading the page.Remember — you're only editing the Bolt-JS docs right now -- the rest of slack.dev are other repos.
+
+#### Deploying
+
+1. The following command generates static content into the `build` directory. `npm run build`.
+2. Then you can test out with the following command. `npm run serve`.
+
+#### Deployment to GitHub pages
+
+There are two docs-related GitHub action workflows:
+
+* **Test Deployment**: a PR to merge to main -> build site as test
+
+* **Deploy to GitHub pages**: a push to main -> build site -> deploy site
+
+Site should update in a minute or two.
 
 ### Releases
 _For beta releases, see Beta Releases section below:_
