@@ -40,7 +40,7 @@ const config = {
           breadcrumbs: false,
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: './sidebars.js',
-          editUrl: 'https://github.com/slackapi/slackapi.github.io',
+          editUrl: 'https://github.com/slackapi/bolt-js/tree/main/docs',
         },
         blog: false,
         theme: {
