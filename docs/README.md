@@ -52,7 +52,7 @@ A cheat-sheet:
 
 ## Running locally
 
-Docusaurus requires at least Node 18. You can update Node however you want. `nvm` is one way. 
+You'll want to be using at least Node 20. You can update Node however you want. `nvm` is one way. 
 
 Install `nvm` if you don't have it:
 

@@ -21,56 +21,9 @@ A useful trick for debugging inside tests is to use the Chrome Debugging Protoco
 
 ### Managing Documentation
 
-The documentation is built using [Docusaurus](https://docusaurus.io/) and hosted with GitHub Pages.
-The source files are contained in the `concepts` directory. They are then broken up according to general category. The full file structure is explained in the `/docs` README. 
+See the [`/docs/README.md`](./docs/README.md) file for documentation instructions. 
 
-A cheat-sheet:
-* _I want to edit a doc._ `content/*/*.md`
-* _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`
-* _I want to change the docs sidebar._ `sidebar.js`
-* _I want to change the css._ Don't use this repo, use the home repo and the changes will propagate here.
-* _I want to change anything else._ `docusaurus.config.js`
-
-#### Adding a doc
-
-1. Make a markdown file. Add a `# Title` or use [front matter](https://docusaurus.io/docs/next/create-doc) with `title:`. 
-
-2. Save it in `content/folder/title.md` or `content/title.md`, depending on if it's in a sidebar category. The nuance is just for internal organization.
-
-3. There needs to be 1:1 docs content for the sidebar. Copy the folder/file and put it in the Japanese docs: `i18n/ja/docusaurus-plugin-content-docs/current/*`. Just leave it in English if you don't speak Japanese. 
-
-4. Add the doc's path to the sidebar within `docusaurus.config.js`. Where ever makes most sense for you.
-
-5. Test the changes ↓
-
-#### Running locally
-
-1. Docusaurus requires at least Node 18. You can update Node however you want. `nvm` is one way. Install `nvm` if you don't have it: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash`
-
-2. Then grab the latest version of Node. `nvm install node`
-
-3. If you are running this project locally for the first time, you'll need to install the packages with the following command: `npm install`
-
-4. The following command starts a local development server and opens up a browser window. `npm run start`. 
-
-    For local runs, Docusaurus treats each language as a different instance of the website. You'll want to specify the language to run the japanese site locally `npm run start -- --locale ja`. Don't worry - both languages will be built/served on deployment. 
-
-5. Edit the desired markdown file. Edits to pages are reflected live — no restarting the server or reloading the page.Remember — you're only editing the Bolt-JS docs right now -- the rest of slack.dev are other repos.
-
-#### Deploying
-
-1. The following command generates static content into the `build` directory. `npm run build`.
-2. Then you can test out with the following command. `npm run serve`.
-
-#### Deployment to GitHub pages
-
-There are two docs-related GitHub action workflows:
-
-* **Test Deployment**: a PR to merge to main -> build site as test
-
-* **Deploy to GitHub pages**: a push to main -> build site -> deploy site
-
-Site should update in a minute or two.
+If you're not touching the `/docs` folder, you don't need to worry about the docs setup affecting your PR.
 
 ### Releases
 _For beta releases, see Beta Releases section below:_

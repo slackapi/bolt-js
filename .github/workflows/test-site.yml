@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'docs-site/**'
+      - 'docs/**'
 
 jobs:
   test:
@@ -17,15 +17,15 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-          cache-dependency-path: docs-site/package-lock.json
+          cache-dependency-path: docs/package-lock.json
 
       - name: Install dependencies
         run: npm ci  
-        working-directory: ./docs-site  
+        working-directory: ./docs
 
 
       - name: Test build website
         run: npm run build
-        working-directory: ./docs-site  
+        working-directory: ./docs
