@@ -1,4 +1,4 @@
-name: Test deployment
+name: Test site build
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: Test deployment
+    name: Test site build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,6 @@ jobs:
         run: npm ci  
         working-directory: ./docs
 
-
-      - name: Test build website
+      - name: Build website
         run: npm run build
         working-directory: ./docs
