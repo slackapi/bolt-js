@@ -1,4 +1,4 @@
-name: Test site build
+name: Build docs site
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: Test site build
+    name: Build docs site
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
