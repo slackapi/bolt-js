@@ -4,6 +4,8 @@ if (ExecutionEnvironment.canUseDOM) {
 (function() {
   // List of specific URLs to handle
   const urlsToHandle = [
+    '/bolt-js/concepts#basic',
+    '/bolt-js/concepts#advanced',
     '/bolt-js/concepts#message-listening',
     '/bolt-js/concepts#message-sending',
     '/bolt-js/concepts#event-listening',
@@ -35,7 +37,7 @@ if (ExecutionEnvironment.canUseDOM) {
     '/bolt-js/concepts#defining-custom-functions',
     '/bolt-js/concepts#listening-to-custom-functions',
     '/bolt-js/concepts#responding-to-interactivity',
-    '/bolt-js/concepts#steps-overview',
+    '/bolt-js/concepts#steps',
     '/bolt-js/concepts#creating-steps',
     '/bolt-js/concepts#adding-editing-steps',
     '/bolt-js/concepts#saving-steps',
@@ -71,7 +73,7 @@ if (ExecutionEnvironment.canUseDOM) {
     '/bolt-js/ja-jp/concepts#defining-custom-functions',
     '/bolt-js/ja-jp/concepts#listening-to-custom-functions',
     '/bolt-js/ja-jp/concepts#responding-to-interactivity',
-    '/bolt-js/ja-jp/concepts#steps-overview',
+    '/bolt-js/ja-jp/concepts#steps',
     '/bolt-js/ja-jp/concepts#creating-steps',
     '/bolt-js/ja-jp/concepts#adding-editing-steps',
     '/bolt-js/ja-jp/concepts#saving-steps',
