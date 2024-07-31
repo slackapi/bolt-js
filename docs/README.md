@@ -114,12 +114,10 @@ If it looks good, make a PR request!
 
 ### Deployment to GitHub pages
 
-There are two GitHub action workflows set up in each repo. They flow as follows:
+There is a GitHub action workflow set up in each repo. 
 
-* **Test Deployment**: a PR to merge to main -> build site as test
-* **Deploy to GitHub pages**: a push to main -> build site -> deploy site
-
-Site should update in a minute or two.
+* On PR, it tests a site build.
+* On Merge, it builds the site and deploys it. Site should update in a minute or two.
 
 ---
 

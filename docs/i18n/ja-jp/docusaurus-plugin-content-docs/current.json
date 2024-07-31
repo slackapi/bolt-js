@@ -32,7 +32,7 @@
     "description": "The label for link Code on GitHub in sidebar sidebarJSBolt, linking to https://github.com/SlackAPI/bolt-js"
   },
   "sidebar.sidebarJSBolt.link.Contributors Guide": {
-    "message": "Contributors Guide",
+    "message": "貢献",
     "description": "The label for link Contributors Guide in sidebar sidebarJSBolt, linking to https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md"
   }
 }
