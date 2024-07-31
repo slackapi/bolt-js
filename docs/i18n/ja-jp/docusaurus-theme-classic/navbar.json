@@ -1,0 +1,58 @@
+{
+  "title": {
+    "message": "Slack Developer Tools",
+    "description": "The title in the navbar"
+  },
+  "item.label.SDKs": {
+    "message": "SDKs",
+    "description": "Navbar item with label SDKs"
+  },
+  "item.label.Java": {
+    "message": "Java",
+    "description": "Navbar item with label Java"
+  },
+  "item.label.JavaScript": {
+    "message": "JavaScript",
+    "description": "Navbar item with label JavaScript"
+  },
+  "item.label.Python": {
+    "message": "Python",
+    "description": "Navbar item with label Python"
+  },
+  "item.label.Community": {
+    "message": "Community",
+    "description": "Navbar item with label Community"
+  },
+  "item.label.Bolt": {
+    "message": "Bolt",
+    "description": "Navbar item with label Bolt"
+  },
+  "item.label.API Docs": {
+    "message": "API Docs",
+    "description": "Navbar item with label API Docs"
+  },
+  "item.label.Java Slack SDK": {
+    "message": "Java Slack SDK",
+    "description": "Navbar item with label Java Slack SDK"
+  },
+  "item.label.Node Slack SDK": {
+    "message": "Node Slack SDK",
+    "description": "Navbar item with label Node Slack SDK"
+  },
+  "item.label.Python Slack SDK": {
+    "message": "Python Slack SDK",
+    "description": "Navbar item with label Python Slack SDK"
+  },
+  "item.label.Deno Slack SDK": {
+    "message": "Deno Slack SDK",
+    "description": "Navbar item with label Deno Slack SDK"
+  },
+  "item.label.Community tools": {
+    "message": "Community tools",
+    "description": "Navbar item with label Community tools"
+  },
+  "item.label.Slack Community": {
+    "message": "Slack Community",
+    "description": "Navbar item with label Slack Community"
+  }
+}

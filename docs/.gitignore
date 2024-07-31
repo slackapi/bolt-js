@@ -1,7 +1,5 @@
-_site
-Gemfile.lock
-.env
-.jekyll-metadata
-.vscode/
-.bundle/
-vendor/
+node_modules/
+.docusaurus
+.DS_Store
+build/
+.stylelintrc.json
