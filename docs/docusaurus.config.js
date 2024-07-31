@@ -12,14 +12,10 @@ const config = {
   tagline: 'Official frameworks, libraries, and SDKs for Slack developers',
   favicon: 'img/favicon.ico',
 
-  // Set the production url of your site here
   url: 'https://slack.dev',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/bolt-js/',
-  // GitHub pages deployment config.
-  organizationName: 'slackapi', // Usually your GitHub org/user name.
-  projectName: 'bolt-js', // Usually your repo name.
+  organizationName: 'slackapi',
+  projectName: 'bolt-js',
 
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'warn',
@@ -162,7 +158,7 @@ const config = {
           {
             'aria-label': 'GitHub Repository',
             'className': 'navbar-github-link',
-            'href': 'https://github.com/slackapi',
+            'href': 'https://github.com/slackapi/bolt-js',
             'position': 'right',
             target: '_self',
           },
