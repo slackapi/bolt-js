@@ -1,11 +1,17 @@
 name: Deploy to GitHub Pages
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
   push:
     branches:
       - main
     paths:
       - 'docs/**'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -36,6 +42,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
+    if: github.event_name != 'pull_request'
     needs: build
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
