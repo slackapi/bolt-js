@@ -1,4 +1,4 @@
-# slack.dev
+# Bolt for JavaScript Japanese documentation
 
 This README describes how the Japanese documentation is created. Please read the [/docs README](./docs/README) for information on _all_ the documentation.
 
