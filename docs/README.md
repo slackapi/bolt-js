@@ -13,7 +13,7 @@ docs/
 ├── i18n/ja-jp/ (the japanese translations)
 │   ├── docusaurus-theme-classic/ (footer/navbar translations)
 │   └── docusaurus-plugin-content-docs/
-│       └── current/ (this folder's file names need to exactly match **/content/, but japanese content)
+│       └── current/ (this folder's file names need to match **/content/)
 │           ├── getting-started.md
 │           └── concepts
 │               └── sending-message.md
@@ -43,9 +43,8 @@ A cheat-sheet:
 
 1. Make a markdown file. Add a `# Title` or use [front matter](https://docusaurus.io/docs/next/create-doc) with `title:`. 
 2. Save it in `content/folder/title.md` or `content/title.md`, depending on if it's in a sidebar category. The nuance is just for internal organization.
-3. There needs to be 1:1 docs content for the sidebar. Copy the folder/file and put it in the Japanese docs: `i18n/ja/docusaurus-plugin-content-docs/current/*`. Just leave it in English if you don't speak Japanese. 
-4. Add the doc's path to the sidebar within `docusaurus.config.js`. Where ever makes most sense for you.
-5. Test the changes ↓
+3. Add the doc's path to the sidebar within `docusaurus.config.js`. Where ever makes most sense for you.
+4. Test the changes ↓
 
 ---
 
