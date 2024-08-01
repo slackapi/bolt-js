@@ -1,12 +1,10 @@
-# slack.dev
+# Bolt for JavaScript Japanese documentation
 
 This README describes how the Japanese documentation is created. Please read the [/docs README](./docs/README) for information on _all_ the documentation.
 
-[Docusaurus](https://docusaurus.io) supports using different languages. Each language is a different version of the same site. Therefore, the Japanese documentation and English documentation must have the exact same pages.
+[Docusaurus](https://docusaurus.io) supports using different languages. Each language is a different version of the same site. The English site is the default. The English page will be viewable if the page is not translated into Japanese. 
 
-If you add a page to the English documentation, then you must add the page to the Japanese documentation too. If you don't speak Japanese, copy the English documentation to the Japanese page. 
-
-There will be English pages on the Japanese site if the pages are not translated yet. Japanese readers will not miss any content, but they may be confused seeing English and Japanese mixed together. Please give us your thoughts on this setup.
+There will be English pages on the Japanese site of the pages are not translated yet. Japanese readers will not miss any content, but they may be confused seeing English and Japanese mixed together. Please give us your thoughts on this setup.
 
 Because of this, the sidebar does not need to be updated for the Japanese documentation. It's always the same as the English documentation!
 
@@ -47,6 +45,7 @@ The Japanese documentation is in `i18n/ja-jp/`. The folder contains `docusaurus-
 ```
 docs/
 ├── content/ (English pages)
+│   ├── example-page.md 
 │   ├── getting-started.md
 │   └── concepts
 │       └── sending-message.md
@@ -58,9 +57,9 @@ docs/
 │               └── sending-message.md
 ```
 
-The Japanese page files in `i18n/ja-jp/docusaurus-plugin-content-docs/current/` must be the same as the English page files in `docs/content/`. Please keep the file names in English (example: `sending-message.md`)
+If the file is not in `i18n/ja-jp/docusaurus-plugin-content-docs/current/`, then the English file will be used. In the example above, `example-page.md` is not in `i18n/ja-jp/docusaurus-plugin-content-docs/current/`. Therefore, the English version of `example-page.md` will appear on the Japanese site. 
 
-Each page is a markdown file. If the page is not translated, it will be in English. Simply remove the English words and write Japanese to replace the page. 
+The Japanese page file formats in `i18n/ja-jp/docusaurus-plugin-content-docs/current/` must be the same as the English page files in `docs/content/`. Please keep the file names in English (example: `sending-message.md`). 
 
 Please provide a title in Japanese. It will show up in the sidebar. There are two options:
 
