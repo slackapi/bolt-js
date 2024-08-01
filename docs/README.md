@@ -24,11 +24,9 @@ docs/
 │       ├── rory.png 
 │       └── oslo.svg 
 ├── src/
-│   ├── pages/ (stuff that isn't docs content. This is empty for every repo but homepage)
+│   ├── pages/ (stuff that isn't docs content. This is empty for this repo!)
 │   └── theme (only contains the 404 page)
 ├── docusaurus.config.js (main config file. also where to set navbar/footer)
-├── redirects-hashes.js (a # to / redirects script because the old site used # as pages)
-└── redirects-pages.js (a redirects script for regular pages -- redirects plugin doesn't work with above script)
 └── sidebar.js (manually set where the content docs are in the sidebar.)
 ```
 

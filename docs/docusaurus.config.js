@@ -46,20 +46,37 @@ const config = {
     ],
   ],
 
-  clientModules: [
-    require.resolve('./redirects-hashes.js'),
-    require.resolve('./redirects-pages.js'),
+plugins:
+['docusaurus-theme-github-codeblock',
+  [
+    '@docusaurus/plugin-client-redirects',
+    {
+      redirects: [
+        {
+          to: '/getting-started',
+          from: ['/tutorial/getting-started'],
+        },
+        {
+          to: '/',
+          from: ['/concepts','/concepts/advanced','/concepts/basic'],
+        },
+      ],
+    },
+  ],
+  
 ],
 
-  plugins:
-    ['docusaurus-theme-github-codeblock',
-  ],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       colorMode: {
         respectPrefersColorScheme: true,
+      },
+      docs: {
+        sidebar: {
+          autoCollapseCategories: true,
+        },
       },
       navbar: {
         title: "Slack Developer Tools",
