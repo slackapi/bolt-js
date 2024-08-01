@@ -104,8 +104,8 @@ const sidebars = {
     'Changelog',
     {
       type: 'link',
-      label: 'Code on GitHub',
-      href: 'https://github.com/SlackAPI/bolt-js',
+      label: 'Release notes',
+      href: 'https://github.com/slackapi/bolt-python/releases',
     },
     {
       type: 'link',
