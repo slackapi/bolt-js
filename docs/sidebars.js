@@ -13,9 +13,10 @@ const sidebars = {
   // But you can create a sidebar manually
   sidebarJSBolt: [
     {
-      type: 'html',
-      value: '<h3>Bolt for JavaScript</h3>', // The HTML to be rendered
-      defaultStyle: true, // Use the default menu item styling
+      type: 'doc',
+      id: 'index', // document ID
+      label: 'Bolt for JavaScript', // sidebar label
+      className: 'sidebar-title',
     },
     'getting-started',
     {

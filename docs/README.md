@@ -10,9 +10,9 @@ docs/
 │   ├── getting-started.md
 │   └── concepts
 │       └── sending-message.md
-├── i18n/ja/ (the japanese translations)
-│   ├──docusaurus-theme-classic/ (footer/navbar translations)
-│   └──docusaurus-plugin-content-docs/
+├── i18n/ja-jp/ (the japanese translations)
+│   ├── docusaurus-theme-classic/ (footer/navbar translations)
+│   └── docusaurus-plugin-content-docs/
 │       └── current/ (this folder's file names need to exactly match **/content/, but japanese content)
 │           ├── getting-started.md
 │           └── concepts
@@ -24,17 +24,15 @@ docs/
 │       ├── rory.png 
 │       └── oslo.svg 
 ├── src/
-│   ├── pages/ (stuff that isn't docs content. This is empty for every repo but homepage)
+│   ├── pages/ (stuff that isn't docs content. This is empty for this repo!)
 │   └── theme (only contains the 404 page)
 ├── docusaurus.config.js (main config file. also where to set navbar/footer)
-├── redirects-hashes.js (a # to / redirects script because the old site used # as pages)
-└── redirects-pages.js (a redirects script for regular pages -- redirects plugin doesn't work with above script)
 └── sidebar.js (manually set where the content docs are in the sidebar.)
 ```
 
 A cheat-sheet:
 * _I want to edit a doc._ `content/*/*.md`
-* _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`
+* _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`. See the [Japanese docs README](./docs/README.md)
 * _I want to change the docs sidebar._ `sidebar.js`
 * _I want to change the css._ Don't use this repo, use the home repo and the changes will propagate here.
 * _I want to change anything else._ `docusaurus.config.js`
