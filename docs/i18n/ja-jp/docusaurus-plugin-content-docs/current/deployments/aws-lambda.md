@@ -40,7 +40,7 @@ Lambda へのデプロイでは、プログラムから AWS アカウントに�
 
 :::tip 
 
-**すでに IAM ユーザーの作成が完了している場合は、**AWS の公式ガイドに従って [IAM ユーザーのアクセスキーを作成](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds)してください。
+**すでに IAM ユーザーの作成が完了している場合は、** AWS の公式ガイドに従って [IAM ユーザーのアクセスキーを作成](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds)してください。
 
 :::
 
