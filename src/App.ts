@@ -50,9 +50,9 @@ import {
   InteractiveAction,
   ViewOutput,
   KnownOptionsPayloadFromType,
-  KnownEventFromType,
   SlashCommand,
   WorkflowStepEdit,
+  KnownEventFromType,
   SlackOptions,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
@@ -193,9 +193,17 @@ export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 }
 
 // Used only in this file
-type MessageEventMiddleware<
+type AllMessageEventMiddleware<
     CustomContext extends StringIndexed = StringIndexed,
-> = Middleware<SlackEventMiddlewareArgs<'message'>, CustomContext>;
+> = Middleware<SlackEventMiddlewareArgs<'message', string | undefined>, CustomContext>;
+
+// Used only in this file
+type FilteredMessageEventMiddleware<
+    CustomContext extends StringIndexed = StringIndexed,
+> = Middleware<SlackEventMiddlewareArgs<
+'message',
+undefined | 'bot_message' | 'file_share' | 'thread_broadcast'
+>, CustomContext>;
 
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
@@ -546,21 +554,27 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<
+    SlackEventMiddlewareArgs<EventType>,
+    AppCustomContext & MiddlewareCustomContext
+    >[]
   ): void;
   public event<
       EventType extends RegExp = RegExp,
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventName: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<SlackEventMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public event<
       EventType extends EventTypePattern = EventTypePattern,
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventNameOrPattern: EventType,
-    ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<
+    SlackEventMiddlewareArgs,
+    AppCustomContext & MiddlewareCustomContext
+    >[]
   ): void {
     let invalidEventName = false;
     if (typeof eventNameOrPattern === 'string') {
@@ -592,7 +606,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    */
   public message<
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]): void;
+  >(...listeners: FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]): void;
   /**
    *
    * @param pattern Used for filtering out messages that don't match.
@@ -603,7 +617,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     pattern: string | RegExp,
-    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
    *
@@ -616,9 +630,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   public message<
       MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    filter: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
+    filter: FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
     pattern: string | RegExp,
-    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
    *
@@ -629,8 +643,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   public message<
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    filter: MessageEventMiddleware,
-    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+    filter: FilteredMessageEventMiddleware,
+    ...listeners: FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
    * This allows for further control of the filtering and response logic. Patterns and middlewares are processed in
@@ -641,16 +655,78 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   public message<
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
   ): void;
   public message<
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | FilteredMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
   ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
       if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
-        return matchMessage(patternOrMiddleware);
+        return matchMessage<undefined | 'bot_message' | 'file_share' | 'thread_broadcast'>(patternOrMiddleware, true);
+      }
+      return patternOrMiddleware;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+
+    this.listeners.push([
+      onlyEvents,
+      matchEventType('message'),
+      ...messageMiddleware,
+    ] as Middleware<AnyMiddlewareArgs>[]);
+  }
+
+  public allMessageSubtypes<
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(...listeners: AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]): void;
+  public allMessageSubtypes<
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    pattern: string | RegExp,
+    ...listeners: AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+  ): void;
+  public allMessageSubtypes<
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    filter: AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
+    pattern: string | RegExp,
+    ...listeners: AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+  ): void;
+  public allMessageSubtypes<
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    filter: AllMessageEventMiddleware,
+    ...listeners: AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+  ): void;
+  public allMessageSubtypes<
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+  ): void;
+  /**
+   * Accepts all subtype events of message ones.
+   */
+  public allMessageSubtypes<
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+  >(
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | AllMessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+  ): void {
+    const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
+      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
+        return matchMessage<string | undefined | never>(patternOrMiddleware, false);
       }
       return patternOrMiddleware;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -960,8 +1036,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
-    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
+    let payload: DialogSubmitAction
+    | WorkflowStepEdit
+    | SlackShortcut
+    | KnownEventFromType<string, string | undefined>
+    | SlashCommand
+    | KnownOptionsPayloadFromType<string>
+    | BlockElementAction
+    | ViewOutput
+    | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;

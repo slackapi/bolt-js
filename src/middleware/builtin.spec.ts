@@ -92,7 +92,7 @@ describe('Built-in global middleware', () => {
     function matchesPatternTestCase(
       pattern: string | RegExp,
       matchingText: string,
-      buildFakeEvent: (content: string) => SlackEvent,
+      buildFakeEvent: (content: string) => AppMentionEvent | MessageEvent,
     ): Mocha.AsyncFunc {
       return async () => {
         // Arrange
@@ -859,7 +859,10 @@ interface MiddlewareCommonArgs {
   logger: Logger;
   client: WebClient;
 }
-type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
+type MessageMiddlewareArgs = SlackEventMiddlewareArgs<
+'message',
+undefined | 'bot_message' | 'file_share' | 'thread_broadcast'
+> & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
 type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'> & MiddlewareCommonArgs;
