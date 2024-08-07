@@ -432,11 +432,11 @@ export interface FileUnsharedEvent {
 }
 
 export interface FunctionParams {
-  type?: string;
-  name?: string;
+  type: string;
+  name: string;
   description?: string;
   title?: string;
-  is_required?: boolean;
+  is_required: boolean;
 }
 
 export interface FunctionInputs {
@@ -451,7 +451,7 @@ export interface FunctionExecutedEvent {
     id: string;
     callback_id: string;
     title: string;
-    description: string;
+    description?: string;
     type: string;
     input_parameters: FunctionParams[];
     output_parameters: FunctionParams[];
