@@ -1,7 +1,7 @@
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
 import { StringIndexed } from './helpers';
-import { SlackEventMiddlewareArgs } from './events';
+import { FunctionInputs, SlackEventMiddlewareArgs } from './events';
 import { SlackActionMiddlewareArgs } from './actions';
 import { SlackCommandMiddlewareArgs } from './command';
 import { SlackOptionsMiddlewareArgs } from './options';
@@ -74,6 +74,23 @@ export interface Context extends StringIndexed {
   isEnterpriseInstall: boolean,
 
   /**
+   * A JIT and function-specific token that, when used to make API calls,
+   * creates an association between a function's execution and subsequent actions
+   * (e.g., buttons and other interactivity)
+   */
+  functionBotAccessToken?: string;
+
+  /**
+   * Function execution ID associated with the event
+   */
+  functionExecutionId?: string;
+
+  /**
+   * Inputs that were provided to a function when it was executed
+   */
+  functionInputs?: FunctionInputs;
+
+  /**
    * Retry count of an Events API request (this property does not exist for other requests)
    */
   retryNum?: number;
@@ -90,6 +107,9 @@ export const contextBuiltinKeys: string[] = [
   'botUserId',
   'teamId',
   'enterpriseId',
+  'functionBotAccessToken',
+  'functionExecutionId',
+  'functionInputs',
   'retryNum',
   'retryReason',
 ];

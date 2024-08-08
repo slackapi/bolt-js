@@ -65,7 +65,7 @@ describe('CustomFunction class', () => {
       assert(fakeNext.called);
     });
 
-    it('should call next if not a workflow step event', async () => {
+    it('should call next if not a function executed event', async () => {
       const fn = new CustomFunction('test_view_callback_id', MOCK_MIDDLEWARE_SINGLE);
       const middleware = fn.getMiddleware();
       const fakeViewArgs = createFakeViewEvent() as unknown as
@@ -215,6 +215,7 @@ function createFakeFunctionExecutedEvent() {
     },
     context: {
       functionBotAccessToken: 'xwfp-123',
+      functionExecutionId: 'test_executed_callback_id',
     },
   };
 }
