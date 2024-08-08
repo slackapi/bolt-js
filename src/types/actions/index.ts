@@ -3,6 +3,8 @@ import { InteractiveMessage } from './interactive-message';
 import { WorkflowStepEdit } from './workflow-step-edit';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
+import { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
+import { FunctionInputs } from '../events';
 
 export * from './block-action';
 export * from './interactive-message';
@@ -45,6 +47,9 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
   say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : never;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
+  complete?: FunctionCompleteFn;
+  fail?: FunctionFailFn;
+  inputs?: FunctionInputs;
 }
 
 /**
