@@ -163,9 +163,37 @@ describe('CustomFunction class', () => {
   });
 
   describe('custom function utility functions', () => {
-    it('complete should call functions.completeSuccess');
+    describe('`complete` factory function', () => {
+      it('complete should call functions.completeSuccess', async () => {
+        const client = new WebClient('sometoken');
+        const completeMock = sinon.stub(client.functions, 'completeSuccess').resolves();
+        const complete = CustomFunction.createFunctionComplete({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
+        await complete();
+        assert(completeMock.called, 'client.functions.completeSuccess not called!');
+      });
+      it('should throw if no functionExecutionId present on context', () => {
+        const client = new WebClient('sometoken');
+        assert.throws(() => {
+          CustomFunction.createFunctionComplete({ isEnterpriseInstall: false }, client);
+        });
+      });
+    });
 
-    it('fail should call functions.completeError');
+    describe('`fail` factory function', () => {
+      it('fail should call functions.completeError', async () => {
+        const client = new WebClient('sometoken');
+        const completeMock = sinon.stub(client.functions, 'completeError').resolves();
+        const complete = CustomFunction.createFunctionFail({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
+        await complete({ error: 'boom' });
+        assert(completeMock.called, 'client.functions.completeError not called!');
+      });
+      it('should throw if no functionExecutionId present on context', () => {
+        const client = new WebClient('sometoken');
+        assert.throws(() => {
+          CustomFunction.createFunctionFail({ isEnterpriseInstall: false }, client);
+        });
+      });
+    });
 
     it('inputs should map to function payload inputs', async () => {
       const fakeExecuteArgs = createFakeFunctionExecutedEvent();

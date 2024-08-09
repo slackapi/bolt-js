@@ -126,15 +126,15 @@ export class CustomFunction {
  */
   public static createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
     const token = selectToken(context);
+    const { functionExecutionId } = context;
+
+    if (!functionExecutionId) {
+      const errorMsg = 'No function_execution_id found';
+      throw new CustomFunctionCompleteFailError(errorMsg);
+    }
 
     return (params: Parameters<FunctionFailFn>[0]) => {
       const { error } = params ?? {};
-      const { functionExecutionId } = context;
-
-      if (!functionExecutionId) {
-        const errorMsg = 'No function_execution_id found';
-        throw new CustomFunctionCompleteFailError(errorMsg);
-      }
 
       return client.functions.completeError({
         token,
