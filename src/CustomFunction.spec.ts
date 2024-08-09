@@ -244,12 +244,14 @@ function createFakeFunctionExecutedEvent(callbackId?: string): AllCustomFunction
     fail: () => Promise.resolve({ ok: true }),
     inputs,
     logger: createFakeLogger(),
+    message: undefined,
     next: () => Promise.resolve(),
     payload: {
       function: func,
       inputs: { message: 'test123', recipient: 'U012345' },
       ...base,
     },
+    say: undefined,
   };
 }
 

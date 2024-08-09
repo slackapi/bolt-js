@@ -53,7 +53,7 @@ expectType<void>(
 
 expectType<void>(
   app.event('pin_added', async ({ say, event }) => {
-    expectType<SayFn>(say!);
+    expectType<SayFn>(say);
     expectType<PinAddedEvent>(event);
     await Promise.resolve(event);
   }),
