@@ -8,7 +8,7 @@ expectType<void>(
     expectType<AppMentionEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
@@ -16,7 +16,7 @@ expectType<void>(
     expectType<ReactionAddedEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
@@ -24,7 +24,7 @@ expectType<void>(
     expectType<ReactionRemovedEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
@@ -32,7 +32,7 @@ expectType<void>(
     expectType<UserHuddleChangedEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
@@ -40,7 +40,7 @@ expectType<void>(
     expectType<UserProfileChangedEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
@@ -48,15 +48,15 @@ expectType<void>(
     expectType<UserStatusChangedEvent>(event);
     expectNotType<SlackEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
   app.event('pin_added', async ({ say, event }) => {
-    expectType<SayFn>(say);
+    expectType<SayFn>(say!);
     expectType<PinAddedEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
@@ -64,19 +64,19 @@ expectType<void>(
     expectType<SayFn>(say);
     expectType<PinRemovedEvent>(event);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
   app.event('reaction_added', async ({ say, event }) => {
     expectType<SayFn>(say);
     await Promise.resolve(event);
-  })
+  }),
 );
 
 expectType<void>(
   app.event('reaction_removed', async ({ say, event }) => {
     expectType<SayFn>(say);
     await Promise.resolve(event);
-  })
+  }),
 );

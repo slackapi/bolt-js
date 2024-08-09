@@ -3,6 +3,7 @@ import {
   WebClient,
   FunctionsCompleteErrorResponse,
   FunctionsCompleteSuccessResponse,
+  WebClientOptions,
 } from '@slack/web-api';
 import {
   Middleware,
@@ -62,14 +63,18 @@ export class CustomFunction {
   /** Function callback_id */
   public callbackId: string;
 
+  private appWebClientOptions: WebClientOptions;
+
   private middleware: CustomFunctionMiddleware;
 
   public constructor(
     callbackId: string,
     middleware: CustomFunctionExecuteMiddleware,
+    clientOptions: WebClientOptions,
   ) {
     validate(callbackId, middleware);
 
+    this.appWebClientOptions = clientOptions;
     this.callbackId = callbackId;
     this.middleware = middleware;
   }
@@ -88,7 +93,7 @@ export class CustomFunction {
   }
 
   private async processEvent(args: AllCustomFunctionMiddlewareArgs): Promise<void> {
-    const functionArgs = enrichFunctionArgs(args);
+    const functionArgs = enrichFunctionArgs(args, this.appWebClientOptions);
     const functionMiddleware = this.getFunctionMiddleware();
     return processFunctionMiddleware(functionArgs, functionMiddleware);
   }
@@ -99,7 +104,6 @@ export class CustomFunction {
 
   /**
    * Factory for `complete()` utility
-   * @param args function_executed event
    */
   public static createFunctionComplete(context: Context, client: WebClient): FunctionCompleteFn {
     const token = selectToken(context);
@@ -119,7 +123,6 @@ export class CustomFunction {
 
   /**
  * Factory for `fail()` utility
- * @param args function_executed event
  */
   public static createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
     const token = selectToken(context);
@@ -169,7 +172,6 @@ export function validate(callbackId: string, middleware: CustomFunctionExecuteMi
 
 /**
  * `processFunctionMiddleware()` invokes each listener middleware
- * @param args function_executed event
  */
 export async function processFunctionMiddleware(
   args: AllCustomFunctionMiddlewareArgs,
@@ -202,14 +204,16 @@ function selectToken(context: Context): string | undefined {
  *    - events will *not* continue down global middleware chain to subsequent listeners
  *  2. augments args with step lifecycle-specific properties/utilities
  * */
-export function enrichFunctionArgs(args: any): AllCustomFunctionMiddlewareArgs {
+export function enrichFunctionArgs(
+  args: AllCustomFunctionMiddlewareArgs, webClientOptions: WebClientOptions,
+): AllCustomFunctionMiddlewareArgs {
   const { next: _next, ...functionArgs } = args;
-  const enrichedArgs: any = { ...functionArgs };
+  const enrichedArgs = { ...functionArgs };
   const token = selectToken(functionArgs.context);
 
   // Making calls with a functionBotAccessToken establishes continuity between
   // a function_executed event and subsequent interactive events (actions)
-  const client = new WebClient(token, { ...functionArgs.client });
+  const client = new WebClient(token, webClientOptions);
   enrichedArgs.client = client;
 
   // Utility args
@@ -217,5 +221,5 @@ export function enrichFunctionArgs(args: any): AllCustomFunctionMiddlewareArgs {
   enrichedArgs.complete = CustomFunction.createFunctionComplete(enrichedArgs.context, client);
   enrichedArgs.fail = CustomFunction.createFunctionFail(enrichedArgs.context, client);
 
-  return enrichedArgs;
+  return enrichedArgs as AllCustomFunctionMiddlewareArgs; // TODO: dangerous casting as it obfuscates missing `next()`
 }
