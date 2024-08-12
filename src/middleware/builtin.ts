@@ -299,15 +299,19 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
     const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
 
     if (isEventArgs(args)) {
-      // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
-      // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
-      if (args.message !== undefined) {
-        const message = args.message as SlackEventMiddlewareArgs<'message'>['message'];
+      if (args.event.type === 'message') {
+        // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
+        // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
+        // TODO: there must be a better way; generics-based types for event and middleware arguments likely the issue
+        // should instead use a discriminated union
+        const message = args.message as unknown as SlackEventMiddlewareArgs<'message'>['message'];
+        if (message !== undefined) {
         // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
         // type narrowing
         // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
-        if (message.subtype === 'bot_message' && message.bot_id === botId) {
-          return;
+          if (message.subtype === 'bot_message' && message.bot_id === botId) {
+            return;
+          }
         }
       }
 
@@ -331,7 +335,7 @@ export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
  */
 export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'message'>> {
   return async ({ message, next }) => {
-    if (message.subtype === subtype1) {
+    if (message && message.subtype === subtype1) {
       await next();
     }
   };
@@ -354,7 +358,7 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
       );
     }
 
-    if (!('text' in message) || message.text === undefined) {
+    if (!message || !('text' in message) || message.text === undefined) {
       return;
     }
 
@@ -406,6 +410,8 @@ function isViewBody(
   return (body as SlackViewAction).view !== undefined;
 }
 
-function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
+function isEventArgs(
+  args: AnyMiddlewareArgs,
+): args is SlackEventMiddlewareArgs {
   return (args as SlackEventMiddlewareArgs).event !== undefined;
 }

@@ -503,6 +503,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
   }
 
+  public get webClientOptions(): WebClientOptions {
+    return this.clientOptions;
+  }
+
   /**
    * Register a new middleware, processed in the order registered.
    *
@@ -530,7 +534,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
  * Register CustomFunction middleware
  */
   public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
-    const fn = new CustomFunction(callbackId, listeners);
+    const fn = new CustomFunction(callbackId, listeners, this.webClientOptions);
     const m = fn.getMiddleware();
     this.middleware.push(m);
     return this;

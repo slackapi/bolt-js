@@ -30,7 +30,8 @@
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "eslint --fix --ext .ts src",
     "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run lint && npm run mocha && npm run test:types",
+    "test": "npm run build && npm run lint && npm run mocha && npm run test:types",
+    "test:coverage": "npm run mocha && nyc report --reporter=text",
     "test:types": "tsd",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },

@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import rewiremock from 'rewiremock';
+import { WebClient } from '@slack/web-api';
 import {
   CustomFunction,
   SlackCustomFunctionMiddlewareArgs,
@@ -9,8 +10,8 @@ import {
   CustomFunctionMiddleware,
   CustomFunctionExecuteMiddlewareArgs,
 } from './CustomFunction';
-import { Override } from './test-helpers';
-import { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware } from './types';
+import { createFakeLogger, Override } from './test-helpers';
+import { AllMiddlewareArgs, Middleware } from './types';
 import { CustomFunctionInitializationError } from './errors';
 
 async function importCustomFunction(overrides: Override = {}): Promise<typeof import('./CustomFunction')> {
@@ -26,36 +27,35 @@ const MOCK_MIDDLEWARE_MULTIPLE = [MOCK_FN, MOCK_FN_2];
 describe('CustomFunction class', () => {
   describe('constructor', () => {
     it('should accept single function as middleware', async () => {
-      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE);
+      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
       assert.isNotNull(fn);
     });
 
     it('should accept multiple functions as middleware', async () => {
-      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE);
+      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE, {});
       assert.isNotNull(fn);
     });
   });
 
   describe('getMiddleware', () => {
     it('should not call next if a function_executed event', async () => {
-      const fn = new CustomFunction('test_executed_callback_id', MOCK_MIDDLEWARE_SINGLE);
+      const cbId = 'test_executed_callback_id';
+      const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, {});
       const middleware = fn.getMiddleware();
-      const fakeEditArgs = createFakeFunctionExecutedEvent() as unknown as
-        SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs;
+      const fakeEditArgs = createFakeFunctionExecutedEvent(cbId);
 
       const fakeNext = sinon.spy();
       fakeEditArgs.next = fakeNext;
 
       await middleware(fakeEditArgs);
 
-      assert(fakeNext.notCalled);
+      assert(fakeNext.notCalled, 'next called!');
     });
 
     it('should call next if valid custom function but mismatched callback_id', async () => {
-      const fn = new CustomFunction('bad_executed_callback_id', MOCK_MIDDLEWARE_SINGLE);
+      const fn = new CustomFunction('bad_executed_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
       const middleware = fn.getMiddleware();
-      const fakeEditArgs = createFakeFunctionExecutedEvent() as unknown as
-        SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs;
+      const fakeEditArgs = createFakeFunctionExecutedEvent();
 
       const fakeNext = sinon.spy();
       fakeEditArgs.next = fakeNext;
@@ -66,7 +66,7 @@ describe('CustomFunction class', () => {
     });
 
     it('should call next if not a function executed event', async () => {
-      const fn = new CustomFunction('test_view_callback_id', MOCK_MIDDLEWARE_SINGLE);
+      const fn = new CustomFunction('test_view_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
       const middleware = fn.getMiddleware();
       const fakeViewArgs = createFakeViewEvent() as unknown as
         SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs;
@@ -120,8 +120,7 @@ describe('CustomFunction class', () => {
 
   describe('isFunctionEvent', () => {
     it('should return true if recognized function_executed payload type', async () => {
-      const fakeExecuteArgs = createFakeFunctionExecutedEvent() as unknown as SlackCustomFunctionMiddlewareArgs
-      & AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeFunctionExecutedEvent();
 
       const { isFunctionEvent } = await importCustomFunction();
       const eventIsFunctionExcuted = isFunctionEvent(fakeExecuteArgs);
@@ -130,7 +129,8 @@ describe('CustomFunction class', () => {
     });
 
     it('should return false if not a function_executed payload type', async () => {
-      const fakeExecutedEvent = createFakeFunctionExecutedEvent() as unknown as AnyMiddlewareArgs;
+      const fakeExecutedEvent = createFakeFunctionExecutedEvent();
+      // @ts-expect-error expected invalid payload type
       fakeExecutedEvent.payload.type = 'invalid_type';
 
       const { isFunctionEvent } = await importCustomFunction();
@@ -142,10 +142,10 @@ describe('CustomFunction class', () => {
 
   describe('enrichFunctionArgs', () => {
     it('should remove next() from all original event args', async () => {
-      const fakeExecutedEvent = createFakeFunctionExecutedEvent() as unknown as AnyMiddlewareArgs;
+      const fakeExecutedEvent = createFakeFunctionExecutedEvent();
 
       const { enrichFunctionArgs } = await importCustomFunction();
-      const executeFunctionArgs = enrichFunctionArgs(fakeExecutedEvent);
+      const executeFunctionArgs = enrichFunctionArgs(fakeExecutedEvent, {});
 
       assert.notExists(executeFunctionArgs.next);
     });
@@ -154,7 +154,7 @@ describe('CustomFunction class', () => {
       const fakeArgs = createFakeFunctionExecutedEvent();
 
       const { enrichFunctionArgs } = await importCustomFunction();
-      const functionArgs = enrichFunctionArgs(fakeArgs);
+      const functionArgs = enrichFunctionArgs(fakeArgs, {});
 
       assert.exists(functionArgs.inputs);
       assert.exists(functionArgs.complete);
@@ -163,19 +163,43 @@ describe('CustomFunction class', () => {
   });
 
   describe('custom function utility functions', () => {
-    it('complete should call functions.completeSuccess', async () => {
-      // TODO
+    describe('`complete` factory function', () => {
+      it('complete should call functions.completeSuccess', async () => {
+        const client = new WebClient('sometoken');
+        const completeMock = sinon.stub(client.functions, 'completeSuccess').resolves();
+        const complete = CustomFunction.createFunctionComplete({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
+        await complete();
+        assert(completeMock.called, 'client.functions.completeSuccess not called!');
+      });
+      it('should throw if no functionExecutionId present on context', () => {
+        const client = new WebClient('sometoken');
+        assert.throws(() => {
+          CustomFunction.createFunctionComplete({ isEnterpriseInstall: false }, client);
+        });
+      });
     });
 
-    it('fail should call functions.completeError', async () => {
-      // TODO
+    describe('`fail` factory function', () => {
+      it('fail should call functions.completeError', async () => {
+        const client = new WebClient('sometoken');
+        const completeMock = sinon.stub(client.functions, 'completeError').resolves();
+        const complete = CustomFunction.createFunctionFail({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
+        await complete({ error: 'boom' });
+        assert(completeMock.called, 'client.functions.completeError not called!');
+      });
+      it('should throw if no functionExecutionId present on context', () => {
+        const client = new WebClient('sometoken');
+        assert.throws(() => {
+          CustomFunction.createFunctionFail({ isEnterpriseInstall: false }, client);
+        });
+      });
     });
 
     it('inputs should map to function payload inputs', async () => {
-      const fakeExecuteArgs = createFakeFunctionExecutedEvent() as unknown as AllCustomFunctionMiddlewareArgs;
+      const fakeExecuteArgs = createFakeFunctionExecutedEvent();
 
       const { enrichFunctionArgs } = await importCustomFunction();
-      const enrichedArgs = enrichFunctionArgs(fakeExecuteArgs);
+      const enrichedArgs = enrichFunctionArgs(fakeExecuteArgs, {});
 
       assert.isTrue(enrichedArgs.inputs === fakeExecuteArgs.event.inputs);
     });
@@ -183,40 +207,79 @@ describe('CustomFunction class', () => {
 
   describe('processFunctionMiddleware', () => {
     it('should call each callback in user-provided middleware', async () => {
-      const { ...fakeArgs } = createFakeFunctionExecutedEvent() as unknown as AllCustomFunctionMiddlewareArgs;
+      const { ...fakeArgs } = createFakeFunctionExecutedEvent();
       const { processFunctionMiddleware } = await importCustomFunction();
 
       const fn1 = sinon.spy((async ({ next: continuation }) => {
         await continuation();
       }) as Middleware<CustomFunctionExecuteMiddlewareArgs>);
-      const fn2 = sinon.spy(async () => {});
+      const fn2 = sinon.spy(async () => {
+      });
       const fakeMiddleware = [fn1, fn2] as CustomFunctionMiddleware;
 
       await processFunctionMiddleware(fakeArgs, fakeMiddleware);
 
-      assert(fn1.called);
-      assert(fn2.called);
+      assert(fn1.called, 'first user-provided middleware not called!');
+      assert(fn2.called, 'second user-provided middleware not called!');
     });
   });
 });
 
-function createFakeFunctionExecutedEvent() {
+function createFakeFunctionExecutedEvent(callbackId?: string): AllCustomFunctionMiddlewareArgs {
+  const func = {
+    type: 'function',
+    id: 'somefunc',
+    callback_id: callbackId || 'callback_id',
+    title: 'My dope function',
+    input_parameters: [],
+    output_parameters: [],
+    app_id: 'A1234',
+    date_created: 123456,
+    date_deleted: 0,
+    date_updated: 123456,
+  };
+  const base = {
+    bot_access_token: 'xoxb-abcd-1234',
+    event_ts: '123456.789',
+    function_execution_id: 'Fx1234',
+    workflow_execution_id: 'Wf1234',
+    type: 'function_executed',
+  } as const;
+  const inputs = { message: 'test123', recipient: 'U012345' };
+  const event = {
+    function: func,
+    inputs,
+    ...base,
+  } as const;
   return {
-    event: {
-      inputs: { message: 'test123', recipient: 'U012345' },
+    body: {
+      api_app_id: 'A1234',
+      event,
+      event_id: 'E1234',
+      event_time: 123456,
+      team_id: 'T1234',
+      token: 'xoxb-1234',
+      type: 'event_callback',
     },
-    payload: {
-      type: 'function_executed',
-      function: {
-        callback_id: 'test_executed_callback_id',
-      },
-      inputs: { message: 'test123', recipient: 'U012345' },
-      bot_access_token: 'xwfp-123',
-    },
+    client: new WebClient('faketoken'),
+    complete: () => Promise.resolve({ ok: true }),
     context: {
       functionBotAccessToken: 'xwfp-123',
       functionExecutionId: 'test_executed_callback_id',
+      isEnterpriseInstall: false,
     },
+    event,
+    fail: () => Promise.resolve({ ok: true }),
+    inputs,
+    logger: createFakeLogger(),
+    message: undefined,
+    next: () => Promise.resolve(),
+    payload: {
+      function: func,
+      inputs: { message: 'test123', recipient: 'U012345' },
+      ...base,
+    },
+    say: undefined,
   };
 }
 

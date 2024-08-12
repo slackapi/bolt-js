@@ -44,7 +44,7 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
   action: this['payload'];
   body: Action;
   // all action types except dialog submission have a channel context
-  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : never;
+  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : undefined;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
   complete?: FunctionCompleteFn;
