@@ -9,6 +9,9 @@ import { MessageEvent as AllMessageEvents, MessageMetadataEvent as AllMessageMet
  */
 export type SlackEvent =
   | AppRequestedEvent
+  | AppInstalledEvent
+  | AppDeletedEvent
+  | AppUninstalledTeamEvent
   | AppHomeOpenedEvent
   | AppMentionEvent
   | AppRateLimitedEvent
@@ -60,14 +63,15 @@ export type SlackEvent =
   | PinRemovedEvent
   | ReactionAddedEvent
   | ReactionRemovedEvent
-  | SharedChannelInviteReceived
-  | SharedChannelInviteAccepted
-  | SharedChannelInviteApproved
-  | SharedChannelInviteDeclined
+  | SharedChannelInviteReceivedEvent
+  | SharedChannelInviteAcceptedEvent
+  | SharedChannelInviteApprovedEvent
+  | SharedChannelInviteDeclinedEvent
+  | SharedChannelInviteRequestedEvent
   | StarAddedEvent
   | StarRemovedEvent
-  | SubteamCreated
-  | SubteamMembersChanged
+  | SubteamCreatedEvent
+  | SubteamMembersChangedEvent
   | SubteamSelfAddedEvent
   | SubteamSelfRemovedEvent
   | SubteamUpdatedEvent
@@ -183,6 +187,38 @@ export interface AppHomeOpenedEvent {
   event_ts: string;
 }
 
+export interface AppInstalledEvent {
+  type: 'app_installed';
+  app_id: string;
+  app_name: string;
+  app_owner_id: string;
+  user_id: string;
+  team_id: string;
+  team_domain: string;
+  event_ts: string;
+}
+
+export interface AppDeletedEvent {
+  type: 'app_deleted';
+  app_id: string;
+  app_name: string;
+  app_owner_id: string;
+  team_id: string;
+  team_domain: string;
+  event_ts: string;
+}
+
+export interface AppUninstalledTeamEvent {
+  type: 'app_uninstalled_team';
+  app_id: string;
+  app_name: string;
+  app_owner_id: string;
+  team_id: string;
+  team_domain: string;
+  user_id: string;
+  event_ts: string;
+}
+
 // NOTE: this is essentially the same as the `message` event, except for the type and that this uses `event_ts` instead
 // of `ts`
 export interface AppMentionEvent {
@@ -192,6 +228,21 @@ export interface AppMentionEvent {
   bot_profile?: BotProfile;
   username?: string;
   team?: string;
+  // user_team, source_team, and user_profile
+  // can exist when the user who mentioned this bot is in a different workspace/org
+  user_team?: string;
+  source_team?: string;
+  user_profile?: {
+    name: string;
+    first_name: string;
+    real_name: string;
+    display_name: string;
+    team: string;
+    is_restricted?: boolean;
+    is_ultra_restricted?: boolean;
+    avatar_hash?: string;
+    image_72?: string;
+  };
   user?: string;
   text: string;
   attachments?: MessageAttachment[];
@@ -247,6 +298,7 @@ export interface ChannelArchiveEvent {
 
 export interface ChannelCreatedEvent {
   type: 'channel_created';
+  event_ts: string;
   channel: {
     id: string;
     is_channel: boolean;
@@ -256,6 +308,16 @@ export interface ChannelCreatedEvent {
     creator: string; // user ID
     is_shared: boolean;
     is_org_shared: boolean;
+    context_team_id: string,
+    is_archived: boolean;
+    is_frozen: boolean,
+    is_general: boolean,
+    is_group: boolean,
+    is_private: boolean,
+    is_ext_shared: boolean,
+    is_im: boolean,
+    is_mpim: boolean,
+    is_pending_ext_shared: boolean,
   };
 }
 
@@ -643,6 +705,7 @@ export interface PinnedMessageItem {
   blocks?: (KnownBlock | Block)[];
   pinned_to?: string[];
   permalink: string;
+  ts: string
 }
 export interface PinnedFileItem {
   id: string;
@@ -777,7 +840,7 @@ export interface SharedChannelItem {
   is_im: boolean;
   name: string;
 }
-export interface SharedChannelInviteAccepted {
+export interface SharedChannelInviteAcceptedEvent {
   type: 'shared_channel_invite_accepted';
   approval_required: boolean;
   invite: SharedChannelInviteItem;
@@ -786,8 +849,13 @@ export interface SharedChannelInviteAccepted {
   accepting_user: SharedChannelUserItem;
   event_ts: string;
 }
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteAcceptedEvent` interface instead.
+ */
+export type SharedChannelInviteAccepted = SharedChannelInviteAcceptedEvent;
 
-export interface SharedChannelInviteApproved {
+export interface SharedChannelInviteApprovedEvent {
   type: 'shared_channel_invite_approved';
   invite: SharedChannelInviteItem;
   channel: SharedChannelItem;
@@ -796,8 +864,13 @@ export interface SharedChannelInviteApproved {
   approving_user: SharedChannelUserItem;
   event_ts: string;
 }
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteApprovedEvent` interface instead.
+ */
+export type SharedChannelInviteApproved = SharedChannelInviteApprovedEvent;
 
-export interface SharedChannelInviteDeclined {
+export interface SharedChannelInviteDeclinedEvent {
   type: 'shared_channel_invite_declined';
   invite: SharedChannelInviteItem;
   channel: SharedChannelItem;
@@ -806,11 +879,55 @@ export interface SharedChannelInviteDeclined {
   declining_user: SharedChannelUserItem;
   event_ts: string;
 }
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteDeclinedEvent` interface instead.
+ */
+export type SharedChannelInviteDeclined = SharedChannelInviteDeclinedEvent;
 
-export interface SharedChannelInviteReceived {
+export interface SharedChannelInviteReceivedEvent {
   type: 'shared_channel_invite_received';
   invite: SharedChannelInviteItem;
   channel: SharedChannelItem;
+  event_ts: string;
+}
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SharedChannelInviteReceivedEvent` interface instead.
+ */
+export type SharedChannelInviteReceived = SharedChannelInviteReceivedEvent;
+
+export interface SharedChannelInviteRequestedEvent {
+  type: 'shared_channel_invite_requested';
+  actor: {
+    id: string;
+    name: string;
+    is_bot: boolean;
+    team_id: string;
+    timezone: string;
+    real_name: string;
+    display_name: string;
+  };
+  channel_id: string;
+  event_type: 'slack#/events/shared_channel_invite_requested';
+  channel_name: string;
+  channel_type: 'public' | 'private';
+  target_users: [{ email: string; invite_id: string }];
+  teams_in_channel: [
+    {
+      id: string;
+      icon: { image_34: string; image_default: boolean };
+      name: string;
+      domain: string;
+      is_verified: boolean;
+      date_created: number;
+      avatar_base_url: string;
+      requires_sponsorship: boolean;
+    },
+  ];
+  is_external_limited: boolean;
+  channel_date_created: number;
+  channel_message_latest_counted_timestamp: number;
   event_ts: string;
 }
 
@@ -857,13 +974,18 @@ interface Subteam {
   channel_count?: number;
 }
 
-export interface SubteamCreated {
+export interface SubteamCreatedEvent {
   type: 'subteam_created';
   subteam: Subteam;
   event_ts: string;
 }
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SubteamCreatedEvent` interface instead.
+ */
+export type SubteamCreated = SubteamCreatedEvent;
 
-export interface SubteamMembersChanged {
+export interface SubteamMembersChangedEvent {
   type: 'subteam_members_changed';
   subteam_id: string;
   team_id: string;
@@ -875,6 +997,11 @@ export interface SubteamMembersChanged {
   removed_users_count?: number;
   event_ts: string;
 }
+// TODO: (breaking change) for backward-compatibility; remove non-Event-suffix type in next major version.
+/**
+ * @deprecated Will be removed in next major version. Use the `SubteamMembersChangedEvent` interface instead.
+ */
+export type SubteamMembersChanged = SubteamMembersChangedEvent;
 
 export interface SubteamSelfAddedEvent {
   type: 'subteam_self_added';

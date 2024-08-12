@@ -25,6 +25,14 @@ export interface AwsEvent {
 
 export type AwsCallback = (error?: Error | string | null, result?: any) => void;
 
+export interface ReceiverInvalidRequestSignatureHandlerArgs {
+  rawBody: string;
+  signature: string;
+  ts: number;
+  awsEvent: AwsEvent;
+  awsResponse: Promise<AwsResponse>;
+}
+
 export interface AwsResponse {
   statusCode: number;
   headers?: {
@@ -76,6 +84,7 @@ export interface AwsLambdaReceiverOptions {
    * @default noop
    */
   customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
+  invalidRequestSignatureHandler?: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
 }
 
 /*
@@ -95,12 +104,15 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
 
+  private invalidRequestSignatureHandler: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
+
   public constructor({
     signingSecret,
     logger = undefined,
     logLevel = LogLevel.INFO,
     signatureVerification = true,
     customPropertiesExtractor = (_) => ({}),
+    invalidRequestSignatureHandler,
   }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
@@ -112,6 +124,11 @@ export default class AwsLambdaReceiver implements Receiver {
         return defaultLogger;
       })();
     this.customPropertiesExtractor = customPropertiesExtractor;
+    if (invalidRequestSignatureHandler) {
+      this.invalidRequestSignatureHandler = invalidRequestSignatureHandler;
+    } else {
+      this.invalidRequestSignatureHandler = this.defaultInvalidRequestSignatureHandler;
+    }
   }
 
   public init(app: App): void {
@@ -171,8 +188,9 @@ export default class AwsLambdaReceiver implements Receiver {
         const signature = this.getHeaderValue(awsEvent.headers, 'X-Slack-Signature') as string;
         const ts = Number(this.getHeaderValue(awsEvent.headers, 'X-Slack-Request-Timestamp'));
         if (!this.isValidRequestSignature(this.signingSecret, rawBody, signature, ts)) {
-          this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
-          return Promise.resolve({ statusCode: 401, body: '' });
+          const awsResponse = Promise.resolve({ statusCode: 401, body: '' });
+          this.invalidRequestSignatureHandler({ rawBody, signature, ts, awsEvent, awsResponse });
+          return awsResponse;
         }
       }
 
@@ -312,5 +330,11 @@ export default class AwsLambdaReceiver implements Receiver {
   private getHeaderValue(headers: Record<string, any>, key: string): string | undefined {
     const caseInsensitiveKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
     return caseInsensitiveKey !== undefined ? headers[caseInsensitiveKey] : undefined;
+  }
+
+  private defaultInvalidRequestSignatureHandler(args: ReceiverInvalidRequestSignatureHandlerArgs): void {
+    const { signature, ts } = args;
+
+    this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
   }
 }

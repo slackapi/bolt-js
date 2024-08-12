@@ -1,0 +1,38 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.sidebarJSBolt.category.Basic concepts": {
+    "message": "基本的な概念",
+    "description": "The label for category Basic concepts in sidebar sidebarJSBolt"
+  },
+  "sidebar.sidebarJSBolt.category.Advanced concepts": {
+    "message": "応用コンセプト",
+    "description": "The label for category Advanced concepts in sidebar sidebarJSBolt"
+  },
+  "sidebar.sidebarJSBolt.category.Deployments": {
+    "message": "Deployments",
+    "description": "The label for category Deployments in sidebar sidebarJSBolt"
+  },
+  "sidebar.sidebarJSBolt.category.Custom functions (Beta)": {
+    "message": "Custom functions (Beta)",
+    "description": "The label for category Custom functions (Beta) in sidebar sidebarJSBolt"
+  },
+  "sidebar.sidebarJSBolt.category.Workflow steps (Deprecated)": {
+    "message": "ワークフローステップ 非推奨",
+    "description": "The label for category Workflow steps (Deprecated) in sidebar sidebarJSBolt"
+  },
+  "sidebar.sidebarJSBolt.category.Tutorials": {
+    "message": "チュートリアル",
+    "description": "The label for category Tutorials in sidebar sidebarJSBolt"
+  },
+  "sidebar.sidebarJSBolt.link.Code on GitHub": {
+    "message": "Code on GitHub",
+    "description": "The label for link Code on GitHub in sidebar sidebarJSBolt, linking to https://github.com/SlackAPI/bolt-js"
+  },
+  "sidebar.sidebarJSBolt.link.Contributors Guide": {
+    "message": "貢献",
+    "description": "The label for link Contributors Guide in sidebar sidebarJSBolt, linking to https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md"
+  }
+}
