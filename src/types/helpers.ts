@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// TODO: breaking change: remove, unnecessary abstraction, just use Record directly
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
  */
 export type StringIndexed = Record<string, any>;
 
+// TODO: breaking change: no longer used! remove
 /**
  * @deprecated No longer works in TypeScript 4.3
  */
