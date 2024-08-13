@@ -12,12 +12,27 @@ import {
   SlackEventMiddlewareArgs,
   Context,
   FunctionExecutedEvent,
+  SlackActionMiddlewareArgs,
+  BlockAction,
+  FunctionInputs,
 } from './types';
 import processMiddleware from './middleware/process';
 import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';
 
 /** Interfaces */
 
+interface FunctionBlockAction extends BlockAction {
+  function_data: {
+    execution_id: string;
+    function: FunctionInputs;
+    inputs: FunctionInputs;
+  };
+  interactivity: {
+    interactor: unknown; // TODO :: replace
+    interactivity_pointer: string;
+  };
+
+}
 interface FunctionCompleteArguments {
   outputs?: {
     [key: string]: any;
@@ -42,9 +57,16 @@ export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewar
   fail: FunctionFailFn;
 }
 
+export interface CustomFunctionActionMiddlewareArgs extends SlackActionMiddlewareArgs<FunctionBlockAction> {
+  inputs: FunctionBlockAction['function_data']['inputs'];
+  complete: FunctionCompleteFn;
+  fail: FunctionFailFn;
+}
+
 /** Types */
 
-export type SlackCustomFunctionMiddlewareArgs = CustomFunctionExecuteMiddlewareArgs;
+export type SlackCustomFunctionMiddlewareArgs =
+  CustomFunctionExecuteMiddlewareArgs | CustomFunctionActionMiddlewareArgs;
 
 type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
 
@@ -55,7 +77,7 @@ export type AllCustomFunctionMiddlewareArgs
 
 /** Constants */
 
-const VALID_PAYLOAD_TYPES = new Set(['function_executed']);
+const VALID_PAYLOAD_TYPES = new Set(['function_executed', 'block_actions']);
 
 /** Class */
 
@@ -89,7 +111,13 @@ export class CustomFunction {
   }
 
   private matchesConstraints(args: SlackCustomFunctionMiddlewareArgs): boolean {
-    return args.payload.function.callback_id === this.callbackId;
+    if ('function' in args.payload) {
+      return args.payload.function.callback_id === this.callbackId;
+    }
+    if ('function_data' in args.payload) {
+      return args.payload.function_data.callback_id === this.callbackId;
+    }
+    return false;
   }
 
   private async processEvent(args: AllCustomFunctionMiddlewareArgs): Promise<void> {
@@ -190,6 +218,7 @@ export async function processFunctionMiddleware(
 }
 
 export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
+  console.log('isFunctionEvent : args => ', args);
   return VALID_PAYLOAD_TYPES.has(args.payload.type);
 }
 
