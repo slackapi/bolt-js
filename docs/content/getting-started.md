@@ -115,6 +115,17 @@ const app = new App({
 
 Save your `app.js` file, then on the command line run the following:
 
+Note: if you copy & pasted above code. than, you have to setup ```.env``` in your project. in order to do so follow bellow steps:
+
+```shell
+npm install dotenv --save
+```
+inside ```.env```
+ ```
+SLACK_SIGNING_SECRET="replace_with_your_signing_key"
+SLACK_BOT_TOKEN="replace_with_your_bot-token"
+```
+
 ```script
 node app.js
 ```
