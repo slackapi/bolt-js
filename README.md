@@ -45,29 +45,33 @@ Apps typically react to a collection of incoming events, which can correspond [E
 request, there's a method to build a listener function.
 
 ```js
-// Listen for an event from the Events API
-app.event(eventType, fn);
-
-// Convenience method to listen to only `message` events using a string or RegExp
-app.message([pattern ,] fn);
-
 // Listen for an action from a Block Kit element (buttons, select menus, date pickers, etc)
 app.action(actionId, fn);
 
 // Listen for dialog submissions
 app.action({ callback_id: callbackId }, fn);
 
-// Listen for a global or message shortcuts
-app.shortcut(callbackId, fn);
-
 // Listen for slash commands
 app.command(commandName, fn);
+
+// Listen for an event from the Events API
+app.event(eventType, fn);
+
+// Listen for a custom step execution from a workflow
+app.function(callbackId, fn)
+
+// Convenience method to listen to only `message` events using a string or RegExp
+app.message([pattern ,] fn);
+
+// Listen for options requests (from select menus with an external data source)
+app.options(actionId, fn);
+
+// Listen for a global or message shortcuts
+app.shortcut(callbackId, fn);
 
 // Listen for view_submission modal events
 app.view(callbackId, fn);
 
-// Listen for options requests (from select menus with an external data source)
-app.options(actionId, fn);
 ```
 
 ## Making things happen
@@ -83,6 +87,8 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | `respond` | Function that responds to an incoming event **if** it contains a `response_url` (actions, shortcuts, view submissions, and slash commands). `respond` returns a promise that resolves with the results of responding using the `response_url`.
 | `context` | Event context. This object contains data about the event and the app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
 | `body` | Object that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`).
+| `complete` | Function used to signal the successful completion of a custom step execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
+| `fail` | Function used to signal that a custom step failed to complete. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
 
 
 The arguments are grouped into properties of one object, so that it's easier to pick just the ones your listener needs (using

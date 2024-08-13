@@ -36,10 +36,11 @@ const sidebars = {
         'basic/updating-pushing-views',
         'basic/view-submissions',
         'basic/publishing-views',
+        'basic/custom-steps',
         'basic/options',
         'basic/authenticating-oauth',
         'basic/socket-mode'
-        ],
+      ],
     },
     {
       type: 'category',
@@ -87,7 +88,7 @@ const sidebars = {
         'steps/executing-steps',
       ],
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'category',
       label: 'Tutorials',
@@ -98,9 +99,9 @@ const sidebars = {
         'tutorial/migration-v3'
       ],
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     'reference',
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'link',
       label: 'Release notes',
