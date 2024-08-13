@@ -12,11 +12,27 @@ import {
   SlackEventMiddlewareArgs,
   Context,
   FunctionExecutedEvent,
+  SlackActionMiddlewareArgs,
+  FunctionInputs,
+  BlockButtonAction,
 } from './types';
 import processMiddleware from './middleware/process';
 import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';
 
 /** Interfaces */
+
+interface FunctionBlockAction extends BlockButtonAction {
+  // related to a function_executed event
+  function_data: {
+    execution_id: string;
+    function: FunctionInputs;
+    inputs: FunctionInputs;
+  };
+  interactivity: {
+    interactor: unknown; // TODO :: replace
+    interactivity_pointer: string;
+  };
+}
 
 interface FunctionCompleteArguments {
   outputs?: {
@@ -42,20 +58,28 @@ export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewar
   fail: FunctionFailFn;
 }
 
+export interface CustomFunctionActionMiddlewareArgs extends SlackActionMiddlewareArgs<FunctionBlockAction> {
+  inputs: FunctionBlockAction['function_data']['inputs'];
+  complete: FunctionCompleteFn;
+  fail: FunctionFailFn;
+}
+
 /** Types */
 
-export type SlackCustomFunctionMiddlewareArgs = CustomFunctionExecuteMiddlewareArgs;
+export type SlackCustomFunctionMiddlewareArgs =
+  CustomFunctionExecuteMiddlewareArgs | CustomFunctionActionMiddlewareArgs;
 
 type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+type CustomFunctionActionMiddleware = Middleware<CustomFunctionActionMiddlewareArgs>[];
 
-export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+export type CustomFunctionMiddleware = CustomFunctionExecuteMiddleware | CustomFunctionActionMiddleware;
 
 export type AllCustomFunctionMiddlewareArgs
   <T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs> = T & AllMiddlewareArgs;
 
 /** Constants */
 
-const VALID_PAYLOAD_TYPES = new Set(['function_executed']);
+const VALID_PAYLOAD_TYPES = new Set(['function_executed', 'block_actions']);
 
 /** Class */
 
@@ -69,7 +93,7 @@ export class CustomFunction {
 
   public constructor(
     callbackId: string,
-    middleware: CustomFunctionExecuteMiddleware,
+    middleware: CustomFunctionMiddleware,
     clientOptions: WebClientOptions,
   ) {
     validate(callbackId, middleware);
@@ -89,7 +113,17 @@ export class CustomFunction {
   }
 
   private matchesConstraints(args: SlackCustomFunctionMiddlewareArgs): boolean {
-    return args.payload.function.callback_id === this.callbackId;
+    // function_executed event
+    if ('function' in args.payload) {
+      return args.payload.function.callback_id === this.callbackId;
+    }
+
+    // 'block_actions` event
+    if (args.body.type === 'block_actions' && args.body.function_data) {
+      return args.body.function_data.function.callback_id === this.callbackId;
+    }
+
+    return false;
   }
 
   private async processEvent(args: AllCustomFunctionMiddlewareArgs): Promise<void> {
@@ -146,7 +180,7 @@ export class CustomFunction {
 }
 
 /** Helper Functions */
-export function validate(callbackId: string, middleware: CustomFunctionExecuteMiddleware): void {
+export function validate(callbackId: string, middleware: CustomFunctionMiddleware): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'CustomFunction expects a callback_id as the first argument';
@@ -190,7 +224,7 @@ export async function processFunctionMiddleware(
 }
 
 export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
-  return VALID_PAYLOAD_TYPES.has(args.payload.type);
+  return VALID_PAYLOAD_TYPES.has(args.payload.type) || VALID_PAYLOAD_TYPES.has(args.body.type);
 }
 
 function selectToken(context: Context): string | undefined {
@@ -207,9 +241,9 @@ function selectToken(context: Context): string | undefined {
 export function enrichFunctionArgs(
   args: AllCustomFunctionMiddlewareArgs, webClientOptions: WebClientOptions,
 ): AllCustomFunctionMiddlewareArgs {
-  const { next: _next, ...functionArgs } = args;
-  const enrichedArgs = { ...functionArgs };
-  const token = selectToken(functionArgs.context);
+  // const { next: _next, ...functionArgs } = args;
+  const enrichedArgs = { ...args };
+  const token = selectToken(args.context);
 
   // Making calls with a functionBotAccessToken establishes continuity between
   // a function_executed event and subsequent interactive events (actions)
@@ -217,7 +251,10 @@ export function enrichFunctionArgs(
   enrichedArgs.client = client;
 
   // Utility args
-  enrichedArgs.inputs = enrichedArgs.event.inputs;
+  // @ts-ignore
+  enrichedArgs.inputs = !enrichedArgs.inputs ? enrichedArgs.event.inputs : enrichedArgs.inputs;
+  // enrichedArgs.inputs = enrichedArgs.event.inputs;
+  // enrichedArgs.inputs = {}; // REMOVE!
   enrichedArgs.complete = CustomFunction.createFunctionComplete(enrichedArgs.context, client);
   enrichedArgs.fail = CustomFunction.createFunctionFail(enrichedArgs.context, client);
 
