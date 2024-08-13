@@ -87,8 +87,8 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | `respond` | Function that responds to an incoming event **if** it contains a `response_url` (actions, shortcuts, view submissions, and slash commands). `respond` returns a promise that resolves with the results of responding using the `response_url`.
 | `context` | Event context. This object contains data about the event and the app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
 | `body` | Object that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`).
-| `complete` | Function used to signal the successful completion of a custom step execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
-| `fail` | Function used to signal that a custom step failed to complete. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
+| `complete` | Function used to signal the successful completion of a custom step execution. This tells Slack to proceed with the next steps in the workflow. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
+| `fail` | Function used to signal that a custom step failed to complete. This tells Slack to stop the workflow execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
 
 
 The arguments are grouped into properties of one object, so that it's easier to pick just the ones your listener needs (using
