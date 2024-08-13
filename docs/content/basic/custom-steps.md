@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/custom-steps
 ---
 
-Your app can use the `function()` method to listen to incoming [custom step requests](https://api.slack.com/automation/functions/custom-bolt). The method requires a step `callback_id` of type string. This `callback_id` must also be defined in your [Function](https://api.slack.com/concepts/manifests#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
+Your app can use the `function()` method to listen to incoming [custom step requests](https://api.slack.com/automation/functions/custom-bolt). Custom steps are used in Workflow Builder to build workflows. The method requires a step `callback_id` of type string. This `callback_id` must also be defined in your [Function](https://api.slack.com/concepts/manifests#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
 
 * `complete()` requires one argument: an `outputs` object. It completes your custom step **successfully** and provides an object containing the outputs of your custom step as per its definition.
 * `fail()` requires **one** argument: `error` of type string. It completes your custom step **unsuccessfully** and provides a message containing information regarding why your custom step failed.
@@ -97,5 +97,7 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
   }
 });
 ```
+
+Learn more about responding to interactivity, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#interactivity).
 
 </details>

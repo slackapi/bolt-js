@@ -69,16 +69,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Custom functions (Beta)',
-      items: [
-        'custom-functions/creating-custom-functions',
-        'custom-functions/defining-custom-functions',
-        'custom-functions/listening-to-custom-functions',
-        'custom-functions/responding-to-interactivity',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Workflow steps (Deprecated)',
       items: [
         'steps/steps',
