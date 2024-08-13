@@ -757,8 +757,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
   public command<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     commandName: string | RegExp, ...listeners: Middleware<
-      SlackCommandMiddlewareArgs,
-      AppCustomContext & MiddlewareCustomContext
+    SlackCommandMiddlewareArgs,
+    AppCustomContext & MiddlewareCustomContext
     >[]
   ): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -961,7 +961,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
-      | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
+    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -984,8 +984,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       default:
         payload = (bodyArg as (
           | Exclude<
-            AnyMiddlewareArgs,
-            SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
+          AnyMiddlewareArgs,
+          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
           >
           | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
         )['body']);
@@ -1384,10 +1384,10 @@ function buildSource<IsEnterpriseInstall extends boolean>(
 
     const parseTeamId = (
       bodyAs:
-        | SlackAction
-        | SlackViewAction
-        | SlackShortcut
-        | KnownOptionsPayloadFromType<OptionsSource>,
+      | SlackAction
+      | SlackViewAction
+      | SlackShortcut
+      | KnownOptionsPayloadFromType<OptionsSource>,
     ): string | undefined => {
       // When the app is installed using org-wide deployment, team property will be null
       if (typeof bodyAs.team !== 'undefined' && bodyAs.team !== null) {

@@ -16,7 +16,7 @@ Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023
 
 When a builder adds (or later edits) your step in their workflow, your app will receive a [`workflow_step_edit` event](https://api.slack.com/reference/workflows/workflow_step_edit). The `edit` callback in your `WorkflowStep` configuration will be run when this event is received.
 
-Whether a builder is adding or editing a step, you need to send them a [step form app configuration modal](https://api.slack.com/reference/workflows/configuration-view). This modal is where step-specific settings are chosen, and it has more restrictions than typical modals—most notably, it cannot include `title​`, `submit​`, or `close`​ properties. By default, the configuration modal's `callback_id` will be the same as the step from app.
+Whether a builder is adding or editing a step, you need to send them a [step from app configuration modal](https://api.slack.com/reference/workflows/configuration-view). This modal is where step-specific settings are chosen, and it has more restrictions than typical modals—most notably, it cannot include `title​`, `submit​`, or `close`​ properties. By default, the configuration modal's `callback_id` will be the same as the step from app.
 
 Within the `edit` callback, the `configure()` utility can be used to easily open your step's configuration modal by passing in an object with your view's `blocks`. To disable saving the configuration before certain conditions are met, pass in `submit_disabled` with a value of `true`.
 
