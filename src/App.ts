@@ -1582,7 +1582,7 @@ function isBlockActionOrInteractiveMessageBody(
 
 // Returns either a bot token or a user token for client, say()
 function selectToken(context: Context): string | undefined {
-  return context.functionBotAccessToken ? context.functionBotAccessToken : context.botToken || context.userToken;
+  return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
 function buildRespondFn(

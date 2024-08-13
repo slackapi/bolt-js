@@ -14,25 +14,12 @@ import {
   FunctionExecutedEvent,
   SlackActionMiddlewareArgs,
   BlockAction,
-  FunctionInputs,
 } from './types';
 import processMiddleware from './middleware/process';
 import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';
 
 /** Interfaces */
 
-interface FunctionBlockAction extends BlockAction {
-  function_data: {
-    execution_id: string;
-    function: FunctionInputs;
-    inputs: FunctionInputs;
-  };
-  interactivity: {
-    interactor: unknown; // TODO :: replace
-    interactivity_pointer: string;
-  };
-
-}
 interface FunctionCompleteArguments {
   outputs?: {
     [key: string]: any;
@@ -57,8 +44,8 @@ export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewar
   fail: FunctionFailFn;
 }
 
-export interface CustomFunctionActionMiddlewareArgs extends SlackActionMiddlewareArgs<FunctionBlockAction> {
-  inputs: FunctionBlockAction['function_data']['inputs'];
+export interface CustomFunctionActionMiddlewareArgs extends SlackActionMiddlewareArgs<BlockAction> {
+  inputs: BlockAction['function_data']['inputs'];
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
 }
@@ -69,8 +56,9 @@ export type SlackCustomFunctionMiddlewareArgs =
   CustomFunctionExecuteMiddlewareArgs | CustomFunctionActionMiddlewareArgs;
 
 type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+type CustomFunctionActionMiddleware = Middleware<CustomFunctionActionMiddlewareArgs>[];
 
-export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+export type CustomFunctionMiddleware = CustomFunctionExecuteMiddleware | CustomFunctionActionMiddleware;
 
 export type AllCustomFunctionMiddlewareArgs
   <T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs> = T & AllMiddlewareArgs;
@@ -114,8 +102,8 @@ export class CustomFunction {
     if ('function' in args.payload) {
       return args.payload.function.callback_id === this.callbackId;
     }
-    if ('function_data' in args.payload) {
-      return args.payload.function_data.callback_id === this.callbackId;
+    if ('function_data' in args.body) {
+      return args.body.function_data.callback_id === this.callbackId;
     }
     return false;
   }

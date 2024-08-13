@@ -1,6 +1,7 @@
 import { PlainTextElement, Confirmation, Option, RichTextBlock } from '@slack/types';
 import { StringIndexed } from '../helpers';
 import { ViewOutput, ViewStateValue } from '../view';
+import { FunctionInputs } from '../events';
 
 /**
  * All known actions from in Slack's interactive elements
@@ -281,6 +282,17 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   enterprise?: {
     id: string;
     name: string;
+  };
+
+  // related to a function_executed event
+  function_data?: {
+    execution_id: string;
+    function: FunctionInputs;
+    inputs: FunctionInputs;
+  };
+  interactivity?: {
+    interactor: unknown; // TODO :: replace
+    interactivity_pointer: string;
   };
 }
 
