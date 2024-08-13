@@ -194,7 +194,7 @@ export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
 
 // Used only in this file
 type MessageEventMiddleware<
-  CustomContext extends StringIndexed = StringIndexed,
+    CustomContext extends StringIndexed = StringIndexed,
 > = Middleware<SlackEventMiddlewareArgs<'message'>, CustomContext>;
 
 class WebClientPool {
@@ -380,8 +380,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       this.developerMode &&
       this.installerOptions &&
       (typeof this.installerOptions.callbackOptions === 'undefined' ||
-        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
-          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+      (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+      typeof this.installerOptions.callbackOptions.failure === 'undefined'))
     ) {
       // add a custom failure callback for Developer Mode in case they are using OAuth
       this.logger.debug('adding Developer Mode custom OAuth failure handler');
@@ -509,7 +509,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register WorkflowStep middleware
    *
-   * @param workflowStep global step from app middleware function
+   * @param workflowStep global workflow step middleware function
    */
   public step(workflowStep: WorkflowStep): this {
     const m = workflowStep.getMiddleware();
@@ -542,22 +542,22 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   public event<
-    EventType extends string = string,
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+      EventType extends string = string,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public event<
-    EventType extends RegExp = RegExp,
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+      EventType extends RegExp = RegExp,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public event<
-    EventType extends EventTypePattern = EventTypePattern,
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+      EventType extends EventTypePattern = EventTypePattern,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventNameOrPattern: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
@@ -573,8 +573,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     if (invalidEventName) {
       throw new AppInitializationError(
         `Although the document mentions "${eventNameOrPattern}",` +
-        'it is not a valid event type. Use "message" instead. ' +
-        'If you want to filter message events, you can use event.channel_type for it.',
+          'it is not a valid event type. Use "message" instead. ' +
+          'If you want to filter message events, you can use event.channel_type for it.',
       );
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -591,7 +591,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param listeners Middlewares that process and react to a message event
    */
   public message<
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]): void;
   /**
    *
@@ -600,7 +600,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
   public message<
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     pattern: string | RegExp,
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
@@ -614,7 +614,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param listeners Middlewares that process and react to the message events that matched the provided pattern.
    */
   public message<
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
+      MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     filter: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
     pattern: string | RegExp,
@@ -653,7 +653,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any; // FIXME: workaround for TypeScript 4.7 breaking changes
 
     this.listeners.push([
@@ -980,7 +980,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           [payload] = actions;
           break;
         }
-      // If above conditional does not hit, fall through to fallback payload in default block below
+        // If above conditional does not hit, fall through to fallback payload in default block below
       default:
         payload = (bodyArg as (
           | Exclude<
@@ -1205,7 +1205,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
         'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
-        'custom receiver. You can find your Signing Secret in your Slack App Settings.',
+          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
       );
     }
     this.logger.debug('Initializing HTTPReceiver');
