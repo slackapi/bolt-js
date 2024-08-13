@@ -54,6 +54,7 @@ import {
   SlashCommand,
   WorkflowStepEdit,
   SlackOptions,
+  FunctionInputs,
 } from './types';
 import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
@@ -61,6 +62,7 @@ import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
+import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -108,6 +110,7 @@ export interface AppOptions {
   tokenVerificationEnabled?: boolean;
   deferInitialization?: boolean;
   extendedErrorHandler?: boolean;
+  attachFunctionToken?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -268,6 +271,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
   private initialized: boolean;
 
+  private attachFunctionToken: boolean;
+
   public constructor({
     signingSecret = undefined,
     endpoints = undefined,
@@ -300,6 +305,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     tokenVerificationEnabled = true,
     extendedErrorHandler = false,
     deferInitialization = false,
+    attachFunctionToken = true,
   }: AppOptions = {}) {
     /* ------------------------ Developer mode ----------------------------- */
     this.developerMode = developerMode;
@@ -331,6 +337,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.hasCustomErrorHandler = false;
     this.errorHandler = defaultErrorHandler(this.logger) as AnyErrorHandler;
     this.extendedErrorHandler = extendedErrorHandler;
+
+    // Override token with functionBotAccessToken in function-related handlers
+    this.attachFunctionToken = attachFunctionToken;
 
     /* ------------------------ Set client options ------------------------*/
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
@@ -494,6 +503,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
   }
 
+  public get webClientOptions(): WebClientOptions {
+    return this.clientOptions;
+  }
+
   /**
    * Register a new middleware, processed in the order registered.
    *
@@ -513,6 +526,16 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    */
   public step(workflowStep: WorkflowStep): this {
     const m = workflowStep.getMiddleware();
+    this.middleware.push(m);
+    return this;
+  }
+
+  /**
+ * Register CustomFunction middleware
+ */
+  public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
+    const fn = new CustomFunction(callbackId, listeners, this.webClientOptions);
+    const m = fn.getMiddleware();
     this.middleware.push(m);
     return this;
   }
@@ -946,6 +969,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       retryReason: event.retryReason,
     };
 
+    // Extract function-related information and augment context
+    const { functionExecutionId, functionBotAccessToken, functionInputs } = extractFunctionContext(body);
+    if (functionExecutionId) {
+      context.functionExecutionId = functionExecutionId;
+      if (functionInputs) { context.functionInputs = functionInputs; }
+    }
+
+    if (this.attachFunctionToken) {
+      if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
+    }
+
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = selectToken(context);
@@ -1001,6 +1035,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       /** Ack function might be set below */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ack?: AckFn<any>;
+      complete?: FunctionCompleteFn;
+      fail?: FunctionFailFn;
+      inputs?: FunctionInputs;
     } = {
       body: bodyArg,
       payload,
@@ -1055,6 +1092,13 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Get the client arg
     let { client } = this;
     const token = selectToken(context);
+
+    // Add complete() and fail() utilities for function-related interactivity
+    if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
+      listenerArgs.complete = CustomFunction.createFunctionComplete(context, client);
+      listenerArgs.fail = CustomFunction.createFunctionFail(context, client);
+      listenerArgs.inputs = context.functionInputs;
+    }
 
     if (token !== undefined) {
       let pool;
@@ -1560,6 +1604,27 @@ function escapeHtml(input: string | undefined | null): string {
       .replace(/'/g, '&#x27;');
   }
   return '';
+}
+
+function extractFunctionContext(body: StringIndexed) {
+  let functionExecutionId;
+  let functionBotAccessToken;
+  let functionInputs;
+
+  // function_executed event
+  if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
+    functionExecutionId = body.event.function_execution_id;
+    functionBotAccessToken = body.event.bot_access_token;
+  }
+
+  // interactivity (block_actions)
+  if (body.function_data) {
+    functionExecutionId = body.function_data.execution_id;
+    functionBotAccessToken = body.bot_access_token;
+    functionInputs = body.function_data.inputs;
+  }
+
+  return { functionExecutionId, functionBotAccessToken, functionInputs };
 }
 
 // ----------------------------

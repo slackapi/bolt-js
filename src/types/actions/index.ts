@@ -3,6 +3,8 @@ import { InteractiveMessage } from './interactive-message';
 import { WorkflowStepEdit } from './workflow-step-edit';
 import { DialogSubmitAction, DialogValidation } from './dialog-action';
 import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
+import { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
+import { FunctionInputs } from '../events';
 
 export * from './block-action';
 export * from './interactive-message';
@@ -42,9 +44,12 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
   action: this['payload'];
   body: Action;
   // all action types except dialog submission have a channel context
-  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : never;
+  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : undefined;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
+  complete?: FunctionCompleteFn;
+  fail?: FunctionFailFn;
+  inputs?: FunctionInputs;
 }
 
 /**

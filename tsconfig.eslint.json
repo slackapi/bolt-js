@@ -14,6 +14,7 @@
     ".eslintrc.js",
     "docs/**/*",
     "examples/**/*",
+    "types-tests/**/*"
   ],
   "exclude": [
     // Overwrite exclude from the base config to clear the value
@@ -21,6 +22,5 @@
     // Contains external module type definitions, which are not subject to this project's style rules
     "types/**/*",
     // Contain intentional type checking issues for the purpose of testing the typechecker's output
-    "types-tests/**/*"
   ]
 }
