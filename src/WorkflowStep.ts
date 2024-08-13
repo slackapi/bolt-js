@@ -341,7 +341,7 @@ function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteM
 }
 
 /**
- * `prepareStepArgs()` takes in a workflow step's args and:
+ * `prepareStepArgs()` takes in a step's args and:
  *  1. removes the next() passed in from App-level middleware processing
  *    - events will *not* continue down global middleware chain to subsequent listeners
  *  2. augments args with step lifecycle-specific properties/utilities

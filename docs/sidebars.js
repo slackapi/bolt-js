@@ -39,7 +39,7 @@ const sidebars = {
         'basic/options',
         'basic/authenticating-oauth',
         'basic/socket-mode'
-        ],
+      ],
     },
     {
       type: 'category',
@@ -78,7 +78,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Workflow steps (Deprecated)',
+      label: 'Steps from apps (Deprecated)',
       items: [
         'steps/steps',
         'steps/creating-steps',
@@ -87,7 +87,7 @@ const sidebars = {
         'steps/executing-steps',
       ],
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'category',
       label: 'Tutorials',
@@ -98,9 +98,9 @@ const sidebars = {
         'tutorial/migration-v3'
       ],
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     'reference',
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'link',
       label: 'Release notes',

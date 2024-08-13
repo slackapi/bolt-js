@@ -96,7 +96,7 @@ export interface ViewClosedAction {
 }
 
 /**
- * A Slack view_submission Workflow Step event
+ * A Slack view_submission step from app event
  *
  * This describes the additional JSON-encoded body details for a step's view_submission event
  */
@@ -112,7 +112,7 @@ export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
 }
 
 /**
- * A Slack view_closed Workflow Step event
+ * A Slack view_closed step from app event
  *
  * This describes the additional JSON-encoded body details for a step's view_closed event
  */
