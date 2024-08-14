@@ -977,8 +977,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     // Attach and make available the JIT/function-related token on context
-    if (this.attachFunctionToken) {
-      if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
+    if (this.attachFunctionToken && functionBotAccessToken) {
+      context.functionBotAccessToken = functionBotAccessToken;
     }
 
     // Factory for say() utility
@@ -1624,8 +1624,8 @@ function extractFunctionContext(body: StringIndexed) {
 
   // interactivity (block_actions)
   if (body.function_data) {
-    functionExecutionId = body.function_data.execution_id;
-    functionBotAccessToken = body.bot_access_token;
+    functionExecutionId = body.function_data.execution_id || functionExecutionId;
+    functionBotAccessToken = body.function_data.bot_access_token || functionBotAccessToken;
     functionInputs = body.function_data.inputs;
   }
 
