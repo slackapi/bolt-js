@@ -69,7 +69,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Workflow steps (Deprecated)',
+      label: 'Steps from apps (Deprecated)',
       items: [
         'steps/steps',
         'steps/creating-steps',

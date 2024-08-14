@@ -976,6 +976,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       if (functionInputs) { context.functionInputs = functionInputs; }
     }
 
+    // Attach and make available the JIT/function-related token on context
     if (this.attachFunctionToken) {
       if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
     }
@@ -1091,7 +1092,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Get the client arg
     let { client } = this;
-    const token = selectToken(context);
+
+    // If functionBotAccessToken exists on context, the incoming event is function-related *and* the
+    // user has `attachFunctionToken` enabled. In that case, subsequent calls with the client should
+    // use the function-related/JIT token in lieu of the botToken or userToken.
+    const token = context.functionBotAccessToken ? context.functionBotAccessToken : selectToken(context);
 
     // Add complete() and fail() utilities for function-related interactivity
     if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
