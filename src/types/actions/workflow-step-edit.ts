@@ -1,7 +1,7 @@
 /**
- * A Slack workflow step action wrapped in the standard metadata.
+ * A Slack step from app action wrapped in the standard metadata.
  *
- * This describes the entire JSON-encoded body of a request from Slack workflow step actions.
+ * This describes the entire JSON-encoded body of a request from Slack step from app actions.
  */
 export interface WorkflowStepEdit {
   type: 'workflow_step_edit';
