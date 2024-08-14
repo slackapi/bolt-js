@@ -16,7 +16,7 @@ Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023
 
 ---
 
-Steps from apps allow your app to create and process step that users can add using [Workflow Builder](https://api.slack.com/workflows).
+Steps from apps allow your app to create and process steps that users can add using [Workflow Builder](https://api.slack.com/workflows).
 
 A step from app is made up of three distinct user events:
 
