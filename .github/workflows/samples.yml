@@ -14,6 +14,7 @@ jobs:
         node-version: [18.x, 20.x, 22.x]
         sample:
           - slack-samples/bolt-ts-starter-template
+          - slack-samples/bolt-ts-custom-function-template
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
