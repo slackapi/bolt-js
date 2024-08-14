@@ -48,7 +48,7 @@
     "@types/express": "^4.16.1",
     "@types/promise.allsettled": "^1.0.3",
     "@types/tsscmp": "^1.0.0",
-    "axios": "^1.7.3",
+    "axios": "^1.7.4",
     "express": "^4.16.4",
     "path-to-regexp": "^6.2.1",
     "please-upgrade-node": "^3.2.0",
