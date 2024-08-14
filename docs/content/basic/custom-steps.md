@@ -79,7 +79,7 @@ You’ll notice in all interactivity handler examples, `ack()` is used. It is re
 
 ```js
 /** This sample custom step posts a message with a button */
-app.function('sample_custom_step', async ({ ack, client, inputs, fail, logger }) => {
+app.function('custom_step_button', async ({ ack, client, inputs, fail, logger }) => {
   try {
     await ack();
     const { user_id } = inputs;
@@ -141,9 +141,9 @@ definition
 ```json
 ...
 "functions": {
-    "sample_custom_step": {
-        "title": "Sample custom step",
-        "description": "Run a sample custom step",
+    "custom_step_button": {
+        "title": "Custom step with a button",
+        "description": "Custom step that waits for a button click",
         "input_parameters": {
             "user_id": {
                 "type": "slack#/types/user_id",
