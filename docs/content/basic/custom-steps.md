@@ -32,7 +32,7 @@ app.function('sample_custom_step', async ({ ack, inputs, complete, fail, logger 
 
 <details>
   <summary>
-  Listening to custom step actions
+  Listening to custom step interactivity events
   </summary>
   Your app can listen to user actions, like button clicks, created from `custom steps` using the `action` method.
   
