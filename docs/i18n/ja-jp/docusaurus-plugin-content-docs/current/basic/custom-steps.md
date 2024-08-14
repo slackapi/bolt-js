@@ -6,8 +6,8 @@ slug: /concepts/custom-steps
 
 Your app can use the `function()` method to listen to incoming [custom step requests](https://api.slack.com/automation/functions/custom-bolt). Custom steps are used in Workflow Builder to build workflows. The method requires a step `callback_id` of type string. This `callback_id` must also be defined in your [Function](https://api.slack.com/concepts/manifests#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
 
-* `complete()` requires one argument: an `outputs` object. It completes your custom step **successfully** and provides an object containing the outputs of your custom step as per its definition.
-* `fail()` requires **one** argument: `error` of type string. It completes your custom step **unsuccessfully** and provides a message containing information regarding why your custom step failed.
+* `complete()` requires one argument: an `outputs` object. It ends your custom step **successfully** and provides an object containing the outputs of your custom step as per its definition.
+* `fail()` requires **one** argument: `error` of type string. It ends your custom step **unsuccessfully** and provides a message containing information regarding why your custom step failed.
 
 You can reference your custom step's inputs using the `inputs` listener argument.
 
@@ -30,6 +30,39 @@ app.function('sample_custom_step', async ({ ack, inputs, complete, fail, logger 
 });
 ```
 
+<details>
+<summary>
+definition
+</summary>
+
+```json
+...
+"functions": {
+    "sample_custom_step": {
+        "title": "Sample custom step",
+        "description": "Run a sample custom step",
+        "input_parameters": {
+            "message": {
+                "type": "string",
+                "title": "Message",
+                "description": "A message to be formatted by a custom step",
+                "is_required": true,
+            }
+        },
+        "output_parameters": {
+            "message": {
+                "type": "string",
+                "title": "Messge",
+                "description": "A formatted message",
+                "is_required": true,
+            }
+        }
+    }
+}
+```
+
+</details>
+
 ---
 
 ### Listening to custom step interactivity events
@@ -46,7 +79,7 @@ You’ll notice in all interactivity handler examples, `ack()` is used. It is re
 
 ```js
 /** This sample custom step posts a message with a button */
-app.function('sample_function', async ({ ack, client, inputs, fail, logger }) => {
+app.function('custom_step_button', async ({ ack, client, inputs, fail, logger }) => {
   try {
     await ack();
     const { user_id } = inputs;
@@ -99,5 +132,38 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
   }
 });
 ```
+
+<details>
+<summary>
+definition
+</summary>
+
+```json
+...
+"functions": {
+    "custom_step_button": {
+        "title": "Custom step with a button",
+        "description": "Custom step that waits for a button click",
+        "input_parameters": {
+            "user_id": {
+                "type": "slack#/types/user_id",
+                "title": "User",
+                "description": "The recipient of a message with a button",
+                "is_required": true,
+            }
+        },
+        "output_parameters": {
+            "user_id": {
+                "type": "slack#/types/user_id",
+                "title": "User",
+                "description": "The user that completed the function",
+                "is_required": true
+            }
+        }
+    }
+}
+```
+
+</details>
 
 Learn more about responding to interactivity, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#interactivity).
