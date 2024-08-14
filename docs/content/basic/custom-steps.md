@@ -30,6 +30,39 @@ app.function('sample_custom_step', async ({ ack, inputs, complete, fail, logger 
 });
 ```
 
+<details>
+<summary>
+definition
+</summary>
+
+```json
+...
+"functions": {
+    "sample_custom_step": {
+        "title": "Sample custom step",
+        "description": "Run a sample custom step",
+        "input_parameters": {
+            "message": {
+                "type": "string",
+                "title": "Message",
+                "description": "A message to be formatted by a custom step",
+                "is_required": true,
+            }
+        },
+        "output_parameters": {
+            "message": {
+                "type": "string",
+                "title": "Messge",
+                "description": "A formatted message",
+                "is_required": true,
+            }
+        }
+    }
+}
+```
+
+</details>
+
 ---
 
 ### Listening to custom step interactivity events
@@ -46,7 +79,7 @@ You’ll notice in all interactivity handler examples, `ack()` is used. It is re
 
 ```js
 /** This sample custom step posts a message with a button */
-app.function('sample_function', async ({ ack, client, inputs, fail, logger }) => {
+app.function('sample_custom_step', async ({ ack, client, inputs, fail, logger }) => {
   try {
     await ack();
     const { user_id } = inputs;
@@ -99,5 +132,38 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
   }
 });
 ```
+
+<details>
+<summary>
+definition
+</summary>
+
+```json
+...
+"functions": {
+    "sample_custom_step": {
+        "title": "Sample custom step",
+        "description": "Run a sample custom step",
+        "input_parameters": {
+            "user_id": {
+                "type": "slack#/types/user_id",
+                "title": "User",
+                "description": "The recipient of a message with a button",
+                "is_required": true,
+            }
+        },
+        "output_parameters": {
+            "user_id": {
+                "type": "slack#/types/user_id",
+                "title": "User",
+                "description": "The user that completed the function",
+                "is_required": true
+            }
+        }
+    }
+}
+```
+
+</details>
 
 Learn more about responding to interactivity, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#interactivity).
