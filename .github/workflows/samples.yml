@@ -1,0 +1,42 @@
+# This workflow runs a TypeScript compilation against slack sample apps built on top of bolt-js
+name: Samples Integration Type-checking
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  samples:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        sample:
+          - slack-samples/bolt-ts-starter-template
+
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Checkout bolt-js
+        uses: actions/checkout@v4
+        with:
+          path: ./bolt-js
+      - name: Install and link bolt-js
+        working-directory: ./bolt-js
+        run: npm i && npm link .
+      - name: Checkout ${{ matrix.sample }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.sample }}
+          path: ./sample
+      - name: Install sample dependencies and link bolt-js
+        working-directory: ./sample
+        run: npm i && npm link @slack/bolt
+      - name: Compile sample
+        working-directory: ./sample
+        run: npx tsc
+
