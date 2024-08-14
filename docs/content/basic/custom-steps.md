@@ -13,9 +13,8 @@ You can reference your custom step's inputs using the `inputs` listener argument
 
 ```js
 // This sample custom step formats an input and outputs it
-app.function('sample_custom_step', async ({ ack, inputs, complete, fail, logger }) => {
+app.function('sample_custom_step', async ({ inputs, complete, fail, logger }) => {
   try {
-    await ack();
     const { message } = inputs;
 
     await complete({
@@ -32,7 +31,7 @@ app.function('sample_custom_step', async ({ ack, inputs, complete, fail, logger 
 
 <details>
 <summary>
-definition
+Example app manifest definition
 </summary>
 
 ```json
@@ -79,9 +78,8 @@ You’ll notice in all interactivity handler examples, `ack()` is used. It is re
 
 ```js
 /** This sample custom step posts a message with a button */
-app.function('custom_step_button', async ({ ack, client, inputs, fail, logger }) => {
+app.function('custom_step_button', async ({ client, inputs, fail, logger }) => {
   try {
-    await ack();
     const { user_id } = inputs;
 
     await client.chat.postMessage({
@@ -135,7 +133,7 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
 
 <details>
 <summary>
-definition
+Example app manifest definition
 </summary>
 
 ```json
