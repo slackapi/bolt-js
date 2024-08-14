@@ -38,7 +38,7 @@ app.function('sample_custom_step', async ({ ack, inputs, complete, fail, logger 
   
   Actions can be filtered on an `action_id` of type string or RegExp object. `action_id`s act as unique identifiers for interactive components on the Slack platform.
 
-  Your app can skip calling `complete()` or `fail()` in the `function()` listener if the custom step creates an `action` that waits for user interaction. However, in the `action()` method, your app must invoke `complete()` or `fail()` to notify Slack that the custom step has been processed.
+  Your app can skip calling `complete()` or `fail()` in the `function()` listener if the custom step creates an interaction point that requires user interaction before the step can complete. However, in the relevant interactivity handler method, your app must invoke `complete()` or `fail()` to notify Slack that the custom step has been processed.
 
   You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/concepts/acknowledge).
 
