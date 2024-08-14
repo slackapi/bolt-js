@@ -1625,7 +1625,7 @@ function extractFunctionContext(body: StringIndexed) {
   // interactivity (block_actions)
   if (body.function_data) {
     functionExecutionId = body.function_data.execution_id || functionExecutionId;
-    functionBotAccessToken = body.function_data.bot_access_token || functionBotAccessToken;
+    functionBotAccessToken = body.bot_access_token || functionBotAccessToken;
     functionInputs = body.function_data.inputs;
   }
 

@@ -126,10 +126,10 @@ describe('App function() and function_executed and function-scoped interactivity
     await fakeReceiver.sendEvent({
       body: {
         actions: [],
+        bot_access_token: 'xowfp',
         channel: { id: 'C1234' },
         function_data: {
           execution_id: 'Fx1234',
-          bot_access_token: 'xowfp',
           inputs: 'yo',
         },
         user: {
