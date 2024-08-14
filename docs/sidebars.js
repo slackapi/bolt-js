@@ -36,6 +36,7 @@ const sidebars = {
         'basic/updating-pushing-views',
         'basic/view-submissions',
         'basic/publishing-views',
+        'basic/custom-steps',
         'basic/options',
         'basic/authenticating-oauth',
         'basic/socket-mode'
@@ -64,16 +65,6 @@ const sidebars = {
       items: [
         'deployments/aws-lambda',
         'deployments/heroku'
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Custom functions (Beta)',
-      items: [
-        'custom-functions/creating-custom-functions',
-        'custom-functions/defining-custom-functions',
-        'custom-functions/listening-to-custom-functions',
-        'custom-functions/responding-to-interactivity',
       ],
     },
     {
