@@ -16,6 +16,8 @@ export type SlackEvent =
   | AppMentionEvent
   | AppRateLimitedEvent
   | AppUninstalledEvent
+  | AssistantThreadContextChangedEvent
+  | AssistantThreadStartedEvent
   | CallRejectedEvent
   | ChannelArchiveEvent
   | ChannelCreatedEvent
@@ -278,6 +280,29 @@ export interface AppRateLimitedEvent {
 
 export interface AppUninstalledEvent {
   type: 'app_uninstalled';
+}
+
+export interface AssistantThreadContextChangedEvent {
+  type: 'assistant_thread_context_changed';
+  assistant_thread: {
+    user_id: string;
+    context: {
+      channel_id: string;
+    };
+    channel_id: string;
+    thread_ts: string
+  };
+  event_ts: string;
+}
+
+export interface AssistantThreadStartedEvent {
+  type: 'assistant_thread_started';
+  assistant_thread: {
+    user_id: string;
+    context: string;
+    thread_ts: string;
+  },
+  event_ts: string;
 }
 
 export interface CallRejectedEvent {
