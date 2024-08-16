@@ -21,7 +21,7 @@ A useful trick for debugging inside tests is to use the Chrome Debugging Protoco
 
 ### Managing Documentation
 
-See the [`/docs/README.md`](./docs/README.md) file for documentation instructions. 
+See the [`/docs/README.md`](../docs/README.md) file for documentation instructions.
 
 If you're not touching the `/docs` folder, you don't need to worry about the docs setup affecting your PR.
 
