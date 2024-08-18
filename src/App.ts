@@ -104,7 +104,7 @@ export interface AppOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
-  clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
+  clientOptions?: Pick<WebClientOptions, 'slackApiUrl' | 'experimentalAxiosAdapter'>;
   socketMode?: boolean;
   developerMode?: boolean;
   tokenVerificationEnabled?: boolean;
@@ -363,6 +363,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.axios = axios.create({
       httpAgent: agent,
       httpsAgent: agent,
+      adapter: clientOptions?.experimentalAxiosAdapter ?? ['xhr', 'http', 'fetch'],
       // disabling axios' automatic proxy support:
       // axios would read from env vars to configure a proxy automatically, but it doesn't support TLS destinations.
       // for compatibility with https://api.slack.com, and for a larger set of possible proxies (SOCKS or other
