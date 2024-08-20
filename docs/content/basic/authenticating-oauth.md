@@ -48,7 +48,7 @@ You can skip rendering the provided default webpage and navigate users directly 
 
 :::
 
-- **Add to Slack**: The `Add to Slack` button initiates the OAuth process with Slack. After users have clicked Allow to grant your app permissions, Slack will call your app's **Redirect URI** (provided out-of-the-box), and prompt users to **Open Slack**. See the **Redirect URI** section below for customization options.
+- **Add to Slack**: The `Add to Slack` button initiates the OAuth process with Slack. After users have clicked Allow to grant your app permissions, Slack will call your app's **Redirect URL** (provided out-of-the-box), and prompt users to **Open Slack**. Read the [**Redirect URL**](#redirect-url) section for customization options.
 
 - **Open Slack**: After users **Open Slack**, and here after as your app processes events from Slack, your provided `installationStore`'s `fetchInstallation` and `storeInstallation` handlers will execute. See the **Installation Object** section below for more detail on arguments passed to those handlers.
 
@@ -62,13 +62,13 @@ Bolt for JavaScript does not support OAuth for [custom receivers](/concepts/rece
 
 ---
 
-## Redirect URI
+## Redirect URL
 
-Bolt for JavaScript provides a **Redirect URI Path** `/slack/oauth_redirect`. Slack uses the Redirect URI to redirect users after they complete an app's installation flow.
+Bolt for JavaScript provides a **Redirect URL Path** `/slack/oauth_redirect`. Slack uses the Redirect URL to redirect users after they complete an app's installation flow.
 
-You will need to add the full **Redirect URI** including your app domain in your Slack app configuration settings under **OAuth and Permissions**, e.g. `https://example.com/slack/oauth_redirect`.
+You will need to add the full **Redirect URL** including your app domain in your Slack [app settings][settings] under **OAuth and Permissions**, e.g. `https://example.com/slack/oauth_redirect`.
 
-To supply your own custom **Redirect URI**, you can set `redirectUri` in the App options and `installerOptions.redirectUriPath`. You must supply both, and the path must be consistent with the full URI.
+To supply your own custom **Redirect URL**, you can set `redirectUri` in the App options and `installerOptions.redirectUriPath`. You must supply both, and the path must be consistent with the full URL.
 
 ```javascript
 const app = new App({
@@ -281,4 +281,5 @@ const app = new App({
 ```
 
 </details>
+[settings]: https://api.slack.com/apps
 
