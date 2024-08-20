@@ -212,10 +212,9 @@ const app = new App({
 });
 ```
 
-<details>
-<summary>
-Customizing OAuth defaults
-</summary>
+---
+
+## Customizing OAuth defaults
 
 We provide several options for customizing default OAuth using the `installerOptions` object, which can be passed in during the initialization of `App`. You can override the following:
 
@@ -233,10 +232,10 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: [
-    "channels:read",
-    "groups:read",
     "channels:manage",
+    "channels:read",
     "chat:write",
+    "groups:read",
     "incoming-webhook",
   ],
   installerOptions: {
@@ -280,6 +279,4 @@ const app = new App({
 });
 ```
 
-</details>
 [settings]: https://api.slack.com/apps
-
