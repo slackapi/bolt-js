@@ -25,6 +25,7 @@
   --slack-dark-blue: #1264a3;
 
   --grey: #868686;
+  --dim: #eef2f6;
   --white: #ffffff;
 }
 
@@ -44,6 +45,7 @@ p a {
 
 /* adjusting for light and dark modes */
 [data-theme="light"] {
+  --docusaurus-highlighted-code-line-bg: var(--dim);
   --ifm-color-primary: var(--aubergine-active);
   --ifm-footer-background-color: var(--horchata);
   --slack-link: var(--slack-dark-blue);
