@@ -24,19 +24,21 @@ which you must store.
 
 The following `App` options are required for OAuth installations:
 
-- `clientId`: unique identifier of the application client.
-- `clientSecret`: secret value to confirm the client ID.
-- `stateSecret`: secret value used for [state verificiation][verification] of
-  authorization requests.
-- `scopes`: permissions requested for the `bot` user during installation.
-  [Explore scopes][scopes].
-- `installationStore`: handlers that store, fetch, and delete installation
-  information.
+- `clientId`: `string`. An application credential found on the **Basic
+  Information** page of your [app settings][app-settings].
+- `clientSecret`: `string`. A secret value to confirm the client ID.
+- `stateSecret`: `string`. A secret value used to
+  [generate and verify state][verification] parameters of authorization
+  requests.
+- `scopes`: `string[]`. Permissions requested for the `bot` user during
+  installation. [Explore scopes][scopes].
+- `installationStore`: [`InstallationStore`][installation-store]. Handlers that
+  store, fetch, and delete installation information.
 
 #### Development and testing
 
 Here we've provided a default implementation of the `installationStore` with
-[`FileInstallationStore`][store-file-installation] which can be useful when
+[`FileInstallationStore`][installation-store-file] which can be useful when
 developing and testing your app:
 
 ```javascript
@@ -67,22 +69,30 @@ We provide several options for customizing default OAuth using the
 `App`. You can override these common options and
 [find others here][install-provider-options]:
 
-- `authVersion`: Settings for either new Slack Apps (`v2`) or Classic Slack Apps
-  (`v1`). Default: `v2`.
-- `directInstall`: Skip the [default installation page][installation] at
-  `installPath`. Default: `false`.
-- `installPath`: Path of the URL for starting an installation. Default:
-  `/slack/install`.
-- `metadata`: Relevant session information passed between requests. Optional.
-- `redirectUriPath`: Path of the installation callback URL. Default:
+- `authVersion`: `string`. Settings for either new Slack apps (`v2`) or
+  "classic" Slack apps (`v1`). Most apps use `v2` since `v1` was available for a
+  Slack app model that can no longer be created. Default: `v2`.
+- `directInstall`: `boolean`. Skip rendering the
+  [installation page](#add-to-slack-button) at `installPath` and redirect to the
+  authorization URL instead. Default: `false`.
+- `installPath`: `string`. Path of the URL for starting an installation.
+  Default: `/slack/install`.
+- `metadata`: `string`. Static information shared between requests as install
+  URL options. Optional.
+- `redirectUriPath`: `string`. Path of the installation callback URL. Default:
   `/slack/oauth_redirect`.
-- `stateVerification`: Option to skip state verification for requests. Default:
-  `true`.
-- `userScopes`: User scopes to request during installation. Default: `[]`.
-- `callbackOptions`: Customized [responses to send][callbacks] during OAuth.
-  Default: [`CallbackOptions`][callback-options-default].
-- `stateStore`: Replace the `stateSecret` with a [custom state store][state].
-  Default: [`ClearStateStore`][state-clear].
+- `stateVerification`: `boolean`. Option to skip state verification for
+  requests. Default: `true`.
+- `userScopes`: `string[]`. User scopes to request during installation. Default:
+  `[]`.
+- `callbackOptions`: [`CallbackOptions`][callback-options]. Customized
+  [responses to send][callbacks] during OAuth.
+  [Default callbacks][callback-options-default].
+- `stateStore`: [`StateStore`][state-store]. Customized generator and validator
+  for [OAuth state parameters][state]; the default `ClearStateStore` should work
+  well for most scenarios. However, if you need even better security, storing
+  state parameter data with a server-side database would be a good approach.
+  Default: [`ClearStateStore`][state-store-clear].
 
 ```javascript
 const app = new App({
@@ -111,10 +121,10 @@ const app = new App({
      * Example pages to navigate to on certain callbacks.
      */
     callbackOptions: {
-      success: (installation, installOptions, req, res) => {
+      success: (installation, installUrlOptions, req, res) => {
         res.send("The installation succeeded!");
       },
-      failure: (error, installOptions, req, res) => {
+      failure: (error, installUrlOptions, req, res) => {
         res.send("Something strange happened...");
       },
     },
@@ -675,6 +685,7 @@ errors, but these often have meaning! Explore [the API documentation][errors]
 for additional details for common error codes.
 
 [add-to-slack]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/default-render-html-for-install-path.ts
+[app-settings]: https://api.slack.com/apps
 [authorization]: /concepts/authorization
 [callback-default-failure]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L127-L162
 [callback-default-success]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L125
@@ -687,8 +698,9 @@ for additional details for common error codes.
 [examples]: https://github.com/slackapi/bolt-js/tree/main/examples/oauth
 [generate-install-url]: https://slack.dev/node-slack-sdk/oauth/#showing-an-installation-page
 [install-provider-options]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/install-provider-options.ts
-[installation]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/default-render-html-for-install-path.ts
 [installation-page]: https://slack.dev/node-slack-sdk/oauth/#showing-an-installation-page
+[installation-store]: https://slack.dev/node-slack-sdk/reference/oauth/interfaces/InstallationStore
+[installation-store-file]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/installation-stores/file-store.ts
 [oauth-node]: https://slack.dev/node-slack-sdk/oauth
 [oauth-v2]: https://api.slack.com/authentication/oauth-v2
 [oidc]: https://slack.dev/node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
@@ -698,9 +710,9 @@ for additional details for common error codes.
 [settings]: https://api.slack.com/apps
 [siws]: https://api.slack.com/authentication/sign-in-with-slack
 [state]: https://slack.dev/node-slack-sdk/oauth#using-a-custom-state-store
-[state-clear]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/state-stores/clear-state-store.ts
+[state-store]: https://slack.dev/node-slack-sdk/reference/oauth/interfaces/StateStore
+[state-store-clear]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/state-stores/clear-state-store.ts
 [store]: https://slack.dev/node-slack-sdk/oauth#storing-installations-in-a-database
-[store-file-installation]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/installation-stores/file-store.ts
 [user-tokens]: https://api.slack.com/concepts/token-types#user
 [verification]: https://slack.dev/node-slack-sdk/oauth#state-verification
 [web-api]: https://slack.dev/node-slack-sdk/web-api
