@@ -308,7 +308,7 @@ const app = new App({
 
 Full reference reveals [these additional options][callback-options] but if no
 options are provided, the [`defaultCallbackSuccess`][callback-default-success]
-and [`defaultCallbackFailure`][callback-default-failure] are used.
+and [`defaultCallbackFailure`][callback-default-failure] callbacks are used.
 
 ### Workspace installations
 
