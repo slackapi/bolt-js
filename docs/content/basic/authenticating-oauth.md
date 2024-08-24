@@ -27,7 +27,7 @@ The following `App` options are required for OAuth installations:
 - `clientId`: unique identifier of the application client.
 - `clientSecret`: secret value to confirm the client ID.
 - `stateSecret`: secret value used for [state verificiation][verification] of
-  authentication requests.
+  authorization requests.
 - `scopes`: permissions requested for the `bot` user during installation.
   [Explore scopes][scopes].
 - `installationStore`: handlers that store, fetch, and delete installation
