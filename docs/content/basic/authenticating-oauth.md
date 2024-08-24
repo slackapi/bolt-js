@@ -16,7 +16,7 @@ All of the additional underlying details around authentications can be found at
 
 To set your Slack app up for distribution, you will need to enable Bolt OAuth
 and store installation information securely. Bolt supports OAuth by using
-[`@slack/oauth`][oauth-node] to handle most of the work; this includes setting
+the [`@slack/oauth`][oauth-node] package to handle most of the work; this includes setting
 up OAuth routes, state verification, and passing your app an installation object
 which you must store.
 
@@ -403,9 +403,9 @@ const app = new App({
 });
 ```
 
-Lookups for `fetchInstallation` happen as part of the built-in
+Lookups for the `fetchInstallation` handler happen as part of the built-in
 [`authorization`][authorization] of incoming events and provides app listeners
-with the `context.botToken` for convenient use.
+with the `context.botToken` object for convenient use.
 
 <details>
   <summary>Example database object</summary>
@@ -473,12 +473,12 @@ Most OAuth processes remain the same, but the
 }
 ```
 
-Successful `fetchInstallation` lookups will also include the `context.userToken`
+Successful `fetchInstallation` lookups will also include the `context.userToken` object
 associated with the received event in the app listener arguments.
 
 :::note
 
-The `tokenType` remains `"bot"` while `scopes` are requested, even with the
+The `tokenType` value remains `"bot"` while `scopes` are requested, even with the
 included `userScopes`. This suggests `bot` details exist, and is `undefined`
 along with the `bot` if no bot `scopes` are requested.
 
@@ -547,9 +547,9 @@ or `false`:
 }
 ```
 
-Apps installed org-wide will receive `isEnterpriseInstall` as `true`, but apps
+Apps installed org-wide will receive the `isEnterpriseInstall` parameter as `true`, but apps
 could also still be installed to individual workspaces in organizations. These
-apps receive installation information for both the `team` and `enterprise`:
+apps receive installation information for both the `team` and `enterprise` parameters:
 
 ```javascript
 {
