@@ -9,15 +9,15 @@ in distributing your app. For each completed authentication process, you receive
 unique [access tokens and related information](#the-installation-object) that
 can be retrieved for incoming events and used to make scoped API requests.
 
-All of the additional underlying details around authentications can be found at
-[api.slack.com/authentication/oauth-v2][oauth-v2]!
+All of the additional underlying details around authentications can be found within
+[the Slack API documentation][oauth-v2]!
 
 ## Configuring the application
 
 To set your Slack app up for distribution, you will need to enable Bolt OAuth
 and store installation information securely. Bolt supports OAuth by using
 the [`@slack/oauth`][oauth-node] package to handle most of the work; this includes setting
-up OAuth routes, state verification, and passing your app an installation object
+up OAuth routes, verifying state, and passing your app an installation object
 which you must store.
 
 ### App options
@@ -247,7 +247,7 @@ links to the authorization page!
 
 :::note
 
-Authorization requests with changed or additional scops require
+Authorization requests with changed or additional scopes require
 [generating a unique authorization URL](#extra-authorizations).
 
 :::
