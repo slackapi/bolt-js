@@ -9,16 +9,16 @@ in distributing your app. For each completed authentication process, you receive
 unique [access tokens and related information](#the-installation-object) that
 can be retrieved for incoming events and used to make scoped API requests.
 
-All of the additional underlying details around authentications can be found within
-[the Slack API documentation][oauth-v2]!
+All of the additional underlying details around authentications can be found
+within [the Slack API documentation][oauth-v2]!
 
 ## Configuring the application
 
 To set your Slack app up for distribution, you will need to enable Bolt OAuth
-and store installation information securely. Bolt supports OAuth by using
-the [`@slack/oauth`][oauth-node] package to handle most of the work; this includes setting
-up OAuth routes, verifying state, and passing your app an installation object
-which you must store.
+and store installation information securely. Bolt supports OAuth by using the
+[`@slack/oauth`][oauth-node] package to handle most of the work; this includes
+setting up OAuth routes, verifying state, and passing your app an installation
+object which you must store.
 
 ### App options
 
@@ -473,13 +473,13 @@ Most OAuth processes remain the same, but the
 }
 ```
 
-Successful `fetchInstallation` lookups will also include the `context.userToken` object
-associated with the received event in the app listener arguments.
+Successful `fetchInstallation` lookups will also include the `context.userToken`
+object associated with the received event in the app listener arguments.
 
 :::note
 
-The `tokenType` value remains `"bot"` while `scopes` are requested, even with the
-included `userScopes`. This suggests `bot` details exist, and is `undefined`
+The `tokenType` value remains `"bot"` while `scopes` are requested, even with
+the included `userScopes`. This suggests `bot` details exist, and is `undefined`
 along with the `bot` if no bot `scopes` are requested.
 
 :::
@@ -547,9 +547,10 @@ or `false`:
 }
 ```
 
-Apps installed org-wide will receive the `isEnterpriseInstall` parameter as `true`, but apps
-could also still be installed to individual workspaces in organizations. These
-apps receive installation information for both the `team` and `enterprise` parameters:
+Apps installed org-wide will receive the `isEnterpriseInstall` parameter as
+`true`, but apps could also still be installed to individual workspaces in
+organizations. These apps receive installation information for both the `team`
+and `enterprise` parameters:
 
 ```javascript
 {
@@ -564,8 +565,9 @@ apps receive installation information for both the `team` and `enterprise` param
 ##### The org-wide `installQuery` object
 
 This `installQuery` object provided to the `fetchInstallation` and
-`deleteInstallation` handlers is the same as ever, but now with an additional value, `enterpriseId`, defined and
-another possible `true` or `false` value for `isEnterpriseInstall`:
+`deleteInstallation` handlers is the same as ever, but now with an additional
+value, `enterpriseId`, defined and another possible `true` or `false` value for
+`isEnterpriseInstall`:
 
 ```javascript
 {
@@ -671,7 +673,8 @@ If you need additional authorizations, such as user tokens from users of a team
 where your app is already installed, or have a reason to dynamically generate an
 install URL, an additional installation is required.
 
-Generating a new installation URL requires a few steps: 
+Generating a new installation URL requires a few steps:
+
 1. Manually instantiate an `ExpressReceiver` instance.
 2. Assign the instance to a variable named `receiver`.
 3. Call the `receiver.installer.generateInstallUrl()` function.
