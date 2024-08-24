@@ -564,7 +564,7 @@ apps receive installation information for both the `team` and `enterprise` param
 ##### The org-wide `installQuery` object
 
 This `installQuery` object provided to the `fetchInstallation` and
-`deleteInstallation` handlers is familiar but with an `enterpriseId` defined and
+`deleteInstallation` handlers is the same as ever, but now with an additional value, `enterpriseId`, defined and
 another possible `true` or `false` value for `isEnterpriseInstall`:
 
 ```javascript
@@ -671,9 +671,10 @@ If you need additional authorizations, such as user tokens from users of a team
 where your app is already installed, or have a reason to dynamically generate an
 install URL, an additional installation is required.
 
-Generating a new installation URL requires a few steps: manually instantiate an
-`ExpressReceiver`, assign the instance to a variable named `receiver`, and then
-call `receiver.installer.generateInstallUrl()`.
+Generating a new installation URL requires a few steps: 
+1. Manually instantiate an `ExpressReceiver` instance.
+2. Assign the instance to a variable named `receiver`.
+3. Call the `receiver.installer.generateInstallUrl()` function.
 
 Read more about `generateInstallUrl()` in the
 [OAuth docs][generate-install-url].
