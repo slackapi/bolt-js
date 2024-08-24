@@ -4,10 +4,7 @@ lang: en
 slug: /concepts/authenticating-oauth
 ---
 
-OAuth allows installation of your app to any workspace and is an important step
-in distributing your app. For each completed authentication process, you receive
-unique [access tokens and related information](#the-installation-object) that
-can be retrieved for incoming events and used to make scoped API requests.
+OAuth allows installation of your app to any workspace and is an important step in distributing your app. For each completed authentication process, you receive unique [access tokens and related information](#the-installation-object) that can be retrieved for incoming events and used to make scoped API requests.
 
 All of the additional underlying details around authentications can be found
 within [the Slack API documentation][oauth-v2]!
