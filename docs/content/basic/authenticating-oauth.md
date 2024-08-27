@@ -412,11 +412,11 @@ For quick testing purposes, the following might be interesting:
 ```javascript
 const database = {
   store: {},
-  async get(key) {
-    return this.store[key];
-  },
   async delete(key) {
     delete this.store[key];
+  },
+  async get(key) {
+    return this.store[key];
   },
   async set(key, value) {
     this.store[key] = value;
