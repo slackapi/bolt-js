@@ -328,7 +328,7 @@ workspace team, the `installation` object resembles the following:
 {
   team: { id: "T012345678", name: "example-team-name" },
   enterprise: undefined,
-  user: { token: undefined, scopes: undefined, id: "U01234567" },
+  user: { token: undefined, scopes: undefined, id: "U012345678" },
   tokenType: "bot",
   isEnterpriseInstall: false,
   appId: "A01234567",
@@ -338,7 +338,7 @@ workspace team, the `installation` object resembles the following:
       "chat:write",
     ],
     token: "xoxb-244493-28*********-********************",
-    userId: "U012345678",
+    userId: "U001111000",
     id: "B01234567"
   }
 }
@@ -462,7 +462,7 @@ Most OAuth processes remain the same, but the
   user: {
     token: "xoxp-314159-26*********-********************",
     scopes: ["chat:write"],
-    id: "U01234567"
+    id: "U012345678"
   },
   tokenType: "bot",
   appId: "A01234567",
