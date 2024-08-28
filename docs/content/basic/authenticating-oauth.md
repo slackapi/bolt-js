@@ -59,7 +59,7 @@ You can skip rendering the provided default webpage and navigate users directly 
 
 * **Open Slack**: After users **Open Slack**, as your app processes events from Slack, your provided `installationStore`'s `fetchInstallation` and `storeInstallation` handlers will execute to store and retrieve workspace-specific access tokens as needed. See the **Installation Object** section below for more detail on arguments passed to those handlers.  
 
-* If you need additional authorizations/permissions (such as user scopes/tokens) from users inside a team when your app is already installed, or have a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the ["Manually generating installation page URL" detail section of the OAuth docs](https://slack.dev/node-slack-sdk/oauth#using-handleinstallpath).
+* If you need additional authorizations/permissions (such as user scopes and tokens) from users inside a team when your app is already installed, or have a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the ["Manually generating installation page URL" section of the OAuth docs](https://slack.dev/node-slack-sdk/oauth#using-handleinstallpath).
 
 :::info 
 
