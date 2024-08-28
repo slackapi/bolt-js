@@ -22,7 +22,7 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  stateSecret: 'my-state-secret',
+  stateSecret: process.env.SLACK_STATE_SECRET,
   scopes: ['channels:history', 'chat:write', 'commands'],
   installationStore: new FileInstallationStore(),
 });
@@ -55,7 +55,7 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  stateSecret: 'my-state-secret',
+  stateSecret: process.env.SLACK_STATE_SECRET,
   scopes: ['chat:write'],
   redirectUri: 'https://example.com/slack/redirect', // ここに設定します
   installerOptions: {
@@ -127,7 +127,7 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  stateSecret: 'my-state-secret',
+  stateSecret: process.env.SLACK_STATE_SECRET,
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
     storeInstallation: async (installation) => {

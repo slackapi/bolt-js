@@ -37,6 +37,7 @@ export APP_TOKEN=YOUR_SLACK_APP_TOKEN
 // if using OAuth, also export the following
 export CLIENT_ID=YOUR_SLACK_CLIENT_ID
 export CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
+export STATE_SECRET=YOUR_STATE_SECRET
 ```
 
 ## Run the App
