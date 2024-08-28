@@ -23,7 +23,8 @@ The following `App` options are required for OAuth installations:
 
 - `clientId`: `string`. An application credential found on the **Basic
   Information** page of your [app settings][app-settings].
-- `clientSecret`: `string`. A secret value to confirm the client ID.
+- `clientSecret`: `string`. A secret value also found on the **Basic
+  Information** page of your [app settings][app-settings].
 - `stateSecret`: `string`. A secret value used to
   [generate and verify state][verification] parameters of authorization
   requests.
@@ -78,8 +79,10 @@ We provide several options for customizing default OAuth using the
   URL options. Optional.
 - `redirectUriPath`: `string`. Path of the installation callback URL. Default:
   `/slack/oauth_redirect`.
-- `stateVerification`: `boolean`. Option to skip state verification for
-  requests. Default: `true`.
+- `stateVerification`: `boolean`. Option to customize the state verification
+  logic. When set to `false`, the app does not verify the state parameter. While
+  not recommended for general OAuth security, some apps might want to skip this
+  for internal installations within an enterprise grid org. Default: `true`.
 - `userScopes`: `string[]`. User scopes to request during installation. Default:
   `[]`.
 - `callbackOptions`: [`CallbackOptions`][callback-options]. Customized
