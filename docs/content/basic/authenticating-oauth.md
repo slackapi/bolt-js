@@ -23,7 +23,7 @@ Check out the following examples in the bolt-js project for code samples:
 
 ## Development and Testing
 
-We've provided a default implementation of the `installationStore` - `FileInstallationStore` - which you can use during app development and testing.
+We've provided a default implementation of the `installationStore` option — `FileInstallationStore` — which you can use during app development and testing.
 
 ```javascript
 const { App } = require('@slack/bolt');
