@@ -39,7 +39,7 @@ const socketModeReceiver = new SocketModeReceiver({
   // OAuth フローの実装を合わせて使う場合は、以下を有効にしてください
   // clientId: process.env.CLIENT_ID,
   // clientSecret: process.env.CLIENT_SECRET,
-  // stateSecret: 'my-state-secret',
+  // stateSecret: process.env.SLACK_STATE_SECRET,
   // scopes: ['channels:read', 'chat:write', 'app_mentions:read', 'channels:manage', 'commands'],
 });
 
