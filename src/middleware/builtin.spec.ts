@@ -4,20 +4,23 @@ import sinon from 'sinon';
 import rewiremock from 'rewiremock';
 import { Logger } from '@slack/logger';
 import { WebClient } from '@slack/web-api';
+import {
+  AppHomeOpenedEvent,
+  AppMentionEvent,
+  GenericMessageEvent,
+  MessageEvent,
+  SlackEvent,
+} from '@slack/types';
 import { ErrorCode } from '../errors';
 import { Override, createFakeLogger } from '../test-helpers';
 import {
   SlackEventMiddlewareArgs,
   NextFn,
   Context,
-  SlackEvent,
-  MessageEvent,
   SlackCommandMiddlewareArgs,
 } from '../types';
 import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
 import { SlashCommand } from '../types/command';
-import { AppMentionEvent, AppHomeOpenedEvent } from '../types/events';
-import { GenericMessageEvent } from '../types/events/message-events';
 
 // Test fixtures
 const validCommandPayload: SlashCommand = {
