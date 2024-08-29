@@ -3,10 +3,13 @@ const { App, LogLevel } = require('@slack/bolt');
 const databaseData = {};
 const database = {
   set: async (key, data) => {
-    databaseData[key] = data
+    databaseData[key] = data;
   },
   get: async (key) => {
     return databaseData[key];
+  },
+  delete: async (key) => {
+    delete databaseData[key];
   },
 };
 
