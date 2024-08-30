@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { WorkflowStepExecuteEvent } from '@slack/types';
 import {
   KnownBlock,
   Block,
@@ -17,7 +18,6 @@ import {
   Context,
   SlackEventMiddlewareArgs,
   ViewWorkflowStepSubmitAction,
-  WorkflowStepExecuteEvent,
 } from './types';
 import processMiddleware from './middleware/process';
 import { WorkflowStepInitializationError } from './errors';

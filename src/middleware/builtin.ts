@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/dot-notation */
-
+import { SlackEvent } from '@slack/types';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -9,7 +9,6 @@ import {
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
-  SlackEvent,
   SlackAction,
   SlackShortcut,
   SlashCommand,
