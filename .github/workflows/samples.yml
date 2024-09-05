@@ -20,8 +20,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - uses: actions/checkout@v4
-      - name: Link bolt-js
-        run: npm link .
+      - name: Install dependencies and link bolt-js
+        run: npm i && npm link .
       - name: Install example dependencies and link bolt-js
         working-directory: ${{ matrix.example }}
         run: npm i && npm link @slack/bolt
