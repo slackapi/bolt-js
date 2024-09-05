@@ -88,7 +88,7 @@ const whenSeptemberEnds = '1569887999';
 app.message('wake me up', async ({ message, client, logger }) => {
   try {
     // Call chat.scheduleMessage with the built-in client
-    const result = await client.chat.scheduleMessage({
+    await client.chat.scheduleMessage({
       channel: message.channel,
       post_at: whenSeptemberEnds,
       text: 'Summer has come and passed',
@@ -131,7 +131,11 @@ app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
 app.action('approve_button', async ({ ack, say }) => {
   // Acknowledge action request
   await ack();
-  await say('Request approved 👍');
+  // `say` is possibly undefined because an action could come from a surface where we cannot post message, e.g. a view.
+  // we will use a non-null assertion (!) to tell TypeScript to ignore the fact it may be undefined,
+  // but take care about the originating surface for these events when using these utilities!
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await say!('Request approved 👍');
 });
 
 (async () => {
