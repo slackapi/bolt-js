@@ -299,7 +299,7 @@ export interface AssistantThreadStartedEvent {
   type: 'assistant_thread_started';
   assistant_thread: {
     user_id: string;
-    context: string;
+    context: string; // TODO :: verify what this is
     thread_ts: string;
   },
   event_ts: string;
