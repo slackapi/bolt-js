@@ -95,7 +95,7 @@ const sidebars = {
     {
       type: 'link',
       label: 'Release notes',
-      href: 'https://github.com/slackapi/bolt-python/releases',
+      href: 'https://github.com/slackapi/bolt-js/releases',
     },
     {
       type: 'link',
