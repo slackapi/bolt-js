@@ -288,6 +288,8 @@ export interface AssistantThreadContextChangedEvent {
     user_id: string;
     context: {
       channel_id: string;
+      team_id: string;
+      enterprise_id: string;
     };
     channel_id: string;
     thread_ts: string
@@ -299,7 +301,12 @@ export interface AssistantThreadStartedEvent {
   type: 'assistant_thread_started';
   assistant_thread: {
     user_id: string;
-    context: string; // TODO :: verify what this is
+    context: {
+      channel_id: string;
+      team_id: string;
+      enterprise_id: string;
+    };
+    channel_id: string;
     thread_ts: string;
   },
   event_ts: string;
