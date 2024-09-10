@@ -4,18 +4,18 @@ import processMiddleware from './middleware/process';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
 
 export type AssistantThreadStartedMiddleware = Middleware<AssistantThreadStartedMiddlewareArgs>;
-export type AssistantContextChangedMiddleware = Middleware<AssistantContextChangedMiddlewareArgs>;
-// export type AssistantUserMessageMiddleware = Middleware<AssistantUserMessageMiddlewareArgs>;
+export type AssistantThreadContextChangedMiddleware = Middleware<AssistantThreadContextChangedMiddlewareArgs>;
+export type AssistantUserMessageMiddleware = Middleware<AssistantUserMessageMiddlewareArgs>;
 
 export type AssistantMiddlewareArgs =
   | AssistantThreadStartedMiddlewareArgs
-  | AssistantContextChangedMiddlewareArgs;
-  // | AssistantUserMessageMiddlewareArgs;
+  | AssistantThreadContextChangedMiddlewareArgs
+  | AssistantUserMessageMiddlewareArgs;
 
 export type AssistantMiddleware =
   | AssistantThreadStartedMiddleware[]
-  | AssistantContextChangedMiddleware[];
-  // | AssistantUserMessageMiddleware[];
+  | AssistantThreadContextChangedMiddleware[]
+  | AssistantUserMessageMiddleware[];
 
 export interface AssistantThreadStartedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_started'> {
   setStatus: SetStatusFn;
@@ -23,22 +23,22 @@ export interface AssistantThreadStartedMiddlewareArgs extends SlackEventMiddlewa
   setTitle: SetTitleFn;
 }
 
-export interface AssistantContextChangedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_context_changed'> {
+export interface AssistantThreadContextChangedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_context_changed'> {
   setStatus: SetStatusFn;
   setSuggestedPrompts: SetSuggestedPromptsFn;
   setTitle: SetTitleFn;
 }
 
-// export interface AssistantUserMessageMiddlewareArgs extends SlackEventMiddlewareArgs<'message'> {
-//   setStatus: SetStatusFn;
-//   setSuggestedPrompts: SetSuggestedPromptsFn;
-//   setTitle: SetTitleFn;
-// }
+export interface AssistantUserMessageMiddlewareArgs extends SlackEventMiddlewareArgs<'message'> {
+  setStatus: SetStatusFn;
+  setSuggestedPrompts: SetSuggestedPromptsFn;
+  setTitle: SetTitleFn;
+}
 
 export interface AssistantConfig {
   threadStarted: AssistantThreadStartedMiddleware | AssistantThreadStartedMiddleware[];
-  contextChanged: AssistantContextChangedMiddleware | AssistantContextChangedMiddleware[];
-  // userMessage: AssistantUserMessageMiddleware | AssistantUserMessageMiddleware[];
+  threadContextChanged: AssistantThreadContextChangedMiddleware | AssistantThreadContextChangedMiddleware[];
+  userMessage: AssistantUserMessageMiddleware | AssistantUserMessageMiddleware[];
 }
 
 export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> =
@@ -81,24 +81,24 @@ export default class Assistant {
   private threadStarted: AssistantThreadStartedMiddleware[];
 
   /** 'assistant_thread_context_changed' */
-  private contextChanged: AssistantContextChangedMiddleware[];
+  private threadContextChanged: AssistantThreadContextChangedMiddleware[];
 
   /** 'assistant_thread_started' */
-  // private userMessage: AssistantUserMessageMiddleware[];
+  private userMessage: AssistantUserMessageMiddleware[];
 
   public constructor(config: AssistantConfig) {
     // validate(config);
 
-    const { threadStarted, contextChanged } = config;
+    const { threadStarted, threadContextChanged, userMessage } = config;
 
     this.threadStarted = Array.isArray(threadStarted) ? threadStarted : [threadStarted];
-    this.contextChanged = Array.isArray(contextChanged) ? contextChanged : [contextChanged];
-    // this.userMessage = Array.isArray(userMessage) ? userMessage : [userMessage];
+    this.threadContextChanged = Array.isArray(threadContextChanged) ? threadContextChanged : [threadContextChanged];
+    this.userMessage = Array.isArray(userMessage) ? userMessage : [userMessage];
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
     return async (args): Promise<any> => {
-      if (isAssistantEvent(args)) return this.processEvent(args);
+      if (isAssistantEvent(args) && matchesConstraints(args)) return this.processEvent(args);
       return args.next();
     };
   }
@@ -116,27 +116,22 @@ export default class Assistant {
       case 'assistant_thread_started':
         return this.threadStarted;
       case 'assistant_thread_context_changed':
-        return this.contextChanged;
-      // case 'message':
-      //   return this.userMessage;
+        return this.threadContextChanged;
+      case 'message':
+        return this.userMessage;
       default:
         return [];
     }
   }
 }
 
-export function isAssistantEvent(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
+export function isAssistantEvent(args: AnyMiddlewareArgs): boolean {
   return VALID_PAYLOAD_TYPES.has(args.payload.type);
 }
 
-// function matchesConstraints(): boolean {
-// function matchesConstraints(args: AssistantMiddlewareArgs): boolean {
-//   if (args.payload.type === 'message') {
-//     return (args.payload.channel_type === 'im') &&
-//     (!args.payload.subtype || args.payload.subtype === 'file_share');
-//   }
-//   return false;
-// }
+function matchesConstraints(args: AssistantMiddlewareArgs): boolean {
+  return args.payload.type === 'message' && args.payload.channel_type === 'im';
+}
 
 /**
  * `prepareAssistantArgs()` takes in a step's args and:
@@ -150,19 +145,12 @@ export function prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
 
   switch (preparedArgs.payload.type) {
     case 'assistant_thread_started':
-      preparedArgs.thread = assistantArgs.assistant_thread;
-      preparedArgs.setTitle = createSetTitle(preparedArgs);
-      preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
-      preparedArgs.setStatus = createSetStatus(preparedArgs);
-      break;
     case 'assistant_thread_context_changed':
-      preparedArgs.thread = assistantArgs.assistant_thread;
+    case 'message':
       preparedArgs.setTitle = createSetTitle(preparedArgs);
       preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
       preparedArgs.setStatus = createSetStatus(preparedArgs);
       break;
-    // case 'message':
-    //   break;
     default:
       break;
   }
@@ -196,17 +184,15 @@ function selectToken(context: Context): string | undefined {
 
 /**
  * Factory for `setStatus()` utility
- * @param args assistant_thread_started, assistant_thread_context_changed events
  */
 function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const {
     context,
     client,
-    payload: {
-      assistant_thread: { channel_id, thread_ts },
-    },
+    payload,
   } = args;
   const token = selectToken(context);
+  const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetStatusFn>[0]) => {
     const { status } = params;
@@ -221,23 +207,21 @@ function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
 
 /**
  * Factory for `setSuggestedPrompts()` utility
- * @param args assistant_thread_started, assistant_thread_context_changed events
  */
 function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggestedPromptsFn {
   const {
     context,
     client,
-    payload: {
-      assistant_thread: { user_id, thread_ts },
-    },
+    payload
   } = args;
   const token = selectToken(context);
+  const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
     const { prompts, title = '' } = params; // TODO :: conditionally pass title
     return client.assistant.threads.setSuggestedPrompts({
       token,
-      channel_id: user_id,
+      channel_id,
       prompts,
       title,
       thread_ts,
@@ -247,17 +231,15 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
 
 /**
  * Factory for `setTitle()` utility
- * @param args assistant_thread_started, assistant_thread_context_changed events
  */
 function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   const {
     context,
     client,
-    payload: {
-      assistant_thread: { channel_id, thread_ts },
-    },
+    payload
   } = args;
   const token = selectToken(context);
+  const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetTitleFn>[0]) => {
     const { title } = params;
@@ -268,4 +250,18 @@ function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
       thread_ts,
     });
   };
+}
+
+function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']) {
+  let channelId: string, threadTs: string;
+
+  if ("assistant_thread" in payload) {
+    channelId = payload.assistant_thread.channel_id;
+    threadTs = payload.assistant_thread.thread_ts;
+  } else { // message
+    channelId = payload.channel;
+    threadTs = payload.thread_ts;
+  }
+
+  return { channelId, threadTs };
 }
