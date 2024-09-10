@@ -17,6 +17,9 @@ export function isCodedError(err: any): err is CodedError {
 
 export enum ErrorCode {
   AppInitializationError = 'slack_bolt_app_initialization_error',
+
+  AssistantInitializationError = 'slack_bolt_assistant_initialization_error',
+
   AuthorizationError = 'slack_bolt_authorization_error',
 
   ContextMissingPropertyError = 'slack_bolt_context_missing_property_error',
@@ -67,6 +70,10 @@ export function asCodedError(error: CodedError | Error): CodedError {
 
 export class AppInitializationError extends Error implements CodedError {
   public code = ErrorCode.AppInitializationError;
+}
+
+export class AssistantInitializationError extends Error implements CodedError {
+  public code = ErrorCode.AssistantInitializationError;
 }
 
 export class AuthorizationError extends Error implements CodedError {

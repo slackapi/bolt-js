@@ -2,50 +2,42 @@
 import { WebAPICallResult } from '@slack/web-api';
 import processMiddleware from './middleware/process';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
+import { AssistantInitializationError } from './errors';
 
 export type AssistantThreadStartedMiddleware = Middleware<AssistantThreadStartedMiddlewareArgs>;
 export type AssistantThreadContextChangedMiddleware = Middleware<AssistantThreadContextChangedMiddlewareArgs>;
 export type AssistantUserMessageMiddleware = Middleware<AssistantUserMessageMiddlewareArgs>;
-
-export type AssistantMiddlewareArgs =
-  | AssistantThreadStartedMiddlewareArgs
-  | AssistantThreadContextChangedMiddlewareArgs
-  | AssistantUserMessageMiddlewareArgs;
 
 export type AssistantMiddleware =
   | AssistantThreadStartedMiddleware[]
   | AssistantThreadContextChangedMiddleware[]
   | AssistantUserMessageMiddleware[];
 
-export interface AssistantThreadStartedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_started'> {
-  setStatus: SetStatusFn;
-  setSuggestedPrompts: SetSuggestedPromptsFn;
-  setTitle: SetTitleFn;
-}
+export type AssistantMiddlewareArgs =
+  | AssistantThreadStartedMiddlewareArgs
+  | AssistantThreadContextChangedMiddlewareArgs
+  | AssistantUserMessageMiddlewareArgs;
 
-export interface AssistantThreadContextChangedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_context_changed'> {
-  setStatus: SetStatusFn;
-  setSuggestedPrompts: SetSuggestedPromptsFn;
-  setTitle: SetTitleFn;
-}
-
-export interface AssistantUserMessageMiddlewareArgs extends SlackEventMiddlewareArgs<'message'> {
-  setStatus: SetStatusFn;
-  setSuggestedPrompts: SetSuggestedPromptsFn;
-  setTitle: SetTitleFn;
-}
-
+// Configuration object used to instantiate the Assistant
 export interface AssistantConfig {
   threadStarted: AssistantThreadStartedMiddleware | AssistantThreadStartedMiddleware[];
   threadContextChanged: AssistantThreadContextChangedMiddleware | AssistantThreadContextChangedMiddleware[];
   userMessage: AssistantUserMessageMiddleware | AssistantUserMessageMiddleware[];
 }
 
-export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> =
-  T & AllMiddlewareArgs;
+// Utility functions
+export interface SetStatusFn {
+  // (params: SetStatusArguments): Promise<AssistantSetStatusResponse>;
+  (params: SetStatusArguments): Promise<WebAPICallResult>;
+}
 
 export interface SetStatusArguments {
   status: string;
+}
+
+export interface SetSuggestedPromptsFn {
+  // (params: SetSuggestedPromptsArguments): Promise<AssistantSetSuggestedPromptsResponse>;
+  (params: SetSuggestedPromptsArguments): Promise<WebAPICallResult>;
 }
 
 export interface SetSuggestedPromptsArguments {
@@ -55,26 +47,30 @@ export interface SetSuggestedPromptsArguments {
   }[];
   title?: string;
 }
+export interface SetTitleFn {
+  // (params: SetTitleArguments): Promise<AssistantSetTitleResponse>;
+  (params: SetTitleArguments): Promise<WebAPICallResult>;
+}
 
 export interface SetTitleArguments {
   title: string;
 }
 
-export interface SetStatusFn {
-  // (params: SetStatusArguments): Promise<AssistantSetStatusResponse>;
-  (params: SetStatusArguments): Promise<WebAPICallResult>;
+interface AssistantUtilityArgs {
+  setStatus: SetStatusFn;
+  setSuggestedPrompts: SetSuggestedPromptsFn;
+  setTitle: SetTitleFn;
 }
-export interface SetSuggestedPromptsFn {
-  // (params: SetSuggestedPromptsArguments): Promise<AssistantSetSuggestedPromptsResponse>;
-  (params: SetSuggestedPromptsArguments): Promise<WebAPICallResult>;
-}
-export interface SetTitleFn {
-  // (params: SetTitleArguments): Promise<AssistantSetTitleResponse>;
-  (params: SetTitleArguments): Promise<WebAPICallResult>;
-}
-/** Constants */
 
-const VALID_PAYLOAD_TYPES = new Set(['assistant_thread_started', 'assistant_thread_context_changed', 'message']);
+export interface AssistantThreadStartedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_started'>, AssistantUtilityArgs {}
+export interface AssistantThreadContextChangedMiddlewareArgs extends SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, AssistantUtilityArgs {}
+export interface AssistantUserMessageMiddlewareArgs extends SlackEventMiddlewareArgs<'message'>, AssistantUtilityArgs {}
+
+export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> =
+T & AllMiddlewareArgs;
+
+/** Constants */
+const ASSISTANT_PAYLOAD_TYPES = new Set(['assistant_thread_started', 'assistant_thread_context_changed', 'message']);
 
 export default class Assistant {
   /** 'assistant_thread_started' */
@@ -83,11 +79,11 @@ export default class Assistant {
   /** 'assistant_thread_context_changed' */
   private threadContextChanged: AssistantThreadContextChangedMiddleware[];
 
-  /** 'assistant_thread_started' */
+  /** 'message' */
   private userMessage: AssistantUserMessageMiddleware[];
 
   public constructor(config: AssistantConfig) {
-    // validate(config);
+    validate(config);
 
     const { threadStarted, threadContextChanged, userMessage } = config;
 
@@ -98,14 +94,17 @@ export default class Assistant {
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
     return async (args): Promise<any> => {
-      if (isAssistantEvent(args) && matchesConstraints(args)) return this.processEvent(args);
+      console.log('isAssistantEvent(args) ? ', isAssistantEvent(args))
+      if (isAssistantEvent(args) && matchesConstraints(args)) {
+        return this.processEvent(args); // TODO :: TypeScript not deducing type correctly
+      }
       return args.next();
     };
   }
 
   private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
     const { payload } = args;
-    console.log('in processEvent (args) => ', args);
+
     const assistantArgs = prepareAssistantArgs(args);
     const assistantMiddleware = this.getAssistantMiddleware(payload);
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
@@ -126,22 +125,53 @@ export default class Assistant {
 }
 
 export function isAssistantEvent(args: AnyMiddlewareArgs): boolean {
-  return VALID_PAYLOAD_TYPES.has(args.payload.type);
+  return ASSISTANT_PAYLOAD_TYPES.has(args.payload.type);
 }
 
-function matchesConstraints(args: AssistantMiddlewareArgs): boolean {
-  return args.payload.type === 'message' && args.payload.channel_type === 'im';
+function matchesConstraints(args: AnyMiddlewareArgs): boolean {
+  if (args.payload.type === 'message') {
+    return ("channel_type" in args.payload && args.payload.channel_type === 'im') && 
+    (!("subtype" in args.payload) || args.payload.subtype === 'file_share');
+  }
+  return true;
+}
+
+export function validate(config: AssistantConfig): void {
+  // Ensure assistant config object is passed in
+  if (typeof config !== 'object') {
+    const errorMsg = 'Assistant expects a configuration object as the argument';
+    throw new AssistantInitializationError(errorMsg);
+  }
+
+  // Check for missing required keys
+  const requiredKeys: (keyof AssistantConfig)[] = ['threadStarted', 'threadContextChanged', 'userMessage'];
+  const missingKeys: (keyof AssistantConfig)[] = [];
+  requiredKeys.forEach((key) => { if (config[key] === undefined) missingKeys.push(key); });
+
+  if (missingKeys.length > 0) {
+    const errorMsg = `Assistant is missing required keys: ${missingKeys.join(', ')}`;
+    throw new AssistantInitializationError(errorMsg);
+  }
+
+  // Ensure a callback or an array of callbacks is present
+  const requiredFns: (keyof AssistantConfig)[] = ['threadStarted', 'threadContextChanged', 'userMessage'];
+  requiredFns.forEach((fn) => {
+    if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
+      const errorMsg = `Assistant ${fn} property must be a function or an array of functions`;
+      throw new AssistantInitializationError(errorMsg);
+    }
+  });
 }
 
 /**
- * `prepareAssistantArgs()` takes in a step's args and:
+ * `prepareAssistantArgs()` takes in an assistant's args and:
  *  1. removes the next() passed in from App-level middleware processing
  *    - events will *not* continue down global middleware chain to subsequent listeners
- *  2. augments args with step lifecycle-specific properties/utilities
+ *  2. augments args with assistant-specific properties/utilities
  * */
 export function prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
   const { next: _next, ...assistantArgs } = args;
-  const preparedArgs: any = { ...assistantArgs };
+  const preparedArgs: AllAssistantMiddlewareArgs = { ...assistantArgs };
 
   switch (preparedArgs.payload.type) {
     case 'assistant_thread_started':
@@ -159,8 +189,7 @@ export function prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
 }
 
 /**
- * `processAssistantMiddleware()` invokes each callback for lifecycle event
- * @param args assistant_thread_started, assistant_thread_context_changed events
+ * `processAssistantMiddleware()` invokes each callback for event
  */
 export async function processAssistantMiddleware(
   args: AllAssistantMiddlewareArgs,
