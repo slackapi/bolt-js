@@ -29,7 +29,7 @@ export type FunctionInputs = Record<string, unknown>;
  *
  * This describes the entire JSON-encoded body of a request from Slack's Events API.
  */
-interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
+export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   token: string;
   team_id: string;
   enterprise_id?: string;
