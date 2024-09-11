@@ -529,7 +529,7 @@ describe('ExpressReceiver', function () {
         // Act
         const req = { body: { }, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
         const resp = { send: () => { } } as Response;
-        (receiver.router as any).handle(req, resp);
+        (receiver.router as any).handle(req, resp, () => {});
 
         // Assert
         assert(handleStub.calledWith(req, resp, callbackOptions), 'installer.handleCallback not called');
@@ -552,7 +552,7 @@ describe('ExpressReceiver', function () {
         // Act
         const req = { body: { }, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
         const resp = { send: () => { } } as Response;
-        (receiver.router as any).handle(req, resp);
+        (receiver.router as any).handle(req, resp, () => {});
 
         // Assert
         assert(handleStub.calledWith(req, resp, callbackOptions, sinon.match({ scopes })), 'installer.handleCallback not called');
