@@ -21,12 +21,12 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">=12.13.0",
-    "npm": ">=6.12.0"
+    "node": ">=14.21.3",
+    "npm": ">=6.14.18"
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+    "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
     "lint": "eslint --fix --ext .ts src",
     "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
@@ -51,7 +51,7 @@
     "@types/tsscmp": "^1.0.0",
     "axios": "^1.7.4",
     "express": "^4.16.4",
-    "path-to-regexp": "^6.2.1",
+    "path-to-regexp": "^8.1.0",
     "promise.allsettled": "^1.0.2",
     "raw-body": "^2.3.3",
     "tsscmp": "^1.0.6"
@@ -77,9 +77,9 @@
     "nyc": "^15.1.0",
     "rewiremock": "^3.13.4",
     "shx": "^0.3.2",
-    "sinon": "^7.3.1",
+    "sinon": "^18.0.1",
     "source-map-support": "^0.5.12",
-    "ts-node": "^8.1.0",
+    "ts-node": "^10.9.2",
     "tsd": "^0.22.0",
     "typescript": "4.8.4"
   },
