@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "skipLibCheck": true,
-    "lib": ["ES2019"],
-    "target": "ES2019",
+    "lib": ["ES2018"],
+    "target": "ES2018",
     "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
