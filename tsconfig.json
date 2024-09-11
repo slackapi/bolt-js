@@ -16,7 +16,7 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "baseUrl": ".",
-    "paths": {
+    "paths": {    
       "*": ["./types/*"]
     },
     "esModuleInterop": true
