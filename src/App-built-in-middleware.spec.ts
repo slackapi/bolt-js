@@ -366,6 +366,19 @@ describe('App built-in middleware and mechanism', () => {
       assert.throws(() => app.event('message.channels', async () => {}), 'Although the document mentions');
       assert.throws(() => app.event(/message\..+/, async () => {}), 'Although the document mentions');
     });
+
+    // https://github.com/slackapi/bolt-js/issues/1457
+    it('should not cause a runtime exception if the last listener middleware invokes next()', async () => new Promise((resolve, reject) => {
+      app.event('app_mention', async ({ next }) => {
+        try {
+          await next();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+      fakeReceiver.sendEvent(createDummyReceiverEvent('app_mention'));
+    }));
   });
 
   describe('middleware and listener arguments', () => {

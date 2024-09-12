@@ -7,6 +7,27 @@ on:
   pull_request:
 
 jobs:
+  examples:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        example:
+          - examples/getting-started-typescript
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/checkout@v4
+      - name: Install dependencies and link bolt-js
+        run: npm i && npm link .
+      - name: Install example dependencies and link bolt-js
+        working-directory: ${{ matrix.example }}
+        run: npm i && npm link @slack/bolt
+      - name: Compile sample
+        working-directory: ${{ matrix.example }}
+        run: npm run build
   samples:
     runs-on: ubuntu-latest
     strategy:
@@ -15,7 +36,6 @@ jobs:
         sample:
           - slack-samples/bolt-ts-starter-template
           - slack-samples/bolt-ts-custom-function-template
-
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4

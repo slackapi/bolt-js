@@ -44,7 +44,9 @@ app.message('hello', async ({ message, say }) => {
 app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
-  await say(`<@${body.user.id}> clicked the button`);
+  // we know that this event comes from a button click from a message in a channel, so `say` will be available.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await say!(`<@${body.user.id}> clicked the button`);
 });
 
 (async () => {

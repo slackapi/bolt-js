@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FunctionExecutedEvent } from '@slack/types';
 import {
   WebClient,
   FunctionsCompleteErrorResponse,
@@ -11,7 +12,6 @@ import {
   AnyMiddlewareArgs,
   SlackEventMiddlewareArgs,
   Context,
-  FunctionExecutedEvent,
 } from './types';
 import processMiddleware from './middleware/process';
 import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';

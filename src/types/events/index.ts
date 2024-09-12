@@ -1,27 +1,9 @@
-import { SlackEvent, BasicSlackEvent } from './base-events';
+import { SlackEvent } from '@slack/types';
 import { StringIndexed } from '../helpers';
 import { SayFn } from '../utilities';
 
-export * from './base-events';
-export {
-  GenericMessageEvent,
-  BotMessageEvent,
-  ChannelArchiveMessageEvent,
-  ChannelJoinMessageEvent,
-  ChannelLeaveMessageEvent,
-  ChannelNameMessageEvent,
-  ChannelPostingPermissionsMessageEvent,
-  ChannelPurposeMessageEvent,
-  ChannelTopicMessageEvent,
-  ChannelUnarchiveMessageEvent,
-  EKMAccessDeniedMessageEvent,
-  FileShareMessageEvent,
-  MeMessageEvent,
-  MessageChangedEvent,
-  MessageDeletedEvent,
-  MessageRepliedEvent,
-  ThreadBroadcastMessageEvent,
-} from './message-events';
+// TODO: for backwards compatibility; remove at next major (breaking change)
+export * from '@slack/types';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
@@ -36,12 +18,18 @@ export interface SlackEventMiddlewareArgs<EventType extends string = string> {
   ack?: undefined;
 }
 
+interface BaseSlackEvent<T extends string = string> {
+  type: T;
+}
+export type EventTypePattern = string | RegExp;
+export type FunctionInputs = Record<string, unknown>;
+
 /**
  * A Slack Events API event wrapped in the standard envelope.
  *
  * This describes the entire JSON-encoded body of a request from Slack's Events API.
  */
-export interface EnvelopedEvent<Event = BasicSlackEvent> extends StringIndexed {
+export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   token: string;
   team_id: string;
   enterprise_id?: string;
@@ -72,7 +60,7 @@ interface Authorization {
  * Otherwise, the `BasicSlackEvent<T>` type is returned.
  */
 export type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
-  BasicSlackEvent<T> :
+  BaseSlackEvent<T> :
   KnownEventFromType<T>;
 export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
 

@@ -16,7 +16,7 @@ const clientOptions = {
 //   // enable the following if you want to use OAuth
 //   // clientId: process.env.CLIENT_ID,
 //   // clientSecret: process.env.CLIENT_SECRET,
-//   // stateSecret: 'my-state-secret',
+//   // stateSecret: process.STATE_SECRET,
 //   // scopes: ['channels:read', 'chat:write', 'app_mentions:read', 'channels:manage', 'commands'],
 
 //   logLevel: LogLevel.DEBUG,

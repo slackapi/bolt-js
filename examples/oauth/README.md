@@ -14,12 +14,13 @@ npm install
 
 ## Setup Environment Variables
 
-This app requires you setup a few environment variables. You can find these values in your [app configuration](https://api.slack.com/apps).
+This app requires you setup a few environment variables. You can find these values in your [app configuration](https://api.slack.com/apps), except for the state secret, which can be any secret of your choosing.
 
 ```bash
 export SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
 export SLACK_CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
 export SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
+export SLACK_STATE_SECRET=YOUR_SLACK_STATE_SECRET
 ```
 
 ## Run the App

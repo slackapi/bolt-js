@@ -1155,7 +1155,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
             // Copy the array so modifications don't affect the original
             const listenerMiddleware = [...origListenerMiddleware];
 
-            // Don't process the last item in the listenerMiddleware array - it shouldn't get a next fn
+            // Don't process the last item in the listenerMiddleware array - it will be passed a no-op next fn
             const listener = listenerMiddleware.pop();
 
             if (listener === undefined) {
@@ -1168,13 +1168,13 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
               client,
               this.logger,
               // When all the listener middleware are done processing,
-              // `listener` here will be called without a `next` execution
+              // `listener` here will be called with a noop `next` fn
               async () => listener({
                 ...(listenerArgs as AnyMiddlewareArgs),
                 context,
                 client,
                 logger: this.logger,
-                // `next` is already set in the outer processMiddleware
+                next: () => {},
               } as AnyMiddlewareArgs & AllMiddlewareArgs),
             );
           });
