@@ -103,7 +103,7 @@ App オプションは、`App` のコンストラクターに渡します。`rec
 | オプション  | 説明  |
 | :--- | :--- |
 | `receiver` | `Receiver` のインスタンス。受信イベントのパースとその処理を行います。[`Receiver` インターフェイス](/concepts/receiver)に準拠して、`init(app)`、`start()`、`stop()`を持つ必要があります。receiver について詳しくは、[ドキュメント](/concepts/receiver)を参照してください。 |
-| `agent` | オプションの HTTP `エージェント`。プロキシのサポートを設定する場合に使用します。カスタムの agent について詳しくは、[Node Slack SDK のドキュメント](https://slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent)を参照してください。 |
+| `agent` | オプションの HTTP `エージェント`。プロキシのサポートを設定する場合に使用します。カスタムの agent について詳しくは、[Node Slack SDK のドキュメント](https://tools.slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent)を参照してください。 |
 | `clientTls` |  設定必須ではない文字列。HTTP クライアントリクエストにカスタムの TLS を設定する場合に指定します。`"pfx"`、`"key"`、`"passphrase"`、`"cert"`、`"ca"` のいずれかを指定します。 |
 | `convoStore` | ステートに関連する会話のデータを設定・取得するためのデータストア実装。`set()` で会話のステートを設定し、`get()` で取得します。デフォルトでは、アプリはインメモリのストアを利用できます。詳細とサンプルについては、[ドキュメント](/concepts/conversation-store)を参照してください。 |
 | `token` | アプリの設定（「Settings」>「Install App」）で指定した 文字列。Web API の呼び出しに必要です。`authorize`、`orgAuthorize`やOAuth 設定を使用する場合には指定しないでください。 |
@@ -120,7 +120,7 @@ App オプションは、`App` のコンストラクターに渡します。`rec
 | `deferInitialization` | アプリの初期化を遅延させる真偽値です。有効にすると非同期の `App#init()` メソッドを手動で呼び出す必要があります。 また `init()` メソッドは `App#start()` を実行する前に呼び出さなければなりません。 デフォルトは `false` です。 |
 | `signatureVerification` | Boltが着信リクエストでSlackの署名を検証する必要があるかどうかを決定するブール値。 デフォルトは`true`です。 |
 
-> Bolt のclientは [Node Slack SDK](https://slack.dev/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
+> Bolt のclientは [Node Slack SDK](https://tools.slack.dev/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
 
 ## フレームワークのエラー {#framework-error-types}
 
@@ -140,11 +140,11 @@ Bolt では、さまざまなエラーが定義されています。これらに
 > [errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts) のコードで、エラー定義の部分とコンストラクターの部分を読み、参考にしてみてください。
 
 ### クライアント側のエラー {#client-errors}
-Bolt では、Slack API の呼び出しのため `WebClient` をインポートしています。クライアントで API 呼び出しを行う際に目にすると思われるエラーを以下に示します。より詳しい内容は、[Web API のドキュメント](https://slack.dev/node-slack-sdk/web-api#handle-errors)を参照してください。クライアントのエラーをハンドリングする際、`data` プロパティの `body` で詳しい情報を確認できます。
+Bolt では、Slack API の呼び出しのため `WebClient` をインポートしています。クライアントで API 呼び出しを行う際に目にすると思われるエラーを以下に示します。より詳しい内容は、[Web API のドキュメント](https://tools.slack.dev/node-slack-sdk/web-api#handle-errors)を参照してください。クライアントのエラーをハンドリングする際、`data` プロパティの `body` で詳しい情報を確認できます。
 
 | エラーコード                         | 詳細 |
 | :--- | :--- |
 | `PlatformError` | Slack API の呼び出し中に何らかの異常が発生したことを示すエラー。`data` プロパティを持ちます。 |
 | `RequestError` | リクエストが送信できなかったことを示すエラー。ネットワーク接続が利用できないことなどが原因として考えられます。`original` プロパティで詳細を確認できます。 |
-| `RateLimitedError` | 短時間で送信したリクエストが多すぎることを示すエラー。`retryAfter` プロパティで、再送信まで待機する必要のある秒数を確認できます。`WebClient` は、デフォルトでレート制限エラーのハンドリングを行います。[詳しくはドキュメントを参照してください](https://slack.dev/node-slack-sdk/web-api#rate-limits)。 |
+| `RateLimitedError` | 短時間で送信したリクエストが多すぎることを示すエラー。`retryAfter` プロパティで、再送信まで待機する必要のある秒数を確認できます。`WebClient` は、デフォルトでレート制限エラーのハンドリングを行います。[詳しくはドキュメントを参照してください](https://tools.slack.dev/node-slack-sdk/web-api#rate-limits)。 |
 | `HTTPError` | HTTP レスポンスに通常は想定されないステータスコードが設定されていたことを示すエラー。Web API が返す HTTP ステータスコードは、通常 `200`（エラー時を含む）または `429`（レート制限時）のみです。 |

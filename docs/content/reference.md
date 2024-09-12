@@ -128,7 +128,7 @@ App options are passed into the `App` constructor. When the `receiver` argument 
 | Option  | Description  |
 | :--- | :--- |
 | `receiver` | An instance of `Receiver` that parses and handles incoming events. Must conform to the [`Receiver` interface](/concepts/receiver), which includes `init(app)`, `start()`, and `stop()`. More information about receivers is [in the documentation](/concepts/receiver). |
-| `agent` | Optional HTTP `Agent` used to set up proxy support. Read more about custom agents in the [Node Slack SDK documentation](https://slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent). |
+| `agent` | Optional HTTP `Agent` used to set up proxy support. Read more about custom agents in the [Node Slack SDK documentation](https://tools.slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent). |
 | `clientTls` |  Optional `string` to set a custom TLS configuration for HTTP client requests. Must be one of: `"pfx"`, `"key"`, `"passphrase"`, `"cert"`, or `"ca"`. |
 | `convoStore` | A store to set and retrieve state-related conversation information. `set()` sets conversation state and `get()` fetches it. By default, apps have access to an in-memory store. More information and an example can be found [in the documentation](/concepts/conversation-store). |
 | `token` | A `string` from your app's configuration (under "Settings" > "Install App") required for calling the Web API. May not be passed when using `authorize`, `orgAuthorize`, or OAuth. |
@@ -147,7 +147,7 @@ App options are passed into the `App` constructor. When the `receiver` argument 
 
 :::info 
 
-Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://slack.dev/node-slack-sdk), so some of that documentation may be helpful as you're developing.
+Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://tools.slack.dev/node-slack-sdk), so some of that documentation may be helpful as you're developing.
 
 :::
 
@@ -172,11 +172,11 @@ You can find the code for error definition and construction within [errors.ts](h
 :::
 
 ### Client errors
-Bolt imports a `WebClient` to call Slack's APIs. Below is a set of errors you may encounter when making API calls with the client, though you can read more [in the web API documentation](https://slack.dev/node-slack-sdk/web-api#handle-errors). When handling client errors, more information can be found in the body within the `data` property.
+Bolt imports a `WebClient` to call Slack's APIs. Below is a set of errors you may encounter when making API calls with the client, though you can read more [in the web API documentation](https://tools.slack.dev/node-slack-sdk/web-api#handle-errors). When handling client errors, more information can be found in the body within the `data` property.
 
 | Error code | Details |
 | :--- | :--- |
 | `PlatformError` | Error received when calling a Slack API. Includes a `data` property. |
 | `RequestError` | A request could not be sent, perhaps because your network connection is not available. It has an `original` property with more details. |
-| `RateLimitedError` | Your app has made too many requests too quickly. Includes a `retryAfter` property with the number of seconds you should wait before trying to send again. The `WebClient` will handle rate limit errors by default–[you can read more in the documentation](https://slack.dev/node-slack-sdk/web-api#rate-limits). |
+| `RateLimitedError` | Your app has made too many requests too quickly. Includes a `retryAfter` property with the number of seconds you should wait before trying to send again. The `WebClient` will handle rate limit errors by default–[you can read more in the documentation](https://tools.slack.dev/node-slack-sdk/web-api#rate-limits). |
 | `HTTPError` | The HTTP response contained an unfamiliar status code. The Web API only responds with `200` (including for errors), or `429` for rate limiting. |
