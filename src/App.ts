@@ -6,6 +6,7 @@ import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
 import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
+import { isRejected } from './types/utilities';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -60,8 +61,6 @@ import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeE
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
 import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { StringIndexed } from './types/helpers';
-// eslint-disable-next-line import/order
-import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
 import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
@@ -1171,10 +1170,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
             );
           });
 
-          const settledListenerResults = await allSettled(listenerResults);
-          const rejectedListenerResults = settledListenerResults.filter(
-            (lr) => lr.status === 'rejected',
-          ) as allSettled.PromiseRejection<Error>[];
+          const settledListenerResults = await Promise.allSettled(listenerResults);
+          const rejectedListenerResults = settledListenerResults.filter(isRejected);
           if (rejectedListenerResults.length === 1) {
             throw rejectedListenerResults[0].reason;
           } else if (rejectedListenerResults.length > 1) {

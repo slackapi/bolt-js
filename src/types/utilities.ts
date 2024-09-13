@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
 
+export const isFulfilled = <T>(p:PromiseSettledResult<T>): p is PromiseFulfilledResult<T> => p.status === 'fulfilled';
+export const isRejected = <T>(p:PromiseSettledResult<T>): p is PromiseRejectedResult => p.status === 'rejected';
+
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
 // listener. Therefore, specifying the `channel` argument is not required.
 export type SayArguments = Omit<ChatPostMessageArguments, 'channel'> & {
