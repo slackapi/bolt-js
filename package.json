@@ -79,7 +79,7 @@
     "sinon": "^18.0.1",
     "source-map-support": "^0.5.12",
     "ts-node": "^10.9.2",
-    "tsd": "^0.22.0",
+    "tsd": "^0.31.2",
     "typescript": "5.3.3"
   },
   "tsd": {

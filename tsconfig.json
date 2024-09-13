@@ -5,7 +5,7 @@
     "declaration": true,
     "declarationMap": true,
     "module": "CommonJS",
-    "moduleResolution": "Node10",
+    "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
