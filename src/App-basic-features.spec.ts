@@ -54,6 +54,8 @@ function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEv
   };
 }
 
+const fakeAppToken = 'xapp-1234';
+
 describe('App basic features', () => {
   describe('constructor', () => {
     describe('with a custom port value in HTTP Mode', () => {
@@ -99,7 +101,7 @@ describe('App basic features', () => {
         // Act
         const app = new MockApp({
           socketMode: true,
-          appToken: '',
+          appToken: fakeAppToken,
           port: 9999,
           clientId: '',
           clientSecret: '',
@@ -117,7 +119,7 @@ describe('App basic features', () => {
         // Act
         const app = new MockApp({
           socketMode: true,
-          appToken: '',
+          appToken: fakeAppToken,
           port: 7777,
           clientId: '',
           clientSecret: '',
@@ -288,7 +290,7 @@ describe('App basic features', () => {
         withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
       );
       const MockApp = await importApp(overrides);
-      const socketModeReceiver = new SocketModeReceiver({ appToken: '' });
+      const socketModeReceiver = new SocketModeReceiver({ appToken: fakeAppToken });
 
       // Act
       const app = new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
@@ -487,7 +489,7 @@ describe('App basic features', () => {
         const fakeLogger = createFakeLogger();
         const MockApp = await importApp(overrides);
         // Act
-        const app = new MockApp({ logger: fakeLogger, token: '', appToken: '', developerMode: true });
+        const app = new MockApp({ logger: fakeLogger, token: '', appToken: fakeAppToken, developerMode: true });
         // Assert
         assert.equal((app as any).logLevel, LogLevel.DEBUG);
         assert.equal((app as any).socketMode, true);
