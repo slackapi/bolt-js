@@ -984,10 +984,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
       const token = selectToken(context);
-      return (message: Parameters<SayFn>[0]) => {
-        const postMessageArguments: ChatPostMessageArguments = typeof message === 'string' ?
-          { token, text: message, channel: channelId } :
-          { ...message, token, channel: channelId };
+      return (message) => {
+        let postMessageArguments: ChatPostMessageArguments;
+        if (typeof message === 'string') {
+          postMessageArguments = { token, text: message, channel: channelId };
+        } else {
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          postMessageArguments = { ...message, token, channel: channelId } as ChatPostMessageArguments;
+        }
 
         return this.client.chat.postMessage(postMessageArguments);
       };
