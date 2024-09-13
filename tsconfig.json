@@ -1,25 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "skipLibCheck": true,
-    "lib": ["ES2018"],
-    "target": "ES2018",
-    "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
-    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {    
       "*": ["./types/*"]
-    },
-    "esModuleInterop": true
+    }
   },
   "include": [
     "src/**/*"
