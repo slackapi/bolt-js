@@ -16,11 +16,9 @@ import {
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
-// TODO: Resolve the event type when having subtype in a listener constraint
-// app.message({pattern: 'foo', subtype: 'message_replied'}, async ({ message }) => {});
-
 // TODO: asserting on the types of event sub-properties is a responsibility of the `@slack/types` package, not bolt.
 // e.g. message.user, message.team, etc.
+//
 // Types for generic message listeners, i.e. MessageEvent aka GenericMessageEvent
 app.message(async ({ message }) => {
   expectType<MessageEvent>(message);
