@@ -1,5 +1,5 @@
 import { expectError, expectType } from 'tsd';
-import { App, BlockElementAction, InteractiveAction, DialogSubmitAction } from '../';
+import { App, BlockElementAction, InteractiveAction, DialogSubmitAction } from '..';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

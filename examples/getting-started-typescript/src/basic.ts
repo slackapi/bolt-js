@@ -119,7 +119,7 @@ app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
         await client.reactions.add({
           name: 'white_check_mark',
           timestamp: body.message?.ts,
-          channel: body.channel?.id,
+          channel: body.channel!.id, // if the body has a message, we know it has a channel, too.
         });
       }
     } catch (error) {

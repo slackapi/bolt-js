@@ -1,6 +1,8 @@
 import { expectType } from 'tsd';
 import { ChatPostMessageResponse } from '@slack/web-api';
-import { App, InteractiveButtonClick } from '..';
+// eslint-disable-next-line
+import App from '../src/App';
+import { InteractiveButtonClick } from '../src/types';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
