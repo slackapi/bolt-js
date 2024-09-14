@@ -69,9 +69,11 @@ npm init
 
 You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
 
-Before we install the Bolt for JavaScript package to your new project, let's save the **bot token** and **Signing Secret** that were generated when you configured your app.
+Before we install the Bolt for JavaScript package to your new project, let's save the **bot token** and **Signing Secret** that were generated when you configured your app. 
 
-1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
+1. Create a new file and name it .env
+2. Edit the new .env file
+3. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
 ```shell
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
@@ -88,16 +90,26 @@ Remember to keep your tokens and signing secret secure. At a minimum, you should
 :::
 
 
-Now, let's create your app. Install the `@slack/bolt` package and save it to your `package.json` dependencies using the following command:
+Now, let's start creating your app. 
+
+Install the `@slack/bolt` and 'dotenv' packages and save it to your `package.json` dependencies using the following command:
 
 ```shell
 npm install @slack/bolt
+npm install dotenv
 ```
+:::tip
+ 
+"dotenv" is used to import your tokens from the .env  into your app.js 
+:::
 
 Create a new entrypoint file called `app.js` in this directory and add the following code:
 
 ```javascript
 const { App } = require('@slack/bolt');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
