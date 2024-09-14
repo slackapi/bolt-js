@@ -1021,7 +1021,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       case IncomingEventType.Shortcut:
         payload = (bodyArg as SlackShortcutMiddlewareArgs['body']);
         break;
-      // @ts-ignore: Fallthrough case in switch
       case IncomingEventType.Action:
         if (isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) {
           const { actions } = (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']);
