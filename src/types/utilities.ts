@@ -6,19 +6,22 @@ export const isFulfilled = <T>(p:PromiseSettledResult<T>): p is PromiseFulfilled
 /** Type predicate for use with `Promise.allSettled` for filtering for rejected results. */
 export const isRejected = <T>(p:PromiseSettledResult<T>): p is PromiseRejectedResult => p.status === 'rejected';
 
-// TODO: consider moving the following types closer to relevant code
+/** Using type parameter T (generic), can distribute the Omit over a union set. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends any
+  ? Omit<T, K>
+  : never;
+
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
 // listener. Therefore, specifying the `channel` argument is not required.
-export type SayArguments = Omit<ChatPostMessageArguments, 'channel'> & {
+export type SayArguments = DistributiveOmit<ChatPostMessageArguments, 'channel'> & {
   // TODO: This will be overwritten in the `createSay` factory method in App.ts anyways, so why include it?
   channel?: string;
 };
-
 export interface SayFn {
   (message: string | SayArguments): Promise<ChatPostMessageResponse>;
 }
 
-export type RespondArguments = Omit<ChatPostMessageArguments, 'channel' | 'text'>
+export type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'channel' | 'text'>
 & {
   /** Response URLs can be used to send ephemeral messages or in-channel messages using this argument */
   response_type?: 'in_channel' | 'ephemeral';

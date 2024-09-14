@@ -6,6 +6,7 @@
     "declarationMap": true,
     "module": "CommonJS",
     "moduleResolution": "node",
+    "noErrorTruncation": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
