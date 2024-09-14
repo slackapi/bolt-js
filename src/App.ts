@@ -999,7 +999,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
     | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
-    // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? dont we have isEvent, isView, isShortcut, isAction already in types/utilities or helpers?
+    // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -1045,6 +1045,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       payload,
     };
 
+    // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
       const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs;
