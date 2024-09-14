@@ -1,32 +1,32 @@
-import {
-  Middleware,
+import type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from '../App';
+import { ContextMissingPropertyError } from '../errors';
+import type {
   AnyMiddlewareArgs,
+  BlockElementAction,
+  BlockSuggestion,
+  DialogSubmitAction,
+  DialogSuggestion,
+  EventTypePattern,
+  GlobalShortcut,
+  InteractiveMessage,
+  InteractiveMessageSuggestion,
+  MessageShortcut,
+  Middleware,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
-  SlackViewMiddlewareArgs,
-  BlockSuggestion,
-  InteractiveMessageSuggestion,
-  DialogSuggestion,
-  InteractiveMessage,
-  DialogSubmitAction,
-  GlobalShortcut,
-  MessageShortcut,
-  BlockElementAction,
   SlackViewAction,
-  EventTypePattern,
+  SlackViewMiddlewareArgs,
 } from '../types';
-import { ActionConstraints, ViewConstraints, ShortcutConstraints, OptionsConstraints } from '../App';
-import { ContextMissingPropertyError } from '../errors';
 
 /** Type predicate that can narrow payloads block action or suggestion payloads */
 function isBlockPayload(
   payload:
-  | SlackActionMiddlewareArgs['payload']
-  | SlackOptionsMiddlewareArgs['payload']
-  | SlackViewMiddlewareArgs['payload'],
+    | SlackActionMiddlewareArgs['payload']
+    | SlackOptionsMiddlewareArgs['payload']
+    | SlackViewMiddlewareArgs['payload'],
 ): payload is BlockElementAction | BlockSuggestion {
   return 'action_id' in payload && payload.action_id !== undefined;
 }
@@ -55,15 +55,11 @@ function isViewBody(
   return 'view' in body && body.view !== undefined;
 }
 
-function isEventArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackEventMiddlewareArgs {
+function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
   return 'event' in args && args.event !== undefined;
 }
 
-function isMessageEventArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackEventMiddlewareArgs<'message'> {
+function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
   return isEventArgs(args) && 'message' in args;
 }
 

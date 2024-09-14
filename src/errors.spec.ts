@@ -1,14 +1,14 @@
 import { assert } from 'chai';
 import {
-  asCodedError,
-  ErrorCode,
-  CodedError,
   AppInitializationError,
   AuthorizationError,
+  type CodedError,
   ContextMissingPropertyError,
+  ErrorCode,
   ReceiverAuthenticityError,
   ReceiverMultipleAckError,
   UnknownError,
+  asCodedError,
 } from './errors';
 
 describe('Errors', () => {

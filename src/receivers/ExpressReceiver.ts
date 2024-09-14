@@ -1,27 +1,45 @@
+import crypto from 'crypto';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createServer, Server, ServerOptions } from 'http';
+import { type Server, type ServerOptions, createServer } from 'http';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
-import { ListenOptions } from 'net';
+import {
+  type Server as HTTPSServer,
+  type ServerOptions as HTTPSServerOptions,
+  createServer as createHttpsServer,
+} from 'https';
+import type { ListenOptions } from 'net';
 import querystring from 'querystring';
-import crypto from 'crypto';
-import express, { Request, Response, Application, RequestHandler, Router, IRouter } from 'express';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import {
+  type CallbackOptions,
+  type InstallPathOptions,
+  InstallProvider,
+  type InstallProviderOptions,
+  type InstallURLOptions,
+} from '@slack/oauth';
+import express, {
+  type Request,
+  type Response,
+  type Application,
+  type RequestHandler,
+  Router,
+  type IRouter,
+} from 'express';
 import rawBody from 'raw-body';
 import tsscmp from 'tsscmp';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
-import App from '../App';
+import type App from '../App';
+import { type CodedError, ReceiverAuthenticityError, ReceiverInconsistentStateError } from '../errors';
+import type { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
+import type { StringIndexed } from '../types/utilities';
 import {
-  ReceiverAuthenticityError,
-  ReceiverInconsistentStateError,
-  CodedError,
-} from '../errors';
-import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import { verifyRedirectOpts } from './verify-redirect-opts';
-import { StringIndexed } from '../types/utilities';
-import { HTTPModuleFunctions as httpFunc, ReceiverDispatchErrorHandlerArgs, ReceiverProcessEventErrorHandlerArgs, ReceiverUnhandledRequestHandlerArgs } from './HTTPModuleFunctions';
+  type ReceiverDispatchErrorHandlerArgs,
+  type ReceiverProcessEventErrorHandlerArgs,
+  type ReceiverUnhandledRequestHandlerArgs,
+  HTTPModuleFunctions as httpFunc,
+} from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -57,7 +75,8 @@ const httpsOptionKeys = [
   'sessionIdContext',
 ];
 
-const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+const missingServerErrorDescription =
+  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 export const respondToSslCheck: RequestHandler = (req, res, next) => {
   if (req.body && req.body.ssl_check) {
@@ -192,9 +211,9 @@ export default class ExpressReceiver implements Receiver {
     }
 
     this.signatureVerification = signatureVerification;
-    const bodyParser = this.signatureVerification ?
-      buildVerificationBodyParserMiddleware(this.logger, signingSecret) :
-      buildBodyParserMiddleware(this.logger);
+    const bodyParser = this.signatureVerification
+      ? buildVerificationBodyParserMiddleware(this.logger, signingSecret)
+      : buildBodyParserMiddleware(this.logger);
     const expressMiddleware: RequestHandler[] = [
       bodyParser,
       respondToSslCheck,
@@ -254,9 +273,8 @@ export default class ExpressReceiver implements Receiver {
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
       const { installer } = this;
-      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
-        '/slack/oauth_redirect' :
-        installerOptions.redirectUriPath;
+      const redirectUriPath =
+        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
       const { callbackOptions, stateVerification } = installerOptions;
       this.router.use(redirectUriPath, async (req, res) => {
         try {
@@ -355,8 +373,8 @@ export default class ExpressReceiver implements Receiver {
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn:
-      typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
-      typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
+      | typeof createServer<typeof IncomingMessage, typeof ServerResponse>
+      | typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
@@ -412,7 +430,9 @@ export default class ExpressReceiver implements Receiver {
   // generic types
   public stop(): Promise<void> {
     if (this.server === undefined) {
-      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'),
+      );
     }
     return new Promise((resolve, reject) => {
       this.server?.close((error) => {
@@ -485,9 +505,8 @@ function buildVerificationBodyParserMiddleware(
 }
 
 function logError(logger: Logger, message: string, error: any): void {
-  const logMessage = 'code' in error ?
-    `${message} (code: ${error.code}, message: ${error.message})` :
-    `${message} (error: ${error})`;
+  const logMessage =
+    'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
   logger.warn(logMessage);
 }
 

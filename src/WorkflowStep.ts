@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { WorkflowStepExecuteEvent } from '@slack/types';
-import {
-  KnownBlock,
+import type { WorkflowStepExecuteEvent } from '@slack/types';
+import type {
   Block,
+  KnownBlock,
   ViewsOpenResponse,
-  WorkflowsUpdateStepResponse,
   WorkflowsStepCompletedResponse,
   WorkflowsStepFailedResponse,
+  WorkflowsUpdateStepResponse,
 } from '@slack/web-api';
-import {
-  Middleware,
+import { WorkflowStepInitializationError } from './errors';
+import processMiddleware from './middleware/process';
+import type {
   AllMiddlewareArgs,
   AnyMiddlewareArgs,
-  SlackActionMiddlewareArgs,
-  SlackViewMiddlewareArgs,
-  WorkflowStepEdit,
   Context,
+  Middleware,
+  SlackActionMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackViewMiddlewareArgs,
   ViewWorkflowStepSubmitAction,
+  WorkflowStepEdit,
 } from './types';
-import processMiddleware from './middleware/process';
-import { WorkflowStepInitializationError } from './errors';
 
 /** Interfaces */
 
@@ -296,9 +296,8 @@ export async function processStepMiddleware(
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
-    await processMiddleware(
-      callbacks, args, context, client, logger,
-      async () => lastCallback({ ...args, context, client, logger }),
+    await processMiddleware(callbacks, args, context, client, logger, async () =>
+      lastCallback({ ...args, context, client, logger }),
     );
   }
 }
@@ -326,15 +325,16 @@ function createStepConfigure(args: AllWorkflowStepMiddlewareArgs<WorkflowStepEdi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepConfigureFn>[0]) => client.views.open({
-    token,
-    trigger_id,
-    view: {
-      callback_id,
-      type: 'workflow_step',
-      ...params,
-    },
-  });
+  return (params: Parameters<StepConfigureFn>[0]) =>
+    client.views.open({
+      token,
+      trigger_id,
+      view: {
+        callback_id,
+        type: 'workflow_step',
+        ...params,
+      },
+    });
 }
 
 /**
@@ -351,11 +351,12 @@ function createStepUpdate(args: AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepUpdateFn>[0] = {}) => client.workflows.updateStep({
-    token,
-    workflow_step_edit_id,
-    ...params,
-  });
+  return (params: Parameters<StepUpdateFn>[0] = {}) =>
+    client.workflows.updateStep({
+      token,
+      workflow_step_edit_id,
+      ...params,
+    });
 }
 
 /**
@@ -372,11 +373,12 @@ function createStepComplete(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExec
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepCompleteFn>[0] = {}) => client.workflows.stepCompleted({
-    token,
-    workflow_step_execute_id,
-    ...params,
-  });
+  return (params: Parameters<StepCompleteFn>[0] = {}) =>
+    client.workflows.stepCompleted({
+      token,
+      workflow_step_execute_id,
+      ...params,
+    });
 }
 
 /**

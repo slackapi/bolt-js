@@ -1,12 +1,12 @@
+import crypto from 'crypto';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import querystring from 'querystring';
-import crypto from 'crypto';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import tsscmp from 'tsscmp';
-import App from '../App';
-import { Receiver, ReceiverEvent } from '../types/receiver';
+import type App from '../App';
 import { ReceiverMultipleAckError } from '../errors';
-import { StringIndexed } from '../types/utilities';
+import type { StringIndexed } from '../types/utilities';
+import type { Receiver, ReceiverEvent } from '../types/receiver';
 
 export type AwsEvent = AwsEventV1 | AwsEventV2;
 type AwsEventStringParameters = Record<string, string | undefined>;
@@ -138,7 +138,8 @@ export default class AwsLambdaReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;
-    this.logger = logger ??
+    this.logger =
+      logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);

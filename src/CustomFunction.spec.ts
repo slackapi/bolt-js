@@ -1,18 +1,18 @@
 import 'mocha';
-import { assert } from 'chai';
-import sinon from 'sinon';
-import rewiremock from 'rewiremock';
 import { WebClient } from '@slack/web-api';
+import { assert } from 'chai';
+import rewiremock from 'rewiremock';
+import sinon from 'sinon';
 import {
+  type AllCustomFunctionMiddlewareArgs,
   CustomFunction,
-  SlackCustomFunctionMiddlewareArgs,
-  AllCustomFunctionMiddlewareArgs,
-  CustomFunctionMiddleware,
-  CustomFunctionExecuteMiddlewareArgs,
+  type CustomFunctionExecuteMiddlewareArgs,
+  type CustomFunctionMiddleware,
+  type SlackCustomFunctionMiddlewareArgs,
 } from './CustomFunction';
-import { createFakeLogger, Override } from './test-helpers';
-import { AllMiddlewareArgs, Middleware } from './types';
 import { CustomFunctionInitializationError } from './errors';
+import { type Override, createFakeLogger } from './test-helpers';
+import type { AllMiddlewareArgs, Middleware } from './types';
 
 async function importCustomFunction(overrides: Override = {}): Promise<typeof import('./CustomFunction')> {
   return rewiremock.module(() => import('./CustomFunction'), overrides);
@@ -68,8 +68,7 @@ describe('CustomFunction class', () => {
     it('should call next if not a function executed event', async () => {
       const fn = new CustomFunction('test_view_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
       const middleware = fn.getMiddleware();
-      const fakeViewArgs = createFakeViewEvent() as unknown as
-        SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs;
+      const fakeViewArgs = createFakeViewEvent() as unknown as SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs;
 
       const fakeNext = sinon.spy();
       fakeViewArgs.next = fakeNext;
@@ -107,10 +106,7 @@ describe('CustomFunction class', () => {
       const { validate } = await importCustomFunction();
 
       // intentionally casting to CustomFunctionMiddleware to trigger failure
-      const badMiddleware = [
-        async () => {},
-        'not-a-function',
-      ] as unknown as CustomFunctionMiddleware;
+      const badMiddleware = [async () => {}, 'not-a-function'] as unknown as CustomFunctionMiddleware;
 
       const validationFn = () => validate('callback_id', badMiddleware);
       const expectedMsg = 'All CustomFunction middleware must be functions';
@@ -167,7 +163,10 @@ describe('CustomFunction class', () => {
       it('complete should call functions.completeSuccess', async () => {
         const client = new WebClient('sometoken');
         const completeMock = sinon.stub(client.functions, 'completeSuccess').resolves();
-        const complete = CustomFunction.createFunctionComplete({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
+        const complete = CustomFunction.createFunctionComplete(
+          { isEnterpriseInstall: false, functionExecutionId: 'Fx1234' },
+          client,
+        );
         await complete();
         assert(completeMock.called, 'client.functions.completeSuccess not called!');
       });
@@ -183,7 +182,10 @@ describe('CustomFunction class', () => {
       it('fail should call functions.completeError', async () => {
         const client = new WebClient('sometoken');
         const completeMock = sinon.stub(client.functions, 'completeError').resolves();
-        const complete = CustomFunction.createFunctionFail({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
+        const complete = CustomFunction.createFunctionFail(
+          { isEnterpriseInstall: false, functionExecutionId: 'Fx1234' },
+          client,
+        );
         await complete({ error: 'boom' });
         assert(completeMock.called, 'client.functions.completeError not called!');
       });
@@ -213,8 +215,7 @@ describe('CustomFunction class', () => {
       const fn1 = sinon.spy((async ({ next: continuation }) => {
         await continuation();
       }) as Middleware<CustomFunctionExecuteMiddlewareArgs>);
-      const fn2 = sinon.spy(async () => {
-      });
+      const fn2 = sinon.spy(async () => {});
       const fakeMiddleware = [fn1, fn2] as CustomFunctionMiddleware;
 
       await processFunctionMiddleware(fakeArgs, fakeMiddleware);

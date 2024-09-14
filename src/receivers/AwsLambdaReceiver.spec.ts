@@ -1,17 +1,17 @@
 import crypto from 'crypto';
-import sinon from 'sinon';
-import { Logger, LogLevel } from '@slack/logger';
+import { LogLevel, type Logger } from '@slack/logger';
 import { assert } from 'chai';
+import sinon from 'sinon';
 import 'mocha';
+import type { WebClientOptions } from '@slack/web-api';
 import rewiremock from 'rewiremock';
-import { WebClientOptions } from '@slack/web-api';
-import AwsLambdaReceiver, { AwsHandler } from './AwsLambdaReceiver';
-import { Override, mergeOverrides } from '../test-helpers';
+import { type Override, mergeOverrides } from '../test-helpers';
+import AwsLambdaReceiver, { type AwsHandler } from './AwsLambdaReceiver';
 
 const noop = () => Promise.resolve(undefined);
 
-describe('AwsLambdaReceiver', function () {
-  beforeEach(function () {});
+describe('AwsLambdaReceiver', () => {
+  beforeEach(() => {});
 
   const noopLogger: Logger = {
     debug(..._msg: any[]): void {
@@ -122,11 +122,7 @@ describe('AwsLambdaReceiver', function () {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp();
     const app = new App({
@@ -134,11 +130,7 @@ describe('AwsLambdaReceiver', function () {
       receiver: awsReceiver,
     });
     app.event('app_mention', noop);
-    const response2 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -201,11 +193,7 @@ describe('AwsLambdaReceiver', function () {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp();
     const app = new App({
@@ -213,11 +201,7 @@ describe('AwsLambdaReceiver', function () {
       receiver: awsReceiver,
     });
     app.event('app_mention', noop);
-    const response2 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -228,7 +212,8 @@ describe('AwsLambdaReceiver', function () {
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000);
-    const body = 'payload=%7B%22type%22%3A%22shortcut%22%2C%22token%22%3A%22fixed-value%22%2C%22action_ts%22%3A%221612879511.716075%22%2C%22team%22%3A%7B%22id%22%3A%22T111%22%2C%22domain%22%3A%22domain-value%22%2C%22enterprise_id%22%3A%22E111%22%2C%22enterprise_name%22%3A%22Sandbox+Org%22%7D%2C%22user%22%3A%7B%22id%22%3A%22W111%22%2C%22username%22%3A%22primary-owner%22%2C%22team_id%22%3A%22T111%22%7D%2C%22is_enterprise_install%22%3Afalse%2C%22enterprise%22%3A%7B%22id%22%3A%22E111%22%2C%22name%22%3A%22Kaz+SDK+Sandbox+Org%22%7D%2C%22callback_id%22%3A%22bolt-js-aws-lambda-shortcut%22%2C%22trigger_id%22%3A%22111.222.xxx%22%7D';
+    const body =
+      'payload=%7B%22type%22%3A%22shortcut%22%2C%22token%22%3A%22fixed-value%22%2C%22action_ts%22%3A%221612879511.716075%22%2C%22team%22%3A%7B%22id%22%3A%22T111%22%2C%22domain%22%3A%22domain-value%22%2C%22enterprise_id%22%3A%22E111%22%2C%22enterprise_name%22%3A%22Sandbox+Org%22%7D%2C%22user%22%3A%7B%22id%22%3A%22W111%22%2C%22username%22%3A%22primary-owner%22%2C%22team_id%22%3A%22T111%22%7D%2C%22is_enterprise_install%22%3Afalse%2C%22enterprise%22%3A%7B%22id%22%3A%22E111%22%2C%22name%22%3A%22Kaz+SDK+Sandbox+Org%22%7D%2C%22callback_id%22%3A%22bolt-js-aws-lambda-shortcut%22%2C%22trigger_id%22%3A%22111.222.xxx%22%7D';
     const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
     const awsEvent = {
       resource: '/slack/events',
@@ -251,11 +236,7 @@ describe('AwsLambdaReceiver', function () {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp();
     const app = new App({
@@ -265,11 +246,7 @@ describe('AwsLambdaReceiver', function () {
     app.shortcut('bolt-js-aws-lambda-shortcut', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -280,7 +257,8 @@ describe('AwsLambdaReceiver', function () {
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000);
-    const body = 'token=fixed-value&team_id=T111&team_domain=domain-value&channel_id=C111&channel_name=random&user_id=W111&user_name=primary-owner&command=%2Fhello-bolt-js&text=&api_app_id=A111&is_enterprise_install=false&enterprise_id=E111&enterprise_name=Sandbox+Org&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxx&trigger_id=111.222.xxx';
+    const body =
+      'token=fixed-value&team_id=T111&team_domain=domain-value&channel_id=C111&channel_name=random&user_id=W111&user_name=primary-owner&command=%2Fhello-bolt-js&text=&api_app_id=A111&is_enterprise_install=false&enterprise_id=E111&enterprise_name=Sandbox+Org&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxx&trigger_id=111.222.xxx';
     const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
     const awsEvent = {
       resource: '/slack/events',
@@ -303,11 +281,7 @@ describe('AwsLambdaReceiver', function () {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp();
     const app = new App({
@@ -317,11 +291,7 @@ describe('AwsLambdaReceiver', function () {
     app.command('/hello-bolt-js', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -384,11 +354,7 @@ describe('AwsLambdaReceiver', function () {
       body: Buffer.from(body).toString('base64'),
       isBase64Encoded: true,
     };
-    const response1 = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
   });
 
@@ -418,11 +384,7 @@ describe('AwsLambdaReceiver', function () {
       body,
       isBase64Encoded: false,
     };
-    const response = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -439,7 +401,10 @@ describe('AwsLambdaReceiver', function () {
       logger: noopLogger,
     });
     const handler = awsReceiver.toHandler();
-    const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${urlVerificationBody}`).digest('hex');
+    const signature = crypto
+      .createHmac('sha256', 'my-secret')
+      .update(`v0:${timestamp}:${urlVerificationBody}`)
+      .digest('hex');
     const awsEvent = {
       resource: '/slack/events',
       path: '/slack/events',
@@ -461,11 +426,7 @@ describe('AwsLambdaReceiver', function () {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -478,7 +439,10 @@ describe('AwsLambdaReceiver', function () {
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000);
-    const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${urlVerificationBody}`).digest('hex');
+    const signature = crypto
+      .createHmac('sha256', 'my-secret')
+      .update(`v0:${timestamp}:${urlVerificationBody}`)
+      .digest('hex');
     const awsEvent = {
       resource: '/slack/events',
       path: '/slack/events',
@@ -500,11 +464,7 @@ describe('AwsLambdaReceiver', function () {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 401);
     assert(spy.calledOnce);
   });
@@ -516,7 +476,10 @@ describe('AwsLambdaReceiver', function () {
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000) - 600; // 10 minutes ago
-    const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${urlVerificationBody}`).digest('hex');
+    const signature = crypto
+      .createHmac('sha256', 'my-secret')
+      .update(`v0:${timestamp}:${urlVerificationBody}`)
+      .digest('hex');
     const awsEvent = {
       resource: '/slack/events',
       path: '/slack/events',
@@ -538,11 +501,7 @@ describe('AwsLambdaReceiver', function () {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 401);
   });
 
@@ -574,11 +533,7 @@ describe('AwsLambdaReceiver', function () {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(
-      awsEvent,
-      {},
-      (_error, _result) => {},
-    );
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
   });
 });

@@ -1,7 +1,12 @@
 import 'mocha';
 import { assert } from 'chai';
-import { isBodyWithTypeEnterpriseInstall, getTypeAndConversation, IncomingEventType, isEventTypeToSkipAuthorize } from './helpers';
-import { AnyMiddlewareArgs, ReceiverEvent, SlackEventMiddlewareArgs } from './types';
+import {
+  IncomingEventType,
+  getTypeAndConversation,
+  isBodyWithTypeEnterpriseInstall,
+  isEventTypeToSkipAuthorize,
+} from './helpers';
+import type { AnyMiddlewareArgs, ReceiverEvent, SlackEventMiddlewareArgs } from './types';
 
 describe('Helpers', () => {
   describe('getTypeAndConversation()', () => {
@@ -128,13 +133,15 @@ describe('Helpers', () => {
           channel: '',
           event_ts: '',
         },
-        authorizations: [{
-          enterprise_id: '',
-          is_bot: true,
-          team_id: '',
-          user_id: '',
-          is_enterprise_install: true,
-        }],
+        authorizations: [
+          {
+            enterprise_id: '',
+            is_bot: true,
+            team_id: '',
+            user_id: '',
+            is_enterprise_install: true,
+          },
+        ],
       };
 
       it('should resolve the is_enterprise_install field', () => {
@@ -197,7 +204,7 @@ describe('Helpers', () => {
     describe('receiver events that can be skipped', () => {
       it('should return truthy when event can be skipped', () => {
         // Arrange
-        const dummyEventBody = { ack: async () => { }, body: { event: { type: 'app_uninstalled' } } } as ReceiverEvent;
+        const dummyEventBody = { ack: async () => {}, body: { event: { type: 'app_uninstalled' } } } as ReceiverEvent;
         // Act
         const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
         // Assert
@@ -206,7 +213,7 @@ describe('Helpers', () => {
 
       it('should return falsy when event can not be skipped', () => {
         // Arrange
-        const dummyEventBody = { ack: async () => { }, body: { event: { type: '' } } } as ReceiverEvent;
+        const dummyEventBody = { ack: async () => {}, body: { event: { type: '' } } } as ReceiverEvent;
         // Act
         const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
         // Assert
@@ -215,7 +222,7 @@ describe('Helpers', () => {
 
       it('should return falsy when event is invalid', () => {
         // Arrange
-        const dummyEventBody = { ack: async () => { }, body: {} } as ReceiverEvent;
+        const dummyEventBody = { ack: async () => {}, body: {} } as ReceiverEvent;
         // Act
         const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
         // Assert

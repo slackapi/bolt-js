@@ -1,6 +1,6 @@
-import { PlainTextElement, Confirmation, Option, RichTextBlock } from '@slack/types';
-import { StringIndexed } from '../utilities';
-import { ViewOutput, ViewStateValue } from '../view';
+import type { Confirmation, Option, PlainTextElement, RichTextBlock } from '@slack/types';
+import type { StringIndexed } from '../utilities';
+import type { ViewOutput, ViewStateValue } from '../view';
 
 /**
  * All known actions from in Slack's interactive elements

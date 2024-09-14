@@ -1,10 +1,10 @@
+import type { IncomingMessage, ServerResponse } from 'http';
 /* eslint-disable import/prefer-default-export */
 import { parse as qsParse } from 'querystring';
-import type { IncomingMessage, ServerResponse } from 'http';
-import rawBody from 'raw-body';
 import type { Logger } from '@slack/logger';
-import { CodedError, ErrorCode } from '../errors';
-import { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import rawBody from 'raw-body';
+import { type CodedError, ErrorCode } from '../errors';
+import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { verifySlackRequest } from './verify-request';
 
 const verifyErrorPrefix = 'Failed to verify authenticity';
@@ -20,9 +20,9 @@ export class HTTPModuleFunctions {
     if (retryNumHeaderValue === undefined) {
       retryNum = undefined;
     } else if (typeof retryNumHeaderValue === 'string') {
-      retryNum = parseInt(retryNumHeaderValue, 10);
+      retryNum = Number.parseInt(retryNumHeaderValue, 10);
     } else if (Array.isArray(retryNumHeaderValue) && retryNumHeaderValue.length > 0) {
-      retryNum = parseInt(retryNumHeaderValue[0], 10);
+      retryNum = Number.parseInt(retryNumHeaderValue[0], 10);
     }
     return retryNum;
   }
@@ -109,7 +109,9 @@ export class HTTPModuleFunctions {
   public static getHeader(req: IncomingMessage, header: string): string {
     const value = req.headers[header];
     if (value === undefined || Array.isArray(value)) {
-      throw new Error(`${verifyErrorPrefix}: header ${header} did not have the expected type (received ${typeof value}, expected string)`);
+      throw new Error(
+        `${verifyErrorPrefix}: header ${header} did not have the expected type (received ${typeof value}, expected string)`,
+      );
     }
     return value;
   }
@@ -186,9 +188,7 @@ export class HTTPModuleFunctions {
 
   // The default processEventErrorHandler implementation:
   // Developers can customize this behavior by passing processEventErrorHandler to the constructor
-  public static async defaultProcessEventErrorHandler(
-    args: ReceiverProcessEventErrorHandlerArgs,
-  ): Promise<boolean> {
+  public static async defaultProcessEventErrorHandler(args: ReceiverProcessEventErrorHandlerArgs): Promise<boolean> {
     const { error, response, logger, storedResponse } = args;
 
     // Check if the response headers have already been sent
@@ -199,10 +199,10 @@ export class HTTPModuleFunctions {
     }
 
     if ('code' in error) {
-    // CodedError has code: string
+      // CodedError has code: string
       const errorCode = (error as CodedError).code;
       if (errorCode === ErrorCode.AuthorizationError) {
-      // authorize function threw an exception, which means there is no valid installation data
+        // authorize function threw an exception, which means there is no valid installation data
         response.writeHead(401);
         response.end();
         return true;
@@ -222,7 +222,7 @@ export class HTTPModuleFunctions {
     const { logger, response } = args;
     logger.error(
       'An incoming event was not acknowledged within 3 seconds. ' +
-      'Ensure that the ack() argument is called in a listener.',
+        'Ensure that the ack() argument is called in a listener.',
     );
 
     // Check if the response has already been sent

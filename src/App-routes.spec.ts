@@ -1,14 +1,11 @@
 import 'mocha';
-import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
-import { Override, mergeOverrides, createFakeLogger } from './test-helpers';
-import {
-  Receiver,
-  ReceiverEvent,
-  NextFn,
-} from './types';
-import App, { ViewConstraints } from './App';
+import sinon, { type SinonSpy } from 'sinon';
+import type App from './App';
+import type { ViewConstraints } from './App';
+import { type Override, createFakeLogger, mergeOverrides } from './test-helpers';
+import type { NextFn, Receiver, ReceiverEvent } from './types';
 
 // Utility functions
 const noop = () => Promise.resolve(undefined);
@@ -34,7 +31,7 @@ class FakeReceiver implements Receiver {
 }
 
 // Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEvent {
+function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
   // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
   // IncomingEventType.Event
   return {
@@ -557,21 +554,27 @@ describe('App event routing', () => {
       app.options('external_select_action_id', async () => {
         await optionsFn();
       });
-      app.options({
-        type: 'block_suggestion',
-        action_id: 'external_select_action_id',
-      }, async () => {
-        await optionsFn();
-      });
+      app.options(
+        {
+          type: 'block_suggestion',
+          action_id: 'external_select_action_id',
+        },
+        async () => {
+          await optionsFn();
+        },
+      );
       app.options({ callback_id: 'dialog_suggestion_callback_id' }, async () => {
         await optionsFn();
       });
-      app.options({
-        type: 'dialog_suggestion',
-        callback_id: 'dialog_suggestion_callback_id',
-      }, async () => {
-        await optionsFn();
-      });
+      app.options(
+        {
+          type: 'dialog_suggestion',
+          callback_id: 'dialog_suggestion_callback_id',
+        },
+        async () => {
+          await optionsFn();
+        },
+      );
 
       app.event('app_home_opened', noop);
       app.event(/app_home_opened|app_mention/, noop);
@@ -823,28 +826,33 @@ describe('App event routing', () => {
     let MockApp: typeof import('./App').default;
     let app: App;
 
-    const callNextMiddleware = () => async ({ next }: { next?: NextFn }) => {
-      if (next) {
-        await next();
-      }
-    };
+    const callNextMiddleware =
+      () =>
+      async ({ next }: { next?: NextFn }) => {
+        if (next) {
+          await next();
+        }
+      };
 
-    const fakeMessageEvent = (receiver: FakeReceiver, message: string): Promise<void> => receiver.sendEvent({
-      body: {
-        type: 'event_callback',
-        event: {
-          type: 'message',
-          text: message,
+    const fakeMessageEvent = (receiver: FakeReceiver, message: string): Promise<void> =>
+      receiver.sendEvent({
+        body: {
+          type: 'event_callback',
+          event: {
+            type: 'message',
+            text: message,
+          },
         },
-      },
-      ack: noop,
-    });
+        ack: noop,
+      });
 
-    const controlledMiddleware = (shouldCallNext: boolean) => async ({ next }: { next?: NextFn }) => {
-      if (next && shouldCallNext) {
-        await next();
-      }
-    };
+    const controlledMiddleware =
+      (shouldCallNext: boolean) =>
+      async ({ next }: { next?: NextFn }) => {
+        if (next && shouldCallNext) {
+          await next();
+        }
+      };
 
     const assertMiddlewaresCalledOnce = () => {
       assert(fakeMiddleware1.calledOnce);
@@ -872,10 +880,7 @@ describe('App event routing', () => {
       app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       fakeMiddleware1 = sinon.spy(callNextMiddleware());
       fakeMiddleware2 = sinon.spy(callNextMiddleware());
-      fakeMiddlewares = [
-        fakeMiddleware1,
-        fakeMiddleware2,
-      ];
+      fakeMiddlewares = [fakeMiddleware1, fakeMiddleware2];
 
       passFilter = sinon.spy(controlledMiddleware(true));
       failFilter = sinon.spy(controlledMiddleware(false));

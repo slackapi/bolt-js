@@ -1,5 +1,5 @@
-import { createHmac } from 'crypto';
-import { Logger } from '@slack/logger';
+import { createHmac } from 'node:crypto';
+import type { Logger } from '@slack/logger';
 import tsscmp from 'tsscmp';
 
 // ------------------------------
@@ -12,8 +12,8 @@ export interface SlackRequestVerificationOptions {
   signingSecret: string;
   body: string;
   headers: {
-    'x-slack-signature': string,
-    'x-slack-request-timestamp': number,
+    'x-slack-signature': string;
+    'x-slack-request-timestamp': number;
   };
   nowMilliseconds?: number;
   logger?: Logger;
@@ -41,8 +41,10 @@ export function verifySlackRequest(options: SlackRequestVerificationOptions): vo
 
   // Rule 1: Check staleness
   if (requestTimestampSec < fiveMinutesAgoSec) {
-    throw new Error(`${verifyErrorPrefix}: x-slack-request-timestamp must differ from system time by no more than ${requestTimestampMaxDeltaMin
-    } minutes or request is stale`);
+    throw new Error(
+      `${verifyErrorPrefix}: x-slack-request-timestamp must differ from system time by no more than ${requestTimestampMaxDeltaMin
+      } minutes or request is stale`,
+    );
   }
 
   // Rule 2: Check signature

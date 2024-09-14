@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/ja-jp/tutorial/hubot-migration">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+      <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700&display=swap" rel="stylesheet">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg">
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started"><li class="title">Bolt 入門ガイド</li></a>
+    <a href="http://localhost:4000/bolt-js/ja-jp/reference"><li class="title">リファレンス</li></a>
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#basic"><li class="title">基本的な概念</li></a>
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-listening">
+      <li>メッセージ・イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-sending">
+      <li>メッセージの送信</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#event-listening">
+      <li>イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#web-api">
+      <li>Web API の使用</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-listening">
+      <li>アクションのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-respond">
+      <li>アクションへの応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#acknowledge">
+      <li>リクエストの確認</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#shortcuts">
+      <li>ショートカットのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#commands">
+      <li>コマンドのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-modals">
+      <li>モーダルの開始</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#updating-pushing-views">
+      <li>モーダルの更新と多重表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#view-submissions">
+      <li>モーダルでの送信のリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#publishing-views">
+      <li>ホームタブの更新</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#options">
+      <li>オプションのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authenticating-oauth">
+      <li>OAuth フローの実装</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#socket-mode">
+      <li>ソケットモードの使用</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#advanced">
+      <li class="title">応用コンセプト</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#error-handling">
+      <li>エラーの処理</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authorization">
+      <li>認可（Authorization）</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#token-rotation">
+      <li>トークンのローテーション</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#conversation-store">
+      <li>会話ストア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#global-middleware">
+      <li>グローバルミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#listener-middleware">
+      <li>リスナーミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#context">
+      <li>context の追加</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#logging">
+      <li>ログの表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#receiver">
+      <li>レシーバーのカスタマイズ</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#custom-routes">
+      <li>カスタム HTTP ルートの追加</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/aws-lambda">
+          <li>AWS Lambda へのデプロイ</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/heroku">
+          <li>Heroku へのデプロイ</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#steps">
+      <li class="title">
+        ワークフローステップ
+        <span class="label-deprecated">
+          非推奨
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの定義
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの追加・編集
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの設定の保存
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの実行
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started-http">
+      <li class="title">Bolt 入門ガイド (HTTP)</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/hubot-migration">
+      <li class="title">Hubot から Bolt に移行する方法</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v2">
+      <li class="title">2.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v3">
+      <li class="title">3.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/using-typescript">
+      <li class="title">TypeScript での利用ガイド</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">貢献</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/" class="header_btn language-switcher float_right">English</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
+        </div>
+        
+        <div class="tutorial">
+          <h1 id="hubot-のアプリを-bolt-に移行する方法">Hubot のアプリを Bolt に移行する方法</h1>
+
+<div class="section-content">
+  <p>Bolt は、Slack アプリを構築する時間と手間を減らすために作成されたフレームワークで、Slack 開発者のみなさんに最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、<a href="https://hubot.github.com/docs/">Hubot で作成されたアプリを Bolt アプリに</a>移行するプロセスを順を追って説明します。</p>
+
+  <p>すでに <a href="https://api.slack.com/bot-users#getting-started">ボットユーザーがいるアプリ</a> を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに<a href="https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js">Bolt リポジトリのサンプルスクリプト</a> を読むとよいでしょう。</p>
+</div>
+
+<hr>
+
+<h3 id="setting-the-stage">まずはじめに</h3>
+<p>Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握しているとさらに理解を深めることができるでしょう。Slack の Hubot アダプターは、　WebSocket をベースとした <a href="https://api.slack.com/rtm">RTM API</a> と接続するように実装されているので、Hubot アプリには一連のワークスペースイベントが一気にストリーミングされます。そして、RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでおすすめできません。</p>
+
+<p>デフォルトの Bolt レシーバーは、<a href="https://api.slack.com/events-api">Events API</a> をサポートするように構築されています。これは、HTTP ベースのイベントサブスクリプションを使用して Bolt アプリに JSON ペイロードを送信します。Events API には、RTM にはない新機能のイベントも含まれており、より細かい制御が可能でスケーラブルですのでほとんどのユースケースで推奨されています。しかし例外として、RTM API を使用し続けなければならない理由の 1 つに、アプリをホストしているサーバーにファイアウォールがあり、HTTP 送信リクエストのみを許可して、受信リクエストを許可しないというようなケースが挙げられます。</p>
+
+<p>Bolt アプリを作成する前に考慮に入れた方がよい違いがほかにもあります。</p>
+<ul>
+  <li>Bolt は Node v10.0.0 以上で動作します。アプリをホストしているサーバーが、v10 をサポートできない場合は、現時点でアプリを Bolt に移行することはできません。</li>
+  <li>Bolt は、外部スクリプトをサポートしていません。Hubot アプリがアプリの機能または展開に必要な外部スクリプトを使用している場合、当面は Hubot のままでいいと思われます。アプリに外部スクリプトがあるかどうかわからない場合は、<code class="language-plaintext highlighter-rouge">external-scripts.json</code> ファイルをチェックしてください。Slack は Bolt の開発を続けていきますので、将来的にどう改良し続けていくかを常に検討しています。外部スクリプトでどうしても必要、というリクエストなどがある場合、<a href="https://github.com/slackapi/bolt-js/issues/119">専用の Github の Issues で要望を 聞かせてください</a>。</li>
+  <li>Hubot アプリは、CoffeeScript で書かれており、JavaScript にトランスパイルされます。Slack は、Bolt を TypeScript で書くことでリッチな型情報にアクセスできるようにしました。Bolt アプリは、TypeScript または JavaScript を使用して開発できます。こちらの <a href="https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js">サンプルスクリプト</a> は、CoffeeScript がどのように JavaScript に変換されるかを示しています。あなたのアプリが比較的複雑なスクリプトである場合、<a href="https://github.com/decaffeinate/decaffeinate">Decaffeinate</a> などのプロジェクトを調べて、CoffeeScript を JavaScript に変換するとよいかもしれません。</li>
+</ul>
+
+<hr>
+
+<h3 id="configuring-your-bot">ボットの設定</h3>
+<p>ボットユーザーを持つ既存の Slack アプリをお持ちの方は、<a href="#%E3%83%9C%E3%83%83%E3%83%88%E3%81%AE%E8%A8%AD%E5%AE%9A-1">次のセクションに進むことができます</a>。わからない場合は、<a href="https://api.slack.com/apps">App Management ページ</a> に移動し、自分の Hubot アプリがあるかどうかを確認してください。ある場合は、そのアプリの認証情報をそのまま使用できます (<a href="#%E3%83%9C%E3%83%83%E3%83%88%E3%81%AE%E8%A8%AD%E5%AE%9A-1">次のセクションに進んでください</a>)。ない場合は、下記の手順通りに進めていきましょう。</p>
+
+<h4 id="slack-アプリを作成する">Slack アプリを作成する</h4>
+<p>まず最初に、Slack アプリを作成します。</p>
+
+<blockquote>
+  <p>💡ここでは普段の仕事の支障にならないように、開発専用のワークスペースを使用することをおすすめします — <a href="https://api.slack.com/apps/new">新しいワークスペースの作成はここから</a>。</p>
+</blockquote>
+
+<p>アプリ名を入力し、インストール先のワークスペースを選択したら、<code class="language-plaintext highlighter-rouge">Create App</code> ボタンをクリックします。そうすると、アプリの <strong>Basic Information</strong> ページが表示されます。</p>
+
+<p>このページには、後で必要になる重要な認証情報 (<strong>App Credentials</strong> ヘッダーの下の <code class="language-plaintext highlighter-rouge">Signing Secret</code> など) に加えて、アプリケーションの概要が表示されます。</p>
+
+<p>ひと通り確認し、アプリのアイコンと説明を追加したら、アプリの構成 🔩 を始めましょう。</p>
+
+<h4 id="ボットユーザーを追加する">ボットユーザーを追加する</h4>
+<p>Slack では、Hubot アプリはユーザーとの対話型のボットユーザーを採用しています。</p>
+
+<p>新しいアプリにボットユーザーを追加するには、左側のサイドバーの <strong>Bot Users</strong> をクリックしてから、<strong>Add A Bot User</strong> をクリックします。表示名とユーザー名を指定して、<strong>Add Bot User</strong> をクリックします。その他のフィールドの詳しい情報は、<a href="https://api.slack.com/bot-users#creating-bot-user">API サイト</a> をご覧ください。</p>
+
+<h3 id="configure-what-your-bot-will-hear">ボットの設定</h3>
+<p><a href="https://api.slack.com/bot-users#app-mentions-response">Events API</a> は、ボットの目と耳に相当します。これによりボットは、投稿されたメッセージ、チャンネルの変更、Slack で発生するその他のアクティビティに反応することができます。</p>
+
+<blockquote>
+  <p>⚠️ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の <a href="https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-your-local-project">ローカル Bolt プロジェクトの設定</a> と <a href="https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events">イベントの設定</a> を参考にしてください。</p>
+</blockquote>
+
+<h4 id="メッセージのリスニング">メッセージのリスニング</h4>
+<p>すべての Hubot アプリは、デフォルトでメッセージをリッスンできるので、ボットユーザーがそうするように設定する必要があります。</p>
+
+<p><a href="https://slack.dev/bolt/ja-jp/tutorial/getting-started#setting-up-events">イベントの設定</a> を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、<strong>Subscribe to Bot Events</strong> にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります <code class="language-plaintext highlighter-rouge">message channel</code> (パブリックチャンネルのメッセージをリッスン)、<code class="language-plaintext highlighter-rouge">message group</code> (プライベートチャンネルのメッセージをリッスン)、<code class="language-plaintext highlighter-rouge">message.im</code> (アプリのホーム/DM スペースのメッセージをリッスン)、<code class="language-plaintext highlighter-rouge">message.mpim</code> (マルチパーソン DM のメッセージをリッスン）。</p>
+
+<p>ボットがチャンネルのメッセージをリッスンするだけでよい場合は、<code class="language-plaintext highlighter-rouge">message.channels</code> と<code class="language-plaintext highlighter-rouge">message.groups</code> をリッスンできます。または、ボットがすべての場所のメッセージをリッスンするようにするには、4 つのメッセージイベントすべてを選択します。</p>
+
+<p>ボットにリッスンさせるメッセージイベントの種類を追加して、<strong>Save Changes</strong> をクリックします。</p>
+
+<h4 id="その他のイベントのリッスン">その他のイベントのリッスン</h4>
+<p>使用していた機能に応じて、Hubot アプリはほかのイベントにも応答していたかもしれません。スクリプトを調べて、<code class="language-plaintext highlighter-rouge">react</code>、<code class="language-plaintext highlighter-rouge">respond</code>、<code class="language-plaintext highlighter-rouge">presenceChange</code> が使用されている箇所を特定してください。</p>
+<ul>
+  <li>アプリで <code class="language-plaintext highlighter-rouge">respond</code> が使用されている場合、<code class="language-plaintext highlighter-rouge">app_mention</code> イベントをサブスクライブします。これで、ボットユーザーがメンションされる時をリッスンします。</li>
+  <li>アプリで <code class="language-plaintext highlighter-rouge">react</code> が使用されている場合、<code class="language-plaintext highlighter-rouge">reaction_added</code> イベントをサブスクライブします。これにより、ボットユーザーがいるチャンネルのメッセージにリアクションが追加される時をリッスンします。</li>
+  <li>アプリで <code class="language-plaintext highlighter-rouge">presenceChange</code> が使用されている場合、対応するイベントはありません。このイベントがあなたのボットの機能上重要な場合は、Hubot の使用を継続するか、アプリのロジックを変更する必要があるかもしれません。</li>
+</ul>
+
+<blockquote>
+  <p>💡Bolt に追加された利点として、どの <a href="https://api.slack.com/events">Events API イベント</a> でもリッスンできることが挙げられます。移行が完了すれば、<a href="https://api.slack.com/events/team_join">ユーザーがワークスペースに参加したとき</a> や <a href="https://api.slack.com/events/app_home_opened">ユーザーがアプリで DM を開いたとき</a> など、より多くのイベントをリッスンできます。</p>
+</blockquote>
+
+<p>アプリの機能に対応するイベントを追加 し終えたら、<strong>Save Changes</strong> をクリックします。</p>
+
+<h3 id="changes-to-script-interfaces">スクリプトインターフェイスの変更</h3>
+<p>Bolt のインターフェイスは、可能な限り Slack API 言語に適合するように設計されましたが、Hubot は複数のサービスを抽象化するために一般化された言語を使用して設計されました。インターフェイスは似ていますが、Hubot スクリプトを Bolt スクリプトに変換するには、いくらかコードを変更する必要があります。</p>
+
+<p>Bolt は、<code class="language-plaintext highlighter-rouge">res</code> を使用せず、Slack からの raw リクエストを公開しません。代わりに、<code class="language-plaintext highlighter-rouge">payload</code> 使ってペイロードボディを取得したり、<code class="language-plaintext highlighter-rouge">say()</code> を使ってメッセージを送信するといった一般的な機能を使用したりできます。</p>
+
+<blockquote>
+  <p>⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、<a href="https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js">Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています。</a></p>
+</blockquote>
+
+<h4 id="message-を使用したパターンのリスニング">
+<code class="language-plaintext highlighter-rouge">message()</code> を使用したパターンのリスニング</h4>
+<p>Hubot スクリプトは、<code class="language-plaintext highlighter-rouge">hear()</code> を使用して、一致するパターンを持つメッセージをリッスンします。代わりに、 Bolt は <code class="language-plaintext highlighter-rouge">message()</code> を使用して、そのパターンの <code class="language-plaintext highlighter-rouge">string</code> または <code class="language-plaintext highlighter-rouge">RegExp</code> を受け入れます。</p>
+
+<blockquote>
+  <p>👨‍💻👩‍💻コードで <code class="language-plaintext highlighter-rouge">hear()</code> を使用している箇所はすべて、<code class="language-plaintext highlighter-rouge">message()</code> を使用するように変更してください。</p>
+</blockquote>
+
+<p><a href="https://slack.dev/bolt/ja-jp/concepts#message-listening">メッセージのリスニングについてもっと詳しく読む</a>.</p>
+
+<h4 id="say-および-respond-を使用したメッセージで応答する">
+<code class="language-plaintext highlighter-rouge">say()</code> および <code class="language-plaintext highlighter-rouge">respond()</code> を使用したメッセージで応答する</h4>
+<p>Hubot スクリプトは、<code class="language-plaintext highlighter-rouge">send()</code> を使用してメッセージを同じ会話に送信し、<code class="language-plaintext highlighter-rouge">reply()</code> を使用して、元のメッセージを送信したユーザー宛の@メンションを付けて、メッセージを同じ会話上に送信します。</p>
+
+<p>Bolt は、<code class="language-plaintext highlighter-rouge">send()</code> の代わりに <code class="language-plaintext highlighter-rouge">say()</code> を使用し、<code class="language-plaintext highlighter-rouge">respond()</code> を使用して <code class="language-plaintext highlighter-rouge">response_url</code> で返信を送信します。返信の冒頭にメンションを追加するには、<code class="language-plaintext highlighter-rouge">context</code> オブジェクトにあるユーザー ID を使用できます。たとえば、メッセージイベントの場合は次のようにできます: <code class="language-plaintext highlighter-rouge">say('&lt;@${message.user}&gt;Hello :wave:')</code></p>
+
+<p>Hubot の <code class="language-plaintext highlighter-rouge">send()</code> と Bolt の <code class="language-plaintext highlighter-rouge">say()</code> はほとんど同じですが、<code class="language-plaintext highlighter-rouge">say()</code> を使用すると <a href="https://api.slack.com/messaging/interactivity#interaction">ボタン、メニューの選択、デートピッカー</a> といったインタラクティブなコンポーネントを付けてメッセージを送信できます。</p>
+
+<blockquote>
+  <p>👨‍💻👩‍💻コードで <code class="language-plaintext highlighter-rouge">send()</code> が使用されている箇所はすべて <code class="language-plaintext highlighter-rouge">say()</code> に変更してください</p>
+</blockquote>
+
+<p><a href="https://slack.dev/bolt/ja-jp/concepts#message-sending">メッセージへの応答についてもっと詳しく読む</a>.</p>
+
+<h4 id="respond-と-react">
+<code class="language-plaintext highlighter-rouge">respond</code> と <code class="language-plaintext highlighter-rouge">react</code>
+</h4>
+<p>前のセクションで、Hubot スクリプトで <code class="language-plaintext highlighter-rouge">respond()</code> が使用されている場合は <code class="language-plaintext highlighter-rouge">app_mention</code> イベントを、<code class="language-plaintext highlighter-rouge">react()</code> が使用されている場合は <code class="language-plaintext highlighter-rouge">reaction_added</code> をサブスクライブするようにアプリを設定しました。</p>
+
+<p>Bolt は、<code class="language-plaintext highlighter-rouge">event()</code> と呼ばれるメソッドを使用して、任意の <a href="https://api.slack.com/events">Events API イベント</a> をリッスンできます。コードを変更するには、<code class="language-plaintext highlighter-rouge">respond()</code> を app.event(‘app_mention’) に、<code class="language-plaintext highlighter-rouge">react()</code> を <code class="language-plaintext highlighter-rouge">app.event(‘reaction_added’)</code> に変更するだけです。この点は、<a href="https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js">サンプルスクリプト</a> で詳しく説明されています。</p>
+
+<blockquote>
+  <p>👨‍💻👩‍💻コードで <code class="language-plaintext highlighter-rouge">respond()</code> が使用されている箇所はすべて、app.event (‘app_mention’) を使用するように変更してください。<code class="language-plaintext highlighter-rouge">react</code> が使用されている箇所はすべて <code class="language-plaintext highlighter-rouge">app.event('reaction_added')</code> に変更してください。</p>
+</blockquote>
+
+<p><a href="https://slack.dev/bolt/ja-jp/concepts#event-listening">イベントのリッスンについてもっと詳しく読む</a>.</p>
+
+<h3 id="using-web-api-methods-with-bolt-for-javascript">Bolt で Web API メソッドを使用する</h3>
+<p>Hubot では、<code class="language-plaintext highlighter-rouge">@slack/client</code> から <code class="language-plaintext highlighter-rouge">WebClient</code> パッケージをインポートする必要がありました。Bolt では、<code class="language-plaintext highlighter-rouge">app.client</code> からアクセスできる <code class="language-plaintext highlighter-rouge">WebClient</code> インスタンスがデフォルトでインポートされます。</p>
+
+<p>組み込みの <code class="language-plaintext highlighter-rouge">WebClient</code> を使用するには、アプリをインスタンス化するために使用されるトークン、またはリクエストの送信元のチームに関連付けられているトークンを渡す必要があります。これは、リスナー関数に渡された <code class="language-plaintext highlighter-rouge">context</code> オブジェクトにあります。たとえば、メッセージにリアクションを追加するには、次を使用します:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td>
+<td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="dl">'</span><span class="s1">react</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">logger</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">reactions</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
+      <span class="na">token</span><span class="p">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">botToken</span><span class="p">,</span>
+      <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">star</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">channel</span><span class="p">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">channel</span><span class="p">,</span>
+      <span class="na">timestamp</span><span class="p">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">ts</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+  <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></td>
+</tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<blockquote>
+  <p>👨‍💻👩‍💻<code class="language-plaintext highlighter-rouge">app.client</code> で組み込みのクライアントを使用するように、Web API 呼び出しを変更してください。</p>
+</blockquote>
+
+<p><a href="https://slack.dev/bolt/ja-jp/concepts#web-api">Bolt での Web API の使用についてもっと詳しく読む。</a></p>
+
+<h3 id="using-middleware-with-bolt-for-javascript">Bolt でのミドルウェアの使用</h3>
+<p>Hubot には、受信 (リスナーが呼び出される前に実行される)、リスナー (一致するすべてのリスナーに対して実行される)、応答 (送信されるすべての応答に対して実行される) という 3 種類のミドルウェアがあります。</p>
+
+<p>Bolt には、グローバルとリスナーという 2 種類のミドルウェアしかありません。</p>
+<ul>
+  <li>グローバルミドルウェアは、リスナーミドルウェアが呼び出される前に実行されます。Bolt アプリ自体に付属しています。<a href="https://slack.dev/bolt/ja-jp/concepts#global-middleware">Bolt のグローバルミドルウェアについてもっと詳しく読む。</a>.</li>
+  <li>リスナーミドルウェアは、付属するリスナー関数に対してのみ実行されます。<a href="https://slack.dev/bolt/ja-jp/concepts#listener-middleware">Bolt のリスナーミドルウェアについてもっと詳しく読む。</a>
+</li>
+</ul>
+
+<p>Bolt では、グローバルとリスナーというミドルウェアはいずれも、<code class="language-plaintext highlighter-rouge">await next()</code> を呼び出して実行の制御を次のミドルウェアに渡す必要があります。ミドルウェアが実行中にエラーを検出した場合、<code class="language-plaintext highlighter-rouge">Error</code> を <code class="language-plaintext highlighter-rouge">next()</code> に渡すことができ、エラーはその前に実行されたミドルウェアチェーンにバブルアップされます。</p>
+
+<p>既存のミドルウェア関数を移行するには、Hubot の受信ミドルウェアは、Bolt のグローバルミドルウェアのユースケースと対応しています。Hubot と Bolt のリスナーミドルウェアは、ほぼ同じです。Hubot の応答ミドルウェアを移行するには、後処理関数と呼ばれる Bolt のコンセプトを使用します。</p>
+
+<p>ミドルウェアがイベントの後処理を実行する必要がある場合、<code class="language-plaintext highlighter-rouge">undefined</code> で呼び出すのではなく、後処理関数を使用して <code class="language-plaintext highlighter-rouge">await next()</code> を呼び出すことができます。後処理関数は、ミドルウェア関数が <code class="language-plaintext highlighter-rouge">await next()</code> を呼び出すのと同じ方法で<code class="language-plaintext highlighter-rouge"> done()</code> を呼び出す必要があります(<code class="language-plaintext highlighter-rouge">Error</code> で呼び出すことも可能) 。</p>
+
+<h3 id="migrating-the-brain-to-the-conversation-store">Brain を conversation store に移行する</h3>
+<p>Hubot には、brain と呼ばれるメモリ内ストレージがあります。これによって、Hubot スクリプトはデータの基本部分を <code class="language-plaintext highlighter-rouge">get</code> および <code class="language-plaintext highlighter-rouge">set</code> することができます。Bolt は、conversation store と呼ばれる、<code class="language-plaintext highlighter-rouge">get()</code>/<code class="language-plaintext highlighter-rouge">set()</code> インターフェイスを含むグローバルミドルウェアを使用します。</p>
+
+<p>デフォルトの組み込み conversation store は Hubot に似たメモリ内ストレージを使用し、ミリ秒単位で有効期限を設定できます。conversation の状態情報を get および set する方法は 2 つあります。</p>
+<ul>
+  <li>conversation ID を使用して <code class="language-plaintext highlighter-rouge">app.convoStore.get()</code> を呼び出して conversation の状態情報を取得する方法と、conversation ID、 conversation の状態情報 (キーと値のペア) 、オプションで <code class="language-plaintext highlighter-rouge">expriesAt</code> 時間 (ミリ秒) を使用して <code class="language-plaintext highlighter-rouge">app.convoStore.set()</code> を呼び出す方法です。</li>
+  <li>リスナーミドルウェアでは、<code class="language-plaintext highlighter-rouge">context.updateConversation()</code> を呼び出して更新されたconversation の状態情報を得るか、<code class="language-plaintext highlighter-rouge">context.conversation</code> を使用して現在のconversation の状態情報にアクセスします。</li>
+</ul>
+
+<p>アプリのインスタンスが複数実行されている場合、組み込みの conversation store はプロセス間で共有されないため、データベースから conversation の状態を取得する conversation store を実装することをおすすめします。</p>
+
+<p><a href="https://slack.dev/bolt/ja-jp/concepts#conversation-store">会話ストアについてもっと詳しく読む</a>.</p>
+
+<h3 id="next-steps">次のステップ</h3>
+<p>ここまで来れば、きっと Hubot アプリを Bolt アプリに変換できているはずです！✨⚡</p>
+
+<p>新しくなってよりクールになった Bolt アプリを、さらにパワーアップしていくこともできます。</p>
+<ul>
+  <li>
+<a href="https://api.slack.com/messaging/interactivity#interaction">ボタンやメニュー選択</a> などの双方向のインタラクションを追加することを検討してください。これらの機能は、Hubot ではサポートされていませんでしたが、アプリが Slack にメッセージを送信するときにコンテキストアクションを含めることができるようになります。</li>
+  <li>こちらの <a href="/bolt-js/ja-jp/concepts">ドキュメント</a> を読んで、Bolt でほかに何ができるか探してみてください。</li>
+  <li>イベントやインタラクティブコンポーネントの使用方法を示す <a href="https://glitch.com/~slack-bolt">サンプルアプリ</a> をチェックしてみてください。</li>
+</ul>
+
+<p>開発中に問題が発生した場合は、Slack の開発者サポートチーム<a href="mailto:developers@slack.com">developers@slack.com</a>までお問合せください。フレームワークで問題が発生した場合は、<a href="https://github.com/slackapi/bolt-js/issues/new">Githubで issues を開いてください</a>。</p>
+
+        </div>
+    </div>
+
+  </div>
+  <script src="http://localhost:4000/bolt-js/scripts/tutorial_nav.js"></script>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+
+</body>
+</html>

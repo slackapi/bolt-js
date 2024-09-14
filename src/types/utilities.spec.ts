@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { RespondArguments } from './utilities';
+import type { RespondArguments } from './utilities';
 
 describe('RespondArguments', () => {
   it('has expected properties', () => {

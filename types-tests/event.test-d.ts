@@ -1,5 +1,17 @@
 import { expectNotType, expectType } from 'tsd';
-import { App, SlackEvent, AppMentionEvent, ReactionAddedEvent, ReactionRemovedEvent, UserHuddleChangedEvent, UserProfileChangedEvent, UserStatusChangedEvent, PinAddedEvent, SayFn, PinRemovedEvent } from '..';
+import {
+  App,
+  type AppMentionEvent,
+  type PinAddedEvent,
+  type PinRemovedEvent,
+  type ReactionAddedEvent,
+  type ReactionRemovedEvent,
+  type SayFn,
+  type SlackEvent,
+  type UserHuddleChangedEvent,
+  type UserProfileChangedEvent,
+  type UserStatusChangedEvent,
+} from '..';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

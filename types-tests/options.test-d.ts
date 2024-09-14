@@ -1,12 +1,12 @@
-import { expectType, expectError } from 'tsd';
+import type { Option } from '@slack/types';
+import { expectError, expectType } from 'tsd';
 import {
   App,
-  SlackOptions,
-  BlockSuggestion,
-  InteractiveMessageSuggestion,
-  DialogSuggestion,
+  type BlockSuggestion,
+  type DialogSuggestion,
+  type InteractiveMessageSuggestion,
+  type SlackOptions,
 } from '../dist';
-import { Option } from '@slack/types';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -76,7 +76,9 @@ expectType<void>(
 // FIXME: app.options({ type: 'dialog_suggestion', callback_id: 'a' } does not work
 
 const db = {
-  get: (_teamId: String) => { return [{ label: 'l', value: 'v' }]; },
+  get: (_teamId: string) => {
+    return [{ label: 'l', value: 'v' }];
+  },
 };
 
 expectType<void>(
@@ -89,23 +91,23 @@ expectType<void>(
 
     if (results) {
       // (modified to satisfy TS compiler)
-      let options: Option[] = [];
+      const options: Option[] = [];
       // Collect information in options array to send in Slack ack response
       for (const result of results) {
         options.push({
-          "text": {
-            "type": "plain_text",
-            "text": result.label
+          text: {
+            type: 'plain_text',
+            text: result.label,
           },
-          "value": result.value
+          value: result.value,
         });
       }
 
       await ack({
-        "options": options
+        options: options,
       });
     } else {
       await ack();
     }
-  })
+  }),
 );

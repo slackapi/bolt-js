@@ -1,12 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
-import { SocketModeFunctions as func } from './SocketModeFunctions';
-import {
-  ReceiverMultipleAckError,
-  AuthorizationError,
-} from '../errors';
+import { AuthorizationError, ReceiverMultipleAckError } from '../errors';
 import { createFakeLogger } from '../test-helpers';
-import { ReceiverEvent } from '../types';
+import type { ReceiverEvent } from '../types';
+import { SocketModeFunctions as func } from './SocketModeFunctions';
 
 describe('SocketModeFunctions', async () => {
   describe('Error handlers for event processing', async () => {

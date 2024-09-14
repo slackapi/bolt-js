@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/tutorial/migration-v3">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" 
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg" />
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/tutorial/getting-started"
+      ><li class="title">Getting started</li></a
+    >
+    <a href="http://localhost:4000/bolt-js/reference"
+      ><li class="title">Reference</li></a
+    >
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#basic"
+      ><li class="title">Basic concepts</li></a
+    >
+     
+    <a href="http://localhost:4000/bolt-js/concepts#message-listening">
+      <li>Listening to messages</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#message-sending">
+      <li>Sending messages</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#event-listening">
+      <li>Listening to events</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#web-api">
+      <li>Using the Web API</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#action-listening">
+      <li>Listening to actions</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#action-respond">
+      <li>Responding to actions</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#acknowledge">
+      <li>Acknowledging requests</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#shortcuts">
+      <li>Listening and responding to shortcuts</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#commands">
+      <li>Listening and responding to commands</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#creating-modals">
+      <li>Opening modals</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#updating-pushing-views">
+      <li>Updating and pushing views</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#view-submissions">
+      <li>Listening to views</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#publishing-views">
+      <li>Publishing views to App Home</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#options">
+      <li>Listening and responding to options</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#authenticating-oauth">
+      <li>Authenticating with OAuth</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#socket-mode">
+      <li>Using Socket Mode</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#advanced">
+      <li class="title">Advanced concepts</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/concepts#error-handling">
+      <li>Handling errors</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#authorization">
+      <li>Authorization</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#token-rotation">
+      <li>Token rotation</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#conversation-store">
+      <li>Conversation stores</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#global-middleware">
+      <li>Global middleware</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#listener-middleware">
+      <li>Listener middleware</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#context">
+      <li>Adding context</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#deferring-initialization">
+      <li>Deferring App initialization</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#logging">
+      <li>Logging</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#receiver">
+      <li>Customizing a receiver</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#custom-routes">
+      <li>Adding Custom HTTP routes</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/deployments/aws-lambda">
+          <li>AWS Lambda</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/deployments/heroku">
+          <li>Heroku Platform</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#steps">
+      <li class="title">
+        Workflow steps
+        <span class="label-deprecated">
+          Deprecated
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Creating workflow steps
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Adding or editing workflow steps
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Saving step configurations
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Executing workflow steps
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/getting-started-http">
+      <li class="title">Getting started with HTTP</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/hubot-migration">
+      <li class="title">Migrating Hubot apps</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/migration-v2">
+      <li class="title">Migrating to V2</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/migration-v3">
+      <li class="title">Migrating to V3</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/using-typescript">
+      <li class="title">Using TypeScript</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">Contributing</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/ja-jp" class="header_btn language-switcher float_right">日本語 (Japanese)</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
+        </div>
+        
+        <div class="tutorial">
+          <h1 id="migrating-to-v3x">Migrating to v3.x</h1>
+
+<div class="section-content">
+  <p>This guide will walk you through the process of updating your app from using <code class="language-plaintext highlighter-rouge">@slack/bolt@2.x</code> to <code class="language-plaintext highlighter-rouge">@slack/bolt@3.x</code>. There are a few changes you’ll need to make but for most apps, these changes can be applied in 5 - 15 minutes.</p>
+
+  <p><em>Note: Make sure to checkout our <a href="#slackbolt2x-support-schedule">support schedule</a> for <code class="language-plaintext highlighter-rouge">@slack/bolt@2.x</code> if you don’t plan on upgrading right away</em></p>
+</div>
+
+<hr />
+
+<h3 id="org-wide-app-installation-changes-to-installationstore--orgauthorize">Org Wide App Installation Changes to InstallationStore &amp; orgAuthorize</h3>
+
+<p>In <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0">Bolt for JavaScript 2.5.0</a>, we introduced support for <a href="https://api.slack.com/enterprise/apps">org wide app installations</a>. To add support to your applications, two new methods were introduced to the Installation Store used during OAuth, <code class="language-plaintext highlighter-rouge">fetchOrgInstallation</code> &amp; <code class="language-plaintext highlighter-rouge">storeOrgInstallation</code>. With <code class="language-plaintext highlighter-rouge">@slack/bolt@3.x</code>, we have dropped support for these two new methods for a simpler interface and to be better aligned with Bolt for Python and Bolt for Java. See the code samples below for the recommended changes to migrate.</p>
+
+<p>Before:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="rouge-code"><pre><span class="nx">installationStore</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">storeInstallation</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">installation</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// change the line below so it saves to your database</span>
+      <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">installation</span><span class="p">.</span><span class="nx">team</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">installation</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">fetchInstallation</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">installQuery</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// change the line below so it fetches from your database</span>
+      <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">installQuery</span><span class="p">.</span><span class="nx">teamId</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">storeOrgInstallation</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">installation</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// include this method if you want your app to support org wide installations</span>
+      <span class="c1">// change the line below so it saves to your database</span>
+      <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">installation</span><span class="p">.</span><span class="nx">enterprise</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">installation</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">fetchOrgInstallation</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">installQuery</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// include this method if you want your app to support org wide installations</span>
+      <span class="c1">// change the line below so it fetches from your database</span>
+      <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">installQuery</span><span class="p">.</span><span class="nx">enterpriseId</span><span class="p">);</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>After:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="rouge-code"><pre><span class="nx">installationStore</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">storeInstallation</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">installation</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">installation</span><span class="p">.</span><span class="nx">isEnterpriseInstall</span> <span class="o">&amp;&amp;</span> <span class="nx">installation</span><span class="p">.</span><span class="nx">enterprise</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// support for org wide app installation</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">installation</span><span class="p">.</span><span class="nx">enterprise</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">installation</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">installation</span><span class="p">.</span><span class="nx">team</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// single team app installation</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">installation</span><span class="p">.</span><span class="nx">team</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">installation</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed saving installation data to installationStore</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">fetchInstallation</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">installQuery</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// replace database.get so it fetches from your database</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">installQuery</span><span class="p">.</span><span class="nx">isEnterpriseInstall</span> <span class="o">&amp;&amp;</span> <span class="nx">installQuery</span><span class="p">.</span><span class="nx">enterpriseId</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// org wide app installation lookup</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">installQuery</span><span class="p">.</span><span class="nx">enterpriseId</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">installQuery</span><span class="p">.</span><span class="nx">teamId</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// single team app installation lookup</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nx">database</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">installQuery</span><span class="p">.</span><span class="nx">teamId</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed fetching installation</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>Along with this change, we have also dropped support for <code class="language-plaintext highlighter-rouge">orgAuthorize</code>, and instead recommend developers to use <code class="language-plaintext highlighter-rouge">authorize</code> for both the single workspace installs and org wide app installs (if you are not using the built-in OAuth or providing a token when initializing App). See the code sample below for migration steps:</p>
+
+<p>Before:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span> <span class="na">authorize</span><span class="p">:</span> <span class="nx">authorizeFn</span><span class="p">,</span> <span class="na">orgAuthorize</span><span class="p">:</span> <span class="nx">orgAuthorizeFn</span><span class="p">,</span> <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span> <span class="p">});</span>
+
+<span class="kd">const</span> <span class="nx">authorizeFn</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">teamId</span><span class="p">,</span> <span class="nx">enterpriseId</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+  <span class="c1">// Use teamId to fetch installation details from database</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">orgAuthorizeFn</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">teamId</span><span class="p">,</span> <span class="nx">enterpriseId</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+  <span class="c1">// Use enterpriseId to fetch installation details from database</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>After:</p>
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span> <span class="na">authorize</span><span class="p">:</span> <span class="nx">authorizeFn</span><span class="p">,</span> <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span> <span class="p">});</span>
+
+<span class="kd">const</span> <span class="nx">authorizeFn</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">teamId</span><span class="p">,</span> <span class="nx">enterpriseId</span><span class="p">,</span> <span class="nx">isEnterpriseInstall</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+  <span class="c1">// if isEnterpriseInstall is true, use enterpriseId to fetch installation details from database</span>
+  <span class="c1">// else, use teamId to fetch installation details from database</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<h3 id="http-receiver-as-default">HTTP Receiver as default</h3>
+
+<p>In <code class="language-plaintext highlighter-rouge">@slack/bolt@3.x</code>, we have introduced a new default <a href="https://github.com/slackapi/bolt-js/issues/670"><code class="language-plaintext highlighter-rouge">HTTPReceiver</code></a> which replaces the previous default <code class="language-plaintext highlighter-rouge">ExpressReceiver</code>. This will allow Bolt for JavaScript apps to easily work with other popular web frameworks (Hapi.js, Koa, etc). <code class="language-plaintext highlighter-rouge">ExpressReceiver</code> is still being shipped with Bolt for JavaScript and <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> will not provide all the same functionality. One use case that isn’t supported by <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> is creating custom routes (ex: create a route to do a health check). For these use cases, we recommend continuing to use <code class="language-plaintext highlighter-rouge">ExpressReceiver</code> by importing the class, and creating your own instance of it, and passing this instance into the constructor of <code class="language-plaintext highlighter-rouge">App</code>. See <a href="https://slack.dev/bolt-js/concepts#custom-routes">our documentation on adding custom http routes</a> for an example.</p>
+
+<h3 id="slackbolt2x-support-schedule">@slack/bolt@2.x support schedule</h3>
+
+<p><code class="language-plaintext highlighter-rouge">@slack/bolt@2.x</code> will be deprecated on <strong>January 12th, 2021</strong>. We will only implement <strong>critical bug fixes</strong> until the official end of life date and close non critical issues and pull requests, which is slated for <strong>May 31st, 2021</strong>. At this time, development will fully stop for <code class="language-plaintext highlighter-rouge">@slack/bolt@2.x</code> and all remaining open issues and pull requests will be closed.</p>
+
+<h3 id="minimum-node-version">Minimum Node Version</h3>
+
+<p><code class="language-plaintext highlighter-rouge">@slack/bolt@3.x</code> requires a minimum Node version of <code class="language-plaintext highlighter-rouge">12.13.0</code> and minimum npm version of <code class="language-plaintext highlighter-rouge">6.12.0</code> .</p>
+
+<h3 id="minimum-typescript-version">Minimum TypeScript Version</h3>
+
+<p>As outlined in our <a href="https://slack.dev/bolt/tutorial/using-typescript">using TypeScript guide</a>, <code class="language-plaintext highlighter-rouge">@slack/bolt@3.x</code> requires a minimum TypeScript version of <code class="language-plaintext highlighter-rouge">4.1</code>.</p>
+
+        </div>
+    </div>
+
+  </div>
+  <script src="http://localhost:4000/bolt-js/scripts/tutorial_nav.js"></script>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</body>
+</html>

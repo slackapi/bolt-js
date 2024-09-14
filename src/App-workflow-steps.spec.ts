@@ -1,14 +1,11 @@
 import 'mocha';
-import sinon from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
-import { Override, mergeOverrides } from './test-helpers';
-import {
-  Receiver,
-  ReceiverEvent,
-} from './types';
-import App from './App';
+import sinon from 'sinon';
+import type App from './App';
 import { WorkflowStep } from './WorkflowStep';
+import { type Override, mergeOverrides } from './test-helpers';
+import type { Receiver, ReceiverEvent } from './types';
 
 // Fakes
 class FakeReceiver implements Receiver {
@@ -52,7 +49,7 @@ describe('App WorkflowStep middleware', () => {
     /* middleware is a private property on App. Since app.step relies on app.use,
     and app.use is fully tested above, we're opting just to ensure that the step listener
     is added to the global middleware array, rather than repeating the same tests. */
-    const { middleware } = (app as any);
+    const { middleware } = app as any;
 
     assert.equal(middleware.length, 2);
 

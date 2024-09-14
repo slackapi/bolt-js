@@ -1,26 +1,15 @@
 import 'mocha';
-import { assert } from 'chai';
-import sinon from 'sinon';
-import rewiremock from 'rewiremock';
-import { Logger } from '@slack/logger';
+import type { Logger } from '@slack/logger';
+import type { AppHomeOpenedEvent, AppMentionEvent, GenericMessageEvent, MessageEvent, SlackEvent } from '@slack/types';
 import { WebClient } from '@slack/web-api';
-import {
-  AppHomeOpenedEvent,
-  AppMentionEvent,
-  GenericMessageEvent,
-  MessageEvent,
-  SlackEvent,
-} from '@slack/types';
+import { assert } from 'chai';
+import rewiremock from 'rewiremock';
+import sinon from 'sinon';
 import { ErrorCode } from '../errors';
-import { Override, createFakeLogger } from '../test-helpers';
-import {
-  SlackEventMiddlewareArgs,
-  NextFn,
-  Context,
-  SlackCommandMiddlewareArgs,
-} from '../types';
-import { onlyCommands, onlyEvents, matchCommandName, matchEventType, subtype } from './builtin';
-import { SlashCommand } from '../types/command';
+import { type Override, createFakeLogger } from '../test-helpers';
+import type { Context, NextFn, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs } from '../types';
+import type { SlashCommand } from '../types/command';
+import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from './builtin';
 
 // Test fixtures
 const validCommandPayload: SlashCommand = {
@@ -479,14 +468,17 @@ describe('Built-in global middleware', () => {
       const fakeBotUserId = 'BUSER1';
       const eventsWhichShouldNotBeFilteredOut = ['member_joined_channel', 'member_left_channel'];
 
-      const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map((eventType) => ({
-        next: fakeNext,
-        context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
-        event: {
-          type: eventType,
-          user: fakeBotUserId,
-        },
-      } as unknown as MemberJoinedOrLeftChannelMiddlewareArgs));
+      const listOfFakeArgs = eventsWhichShouldNotBeFilteredOut.map(
+        (eventType) =>
+          ({
+            next: fakeNext,
+            context: { botUserId: fakeBotUserId, botId: fakeBotUserId },
+            event: {
+              type: eventType,
+              user: fakeBotUserId,
+            },
+          }) as unknown as MemberJoinedOrLeftChannelMiddlewareArgs,
+      );
 
       const { ignoreSelf: getIgnoreSelfMiddleware } = await importBuiltin();
 
@@ -866,7 +858,10 @@ interface MiddlewareCommonArgs {
 type MessageMiddlewareArgs = SlackEventMiddlewareArgs<'message'> & MiddlewareCommonArgs;
 type TokensRevokedMiddlewareArgs = SlackEventMiddlewareArgs<'tokens_revoked'> & MiddlewareCommonArgs;
 
-type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<'member_joined_channel' | 'member_left_channel'> & MiddlewareCommonArgs;
+type MemberJoinedOrLeftChannelMiddlewareArgs = SlackEventMiddlewareArgs<
+  'member_joined_channel' | 'member_left_channel'
+> &
+  MiddlewareCommonArgs;
 
 type CommandMiddlewareArgs = SlackCommandMiddlewareArgs & MiddlewareCommonArgs;
 
@@ -889,7 +884,7 @@ function createFakeMessageEvent(content: string | GenericMessageEvent['blocks'] 
   return event as MessageEvent;
 }
 
-function createFakeAppMentionEvent(text: string = ''): AppMentionEvent {
+function createFakeAppMentionEvent(text = ''): AppMentionEvent {
   const event: Partial<AppMentionEvent> = {
     text,
     type: 'app_mention',

@@ -1,21 +1,21 @@
 import 'mocha';
+import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
-import sinon from 'sinon';
 import rewiremock from 'rewiremock';
-import { WebClient } from '@slack/web-api';
+import sinon from 'sinon';
 import {
+  type AllWorkflowStepMiddlewareArgs,
+  type SlackWorkflowStepMiddlewareArgs,
   WorkflowStep,
-  SlackWorkflowStepMiddlewareArgs,
-  AllWorkflowStepMiddlewareArgs,
-  WorkflowStepMiddleware,
-  WorkflowStepConfig,
-  WorkflowStepEditMiddlewareArgs,
-  WorkflowStepSaveMiddlewareArgs,
-  WorkflowStepExecuteMiddlewareArgs,
+  type WorkflowStepConfig,
+  type WorkflowStepEditMiddlewareArgs,
+  type WorkflowStepExecuteMiddlewareArgs,
+  type WorkflowStepMiddleware,
+  type WorkflowStepSaveMiddlewareArgs,
 } from './WorkflowStep';
-import { Override } from './test-helpers';
-import { AllMiddlewareArgs, AnyMiddlewareArgs, WorkflowStepEdit, Middleware } from './types';
 import { WorkflowStepInitializationError } from './errors';
+import type { Override } from './test-helpers';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from './types';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('./WorkflowStep')> {
   return rewiremock.module(() => import('./WorkflowStep'), overrides);
@@ -145,8 +145,8 @@ describe('WorkflowStep class', () => {
     it('should return true if recognized workflow step payload type', async () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs
-      & AllMiddlewareArgs;
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs;
 
       const { isStepEvent } = await importWorkflowStep();
 
@@ -174,7 +174,8 @@ describe('WorkflowStep class', () => {
     it('should remove next() from all original event args', async () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs; // eslint-disable-line max-len
 
       const { prepareStepArgs } = await importWorkflowStep();
 
@@ -255,7 +256,8 @@ describe('WorkflowStep class', () => {
     });
 
     it('complete should call workflows.stepCompleted', async () => {
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs; // eslint-disable-line max-len
 
       const fakeClient = { workflows: { stepCompleted: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
@@ -272,7 +274,8 @@ describe('WorkflowStep class', () => {
     });
 
     it('fail should call workflows.stepFailed', async () => {
-      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
+      const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
+        AllMiddlewareArgs; // eslint-disable-line max-len
 
       const fakeClient = { workflows: { stepFailed: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;

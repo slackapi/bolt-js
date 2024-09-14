@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Middleware, AnyMiddlewareArgs } from './types';
 import { getTypeAndConversation } from './helpers';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { AnyMiddlewareArgs, Middleware } from './types';
 
 /**
  * Storage backend used by the conversation context middleware
@@ -59,8 +59,8 @@ export function conversationContext<ConversationState = any>(
   return async ({ body, context, next, logger }) => {
     const { conversationId } = getTypeAndConversation(body);
     if (conversationId !== undefined) {
-      context.updateConversation = (conversation: ConversationState,
-        expiresAt?:number) => store.set(conversationId, conversation, expiresAt);
+      context.updateConversation = (conversation: ConversationState, expiresAt?: number) =>
+        store.set(conversationId, conversation, expiresAt);
       try {
         context.conversation = await store.get(conversationId);
         logger.debug(`Conversation context loaded for ID: ${conversationId}`);

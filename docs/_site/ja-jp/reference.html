@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/ja-jp/reference">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+      <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700&display=swap" rel="stylesheet">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" 
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg" />
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started"
+      ><li class="title">Bolt 入門ガイド</li></a
+    >
+    <a href="http://localhost:4000/bolt-js/ja-jp/reference"
+      ><li class="title">リファレンス</li></a
+    >
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#basic"
+      ><li class="title">基本的な概念</li></a
+    >
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-listening">
+      <li>メッセージ・イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-sending">
+      <li>メッセージの送信</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#event-listening">
+      <li>イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#web-api">
+      <li>Web API の使用</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-listening">
+      <li>アクションのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-respond">
+      <li>アクションへの応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#acknowledge">
+      <li>リクエストの確認</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#shortcuts">
+      <li>ショートカットのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#commands">
+      <li>コマンドのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-modals">
+      <li>モーダルの開始</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#updating-pushing-views">
+      <li>モーダルの更新と多重表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#view-submissions">
+      <li>モーダルでの送信のリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#publishing-views">
+      <li>ホームタブの更新</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#options">
+      <li>オプションのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authenticating-oauth">
+      <li>OAuth フローの実装</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#socket-mode">
+      <li>ソケットモードの使用</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#advanced">
+      <li class="title">応用コンセプト</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#error-handling">
+      <li>エラーの処理</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authorization">
+      <li>認可（Authorization）</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#token-rotation">
+      <li>トークンのローテーション</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#conversation-store">
+      <li>会話ストア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#global-middleware">
+      <li>グローバルミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#listener-middleware">
+      <li>リスナーミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#context">
+      <li>context の追加</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#logging">
+      <li>ログの表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#receiver">
+      <li>レシーバーのカスタマイズ</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#custom-routes">
+      <li>カスタム HTTP ルートの追加</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/aws-lambda">
+          <li>AWS Lambda へのデプロイ</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/heroku">
+          <li>Heroku へのデプロイ</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#steps">
+      <li class="title">
+        ワークフローステップ
+        <span class="label-deprecated">
+          非推奨
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの定義
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの追加・編集
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの設定の保存
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの実行
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started-http">
+      <li class="title">Bolt 入門ガイド (HTTP)</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/hubot-migration">
+      <li class="title">Hubot から Bolt に移行する方法</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v2">
+      <li class="title">2.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v3">
+      <li class="title">3.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/using-typescript">
+      <li class="title">TypeScript での利用ガイド</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">貢献</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/" class="header_btn language-switcher float_right">English</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="reference">
+          <h1 id="リファレンスappインターフェイスと設定">リファレンス（Appインターフェイスと設定）</h1>
+
+<div class="section-content">
+  <p>このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡<a href="/bolt-js/ja-jp/tutorial/getting-started">入門ガイド</a>をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。</p>
+</div>
+
+<ul>
+  <li><a href="#listener-functions">リスナー関数</a>
+    <ul>
+      <li><a href="#methods">メソッド</a></li>
+      <li><a href="#listener-function-arguments">リスナー関数の引数</a></li>
+      <li><a href="#difference-from-listener-middleware">リスナーミドルウェアとの違い</a></li>
+    </ul>
+  </li>
+  <li><a href="#initialization-options">初期化オプション</a>
+    <ul>
+      <li><a href="#receiver-options">レシーバーオプション</a></li>
+      <li><a href="#app-options">Appオプション</a></li>
+    </ul>
+  </li>
+  <li><a href="#framework-error-types">フレームワークのエラー</a>
+    <ul>
+      <li><a href="#client-errors">クライアント側のエラー</a></li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="listener-functions">リスナー関数</h2>
+<p>Slack アプリは通常、Slack からのイベント情報を受け取ったり、それに応答を返したりします。受信するイベントは 1 つの場合もあれば、多数の場合もあります。例えば、Events API のイベント（アプリに関連するリンクが共有されたときなど）や、ユーザーがアプリのショートカットを実行するイベントを受け取ったりします。Slack からのリクエストの種類に応じて、それぞれ異なるメソッドが用意されています。これらのメソッドに、それらのイベントを処理したり応答を返したりするための<strong>リスナー関数</strong>を渡します。</p>
+
+<h3 id="methods">メソッド</h3>
+<p>以下の表は、現在提供しているリスナー関数を渡すためのメソッドの一覧です。これらのメソッドを使って、Slack から送信された各種のイベントを処理します。各メソッドの一般的な設定は、まずイベントを判別するためのパラメーターがあり、リスナー関数がそれに続く形になっています。イベント判定のためのパラメーターとは、以下の説明にある、特定の <code class="language-plaintext highlighter-rouge">callback_id</code> やメッセージ中の部分一致の文字列を指定する部分などのことです。これにより、リスナー関数が処理するイベントを条件に合致するものだけに絞り込むことができます。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">メソッド</th>
+      <th style="text-align: left">説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.event(eventType, fn);</code></td>
+      <td style="text-align: left">Events API のイベントをリッスンします。<code class="language-plaintext highlighter-rouge">eventType</code> は、処理対象の<a href="https://api.slack.com/events">イベント</a>を指定するための文字列 です。この値は、Slackアプリの設定画面でサブスクライブの設定がされている必要があります。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.message([pattern ,] fn);</code></td>
+      <td style="text-align: left"><a href="https://api.slack.com/events/message"><code class="language-plaintext highlighter-rouge">message</code> イベント</a>のリッスンに特化した、便利なメソッドです。<code class="language-plaintext highlighter-rouge">pattern</code> パラメーターには、部分一致させる文字列、または正規表現を指定します。これによって処理対象のメッセージを判別します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.action(actionId, fn);</code></td>
+      <td style="text-align: left">Block Kit エレメントから送信される <code class="language-plaintext highlighter-rouge">action</code> イベントをリッスンします。このイベントにはユーザーのボタン操作、メニュー選択、日付ピッカーの操作などがあります。<code class="language-plaintext highlighter-rouge">actionId</code> は文字列型で、アプリがビュー内に含めたブロックエレメントに指定した一意の <code class="language-plaintext highlighter-rouge">action_id</code> の値と一致する必要があります。ここでいう「ビュー」とは、メッセージ、モーダル、アプリのホームタブのことを指します。アクションエレメントを <code class="language-plaintext highlighter-rouge">input</code> ブロックに配置した場合はイベントがトリガーされないことに注意してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.shortcut(callbackId, fn);</code></td>
+      <td style="text-align: left">グローバルショートカットまたはメッセージショートカットの呼び出しをリッスンします。<code class="language-plaintext highlighter-rouge">callbackId</code> は文字列または正規表現で、アプリの設定で指定したショートカットの <code class="language-plaintext highlighter-rouge">callback_id</code> にマッチする必要があります。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.view(callbackId, fn);</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">view_submission</code> イベントと <code class="language-plaintext highlighter-rouge">view_closed</code> イベントをリッスンします。<code class="language-plaintext highlighter-rouge">view_submission</code> イベントは、アプリが開いたモーダルでユーザーがデータ送信の操作をしたときに発生します。<code class="language-plaintext highlighter-rouge">view_closed</code> イベントは、ユーザーがデータ送信を実行せずにモーダルを閉じたときに発生します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.step(workflowStep)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">WorkflowStep</code> のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには <code class="language-plaintext highlighter-rouge">edit</code>、<code class="language-plaintext highlighter-rouge">save</code>、<code class="language-plaintext highlighter-rouge">execute</code> の 3 種類があります。ワークフローステップについて詳しくは、<a href="/bolt-js/ja-jp/concepts#adding-editing-steps">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.command(commandName, fn);</code></td>
+      <td style="text-align: left">Slash コマンドの呼び出しをリッスンします。<code class="language-plaintext highlighter-rouge">commandName</code> は文字列型で、アプリの設定で指定したスラッシュコマンドと一致する必要があります。スラッシュコマンドの名前では <code class="language-plaintext highlighter-rouge">/</code> を最初に配置します（例 : <code class="language-plaintext highlighter-rouge">/helpdesk</code>）。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.options(actionId, fn);</code></td>
+      <td style="text-align: left">外部データソースを使用するセレクトメニューなどから送られる選択肢読み込みのリクエストをリッスンします。使う機会は多くありませんが、<code class="language-plaintext highlighter-rouge">app.action</code> と混同しないようにしましょう。<code class="language-plaintext highlighter-rouge">actionId</code> は文字列型で、アプリがビュー内に<a href="https://api.slack.com/reference/block-kit/block-elements#external_select">外部データソースを使用するセレクトメニュー</a>を含めるときに指定した<code class="language-plaintext highlighter-rouge">action_id</code> と一致する必要があります。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="制約オブジェクト">制約オブジェクト</h4>
+<p>一部のメソッドでは、さまざまな制約オブジェクトを指定することができます。制約オブジェクトを使用すると、リスナー関数で扱うイベントをさらに絞り込んだり、特定のケースに対応することができます。制約オブジェクトは、上で説明した識別子の代わりとしてメソッドに渡すことができます。さまざまな制約オブジェクトとそれを渡せるメソッドを以下の表にまとめます。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">メソッド</th>
+      <th style="text-align: left">オプション</th>
+      <th style="text-align: left">詳細</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.action(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">block_id</code>, <code class="language-plaintext highlighter-rouge">action_id</code>, <code class="language-plaintext highlighter-rouge">callback_id</code>, (,<code class="language-plaintext highlighter-rouge">type</code>)</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">action_id</code> だけでなく、他の制約指定でもリッスンします。<code class="language-plaintext highlighter-rouge">block_id</code> は、エレメントの親ブロックの ID です。<code class="language-plaintext highlighter-rouge">callback_id</code> は、ビューの初期化時に指定したビューの ID です（モーダルに配置したアクションエレメントのみで使用できます）。<code class="language-plaintext highlighter-rouge">type</code> を指定することで、blocks内のアクションのみを処理するか、あるいは <code class="language-plaintext highlighter-rouge">attachments</code> 内のアクションのみなのかを選択できます。type に <code class="language-plaintext highlighter-rouge">block_actions</code> を指定すると、blocks内のアクションエレメントのみを処理します。<code class="language-plaintext highlighter-rouge">interactive_message</code> を指定すると、旧来の <code class="language-plaintext highlighter-rouge">attachments</code> 内のインタラクティブなアクションのみを処理します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.shortcut(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">type</code>, <code class="language-plaintext highlighter-rouge">callback_id</code></td>
+      <td style="text-align: left">対象のショートカットの種類を指定できます。<code class="language-plaintext highlighter-rouge">type</code> に <code class="language-plaintext highlighter-rouge">shortcut</code>を指定すると<strong>グローバルショートカット</strong>、 <code class="language-plaintext highlighter-rouge">message_action</code>の場合は<strong>メッセージショートカット</strong>）となります。<code class="language-plaintext highlighter-rouge">callbackId</code> には文字列か正規表現を指定します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.view(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">type</code>, <code class="language-plaintext highlighter-rouge">callback_id</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">type</code> には <code class="language-plaintext highlighter-rouge">view_closed</code> または <code class="language-plaintext highlighter-rouge">view_submission</code> のいずれかを指定します。ここで指定した種別のイベントの場合のみリスナー関数にイベントが渡されます。<code class="language-plaintext highlighter-rouge">callback_id</code> は、アプリでモーダルを開く際に設定したビューの <code class="language-plaintext highlighter-rouge">callback_id</code> です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.options(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">block_id</code>, <code class="language-plaintext highlighter-rouge">action_id</code>, <code class="language-plaintext highlighter-rouge">callback_id</code></td>
+      <td style="text-align: left">必須ではない設定として、<code class="language-plaintext highlighter-rouge">action_id</code> の他に <code class="language-plaintext highlighter-rouge">block_id</code> と <code class="language-plaintext highlighter-rouge">callback_id</code> もリッスンする条件に追加することができます。<code class="language-plaintext highlighter-rouge">callback_id</code> はモーダル内の options エレメントを処理する場合にのみ指定できます。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="listener-function-arguments">リスナー関数の引数</h3>
+<p>リスナー関数がアクセスできる引数は、リスナー関数が渡されるメソッドによって決まります。以下の表は、これらの引数の説明です。この表は、それぞれの引数とそれにアクセスできるメソッドの詳細をカバーします。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">引数</th>
+      <th style="text-align: left">説明</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">payload</code></td>
+      <td style="text-align: left">すべてのリスナー</td>
+      <td>受信したイベントペイロードから装飾部分などが取り除かれた本質的な内容部分。この内容や構造はイベントの種別によって異なります。このペイロード情報は下記の <code class="language-plaintext highlighter-rouge">body</code>のサブセットです。また、<code class="language-plaintext highlighter-rouge">payload</code> には、リスナーが渡されたメソッド名と同じ名前のエイリアスを使ってアクセスすることもできます（<code class="language-plaintext highlighter-rouge">message</code>、<code class="language-plaintext highlighter-rouge">event</code>、<code class="language-plaintext highlighter-rouge">action</code>、<code class="language-plaintext highlighter-rouge">shortcut</code>、<code class="language-plaintext highlighter-rouge">view</code>、<code class="language-plaintext highlighter-rouge">command</code>、<code class="language-plaintext highlighter-rouge">options</code>）。<strong>payload の内容を簡単に確認する方法は、それを実際にログに出力してみることです</strong>。または、<a href="/bolt-js/ja-jp/tutorial/using-typescript">TypeScript</a> を使うのもよいでしょう。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">say</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">message</code>, <code class="language-plaintext highlighter-rouge">event</code>, <code class="language-plaintext highlighter-rouge">action</code>, <code class="language-plaintext highlighter-rouge">command</code></td>
+      <td>受信したイベントが紐づいているチャンネルにメッセージを送信する関数。この引数が使用できるのは、リスナーをトリガーしたイベントにチャンネル ID が含まれる場合のみです（<code class="language-plaintext highlighter-rouge">message</code> イベントが最も一般的です）。<code class="language-plaintext highlighter-rouge">say</code> は、シンプルな文字列（プレーンテキストのメッセージ）またはオブジェクト（ブロックを含むメッセージ）を受け付けます。<code class="language-plaintext highlighter-rouge">say</code> は Promise を返します。この Promise は <a href="https://api.slack.com/methods/chat.postMessage"><code class="language-plaintext highlighter-rouge">chat.postMessage</code> の応答でresolveされます</a>。もし<code class="language-plaintext highlighter-rouge">action</code> メソッドや、<code class="language-plaintext highlighter-rouge">message</code> 以外のイベントを使用する場合は、<a href="https://api.slack.com/events">イベントの payload にチャンネル ID が含まれているかを確認するようにしてください</a>。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ack</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">action</code>, <code class="language-plaintext highlighter-rouge">shortcut</code>, <code class="language-plaintext highlighter-rouge">view</code>, <code class="language-plaintext highlighter-rouge">command</code>, <code class="language-plaintext highlighter-rouge">options</code></td>
+      <td>アプリが受信イベントを受け取ったことを確認するために呼び出す<strong>必要のある関数</strong>。<code class="language-plaintext highlighter-rouge">ack</code> は応答の完了時にresolveする Promise を返します。詳しくは、<a href="#acknowledging-events">イベントの確認</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">client</code></td>
+      <td style="text-align: left">すべてのリスナー</td>
+      <td>イベントに関連づけられたトークンを使用する Web API クライアント。単一のワークスペースへのインストールでは、トークンは Appのコンストラクターに提供されます。複数のワークスペースへのインストールでは、トークンは <code class="language-plaintext highlighter-rouge">authorize</code> 関数から返されます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">respond</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">action</code>, <code class="language-plaintext highlighter-rouge">shortcut</code>, <code class="language-plaintext highlighter-rouge">view</code>, <code class="language-plaintext highlighter-rouge">command</code></td>
+      <td>受信イベントに <code class="language-plaintext highlighter-rouge">response_url</code> が<strong>含まれる場合</strong>に、受信イベントに応答を返す関数。<code class="language-plaintext highlighter-rouge">respond</code> は Promise を返します。この Promise は、<code class="language-plaintext highlighter-rouge">response_url</code> の応答結果に resolveされます。ショートカットに関しては、<code class="language-plaintext highlighter-rouge">respond</code> はメッセージショートカットで<strong>のみ</strong>動作します（グローバルショートカットでは動作しません）。ビューでの <code class="language-plaintext highlighter-rouge">respond</code> は モーダル内の input ブロックの <a href="https://api.slack.com/reference/block-kit/block-elements#conversation_select">conversations list</a> や <a href="https://api.slack.com/reference/block-kit/block-elements#channel_select">channels list</a> のセレクトメニューで <code class="language-plaintext highlighter-rouge">response_url_enabled: true</code> というオプションが指定されている場合<strong>のみ</strong>動作します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">context</code></td>
+      <td style="text-align: left">すべてのリスナー</td>
+      <td>イベントのコンテキスト。このオブジェクトは、<code class="language-plaintext highlighter-rouge">botId</code> など、イベントやアプリに関するデータを保持します。イベントがリスナーに渡される前に、ミドルウェアで他のコンテキスト情報を追加することもできます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">body</code></td>
+      <td style="text-align: left">すべてのリスナー</td>
+      <td>リクエストの <code class="language-plaintext highlighter-rouge">body</code> 全体を保持するオブジェクト（<code class="language-plaintext highlighter-rouge">payload</code> のスーパーセット）。<code class="language-plaintext highlighter-rouge">trigger_id</code> や <code class="language-plaintext highlighter-rouge">authorizations</code> など、一部の付帯的なデータは payload の外側でのみ利用できます。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="body-と-payload-について">body と payload について</h4>
+
+<p><code class="language-plaintext highlighter-rouge">payload</code> と <code class="language-plaintext highlighter-rouge">body</code> の構造は、API サイトで説明しています。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">action</code> : <a href="https://api.slack.com/reference/interaction-payloads/block-actions"><code class="language-plaintext highlighter-rouge">body</code></a> と <a href="https://api.slack.com/reference/block-kit/block-elements"><code class="language-plaintext highlighter-rouge">payload</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">event</code> : <a href="https://api.slack.com/types/event"><code class="language-plaintext highlighter-rouge">body</code></a> と <a href="https://api.slack.com/events"><code class="language-plaintext highlighter-rouge">payload</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">shortcut</code> : <a href="https://api.slack.com/reference/interaction-payloads/shortcuts"><code class="language-plaintext highlighter-rouge">body</code> と <code class="language-plaintext highlighter-rouge">payload</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">command</code> : <a href="https://api.slack.com/interactivity/slash-commands"><code class="language-plaintext highlighter-rouge">body</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">view</code> : <a href="https://api.slack.com/reference/interaction-payloads/views#view_submission"><code class="language-plaintext highlighter-rouge">view_submission</code> の <code class="language-plaintext highlighter-rouge">body</code> と <code class="language-plaintext highlighter-rouge">payload</code></a>、<a href="https://api.slack.com/reference/interaction-payloads/views#view_closed"><code class="language-plaintext highlighter-rouge">view_closed</code> の <code class="language-plaintext highlighter-rouge">body</code> と <code class="language-plaintext highlighter-rouge">payload</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">options</code> : <a href="https://api.slack.com/reference/block-kit/block-elements#external_select"><code class="language-plaintext highlighter-rouge">body</code> と <code class="language-plaintext highlighter-rouge">payload</code></a></li>
+</ul>
+
+<h3 id="difference-from-listener-middleware">リスナーミドルウェアとの違い</h3>
+<p>リスナーミドルウェアは、多くのリスナー関数で利用するロジックを実装したい場合に使用します（全てのリスナーでは使わないようなケースで）。リスナーミドルウェアは、上で説明したリスナー関数と同じ引数を持ちますが、唯一異なるのは <code class="language-plaintext highlighter-rouge">next()</code> 関数を持っている点です。この関数は、実行のチェインを切らないために、<strong>必ず呼び出される必要があります</strong>。リスナーミドルウェアについて詳しくは、<a href="/bolt-js/ja-jp/concepts#listener-middleware">ドキュメント</a>を参照してください。</p>
+
+<h2 id="initialization-options">初期化オプション</h2>
+<p>Bolt には、アプリをカスタマイズするためのさまざまな初期化オプションが用意されています。主なオプションには、Bolt アプリのオプションとレシーバーのオプションの 2 種類があります。レシーバーのオプションは、アプリで使用するレシーバーによって異なります。デフォルトの <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> では以下のレシーバーオプションが利用できます（カスタムのレシーバーを使わない限りはこれらが利用できます）。</p>
+
+<h3 id="receiver-options">レシーバーオプション</h3>
+<p><code class="language-plaintext highlighter-rouge">HTTPReceiver</code> オプションは、Bolt App オプションと同様に、<code class="language-plaintext highlighter-rouge">App</code> のコンストラクターに渡すことができます。渡したオプションは、初期化の際に <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> のインスタンスに渡されます。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">オプション</th>
+      <th style="text-align: left">説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">signingSecret</code></td>
+      <td style="text-align: left">アプリの設定の「Basic Information」から取得した 文字列。受信イベントが Slack から送信されたものであることを検証するために使用されます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">endpoints</code></td>
+      <td style="text-align: left">レシーバーが Slack からの受信リクエストをリッスンするエンドポイントを指定する文字列または <code class="language-plaintext highlighter-rouge">オブジェクト</code>。現在、オブジェクトに指定できるキーはラベルとしての任意の文字列のみで、値にはカスタムのエンドポイントを指定します（例 : <code class="language-plaintext highlighter-rouge">/myapp/events</code>）。<strong>デフォルトでは <code class="language-plaintext highlighter-rouge">/slack/events</code> というエンドポイントにすべてのイベントが送信されます。</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">processBeforeResponse</code></td>
+      <td style="text-align: left">イベントに対して即座に確認の応答を返すかどうかを指定する真偽値。リクエストへの応答が完了するとリスナーはただちに終了してしまうため、FaaS プラットフォームでアプリを実行する場合に有用な設定です。 <code class="language-plaintext highlighter-rouge">true</code> に設定すると早期終了を防ぐためにハンドラーが実行されるまで応答を返すのを遅らせます。デフォルトは <code class="language-plaintext highlighter-rouge">false</code> です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientId</code></td>
+      <td style="text-align: left">アプリの設定で指定した、クライアントの ID を示す文字列。<a href="/bolt-js/ja-jp/concepts#authenticating-oauth">OAuth の設定を行うために必要です</a>。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientSecret</code></td>
+      <td style="text-align: left">アプリの設定で指定した、クライアントのシークレットキーを示す 文字列。<a href="/bolt-js/ja-jp/concepts#authenticating-oauth">OAuth の設定を行うために必要です</a>。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">stateSecret</code></td>
+      <td style="text-align: left">CSRF 攻撃を防ぐために <a href="/bolt-js/ja-jp/concepts#authenticating-oauth">OAuth の設定時</a>に渡すことができる、推奨のパラメーター（文字列）。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">installationStore</code></td>
+      <td style="text-align: left"><a href="/bolt-js/ja-jp/concepts#authenticating-oauth">OAuth の設定時</a>に、インストールデータの保存・取得・削除の手段を定義します。<code class="language-plaintext highlighter-rouge">fetchInstallation</code> 、<code class="language-plaintext highlighter-rouge">storeInstallation</code>、<code class="language-plaintext highlighter-rouge">deleteInstallation</code> という 3 つのメソッドが含まれます。デフォルトの <code class="language-plaintext highlighter-rouge">installationStore</code> はインメモリストアです。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">scopes</code></td>
+      <td style="text-align: left">アプリが <a href="/bolt-js/ja-jp/concepts#authenticating-oauth">OAuth のプロセスの中で</a>アクセス許可を求めるスコープのリスト。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">installerOptions</code></td>
+      <td style="text-align: left"><a href="/bolt-js/ja-jp/concepts#authenticating-oauth">デフォルトの OAuth サポート</a>をカスタマイズする場合に指定するオブジェクト（必須ではない）。詳しくは、OAuth のドキュメントを参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">dispatchErrorHandler</code></td>
+      <td style="text-align: left">受信リクエストが想定しないパスへのリクエストを受信したときに実行されるエラーハンドラー。 詳細は<a href="/bolt-js/ja-jp/concepts#error-handling">エラー処理のドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">processEventErrorHandler</code></td>
+      <td style="text-align: left">イベントの処理中に例外がスローされたときに実行されるエラーハンドラー。  詳細は<a href="/bolt-js/ja-jp/concepts#error-handling">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">unhandledRequestHandler</code></td>
+      <td style="text-align: left">Slack からのリクエストが Bolt アプリによって確認（<code class="language-plaintext highlighter-rouge">ack()</code>）されなかったときに実行されるエラーハンドラー。 詳細は<a href="/bolt-js/ja-jp/concepts#error-handling">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">unhandledRequestTimeoutMillis</code></td>
+      <td style="text-align: left">リクエストが受信されてから <code class="language-plaintext highlighter-rouge">unhandledRequestHandler</code> が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは <code class="language-plaintext highlighter-rouge">3001</code> です。 詳細は<a href="/bolt-js/ja-jp/concepts#error-handling">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">signatureVerification</code></td>
+      <td style="text-align: left">Bolt が Slack からの受信リクエストの署名を検証するかどうかを指定する真偽値。 デフォルトは <code class="language-plaintext highlighter-rouge">true</code> です。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="app-options">App オプション</h3>
+<p>App オプションは、<code class="language-plaintext highlighter-rouge">App</code> のコンストラクターに渡します。<code class="language-plaintext highlighter-rouge">receiver</code> 引数が設定されない場合 <code class="language-plaintext highlighter-rouge">App</code> コンストラクターは上記の<a href="#レシーバーオプション"> <code class="language-plaintext highlighter-rouge">receiver</code> オプション</a>を受け取り、それを用いて <code class="language-plaintext highlighter-rouge">socketMode</code> の値に応じて <code class="language-plaintext highlighter-rouge">HttpReceiver</code> または <code class="language-plaintext highlighter-rouge">SocketModeReceiver</code> を初期化します。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">オプション</th>
+      <th style="text-align: left">説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">receiver</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Receiver</code> のインスタンス。受信イベントのパースとその処理を行います。<a href="/bolt-js/ja-jp/concepts#receiver"><code class="language-plaintext highlighter-rouge">Receiver</code> インターフェイス</a>に準拠して、<code class="language-plaintext highlighter-rouge">init(app)</code>、<code class="language-plaintext highlighter-rouge">start()</code>、<code class="language-plaintext highlighter-rouge">stop()</code>を持つ必要があります。receiver について詳しくは、<a href="/bolt-js/ja-jp/concepts#receiver">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">agent</code></td>
+      <td style="text-align: left">オプションの HTTP <code class="language-plaintext highlighter-rouge">エージェント</code>。プロキシのサポートを設定する場合に使用します。カスタムの agent について詳しくは、<a href="https://slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent">Node Slack SDK のドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientTls</code></td>
+      <td style="text-align: left">設定必須ではない文字列。HTTP クライアントリクエストにカスタムの TLS を設定する場合に指定します。<code class="language-plaintext highlighter-rouge">"pfx"</code>、<code class="language-plaintext highlighter-rouge">"key"</code>、<code class="language-plaintext highlighter-rouge">"passphrase"</code>、<code class="language-plaintext highlighter-rouge">"cert"</code>、<code class="language-plaintext highlighter-rouge">"ca"</code> のいずれかを指定します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">convoStore</code></td>
+      <td style="text-align: left">ステートに関連する会話のデータを設定・取得するためのデータストア実装。<code class="language-plaintext highlighter-rouge">set()</code> で会話のステートを設定し、<code class="language-plaintext highlighter-rouge">get()</code> で取得します。デフォルトでは、アプリはインメモリのストアを利用できます。詳細とサンプルについては、<a href="/bolt-js/ja-jp/concepts#conversation-store">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">token</code></td>
+      <td style="text-align: left">アプリの設定（「Settings」&gt;「Install App」）で指定した 文字列。Web API の呼び出しに必要です。<code class="language-plaintext highlighter-rouge">authorize</code>、<code class="language-plaintext highlighter-rouge">orgAuthorize</code>やOAuth 設定を使用する場合には指定しないでください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">botId</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">authorize</code> が定義されていない場合に限り指定できる、設定必須ではない<code class="language-plaintext highlighter-rouge">botId</code>（例 :<code class="language-plaintext highlighter-rouge">B12345</code>）。ボットトークンの ID で、アプリ自身によって送信されたメッセージを無視するために使用されます。<code class="language-plaintext highlighter-rouge">xoxb</code> トークンがアプリに渡されている場合、アプリは <a href="https://api.slack.com/methods/auth.test"><code class="language-plaintext highlighter-rouge">auth.test</code> メソッド</a>を呼び出して、この値を自動的に取得します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">botUserId</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">authorize</code> が定義されていない場合に限り指定できる、設定必須ではない<code class="language-plaintext highlighter-rouge">botUserId</code>。<code class="language-plaintext highlighter-rouge">botId</code> とは異なり、ボットユーザーに関連づけられたユーザー ID を指します。ダイレクトメンションを識別するために使用します。<code class="language-plaintext highlighter-rouge">xoxb</code> トークンがアプリに渡されている場合、アプリは <a href="https://api.slack.com/methods/auth.test"><code class="language-plaintext highlighter-rouge">auth.test</code> メソッド</a>を呼び出して、この値を自動的に取得します。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">authorize</code></td>
+      <td style="text-align: left">複数のチームでのインストールをサポートする場合に使用する関数。どのトークンが受信イベントに関連づけられているかを判断するのに使用します。<code class="language-plaintext highlighter-rouge">authorize</code> 関数に渡される元データには、場合によって <code class="language-plaintext highlighter-rouge">userId</code>、<code class="language-plaintext highlighter-rouge">conversationId</code>、<code class="language-plaintext highlighter-rouge">enterpriseId</code>、<code class="language-plaintext highlighter-rouge">teamId</code>、<code class="language-plaintext highlighter-rouge">isEnterpriseInstall</code> が含まれます（受信イベントによって異なります）。<code class="language-plaintext highlighter-rouge">authorize</code> 関数は、<code class="language-plaintext highlighter-rouge">botToken</code>、<code class="language-plaintext highlighter-rouge">botId</code>、<code class="language-plaintext highlighter-rouge">botUserId</code>、または <code class="language-plaintext highlighter-rouge">userToken</code>を返します。<a href="/bolt-js/ja-jp/concepts#authenticating-oauth">ビルトインの OAuth サポート</a>を使用する場合、<code class="language-plaintext highlighter-rouge">authorize</code> 関数は自動的に作成されるため、自分で渡す必要はありません。<code class="language-plaintext highlighter-rouge">authorize</code> 関数について詳しくは、こちらを参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">logger</code></td>
+      <td style="text-align: left">ビルトインのロガーの代わりにカスタムのロガーを渡すためのオプション。ロガーには特定のメソッドが実装されている必要があります。これには <a href="https://github.com/slackapi/node-slack-sdk/blob/main/packages/logger/src/index.ts"><code class="language-plaintext highlighter-rouge">Logger</code> インターフェイス</a>で定義されている <code class="language-plaintext highlighter-rouge">setLevel(level:LogLevel)</code>、<code class="language-plaintext highlighter-rouge">getLevel()</code>、<code class="language-plaintext highlighter-rouge">setName(name: string)</code>、<code class="language-plaintext highlighter-rouge">debug(...msgs: any\[])</code>、<code class="language-plaintext highlighter-rouge">info(...msgs: any\[])</code>、<code class="language-plaintext highlighter-rouge">warn(...msgs: any\[])</code>、<code class="language-plaintext highlighter-rouge">error(...msgs: any\[])</code> があります。ログ出力の詳細については、<a href="/bolt-js/ja-jp/concepts#logging">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">logLevel</code></td>
+      <td style="text-align: left">出力するログのレベルを指定するオプション。<code class="language-plaintext highlighter-rouge">LogLevel</code> の出力に含まれる情報のレベルには、重要度の低い順から高い順に <code class="language-plaintext highlighter-rouge">DEBUG</code>、<code class="language-plaintext highlighter-rouge">INFO</code>、<code class="language-plaintext highlighter-rouge">WARN</code>、<code class="language-plaintext highlighter-rouge">ERROR</code> があります。デフォルトの <code class="language-plaintext highlighter-rouge">logLevel</code> は <code class="language-plaintext highlighter-rouge">INFO</code> に設定されています。ログ出力の詳細については、<a href="/bolt-js/ja-jp/concepts#logging">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">extendedErrorHandler</code></td>
+      <td style="text-align: left">真偽値を指定するオプションで、 <code class="language-plaintext highlighter-rouge">true</code> に設定するとさらなるリクエストのコンテキスト情報を含んだオブジェクトがグローバルエラーハンドラーに渡されます。 バージョン 3.8.0 から利用することができます。 デフォルトは <code class="language-plaintext highlighter-rouge">false</code> です。 より高度なエラーの処理に関する詳細は <a href="/bolt-js/ja-jp/concepts#error-handling">API ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ignoreSelf</code></td>
+      <td style="text-align: left">アプリ自身から発信されたメッセージをミドルウェアの関数で無視するかどうかを指定する真偽値。<code class="language-plaintext highlighter-rouge">botId</code> が必要です。デフォルトは <code class="language-plaintext highlighter-rouge">true</code> です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientOptions.slackApiUrl</code></td>
+      <td style="text-align: left">Slack Web API で使用するエンドポイントをカスタマイズできます。これが使用されるのはほとんどがテスト用途です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">socketMode</code></td>
+      <td style="text-align: left">真偽値を指定するオプションで、<code class="language-plaintext highlighter-rouge">true</code> に設定するとアプリは<a href="/bolt-js/ja-jp/concepts#socket-mode">ソケットモード</a>で起動します。ソケットモードは WebSocket のコネクションを通して Slack からのデータを受信する機能です。デフォルトは <code class="language-plaintext highlighter-rouge">false</code> です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">developerMode</code></td>
+      <td style="text-align: left">デベロッパーモードを有効にする真偽値です。 <code class="language-plaintext highlighter-rouge">true</code> に設定したとき、<code class="language-plaintext highlighter-rouge">logLevel</code> は <code class="language-plaintext highlighter-rouge">DEBUG</code>、 <code class="language-plaintext highlighter-rouge">socketMode</code> は <code class="language-plaintext highlighter-rouge">true</code> に自動的に設定されます。しかし、 これらの二つのプロパティを明示的に設定した場合、それらの設定が <code class="language-plaintext highlighter-rouge">developerMode</code> による設定よりも優先されます。さらに、デバッグをしやすくするためのカスタムの OAuth エラーハンドラーも提供されます。また、全ての Slack からのリクエストのボディがログ出力されるため、トークンのようなセンシティブな情報がログに含まれる可能性があります。デフォルトは <code class="language-plaintext highlighter-rouge">false</code> です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">deferInitialization</code></td>
+      <td style="text-align: left">アプリの初期化を遅延させる真偽値です。有効にすると非同期の <code class="language-plaintext highlighter-rouge">App#init()</code> メソッドを手動で呼び出す必要があります。 また <code class="language-plaintext highlighter-rouge">init()</code> メソッドは <code class="language-plaintext highlighter-rouge">App#start()</code> を実行する前に呼び出さなければなりません。 デフォルトは <code class="language-plaintext highlighter-rouge">false</code> です。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">signatureVerification</code></td>
+      <td style="text-align: left">Boltが着信リクエストでSlackの署名を検証する必要があるかどうかを決定するブール値。 デフォルトは<code class="language-plaintext highlighter-rouge">true</code>です。</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>Bolt のclientは <a href="/node-slack-sdk">Node Slack SDK</a> の <code class="language-plaintext highlighter-rouge">WebClient</code> のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。</p>
+</blockquote>
+
+<h2 id="framework-error-types">フレームワークのエラー</h2>
+
+<p>Bolt では、さまざまなエラーが定義されています。これらにはより具体的なコンテキスト情報が含まるため、エラーのハンドリングが行いやすくなるでしょう。以下は、すべてのエラーコードを網羅しているわけではありませんが、開発中に目にすると思われるものを取り上げたエラーコードの一覧です。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">エラーコード</th>
+      <th style="text-align: left">詳細</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">AppInitializationError</code></td>
+      <td style="text-align: left">無効な初期化オプションが渡されたことを示します。原因として、署名シークレットが渡されていないことや、競合するオプションが指定されたことなどが考えられます（例 : <code class="language-plaintext highlighter-rouge">token</code> と <code class="language-plaintext highlighter-rouge">authorize</code> の両方を同時に指定することはできない）。<code class="language-plaintext highlighter-rouge">original</code> プロパティで詳細を確認できます。このエラーがスローされるのは、アプリのコンストラクターで行われる初期化時のみです。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">AuthorizationError</code></td>
+      <td style="text-align: left">インストール情報が取得できなかった、またはパースできなかったときにのみスローされるエラーです。このエラーは、ビルトインの OAuth サポートを使用しているときに発生する可能性があります。また、独自の <code class="language-plaintext highlighter-rouge">authorize</code> 関数を作成するときに、このエラーをインポートして使用することができます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ContextMissingPropertyError</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">context</code> オブジェクトに必要な情報が不足しているときにスローされるエラーです（例 : <code class="language-plaintext highlighter-rouge">ignoreSelf</code> を <code class="language-plaintext highlighter-rouge">true</code> に設定したのに <code class="language-plaintext highlighter-rouge">botUserId</code> または <code class="language-plaintext highlighter-rouge">botId</code> が含まれていない）。不足しているプロパティは、<code class="language-plaintext highlighter-rouge">missingProperty</code> プロパティで確認できます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ReceiverMultipleAckError</code></td>
+      <td style="text-align: left">Receiver 内で、すでに確認が済んでいるリクエストに対してアプリがさらに <code class="language-plaintext highlighter-rouge">ack()</code> を呼んだ場合にスローされるエラーです。現在、デフォルトの <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> でのみ使用されます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ReceiverAuthenticityError</code></td>
+      <td style="text-align: left">アプリのリクエストの署名が検証できないときにスローされるエラーです。このエラーには、失敗した理由を示す情報が含まれます（例 : タイムスタンプが有効でない、ヘッダーに抜けがある、署名シークレットが有効でない）。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">MultipleListenerError</code></td>
+      <td style="text-align: left">単一のイベントに対して複数のリスナーでの処理中に複数のエラーが発生した場合にスローされるエラーです。個々のエラーを配列に収めた <code class="language-plaintext highlighter-rouge">originals</code> プロパティを持ちます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">WorkflowStepInitializationError</code></td>
+      <td style="text-align: left">新しい <code class="language-plaintext highlighter-rouge">WorkflowStep</code> をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、<code class="language-plaintext highlighter-rouge">callback_id</code> が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、<a href="/concepts#steps">ドキュメント</a>を参照してください。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">UnknownError</code></td>
+      <td style="text-align: left">フレームワーク内でスローされる、特定のエラーコードを持たないエラーです。<code class="language-plaintext highlighter-rouge">original</code> プロパティで詳細を確認できます。</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><a href="https://github.com/slackapi/bolt-js/blob/main/src/errors.ts">errors.ts</a> のコードで、エラー定義の部分とコンストラクターの部分を読み、参考にしてみてください。</p>
+</blockquote>
+
+<h3 id="client-errors">クライアント側のエラー</h3>
+<p>Bolt では、Slack API の呼び出しのため <code class="language-plaintext highlighter-rouge">WebClient</code> をインポートしています。クライアントで API 呼び出しを行う際に目にすると思われるエラーを以下に示します。より詳しい内容は、<a href="/node-slack-sdk/web-api#handle-errors">Web API のドキュメント</a>を参照してください。クライアントのエラーをハンドリングする際、<code class="language-plaintext highlighter-rouge">data</code> プロパティの <code class="language-plaintext highlighter-rouge">body</code> で詳しい情報を確認できます。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">エラーコード</th>
+      <th style="text-align: left">詳細</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">PlatformError</code></td>
+      <td style="text-align: left">Slack API の呼び出し中に何らかの異常が発生したことを示すエラー。<code class="language-plaintext highlighter-rouge">data</code> プロパティを持ちます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">RequestError</code></td>
+      <td style="text-align: left">リクエストが送信できなかったことを示すエラー。ネットワーク接続が利用できないことなどが原因として考えられます。<code class="language-plaintext highlighter-rouge">original</code> プロパティで詳細を確認できます。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">RateLimitedError</code></td>
+      <td style="text-align: left">短時間で送信したリクエストが多すぎることを示すエラー。<code class="language-plaintext highlighter-rouge">retryAfter</code> プロパティで、再送信まで待機する必要のある秒数を確認できます。<code class="language-plaintext highlighter-rouge">WebClient</code> は、デフォルトでレート制限エラーのハンドリングを行います。<a href="/node-slack-sdk/web-api#rate-limits">詳しくはドキュメントを参照してください</a>。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">HTTPError</code></td>
+      <td style="text-align: left">HTTP レスポンスに通常は想定されないステータスコードが設定されていたことを示すエラー。Web API が返す HTTP ステータスコードは、通常 <code class="language-plaintext highlighter-rouge">200</code>（エラー時を含む）または <code class="language-plaintext highlighter-rouge">429</code>（レート制限時）のみです。</td>
+    </tr>
+  </tbody>
+</table>
+
+        </div>
+    </div>
+
+  </div>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</body>
+</html>

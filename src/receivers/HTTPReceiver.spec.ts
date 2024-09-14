@@ -1,19 +1,15 @@
 import 'mocha';
 import { EventEmitter } from 'events';
 import { IncomingMessage, ServerResponse } from 'http';
-import sinon, { SinonSpy } from 'sinon';
-import { assert } from 'chai';
-import rewiremock from 'rewiremock';
-import { Logger, LogLevel } from '@slack/logger';
+import { LogLevel, type Logger } from '@slack/logger';
 import { InstallProvider } from '@slack/oauth';
+import { assert } from 'chai';
+import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { Override, mergeOverrides } from '../test-helpers';
-import {
-  AppInitializationError,
-  CustomRouteInitializationError,
-  HTTPReceiverDeferredRequestError,
-} from '../errors';
+import rewiremock from 'rewiremock';
+import sinon, { type SinonSpy } from 'sinon';
+import { AppInitializationError, CustomRouteInitializationError, HTTPReceiverDeferredRequestError } from '../errors';
+import { type Override, mergeOverrides } from '../test-helpers';
 
 /* Testing Harness */
 
@@ -64,15 +60,13 @@ class FakeServer extends EventEmitter {
   }
 }
 
-describe('HTTPReceiver', function () {
+describe('HTTPReceiver', () => {
   beforeEach(function () {
     this.listener = (_req: any, _res: any) => {};
     this.fakeServer = new FakeServer();
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    this.fakeCreateServer = sinon.fake(function (_: any, handler: (req: any, res: any) => void) {
-      that.listener = handler; // pick up the socket listener method so we can assert on its behaviour
-      return that.fakeServer as FakeServer;
+    this.fakeCreateServer = sinon.fake((_: any, handler: (req: any, res: any) => void) => {
+      this.listener = handler; // pick up the socket listener method so we can assert on its behaviour
+      return this.fakeServer as FakeServer;
     });
   });
 
@@ -100,7 +94,7 @@ describe('HTTPReceiver', function () {
     },
   };
 
-  describe('constructor', function () {
+  describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments and use default arguments when not provided', async function () {
       // Arrange
@@ -178,7 +172,7 @@ describe('HTTPReceiver', function () {
       assert.equal((customPort2 as any).port, 9999);
     });
 
-    it('should throw an error if redirect uri options supplied invalid or incomplete', async function () {
+    it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const HTTPReceiver = await importHTTPReceiver();
       const clientId = 'my-clientId';
       const clientSecret = 'my-clientSecret';
@@ -201,39 +195,51 @@ describe('HTTPReceiver', function () {
       });
       assert.isNotNull(receiver);
       // redirectUri supplied, but missing redirectUriPath
-      assert.throws(() => new HTTPReceiver({
-        clientId,
-        clientSecret,
-        signingSecret,
-        stateSecret,
-        scopes,
-        redirectUri,
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new HTTPReceiver({
+            clientId,
+            clientSecret,
+            signingSecret,
+            stateSecret,
+            scopes,
+            redirectUri,
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUriPath
-      assert.throws(() => new HTTPReceiver({
-        clientId: 'my-clientId',
-        clientSecret,
-        signingSecret,
-        stateSecret,
-        scopes,
-        redirectUri,
-        installerOptions: {
-          redirectUriPath: '/hiya',
-        },
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new HTTPReceiver({
+            clientId: 'my-clientId',
+            clientSecret,
+            signingSecret,
+            stateSecret,
+            scopes,
+            redirectUri,
+            installerOptions: {
+              redirectUriPath: '/hiya',
+            },
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUri
-      assert.throws(() => new HTTPReceiver({
-        clientId: 'my-clientId',
-        clientSecret,
-        signingSecret,
-        stateSecret,
-        scopes,
-        redirectUri: 'http://example.com/hiya',
-        installerOptions,
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new HTTPReceiver({
+            clientId: 'my-clientId',
+            clientSecret,
+            signingSecret,
+            stateSecret,
+            scopes,
+            redirectUri: 'http://example.com/hiya',
+            installerOptions,
+          }),
+        AppInitializationError,
+      );
     });
   });
-  describe('start() method', function () {
+  describe('start() method', () => {
     it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async function () {
       // Arrange
       const overrides = mergeOverrides(
@@ -255,8 +261,8 @@ describe('HTTPReceiver', function () {
       await defaultPort.stop();
     });
   });
-  describe('request handling', function () {
-    describe('handleInstallPathRequest()', function () {
+  describe('request handling', () => {
+    describe('handleInstallPathRequest()', () => {
       it('should invoke installer handleInstallPath if a request comes into the install path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
@@ -383,7 +389,7 @@ describe('HTTPReceiver', function () {
       });
     });
 
-    describe('handleInstallRedirectRequest()', function () {
+    describe('handleInstallRedirectRequest()', () => {
       it('should invoke installer handler if a request comes into the redirect URI path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
@@ -479,12 +485,16 @@ describe('HTTPReceiver', function () {
         fakeRes.end = sinon.fake();
         await receiver.requestListener(fakeReq, fakeRes);
         sinon.assert.calledWith(
-          installProviderStub.handleCallback, fakeReq, fakeRes, callbackOptions, installUrlOptions,
+          installProviderStub.handleCallback,
+          fakeReq,
+          fakeRes,
+          callbackOptions,
+          installUrlOptions,
         );
       });
     });
-    describe('custom route handling', async function () {
-      it('should call custom route handler only if request matches route path and method', async function () {
+    describe('custom route handling', async () => {
+      it('should call custom route handler only if request matches route path and method', async () => {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
@@ -500,7 +510,7 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/test';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
@@ -516,7 +526,7 @@ describe('HTTPReceiver', function () {
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
       });
 
-      it('should call custom route handler only if request matches route path and method, ignoring query params', async function () {
+      it('should call custom route handler only if request matches route path and method, ignoring query params', async () => {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
@@ -532,7 +542,7 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/test?hello=world';
         const tempMatch = matchRegex('/test');
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
@@ -548,7 +558,7 @@ describe('HTTPReceiver', function () {
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
       });
 
-      it('should call custom route handler only if request matches route path and method including params', async function () {
+      it('should call custom route handler only if request matches route path and method including params', async () => {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
@@ -564,7 +574,7 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
@@ -580,7 +590,7 @@ describe('HTTPReceiver', function () {
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
       });
 
-      it('should call custom route handler only if request matches multiple route paths and method including params', async function () {
+      it('should call custom route handler only if request matches multiple route paths and method including params', async () => {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [
           { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
@@ -599,7 +609,7 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
@@ -616,7 +626,7 @@ describe('HTTPReceiver', function () {
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
       });
 
-      it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async function () {
+      it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async () => {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [
           { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
@@ -635,7 +645,7 @@ describe('HTTPReceiver', function () {
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
 
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
@@ -652,15 +662,19 @@ describe('HTTPReceiver', function () {
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
       });
 
-      it("should throw an error if customRoutes don't have the required keys", async function () {
+      it("should throw an error if customRoutes don't have the required keys", async () => {
         const HTTPReceiver = await importHTTPReceiver();
         const customRoutes = [{ path: '/test' }] as any;
 
-        assert.throws(() => new HTTPReceiver({
-          clientSecret: 'my-client-secret',
-          signingSecret: 'secret',
-          customRoutes,
-        }), CustomRouteInitializationError);
+        assert.throws(
+          () =>
+            new HTTPReceiver({
+              clientSecret: 'my-client-secret',
+              signingSecret: 'secret',
+              customRoutes,
+            }),
+          CustomRouteInitializationError,
+        );
       });
     });
 

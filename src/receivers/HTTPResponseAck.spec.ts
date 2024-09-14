@@ -1,11 +1,11 @@
 import 'mocha';
 import { IncomingMessage, ServerResponse } from 'http';
-import sinon from 'sinon';
 import { assert } from 'chai';
-import { HTTPResponseAck } from './HTTPResponseAck';
-import { HTTPModuleFunctions } from './HTTPModuleFunctions';
+import sinon from 'sinon';
 import { ReceiverMultipleAckError } from '../errors';
 import { createFakeLogger } from '../test-helpers';
+import { HTTPModuleFunctions } from './HTTPModuleFunctions';
+import { HTTPResponseAck } from './HTTPResponseAck';
 
 describe('HTTPResponseAck', async () => {
   it('should work', async () => {
@@ -102,7 +102,11 @@ describe('HTTPResponseAck', async () => {
     const bound = ack.bind();
     const body = false;
     await bound(body);
-    assert.equal(ack.storedResponse, '', 'Falsy body passed to bound handler not stored as empty string in Ack instance.');
+    assert.equal(
+      ack.storedResponse,
+      '',
+      'Falsy body passed to bound handler not stored as empty string in Ack instance.',
+    );
   });
   it('should call buildContentResponse with response body if processBeforeResponse=false', async () => {
     const stub = sinon.stub(HTTPModuleFunctions, 'buildContentResponse');
@@ -117,6 +121,9 @@ describe('HTTPResponseAck', async () => {
     const bound = ack.bind();
     const body = { some: 'thing' };
     await bound(body);
-    assert(stub.calledWith(httpResponse, body), 'buildContentResponse called with HTTP Response object and response body.');
+    assert(
+      stub.calledWith(httpResponse, body),
+      'buildContentResponse called with HTTP Response object and response body.',
+    );
   });
 });

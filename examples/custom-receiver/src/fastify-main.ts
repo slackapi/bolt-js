@@ -5,10 +5,10 @@
 /* eslint-disable node/no-extraneous-import */
 /* eslint-disable import/no-extraneous-dependencies */
 
-import Fastify from 'fastify';
 import { App, FileInstallationStore } from '@slack/bolt';
-import { FileStateStore } from '@slack/oauth';
 import { ConsoleLogger, LogLevel } from '@slack/logger';
+import { FileStateStore } from '@slack/oauth';
+import Fastify from 'fastify';
 import FastifyReceiver from './FastifyReceiver';
 
 const logger = new ConsoleLogger();

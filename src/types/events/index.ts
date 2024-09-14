@@ -1,5 +1,5 @@
-import { SlackEvent } from '@slack/types';
-import { StringIndexed, SayFn } from '../utilities';
+import type { SlackEvent } from '@slack/types';
+import type { SayFn, StringIndexed } from '../utilities';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
@@ -11,14 +11,13 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   // Add `ack` as undefined for global middleware in TypeScript TODO: but why? spend some time digging into this
   ack?: undefined;
 } & (EventType extends 'message'
-  // If this is a message event, add a `message` property
-  ? { message: EventFromType<EventType> }
-  : unknown
-) & (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
-  // If this event contains a channel, add a `say` utility function
-  ? { say: SayFn }
-  : unknown
-);
+  ? // If this is a message event, add a `message` property
+  { message: EventFromType<EventType> }
+  : unknown) &
+  (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
+    ? // If this event contains a channel, add a `say` utility function
+    { say: SayFn }
+    : unknown);
 
 interface BaseSlackEvent<T extends string = string> {
   type: T;
@@ -58,9 +57,9 @@ interface Authorization {
  * When the string matches known event(s) from the `SlackEvent` union, only those types are returned (also as a union).
  * Otherwise, the `BasicSlackEvent<T>` type is returned.
  */
-export type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
-  BaseSlackEvent<T> :
-  KnownEventFromType<T>;
+export type EventFromType<T extends string> = KnownEventFromType<T> extends never
+  ? BaseSlackEvent<T>
+  : KnownEventFromType<T>;
 export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
 
 /**

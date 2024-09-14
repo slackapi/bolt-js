@@ -1,7 +1,7 @@
+import type { Logger } from '@slack/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // eslint-disable-next-line import/no-extraneous-dependencies
-import sinon, { SinonSpy } from 'sinon';
-import { Logger } from '@slack/logger';
+import sinon, { type SinonSpy } from 'sinon';
 
 export interface Override {
   [packageName: string]: {
@@ -64,7 +64,7 @@ export function createFakeLogger(): FakeLogger {
   };
 }
 
-export function delay(ms: number = 0): Promise<void> {
+export function delay(ms = 0): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });

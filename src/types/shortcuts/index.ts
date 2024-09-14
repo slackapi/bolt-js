@@ -1,6 +1,6 @@
-import { MessageShortcut } from './message-shortcut';
-import { GlobalShortcut } from './global-shortcut';
-import { SayFn, RespondFn, AckFn } from '../utilities';
+import type { AckFn, RespondFn, SayFn } from '../utilities';
+import type { GlobalShortcut } from './global-shortcut';
+import type { MessageShortcut } from './message-shortcut';
 
 // export * from './message-action';
 export * from './global-shortcut';

@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import type { Logger } from '@slack/logger';
-import { CodedError, ErrorCode } from '../errors';
-import { ReceiverEvent } from '../types';
+import { type CodedError, ErrorCode } from '../errors';
+import type { ReceiverEvent } from '../types';
 
 export class SocketModeFunctions {
   // ------------------------------------------
@@ -34,5 +34,5 @@ export class SocketModeFunctions {
 export interface SocketModeReceiverProcessEventErrorHandlerArgs {
   error: Error | CodedError;
   logger: Logger;
-  event: ReceiverEvent,
+  event: ReceiverEvent;
 }

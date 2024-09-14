@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import App from '../App';
-import { AckFn } from './index';
-import { StringIndexed } from './utilities';
+import type App from '../App';
+import type { StringIndexed } from './utilities';
+import type { AckFn } from './index';
 
 export interface ReceiverEvent {
   // Parsed HTTP request body / Socket Mode message body

@@ -1,31 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createServer, Server, ServerOptions, RequestListener, IncomingMessage, ServerResponse } from 'http';
-import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
-import { ListenOptions } from 'net';
+import {
+  type IncomingMessage,
+  type RequestListener,
+  type Server,
+  type ServerOptions,
+  type ServerResponse,
+  createServer,
+} from 'http';
+import {
+  type Server as HTTPSServer,
+  type ServerOptions as HTTPSServerOptions,
+  createServer as createHttpsServer,
+} from 'https';
+import type { ListenOptions } from 'net';
 import { URL } from 'url';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import {
+  type CallbackOptions,
+  type InstallPathOptions,
+  InstallProvider,
+  type InstallProviderOptions,
+  type InstallURLOptions,
+} from '@slack/oauth';
+import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParamsIncomingMessage } from './ParamsIncomingMessage';
-import { verifyRedirectOpts } from './verify-redirect-opts';
-import App from '../App';
-import { Receiver, ReceiverEvent } from '../types';
+import type App from '../App';
+import { type CodedError, HTTPReceiverDeferredRequestError, ReceiverInconsistentStateError } from '../errors';
+import type { Receiver, ReceiverEvent } from '../types';
+import type { StringIndexed } from '../types/utilities';
+import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import {
-  ReceiverInconsistentStateError,
-  HTTPReceiverDeferredRequestError,
-  CodedError,
-} from '../errors';
-import { CustomRoute, buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
-import { StringIndexed } from '../types/utilities';
-import { BufferedIncomingMessage } from './BufferedIncomingMessage';
-import {
+  type ReceiverDispatchErrorHandlerArgs,
+  type ReceiverProcessEventErrorHandlerArgs,
+  type ReceiverUnhandledRequestHandlerArgs,
   HTTPModuleFunctions as httpFunc,
-  ReceiverDispatchErrorHandlerArgs,
-  ReceiverProcessEventErrorHandlerArgs,
-  ReceiverUnhandledRequestHandlerArgs,
 } from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
+import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
+import { type CustomRoute, type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -61,7 +74,8 @@ const httpsOptionKeys = [
   'sessionIdContext',
 ];
 
-const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+const missingServerErrorDescription =
+  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 // All the available arguments in the constructor
 export interface HTTPReceiverOptions {
@@ -186,7 +200,8 @@ export default class HTTPReceiver implements Receiver {
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
-    this.logger = logger ??
+    this.logger =
+      logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -204,9 +219,9 @@ export default class HTTPReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-       (this.stateVerification === false || // state store not needed
-         stateSecret !== undefined ||
-          installerOptions.stateStore !== undefined) // user provided state store
+      (this.stateVerification === false || // state store not needed
+        stateSecret !== undefined ||
+        installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -265,8 +280,8 @@ export default class HTTPReceiver implements Receiver {
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn:
-    typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
-    typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
+      | typeof createServer<typeof IncomingMessage, typeof ServerResponse>
+      | typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Decide which kind of server, HTTP or HTTPS, by searching for any keys in the serverOptions that are exclusive
     // to HTTPS
@@ -346,7 +361,9 @@ export default class HTTPReceiver implements Receiver {
   // generic types
   public stop(): Promise<void> {
     if (this.server === undefined) {
-      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'),
+      );
     }
     return new Promise((resolve, reject) => {
       this.server?.close((error) => {
@@ -512,15 +529,12 @@ export default class HTTPReceiver implements Receiver {
     (async () => {
       try {
         /* eslint-disable @typescript-eslint/no-non-null-assertion */
-        await this.installer!.handleInstallPath(
-          req,
-          res,
-          this.installPathOptions,
-          this.installUrlOptions,
-        );
+        await this.installer!.handleInstallPath(req, res, this.installPathOptions, this.installUrlOptions);
       } catch (err) {
         const e = err as any;
-        this.logger.error(`An unhandled error occurred while Bolt processed a request to the installation path (${e.message})`);
+        this.logger.error(
+          `An unhandled error occurred while Bolt processed a request to the installation path (${e.message})`,
+        );
         this.logger.debug(`Error details: ${e}`);
       }
     })();

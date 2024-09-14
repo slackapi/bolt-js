@@ -1,6 +1,6 @@
-import { ServerResponse } from 'http';
+import type { ServerResponse } from 'http';
 import { CustomRouteInitializationError } from '../errors';
-import { ParamsIncomingMessage } from './ParamsIncomingMessage';
+import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 
 export interface CustomRoute {
   path: string;
@@ -20,9 +20,9 @@ export function buildReceiverRoutes(customRoutes: CustomRoute[]): ReceiverRoutes
   validateCustomRoutes(customRoutes);
 
   customRoutes.forEach((r) => {
-    const methodObj = Array.isArray(r.method) ?
-      r.method.reduce((o, key) => ({ ...o, [key.toUpperCase()]: r.handler }), {}) :
-      { [r.method.toUpperCase()]: r.handler };
+    const methodObj = Array.isArray(r.method)
+      ? r.method.reduce((o, key) => ({ ...o, [key.toUpperCase()]: r.handler }), {})
+      : { [r.method.toUpperCase()]: r.handler };
     routes[r.path] = routes[r.path] ? { ...routes[r.path], ...methodObj } : methodObj;
   });
 

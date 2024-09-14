@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/reference">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" 
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg" />
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/tutorial/getting-started"
+      ><li class="title">Getting started</li></a
+    >
+    <a href="http://localhost:4000/bolt-js/reference"
+      ><li class="title">Reference</li></a
+    >
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#basic"
+      ><li class="title">Basic concepts</li></a
+    >
+     
+    <a href="http://localhost:4000/bolt-js/concepts#message-listening">
+      <li>Listening to messages</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#message-sending">
+      <li>Sending messages</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#event-listening">
+      <li>Listening to events</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#web-api">
+      <li>Using the Web API</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#action-listening">
+      <li>Listening to actions</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#action-respond">
+      <li>Responding to actions</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#acknowledge">
+      <li>Acknowledging requests</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#shortcuts">
+      <li>Listening and responding to shortcuts</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#commands">
+      <li>Listening and responding to commands</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#creating-modals">
+      <li>Opening modals</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#updating-pushing-views">
+      <li>Updating and pushing views</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#view-submissions">
+      <li>Listening to views</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#publishing-views">
+      <li>Publishing views to App Home</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#options">
+      <li>Listening and responding to options</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#authenticating-oauth">
+      <li>Authenticating with OAuth</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#socket-mode">
+      <li>Using Socket Mode</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#advanced">
+      <li class="title">Advanced concepts</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/concepts#error-handling">
+      <li>Handling errors</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#authorization">
+      <li>Authorization</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#token-rotation">
+      <li>Token rotation</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#conversation-store">
+      <li>Conversation stores</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#global-middleware">
+      <li>Global middleware</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#listener-middleware">
+      <li>Listener middleware</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#context">
+      <li>Adding context</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#deferring-initialization">
+      <li>Deferring App initialization</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#logging">
+      <li>Logging</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#receiver">
+      <li>Customizing a receiver</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#custom-routes">
+      <li>Adding Custom HTTP routes</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/deployments/aws-lambda">
+          <li>AWS Lambda</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/deployments/heroku">
+          <li>Heroku Platform</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#steps">
+      <li class="title">
+        Workflow steps
+        <span class="label-deprecated">
+          Deprecated
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Creating workflow steps
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Adding or editing workflow steps
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Saving step configurations
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Executing workflow steps
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/getting-started-http">
+      <li class="title">Getting started with HTTP</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/hubot-migration">
+      <li class="title">Migrating Hubot apps</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/migration-v2">
+      <li class="title">Migrating to V2</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/migration-v3">
+      <li class="title">Migrating to V3</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/using-typescript">
+      <li class="title">Using TypeScript</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">Contributing</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/ja-jp" class="header_btn language-switcher float_right">日本語 (Japanese)</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="reference">
+          <h1 id="app-interface-and-configuration">App interface and configuration</h1>
+
+<div class="section-content">
+  <p>This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️<a href="/bolt-js/tutorial/getting-started">Getting Started guide</a> to learn the basics of building Bolt for JavaScript apps.</p>
+</div>
+
+<ul>
+  <li><a href="#app-interface-and-configuration">App interface and configuration</a>
+    <ul>
+      <li><a href="#listener-functions">Listener functions</a>
+        <ul>
+          <li><a href="#methods">Methods</a>
+            <ul>
+              <li><a href="#constraint-objects">Constraint objects</a></li>
+            </ul>
+          </li>
+          <li><a href="#listener-function-arguments">Listener function arguments</a>
+            <ul>
+              <li><a href="#body-and-payload-references">Body and payload references</a></li>
+            </ul>
+          </li>
+          <li><a href="#difference-from-listener-middleware">Difference from listener middleware</a></li>
+        </ul>
+      </li>
+      <li><a href="#built-in-listener-functions">Built-in middleware functions</a>
+        <ul>
+          <li><a href="#built-in-global-middleware-functions">Built-in global middleware functions</a></li>
+          <li><a href="#built-in-listener-middleware-functions">Built-in listener middleware functions</a></li>
+        </ul>
+      </li>
+      <li><a href="#initialization-options">Initialization options</a>
+        <ul>
+          <li><a href="#receiver-options">Receiver options</a></li>
+          <li><a href="#app-options">App options</a></li>
+        </ul>
+      </li>
+      <li><a href="#framework-error-types">Framework error types</a>
+        <ul>
+          <li><a href="#client-errors">Client errors</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="listener-functions">Listener functions</h2>
+<p>Slack apps typically receive and/or respond to one to many incoming events from Slack. This can be something like listening to an Events API event (like when a link associated with your app is shared) or a user invoking one of your app’s shortcuts. For each type of incoming request from Slack, there are distinct methods that you can pass <strong>listener functions</strong> to handle and respond to the event.</p>
+
+<h3 id="methods">Methods</h3>
+<p>Below is the current list of methods that accept listener functions. These methods handle specific event types coming from Slack, and typically include an identifying parameter before the listener function. The identifying parameter (included below) narrows the events to specific interactions that your listener function is intended to handle, such as a specific <code class="language-plaintext highlighter-rouge">callback_id</code>, or a certain substring within a message.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Method</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.event(eventType, fn);</code></td>
+      <td style="text-align: left">Listens for Events API events. The <code class="language-plaintext highlighter-rouge">eventType</code> is a <code class="language-plaintext highlighter-rouge">string</code> to identify a <a href="https://api.slack.com/events">specific event</a> to handle (which must be subscribed to in your app’s configuration).</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.message([pattern ,] fn);</code></td>
+      <td style="text-align: left">Convenience method to listen specifically to the <a href="https://api.slack.com/events/message"><code class="language-plaintext highlighter-rouge">message</code> event</a>. The pattern parameter can be any substring (<code class="language-plaintext highlighter-rouge">string</code>) or <code class="language-plaintext highlighter-rouge">RegExp</code> expression, which will be used to identify the incoming message.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.action(actionId, fn);</code></td>
+      <td style="text-align: left">Listens for an action event from a Block Kit element, such as a user interaction with a button, select menu, or datepicker. The <code class="language-plaintext highlighter-rouge">actionId</code> identifier is a <code class="language-plaintext highlighter-rouge">string</code> that should match the unique <code class="language-plaintext highlighter-rouge">action_id</code> included when your app sends the element to a view. Note that a view can be a message, modal, or app home. Note that action elements included in an <code class="language-plaintext highlighter-rouge">input</code> block do not trigger any events.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.shortcut(callbackId, fn);</code></td>
+      <td style="text-align: left">Listens for global or message shortcut invocation. The <code class="language-plaintext highlighter-rouge">callbackId</code> is a <code class="language-plaintext highlighter-rouge">string</code> or <code class="language-plaintext highlighter-rouge">RegExp</code> that must match a shortcut <code class="language-plaintext highlighter-rouge">callback_id</code> specified within your app’s configuration.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.view(callbackId, fn);</code></td>
+      <td style="text-align: left">Listens for <code class="language-plaintext highlighter-rouge">view_submission</code> and <code class="language-plaintext highlighter-rouge">view_closed</code> events. <code class="language-plaintext highlighter-rouge">view_submission</code> events are sent when a user submits a modal that your app opened. <code class="language-plaintext highlighter-rouge">view_closed</code> events are sent when a user closes the modal rather than submits it.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.step(workflowStep)</code></td>
+      <td style="text-align: left">Listen and responds to workflow step events using the callbacks passed in an instance of <code class="language-plaintext highlighter-rouge">WorkflowStep</code>. Callbacks include three callbacks: <code class="language-plaintext highlighter-rouge">edit</code>, <code class="language-plaintext highlighter-rouge">save</code>, and <code class="language-plaintext highlighter-rouge">execute</code>. More information on workflow steps can be found <a href="/bolt-js/concepts#adding-editing-steps">in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.command(commandName, fn);</code></td>
+      <td style="text-align: left">Listens for slash command invocations. The <code class="language-plaintext highlighter-rouge">commandName</code> is a <code class="language-plaintext highlighter-rouge">string</code> that must match a slash command specified in your app’s configuration. Slash command names should be prefaced with a <code class="language-plaintext highlighter-rouge">/</code> (ex: <code class="language-plaintext highlighter-rouge">/helpdesk</code>).</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.options(actionId, fn);</code></td>
+      <td style="text-align: left">Listens for options requests (from select menus with an external data source). This isn’t often used, and shouldn’t be mistaken with <code class="language-plaintext highlighter-rouge">app.action</code>. The <code class="language-plaintext highlighter-rouge">actionId</code> identifier is a <code class="language-plaintext highlighter-rouge">string</code> that matches the unique <code class="language-plaintext highlighter-rouge">action_id</code> included when you app sends a <a href="https://api.slack.com/reference/block-kit/block-elements#external_select">select with an external data source</a>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="constraint-objects">Constraint objects</h4>
+<p>There are a collection of constraint objects that some methods have access to. These can be used to narrow the event your listener function handles, or to handle special cases. Constraint objects can be passed in lieu of the identifiers outlined above. Below is a collection of constraint objects and the methods they can be passed to.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Method</th>
+      <th style="text-align: left">Options</th>
+      <th style="text-align: left">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.action(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">block_id</code>, <code class="language-plaintext highlighter-rouge">action_id</code>, <code class="language-plaintext highlighter-rouge">callback_id</code>, (,<code class="language-plaintext highlighter-rouge">type</code>)</td>
+      <td style="text-align: left">Listens for more than just the <code class="language-plaintext highlighter-rouge">action_id</code>. <code class="language-plaintext highlighter-rouge">block_id</code> is the ID for the element’s parent block. <code class="language-plaintext highlighter-rouge">callback_id</code> is the ID of the view that is passed when instantiating it (only used when action elements are in modals). To specifically handle an action element in blocks or in legacy attachments, you can use <code class="language-plaintext highlighter-rouge">type</code> with the value of <code class="language-plaintext highlighter-rouge">block_actions</code> or <code class="language-plaintext highlighter-rouge">interactive_message</code> respectively.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.shortcut(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">type</code>, <code class="language-plaintext highlighter-rouge">callback_id</code></td>
+      <td style="text-align: left">Allows specification of the type of shortcut. <code class="language-plaintext highlighter-rouge">type</code> must either be <code class="language-plaintext highlighter-rouge">shortcut</code> for <strong>global shortcuts</strong> or <code class="language-plaintext highlighter-rouge">message_action</code> for <strong>message_shortcuts</strong>. <code class="language-plaintext highlighter-rouge">callbackId</code> can be a <code class="language-plaintext highlighter-rouge">string</code> or <code class="language-plaintext highlighter-rouge">RegExp</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.view(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">type</code>, <code class="language-plaintext highlighter-rouge">callback_id</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">type</code> must either be <code class="language-plaintext highlighter-rouge">view_closed</code> or <code class="language-plaintext highlighter-rouge">view_submission</code>, which determines what specific event your listener function is sent. <code class="language-plaintext highlighter-rouge">callback_id</code> is the <code class="language-plaintext highlighter-rouge">callback_id</code> of the view that is sent when your app opens the modal.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">app.options(constraints, fn)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">block_id</code>, <code class="language-plaintext highlighter-rouge">action_id</code>, <code class="language-plaintext highlighter-rouge">callback_id</code></td>
+      <td style="text-align: left">Optionally listens for <code class="language-plaintext highlighter-rouge">block_id</code> and <code class="language-plaintext highlighter-rouge">callback_id</code> in addition to <code class="language-plaintext highlighter-rouge">action_id</code>. <code class="language-plaintext highlighter-rouge">callback_id</code> can only be passed when handling options elements within modals.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="listener-function-arguments">Listener function arguments</h3>
+<p>Listener functions have access to a set of arguments that may change based on the method which the function is passed to. Below is an explanation of the different arguments. The below table details the different arguments and the methods they’ll be accessible in.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Argument</th>
+      <th style="text-align: left">Description</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">payload</code></td>
+      <td style="text-align: left">All listeners</td>
+      <td>The unwrapped contents of the incoming event, which varies based on event. This is a subset of the information included in <code class="language-plaintext highlighter-rouge">body</code> which is detailed below. <code class="language-plaintext highlighter-rouge">payload</code> is also accessible via the alias corresponding to the method name that the listener is passed to (<code class="language-plaintext highlighter-rouge">message</code>, <code class="language-plaintext highlighter-rouge">event</code>, <code class="language-plaintext highlighter-rouge">action</code>, <code class="language-plaintext highlighter-rouge">shortcut</code>, <code class="language-plaintext highlighter-rouge">view</code>, <code class="language-plaintext highlighter-rouge">command</code>, <code class="language-plaintext highlighter-rouge">options</code>) <strong>An easy way to understand what’s in a payload is to log it</strong>, or <a href="/bolt-js/tutorial/using-typescript">use TypeScript</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">say</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">message</code>, <code class="language-plaintext highlighter-rouge">event</code>, <code class="language-plaintext highlighter-rouge">action</code> <code class="language-plaintext highlighter-rouge">command</code></td>
+      <td>Function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a channel ID (the most common being <code class="language-plaintext highlighter-rouge">message</code> events). <code class="language-plaintext highlighter-rouge">say</code> accepts simple strings (for plain-text messages) and objects (for messages containing blocks). <code class="language-plaintext highlighter-rouge">say</code> returns a promise that will resolve with a <a href="https://api.slack.com/methods/chat.postMessage"><code class="language-plaintext highlighter-rouge">chat.postMessage</code> response</a>. If you’re using an the <code class="language-plaintext highlighter-rouge">action</code> method, or an event other than <code class="language-plaintext highlighter-rouge">message</code>, you should <a href="https://api.slack.com/events">ensure that the event payload contains a channel ID</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ack</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">action</code>, <code class="language-plaintext highlighter-rouge">shortcut</code>, <code class="language-plaintext highlighter-rouge">view</code>, <code class="language-plaintext highlighter-rouge">command</code>, <code class="language-plaintext highlighter-rouge">options</code></td>
+      <td>Function that <strong>must</strong> be called to acknowledge that an incoming event was received by your app. <code class="language-plaintext highlighter-rouge">ack</code> returns a promise that resolves when complete. Read more in <a href="#acknowledging-events">Acknowledging events</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">client</code></td>
+      <td style="text-align: left">All listeners</td>
+      <td>Web API client that uses the token associated with that event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by the <code class="language-plaintext highlighter-rouge">authorize</code> function.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">respond</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">action</code>, <code class="language-plaintext highlighter-rouge">shortcut</code>, <code class="language-plaintext highlighter-rouge">view</code>, <code class="language-plaintext highlighter-rouge">command</code></td>
+      <td>Function that responds to an incoming event <strong>if</strong> it contains a <code class="language-plaintext highlighter-rouge">response_url</code>. <code class="language-plaintext highlighter-rouge">respond</code> returns a promise that resolves with the results of responding using the <code class="language-plaintext highlighter-rouge">response_url</code>. For shortcuts, <code class="language-plaintext highlighter-rouge">respond</code> will <strong>only</strong> work for message shortcuts (not global shortcuts). For views, <code class="language-plaintext highlighter-rouge">respond</code> will <strong>only</strong> work when using <code class="language-plaintext highlighter-rouge">response_url_enabled: true</code> for <a href="https://api.slack.com/reference/block-kit/block-elements#conversation_select">conversations list</a> and <a href="https://api.slack.com/reference/block-kit/block-elements#channel_select">channels list</a> select menus in input blocks in modals.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">context</code></td>
+      <td style="text-align: left">All listeners</td>
+      <td>Event context. This object contains data about the event and the app, such as the <code class="language-plaintext highlighter-rouge">botId</code>. Middleware can add additional context before the event is passed to listeners.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">body</code></td>
+      <td style="text-align: left">All listeners</td>
+      <td>Object that contains the entire body of the request (superset of <code class="language-plaintext highlighter-rouge">payload</code>). Some accessory data is only available outside of the payload (such as <code class="language-plaintext highlighter-rouge">trigger_id</code> and <code class="language-plaintext highlighter-rouge">authorizations</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="body-and-payload-references">Body and payload references</h4>
+<p>The structure of the <code class="language-plaintext highlighter-rouge">payload</code> and <code class="language-plaintext highlighter-rouge">body</code> is detailed on the API site:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">action</code>: <a href="https://api.slack.com/reference/interaction-payloads/block-actions"><code class="language-plaintext highlighter-rouge">body</code></a> and <a href="https://api.slack.com/reference/block-kit/block-elements"><code class="language-plaintext highlighter-rouge">payload</code>s</a></li>
+  <li><code class="language-plaintext highlighter-rouge">event</code>: <a href="https://api.slack.com/types/event"><code class="language-plaintext highlighter-rouge">body</code></a> and <a href="https://api.slack.com/events"><code class="language-plaintext highlighter-rouge">payload</code>s</a></li>
+  <li><code class="language-plaintext highlighter-rouge">shortcut</code>: <a href="https://api.slack.com/reference/interaction-payloads/shortcuts"><code class="language-plaintext highlighter-rouge">body</code> and <code class="language-plaintext highlighter-rouge">payload</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">command</code>: <a href="https://api.slack.com/interactivity/slash-commands"><code class="language-plaintext highlighter-rouge">body</code> </a></li>
+  <li><code class="language-plaintext highlighter-rouge">view</code>: <a href="https://api.slack.com/reference/interaction-payloads/views#view_submission"><code class="language-plaintext highlighter-rouge">view_submission</code> <code class="language-plaintext highlighter-rouge">body</code> and <code class="language-plaintext highlighter-rouge">payload</code></a>; <a href="https://api.slack.com/reference/interaction-payloads/views#view_closed"><code class="language-plaintext highlighter-rouge">view_closed</code> <code class="language-plaintext highlighter-rouge">body</code> and <code class="language-plaintext highlighter-rouge">payload</code></a></li>
+  <li><code class="language-plaintext highlighter-rouge">options</code>: <a href="https://api.slack.com/reference/block-kit/block-elements#external_select"><code class="language-plaintext highlighter-rouge">body</code> and <code class="language-plaintext highlighter-rouge">payload</code></a></li>
+</ul>
+
+<h3 id="difference-from-listener-middleware">Difference from listener middleware</h3>
+<p>Listener middleware is used to implement logic across many listener functions (though usually not all of them). Listener middleware has the same arguments as the above listener functions, with one distinction: they also have a <code class="language-plaintext highlighter-rouge">next()</code> function that <strong>must</strong> be called in order to pass the chain of execution. Learn more about listener middleware <a href="/bolt-js/concepts#listener-middleware">in the documentation</a>.</p>
+
+<h2 id="built-in-middleware-functions">Built-in middleware functions</h2>
+
+<p>Bolt offers a variety of built-in middleware functions to help simplify development of your Slack applications. These middleware functions implement common patterns to help filter out or focus your own listener function implementations.</p>
+
+<p>These middleware functions are exported from the main <code class="language-plaintext highlighter-rouge">@slack/bolt</code> package for you to easily <code class="language-plaintext highlighter-rouge">import</code> in your applications:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="k">import</span> <span class="p">{</span> <span class="nx">matchMessage</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@slack/bolt</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="nx">matchMessage</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">),</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">logger</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// this function will now only execute if "hello" is present in the message</span>
+<span class="p">});</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>These middleware functions are divided into two groups: <a href="concepts#global-middleware">global middleware functions</a> and <a href="concepts#listener-middleware">listener middleware functions</a>.</p>
+
+<h3 id="built-in-global-middleware-functions">Built-in global middleware functions</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ignoreSelf()</code>: Filters out any event that originates from the app. Note that this middleware is enabled by default via the <a href="#app-options"><code class="language-plaintext highlighter-rouge">ignoreSelf</code> App initialization options</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">onlyActions</code>: Filters out any event that isn’t an action.</li>
+  <li><code class="language-plaintext highlighter-rouge">onlyCommands</code>: Filters out any event that isn’t a command.</li>
+  <li><code class="language-plaintext highlighter-rouge">onlyEvents</code>: Allows for only events to propagate down the middleware chain.</li>
+  <li><code class="language-plaintext highlighter-rouge">onlyOptions</code>: Filters out any event that isn’t a drop-down-options event.</li>
+  <li><code class="language-plaintext highlighter-rouge">onlyShortcuts</code>: Filters out any event that isn’t a shortcut.</li>
+  <li><code class="language-plaintext highlighter-rouge">onlyViewActions</code>: Filters out any event that isn’t a <code class="language-plaintext highlighter-rouge">view_submission</code> or <code class="language-plaintext highlighter-rouge">view_closed</code> event.</li>
+</ul>
+
+<h3 id="built-in-listener-middleware-functions">Built-in listener middleware functions</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">directMention()</code>: Filters out any <code class="language-plaintext highlighter-rouge">message</code> event whose text does not start with an @-mention of the handling app.</li>
+  <li><code class="language-plaintext highlighter-rouge">matchCommandName(pattern)</code>: Filters out any shortcut command whose name does not match the provided <code class="language-plaintext highlighter-rouge">pattern</code>; <code class="language-plaintext highlighter-rouge">pattern</code> can be a string or regular expression.</li>
+  <li><code class="language-plaintext highlighter-rouge">matchConstraints(constraint)</code>: Filters out any <code class="language-plaintext highlighter-rouge">block_action</code>, View or Options event that does not match the properties of the provided <code class="language-plaintext highlighter-rouge">constraint</code> object. Supported <code class="language-plaintext highlighter-rouge">constraint</code> object properties include:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">block_id</code> and <code class="language-plaintext highlighter-rouge">action_id</code>: for filtering out <code class="language-plaintext highlighter-rouge">block_action</code> events that do not match the provided IDs.</li>
+      <li><code class="language-plaintext highlighter-rouge">callback_id</code>: for filtering out <code class="language-plaintext highlighter-rouge">view_*</code> events not matching the provided <code class="language-plaintext highlighter-rouge">callback_id</code>.</li>
+      <li><code class="language-plaintext highlighter-rouge">type</code>: for filtering out any event <code class="language-plaintext highlighter-rouge">type</code>s not matching the provided <code class="language-plaintext highlighter-rouge">type</code>.</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">matchEventType(pattern)</code>: filters out any event whose <code class="language-plaintext highlighter-rouge">type</code> does not match the provided <code class="language-plaintext highlighter-rouge">pattern</code>. <code class="language-plaintext highlighter-rouge">pattern</code> can be a string or regular expression.</li>
+  <li><code class="language-plaintext highlighter-rouge">matchMessage(pattern)</code>: filters out any <code class="language-plaintext highlighter-rouge">message</code> or <code class="language-plaintext highlighter-rouge">app_mention</code> events whose message contents do not match the provided <code class="language-plaintext highlighter-rouge">pattern</code>. <code class="language-plaintext highlighter-rouge">pattern</code> can be a string or regular expression.</li>
+  <li><code class="language-plaintext highlighter-rouge">subtype(type)</code>: Filters out any <code class="language-plaintext highlighter-rouge">message</code> event whose <code class="language-plaintext highlighter-rouge">subtype</code> does not exactly equal the provided <code class="language-plaintext highlighter-rouge">type</code>.</li>
+</ul>
+
+<h2 id="initialization-options">Initialization options</h2>
+<p>Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> (so they’ll work as long as you aren’t using a custom receiver).</p>
+
+<h3 id="receiver-options">Receiver options</h3>
+<p><code class="language-plaintext highlighter-rouge">HTTPReceiver</code> options can be passed into the <code class="language-plaintext highlighter-rouge">App</code> constructor, just like the Bolt app options. They’ll be passed to the <code class="language-plaintext highlighter-rouge">HTTPReceiver</code> instance upon initialization.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Option</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">signingSecret</code></td>
+      <td style="text-align: left">A <code class="language-plaintext highlighter-rouge">string</code> from your app’s configuration (under “Basic Information”) which verifies that incoming events are coming from Slack</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">endpoints</code></td>
+      <td style="text-align: left">A <code class="language-plaintext highlighter-rouge">string</code> or <code class="language-plaintext highlighter-rouge">object</code> that specifies the endpoint(s) that the receiver will listen for incoming requests from Slack. Currently, the only key for the object is <code class="language-plaintext highlighter-rouge">key</code>, the value of which is the customizable endpoint (ex: <code class="language-plaintext highlighter-rouge">/myapp/events</code>). <strong>By default, all events are sent to the <code class="language-plaintext highlighter-rouge">/slack/events</code> endpoint</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">processBeforeResponse</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code> that determines whether events should be immediately acknowledged. This is primarily useful when running apps on FaaS since listeners will terminate immediately once the request has completed. When set to <code class="language-plaintext highlighter-rouge">true</code> it will defer sending the acknowledgement until after your handlers run to prevent early termination. Defaults to <code class="language-plaintext highlighter-rouge">false</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientId</code></td>
+      <td style="text-align: left">The client ID <code class="language-plaintext highlighter-rouge">string</code> from your app’s configuration which is <a href="/bolt-js/concepts#authenticating-oauth">required to configure OAuth</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientSecret</code></td>
+      <td style="text-align: left">The client secret <code class="language-plaintext highlighter-rouge">string</code> from your app’s configuration which is <a href="/bolt-js/concepts#authenticating-oauth">required to configure OAuth</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">stateSecret</code></td>
+      <td style="text-align: left">Recommended parameter (<code class="language-plaintext highlighter-rouge">string</code>) that’s passed when <a href="/bolt-js/concepts#authenticating-oauth">configuring OAuth</a> to prevent CSRF attacks</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">installationStore</code></td>
+      <td style="text-align: left">Defines how to save, fetch and delete installation data when <a href="/bolt-js/concepts#authenticating-oauth">configuring OAuth</a>. Contains three methods: <code class="language-plaintext highlighter-rouge">fetchInstallation</code>, <code class="language-plaintext highlighter-rouge">storeInstallation</code> and <code class="language-plaintext highlighter-rouge">deleteInstallation</code>. The default <code class="language-plaintext highlighter-rouge">installationStore</code> is an in-memory store.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">scopes</code></td>
+      <td style="text-align: left">Array of scopes that your app will request <a href="/bolt-js/concepts#authenticating-oauth">within the OAuth process</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">installerOptions</code></td>
+      <td style="text-align: left">Optional object that can be used to customize <a href="/bolt-js/concepts#authenticating-oauth">the default OAuth support</a>. Read more in the OAuth documentation.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">dispatchErrorHandler</code></td>
+      <td style="text-align: left">Error handler triggered if an incoming request is to an unexpected path. More details available in the <a href="/bolt-js/concepts#error-handling">Error Handling documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">processEventErrorHandler</code></td>
+      <td style="text-align: left">Error handler triggered if event processing threw an exception. More details available in the <a href="/bolt-js/concepts#error-handling">Error Handling documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">unhandledRequestHandler</code></td>
+      <td style="text-align: left">Error handler triggered when a request from Slack goes unacknowledged. More details available in the <a href="/bolt-js/concepts#error-handling">Error Handling documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">unhandledRequestTimeoutMillis</code></td>
+      <td style="text-align: left">How long to wait, in milliseconds, from the time a request is received to when the <code class="language-plaintext highlighter-rouge">unhandledRequestHandler</code> should be triggered. Default is <code class="language-plaintext highlighter-rouge">3001</code>. More details available in the <a href="/bolt-js/concepts#error-handling">Error Handling documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">signatureVerification</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code> that determines whether Bolt should <a href="https://api.slack.com/authentication/verifying-requests-from-slack">verify Slack’s signature on incoming requests</a>. Defaults to <code class="language-plaintext highlighter-rouge">true</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">customPropertiesExtractor</code></td>
+      <td style="text-align: left">Optional <code class="language-plaintext highlighter-rouge">function</code> that can extract custom properties from an incoming receiver event – for example, extracting custom headers to propagate to other services. The function receives one argument that will have the type of the event received by your receiver (e.g. an HTTP request or websocket message) and should return an object with string keys containing your custom properties. More details available in the <a href="/bolt-js/concepts#customizing-built-in-receivers">Customizing a receiver documentation</a>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="app-options">App options</h3>
+<p>App options are passed into the <code class="language-plaintext highlighter-rouge">App</code> constructor. When the <code class="language-plaintext highlighter-rouge">receiver</code> argument is <code class="language-plaintext highlighter-rouge">undefined</code> the <code class="language-plaintext highlighter-rouge">App</code> constructor also accepts the <a href="#receiver-options">above <code class="language-plaintext highlighter-rouge">Receiver</code> options</a> to initialize either a <code class="language-plaintext highlighter-rouge">HttpReceiver</code> or a <code class="language-plaintext highlighter-rouge">SocketModeReceiver</code> depending on the value of the <code class="language-plaintext highlighter-rouge">socketMode</code> argument.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Option</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">receiver</code></td>
+      <td style="text-align: left">An instance of <code class="language-plaintext highlighter-rouge">Receiver</code> that parses and handles incoming events. Must conform to the <a href="/bolt-js/concepts#receiver"><code class="language-plaintext highlighter-rouge">Receiver</code> interface</a>, which includes <code class="language-plaintext highlighter-rouge">init(app)</code>, <code class="language-plaintext highlighter-rouge">start()</code>, and <code class="language-plaintext highlighter-rouge">stop()</code>. More information about receivers is <a href="/bolt-js/concepts#receiver">in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">agent</code></td>
+      <td style="text-align: left">Optional HTTP <code class="language-plaintext highlighter-rouge">Agent</code> used to set up proxy support. Read more about custom agents in the <a href="https://slack.dev/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent">Node Slack SDK documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientTls</code></td>
+      <td style="text-align: left">Optional <code class="language-plaintext highlighter-rouge">string</code> to set a custom TLS configuration for HTTP client requests. Must be one of: <code class="language-plaintext highlighter-rouge">"pfx"</code>, <code class="language-plaintext highlighter-rouge">"key"</code>, <code class="language-plaintext highlighter-rouge">"passphrase"</code>, <code class="language-plaintext highlighter-rouge">"cert"</code>, or <code class="language-plaintext highlighter-rouge">"ca"</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">convoStore</code></td>
+      <td style="text-align: left">A store to set and retrieve state-related conversation information. <code class="language-plaintext highlighter-rouge">set()</code> sets conversation state and <code class="language-plaintext highlighter-rouge">get()</code> fetches it. By default, apps have access to an in-memory store. More information and an example can be found <a href="/bolt-js/concepts#conversation-store">in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">token</code></td>
+      <td style="text-align: left">A <code class="language-plaintext highlighter-rouge">string</code> from your app’s configuration (under “Settings” &gt; “Install App”) required for calling the Web API. May not be passed when using <code class="language-plaintext highlighter-rouge">authorize</code>, <code class="language-plaintext highlighter-rouge">orgAuthorize</code>, or OAuth.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">botId</code></td>
+      <td style="text-align: left">Can only be used when <code class="language-plaintext highlighter-rouge">authorize</code> is not defined. The optional <code class="language-plaintext highlighter-rouge">botId</code> is the ID for your bot token (ex: <code class="language-plaintext highlighter-rouge">B12345</code>) which can be used to ignore messages sent by your app. If a <code class="language-plaintext highlighter-rouge">xoxb-</code> token is passed to your app, this value will automatically be retrieved by your app calling the <a href="https://api.slack.com/methods/auth.test"><code class="language-plaintext highlighter-rouge">auth.test</code> method</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">botUserId</code></td>
+      <td style="text-align: left">Can only be used when <code class="language-plaintext highlighter-rouge">authorize</code> is not defined. The optional <code class="language-plaintext highlighter-rouge">botUserId</code> is distinct from the <code class="language-plaintext highlighter-rouge">botId</code>, as it’s the user ID associated with your bot user used to identify direct mentions. If a <code class="language-plaintext highlighter-rouge">xoxb-</code> token is passed to your app, this value will automatically be retrieved by your app calling the <a href="https://api.slack.com/methods/auth.test"><code class="language-plaintext highlighter-rouge">auth.test</code> method</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">authorize</code></td>
+      <td style="text-align: left">Function for multi-team installations that determines which token is associated with the incoming event. The <code class="language-plaintext highlighter-rouge">authorize</code> function is passed source data that sometimes contains a <code class="language-plaintext highlighter-rouge">userId</code>, <code class="language-plaintext highlighter-rouge">conversationId</code>, <code class="language-plaintext highlighter-rouge">enterpriseId</code>, <code class="language-plaintext highlighter-rouge">teamId</code> and <code class="language-plaintext highlighter-rouge">isEnterpriseInstall</code> (depending which information the incoming event contains). An <code class="language-plaintext highlighter-rouge">authorize</code> function should either return a <code class="language-plaintext highlighter-rouge">botToken</code>, <code class="language-plaintext highlighter-rouge">botId</code>, and <code class="language-plaintext highlighter-rouge">botUserId</code>, or could return a <code class="language-plaintext highlighter-rouge">userToken</code>. If using <a href="/bolt-js/concepts#authenticating-oauth">built-in OAuth support</a>, an <code class="language-plaintext highlighter-rouge">authorize</code> function will automatically be created so you do not need to pass one in. More information about <code class="language-plaintext highlighter-rouge">authorization</code> functions can be found on</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">logger</code></td>
+      <td style="text-align: left">Option that allows you to pass a custom logger rather than using the built-in one. Loggers must implement specific methods (<a href="https://github.com/slackapi/node-slack-sdk/blob/main/packages/logger/src/index.ts">the <code class="language-plaintext highlighter-rouge">Logger</code> interface</a>), which includes <code class="language-plaintext highlighter-rouge">setLevel(level: LogLevel)</code>, <code class="language-plaintext highlighter-rouge">getLevel()</code>, <code class="language-plaintext highlighter-rouge">setName(name: string)</code>, <code class="language-plaintext highlighter-rouge">debug(...msgs: any[])</code>, <code class="language-plaintext highlighter-rouge">info(...msgs: any[])</code>, <code class="language-plaintext highlighter-rouge">warn(...msgs: any[])</code>, and <code class="language-plaintext highlighter-rouge">error(...msgs: any[])</code>. More information about logging are <a href="/bolt-js/concepts#logging">in the documentation</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">logLevel</code></td>
+      <td style="text-align: left">Option to control how much or what kind of information is logged. The <code class="language-plaintext highlighter-rouge">LogLevel</code> export contains the possible levels–in order of most to least information: <code class="language-plaintext highlighter-rouge">DEBUG</code>, <code class="language-plaintext highlighter-rouge">INFO</code>, <code class="language-plaintext highlighter-rouge">WARN</code>, and <code class="language-plaintext highlighter-rouge">ERROR</code>. By default, <code class="language-plaintext highlighter-rouge">logLevel</code> is set to <code class="language-plaintext highlighter-rouge">INFO</code>. More information on logging can be found <a href="/bolt-js/concepts#logging">in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">extendedErrorHandler</code></td>
+      <td style="text-align: left">Option that accepts a <code class="language-plaintext highlighter-rouge">boolean</code> value. When set to <code class="language-plaintext highlighter-rouge">true</code>, the global error handler is passed an object with additional request context. Available from version 3.8.0, defaults to <code class="language-plaintext highlighter-rouge">false</code>. More information on advanced error handling can be found <a href="/bolt-js/concepts#error-handling">in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ignoreSelf</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code> to enable a middleware function that ignores any messages coming from your app. Requires a <code class="language-plaintext highlighter-rouge">botId</code>. Defaults to <code class="language-plaintext highlighter-rouge">true</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">clientOptions.slackApiUrl</code></td>
+      <td style="text-align: left">Allows setting a custom endpoint for the Slack API. Used most often for testing.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">socketMode</code></td>
+      <td style="text-align: left">Option that accepts a <code class="language-plaintext highlighter-rouge">boolean</code> value. When set to <code class="language-plaintext highlighter-rouge">true</code> the app is started in <a href="/bolt-js/concepts#socket-mode">Socket Mode</a>, i.e. it allows your app to connect and receive data from Slack via a WebSocket connection. Defaults to <code class="language-plaintext highlighter-rouge">false</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">developerMode</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code> to activate the developer mode. When set to <code class="language-plaintext highlighter-rouge">true</code> the <code class="language-plaintext highlighter-rouge">logLevel</code> is automatically set to <code class="language-plaintext highlighter-rouge">DEBUG</code> and <code class="language-plaintext highlighter-rouge">socketMode</code> is set to <code class="language-plaintext highlighter-rouge">true</code>. However, explicitly setting these two properties takes precedence over implicitly setting them via <code class="language-plaintext highlighter-rouge">developerMode</code>. Furthermore, a custom OAuth failure handler is provided to help debugging. Finally, the body of all incoming requests are logged and thus sensitive information like tokens might be contained in the logs. Defaults to <code class="language-plaintext highlighter-rouge">false</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">deferInitialization</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code> to defer initialization of the app and places responsibility for manually calling the <code class="language-plaintext highlighter-rouge">async</code> <code class="language-plaintext highlighter-rouge">App#init()</code> method on the developer. <code class="language-plaintext highlighter-rouge">init()</code> must be called before <code class="language-plaintext highlighter-rouge">App#start()</code>. Defaults to <code class="language-plaintext highlighter-rouge">false</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">signatureVerification</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code> that determines whether Bolt should <a href="https://api.slack.com/authentication/verifying-requests-from-slack">verify Slack’s signature on incoming requests</a>. Defaults to <code class="language-plaintext highlighter-rouge">true</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>Bolt’s client is an instance of <code class="language-plaintext highlighter-rouge">WebClient</code> from the <a href="/node-slack-sdk">Node Slack SDK</a>, so some of that documentation may be helpful as you’re developing.</p>
+</blockquote>
+
+<h2 id="framework-error-types">Framework error types</h2>
+<p>Bolt includes a set of error types to make errors easier to handle, with more specific contextual information. Below is a non-exhaustive list of error codes you may run into during development:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Error code</th>
+      <th style="text-align: left">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">AppInitializationError</code></td>
+      <td style="text-align: left">Invalid initialization options were passed. This could include not passing a signing secret, or passing in conflicting options (for example, you can’t pass in both <code class="language-plaintext highlighter-rouge">token</code> and <code class="language-plaintext highlighter-rouge">authorize</code>). Includes an <code class="language-plaintext highlighter-rouge">original</code> property with more details. This error is only thrown during initialization (within the App’s constructor).</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">AuthorizationError</code></td>
+      <td style="text-align: left">Error exclusively thrown when installation information can’t be fetched or parsed. You may encounter this error when using the built-in OAuth support, or you may want to import and use this error when building your own <code class="language-plaintext highlighter-rouge">authorize</code> function.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ContextMissingPropertyError</code></td>
+      <td style="text-align: left">Error thrown when the <code class="language-plaintext highlighter-rouge">context</code> object is missing necessary information, such as not including <code class="language-plaintext highlighter-rouge">botUserId</code> or <code class="language-plaintext highlighter-rouge">botId</code> when <code class="language-plaintext highlighter-rouge">ignoreSelf</code> is set to <code class="language-plaintext highlighter-rouge">true</code>. The missing property is available in the <code class="language-plaintext highlighter-rouge">missingProperty</code> property.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ReceiverMultipleAckError</code></td>
+      <td style="text-align: left">Error thrown within Receiver when your app calls <code class="language-plaintext highlighter-rouge">ack()</code> when that request has previously been acknowledged. Currently only used in the default <code class="language-plaintext highlighter-rouge">HTTPReceiver</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">ReceiverAuthenticityError</code></td>
+      <td style="text-align: left">Error thrown when your app’s request signature could not be verified. The error includes information on why it failed, such as an invalid timestamp, missing headers, or invalid signing secret.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">MultipleListenerError</code></td>
+      <td style="text-align: left">Thrown when multiple errors occur when processing multiple listeners for a single event. Includes an <code class="language-plaintext highlighter-rouge">originals</code> property with an array of the individual errors.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">WorkflowStepInitializationError</code></td>
+      <td style="text-align: left">Error thrown when configuration options are invalid or missing when instantiating a new <code class="language-plaintext highlighter-rouge">WorkflowStep</code> instance. This could be scenarios like not including a <code class="language-plaintext highlighter-rouge">callback_id</code>, or not including a configuration object. More information on Workflow Steps <a href="concepts#steps">can be found in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">UnknownError</code></td>
+      <td style="text-align: left">An error that was thrown inside the framework but does not have a specified error code. Contains an <code class="language-plaintext highlighter-rouge">original</code> property with more details.</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>You can read the code for error definition and construction <a href="https://github.com/slackapi/bolt-js/blob/main/src/errors.ts">in errors.ts</a>.</p>
+</blockquote>
+
+<h3 id="client-errors">Client errors</h3>
+<p>Bolt imports a <code class="language-plaintext highlighter-rouge">WebClient</code> to call Slack’s APIs. Below is a set of errors you may encounter when making API calls with the client, though you can read more <a href="/node-slack-sdk/web-api#handle-errors">in the web API documentation</a>. When handling client errors, more information can be found in the body within the <code class="language-plaintext highlighter-rouge">data</code> property.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Error code</th>
+      <th style="text-align: left">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">PlatformError</code></td>
+      <td style="text-align: left">Error received when calling a Slack API. Includes a <code class="language-plaintext highlighter-rouge">data</code> property.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">RequestError</code></td>
+      <td style="text-align: left">A request could not be sent, perhaps because your network connection is not available. It has an <code class="language-plaintext highlighter-rouge">original</code> property with more details.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">RateLimitedError</code></td>
+      <td style="text-align: left">Your app has made too many requests too quickly. Inclues a <code class="language-plaintext highlighter-rouge">retryAfter</code> property with the number of seconds you should wait before trying to send again. The <code class="language-plaintext highlighter-rouge">WebClient</code> will handle rate limit errors by default–<a href="/node-slack-sdk/web-api#rate-limits">you can read more in the documentation</a>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">HTTPError</code></td>
+      <td style="text-align: left">The HTTP response contained an unfamiliar status code. The Web API only responds with <code class="language-plaintext highlighter-rouge">200</code> (including for errors), or <code class="language-plaintext highlighter-rouge">429</code> for rate limiting.</td>
+    </tr>
+  </tbody>
+</table>
+
+        </div>
+    </div>
+
+  </div>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</body>
+</html>

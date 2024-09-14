@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-internal-modules */
 import './utils/env';
-import { App, LogLevel, subtype, BotMessageEvent, BlockAction } from '@slack/bolt';
+import { App, type BlockAction, type BotMessageEvent, LogLevel, subtype } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -25,7 +25,7 @@ app.message(':wave:', async ({ message, say }) => {
  */
 // Listens for messages containing "knock knock" and responds with an italicized "who's there?"
 app.message('knock knock', async ({ say }) => {
-  await say('_Who\'s there?_');
+  await say("_Who's there?_");
 });
 
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
@@ -35,22 +35,24 @@ app.event('reaction_added', async ({ event, client }) => {
     await client.chat.postMessage({
       text: 'Pick a reminder date',
       channel: event.item.channel,
-      blocks: [{
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'Pick a date for me to remind you',
-        },
-        accessory: {
-          type: 'datepicker',
-          action_id: 'datepicker_remind',
-          initial_date: '2019-04-28',
-          placeholder: {
-            type: 'plain_text',
-            text: 'Select a date',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'Pick a date for me to remind you',
+          },
+          accessory: {
+            type: 'datepicker',
+            action_id: 'datepicker_remind',
+            initial_date: '2019-04-28',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+            },
           },
         },
-      }],
+      ],
     });
   }
 });
@@ -75,7 +77,7 @@ app.event('team_join', async ({ event, client, logger }) => {
 });
 
 app.message(subtype('bot_message'), async ({ message, logger }) => {
-  const botMessage = (message as BotMessageEvent);
+  const botMessage = message as BotMessageEvent;
   logger.info(`The bot user ${botMessage.user} said ${botMessage.text}`);
 });
 
@@ -110,7 +112,8 @@ app.action('approve_button', async ({ ack }) => {
 
 // Your listener function will only be called when the action_id matches 'select_user'
 // AND the block_id matches 'assign_ticket'
-app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
+app.action<BlockAction>(
+  { action_id: 'select_user', block_id: 'assign_ticket' },
   async ({ body, client, ack, logger }) => {
     await ack();
     try {
@@ -125,7 +128,8 @@ app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
     } catch (error) {
       logger.error(error);
     }
-  });
+  },
+);
 
 // Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered
 app.action('approve_button', async ({ ack, say }) => {

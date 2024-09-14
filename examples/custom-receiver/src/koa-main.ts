@@ -6,10 +6,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import Router from '@koa/router';
-import Koa from 'koa';
 import { App, FileInstallationStore } from '@slack/bolt';
-import { FileStateStore } from '@slack/oauth';
 import { ConsoleLogger, LogLevel } from '@slack/logger';
+import { FileStateStore } from '@slack/oauth';
+import Koa from 'koa';
 import KoaReceiver from './KoaReceiver';
 
 const logger = new ConsoleLogger();

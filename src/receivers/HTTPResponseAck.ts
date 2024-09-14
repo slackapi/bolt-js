@@ -1,16 +1,16 @@
-import { IncomingMessage, ServerResponse } from 'http';
-import { Logger } from '@slack/logger';
-import { AckFn } from '../types';
+import type { IncomingMessage, ServerResponse } from 'http';
+import type { Logger } from '@slack/logger';
 import { ReceiverMultipleAckError } from '../errors';
-import { HTTPModuleFunctions as httpFunc, ReceiverUnhandledRequestHandlerArgs } from './HTTPModuleFunctions';
+import type { AckFn } from '../types';
+import { type ReceiverUnhandledRequestHandlerArgs, HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
 
 export interface AckArgs {
   logger: Logger;
   processBeforeResponse: boolean;
   unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
-  httpRequest: IncomingMessage,
-  httpResponse: ServerResponse,
+  httpRequest: IncomingMessage;
+  httpResponse: ServerResponse;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

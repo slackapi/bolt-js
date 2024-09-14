@@ -1,0 +1,12 @@
+{
+  "/getting-started": "http://localhost:4000/bolt-js/tutorial/getting-started",
+  "/getting-started-http": "http://localhost:4000/bolt-js/tutorial/getting-started-http",
+  "/hubot-migration": "http://localhost:4000/bolt-js/tutorial/hubot-migration",
+  "/ja-jp/getting-started": "http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started",
+  "/getting-started/ja-jp": "http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started",
+  "/ja-jp/getting-started-http": "http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started-http",
+  "/ja-jp/hubot-migration": "http://localhost:4000/bolt-js/ja-jp/tutorial/hubot-migration",
+  "/": "http://localhost:4000/bolt-js/concepts",
+  "/jp": "http://localhost:4000/bolt-js/ja-jp/concepts",
+  "/ja-jp": "http://localhost:4000/bolt-js/ja-jp/concepts"
+}

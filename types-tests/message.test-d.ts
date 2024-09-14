@@ -1,18 +1,17 @@
-import { expectNotType, expectType, expectError } from 'tsd';
-// eslint-disable-next-line
 import App from '../src/App';
-import {
-  type MessageEvent,
-  type GenericMessageEvent,
-  type BotMessageEvent,
-  type MessageRepliedEvent,
-  type MeMessageEvent,
-  type MessageDeletedEvent,
-  type ThreadBroadcastMessageEvent,
-  type MessageChangedEvent,
-  type EKMAccessDeniedMessageEvent,
+import type {
+  MessageEvent,
+  GenericMessageEvent,
+  BotMessageEvent,
+  MessageRepliedEvent,
+  MeMessageEvent,
+  MessageDeletedEvent,
+  ThreadBroadcastMessageEvent,
+  MessageChangedEvent,
+  EKMAccessDeniedMessageEvent,
   AllMessageEvents,
 } from '..';
+import { expectError, expectNotType, expectType } from 'tsd';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

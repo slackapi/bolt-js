@@ -1,20 +1,15 @@
 import 'mocha';
-import sinon, { SinonSpy } from 'sinon';
+import { LogLevel } from '@slack/logger';
+import type { WebClient, WebClientOptions } from '@slack/web-api';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
-import { LogLevel } from '@slack/logger';
-import { WebClientOptions, WebClient } from '@slack/web-api';
-import { Override, mergeOverrides, createFakeLogger } from './test-helpers';
+import sinon, { type SinonSpy } from 'sinon';
+import type App from './App';
+import type { ConversationStore } from './conversation-store';
 import { ErrorCode } from './errors';
-import {
-  Receiver,
-  ReceiverEvent,
-  SayFn,
-  NextFn,
-} from './types';
-import { ConversationStore } from './conversation-store';
-import App from './App';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
+import { type Override, createFakeLogger, mergeOverrides } from './test-helpers';
+import type { NextFn, Receiver, ReceiverEvent, SayFn } from './types';
 
 // Utility functions
 const noop = () => Promise.resolve(undefined);
@@ -41,7 +36,7 @@ class FakeReceiver implements Receiver {
 }
 
 // Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEvent {
+function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
   // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
   // IncomingEventType.Event
   return {
@@ -87,9 +82,11 @@ describe('App basic features', () => {
       const fakeBotId = 'B_FAKE_BOT_ID';
       const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
       const installationStore = {
-        storeInstallation: async () => { },
-        fetchInstallation: async () => { throw new Error('Failed fetching installation'); },
-        deleteInstallation: async () => { },
+        storeInstallation: async () => {},
+        fetchInstallation: async () => {
+          throw new Error('Failed fetching installation');
+        },
+        deleteInstallation: async () => {},
       };
       const overrides = mergeOverrides(
         withNoopAppMetadata(),
@@ -106,8 +103,7 @@ describe('App basic features', () => {
           clientId: '',
           clientSecret: '',
           stateSecret: '',
-          installerOptions: {
-          },
+          installerOptions: {},
           installationStore,
         });
         // Assert
@@ -234,7 +230,13 @@ describe('App basic features', () => {
 
       // Act
       try {
-        new MockApp({ authorize: authorizeCallback, clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' }); // eslint-disable-line no-new
+        new MockApp({
+          authorize: authorizeCallback,
+          clientId: '',
+          clientSecret: '',
+          stateSecret: '',
+          signingSecret: '',
+        }); // eslint-disable-line no-new
         assert.fail();
       } catch (error: any) {
         // Assert
@@ -375,7 +377,12 @@ describe('App basic features', () => {
 
         // Act
         try {
-          new MockApp({ token: '', signingSecret: '', redirectUri: 'http://example.com/redirect', installerOptions: {} }); // eslint-disable-line no-new
+          new MockApp({
+            token: '',
+            signingSecret: '',
+            redirectUri: 'http://example.com/redirect',
+            installerOptions: {},
+          }); // eslint-disable-line no-new
           assert.fail();
         } catch (error: any) {
           // Assert
@@ -469,7 +476,10 @@ describe('App basic features', () => {
         await app.start();
         assert.fail('The start() method should fail before init() call');
       } catch (err: any) {
-        assert.equal(err.message, 'This App instance is not yet initialized. Call `await App#init()` before starting the app.');
+        assert.equal(
+          err.message,
+          'This App instance is not yet initialized. Call `await App#init()` before starting the app.',
+        );
       }
       try {
         await app.init();
@@ -794,10 +804,7 @@ describe('App basic features', () => {
       it('should be available in middleware/listener args', async () => {
         // Arrange
         const MockApp = await importApp(
-          mergeOverrides(
-            withNoopAppMetadata(),
-            withSuccessfulBotUserFetchingWebClient('B123', 'U123'),
-          ),
+          mergeOverrides(withNoopAppMetadata(), withSuccessfulBotUserFetchingWebClient('B123', 'U123')),
         );
         const tokens = ['xoxb-123', 'xoxp-456', 'xoxb-123'];
         const app = new MockApp({
@@ -1170,9 +1177,7 @@ describe('App basic features', () => {
         ];
 
         // Act
-        await Promise.all(
-          receiverEvents.map((event) => fakeReceiver.sendEvent(event)),
-        );
+        await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
         // Assert
         assert.isTrue(fakeLogger.info.called);
@@ -1184,10 +1189,7 @@ describe('App basic features', () => {
       it('should be able to use the app_installed_team_id when provided by the payload', async () => {
         // Arrange
         const fakeAxiosPost = sinon.fake.resolves({});
-        overrides = buildOverrides([
-          withNoopWebClient(),
-          withAxiosPost(fakeAxiosPost),
-        ]);
+        overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
 
         // Act

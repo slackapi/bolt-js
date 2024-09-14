@@ -1,15 +1,12 @@
 import 'mocha';
-import sinon, { SinonSpy } from 'sinon';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
-import { Override, mergeOverrides, createFakeLogger, delay } from './test-helpers';
-import { ErrorCode, UnknownError, AuthorizationError, CodedError, isCodedError } from './errors';
-import {
-  Receiver,
-  ReceiverEvent,
-  NextFn,
-} from './types';
-import App, { ExtendedErrorHandlerArgs } from './App';
+import sinon, { type SinonSpy } from 'sinon';
+import type App from './App';
+import type { ExtendedErrorHandlerArgs } from './App';
+import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedError } from './errors';
+import { type Override, createFakeLogger, delay, mergeOverrides } from './test-helpers';
+import type { NextFn, Receiver, ReceiverEvent } from './types';
 
 // Utility functions
 const noop = () => Promise.resolve(undefined);
@@ -36,7 +33,7 @@ class FakeReceiver implements Receiver {
 }
 
 // Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(type: string = 'dummy_event_type'): ReceiverEvent {
+function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
   // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
   // IncomingEventType.Event
   return {
@@ -210,16 +207,18 @@ describe('App built-in middleware and mechanism', () => {
        * @param orderDown The order it should be called when processing middleware down the chain
        * @param orderUp The order it should be called when processing middleware up the chain
        */
-      const assertOrderMiddleware = (orderDown: number, orderUp: number) => async ({ next }: { next?: NextFn }) => {
-        await delay(10);
-        middlewareCount += 1;
-        assert.equal(middlewareCount, orderDown);
-        if (next !== undefined) {
-          await next();
-        }
-        middlewareCount += 1;
-        assert.equal(middlewareCount, orderUp);
-      };
+      const assertOrderMiddleware =
+        (orderDown: number, orderUp: number) =>
+        async ({ next }: { next?: NextFn }) => {
+          await delay(10);
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderDown);
+          if (next !== undefined) {
+            await next();
+          }
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderUp);
+        };
 
       app.use(assertOrderMiddleware(1, 8));
       app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -368,17 +367,18 @@ describe('App built-in middleware and mechanism', () => {
     });
 
     // https://github.com/slackapi/bolt-js/issues/1457
-    it('should not cause a runtime exception if the last listener middleware invokes next()', async () => new Promise((resolve, reject) => {
-      app.event('app_mention', async ({ next }) => {
-        try {
-          await next();
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-      fakeReceiver.sendEvent(createDummyReceiverEvent('app_mention'));
-    }));
+    it('should not cause a runtime exception if the last listener middleware invokes next()', async () =>
+      new Promise((resolve, reject) => {
+        app.event('app_mention', async ({ next }) => {
+          try {
+            await next();
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+        fakeReceiver.sendEvent(createDummyReceiverEvent('app_mention'));
+      }));
   });
 
   describe('middleware and listener arguments', () => {

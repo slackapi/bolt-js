@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v2">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+      <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700&display=swap" rel="stylesheet">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" 
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg" />
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started"
+      ><li class="title">Bolt 入門ガイド</li></a
+    >
+    <a href="http://localhost:4000/bolt-js/ja-jp/reference"
+      ><li class="title">リファレンス</li></a
+    >
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#basic"
+      ><li class="title">基本的な概念</li></a
+    >
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-listening">
+      <li>メッセージ・イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-sending">
+      <li>メッセージの送信</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#event-listening">
+      <li>イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#web-api">
+      <li>Web API の使用</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-listening">
+      <li>アクションのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-respond">
+      <li>アクションへの応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#acknowledge">
+      <li>リクエストの確認</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#shortcuts">
+      <li>ショートカットのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#commands">
+      <li>コマンドのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-modals">
+      <li>モーダルの開始</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#updating-pushing-views">
+      <li>モーダルの更新と多重表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#view-submissions">
+      <li>モーダルでの送信のリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#publishing-views">
+      <li>ホームタブの更新</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#options">
+      <li>オプションのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authenticating-oauth">
+      <li>OAuth フローの実装</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#socket-mode">
+      <li>ソケットモードの使用</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#advanced">
+      <li class="title">応用コンセプト</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#error-handling">
+      <li>エラーの処理</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authorization">
+      <li>認可（Authorization）</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#token-rotation">
+      <li>トークンのローテーション</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#conversation-store">
+      <li>会話ストア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#global-middleware">
+      <li>グローバルミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#listener-middleware">
+      <li>リスナーミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#context">
+      <li>context の追加</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#logging">
+      <li>ログの表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#receiver">
+      <li>レシーバーのカスタマイズ</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#custom-routes">
+      <li>カスタム HTTP ルートの追加</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/aws-lambda">
+          <li>AWS Lambda へのデプロイ</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/heroku">
+          <li>Heroku へのデプロイ</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#steps">
+      <li class="title">
+        ワークフローステップ
+        <span class="label-deprecated">
+          非推奨
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの定義
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの追加・編集
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの設定の保存
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの実行
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started-http">
+      <li class="title">Bolt 入門ガイド (HTTP)</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/hubot-migration">
+      <li class="title">Hubot から Bolt に移行する方法</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v2">
+      <li class="title">2.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v3">
+      <li class="title">3.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/using-typescript">
+      <li class="title">TypeScript での利用ガイド</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">貢献</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/" class="header_btn language-switcher float_right">English</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
+        </div>
+        
+        <div class="tutorial">
+          <h1 id="2x-マイグレーションガイド">2.x マイグレーションガイド</h1>
+
+<div class="section-content">
+  <p>このガイドは Bolt 1.x を利用しているアプリを 2.x にアップグレードするための手順について説明します。いくつかの変更が必要とはなりますが、ほとんどのアプリの場合で、おそらく対応に必要な時間は 5 〜 15 分程度です。</p>
+
+  <p><em>注: もしすぐにアップグレードをしない場合は、<a href="#bolt-1x-%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%82%B9%E3%82%B1%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB">Bolt 1.x に関するサポートスケジュール</a>をご確認ください</em></p>
+</div>
+
+<hr />
+
+<h3 id="upgrading-your-listeners-to-async">リスナー関数を <code class="language-plaintext highlighter-rouge">async</code> 関数に変更</h3>
+
+<p>Bolt アプリ内のリスナー関数は、全て <code class="language-plaintext highlighter-rouge">async</code> 関数に変更する必要があります。そして、そのリスナー関数内の <code class="language-plaintext highlighter-rouge">say()</code>、<code class="language-plaintext highlighter-rouge">respond()</code>、<code class="language-plaintext highlighter-rouge">ack()</code> メソッドの呼び出しも全て <code class="language-plaintext highlighter-rouge">await</code> を呼び出しの前につける必要があります。</p>
+
+<p>これまで:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="dl">'</span><span class="s1">some-action-id</span><span class="dl">'</span><span class="p">,</span> <span class="p">({</span><span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">ack</span><span class="p">();</span>
+  <span class="nx">say</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">})</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>これから:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="dl">'</span><span class="s1">some-action-id</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span><span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">await</span> <span class="nx">ack</span><span class="p">();</span>
+  <span class="k">await</span> <span class="nx">say</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">})</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<h3 id="error-handling">エラーハンドリング</h3>
+
+<p>Bolt for JavaScript 2.x では、より多くのユースケースで、必要に応じてエラーをキャッチし、グローバルエラーハンドラーにそれを送るかを制御できるよう改善されました。これまでと同様、グローバルエラーハンドラーに全て任せるよりは、可能な限り、リスナー関数の内部でエラーに対処することをおすすめします。</p>
+
+<h4 id="リスナー関数内で-trycatch-節を用いたエラーハンドリング">リスナー関数内で <code class="language-plaintext highlighter-rouge">try</code>/<code class="language-plaintext highlighter-rouge">catch</code> 節を用いたエラーハンドリング</h4>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="dl">'</span><span class="s1">some-action-id</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span><span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span><span class="p">,</span> <span class="nx">logger</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="nx">ack</span><span class="p">();</span>
+    <span class="k">await</span> <span class="nx">say</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ここでエラーに対処</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<h4 id="グローバルエラーハンドラーによるエラーハンドリング">グローバルエラーハンドラーによるエラーハンドリング</h4>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="k">async</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// エラーの詳細をチェックして、メッセージ送信のリトライやアプリの停止などの対処を行う</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>その他のエラーに関する変更:</p>
+
+<ul>
+  <li>リスナー関数が <code class="language-plaintext highlighter-rouge">ack()</code> メソッドを 3 秒間のうちに呼び出さなかった場合、これまでのように例外を投げるのではなくログを出力するようになりました</li>
+  <li>もし一つのイベントに対して複数のリスナー関数を実行中に複数のエラーが発生した場合、Bolt for JavaScript は <code class="language-plaintext highlighter-rouge">ErrorCode.MultipleListenerError</code> の値での <code class="language-plaintext highlighter-rouge">code</code> と、発生した個々のエラーの配列を含む <code class="language-plaintext highlighter-rouge">originals</code> というパラメーターをラップしたエラーを返します</li>
+</ul>
+
+<h3 id="message-shortcuts">メッセージショートカット</h3>
+
+<p><a href="https://api.slack.com/interactivity/shortcuts/using#message_shortcuts">メッセージショートカット</a> (以前はメッセージアクションと呼ばれていました)は、これまで <code class="language-plaintext highlighter-rouge">action()</code> メソッドでハンドリングしていましたが <code class="language-plaintext highlighter-rouge">shortcut()</code> メソッドを使うようになりました。</p>
+
+<p>これまで:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">({</span> <span class="na">callback_id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">message-action-callback</span><span class="dl">'</span> <span class="p">},</span> <span class="p">({</span><span class="nx">action</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">context</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">ack</span><span class="p">();</span>
+  <span class="c1">// ここで処理を行う</span>
+<span class="p">})</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>これから:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nx">app</span><span class="p">.</span><span class="nx">shortcut</span><span class="p">(</span><span class="dl">'</span><span class="s1">message-action-callback</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span><span class="nx">shortcut</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">context</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">await</span> <span class="nx">ack</span><span class="p">();</span>
+  <span class="c1">// ここで処理を行う</span>
+<span class="p">})</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<h3 id="upgrading-middleware">ミドルウェアに関する変更</h3>
+
+<p>もしカスタムのミドルウェアを書いている場合は、その関数を <code class="language-plaintext highlighter-rouge">async</code> に変更し、さらに <code class="language-plaintext highlighter-rouge">next()</code> の呼び出しを <code class="language-plaintext highlighter-rouge">await next()</code> に変更してください。もし後続の処理がある場合は、関数を <code class="language-plaintext highlighter-rouge">next()</code> に渡す代わりに、その後続の処理を <code class="language-plaintext highlighter-rouge">await next()</code> の後に実行してください。</p>
+
+<p>これまで:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="kd">function</span> <span class="nx">noBotMessages</span><span class="p">({</span><span class="nx">message</span><span class="p">,</span> <span class="nx">next</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">doAfter</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 後続の処理をここでやる</span>
+  <span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">message</span><span class="p">.</span><span class="nx">subtype</span> <span class="o">||</span> <span class="nx">message</span><span class="p">.</span><span class="nx">subtype</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">bot_message</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="nx">doAfter</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>これから:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="k">async</span> <span class="kd">function</span> <span class="nx">noBotMessages</span><span class="p">({</span><span class="nx">message</span><span class="p">,</span> <span class="nx">next</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">message</span><span class="p">.</span><span class="nx">subtype</span> <span class="o">||</span> <span class="nx">message</span><span class="p">.</span><span class="nx">subtype</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">bot_message</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="nx">next</span><span class="p">();</span>
+    <span class="c1">// 後続の処理をここでやる</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<h3 id="slackbolt1x-support-schedule">Bolt 1.x のサポートスケジュール</h3>
+
+<p><code class="language-plaintext highlighter-rouge">@slack/bolt@1.x</code> は <strong>2020 年 6 月 30 日</strong> より非推奨となります。それまでの期間はケースバイケースでバグ修正や新機能のバックポートを対応を継続します。<code class="language-plaintext highlighter-rouge">@slack/bolt@1.x</code> が非推奨となった後は、End of life（正式サポートの終了日）まで <strong>クリティカルなバグ修正のみ</strong> を実装し、クリティカルではない issue や pull request はクローズします。End of life は <strong>2021 年 4 月 30 日</strong> の予定です。この日からは <code class="language-plaintext highlighter-rouge">@slack/bolt@1.x</code> の開発は完全に終了となり、残っている open issue や pull request もクローズされます。</p>
+
+<h3 id="minimum-typescript-version">TypeScript の最低必須バージョン</h3>
+
+<p><a href="http://localhost:4000/bolt-js/ja-jp/tutorial/using-typescript">TypeScript 利用ガイド</a> でも説明していますが、<code class="language-plaintext highlighter-rouge">@slack/bolt@2.x</code> は TypeScirpt 3.7 以上が必須バージョンです。</p>
+
+        </div>
+    </div>
+
+  </div>
+  <script src="http://localhost:4000/bolt-js/scripts/tutorial_nav.js"></script>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</body>
+</html>

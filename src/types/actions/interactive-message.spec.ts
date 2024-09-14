@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { InteractiveMessage, ButtonClick } from './interactive-message';
+import type { ButtonClick, InteractiveMessage } from './interactive-message';
 
 describe('Message shortcut payload types', () => {
   it('should be compatible with block_actions payloads', () => {

@@ -1,16 +1,16 @@
 import 'mocha';
 import { EventEmitter } from 'events';
 import { IncomingMessage, ServerResponse } from 'http';
-import sinon, { SinonSpy } from 'sinon';
-import { assert } from 'chai';
-import rewiremock from 'rewiremock';
-import { Logger, LogLevel } from '@slack/logger';
-import { match } from 'path-to-regexp';
-import { ParamsDictionary } from 'express-serve-static-core';
+import { LogLevel, type Logger } from '@slack/logger';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
-import { Override, mergeOverrides } from '../test-helpers';
-import { CustomRouteInitializationError, AppInitializationError } from '../errors';
+import { assert } from 'chai';
+import type { ParamsDictionary } from 'express-serve-static-core';
+import { match } from 'path-to-regexp';
+import rewiremock from 'rewiremock';
+import sinon, { type SinonSpy } from 'sinon';
+import { AppInitializationError, CustomRouteInitializationError } from '../errors';
+import { type Override, mergeOverrides } from '../test-helpers';
 
 // Fakes
 class FakeServer extends EventEmitter {
@@ -36,15 +36,13 @@ class FakeServer extends EventEmitter {
   }
 }
 
-describe('SocketModeReceiver', function () {
+describe('SocketModeReceiver', () => {
   beforeEach(function () {
     this.listener = (_req: any, _res: any) => {};
     this.fakeServer = new FakeServer();
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    this.fakeCreateServer = sinon.fake(function (handler: (req: any, res: any) => void) {
-      that.listener = handler; // pick up the socket listener method so we can assert on its behaviour
-      return that.fakeServer as FakeServer;
+    this.fakeCreateServer = sinon.fake((handler: (req: any, res: any) => void) => {
+      this.listener = handler; // pick up the socket listener method so we can assert on its behaviour
+      return this.fakeServer as FakeServer;
     });
   });
 
@@ -72,7 +70,7 @@ describe('SocketModeReceiver', function () {
     },
   };
 
-  describe('constructor', function () {
+  describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments and use default arguments when not provided', async function () {
       // Arrange
@@ -166,40 +164,52 @@ describe('SocketModeReceiver', function () {
       });
       assert.isNotNull(receiver);
       // redirectUri supplied, but no redirectUriPath
-      assert.throws(() => new SocketModeReceiver({
-        appToken,
-        clientId,
-        clientSecret,
-        stateSecret,
-        scopes,
-        redirectUri,
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new SocketModeReceiver({
+            appToken,
+            clientId,
+            clientSecret,
+            stateSecret,
+            scopes,
+            redirectUri,
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUriPath
-      assert.throws(() => new SocketModeReceiver({
-        appToken,
-        clientId: 'my-clientId',
-        clientSecret,
-        stateSecret,
-        scopes,
-        redirectUri,
-        installerOptions: {
-          redirectUriPath: '/hiya',
-        },
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new SocketModeReceiver({
+            appToken,
+            clientId: 'my-clientId',
+            clientSecret,
+            stateSecret,
+            scopes,
+            redirectUri,
+            installerOptions: {
+              redirectUriPath: '/hiya',
+            },
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUri
-      assert.throws(() => new SocketModeReceiver({
-        appToken,
-        clientId: 'my-clientId',
-        clientSecret,
-        stateSecret,
-        scopes,
-        redirectUri: 'http://example.com/hiya',
-        installerOptions,
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new SocketModeReceiver({
+            appToken,
+            clientId: 'my-clientId',
+            clientSecret,
+            stateSecret,
+            scopes,
+            redirectUri: 'http://example.com/hiya',
+            installerOptions,
+          }),
+        AppInitializationError,
+      );
     });
   });
-  describe('request handling', function () {
-    describe('handleInstallPathRequest()', function () {
+  describe('request handling', () => {
+    describe('handleInstallPathRequest()', () => {
       it('should invoke installer handleInstallPath if a request comes into the install path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
@@ -320,7 +330,7 @@ describe('SocketModeReceiver', function () {
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
     });
-    describe('handleInstallRedirectRequest()', function () {
+    describe('handleInstallRedirectRequest()', () => {
       it('should invoke installer handleCallback if a request comes into the redirect URI path', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
@@ -424,7 +434,7 @@ describe('SocketModeReceiver', function () {
         );
       });
     });
-    describe('custom route handling', function () {
+    describe('custom route handling', () => {
       it('should call custom route handler only if request matches route path and method', async function () {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
@@ -449,7 +459,7 @@ describe('SocketModeReceiver', function () {
         fakeReq.url = '/test';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
@@ -492,7 +502,7 @@ describe('SocketModeReceiver', function () {
         fakeReq.url = '/test?hello=world';
         const tempMatch = matchRegex('/test');
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
@@ -535,7 +545,7 @@ describe('SocketModeReceiver', function () {
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
@@ -581,7 +591,7 @@ describe('SocketModeReceiver', function () {
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
@@ -629,7 +639,7 @@ describe('SocketModeReceiver', function () {
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params : ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
@@ -658,7 +668,10 @@ describe('SocketModeReceiver', function () {
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ handler: sinon.fake() }] as any;
 
-        assert.throws(() => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }), CustomRouteInitializationError);
+        assert.throws(
+          () => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }),
+          CustomRouteInitializationError,
+        );
       });
     });
 
@@ -708,7 +721,7 @@ describe('SocketModeReceiver', function () {
     });
   });
 
-  describe('#start()', function () {
+  describe('#start()', () => {
     it('should invoke the SocketModeClient start method', async function () {
       // Arrange
       const clientStub = sinon.createStubInstance(SocketModeClient);
@@ -736,7 +749,7 @@ describe('SocketModeReceiver', function () {
       assert(clientStub.start.called);
     });
   });
-  describe('#stop()', function () {
+  describe('#stop()', () => {
     it('should invoke the SocketModeClient disconnect method', async function () {
       // Arrange
       const clientStub = sinon.createStubInstance(SocketModeClient);

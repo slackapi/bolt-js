@@ -1,27 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  SlackEventMiddlewareArgs,
-  SlackCommandMiddlewareArgs,
-  SlackOptionsMiddlewareArgs,
-  SlackActionMiddlewareArgs,
-  SlackShortcutMiddlewareArgs,
-  SlackAction,
-  OptionsSource,
-  MessageShortcut,
+import type {
   AnyMiddlewareArgs,
+  MessageShortcut,
+  OptionsSource,
   ReceiverEvent,
+  SlackAction,
+  SlackActionMiddlewareArgs,
+  SlackCommandMiddlewareArgs,
+  SlackEventMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
+  SlackShortcutMiddlewareArgs,
 } from './types';
 
 /**
  * Internal data type for capturing the class of event processed in App#onIncomingEvent()
  */
 export enum IncomingEventType {
-  Event,
-  Action,
-  Command,
-  Options,
-  ViewAction,
-  Shortcut,
+  Event = 0,
+  Action = 1,
+  Command = 2,
+  Options = 3,
+  ViewAction = 4,
+  Shortcut = 5,
 }
 
 // ----------------------------

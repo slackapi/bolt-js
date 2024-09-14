@@ -1,6 +1,6 @@
-import { Option, PlainTextElement } from '@slack/types';
-import { StringIndexed, XOR, AckFn } from '../utilities';
-import { ViewOutput } from '../view/index';
+import type { Option, PlainTextElement } from '@slack/types';
+import type { AckFn, StringIndexed, XOR } from '../utilities';
+import type { ViewOutput } from '../view/index';
 
 /**
  * Arguments which listeners and middleware receive to process an options request from Slack
@@ -143,8 +143,8 @@ export interface DialogSuggestion extends StringIndexed {
 type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggestion'
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
-    ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
-    : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
+  ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
+  : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
 export interface BlockOptions {
   options: Option[];
@@ -160,7 +160,7 @@ export interface DialogOptions {
 }
 export interface OptionGroups<Options> {
   option_groups: ({
-    label: PlainTextElement
+    label: PlainTextElement;
   } & Options)[];
 }
 export interface DialogOptionGroups<Options> {

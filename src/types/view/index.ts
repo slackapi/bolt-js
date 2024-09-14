@@ -1,5 +1,5 @@
-import { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
-import { AckFn, RespondFn } from '../utilities';
+import type { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
+import type { AckFn, RespondFn } from '../utilities';
 
 /**
  * Known view action types

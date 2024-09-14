@@ -1,10 +1,10 @@
-import { BlockAction } from './block-action';
-import { InteractiveMessage } from './interactive-message';
-import { WorkflowStepEdit } from './workflow-step-edit';
-import { DialogSubmitAction, DialogValidation } from './dialog-action';
-import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
-import { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
-import { FunctionInputs } from '../events';
+import type { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
+import type { FunctionInputs } from '../events';
+import type { AckFn, RespondFn, SayArguments, SayFn } from '../utilities';
+import type { BlockAction } from './block-action';
+import type { DialogSubmitAction, DialogValidation } from './dialog-action';
+import type { InteractiveMessage } from './interactive-message';
+import type { WorkflowStepEdit } from './workflow-step-edit';
 
 export * from './block-action';
 export * from './interactive-message';

@@ -1,24 +1,21 @@
 import 'mocha';
-import { IncomingMessage, ServerResponse } from 'http';
 import { createHmac } from 'crypto';
-import sinon from 'sinon';
+import { IncomingMessage, ServerResponse } from 'http';
 import { assert } from 'chai';
+import sinon from 'sinon';
 
-import {
-  ReceiverMultipleAckError,
-  HTTPReceiverDeferredRequestError,
-  AuthorizationError,
-} from '../errors';
-import { HTTPModuleFunctions as func } from './HTTPModuleFunctions';
+import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../errors';
 import { createFakeLogger } from '../test-helpers';
-import { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import { HTTPModuleFunctions as func } from './HTTPModuleFunctions';
 
 describe('HTTPModuleFunctions', async () => {
   describe('Request header extraction', async () => {
     describe('extractRetryNumFromHTTPRequest', async () => {
       it('should work when the header does not exist', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         const result = func.extractRetryNumFromHTTPRequest(req);
@@ -26,7 +23,8 @@ describe('HTTPModuleFunctions', async () => {
       });
       it('should parse a single value header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         req.headers['x-slack-retry-num'] = '2';
@@ -35,7 +33,8 @@ describe('HTTPModuleFunctions', async () => {
       });
       it('should parse an array of value headers', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         req.headers['x-slack-retry-num'] = ['2'];
@@ -46,7 +45,8 @@ describe('HTTPModuleFunctions', async () => {
     describe('extractRetryReasonFromHTTPRequest', async () => {
       it('should work when the header does not exist', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         const result = func.extractRetryReasonFromHTTPRequest(req);
@@ -54,7 +54,8 @@ describe('HTTPModuleFunctions', async () => {
       });
       it('should parse a valid header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         req.headers['x-slack-retry-reason'] = 'timeout';
@@ -63,7 +64,8 @@ describe('HTTPModuleFunctions', async () => {
       });
       it('should parse an array of value headers', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         req.headers['x-slack-retry-reason'] = ['timeout'];
@@ -96,7 +98,8 @@ describe('HTTPModuleFunctions', async () => {
     describe('getHeader', async () => {
       it('should throw an exception when parsing a missing header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         try {
@@ -108,7 +111,8 @@ describe('HTTPModuleFunctions', async () => {
       });
       it('should parse a valid header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        if (req.headers === undefined) { // sinon on older Node.js may not return an object here
+        if (req.headers === undefined) {
+          // sinon on older Node.js may not return an object here
           req.headers = {};
         }
         req.headers.Cookie = 'foo=bar';
@@ -156,7 +160,10 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.equal((e as any).message, 'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale');
+          assert.equal(
+            (e as any).message,
+            'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
+          );
         }
       });
       it('should detect an invalid signature', async () => {

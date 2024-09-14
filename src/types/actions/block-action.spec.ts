@@ -1,10 +1,10 @@
 import { assert } from 'chai';
-import {
+import type {
   BlockAction,
-  MultiStaticSelectAction,
   MultiChannelsSelectAction,
-  MultiUsersSelectAction,
   MultiConversationsSelectAction,
+  MultiStaticSelectAction,
+  MultiUsersSelectAction,
 } from './block-action';
 
 describe('Interactivity payload types', () => {

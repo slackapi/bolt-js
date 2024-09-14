@@ -1,8 +1,8 @@
-import App from '../src/App';
+import type { IncomingMessage, ServerResponse } from 'http';
 import { expectType } from 'tsd';
-import { CodedError } from '../src/errors';
-import { IncomingMessage, ServerResponse } from 'http';
-import { BufferedIncomingMessage } from '../src/receivers/BufferedIncomingMessage';
+import App from '../src/App';
+import type { CodedError } from '../src/errors';
+import type { BufferedIncomingMessage } from '../src/receivers/BufferedIncomingMessage';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

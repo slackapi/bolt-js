@@ -38,7 +38,10 @@ describe('Request verification', async () => {
           body: rawBody,
         });
       } catch (e) {
-        assert.equal((e as any).message, 'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale');
+        assert.equal(
+          (e as any).message,
+          'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
+        );
       }
     });
     it('should detect an invalid signature', async () => {
@@ -66,14 +69,16 @@ describe('Request verification', async () => {
       const hmac = createHmac('sha256', signingSecret);
       hmac.update(`v0:${timestamp}:${rawBody}`);
       const signature = hmac.digest('hex');
-      assert.isTrue(isValidSlackRequest({
-        signingSecret,
-        headers: {
-          'x-slack-signature': `v0=${signature}`,
-          'x-slack-request-timestamp': timestamp,
-        },
-        body: rawBody,
-      }));
+      assert.isTrue(
+        isValidSlackRequest({
+          signingSecret,
+          headers: {
+            'x-slack-signature': `v0=${signature}`,
+            'x-slack-request-timestamp': timestamp,
+          },
+          body: rawBody,
+        }),
+      );
     });
     it('should detect an invalid timestamp', async () => {
       const timestamp = Math.floor(Date.now() / 1000) - 600; // 10 minutes
@@ -81,26 +86,30 @@ describe('Request verification', async () => {
       const hmac = createHmac('sha256', signingSecret);
       hmac.update(`v0:${timestamp}:${rawBody}`);
       const signature = hmac.digest('hex');
-      assert.isFalse(isValidSlackRequest({
-        signingSecret,
-        headers: {
-          'x-slack-signature': `v0=${signature}`,
-          'x-slack-request-timestamp': timestamp,
-        },
-        body: rawBody,
-      }));
+      assert.isFalse(
+        isValidSlackRequest({
+          signingSecret,
+          headers: {
+            'x-slack-signature': `v0=${signature}`,
+            'x-slack-request-timestamp': timestamp,
+          },
+          body: rawBody,
+        }),
+      );
     });
     it('should detect an invalid signature', async () => {
       const timestamp = Math.floor(Date.now() / 1000);
       const rawBody = '{"foo":"bar"}';
-      assert.isFalse(isValidSlackRequest({
-        signingSecret,
-        headers: {
-          'x-slack-signature': 'v0=invalid-signature',
-          'x-slack-request-timestamp': timestamp,
-        },
-        body: rawBody,
-      }));
+      assert.isFalse(
+        isValidSlackRequest({
+          signingSecret,
+          headers: {
+            'x-slack-signature': 'v0=invalid-signature',
+            'x-slack-request-timestamp': timestamp,
+          },
+          body: rawBody,
+        }),
+      );
     });
   });
 });

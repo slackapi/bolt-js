@@ -1,5 +1,5 @@
 import App from '../src/App';
-import { onlyViewActions, onlyCommands } from '../src/middleware/builtin';
+import { onlyCommands, onlyViewActions } from '../src/middleware/builtin';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

@@ -17,9 +17,7 @@
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist/**/*"
-  ],
+  "files": ["dist/**/*"],
   "engines": {
     "node": ">=18",
     "npm": ">=8.6.0"

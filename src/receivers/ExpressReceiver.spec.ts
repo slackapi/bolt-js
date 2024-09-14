@@ -1,15 +1,21 @@
 import 'mocha';
-import { Readable } from 'stream';
 import { EventEmitter } from 'events';
-import sinon, { SinonFakeTimers, SinonSpy } from 'sinon';
+import { Readable } from 'stream';
+import { LogLevel, type Logger } from '@slack/logger';
 import { assert } from 'chai';
+import type { Application, IRouter, Request, Response } from 'express';
 import rewiremock from 'rewiremock';
-import { Logger, LogLevel } from '@slack/logger';
-import { Application, IRouter, Request, Response } from 'express';
-import { Override, mergeOverrides, createFakeLogger } from '../test-helpers';
-import { ErrorCode, CodedError, ReceiverInconsistentStateError, AppInitializationError, AuthorizationError } from '../errors';
-import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
+import sinon, { type SinonFakeTimers, type SinonSpy } from 'sinon';
 import App from '../App';
+import {
+  AppInitializationError,
+  AuthorizationError,
+  type CodedError,
+  ErrorCode,
+  ReceiverInconsistentStateError,
+} from '../errors';
+import { type Override, createFakeLogger, mergeOverrides } from '../test-helpers';
+import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
 
 import ExpressReceiver, {
   respondToSslCheck,
@@ -41,12 +47,15 @@ class FakeServer extends EventEmitter {
     });
   });
 
-  public constructor(private listeningFailure?: Error, private closingFailure?: Error) {
+  public constructor(
+    private listeningFailure?: Error,
+    private closingFailure?: Error,
+  ) {
     super();
   }
 }
 
-describe('ExpressReceiver', function () {
+describe('ExpressReceiver', () => {
   beforeEach(function () {
     this.fakeServer = new FakeServer();
     this.fakeCreateServer = sinon.fake.returns(this.fakeServer);
@@ -141,7 +150,7 @@ describe('ExpressReceiver', function () {
       assert((router.get as any).called);
       assert((router.post as any).calledOnce);
     });
-    it('should throw an error if redirect uri options supplied invalid or incomplete', async function () {
+    it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const clientId = 'my-clientId';
       const clientSecret = 'my-clientSecret';
       const signingSecret = 'secret';
@@ -163,40 +172,52 @@ describe('ExpressReceiver', function () {
       });
       assert.isNotNull(receiver);
       // missing redirectUriPath
-      assert.throws(() => new ExpressReceiver({
-        clientId,
-        clientSecret,
-        signingSecret,
-        stateSecret,
-        scopes,
-        redirectUri,
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new ExpressReceiver({
+            clientId,
+            clientSecret,
+            signingSecret,
+            stateSecret,
+            scopes,
+            redirectUri,
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUriPath
-      assert.throws(() => new ExpressReceiver({
-        clientId: 'my-clientId',
-        clientSecret,
-        signingSecret,
-        stateSecret,
-        scopes,
-        redirectUri,
-        installerOptions: {
-          redirectUriPath: '/hiya',
-        },
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new ExpressReceiver({
+            clientId: 'my-clientId',
+            clientSecret,
+            signingSecret,
+            stateSecret,
+            scopes,
+            redirectUri,
+            installerOptions: {
+              redirectUriPath: '/hiya',
+            },
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUri
-      assert.throws(() => new ExpressReceiver({
-        clientId: 'my-clientId',
-        clientSecret,
-        signingSecret,
-        stateSecret,
-        scopes,
-        redirectUri: 'http://example.com/hiya',
-        installerOptions,
-      }), AppInitializationError);
+      assert.throws(
+        () =>
+          new ExpressReceiver({
+            clientId: 'my-clientId',
+            clientSecret,
+            signingSecret,
+            stateSecret,
+            scopes,
+            redirectUri: 'http://example.com/hiya',
+            installerOptions,
+          }),
+        AppInitializationError,
+      );
     });
   });
 
-  describe('#start()', function () {
+  describe('#start()', () => {
     it('should start listening for requests using the built-in HTTP server', async function () {
       // Arrange
       const overrides = mergeOverrides(
@@ -234,7 +255,7 @@ describe('ExpressReceiver', function () {
       assert.strictEqual(server, this.fakeServer);
       assert(this.fakeServer.listen.calledWith(port));
     });
-    it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async function () {
+    it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async () => {
       // Arrange
       const fakeCreateFailingServer = sinon.fake.returns(new FakeServer(new Error('fake listening error')));
       const overrides = mergeOverrides(
@@ -256,7 +277,7 @@ describe('ExpressReceiver', function () {
       // Assert
       assert.instanceOf(caughtError, Error);
     });
-    it('should reject with an error when the built-in HTTP server returns undefined', async function () {
+    it('should reject with an error when the built-in HTTP server returns undefined', async () => {
       // Arrange
       const fakeCreateUndefinedServer = sinon.fake.returns(undefined);
       const overrides = mergeOverrides(
@@ -304,7 +325,7 @@ describe('ExpressReceiver', function () {
     });
   });
 
-  describe('#stop()', function () {
+  describe('#stop()', () => {
     it('should stop listening for requests when a built-in HTTP server is already started', async function () {
       // Arrange
       const overrides = mergeOverrides(
@@ -347,7 +368,10 @@ describe('ExpressReceiver', function () {
     });
     it('should reject when a built-in HTTP server raises an error when closing', async function () {
       // Arrange
-      this.fakeServer = new FakeServer(undefined, new Error('this error will be raised by the underlying HTTP server during close()'));
+      this.fakeServer = new FakeServer(
+        undefined,
+        new Error('this error will be raised by the underlying HTTP server during close()'),
+      );
       this.fakeCreateServer = sinon.fake.returns(this.fakeServer);
       const overrides = mergeOverrides(
         withHttpCreateServer(this.fakeCreateServer),
@@ -372,7 +396,7 @@ describe('ExpressReceiver', function () {
     });
   });
 
-  describe('#requestHandler()', function () {
+  describe('#requestHandler()', () => {
     before(function () {
       this.extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
       this.extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
@@ -380,7 +404,9 @@ describe('ExpressReceiver', function () {
       this.buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
       this.processStub = sinon.stub().resolves({});
       this.ackStub = function ackStub() {};
-      this.ackStub.prototype.bind = function () { return this; };
+      this.ackStub.prototype.bind = function () {
+        return this;
+      };
       this.ackStub.prototype.ack = sinon.spy();
     });
     afterEach(() => {
@@ -405,8 +431,8 @@ describe('ExpressReceiver', function () {
       receiver.init(app);
 
       // Act
-      const req = { body: { } } as Request;
-      const resp = { send: () => { } } as Response;
+      const req = { body: {} } as Request;
+      const resp = { send: () => {} } as Response;
       await receiver.requestHandler(req, resp);
 
       // Assert
@@ -430,8 +456,8 @@ describe('ExpressReceiver', function () {
       receiver.init(app);
 
       // Act
-      const req = { body: { } } as Request;
-      const resp = { send: () => { } } as Response;
+      const req = { body: {} } as Request;
+      const resp = { send: () => {} } as Response;
       await receiver.requestHandler(req, resp);
       // Assert
       assert(this.buildContentResponseStub.called, 'HTTPFunction buildContentResponse not called incorrectly');
@@ -450,12 +476,14 @@ describe('ExpressReceiver', function () {
       receiver.init(app);
 
       // Act
-      const req = { body: { } } as Request;
+      const req = { body: {} } as Request;
       let writeHeadStatus = 0;
       const resp = {
-        send: () => { },
-        writeHead: (status: number) => { writeHeadStatus = status; },
-        end: () => { },
+        send: () => {},
+        writeHead: (status: number) => {
+          writeHeadStatus = status;
+        },
+        end: () => {},
       } as unknown as Response;
       await receiver.requestHandler(req, resp);
 
@@ -476,12 +504,14 @@ describe('ExpressReceiver', function () {
       receiver.init(app);
 
       // Act
-      const req = { body: { } } as Request;
+      const req = { body: {} } as Request;
       let writeHeadStatus = 0;
       const resp = {
-        send: () => { },
-        writeHead: (status: number) => { writeHeadStatus = status; },
-        end: () => { },
+        send: () => {},
+        writeHead: (status: number) => {
+          writeHeadStatus = status;
+        },
+        end: () => {},
       } as unknown as Response;
       await receiver.requestHandler(req, resp);
       // Assert
@@ -489,8 +519,8 @@ describe('ExpressReceiver', function () {
     });
   });
 
-  describe('oauth support', function () {
-    describe('install path route', function () {
+  describe('oauth support', () => {
+    describe('install path route', () => {
       it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async function () {
         const overrides = mergeOverrides(
           withHttpCreateServer(this.fakeCreateServer),
@@ -501,8 +531,8 @@ describe('ExpressReceiver', function () {
         const handleStub = sinon.stub(receiver.installer as any, 'handleInstallPath').resolves();
 
         // Act
-        const req = { body: { }, url: 'http://localhost/slack/install', method: 'GET' } as Request;
-        const resp = { send: () => { } } as Response;
+        const req = { body: {}, url: 'http://localhost/slack/install', method: 'GET' } as Request;
+        const resp = { send: () => {} } as Response;
         const next = sinon.spy();
         (receiver.router as any).handle(req, resp, next);
 
@@ -510,7 +540,7 @@ describe('ExpressReceiver', function () {
         assert(handleStub.calledWith(req, resp), 'installer.handleInstallPath not called');
       });
     });
-    describe('redirect path route', function () {
+    describe('redirect path route', () => {
       it('should call installer.handleCallback with callbackOptions when HTTP request hits the redirect URI path and stateVerification=true', async function () {
         const overrides = mergeOverrides(
           withHttpCreateServer(this.fakeCreateServer),
@@ -523,12 +553,19 @@ describe('ExpressReceiver', function () {
           stateVerification: true,
           callbackOptions,
         };
-        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '', scopes, installerOptions });
+        const receiver = new ER({
+          signingSecret: '',
+          clientSecret: '',
+          clientId: '',
+          stateSecret: '',
+          scopes,
+          installerOptions,
+        });
         const handleStub = sinon.stub(receiver.installer as any, 'handleCallback').resolves('poop');
 
         // Act
-        const req = { body: { }, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
-        const resp = { send: () => { } } as Response;
+        const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
+        const resp = { send: () => {} } as Response;
         (receiver.router as any).handle(req, resp, () => {});
 
         // Assert
@@ -546,21 +583,31 @@ describe('ExpressReceiver', function () {
           stateVerification: false,
           callbackOptions,
         };
-        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '', scopes, installerOptions });
+        const receiver = new ER({
+          signingSecret: '',
+          clientSecret: '',
+          clientId: '',
+          stateSecret: '',
+          scopes,
+          installerOptions,
+        });
         const handleStub = sinon.stub(receiver.installer as any, 'handleCallback').resolves('poop');
 
         // Act
-        const req = { body: { }, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
-        const resp = { send: () => { } } as Response;
+        const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
+        const resp = { send: () => {} } as Response;
         (receiver.router as any).handle(req, resp, () => {});
 
         // Assert
-        assert(handleStub.calledWith(req, resp, callbackOptions, sinon.match({ scopes })), 'installer.handleCallback not called');
+        assert(
+          handleStub.calledWith(req, resp, callbackOptions, sinon.match({ scopes })),
+          'installer.handleCallback not called',
+        );
       });
     });
   });
 
-  describe('state management for built-in server', function () {
+  describe('state management for built-in server', () => {
     it('should be able to start after it was stopped', async function () {
       // Arrange
       const overrides = mergeOverrides(
@@ -693,7 +740,8 @@ describe('ExpressReceiver', function () {
     const signingSecret = '8f742231b10e8888abcd99yyyzzz85a5';
     const signature = 'v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503';
     const requestTimestamp = 1531420618;
-    const body = 'token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c';
+    const body =
+      'token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c';
 
     function buildExpressRequest(): Request {
       const reqAsStream = new Readable();
@@ -992,8 +1040,8 @@ describe('ExpressReceiver', function () {
 
   describe('buildBodyParserMiddleware', () => {
     beforeEach(function () {
-      this.req = { body: { }, headers: { 'content-type': 'application/json' } } as Request;
-      this.res = { send: () => { } } as Response;
+      this.req = { body: {}, headers: { 'content-type': 'application/json' } } as Request;
+      this.res = { send: () => {} } as Response;
       this.next = sinon.spy();
     });
     it('should JSON.parse a stringified rawBody if exists on a application/json request', async function () {

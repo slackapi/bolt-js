@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/ja-jp/tutorial/using-typescript">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+      <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700&display=swap" rel="stylesheet">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" 
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg" />
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started"
+      ><li class="title">Bolt 入門ガイド</li></a
+    >
+    <a href="http://localhost:4000/bolt-js/ja-jp/reference"
+      ><li class="title">リファレンス</li></a
+    >
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#basic"
+      ><li class="title">基本的な概念</li></a
+    >
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-listening">
+      <li>メッセージ・イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#message-sending">
+      <li>メッセージの送信</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#event-listening">
+      <li>イベントのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#web-api">
+      <li>Web API の使用</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-listening">
+      <li>アクションのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#action-respond">
+      <li>アクションへの応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#acknowledge">
+      <li>リクエストの確認</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#shortcuts">
+      <li>ショートカットのリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#commands">
+      <li>コマンドのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-modals">
+      <li>モーダルの開始</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#updating-pushing-views">
+      <li>モーダルの更新と多重表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#view-submissions">
+      <li>モーダルでの送信のリスニング</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#publishing-views">
+      <li>ホームタブの更新</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#options">
+      <li>オプションのリスニングと応答</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authenticating-oauth">
+      <li>OAuth フローの実装</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#socket-mode">
+      <li>ソケットモードの使用</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#advanced">
+      <li class="title">応用コンセプト</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#error-handling">
+      <li>エラーの処理</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#authorization">
+      <li>認可（Authorization）</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#token-rotation">
+      <li>トークンのローテーション</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#conversation-store">
+      <li>会話ストア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#global-middleware">
+      <li>グローバルミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#listener-middleware">
+      <li>リスナーミドルウェア</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#context">
+      <li>context の追加</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#logging">
+      <li>ログの表示</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#receiver">
+      <li>レシーバーのカスタマイズ</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#custom-routes">
+      <li>カスタム HTTP ルートの追加</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/aws-lambda">
+          <li>AWS Lambda へのデプロイ</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/ja-jp/deployments/heroku">
+          <li>Heroku へのデプロイ</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/ja-jp/concepts#steps">
+      <li class="title">
+        ワークフローステップ
+        <span class="label-deprecated">
+          非推奨
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの定義
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの追加・編集
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの設定の保存
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/ja-jp/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          ステップの実行
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/getting-started-http">
+      <li class="title">Bolt 入門ガイド (HTTP)</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/hubot-migration">
+      <li class="title">Hubot から Bolt に移行する方法</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v2">
+      <li class="title">2.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/migration-v3">
+      <li class="title">3.x マイグレーションガイド</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/ja-jp/tutorial/using-typescript">
+      <li class="title">TypeScript での利用ガイド</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">貢献</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/" class="header_btn language-switcher float_right">English</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
+        </div>
+        
+        <div class="tutorial">
+          <h1 id="typescript-での利用ガイド">TypeScript での利用ガイド</h1>
+
+<p>このプロジェクトは <a href="https://www.typescriptlang.org/">TypeScript</a> を利用して開発されているため、多くの API が型に関するメタ情報を持っています🎉 Visual Studio Code や Atom をはじめとする型のメタ情報を読み込んでくれるエディタを利用していたり、あなたも TypeScript を使って開発している場合には、このより優れたドキュメンテーションによって、よりスムーズにコードを書いたり、エラーの早期発見、より楽なリファクタリングなどの恩恵を受けることができるでしょう。</p>
+
+<p>このページでは、TypeScript を利用しているプロジェクトからこの npm パッケージを利用する方法について解説します。</p>
+
+<h3 id="minimum-version">最低必須バージョン</h3>
+
+<p><code class="language-plaintext highlighter-rouge">@slack/bolt</code> の最新のメジャーバージョンは TypeScript 4.1 以上での利用をサポートしています。</p>
+
+        </div>
+    </div>
+
+  </div>
+  <script src="http://localhost:4000/bolt-js/scripts/tutorial_nav.js"></script>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</body>
+</html>

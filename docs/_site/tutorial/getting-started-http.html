@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  
+    <title>Slack | Bolt for JavaScript</title>
+    <meta name="author" content="Slack">
+    <meta name="description" content="A framework that makes Slack app development fast and straight-forward. With a single interface for Slack’s Web API, Events API, and interactive features, Bolt gives you the full power of the Slack platform out of the box.">
+    <link rel="canonical" href="http://localhost:4000/bolt-js/tutorial/getting-started-http">
+    <link href="https://a.slack-edge.com/17c88/style/rollup-slack_kit_legacy_adapters.css" rel="stylesheet" type="text/css">
+    <link href="https://a.slack-edge.com/cc5205/style/rollup-api_site.css" rel="stylesheet" type="text/css">
+    
+    <link href="http://localhost:4000/bolt-js/assets/style.css" rel="stylesheet" type="text/css">
+  
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
+    <!--[if lt IE 9]>
+    <script src="https://a.slack-edge.com/ef0d/js/libs/html5shiv.js"></script>
+    <![endif]-->
+  
+    <link id="favicon" rel="shortcut icon" href="http://localhost:4000/bolt-js/assets/bolt-favicon.png" sizes="16x16 32x32 48x48" type="image/png" />
+  
+  </head>
+
+
+<body>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFZ5MK7');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFZ5MK7" 
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="wrapper">
+    <div class="panel">
+      <div class="sidebar-content">
+  <div class="logo">
+    <span class="icon">
+      <img src="http://localhost:4000/bolt-js/assets/bolt-js-logo.svg" />
+    </span>
+
+    <span class="name">
+      Bolt
+    </span>
+
+    <!-- Liquid has no ternary operator, so this is just meant to exclude 
+      english sections since they are at the root URL -->
+    
+
+    <span class="version">
+      
+      <a href="https://github.com/slackapi/bolt-js/releases/tag/%40slack/bolt%403.18.0">v3.18.0</a>
+    </span>
+  </div>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/tutorial/getting-started"
+      ><li class="title">Getting started</li></a
+    >
+    <a href="http://localhost:4000/bolt-js/reference"
+      ><li class="title">Reference</li></a
+    >
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#basic"
+      ><li class="title">Basic concepts</li></a
+    >
+     
+    <a href="http://localhost:4000/bolt-js/concepts#message-listening">
+      <li>Listening to messages</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#message-sending">
+      <li>Sending messages</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#event-listening">
+      <li>Listening to events</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#web-api">
+      <li>Using the Web API</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#action-listening">
+      <li>Listening to actions</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#action-respond">
+      <li>Responding to actions</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#acknowledge">
+      <li>Acknowledging requests</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#shortcuts">
+      <li>Listening and responding to shortcuts</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#commands">
+      <li>Listening and responding to commands</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#creating-modals">
+      <li>Opening modals</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#updating-pushing-views">
+      <li>Updating and pushing views</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#view-submissions">
+      <li>Listening to views</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#publishing-views">
+      <li>Publishing views to App Home</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#options">
+      <li>Listening and responding to options</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#authenticating-oauth">
+      <li>Authenticating with OAuth</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#socket-mode">
+      <li>Using Socket Mode</li>
+    </a>
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#advanced">
+      <li class="title">Advanced concepts</li>
+    </a>
+     
+    <a href="http://localhost:4000/bolt-js/concepts#error-handling">
+      <li>Handling errors</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#authorization">
+      <li>Authorization</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#token-rotation">
+      <li>Token rotation</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#conversation-store">
+      <li>Conversation stores</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#global-middleware">
+      <li>Global middleware</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#listener-middleware">
+      <li>Listener middleware</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#context">
+      <li>Adding context</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#deferring-initialization">
+      <li>Deferring App initialization</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#logging">
+      <li>Logging</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#receiver">
+      <li>Customizing a receiver</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/concepts#custom-routes">
+      <li>Adding Custom HTTP routes</li>
+    </a>
+    
+  </ul>
+
+  
+  
+    <ul class="sidebar-section"> 
+        <li class="title">Deployments</li>
+      
+        <a href="http://localhost:4000/bolt-js/deployments/aws-lambda">
+          <li>AWS Lambda</li>
+        </a>
+      
+        <a href="http://localhost:4000/bolt-js/deployments/heroku">
+          <li>Heroku Platform</li>
+        </a>
+      
+    </ul>
+  
+
+  <ul class="sidebar-section">
+    <a href="http://localhost:4000/bolt-js/concepts#steps">
+      <li class="title">
+        Workflow steps
+        <span class="label-deprecated">
+          Deprecated
+        </span>
+      </li>
+    </a>
+     
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#creating-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Creating workflow steps
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#adding-editing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Adding or editing workflow steps
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#saving-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Saving step configurations
+        </li>
+      </a>
+      
+    
+      
+      <a href="http://localhost:4000/bolt-js/concepts#executing-steps">
+        
+        <!--UNCOMMENT AFTER GA  -->
+        <li>
+          Executing workflow steps
+        </li>
+      </a>
+      
+    
+  </ul>
+
+  <ul class="sidebar-section">
+    
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/getting-started-http">
+      <li class="title">Getting started with HTTP</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/hubot-migration">
+      <li class="title">Migrating Hubot apps</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/migration-v2">
+      <li class="title">Migrating to V2</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/migration-v3">
+      <li class="title">Migrating to V3</li>
+    </a>
+    
+    <a href="http://localhost:4000/bolt-js/tutorial/using-typescript">
+      <li class="title">Using TypeScript</li>
+    </a>
+    
+    <a href="https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md">
+      <li class="title">Contributing</li>
+    </a>
+  </ul>
+</div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="mainheader">
+          <div class="header">
+  <div class="header_nav">
+    <a href="https://github.com/SlackAPI/bolt-js" class="btn header_btn float_right"><ts-icon class="ts_icon_github"></ts-icon>Code on GitHub</a>
+    <a href="https://api.slack.com" class="btn header_btn float_right"><ts-icon class="ts_icon_slack_pillow"></ts-icon>Slack Platform Home</a>
+    <!-- If we add more languages, this logic will need to change -->
+    
+      <a href="http://localhost:4000/bolt-js/ja-jp" class="header_btn language-switcher float_right">日本語 (Japanese)</a>
+    
+    </div>
+</div>
+        </div>
+
+        <div class="tutorial-nav">
+          <ul class="tutorial-nav-list"></ul>
+        </div>
+        
+        <div class="tutorial">
+          <h1 id="getting-started-with-bolt-for-javascript-and-http">Getting started with Bolt for JavaScript and HTTP</h1>
+
+<div class="section-content">
+  <p>This guide is meant to walk you through getting up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.</p>
+</div>
+
+<p>When you’re finished, you’ll have this ⚡️<a href="https://github.com/slackapi/bolt-js-getting-started-app">Getting Started app</a> to run, modify, and make your own.</p>
+
+<hr />
+
+<h3 id="create-an-app">Create an app</h3>
+<p>First thing’s first: before you start developing with Bolt, you’ll want to <a href="https://api.slack.com/apps/new">create a Slack app</a>.</p>
+
+<blockquote>
+  <p>💡 We recommend using a workspace where you won’t disrupt real work getting done — <a href="https://slack.com/get-started#create">you can create a new one for free</a>.</p>
+</blockquote>
+
+<p>After you fill out an app name (<em>you can change it later</em>) and pick a workspace to install it to, hit the <code class="language-plaintext highlighter-rouge">Create App</code> button and you’ll land on your app’s <strong>Basic Information</strong> page.</p>
+
+<p>This page contains an overview of your app in addition to important credentials you’ll need later, like the <code class="language-plaintext highlighter-rouge">Signing Secret</code> under the <strong>App Credentials</strong> header.</p>
+
+<p><img src="../assets/basic-information-page.png" alt="Basic Information page" title="Basic Information page" /></p>
+
+<p>Look around, add an app icon and description, and then let’s start configuring your app. 🔩</p>
+
+<hr />
+
+<h3 id="tokens-and-installing-apps">Tokens and installing apps</h3>
+<p>Slack apps use <a href="https://api.slack.com/docs/oauth">OAuth to manage access to Slack’s APIs</a>. When an app is installed, you’ll receive a token that the app can use to call API methods.</p>
+
+<p>There are three main token types available to a Slack app: user (<code class="language-plaintext highlighter-rouge">xoxp</code>), bot (<code class="language-plaintext highlighter-rouge">xoxb</code>), and app (<code class="language-plaintext highlighter-rouge">xapp</code>) tokens.</p>
+<ul>
+  <li><a href="https://api.slack.com/authentication/token-types#user">User tokens</a> allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace.</li>
+  <li><a href="https://api.slack.com/authentication/token-types#bot">Bot tokens</a> are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that <em>most</em> apps use.</li>
+  <li><a href="https://api.slack.com/authentication/token-types#app">App-level tokens</a> represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.</li>
+</ul>
+
+<p>For brevity, we’re going to use bot tokens for this guide.</p>
+
+<ol>
+  <li>
+    <p>Navigate to the <strong>OAuth &amp; Permissions</strong> on the left sidebar and scroll down to the <strong>Bot Token Scopes</strong> section. Click <strong>Add an OAuth Scope</strong>.</p>
+  </li>
+  <li>
+    <p>For now, we’ll just add one scope: <a href="https://api.slack.com/scopes/chat:write"><code class="language-plaintext highlighter-rouge">chat:write</code></a>. This grants your app the permission to post messages in channels it’s a member of.</p>
+  </li>
+  <li>
+    <p>Scroll up to the top of the OAuth &amp; Permissions page and click <strong>Install App to Workspace</strong>. You’ll be led through Slack’s OAuth UI, where you should allow your app to be installed to your development workspace.</p>
+  </li>
+  <li>
+    <p>Once you authorize the installation, you’ll land on the <strong>OAuth &amp; Permissions</strong> page and see a <strong>Bot User OAuth Access Token</strong>.</p>
+  </li>
+</ol>
+
+<p><img src="../assets/bot-token.png" alt="OAuth Tokens" title="Bot OAuth Token" /></p>
+
+<blockquote>
+  <p>💡 Treat your token like a password and <a href="https://api.slack.com/docs/oauth-safety">keep it safe</a>. Your app uses it to post and retrieve information from Slack workspaces.</p>
+</blockquote>
+
+<hr />
+
+<h3 id="setting-up-your-project">Setting up your project</h3>
+<p>With the initial configuration handled, it’s time to set up a new Bolt project. This is where you’ll write the code that handles the logic for your app.</p>
+
+<p>If you don’t already have a project, let’s create a new one. Create an empty directory and initialize a new project:</p>
+
+<div class="language-shell highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nb">mkdir </span>first-bolt-app
+<span class="nb">cd </span>first-bolt-app
+npm init
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new <code class="language-plaintext highlighter-rouge">package.json</code> file in your directory.</p>
+
+<p>Before we install the Bolt for JavaScript package to your new project, let’s save the <strong>bot token</strong> and <strong>Signing Secret</strong> that were generated when you configured your app.</p>
+
+<ol>
+  <li><strong>Copy your Signing Secret from the Basic Information page</strong> and then store it in a new environment variable. The following example works on Linux and macOS; but <a href="https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153">similar commands are available on Windows</a>.
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">SLACK_SIGNING_SECRET</span><span class="o">=</span>&lt;your-signing-secret&gt;
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+  <li><strong>Copy your bot (xoxb) token from the OAuth &amp; Permissions page</strong> and store it in another environment variable.
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">SLACK_BOT_TOKEN</span><span class="o">=</span>xoxb-&lt;your-bot-token&gt;
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+</ol>
+
+<blockquote>
+  <p>🔒 Remember to keep your token and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we’ve done above. Checkout the API documentation for more on <a href="https://api.slack.com/authentication/best-practices">best practices for app security</a>.</p>
+</blockquote>
+
+<p>Now, let’s create your app. Install the <code class="language-plaintext highlighter-rouge">@slack/bolt</code> package and save it to your <code class="language-plaintext highlighter-rouge">package.json</code> dependencies using the following command:</p>
+
+<div class="language-shell highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>npm <span class="nb">install</span> @slack/bolt
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>Create a new entrypoint file called <code class="language-plaintext highlighter-rouge">app.js</code> in this directory and add the following code:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">@slack/bolt</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="c1">// Initializes your app with your bot token and signing secret</span>
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="na">token</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_BOT_TOKEN</span><span class="p">,</span>
+  <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span>
+<span class="p">});</span>
+
+<span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Start your app</span>
+  <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">⚡️ Bolt app is running!</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">})();</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>Save your <code class="language-plaintext highlighter-rouge">app.js</code> file, then on the command line run the following:</p>
+
+<pre><code class="language-script">node app.js
+</code></pre>
+
+<p>Your app should let you know that it’s up and running. 🎉</p>
+
+<hr />
+
+<h3 id="setting-up-events-with-http">Setting up events with HTTP</h3>
+<p>Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.</p>
+
+<p>To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you’ll use the <a href="https://api.slack.com/events-api">Events API to subscribe to event types</a>.</p>
+
+<p>Let’s enable events for your app:</p>
+
+<ol>
+  <li>
+    <p>Go back to your app configuration page (click on the app from your <a href="https://api.slack.com/apps">app management page</a>). Click <strong>Event Subscriptions</strong> on the left sidebar. Toggle the switch labeled <strong>Enable Events</strong>.</p>
+  </li>
+  <li>
+    <p>Add your Request URL. Slack will send HTTP POST requests corresponding to events to this <a href="https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls">Request URL</a> endpoint. Bolt uses the <code class="language-plaintext highlighter-rouge">/slack/events</code> path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you’ll append <code class="language-plaintext highlighter-rouge">/slack/events</code>, e.g. <code class="language-plaintext highlighter-rouge">https://&lt;your-domain&gt;/slack/events</code>. 💡</p>
+  </li>
+</ol>
+
+<blockquote>
+  <p>💡 For local development, you can use a proxy service like <a href="https://ngrok.com/">ngrok</a> to create a public URL and tunnel requests to your development environment. Refer to <a href="https://ngrok.com/docs#getting-started-expose">ngrok’s getting started guide</a> on how to create this tunnel.</p>
+</blockquote>
+
+<p>Finally, it’s time to tell Slack what events we’d like to listen for. Under <strong>Event Subscriptions</strong>, toggle the switch labeled <strong>Enable Events</strong>.</p>
+
+<p>When an event occurs, Slack will send your app information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.</p>
+
+<p>Scroll down to <strong>Subscribe to Bot Events</strong>. There are four events related to messages:</p>
+<ul>
+  <li><a href="https://api.slack.com/events/message.channels"><code class="language-plaintext highlighter-rouge">message.channels</code></a> listens for messages in public channels that your app is added to</li>
+  <li><a href="https://api.slack.com/events/message.groups"><code class="language-plaintext highlighter-rouge">message.groups</code></a> listens for messages in 🔒 private channels that your app is added to</li>
+  <li><a href="https://api.slack.com/events/message.im"><code class="language-plaintext highlighter-rouge">message.im</code></a> listens for messages in your app’s DMs with users</li>
+  <li><a href="https://api.slack.com/events/message.mpim"><code class="language-plaintext highlighter-rouge">message.mpim</code></a> listens for messages in multi-person DMs that your app is added to</li>
+</ul>
+
+<p>If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green <strong>Save Changes</strong> button.</p>
+
+<hr />
+
+<h3 id="listening-and-responding-to-a-message">Listening and responding to a message</h3>
+<p>Your app is now ready for some logic. Let’s start by using the <code class="language-plaintext highlighter-rouge">message()</code> method to attach a listener for messages.</p>
+
+<p>The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word “hello”:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">@slack/bolt</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="na">token</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_BOT_TOKEN</span><span class="p">,</span>
+  <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span><span class="p">,</span>
+<span class="p">});</span>
+
+<span class="c1">// Listens to incoming messages that contain "hello"</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// say() sends a message to the channel where the event was triggered</span>
+  <span class="k">await</span> <span class="nx">say</span><span class="p">(</span><span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Start your app</span>
+  <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">⚡️ Bolt app is running!</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">})();</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>If you restart your app, so long as your bot user has been added to the channel/DM, when you send any message that contains “hello”, it will respond.</p>
+
+<p>This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let’s try something a little more interactive by sending a button rather than plain text.</p>
+
+<hr />
+
+<h3 id="sending-and-responding-to-actions">Sending and responding to actions</h3>
+
+<p>To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Similar to events, you’ll need to specify a Request URL for Slack to send the action (such as <em>user clicked a button</em>). Head over to <strong>Interactivity &amp; Shortcuts</strong> in your app configuration.</p>
+
+<blockquote>
+  <p>💡 By default, Bolt uses the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was <code class="language-plaintext highlighter-rouge">https://8e8ec2d7.ngrok.io/slack/events</code>). Press the <strong>Save Changes</strong> button in the lower right hand corner, and that’s it. Your app is set up to handle interactivity!</p>
+</blockquote>
+
+<p>When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events.</p>
+
+<p>Now, let’s go back to your app’s code and add logic to handle those events:</p>
+<ul>
+  <li>First, we’ll send a message that contains an interactive component (in this case a button).</li>
+  <li>Next, we’ll listen for the action of a user clicking the button before responding</li>
+</ul>
+
+<p>Below, the code from the last section is modified to send a message containing a button rather than just a string:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">@slack/bolt</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="na">token</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_BOT_TOKEN</span><span class="p">,</span>
+  <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span>
+<span class="p">});</span>
+
+<span class="c1">// Listens to incoming messages that contain "hello"</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// say() sends a message to the channel where the event was triggered</span>
+  <span class="k">await</span> <span class="nx">say</span><span class="p">({</span>
+    <span class="na">blocks</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">section</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">mrkdwn</span><span class="dl">"</span><span class="p">,</span>
+          <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span>
+        <span class="p">},</span>
+        <span class="dl">"</span><span class="s2">accessory</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">button</span><span class="dl">"</span><span class="p">,</span>
+          <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">plain_text</span><span class="dl">"</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Click Me</span><span class="dl">"</span>
+          <span class="p">},</span>
+          <span class="dl">"</span><span class="s2">action_id</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">button_click</span><span class="dl">"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="na">text</span><span class="p">:</span> <span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Start your app</span>
+  <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">⚡️ Bolt app is running!</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">})();</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>The value inside of <code class="language-plaintext highlighter-rouge">say()</code> is now an object that contains an array of <code class="language-plaintext highlighter-rouge">blocks</code>. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we’re using <code class="language-plaintext highlighter-rouge">blocks</code>, the <code class="language-plaintext highlighter-rouge">text</code> is a fallback for notifications and accessibility.</p>
+
+<p>You’ll notice in the button <code class="language-plaintext highlighter-rouge">accessory</code> object, there is an <code class="language-plaintext highlighter-rouge">action_id</code>. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.</p>
+
+<blockquote>
+  <p>💡 The <a href="https://app.slack.com/block-kit-builder">Block Kit Builder</a> is a simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.</p>
+</blockquote>
+
+<p>Now, if you restart your app and say “hello” in a channel your app is in, you’ll see a message with a button. But if you click the button, nothing happens (<em>yet!</em>).</p>
+
+<p>Let’s add a handler to send a followup message when someone clicks the button:</p>
+
+<div class="language-javascript highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="p">{</span> <span class="nx">App</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">@slack/bolt</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">({</span>
+  <span class="na">token</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_BOT_TOKEN</span><span class="p">,</span>
+  <span class="na">signingSecret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_SIGNING_SECRET</span>
+<span class="p">});</span>
+
+<span class="c1">// Listens to incoming messages that contain "hello"</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">message</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// say() sends a message to the channel where the event was triggered</span>
+  <span class="k">await</span> <span class="nx">say</span><span class="p">({</span>
+    <span class="na">blocks</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">section</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">mrkdwn</span><span class="dl">"</span><span class="p">,</span>
+          <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span>
+        <span class="p">},</span>
+        <span class="dl">"</span><span class="s2">accessory</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">button</span><span class="dl">"</span><span class="p">,</span>
+          <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">plain_text</span><span class="dl">"</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">text</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Click Me</span><span class="dl">"</span>
+          <span class="p">},</span>
+          <span class="dl">"</span><span class="s2">action_id</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">button_click</span><span class="dl">"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="na">text</span><span class="p">:</span> <span class="s2">`Hey there &lt;@</span><span class="p">${</span><span class="nx">message</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="s2">&gt;!`</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">action</span><span class="p">(</span><span class="dl">'</span><span class="s1">button_click</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">ack</span><span class="p">,</span> <span class="nx">say</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Acknowledge the action</span>
+  <span class="k">await</span> <span class="nx">ack</span><span class="p">();</span>
+  <span class="k">await</span> <span class="nx">say</span><span class="p">(</span><span class="s2">`&lt;@</span><span class="p">${</span><span class="nx">body</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="s2">&gt; clicked the button`</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Start your app</span>
+  <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">⚡️ Bolt app is running!</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">})();</span>
+</pre></td></tr></tbody></table></code></pre>
+  </div>
+</div>
+
+<p>You can see that we used <code class="language-plaintext highlighter-rouge">app.action()</code> to listen for the <code class="language-plaintext highlighter-rouge">action_id</code> that we named <code class="language-plaintext highlighter-rouge">button_click</code>. If you restart your app and click the button, you’ll see a new message from your app that says you clicked the button.</p>
+
+<hr />
+
+<h3 id="next-steps">Next steps</h3>
+<p>You just built your first <a href="https://github.com/slackapi/bolt-js-getting-started-app">Bolt for JavaScript app</a>! 🎉</p>
+
+<p>Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:</p>
+
+<ul>
+  <li>
+    <p>Read through the <a href="/bolt-js/concepts#basic">Basic concepts</a> to learn about the different methods and features your Bolt app has access to.</p>
+  </li>
+  <li>
+    <p>Explore the different events your bot can listen to with the <a href="/bolt-js/concepts#event-listening"><code class="language-plaintext highlighter-rouge">events()</code> method</a>. All of the events are listed <a href="https://api.slack.com/events">on the API site</a>.</p>
+  </li>
+  <li>
+    <p>Bolt allows you to <a href="/bolt-js/concepts#web-api">call Web API methods</a> with the client attached to your app. There are <a href="https://api.slack.com/methods">over 220 methods</a> on our API site.</p>
+  </li>
+  <li>
+    <p>Learn more about the different token types <a href="https://api.slack.com/docs/token-types">on our API site</a>. Your app may need different tokens depending on the actions you want it to perform. If you are using <a href="/bolt-js/tutorial/getting-started">Socket Mode</a> instead of HTTP, an additional (<code class="language-plaintext highlighter-rouge">xapp</code>) token with <code class="language-plaintext highlighter-rouge">connections:write</code> scopes is required.</p>
+  </li>
+</ul>
+
+        </div>
+    </div>
+
+  </div>
+  <script src="http://localhost:4000/bolt-js/scripts/tutorial_nav.js"></script>
+
+  
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-56978219-13', 'auto');
+  ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</body>
+</html>

@@ -4,7 +4,7 @@
 // There are various equivalent ways to declare your Docusaurus config.
 // See: https://docusaurus.io/docs/api/docusaurus-config
 
-import {themes as prismThemes} from 'prism-react-renderer';
+import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -23,7 +23,7 @@ const config = {
 
   i18n: {
     defaultLocale: 'en',
-    locales: ['en','ja-jp'],
+    locales: ['en', 'ja-jp'],
   },
 
   presets: [
@@ -49,26 +49,24 @@ const config = {
     ],
   ],
 
-plugins:
-['docusaurus-theme-github-codeblock',
-  [
-    '@docusaurus/plugin-client-redirects',
-    {
-      redirects: [
-        {
-          to: '/getting-started',
-          from: ['/tutorial/getting-started'],
-        },
-        {
-          to: '/',
-          from: ['/concepts','/concepts/advanced','/concepts/basic'],
-        },
-      ],
-    },
+  plugins: [
+    'docusaurus-theme-github-codeblock',
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/getting-started',
+            from: ['/tutorial/getting-started'],
+          },
+          {
+            to: '/',
+            from: ['/concepts', '/concepts/advanced', '/concepts/basic'],
+          },
+        ],
+      },
+    ],
   ],
-  
-],
-
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
@@ -82,12 +80,12 @@ plugins:
         },
       },
       navbar: {
-        title: "Slack Developer Tools",
+        title: 'Slack Developer Tools',
         logo: {
           alt: 'Slack logo',
           src: 'img/slack-logo.svg',
           href: 'https://tools.slack.dev',
-          target : '_self'
+          target: '_self',
         },
         items: [
           {
@@ -110,7 +108,7 @@ plugins:
                 to: 'https://tools.slack.dev/bolt-python',
                 target: '_self',
               },
-            ]
+            ],
           },
           {
             type: 'dropdown',
@@ -137,7 +135,7 @@ plugins:
                 to: 'https://api.slack.com/automation/quickstart',
                 target: '_self',
               },
-            ]
+            ],
           },
           {
             type: 'dropdown',
@@ -154,7 +152,7 @@ plugins:
                 to: 'https://slackcommunity.com/',
                 target: '_self',
               },
-            ]
+            ],
           },
           {
             to: 'https://api.slack.com/docs',
@@ -167,9 +165,9 @@ plugins:
           },
           {
             'aria-label': 'GitHub Repository',
-            'className': 'navbar-github-link',
-            'href': 'https://github.com/slackapi/bolt-js',
-            'position': 'right',
+            className: 'navbar-github-link',
+            href: 'https://github.com/slackapi/bolt-js',
+            position: 'right',
             target: '_self',
           },
         ],
@@ -179,13 +177,13 @@ plugins:
       },
       prism: {
         // switch to alucard when available in prism?
-        theme: prismThemes.github, 
+        theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
-        codeblock: {
-            showGithubLink: true,
-            githubLinkLabel: 'View on GitHub',
-        },
+      codeblock: {
+        showGithubLink: true,
+        githubLinkLabel: 'View on GitHub',
+      },
       // announcementBar: {
       //   id: `announcementBar`,
       //   content: `🎉️ <b><a target="_blank" href="https://api.slack.com/">Version 2.26.0</a> of the developer tools for the Slack automations platform is here!</b> 🎉️ `,
