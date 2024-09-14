@@ -988,8 +988,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         if (typeof message === 'string') {
           postMessageArguments = { token, text: message, channel: channelId };
         } else {
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          postMessageArguments = { ...message, token, channel: channelId } as ChatPostMessageArguments;
+          postMessageArguments = { ...message, token, channel: channelId };
         }
 
         return this.client.chat.postMessage(postMessageArguments);
@@ -1010,7 +1009,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       case IncomingEventType.Shortcut:
         payload = (bodyArg as SlackShortcutMiddlewareArgs['body']);
         break;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: Fallthrough case in switch
       case IncomingEventType.Action:
         if (isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) {
