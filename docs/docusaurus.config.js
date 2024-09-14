@@ -173,7 +173,7 @@ const config = {
         ],
       },
       footer: {
-        copyright: `<p> Made with ♡ by Slack and pals like you <p>`,
+        copyright: '<p> Made with ♡ by Slack and pals like you <p>',
       },
       prism: {
         // switch to alucard when available in prism?
