@@ -21,6 +21,7 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
   respond: RespondFn;
 }
 
+// TODO: @slack/types probably has something very close to this
 interface PlainTextElementOutput {
   type: 'plain_text';
   text: string;
@@ -34,6 +35,7 @@ export interface ViewResponseUrl {
   response_url: string;
 }
 
+// TODO: "Action" naming here is confusing. this is a view submisson event. already exists in @slack/types
 /**
  * A Slack view_submission event wrapped in the standard metadata.
  *

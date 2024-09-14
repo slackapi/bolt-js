@@ -255,6 +255,7 @@ describe('Built-in global middleware', () => {
       const fakeBotUserId = 'B123456';
       const messageText = `<@${fakeBotUserId}> hi`;
       const fakeNext = sinon.fake();
+      // TODO: make test utilities that create fake middleware arguments and events
       const fakeArgs = {
         next: fakeNext,
         message: createFakeMessageEvent(messageText),
