@@ -17,7 +17,9 @@
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "engines": {
     "node": ">=18",
     "npm": ">=8.6.0"
@@ -26,7 +28,7 @@
     "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
-    "lint": "npx @biomejs/biome check --write .",
+    "lint": "npx @biomejs/biome check --write docs src types-tests",
     "mocha": "TS_NODE_PROJECT=tsconfig.json mocha --config .mocharc.json \"src/**/*.spec.ts\"",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
     "test:coverage": "c8 npm run mocha",
