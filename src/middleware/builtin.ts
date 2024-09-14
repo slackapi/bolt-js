@@ -46,6 +46,7 @@ function isCallbackIdentifiedBody(
   return 'callback_id' in body && body.callback_id !== undefined;
 }
 
+// TODO: clarify terminology used internally: event vs. body vs. payload
 /** Type predicate that can narrow event bodies to ones containing Views */
 function isViewBody(
   body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
