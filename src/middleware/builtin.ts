@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/dot-notation */
-import { SlackEvent } from '@slack/types';
 import {
   Middleware,
   AnyMiddlewareArgs,
@@ -9,10 +7,6 @@ import {
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
-  SlackAction,
-  SlackShortcut,
-  SlashCommand,
-  SlackOptions,
   BlockSuggestion,
   InteractiveMessageSuggestion,
   DialogSuggestion,
@@ -23,98 +17,101 @@ import {
   BlockElementAction,
   SlackViewAction,
   EventTypePattern,
-  ViewOutput,
 } from '../types';
 import { ActionConstraints, ViewConstraints, ShortcutConstraints, OptionsConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
 
+/** Type predicate that can narrow payloads block action or suggestion payloads */
+function isBlockPayload(
+  payload:
+  | SlackActionMiddlewareArgs['payload']
+  | SlackOptionsMiddlewareArgs['payload']
+  | SlackViewMiddlewareArgs['payload'],
+): payload is BlockElementAction | BlockSuggestion {
+  return 'action_id' in payload && payload.action_id !== undefined;
+}
+
+type CallbackIdentifiedBody =
+  | InteractiveMessage
+  | DialogSubmitAction
+  | MessageShortcut
+  | GlobalShortcut
+  | InteractiveMessageSuggestion
+  | DialogSuggestion;
+
+// TODO: is there overlap with `function_executed` event here?
+function isCallbackIdentifiedBody(
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],
+): body is CallbackIdentifiedBody {
+  return 'callback_id' in body && body.callback_id !== undefined;
+}
+
+/** Type predicate that can narrow event bodies to ones containing Views */
+function isViewBody(
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
+): body is SlackViewAction {
+  return 'view' in body && body.view !== undefined;
+}
+
+function isEventArgs(
+  args: AnyMiddlewareArgs,
+): args is SlackEventMiddlewareArgs {
+  return 'event' in args && args.event !== undefined;
+}
+
 /**
  * Middleware that filters out any event that isn't an action
  */
-export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { action, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-actions
-  if (action === undefined) {
-    return;
+export const onlyActions: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('action' in args && args.action) {
+    await args.next();
   }
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { shortcut, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-shortcuts
-  if (shortcut === undefined) {
-    return;
+export const onlyShortcuts: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('shortcut' in args && args.shortcut) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a command
  */
-export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { command, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-commands
-  if (command === undefined) {
-    return;
+export const onlyCommands: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('command' in args && args.command) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOptions }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { options, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-options requests
-  if (options === undefined) {
-    return;
+export const onlyOptions: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('options' in args && args.options) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't an event
+ * TODO:event terminology, "event that isn't an event" caman
  */
-export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { event, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-events
-  if (event === undefined) {
-    return;
+export const onlyEvents: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if (isEventArgs(args)) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { view, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out anything that doesn't have a view
-  if (view === undefined) {
-    return;
+export const onlyViewActions: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('view' in args) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
@@ -144,7 +141,7 @@ export function matchConstraints(
           tempMatches = payload.block_id.match(constraints.block_id);
 
           if (tempMatches !== null) {
-            context['blockIdMatches'] = tempMatches;
+            context.blockIdMatches = tempMatches;
           } else {
             return;
           }
@@ -161,7 +158,7 @@ export function matchConstraints(
           tempMatches = payload.action_id.match(constraints.action_id);
 
           if (tempMatches !== null) {
-            context['actionIdMatches'] = tempMatches;
+            context.actionIdMatches = tempMatches;
           } else {
             return;
           }
@@ -171,12 +168,12 @@ export function matchConstraints(
 
     // Check callback_id
     if ('callback_id' in constraints && constraints.callback_id !== undefined) {
-      let callbackId: string = '';
+      let callbackId = '';
 
       if (isViewBody(body)) {
-        callbackId = body['view']['callback_id'];
+        callbackId = body.view.callback_id;
       } else if (isCallbackIdentifiedBody(body)) {
-        callbackId = body['callback_id'];
+        callbackId = body.callback_id;
       } else {
         return;
       }
@@ -189,7 +186,7 @@ export function matchConstraints(
         tempMatches = callbackId.match(constraints.callback_id);
 
         if (tempMatches !== null) {
-          context['callbackIdMatches'] = tempMatches;
+          context.callbackIdMatches = tempMatches;
         } else {
           return;
         }
@@ -227,7 +224,7 @@ export function matchMessage(
       tempMatches = event.text.match(pattern);
 
       if (tempMatches !== null) {
-        context['matches'] = tempMatches;
+        context.matches = tempMatches;
       } else {
         return;
       }
@@ -277,7 +274,7 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
       tempMatches = event.type.match(pattern);
 
       if (tempMatches !== null) {
-        context['matches'] = tempMatches;
+        context.matches = tempMatches;
       } else {
         return;
       }
@@ -378,39 +375,4 @@ export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>>
 
     await next();
   };
-}
-
-function isBlockPayload(
-  payload:
-  | SlackActionMiddlewareArgs['payload']
-  | SlackOptionsMiddlewareArgs['payload']
-  | SlackViewMiddlewareArgs['payload'],
-): payload is BlockElementAction | BlockSuggestion {
-  return (payload as BlockElementAction | BlockSuggestion).action_id !== undefined;
-}
-
-type CallbackIdentifiedBody =
-  | InteractiveMessage
-  | DialogSubmitAction
-  | MessageShortcut
-  | GlobalShortcut
-  | InteractiveMessageSuggestion
-  | DialogSuggestion;
-
-function isCallbackIdentifiedBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],
-): body is CallbackIdentifiedBody {
-  return (body as CallbackIdentifiedBody).callback_id !== undefined;
-}
-
-function isViewBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
-): body is SlackViewAction {
-  return (body as SlackViewAction).view !== undefined;
-}
-
-function isEventArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackEventMiddlewareArgs {
-  return (args as SlackEventMiddlewareArgs).event !== undefined;
 }
