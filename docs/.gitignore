@@ -4,3 +4,4 @@ node_modules/
 build/
 .stylelintrc.json
 _site
+Gemfile.lock
