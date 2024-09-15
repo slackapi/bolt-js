@@ -66,6 +66,7 @@ app.message(async ({ message }) => {
     // TODO: move these assertions to `@slack/types`
     expectType<string>(message.channel);
     expectType<string>(message.message.thread_ts);
+    // expectType<string>(message.message.text); // TODO: womp womp https://github.com/slackapi/bolt-js/issues/1572
   }
   if (message.subtype === 'message_changed') {
     expectType<MessageChangedEvent>(message);
