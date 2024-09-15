@@ -23,9 +23,13 @@ class FakeReceiver implements Receiver {
     this.bolt = bolt;
   };
 
-  public start = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
+  public start = sinon.fake(
+    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
+  );
 
-  public stop = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
+  public stop = sinon.fake(
+    (...params: Parameters<typeof App.prototype.stop>): Promise<unknown> => Promise.resolve([...params]),
+  );
 
   public async sendEvent(event: ReceiverEvent): Promise<void> {
     return this.bolt?.processEvent(event);
@@ -176,12 +180,13 @@ describe('App built-in middleware and mechanism', () => {
 
     it('throws errors which can be caught by upstream async listeners', async () => {
       const thrownError = new Error('Error handling the message :(');
-      let caughtError;
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
+      let caughtError: any;
 
       app.use(async ({ next }) => {
         try {
           await next();
-        } catch (err: any) {
+        } catch (err) {
           caughtError = err;
         }
       });
@@ -209,16 +214,16 @@ describe('App built-in middleware and mechanism', () => {
        */
       const assertOrderMiddleware =
         (orderDown: number, orderUp: number) =>
-        async ({ next }: { next?: NextFn }) => {
-          await delay(10);
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderDown);
-          if (next !== undefined) {
-            await next();
-          }
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderUp);
-        };
+          async ({ next }: { next?: NextFn }) => {
+            await delay(10);
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderDown);
+            if (next !== undefined) {
+              await next();
+            }
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderUp);
+          };
 
       app.use(assertOrderMiddleware(1, 8));
       app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -257,9 +262,7 @@ describe('App built-in middleware and mechanism', () => {
 
     it('should, on error, call the global error handler, extended', async () => {
       const error = new Error('Everything is broke, you probably should restart, if not then good luck');
-      // Need to change value of private property for testing purposes
-      // Accessing through bracket notation because it is private
-      // eslint-disable-next-line @typescript-eslint/dot-notation
+      // biome-ignore lint/complexity/useLiteralKeys: Accessing through bracket notation because it is private (for testing purposes)
       app['extendedErrorHandler'] = true;
 
       app.use(() => {
@@ -280,15 +283,14 @@ describe('App built-in middleware and mechanism', () => {
 
       await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-      // Need to change value of private property for testing purposes
-      // Accessing through bracket notation because it is private
-      // eslint-disable-next-line @typescript-eslint/dot-notation
+      // biome-ignore lint/complexity/useLiteralKeys: Accessing through bracket notation because it is private (for testing purposes)
       app['extendedErrorHandler'] = false;
     });
 
     it('with a default global error handler, rejects App#ProcessEvent', async () => {
       const error = new Error('The worst has happened, bot is beyond saving, always hug servers');
-      let actualError;
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
+      let actualError: any;
 
       app.use(() => {
         throw error;
@@ -296,7 +298,7 @@ describe('App built-in middleware and mechanism', () => {
 
       try {
         await fakeReceiver.sendEvent(dummyReceiverEvent);
-      } catch (err: any) {
+      } catch (err) {
         actualError = err;
       }
 
@@ -360,10 +362,10 @@ describe('App built-in middleware and mechanism', () => {
     });
 
     it('should detect invalid event names', async () => {
-      app.event('app_mention', async () => {});
-      app.event('message', async () => {});
-      assert.throws(() => app.event('message.channels', async () => {}), 'Although the document mentions');
-      assert.throws(() => app.event(/message\..+/, async () => {}), 'Although the document mentions');
+      app.event('app_mention', async () => { });
+      app.event('message', async () => { });
+      assert.throws(() => app.event('message.channels', async () => { }), 'Although the document mentions');
+      assert.throws(() => app.event(/message\..+/, async () => { }), 'Although the document mentions');
     });
 
     // https://github.com/slackapi/bolt-js/issues/1457
@@ -569,7 +571,7 @@ async function importApp(
 function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
-      WebClient: class {},
+      WebClient: class { },
     },
   };
 }

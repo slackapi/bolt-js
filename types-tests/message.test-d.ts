@@ -1,17 +1,17 @@
-import App from '../src/App';
-import type {
-  MessageEvent,
-  GenericMessageEvent,
-  BotMessageEvent,
-  MessageRepliedEvent,
-  MeMessageEvent,
-  MessageDeletedEvent,
-  ThreadBroadcastMessageEvent,
-  MessageChangedEvent,
-  EKMAccessDeniedMessageEvent,
-  AllMessageEvents,
-} from '..';
 import { expectError, expectNotType, expectType } from 'tsd';
+import type {
+  AllMessageEvents,
+  BotMessageEvent,
+  EKMAccessDeniedMessageEvent,
+  GenericMessageEvent,
+  MeMessageEvent,
+  MessageChangedEvent,
+  MessageDeletedEvent,
+  MessageEvent,
+  MessageRepliedEvent,
+  ThreadBroadcastMessageEvent,
+} from '..';
+import App from '../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
