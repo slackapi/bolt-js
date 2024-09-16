@@ -214,16 +214,16 @@ describe('App built-in middleware and mechanism', () => {
        */
       const assertOrderMiddleware =
         (orderDown: number, orderUp: number) =>
-          async ({ next }: { next?: NextFn }) => {
-            await delay(10);
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderDown);
-            if (next !== undefined) {
-              await next();
-            }
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderUp);
-          };
+        async ({ next }: { next?: NextFn }) => {
+          await delay(10);
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderDown);
+          if (next !== undefined) {
+            await next();
+          }
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderUp);
+        };
 
       app.use(assertOrderMiddleware(1, 8));
       app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -362,10 +362,10 @@ describe('App built-in middleware and mechanism', () => {
     });
 
     it('should detect invalid event names', async () => {
-      app.event('app_mention', async () => { });
-      app.event('message', async () => { });
-      assert.throws(() => app.event('message.channels', async () => { }), 'Although the document mentions');
-      assert.throws(() => app.event(/message\..+/, async () => { }), 'Although the document mentions');
+      app.event('app_mention', async () => {});
+      app.event('message', async () => {});
+      assert.throws(() => app.event('message.channels', async () => {}), 'Although the document mentions');
+      assert.throws(() => app.event(/message\..+/, async () => {}), 'Although the document mentions');
     });
 
     // https://github.com/slackapi/bolt-js/issues/1457
@@ -571,7 +571,7 @@ async function importApp(
 function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
-      WebClient: class { },
+      WebClient: class {},
     },
   };
 }

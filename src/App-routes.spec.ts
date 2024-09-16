@@ -21,9 +21,13 @@ class FakeReceiver implements Receiver {
     this.bolt = bolt;
   };
 
-  public start = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
+  public start = sinon.fake(
+    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
+  );
 
-  public stop = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
+  public stop = sinon.fake(
+    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
+  );
 
   public async sendEvent(event: ReceiverEvent): Promise<void> {
     return this.bolt?.processEvent(event);
@@ -583,21 +587,23 @@ describe('App event routing', () => {
       app.command(/\/e.*/, noop);
 
       // invalid view constraints
-      const invalidViewConstraints1 = {
+      const invalidViewConstraints1: ViewConstraints = {
         callback_id: 'foo',
         type: 'view_submission',
+        // @ts-ignore known invalid key of ViewConstraints
         unknown_key: 'should be detected',
-      } as any as ViewConstraints;
+      };
       app.view(invalidViewConstraints1, noop);
       assert.isTrue(fakeLogger.error.called);
 
       fakeLogger.error = sinon.fake();
 
-      const invalidViewConstraints2 = {
+      const invalidViewConstraints2: ViewConstraints = {
         callback_id: 'foo',
         type: undefined,
+        // @ts-ignore known invalid key of ViewConstraints
         unknown_key: 'should be detected',
-      } as any as ViewConstraints;
+      };
       app.view(invalidViewConstraints2, noop);
       assert.isTrue(fakeLogger.error.called);
 
@@ -682,21 +688,23 @@ describe('App event routing', () => {
       app.command('/echo', noop);
 
       // invalid view constraints
-      const invalidViewConstraints1 = {
+      const invalidViewConstraints1: ViewConstraints = {
         callback_id: 'foo',
         type: 'view_submission',
+        // @ts-ignore known invalid key for ViewConstraints
         unknown_key: 'should be detected',
-      } as any as ViewConstraints;
+      };
       app.view(invalidViewConstraints1, noop);
       assert.isTrue(fakeLogger.error.called);
 
       fakeLogger.error = sinon.fake();
 
-      const invalidViewConstraints2 = {
+      const invalidViewConstraints2: ViewConstraints = {
         callback_id: 'foo',
         type: undefined,
+        // @ts-ignore known invalid key for ViewConstraints
         unknown_key: 'should be detected',
-      } as any as ViewConstraints;
+      };
       app.view(invalidViewConstraints2, noop);
       assert.isTrue(fakeLogger.error.called);
 
@@ -818,21 +826,26 @@ describe('App event routing', () => {
   });
 
   describe('App#message patterns', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: spy arguments and return types don't matter in this test
     let fakeMiddleware1: sinon.SinonSpy<any[], any>;
+    // biome-ignore lint/suspicious/noExplicitAny: spy arguments and return types don't matter in this test
     let fakeMiddleware2: sinon.SinonSpy<any[], any>;
+    // biome-ignore lint/suspicious/noExplicitAny: spy arguments and return types don't matter in this test
     let fakeMiddlewares: sinon.SinonSpy<any[], any>[];
+    // biome-ignore lint/suspicious/noExplicitAny: spy arguments and return types don't matter in this test
     let passFilter: sinon.SinonSpy<any[], any>;
+    // biome-ignore lint/suspicious/noExplicitAny: spy arguments and return types don't matter in this test
     let failFilter: sinon.SinonSpy<any[], any>;
     let MockApp: typeof import('./App').default;
     let app: App;
 
     const callNextMiddleware =
       () =>
-      async ({ next }: { next?: NextFn }) => {
-        if (next) {
-          await next();
-        }
-      };
+        async ({ next }: { next?: NextFn }) => {
+          if (next) {
+            await next();
+          }
+        };
 
     const fakeMessageEvent = (receiver: FakeReceiver, message: string): Promise<void> =>
       receiver.sendEvent({
@@ -848,11 +861,11 @@ describe('App event routing', () => {
 
     const controlledMiddleware =
       (shouldCallNext: boolean) =>
-      async ({ next }: { next?: NextFn }) => {
-        if (next && shouldCallNext) {
-          await next();
-        }
-      };
+        async ({ next }: { next?: NextFn }) => {
+          if (next && shouldCallNext) {
+            await next();
+          }
+        };
 
     const assertMiddlewaresCalledOnce = () => {
       assert(fakeMiddleware1.calledOnce);
@@ -1065,7 +1078,7 @@ async function importApp(
 function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
-      WebClient: class {},
+      WebClient: class { },
     },
   };
 }
