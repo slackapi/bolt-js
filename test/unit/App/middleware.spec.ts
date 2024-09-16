@@ -1,54 +1,26 @@
-import 'mocha';
 import { assert } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import type App from './App';
-import type { ExtendedErrorHandlerArgs } from './App';
-import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedError } from './errors';
-import { type Override, createFakeLogger, delay, mergeOverrides } from './test-helpers';
-import type { NextFn, Receiver, ReceiverEvent } from './types';
-
-// Utility functions
-const noop = () => Promise.resolve(undefined);
-const noopMiddleware = async ({ next }: { next: NextFn }) => {
-  await next();
-};
-const noopAuthorize = () => Promise.resolve({});
-
-// Fakes
-class FakeReceiver implements Receiver {
-  private bolt: App | undefined;
-
-  public init = (bolt: App) => {
-    this.bolt = bolt;
-  };
-
-  public start = sinon.fake(
-    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
-  );
-
-  public stop = sinon.fake(
-    (...params: Parameters<typeof App.prototype.stop>): Promise<unknown> => Promise.resolve([...params]),
-  );
-
-  public async sendEvent(event: ReceiverEvent): Promise<void> {
-    return this.bolt?.processEvent(event);
-  }
-}
-
-// Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
-  // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
-  // IncomingEventType.Event
-  return {
-    body: {
-      event: {
-        type,
-      },
-    },
-    ack: noop,
-  };
-}
+import type App from '../../../src/App';
+import type { ExtendedErrorHandlerArgs } from '../../../src/App';
+import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedError } from '../../../src/errors';
+import {
+  FakeReceiver,
+  type Override,
+  createDummyReceiverEvent,
+  createFakeLogger,
+  delay,
+  importApp,
+  mergeOverrides,
+  noop,
+  noopMiddleware,
+  noopVoid,
+  withAxiosPost,
+  withConversationContext,
+  withMemoryStore,
+  withNoopAppMetadata,
+  withNoopWebClient,
+} from '../helpers';
+import type { NextFn, ReceiverEvent } from '../../../src/types';
 
 describe('App built-in middleware and mechanism', () => {
   let fakeReceiver: FakeReceiver;
@@ -73,27 +45,24 @@ describe('App built-in middleware and mechanism', () => {
       },
     ];
   }
+  // TODO: tests for ignoreSelf option
 
   it('should warn and skip when processing a receiver event with unknown type (never crash)', async () => {
-    // Arrange
     const fakeLogger = createFakeLogger();
     const fakeMiddleware = sinon.fake(noopMiddleware);
     const invalidReceiverEvents = createInvalidReceiverEvents();
     const MockApp = await importApp();
 
-    // Act
-    const app = new MockApp({ receiver: fakeReceiver, logger: fakeLogger, authorize: noopAuthorize });
+    const app = new MockApp({ receiver: fakeReceiver, logger: fakeLogger, authorize: noop });
     app.use(fakeMiddleware);
     await Promise.all(invalidReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-    // Assert
     assert(fakeErrorHandler.notCalled);
     assert(fakeMiddleware.notCalled);
     assert.isAtLeast(fakeLogger.warn.callCount, invalidReceiverEvents.length);
   });
 
   it('should warn, send to global error handler, and skip when a receiver event fails authorization', async () => {
-    // Arrange
     const fakeLogger = createFakeLogger();
     const fakeMiddleware = sinon.fake(noopMiddleware);
     const dummyOrigError = new Error('auth failed');
@@ -101,7 +70,6 @@ describe('App built-in middleware and mechanism', () => {
     const dummyReceiverEvent = createDummyReceiverEvent();
     const MockApp = await importApp();
 
-    // Act
     const app = new MockApp({
       receiver: fakeReceiver,
       logger: fakeLogger,
@@ -111,7 +79,6 @@ describe('App built-in middleware and mechanism', () => {
     app.error(fakeErrorHandler);
     await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-    // Assert
     assert(fakeMiddleware.notCalled);
     assert(fakeLogger.warn.called);
     assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
@@ -214,16 +181,16 @@ describe('App built-in middleware and mechanism', () => {
        */
       const assertOrderMiddleware =
         (orderDown: number, orderUp: number) =>
-        async ({ next }: { next?: NextFn }) => {
-          await delay(10);
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderDown);
-          if (next !== undefined) {
-            await next();
-          }
-          middlewareCount += 1;
-          assert.equal(middlewareCount, orderUp);
-        };
+          async ({ next }: { next?: NextFn }) => {
+            await delay(10);
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderDown);
+            if (next !== undefined) {
+              await next();
+            }
+            middlewareCount += 1;
+            assert.equal(middlewareCount, orderUp);
+          };
 
       app.use(assertOrderMiddleware(1, 8));
       app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
@@ -322,16 +289,13 @@ describe('App built-in middleware and mechanism', () => {
     });
 
     it('should bubble up errors in listeners to the global error handler', async () => {
-      // Arrange
       const errorToThrow = new Error('listener error');
 
-      // Act
       app.event(eventType, async () => {
         throw errorToThrow;
       });
       await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-      // Assert
       assert(fakeErrorHandler.calledOnce);
       const error = fakeErrorHandler.firstCall.args[0];
       assert.equal(error.code, ErrorCode.UnknownError);
@@ -339,7 +303,6 @@ describe('App built-in middleware and mechanism', () => {
     });
 
     it('should aggregate multiple errors in listeners for the same incoming event', async () => {
-      // Arrange
       const errorsToThrow = [new Error('first listener error'), new Error('second listener error')];
       function createThrowingListener(toBeThrown: Error): () => Promise<void> {
         return async () => {
@@ -347,12 +310,10 @@ describe('App built-in middleware and mechanism', () => {
         };
       }
 
-      // Act
       app.event(eventType, createThrowingListener(errorsToThrow[0]));
       app.event(eventType, createThrowingListener(errorsToThrow[1]));
       await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-      // Assert
       assert(fakeErrorHandler.calledOnce);
       const error = fakeErrorHandler.firstCall.args[0];
       assert.ok(isCodedError(error));
@@ -362,14 +323,15 @@ describe('App built-in middleware and mechanism', () => {
     });
 
     it('should detect invalid event names', async () => {
-      app.event('app_mention', async () => {});
-      app.event('message', async () => {});
-      assert.throws(() => app.event('message.channels', async () => {}), 'Although the document mentions');
-      assert.throws(() => app.event(/message\..+/, async () => {}), 'Although the document mentions');
+      app.event('app_mention', async () => { });
+      app.event('message', async () => { });
+      assert.throws(() => app.event('message.channels', async () => { }), 'Although the document mentions');
+      assert.throws(() => app.event(/message\..+/, async () => { }), 'Although the document mentions');
     });
 
     // https://github.com/slackapi/bolt-js/issues/1457
     it('should not cause a runtime exception if the last listener middleware invokes next()', async () =>
+      // TODO: this.. won't execute, will it
       new Promise((resolve, reject) => {
         app.event('app_mention', async ({ next }) => {
           try {
@@ -398,12 +360,10 @@ describe('App built-in middleware and mechanism', () => {
 
     describe('authorize', () => {
       it('should extract valid enterprise_id in a shared channel #935', async () => {
-        // Arrange
         const fakeAxiosPost = sinon.fake.resolves({});
         overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
 
-        // Act
         let workedAsExpected = false;
         const app = new MockApp({
           receiver: fakeReceiver,
@@ -418,7 +378,7 @@ describe('App built-in middleware and mechanism', () => {
           workedAsExpected = true;
         });
         await fakeReceiver.sendEvent({
-          ack: noop,
+          ack: noopVoid,
           body: {
             team_id: 'T_connected_grid_workspace',
             enterprise_id: 'E_org_id',
@@ -447,16 +407,13 @@ describe('App built-in middleware and mechanism', () => {
           },
         });
 
-        // Assert
         assert.isTrue(workedAsExpected);
       });
       it('should be skipped for tokens_revoked events #674', async () => {
-        // Arrange
         const fakeAxiosPost = sinon.fake.resolves({});
         overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
 
-        // Act
         let workedAsExpected = false;
         let authorizeCallCount = 0;
         const app = new MockApp({
@@ -472,7 +429,7 @@ describe('App built-in middleware and mechanism', () => {
 
         // The authorize must be called for other events
         await fakeReceiver.sendEvent({
-          ack: noop,
+          ack: noopVoid,
           body: {
             enterprise_id: 'E_org_id',
             api_app_id: 'A111',
@@ -485,7 +442,7 @@ describe('App built-in middleware and mechanism', () => {
         assert.equal(authorizeCallCount, 1);
 
         await fakeReceiver.sendEvent({
-          ack: noop,
+          ack: noopVoid,
           body: {
             enterprise_id: 'E_org_id',
             api_app_id: 'A111',
@@ -500,17 +457,14 @@ describe('App built-in middleware and mechanism', () => {
           },
         });
 
-        // Assert
         assert.equal(authorizeCallCount, 1); // still 1
         assert.isTrue(workedAsExpected);
       });
       it('should be skipped for app_uninstalled events #674', async () => {
-        // Arrange
         const fakeAxiosPost = sinon.fake.resolves({});
         overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
 
-        // Act
         let workedAsExpected = false;
         let authorizeCallCount = 0;
         const app = new MockApp({
@@ -526,7 +480,7 @@ describe('App built-in middleware and mechanism', () => {
 
         // The authorize must be called for other events
         await fakeReceiver.sendEvent({
-          ack: noop,
+          ack: noopVoid,
           body: {
             enterprise_id: 'E_org_id',
             api_app_id: 'A111',
@@ -539,7 +493,7 @@ describe('App built-in middleware and mechanism', () => {
         assert.equal(authorizeCallCount, 1);
 
         await fakeReceiver.sendEvent({
-          ack: noop,
+          ack: noopVoid,
           body: {
             enterprise_id: 'E_org_id',
             api_app_id: 'A111',
@@ -550,62 +504,9 @@ describe('App built-in middleware and mechanism', () => {
           },
         });
 
-        // Assert
         assert.equal(authorizeCallCount, 1); // still 1
         assert.isTrue(workedAsExpected);
       });
     });
   });
 });
-
-/* Testing Harness */
-
-// Loading the system under test using overrides
-async function importApp(
-  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('./App').default> {
-  return (await rewiremock.module(() => import('./App'), overrides)).default;
-}
-
-// Composable overrides
-function withNoopWebClient(): Override {
-  return {
-    '@slack/web-api': {
-      WebClient: class {},
-    },
-  };
-}
-
-function withNoopAppMetadata(): Override {
-  return {
-    '@slack/web-api': {
-      addAppMetadata: sinon.fake(),
-    },
-  };
-}
-
-function withMemoryStore(spy: SinonSpy): Override {
-  return {
-    './conversation-store': {
-      MemoryStore: spy,
-    },
-  };
-}
-
-function withConversationContext(spy: SinonSpy): Override {
-  return {
-    './conversation-store': {
-      conversationContext: spy,
-    },
-  };
-}
-
-function withAxiosPost(spy: SinonSpy): Override {
-  return {
-    axios: {
-      create: () => ({
-        post: spy,
-      }),
-    },
-  };
-}
