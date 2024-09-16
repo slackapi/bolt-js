@@ -1,51 +1,28 @@
-import 'mocha';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from './App';
 import type { ViewConstraints } from './App';
-import { type Override, createFakeLogger, mergeOverrides } from './test-helpers';
-import type { NextFn, Receiver, ReceiverEvent } from './types';
+import {
+  FakeReceiver,
+  type Override,
+  createDummyReceiverEvent,
+  createFakeLogger,
+  mergeOverrides,
+  noop,
+  noopMiddleware,
+  withConversationContext,
+  withMemoryStore,
+  withNoopAppMetadata,
+  withNoopWebClient,
+} from './test-helpers';
+import type { NextFn, ReceiverEvent } from './types';
 
-// Utility functions
-const noop = () => Promise.resolve(undefined);
-const noopMiddleware = async ({ next }: { next: NextFn }) => {
-  await next();
-};
-
-// Fakes
-class FakeReceiver implements Receiver {
-  private bolt: App | undefined;
-
-  public init = (bolt: App) => {
-    this.bolt = bolt;
-  };
-
-  public start = sinon.fake(
-    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
-  );
-
-  public stop = sinon.fake(
-    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
-  );
-
-  public async sendEvent(event: ReceiverEvent): Promise<void> {
-    return this.bolt?.processEvent(event);
-  }
-}
-
-// Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
-  // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
-  // IncomingEventType.Event
-  return {
-    body: {
-      event: {
-        type,
-      },
-    },
-    ack: noop,
-  };
+// Loading the system under test using overrides
+async function importApp(
+  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
+): Promise<typeof import('./App').default> {
+  return (await rewiremock.module(() => import('./App'), overrides)).default;
 }
 
 describe('App event routing', () => {
@@ -595,8 +572,7 @@ describe('App event routing', () => {
       };
       app.view(invalidViewConstraints1, noop);
       assert.isTrue(fakeLogger.error.called);
-
-      fakeLogger.error = sinon.fake();
+      fakeLogger.error.reset();
 
       const invalidViewConstraints2: ViewConstraints = {
         callback_id: 'foo',
@@ -697,7 +673,7 @@ describe('App event routing', () => {
       app.view(invalidViewConstraints1, noop);
       assert.isTrue(fakeLogger.error.called);
 
-      fakeLogger.error = sinon.fake();
+      fakeLogger.error.reset();
 
       const invalidViewConstraints2: ViewConstraints = {
         callback_id: 'foo',
@@ -841,11 +817,11 @@ describe('App event routing', () => {
 
     const callNextMiddleware =
       () =>
-      async ({ next }: { next?: NextFn }) => {
-        if (next) {
-          await next();
-        }
-      };
+        async ({ next }: { next?: NextFn }) => {
+          if (next) {
+            await next();
+          }
+        };
 
     const fakeMessageEvent = (receiver: FakeReceiver, message: string): Promise<void> =>
       receiver.sendEvent({
@@ -861,11 +837,11 @@ describe('App event routing', () => {
 
     const controlledMiddleware =
       (shouldCallNext: boolean) =>
-      async ({ next }: { next?: NextFn }) => {
-        if (next && shouldCallNext) {
-          await next();
-        }
-      };
+        async ({ next }: { next?: NextFn }) => {
+          if (next && shouldCallNext) {
+            await next();
+          }
+        };
 
     const assertMiddlewaresCalledOnce = () => {
       assert(fakeMiddleware1.calledOnce);
@@ -1064,45 +1040,3 @@ describe('App event routing', () => {
     });
   });
 });
-
-/* Testing Harness */
-
-// Loading the system under test using overrides
-async function importApp(
-  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('./App').default> {
-  return (await rewiremock.module(() => import('./App'), overrides)).default;
-}
-
-// Composable overrides
-function withNoopWebClient(): Override {
-  return {
-    '@slack/web-api': {
-      WebClient: class {},
-    },
-  };
-}
-
-function withNoopAppMetadata(): Override {
-  return {
-    '@slack/web-api': {
-      addAppMetadata: sinon.fake(),
-    },
-  };
-}
-
-function withMemoryStore(spy: SinonSpy): Override {
-  return {
-    './conversation-store': {
-      MemoryStore: spy,
-    },
-  };
-}
-
-function withConversationContext(spy: SinonSpy): Override {
-  return {
-    './conversation-store': {
-      conversationContext: spy,
-    },
-  };
-}

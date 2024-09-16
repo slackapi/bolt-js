@@ -1,4 +1,3 @@
-import 'mocha';
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
@@ -14,25 +13,23 @@ import {
   type WorkflowStepSaveMiddlewareArgs,
 } from './WorkflowStep';
 import { WorkflowStepInitializationError } from './errors';
-import type { Override } from './test-helpers';
+import { type Override, noop } from './test-helpers';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from './types';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('./WorkflowStep')> {
   return rewiremock.module(() => import('./WorkflowStep'), overrides);
 }
 
-const MOCK_FN = async () => {};
-
 const MOCK_CONFIG_SINGLE = {
-  edit: MOCK_FN,
-  save: MOCK_FN,
-  execute: MOCK_FN,
+  edit: noop,
+  save: noop,
+  execute: noop,
 };
 
 const MOCK_CONFIG_MULTIPLE = {
-  edit: [MOCK_FN, MOCK_FN],
-  save: [MOCK_FN],
-  execute: [MOCK_FN, MOCK_FN, MOCK_FN],
+  edit: [noop, noop],
+  save: [noop],
+  execute: [noop, noop, noop],
 };
 
 describe('WorkflowStep class', () => {
@@ -117,7 +114,7 @@ describe('WorkflowStep class', () => {
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = {
-        edit: async () => {},
+        edit: async () => { },
       } as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
@@ -130,9 +127,9 @@ describe('WorkflowStep class', () => {
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = {
-        edit: async () => {},
+        edit: async () => { },
         save: {},
-        execute: async () => {},
+        execute: async () => { },
       } as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
@@ -300,7 +297,7 @@ describe('WorkflowStep class', () => {
       const fn1 = sinon.spy((async ({ next: continuation }) => {
         await continuation();
       }) as Middleware<WorkflowStepEdit>);
-      const fn2 = sinon.spy(async () => {});
+      const fn2 = sinon.spy(async () => { });
       const fakeMiddleware = [fn1, fn2] as WorkflowStepMiddleware;
 
       await processStepMiddleware(fakeArgs, fakeMiddleware);
@@ -311,6 +308,9 @@ describe('WorkflowStep class', () => {
   });
 });
 
+// TODO: need middleware test utilities like wrapping in AllMiddleWareArgs (creating say, respond, context)
+// same for other kinds of middleware
+// this stuff probably already exists
 function createFakeStepEditAction() {
   return {
     body: {
