@@ -29,10 +29,10 @@
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
     "lint": "npx @biomejs/biome check --write docs src types-tests",
-    "mocha": "TS_NODE_PROJECT=tsconfig.json mocha --config .mocharc.json",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
-    "test:coverage": "c8 npm run mocha",
-    "test:types": "tsd",
+    "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
+    "test:coverage": "c8 npm run test:unit",
+    "test:types": "tsd --files test/types",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": "slackapi/bolt",
@@ -71,8 +71,5 @@
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
     "typescript": "5.3.3"
-  },
-  "tsd": {
-    "directory": "test/types"
   }
 }

@@ -1,53 +1,21 @@
-import 'mocha';
 import { LogLevel } from '@slack/logger';
 import type { WebClient, WebClientOptions } from '@slack/web-api';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import type App from './App';
-import type { ConversationStore } from './conversation-store';
-import { ErrorCode } from './errors';
-import SocketModeReceiver from './receivers/SocketModeReceiver';
-import { type Override, createFakeLogger, mergeOverrides } from './test-helpers';
-import type { NextFn, Receiver, ReceiverEvent, SayFn } from './types';
-
-// Utility functions
-const noop = () => Promise.resolve(undefined);
-const noopMiddleware = async ({ next }: { next: NextFn }) => {
-  await next();
-};
-const noopAuthorize = () => Promise.resolve({});
-
-// Fakes
-class FakeReceiver implements Receiver {
-  private bolt: App | undefined;
-
-  public init = (bolt: App) => {
-    this.bolt = bolt;
-  };
-
-  public start = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
-
-  public stop = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
-
-  public async sendEvent(event: ReceiverEvent): Promise<void> {
-    return this.bolt?.processEvent(event);
-  }
-}
-
-// Dummies (values that have no real behavior but pass through the system opaquely)
-function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
-  // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
-  // IncomingEventType.Event
-  return {
-    body: {
-      event: {
-        type,
-      },
-    },
-    ack: noop,
-  };
-}
+import type { ConversationStore } from '../../src/conversation-store';
+import { ErrorCode } from '../../src/errors';
+import SocketModeReceiver from '../../src/receivers/SocketModeReceiver';
+import {
+  FakeReceiver,
+  type Override,
+  createDummyReceiverEvent,
+  createFakeLogger,
+  mergeOverrides,
+  noop,
+  noopMiddleware,
+} from './helpers';
+import type { ReceiverEvent, SayFn } from '../../src/types';
 
 const fakeAppToken = 'xapp-1234';
 
@@ -82,11 +50,11 @@ describe('App basic features', () => {
       const fakeBotId = 'B_FAKE_BOT_ID';
       const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
       const installationStore = {
-        storeInstallation: async () => {},
+        storeInstallation: async () => { },
         fetchInstallation: async () => {
           throw new Error('Failed fetching installation');
         },
-        deleteInstallation: async () => {},
+        deleteInstallation: async () => { },
       };
       const overrides = mergeOverrides(
         withNoopAppMetadata(),
@@ -1238,32 +1206,6 @@ describe('App basic features', () => {
   });
 });
 
-/* Testing Harness */
-
-// Loading the system under test using overrides
-async function importApp(
-  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('./App').default> {
-  return (await rewiremock.module(() => import('./App'), overrides)).default;
-}
-
-// Composable overrides
-function withNoopWebClient(): Override {
-  return {
-    '@slack/web-api': {
-      WebClient: class {},
-    },
-  };
-}
-
-function withNoopAppMetadata(): Override {
-  return {
-    '@slack/web-api': {
-      addAppMetadata: sinon.fake(),
-    },
-  };
-}
-
 function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string): Override {
   return {
     '@slack/web-api': {
@@ -1288,44 +1230,6 @@ function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string
           }),
         };
       },
-    },
-  };
-}
-
-function withPostMessage(spy: SinonSpy): Override {
-  return {
-    '@slack/web-api': {
-      WebClient: class {
-        public chat = {
-          postMessage: spy,
-        };
-      },
-    },
-  };
-}
-
-function withAxiosPost(spy: SinonSpy): Override {
-  return {
-    axios: {
-      create: () => ({
-        post: spy,
-      }),
-    },
-  };
-}
-
-function withMemoryStore(spy: SinonSpy): Override {
-  return {
-    './conversation-store': {
-      MemoryStore: spy,
-    },
-  };
-}
-
-function withConversationContext(spy: SinonSpy): Override {
-  return {
-    './conversation-store': {
-      conversationContext: spy,
     },
   };
 }

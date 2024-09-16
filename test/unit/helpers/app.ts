@@ -1,7 +1,9 @@
-import { ConsoleLogger } from '@slack/logger';
+import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import type { NextFn, Receiver, ReceiverEvent } from './types';
-import type App from './App';
+
+/*
+ * Contains test helpers related to importing, mocking and overriding parts of the App class
+ */
 
 // biome-ignore lint/suspicious/noExplicitAny: module overrides can be anything
 export interface Override extends Record<string, Record<string, any>> { }
@@ -29,6 +31,16 @@ function mergeObjProperties(first: Override, second: Override): Override {
   }
   return merged;
 }
+
+/**
+ * Helps with importing the App class and overriding certain aspects of it, like its setting of request metadata and ensuring the API client within doesnt issue network requests.
+ */
+export async function importApp(
+  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
+): Promise<typeof import('../../../src/App').default> {
+  return (await rewiremock.module(() => import('../../../src/App'), overrides)).default;
+}
+
 // Composable overrides
 export function withNoopWebClient(): Override {
   return {
@@ -62,50 +74,24 @@ export function withConversationContext(spy: SinonSpy): Override {
   };
 }
 
-export function createFakeLogger() {
-  return sinon.createStubInstance(ConsoleLogger);
-}
-
-export function delay(ms = 0): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-export const noop = () => Promise.resolve(undefined);
-export const noopMiddleware = async ({ next }: { next: NextFn }) => {
-  await next();
-};
-
-export class FakeReceiver implements Receiver {
-  private bolt: App | undefined;
-
-  public init = (bolt: App) => {
-    this.bolt = bolt;
-  };
-
-  public start = sinon.fake(
-    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
-  );
-
-  public stop = sinon.fake(
-    (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
-  );
-
-  public async sendEvent(event: ReceiverEvent): Promise<void> {
-    return this.bolt?.processEvent(event);
-  }
-}
-// Dummies (values that have no real behavior but pass through the system opaquely)
-export function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
-  // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
-  // IncomingEventType.Event
+export function withPostMessage(spy: SinonSpy): Override {
   return {
-    body: {
-      event: {
-        type,
+    '@slack/web-api': {
+      WebClient: class {
+        public chat = {
+          postMessage: spy,
+        };
       },
     },
-    ack: noop,
+  };
+}
+
+export function withAxiosPost(spy: SinonSpy): Override {
+  return {
+    axios: {
+      create: () => ({
+        post: spy,
+      }),
+    },
   };
 }

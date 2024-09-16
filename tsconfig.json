@@ -13,6 +13,10 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["**/*.spec.ts", "src/test-helpers.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "test/**/*"
+  ]
 }

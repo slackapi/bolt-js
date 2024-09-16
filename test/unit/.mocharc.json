@@ -4,7 +4,7 @@
     "source-map-support/register"
   ],
   "spec": [
-    "test/**/*.spec.ts"
+    "test/unit/**/*.spec.ts"
   ],
   "timeout": 3000
 }
