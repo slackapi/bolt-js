@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { WorkflowStepExecuteEvent } from '@slack/types';
 import type {
   Block,
@@ -38,15 +37,16 @@ export interface StepConfigureArguments {
  * version.
  */
 export interface StepUpdateArguments {
-  inputs?: {
-    [key: string]: {
+  inputs?: Record<
+    string,
+    {
+      // biome-ignore lint/suspicious/noExplicitAny: user-defined workflow inputs could be anything
       value: any;
       skip_variable_replacement?: boolean;
-      variables?: {
-        [key: string]: any;
-      };
-    };
-  };
+      // biome-ignore lint/suspicious/noExplicitAny: user-defined workflow inputs could be anything
+      variables?: Record<string, any>;
+    }
+  >;
   outputs?: {
     name: string;
     type: string;
@@ -60,9 +60,8 @@ export interface StepUpdateArguments {
  * version.
  */
 export interface StepCompleteArguments {
-  outputs?: {
-    [key: string]: any;
-  };
+  // biome-ignore lint/suspicious/noExplicitAny: user-defined workflow outputs could be anything
+  outputs?: Record<string, any>;
 }
 
 /** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
@@ -205,7 +204,7 @@ export class WorkflowStep {
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => {
+    return async (args): Promise<void> => {
       if (isStepEvent(args) && this.matchesConstraints(args)) {
         return this.processEvent(args);
       }
@@ -259,11 +258,11 @@ export function validate(callbackId: string, config: WorkflowStepConfig): void {
   // Check for missing required keys
   const requiredKeys: (keyof WorkflowStepConfig)[] = ['save', 'edit', 'execute'];
   const missingKeys: (keyof WorkflowStepConfig)[] = [];
-  requiredKeys.forEach((key) => {
+  for (const key of requiredKeys) {
     if (config[key] === undefined) {
       missingKeys.push(key);
     }
-  });
+  }
 
   if (missingKeys.length > 0) {
     const errorMsg = `WorkflowStep is missing required keys: ${missingKeys.join(', ')}`;
@@ -272,12 +271,12 @@ export function validate(callbackId: string, config: WorkflowStepConfig): void {
 
   // Ensure a callback or an array of callbacks is present
   const requiredFns: (keyof WorkflowStepConfig)[] = ['save', 'edit', 'execute'];
-  requiredFns.forEach((fn) => {
+  for (const fn of requiredFns) {
     if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
       const errorMsg = `WorkflowStep ${fn} property must be a function or an array of functions`;
       throw new WorkflowStepInitializationError(errorMsg);
     }
-  });
+  }
 }
 
 /**
@@ -413,8 +412,10 @@ function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteM
  * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
  * version.
  */
-export function prepareStepArgs(args: any): AllWorkflowStepMiddlewareArgs {
+// TODO :: refactor to incorporate a generic parameter
+export function prepareStepArgs(args: AllWorkflowStepMiddlewareArgs): AllWorkflowStepMiddlewareArgs {
   const { next: _next, ...stepArgs } = args;
+  // biome-ignore lint/suspicious/noExplicitAny: need to use any as the cases of the switch that follows dont narrow to the specific required args type. use type predicates for each workflow_step event args in the switch to get rid of this any.
   const preparedArgs: any = { ...stepArgs };
 
   switch (preparedArgs.payload.type) {

@@ -841,11 +841,11 @@ describe('App event routing', () => {
 
     const callNextMiddleware =
       () =>
-        async ({ next }: { next?: NextFn }) => {
-          if (next) {
-            await next();
-          }
-        };
+      async ({ next }: { next?: NextFn }) => {
+        if (next) {
+          await next();
+        }
+      };
 
     const fakeMessageEvent = (receiver: FakeReceiver, message: string): Promise<void> =>
       receiver.sendEvent({
@@ -861,11 +861,11 @@ describe('App event routing', () => {
 
     const controlledMiddleware =
       (shouldCallNext: boolean) =>
-        async ({ next }: { next?: NextFn }) => {
-          if (next && shouldCallNext) {
-            await next();
-          }
-        };
+      async ({ next }: { next?: NextFn }) => {
+        if (next && shouldCallNext) {
+          await next();
+        }
+      };
 
     const assertMiddlewaresCalledOnce = () => {
       assert(fakeMiddleware1.calledOnce);
@@ -1078,7 +1078,7 @@ async function importApp(
 function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
-      WebClient: class { },
+      WebClient: class {},
     },
   };
 }
