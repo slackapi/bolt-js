@@ -29,7 +29,7 @@
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
     "lint": "npx @biomejs/biome check --write docs src types-tests",
-    "mocha": "TS_NODE_PROJECT=tsconfig.json mocha --config .mocharc.json \"src/**/*.spec.ts\"",
+    "mocha": "TS_NODE_PROJECT=tsconfig.json mocha --config .mocharc.json",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
     "test:coverage": "c8 npm run mocha",
     "test:types": "tsd",
@@ -73,6 +73,6 @@
     "typescript": "5.3.3"
   },
   "tsd": {
-    "directory": "types-tests"
+    "directory": "test/types"
   }
 }

@@ -1,17 +1,17 @@
 import { expectNotType, expectType } from 'tsd';
-import {
-  App,
-  type AppMentionEvent,
-  type PinAddedEvent,
-  type PinRemovedEvent,
-  type ReactionAddedEvent,
-  type ReactionRemovedEvent,
-  type SayFn,
-  type SlackEvent,
-  type UserHuddleChangedEvent,
-  type UserProfileChangedEvent,
-  type UserStatusChangedEvent,
-} from '..';
+import type {
+  AppMentionEvent,
+  PinAddedEvent,
+  PinRemovedEvent,
+  ReactionAddedEvent,
+  ReactionRemovedEvent,
+  SlackEvent,
+  UserHuddleChangedEvent,
+  UserProfileChangedEvent,
+  UserStatusChangedEvent,
+} from '@slack/types';
+import type { SayFn } from '../../';
+import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

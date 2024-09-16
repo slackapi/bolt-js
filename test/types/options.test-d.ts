@@ -1,12 +1,7 @@
 import type { Option } from '@slack/types';
 import { expectError, expectType } from 'tsd';
-import {
-  App,
-  type BlockSuggestion,
-  type DialogSuggestion,
-  type InteractiveMessageSuggestion,
-  type SlackOptions,
-} from '../dist';
+import App from '../../src/App';
+import type { BlockSuggestion, DialogSuggestion, InteractiveMessageSuggestion, SlackOptions } from '../..';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -24,7 +19,7 @@ const blockSuggestionOptions: Option[] = [
 expectType<void>(
   app.options('action-id-or-callback-id', async ({ options, ack }) => {
     expectType<BlockSuggestion>(options);
-    // resolved by StringIndexed
+    // biome-ignore lint/suspicious/noExplicitAny: TODO: should the callback ID be any? seems wrong
     expectType<any>(options.callback_id);
     options.block_id;
     options.action_id;
@@ -86,8 +81,8 @@ expectType<void>(
   // Example of responding to an external_select options request
   app.options('external_action', async ({ options, ack }) => {
     // Get information specific to a team or channel
-    // (modified to satisfy TS compiler)
-    const results = options.team != null ? await db.get(options.team.id) : [];
+    // TODO: modified to satisfy TS compiler; should team be optional?
+    const results = options.team != null ? db.get(options.team.id) : [];
 
     if (results) {
       // (modified to satisfy TS compiler)

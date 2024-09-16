@@ -1,5 +1,6 @@
 import { expectType } from 'tsd';
-import { App, type SlashCommand } from '../dist';
+import type { SlashCommand } from '../..';
+import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

@@ -10,8 +10,8 @@ import type {
   MessageEvent,
   MessageRepliedEvent,
   ThreadBroadcastMessageEvent,
-} from '..';
-import App from '../src/App';
+} from '@slack/types';
+import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

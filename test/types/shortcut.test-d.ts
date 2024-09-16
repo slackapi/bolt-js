@@ -1,5 +1,6 @@
 import { expectError, expectType } from 'tsd';
-import { App, type GlobalShortcut, type MessageShortcut, type SayFn } from '../';
+import type { GlobalShortcut, MessageShortcut, SayFn } from '../..';
+import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

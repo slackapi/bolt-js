@@ -1,8 +1,8 @@
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { expectType } from 'tsd';
-import App from '../src/App';
-import type { CodedError } from '../src/errors';
-import type { BufferedIncomingMessage } from '../src/receivers/BufferedIncomingMessage';
+import App from '../../src/App';
+import type { CodedError } from '../../src/errors';
+import type { BufferedIncomingMessage } from '../../src/receivers/BufferedIncomingMessage';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -12,31 +12,31 @@ app.error(async (error) => {
   expectType<CodedError>(error);
 
   expectType<Error | undefined>(error.original);
-  if (error.original != undefined) {
+  if (error.original !== undefined) {
     expectType<Error>(error.original);
     console.log(error.original.message);
   }
 
   expectType<Error[] | undefined>(error.originals);
-  if (error.originals != undefined) {
+  if (error.originals !== undefined) {
     expectType<Error[]>(error.originals);
     console.log(error.originals);
   }
 
   expectType<string | undefined>(error.missingProperty);
-  if (error.missingProperty != undefined) {
+  if (error.missingProperty !== undefined) {
     expectType<string>(error.missingProperty);
     console.log(error.missingProperty);
   }
 
   expectType<IncomingMessage | BufferedIncomingMessage | undefined>(error.req);
-  if (error.req != undefined) {
+  if (error.req !== undefined) {
     expectType<IncomingMessage | BufferedIncomingMessage>(error.req);
     console.log(error.req);
   }
 
   expectType<ServerResponse | undefined>(error.res);
-  if (error.res != undefined) {
+  if (error.res !== undefined) {
     expectType<ServerResponse>(error.res);
     console.log(error.res);
   }
