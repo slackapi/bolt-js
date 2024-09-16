@@ -1,4 +1,5 @@
 import rewiremock from 'rewiremock';
+import type { WebClientOptions } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 
 /*
@@ -92,6 +93,34 @@ export function withAxiosPost(spy: SinonSpy): Override {
       create: () => ({
         post: spy,
       }),
+    },
+  };
+}
+
+export function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {
+        public token?: string;
+
+        public constructor(token?: string, _options?: WebClientOptions) {
+          this.token = token;
+        }
+
+        public auth = {
+          test: sinon.fake.resolves({ user_id: botUserId }),
+        };
+
+        public users = {
+          info: sinon.fake.resolves({
+            user: {
+              profile: {
+                bot_id: botId,
+              },
+            },
+          }),
+        };
+      },
     },
   };
 }
