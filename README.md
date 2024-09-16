@@ -3,9 +3,9 @@
 [![codecov](https://codecov.io/gh/slackapi/bolt-js/branch/main/graph/badge.svg?token=x4oCgiexvp)](https://codecov.io/gh/slackapi/bolt-js)
 [![Node.js CI](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml/badge.svg)](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml)
 
-A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-js/tutorial/getting-started) to set-up and run your first Bolt app.
+A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://tools.slack.dev/bolt-js/tutorial/getting-started) to set-up and run your first Bolt app.
 
-Read [the documentation](https://slack.dev/bolt-js) to explore the basic and advanced concepts of Bolt for JavaScript.
+Read [the documentation](https://tools.slack.dev/bolt-js) to explore the basic and advanced concepts of Bolt for JavaScript.
 
 ## Setup
 
@@ -80,7 +80,7 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 
 | Argument  | Description  |
 | :---: | :--- |
-| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` array. The `payload` object is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangeably. **An easy way to understand what's in a payload is to log it**, or [use TypeScript](https://slack.dev/bolt-js/tutorial/using-typescript). |
+| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` array. The `payload` object is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangeably. **An easy way to understand what's in a payload is to log it**, or use TypeScript. |
 | `say` | Function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and objects (for messages containing blocks). `say` returns a promise that will resolve with a [`chat.postMessage` response](https://api.slack.com/methods/chat.postMessage).
 | `ack` | Function that **must** be called to acknowledge that an incoming event was received by your app. `ack` exists for all actions, shortcuts, view, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](#acknowledging-events)
 | `client` | Web API client that uses the token associated with that event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by the `authorize` function.
@@ -107,7 +107,7 @@ app.message(async ({ message, say }) => {
 
 ### Calling the Web API
 
-In addition to the [`client` property passed to listeners](#making-things-happen), each app has a top-level `client` that can be used to call methods. Unlike the `client` passed to listeners, the top-level client must be passed a `token`. [Read the documentation](https://slack.dev/bolt-js/concepts#web-api) for more details.
+In addition to the [`client` property passed to listeners](#making-things-happen), each app has a top-level `client` that can be used to call methods. Unlike the `client` passed to listeners, the top-level client must be passed a `token`. [Read the documentation](https://tools.slack.dev/bolt-js/concepts#web-api) for more details.
 
 ### Acknowledging events
 
@@ -129,7 +129,7 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 
 ## Getting Help
 
-[The documentation](https://slack.dev/bolt-js) has more information on basic and advanced concepts for Bolt for JavaScript.
+[The documentation](https://tools.slack.dev/bolt-js) has more information on basic and advanced concepts for Bolt for JavaScript.
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 

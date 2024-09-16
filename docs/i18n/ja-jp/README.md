@@ -118,4 +118,4 @@ For example:
   },
 ```
 
-Be careful changing `code.json`. If you change something in this repo, it will likely need to be changed in the other Slack.dev repos too, like the Bolt-Python repo. We want these translations to match for all Slack.dev sites. 
+Be careful changing `code.json`. If you change something in this repo, it will likely need to be changed in the other tools.slack.dev repos too, like the Bolt-Python repo. We want these translations to match for all tools.slack.dev sites. 
