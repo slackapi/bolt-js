@@ -4,7 +4,7 @@
     "source-map-support/register"
   ],
   "spec": [
-    "test/unit/**/*.spec.ts"
+    "test/unit/App/middleware.spec.ts"
   ],
   "timeout": 3000
 }

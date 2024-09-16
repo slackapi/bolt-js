@@ -19,7 +19,7 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
     { say: SayFn }
     : unknown);
 
-interface BaseSlackEvent<T extends string = string> {
+export interface BaseSlackEvent<T extends string = string> {
   type: T;
 }
 export type EventTypePattern = string | RegExp;

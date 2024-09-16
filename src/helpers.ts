@@ -20,7 +20,7 @@ export enum IncomingEventType {
   Action = 1,
   Command = 2,
   Options = 3,
-  ViewAction = 4,
+  ViewAction = 4, // TODO: terminology: ViewAction? Why Action?
   Shortcut = 5,
 }
 

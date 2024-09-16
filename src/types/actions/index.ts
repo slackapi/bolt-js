@@ -29,6 +29,7 @@ export * from './workflow-step-edit';
 // TODO: remove workflow step stuff in bolt v5
 export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | WorkflowStepEdit;
 
+// TODO: the words (terminology) that follow don't make much sense. What differentiates SlackAction, BlockAction, ElementAction and BasicElementAction?
 /**
  * Arguments which listeners and middleware receive to process an action from Slack's Block Kit interactive components,
  * message actions, dialogs, or legacy interactive messages.
@@ -39,16 +40,16 @@ export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction 
  */
 export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> = {
   payload: Action extends BlockAction<infer ElementAction>
-    ? ElementAction
-    : Action extends InteractiveMessage<infer InteractiveAction>
-      ? InteractiveAction
-      : Action;
+  ? ElementAction
+  : Action extends InteractiveMessage<infer InteractiveAction>
+  ? InteractiveAction
+  : Action;
   // too bad we can't use `this['payload']` in a type (as opposed to interface) but the use of `& unknown` below is too useful
   action: Action extends BlockAction<infer ElementAction>
-    ? ElementAction
-    : Action extends InteractiveMessage<infer InteractiveAction>
-      ? InteractiveAction
-      : Action;
+  ? ElementAction
+  : Action extends InteractiveMessage<infer InteractiveAction>
+  ? InteractiveAction
+  : Action;
   body: Action;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
@@ -58,10 +59,9 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
   inputs?: FunctionInputs;
 // TODO: remove workflow step stuff in bolt v5
 } & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
-  // all action types except dialog submission and steps from apps have a channel context
-  ? { say: SayFn }
-  : unknown
-);
+  ? // all action types except dialog submission and steps from apps have a channel context
+  { say: SayFn }
+  : unknown);
 
 /**
  * Type function which given an action `A` returns a corresponding type for the `ack()` function. The function is used
@@ -70,5 +70,5 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
 type ActionAckFn<A extends SlackAction> = A extends InteractiveMessage
   ? AckFn<string | SayArguments>
   : A extends DialogSubmitAction
-    ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
-    : AckFn<void>;
+  ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
+  : AckFn<void>;

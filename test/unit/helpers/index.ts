@@ -5,6 +5,7 @@ import type App from '../../../src/App';
 import type { ConversationStore } from '../../../src/conversation-store';
 
 export * from './app';
+export * from './events';
 
 export function createFakeLogger() {
   return sinon.createStubInstance(ConsoleLogger);
@@ -42,19 +43,6 @@ export class FakeReceiver implements Receiver {
   public async sendEvent(event: ReceiverEvent): Promise<void> {
     return this.bolt?.processEvent(event);
   }
-}
-// Dummies (values that have no real behavior but pass through the system opaquely)
-export function createDummyReceiverEvent(type = 'dummy_event_type'): ReceiverEvent {
-  // NOTE: this is a degenerate ReceiverEvent that would successfully pass through the App. it happens to look like a
-  // IncomingEventType.Event
-  return {
-    body: {
-      event: {
-        type,
-      },
-    },
-    ack: noopVoid,
-  };
 }
 
 export function createFakeConversationStore(): ConversationStore {
