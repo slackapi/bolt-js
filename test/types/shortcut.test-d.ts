@@ -1,4 +1,4 @@
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 import type { GlobalShortcut, MessageShortcut, SayFn, SlackShortcut } from '../..';
 import App from '../../src/App';
 
@@ -37,3 +37,17 @@ app.shortcut<GlobalShortcut>({}, async ({ shortcut, say }) => {
 
 // TODO: test the Shortcut and Constraints type parameters and how they can rely on each other.
 // relates to https://github.com/slackapi/bolt-js/issues/796; proof out how the Shortcut type parameter can provide nice typing utilities for developers
+
+interface MyContext {
+  doesnt: 'matter';
+}
+// Ensure custom context assigned to individual middleware is honoured
+app.shortcut<SlackShortcut, MyContext>('callback_id', async ({ context }) => {
+  expectAssignable<MyContext>(context);
+});
+
+// Ensure custom context assigned to the entire app is honoured
+const typedContextApp = new App<MyContext>();
+typedContextApp.shortcut('callback_id', async ({ context }) => {
+  expectAssignable<MyContext>(context);
+});
