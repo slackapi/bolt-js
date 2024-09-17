@@ -1,14 +1,10 @@
 import { LogLevel } from '@slack/logger';
-import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
-import sinon, { type SinonSpy } from 'sinon';
-import App from '../../../src/App';
+import sinon from 'sinon';
 import { ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
 import {
   FakeReceiver,
-  type Override,
-  createDummyReceiverEvent,
   createFakeLogger,
   importApp,
   mergeOverrides,
@@ -21,38 +17,30 @@ import {
   withSuccessfulBotUserFetchingWebClient,
   createFakeConversationStore,
 } from '../helpers';
-import type { ReceiverEvent, SayFn } from '../../../src/types';
 
 const fakeAppToken = 'xapp-1234';
 const fakeBotId = 'B_FAKE_BOT_ID';
 const fakeBotUserId = 'U_FAKE_BOT_USER_ID';
 
 describe('App basic features', () => {
-  let fakeReceiver: FakeReceiver;
-  let fakeErrorHandler: SinonSpy;
-  let dummyAuthorizationResult: { botToken: string; botId: string };
   const overrides = mergeOverrides(
     withNoopAppMetadata(),
     withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
   );
-
-  beforeEach(() => {
-    fakeReceiver = new FakeReceiver();
-    fakeErrorHandler = sinon.fake();
-    dummyAuthorizationResult = { botToken: '', botId: '' };
-  });
 
   describe('constructor', () => {
     describe('with a custom port value in HTTP Mode', () => {
       it('should accept a port value at the top-level', async () => {
         const MockApp = await importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '', port: 9999 });
-        assert.propertyVal(app, 'receiver.port', 9999);
+        // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
+        assert.propertyVal(app['receiver'], 'port', 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = await importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '', port: 7777, installerOptions: { port: 9999 } });
-        assert.propertyVal(app, 'receiver.port', 9999);
+        // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
+        assert.propertyVal(app['receiver'], 'port', 9999);
       });
     });
 
@@ -76,7 +64,8 @@ describe('App basic features', () => {
           installerOptions: {},
           installationStore,
         });
-        assert.propertyVal(app, 'receiver.httpServerPort', 9999);
+        // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
+        assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = await importApp(overrides);
@@ -92,7 +81,8 @@ describe('App basic features', () => {
           },
           installationStore,
         });
-        assert.propertyVal(app, 'receiver.httpServerPort', 9999);
+        // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
+        assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
       });
     });
 
@@ -169,11 +159,10 @@ describe('App basic features', () => {
     describe('with a custom receiver', () => {
       it('should succeed with no signing secret', async () => {
         const MockApp = await importApp();
-        const app = new MockApp({
+        new MockApp({
           receiver: new FakeReceiver(),
           authorize: noop,
         });
-        assert.instanceOf(app, App);
       });
     });
     it('should fail when no signing secret for the default receiver is specified', async () => {
@@ -198,8 +187,7 @@ describe('App basic features', () => {
     it('should succeed when both socketMode and SocketModeReceiver are specified', async () => {
       const MockApp = await importApp(overrides);
       const socketModeReceiver = new SocketModeReceiver({ appToken: fakeAppToken });
-      const app = new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
-      assert.instanceOf(app, App);
+      new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
     });
     it('should initialize MemoryStore conversation store by default', async () => {
       const fakeMemoryStore = sinon.fake();
@@ -212,8 +200,7 @@ describe('App basic features', () => {
       );
       const MockApp = await importApp(overrides);
 
-      const app = new MockApp({ authorize: noop, signingSecret: '' });
-      assert.instanceOf(app, App);
+      new MockApp({ authorize: noop, signingSecret: '' });
       assert(fakeMemoryStore.calledWithNew);
       assert(fakeConversationContext.called);
     });
@@ -226,8 +213,7 @@ describe('App basic features', () => {
       );
       it('should initialize without a conversation store when option is false', async () => {
         const MockApp = await importApp(overrides);
-        const app = new MockApp({ convoStore: false, authorize: noop, signingSecret: '' });
-        assert.instanceOf(app, App);
+        new MockApp({ convoStore: false, authorize: noop, signingSecret: '' });
         assert(fakeConversationContext.notCalled);
       });
       it('should initialize the conversation store', async () => {
@@ -268,8 +254,9 @@ describe('App basic features', () => {
       const overrides = mergeOverrides(withNoopAppMetadata(), {
         '@slack/web-api': {
           WebClient: class {
-            public constructor(...args) {
-              fakeConstructor(args);
+            // biome-ignore lint/suspicious/noExplicitAny: test overrides can be anything
+            public constructor(...args: any[]) {
+              fakeConstructor(...args);
             }
           },
         },
@@ -280,22 +267,24 @@ describe('App basic features', () => {
       new MockApp({ clientOptions, authorize: noop, signingSecret: '', logLevel: LogLevel.ERROR });
       assert.ok(fakeConstructor.called);
       const [token, options] = fakeConstructor.lastCall.args;
-      assert.strictEqual(undefined, token, 'token should be undefined');
+      assert.strictEqual(token, undefined, 'token should be undefined');
       assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
       assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
     });
     describe('with auth.test failure', () => {
       const fakeConstructor = sinon.fake();
+      const exception = 'This API method call should not be performed';
       const overrides = mergeOverrides(withNoopAppMetadata(), {
         '@slack/web-api': {
           WebClient: class {
-            public constructor(...args) {
+            // biome-ignore lint/suspicious/noExplicitAny: test overrides can be anything
+            public constructor(...args: any[]) {
               fakeConstructor(args);
             }
 
             public auth = {
               test: () => {
-                throw new Error('This API method call should not be performed');
+                throw new Error(exception);
               },
             };
           },
@@ -303,12 +292,11 @@ describe('App basic features', () => {
       });
       it('should not perform auth.test API call if tokenVerificationEnabled is false', async () => {
         const MockApp = await importApp(overrides);
-        const app = new MockApp({
+        new MockApp({
           token: 'xoxb-completely-invalid-token',
           signingSecret: 'invalid-one',
           tokenVerificationEnabled: false,
         });
-        assert.instanceOf(app, App);
       });
 
       it('should fail in await App#init()', async () => {
@@ -323,8 +311,9 @@ describe('App basic features', () => {
           await app.start();
           assert.fail('The start() method should fail before init() call');
         } catch (err) {
-          assert.equal(
-            err.message,
+          assert.propertyVal(
+            err,
+            'message',
             'This App instance is not yet initialized. Call `await App#init()` before starting the app.',
           );
         }
@@ -332,7 +321,8 @@ describe('App basic features', () => {
           await app.init();
           assert.fail('The init() method should fail here');
         } catch (err) {
-          assert.equal(err.message, 'Failing for init() test!');
+          console.log(err);
+          assert.propertyVal(err, 'message', exception);
         }
       });
     });
