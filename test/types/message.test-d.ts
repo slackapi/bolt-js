@@ -1,4 +1,4 @@
-import { expectError, expectNotType, expectType } from 'tsd';
+import { expectAssignable, expectError, expectNotType, expectType } from 'tsd';
 import type {
   AllMessageEvents,
   BotMessageEvent,
@@ -94,4 +94,18 @@ app.message(async ({ message }) => {
   }
 
   await Promise.resolve(message);
+});
+
+interface MyContext {
+  doesnt: 'matter';
+}
+// Ensure custom context assigned to individual middleware is honoured
+app.message<MyContext>(async ({ context }) => {
+  expectAssignable<MyContext>(context);
+});
+
+// Ensure custom context assigned to the entire app is honoured
+const typedContextApp = new App<MyContext>();
+typedContextApp.message(async ({ context }) => {
+  expectAssignable<MyContext>(context);
 });

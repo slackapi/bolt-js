@@ -659,6 +659,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
   ): void;
+  // TODO: expose a type parameter for overriding the MessageEvent type (just like shortcut() and action() does) https://github.com/slackapi/bolt-js/issues/796
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
   ): void {
@@ -720,7 +721,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
     this.listeners.push([
       onlyShortcuts,
