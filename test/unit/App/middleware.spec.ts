@@ -7,7 +7,11 @@ import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedEr
 import {
   FakeReceiver,
   type Override,
+  createDummyAppMentionEventMiddlewareArgs,
+  createDummyBlockActionEventMiddlewareArgs,
+  createDummyMessageEventMiddlewareArgs,
   createDummyReceiverEvent,
+  createDummyViewSubmissionMiddlewareArgs,
   createFakeLogger,
   delay,
   importApp,
@@ -334,8 +338,7 @@ describe('App middleware processing', () => {
 
     // https://github.com/slackapi/bolt-js/issues/1457
     it('should not cause a runtime exception if the last listener middleware invokes next()', async () =>
-      // TODO: this.. won't execute, will it
-      new Promise((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         app.event('app_mention', async ({ next }) => {
           try {
             await next();
@@ -382,23 +385,9 @@ describe('App middleware processing', () => {
         app.event('message', async () => {
           workedAsExpected = true;
         });
-        // TODO: try createDummyMessageEvent here
         await fakeReceiver.sendEvent({
           ack: noopVoid,
-          body: {
-            team_id: 'T_connected_grid_workspace',
-            enterprise_id: 'E_org_id',
-            api_app_id: 'A111',
-            event: {
-              type: 'message',
-              text: ':wave: Hi, this is my first message in a Slack Connect channel!',
-              user: 'U111',
-              ts: '1622099033.001500',
-              team: 'T_this_non_grid_workspace',
-              channel: 'C111',
-              channel_type: 'channel',
-            },
-            type: 'event_callback',
+          ...createDummyMessageEventMiddlewareArgs({
             authorizations: [
               {
                 enterprise_id: null,
@@ -408,9 +397,7 @@ describe('App middleware processing', () => {
                 is_enterprise_install: false,
               },
             ],
-            is_ext_shared_channel: true,
-            event_context: '2-message-T_connected_grid_workspace-A111-C111',
-          },
+          }),
         });
 
         assert.isTrue(workedAsExpected);
@@ -433,22 +420,13 @@ describe('App middleware processing', () => {
           workedAsExpected = true;
         });
 
-        // TODO: try createDummyAppMentionEvent
         // The authorize must be called for other events
         await fakeReceiver.sendEvent({
           ack: noopVoid,
-          body: {
-            enterprise_id: 'E_org_id',
-            api_app_id: 'A111',
-            event: {
-              type: 'app_mention',
-            },
-            type: 'event_callback',
-          },
+          ...createDummyAppMentionEventMiddlewareArgs(),
         });
         assert.equal(authorizeCallCount, 1);
 
-        // TODO: try createDummyTokensRevokedEvent
         await fakeReceiver.sendEvent({
           ack: noopVoid,
           body: {
@@ -486,22 +464,13 @@ describe('App middleware processing', () => {
           workedAsExpected = true;
         });
 
-        // TODO: try createDummyAppMentionEvent
         // The authorize must be called for other events
         await fakeReceiver.sendEvent({
           ack: noopVoid,
-          body: {
-            enterprise_id: 'E_org_id',
-            api_app_id: 'A111',
-            event: {
-              type: 'app_mention',
-            },
-            type: 'event_callback',
-          },
+          ...createDummyAppMentionEventMiddlewareArgs(),
         });
         assert.equal(authorizeCallCount, 1);
 
-        // TODO: try createDummyAppUninstalledEvent
         await fakeReceiver.sendEvent({
           ack: noopVoid,
           body: {
@@ -522,75 +491,57 @@ describe('App middleware processing', () => {
     describe('respond()', () => {
       it('should respond to events with a response_url', async () => {
         const responseText = 'response';
-        const responseUrl = 'https://fake.slack/response_url';
-        const actionId = 'block_action_id';
+        const response_url = 'https://fake.slack/response_url';
+        const action_id = 'block_action_id';
         const fakeAxiosPost = sinon.fake.resolves({});
         overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
 
         const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-        app.action(actionId, async ({ respond }) => {
+        app.action(action_id, async ({ respond }) => {
           await respond(responseText);
         });
         app.error(fakeErrorHandler);
-        // TODO: try createDummyBlockActionEvent
-        await fakeReceiver.sendEvent({
-          // IncomingEventType.Action (app.action)
-          body: {
-            type: 'block_actions',
-            response_url: responseUrl,
-            actions: [
-              {
-                action_id: actionId,
-              },
-            ],
-            channel: {},
-            user: {},
-            team: {},
-          },
-          ack: noopVoid,
-        });
+        await fakeReceiver.sendEvent(
+          createDummyBlockActionEventMiddlewareArgs(
+            {
+              response_url,
+            },
+            { type: 'button', action_id, block_id: 'bid', action_ts: '1', text: { type: 'plain_text', text: 'hi' } },
+          ),
+        );
 
         assert(fakeErrorHandler.notCalled);
         assert.equal(fakeAxiosPost.callCount, 1);
         // Assert that each call to fakeAxiosPost had the right arguments
-        assert(fakeAxiosPost.calledWith(responseUrl, { text: responseText }));
+        sinon.assert.calledWith(fakeAxiosPost, response_url, { text: responseText });
       });
 
       it('should respond with a response object', async () => {
         const responseObject = { text: 'response' };
-        const responseUrl = 'https://fake.slack/response_url';
-        const actionId = 'block_action_id';
+        const response_url = 'https://fake.slack/response_url';
+        const action_id = 'block_action_id';
         const fakeAxiosPost = sinon.fake.resolves({});
         overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
 
         const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-        app.action(actionId, async ({ respond }) => {
+        app.action(action_id, async ({ respond }) => {
           await respond(responseObject);
         });
         app.error(fakeErrorHandler);
-        // TODO: try createDummyBlockActionEvent
-        await fakeReceiver.sendEvent({
-          // IncomingEventType.Action (app.action)
-          body: {
-            type: 'block_actions',
-            response_url: responseUrl,
-            actions: [
-              {
-                action_id: actionId,
-              },
-            ],
-            channel: {},
-            user: {},
-            team: {},
-          },
-          ack: noopVoid,
-        });
+        await fakeReceiver.sendEvent(
+          createDummyBlockActionEventMiddlewareArgs(
+            {
+              response_url,
+            },
+            { type: 'button', action_id, block_id: 'bid', action_ts: '1', text: { type: 'plain_text', text: 'hi' } },
+          ),
+        );
 
         assert.equal(fakeAxiosPost.callCount, 1);
         // Assert that each call to fakeAxiosPost had the right arguments
-        assert(fakeAxiosPost.calledWith(responseUrl, responseObject));
+        sinon.assert.calledWith(fakeAxiosPost, response_url, responseObject);
       });
       it('should be able to use respond for view_submission payloads', async () => {
         const responseObject = { text: 'response' };
@@ -604,32 +555,25 @@ describe('App middleware processing', () => {
           await respond(responseObject);
         });
         app.error(fakeErrorHandler);
-        // TODO: try createDummyViewSubmissionEvent
-        await fakeReceiver.sendEvent({
-          ack: noopVoid,
-          body: {
-            type: 'view_submission',
-            team: {},
-            user: {},
-            view: {
+        await fakeReceiver.sendEvent(
+          createDummyViewSubmissionMiddlewareArgs(
+            {
+              response_urls: [
+                {
+                  block_id: 'b',
+                  action_id: 'a',
+                  channel_id: 'C111',
+                  response_url: 'https://fake.slack/response_url',
+                },
+              ],
+            },
+            {
               id: 'V111',
               type: 'modal',
               callback_id: 'view-id',
-              state: {},
-              title: {},
-              close: {},
-              submit: {},
             },
-            response_urls: [
-              {
-                block_id: 'b',
-                action_id: 'a',
-                channel_id: 'C111',
-                response_url: 'https://fake.slack/response_url',
-              },
-            ],
-          },
-        });
+          ),
+        );
 
         assert.equal(fakeAxiosPost.callCount, 1);
         // Assert that each call to fakeAxiosPost had the right arguments
@@ -655,7 +599,6 @@ describe('App middleware processing', () => {
           logger.debug(event);
         });
 
-        // TODO: try createDummyAppHomeOpenedEvent
         const receiverEvents = [
           {
             body: {
@@ -701,7 +644,6 @@ describe('App middleware processing', () => {
           logger.debug(event);
         });
 
-        // TODO: try createDummyAppHomeOpenedEvent
         const receiverEvents = [
           {
             body: {
@@ -760,7 +702,6 @@ describe('App middleware processing', () => {
           await client.auth.test();
         });
 
-        // TODO: try createDummyAppHomeOpenedEvent
         const event = {
           body: {
             type: 'event_callback',
@@ -1047,7 +988,6 @@ describe('App middleware processing', () => {
 
         let ackInMiddlewareCalled = false;
 
-        // TODO: try dummy event creator here
         const receiverEvents = [
           {
             body: {
@@ -1101,44 +1041,32 @@ describe('App middleware processing', () => {
         const fakeAxiosPost = sinon.fake.resolves({});
         overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
         const MockApp = await importApp(overrides);
+        const callback_id = 'view-id';
+        const app_installed_team_id = 'T-installed-workspace';
 
         const app = new MockApp({
           receiver: fakeReceiver,
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
 
-        app.view('view-id', async ({ ack, context, view }) => {
-          assert.equal('T-installed-workspace', context.teamId);
-          assert.notEqual('T-installed-workspace', view.team_id);
+        let ackCalled = false;
+        app.view(callback_id, async ({ ack, context, view }) => {
+          assert.equal(context.teamId, app_installed_team_id);
+          assert.notEqual(view.team_id, app_installed_team_id);
           await ack();
+          ackCalled = true;
         });
         app.error(fakeErrorHandler);
 
-        let ackCalled = false;
-
-        // TODO: try dummy view event here
-        const receiverEvent = {
-          ack: async () => {
-            ackCalled = true;
-          },
-          body: {
-            type: 'view_submission',
-            team: {},
-            user: {},
-            view: {
-              id: 'V111',
-              type: 'modal',
-              callback_id: 'view-id',
-              state: {},
-              title: {},
-              close: {},
-              submit: {},
-              app_installed_team_id: 'T-installed-workspace',
+        await fakeReceiver.sendEvent(
+          createDummyViewSubmissionMiddlewareArgs(
+            {},
+            {
+              callback_id,
+              app_installed_team_id,
             },
-          },
-        };
-
-        await fakeReceiver.sendEvent(receiverEvent);
+          ),
+        );
 
         assert.isTrue(ackCalled);
       });

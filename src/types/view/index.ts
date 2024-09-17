@@ -1,6 +1,7 @@
 import type { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
 import type { AckFn, RespondFn } from '../utilities';
 
+// TODO: terminology. 'action' does not belong here.
 /**
  * Known view action types
  */
