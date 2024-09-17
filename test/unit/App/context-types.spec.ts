@@ -1,9 +1,6 @@
-import rewiremock from 'rewiremock';
-import sinon from 'sinon';
-import type App from './App';
-import type { ActionConstraints, ShortcutConstraints } from './App';
-import { type Override, mergeOverrides } from './test-helpers';
-import type { OptionsSource, Receiver, ReceiverEvent, SlackAction, SlackShortcut, SlackViewAction } from './types';
+import type { ActionConstraints, ShortcutConstraints } from '../../../src/App';
+import { FakeReceiver, importApp, noop } from '../helpers';
+import type { OptionsSource, SlackAction, SlackShortcut, SlackViewAction } from '../../../src/types';
 
 // 0 should not be able to extend (1 & <SomeType>), if it does, SomeType must be Any
 // https://stackoverflow.com/a/55541672
@@ -18,36 +15,12 @@ interface MiddlewareContext {
   middlewareContextKey: number;
 }
 
-// Loading the system under test using overrides
-async function importApp(
-  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('./App').default> {
-  return (await rewiremock.module(() => import('./App'), overrides)).default;
-}
-
-class FakeReceiver implements Receiver {
-  private bolt: App | undefined;
-
-  public init = (bolt: App) => {
-    this.bolt = bolt;
-  };
-
-  public start = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
-
-  public stop = sinon.fake((...params: any[]): Promise<unknown> => Promise.resolve([...params]));
-
-  public async sendEvent(event: ReceiverEvent): Promise<void> {
-    return this.bolt?.processEvent(event);
-  }
-}
-
-const noopAuthorize = () => Promise.resolve({});
 const receiver = new FakeReceiver();
 
 describe('context typing', () => {
   it('use should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
 
     // Use - Global Context
     app.use(async ({ context }) => {
@@ -67,7 +40,7 @@ describe('context typing', () => {
 
   it('use should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // Use - Middleware Context
     app.use<MiddlewareContext>(async ({ context }) => {
@@ -78,7 +51,7 @@ describe('context typing', () => {
 
   it('message should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
 
     // Message passes global context to all middleware
     app.message(
@@ -354,7 +327,7 @@ describe('context typing', () => {
 
   it('message should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // Message passes middleware context to all middleware
     app.message<MiddlewareContext>(
@@ -456,7 +429,7 @@ describe('context typing', () => {
 
   it('shortcut should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
 
     // Shortcut with RegExp callbackId is aware of global context and passes context to all middleware
     app.shortcut(
@@ -557,7 +530,7 @@ describe('context typing', () => {
 
   it('shortcut should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // Shortcut with RegExp callbackId is aware of middleware context and passes context to all middleware
     app.shortcut<SlackShortcut, MiddlewareContext>(
@@ -601,7 +574,7 @@ describe('context typing', () => {
 
   it('action should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
 
     // Action with RegExp callbackId is aware of global context and passes context to all middleware
     app.action(
@@ -702,7 +675,7 @@ describe('context typing', () => {
 
   it('action should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // Action with RegExp callbackId is aware of middleware context and passes context to all middleware
     app.action<SlackAction, MiddlewareContext>(
@@ -746,7 +719,7 @@ describe('context typing', () => {
 
   it('command should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
     // Command with commandName is aware of global context and passes context to all middleware
 
     // Command with RegExp commandName is aware of global and middleware context and passes context to all middleware
@@ -816,7 +789,7 @@ describe('context typing', () => {
 
   it('command should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // Command with RegExp commandName is aware of middleware context and passes context to all middleware
     app.command<MiddlewareContext>(
@@ -847,7 +820,7 @@ describe('context typing', () => {
 
   it('options should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
 
     // Options with RegExp actionId is aware of global context and passes context to all middleware
     app.options(
@@ -948,7 +921,7 @@ describe('context typing', () => {
 
   it('options should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // Options with RegExp actionId is aware of middleware context and passes context to all middleware
     app.options<'block_suggestion', MiddlewareContext>(
@@ -992,7 +965,7 @@ describe('context typing', () => {
 
   it('view should handle global and middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp<GlobalContext>({ receiver, authorize: noopAuthorize });
+    const app = new MockApp<GlobalContext>({ receiver, authorize: noop });
 
     // View with RegExp callbackId is aware of global context and passes context to all middleware
     app.view(
@@ -1093,7 +1066,7 @@ describe('context typing', () => {
 
   it('view should handle middleware context', async () => {
     const MockApp = await importApp();
-    const app = new MockApp({ receiver, authorize: noopAuthorize });
+    const app = new MockApp({ receiver, authorize: noop });
 
     // View with RegExp callbackId is aware of global and middleware context and passes context to all middleware
     app.view<SlackViewAction, MiddlewareContext>(
@@ -1135,20 +1108,3 @@ describe('context typing', () => {
     );
   });
 });
-
-// Composable overrides
-function withNoopWebClient(): Override {
-  return {
-    '@slack/web-api': {
-      WebClient: class {},
-    },
-  };
-}
-
-function withNoopAppMetadata(): Override {
-  return {
-    '@slack/web-api': {
-      addAppMetadata: sinon.fake(),
-    },
-  };
-}
