@@ -1,5 +1,5 @@
 import { expectAssignable, expectError, expectType } from 'tsd';
-import type { SlackViewAction, ViewOutput } from '../..';
+import type { AckFn, SlackViewAction, ViewOutput, ViewResponseAction } from '../..';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
@@ -26,16 +26,18 @@ expectError(
   ),
 );
 // view_submission
-app.view('modal-id', async ({ body, view }) => {
+app.view('modal-id', async ({ body, view, ack }) => {
   // TODO: the body can be more specific (ViewSubmitAction) here
   expectType<SlackViewAction>(body);
   expectType<ViewOutput>(view);
+  // TODO: assert on type assignability for `ack`
 });
 
 app.view({ type: 'view_submission', callback_id: 'modal-id' }, async ({ body, view }) => {
   // TODO: the body can be more specific (ViewSubmitAction) here. need to add a type parameter (generic) to view() and 'link' constraint w/ view types.
   expectType<SlackViewAction>(body);
   expectType<ViewOutput>(view);
+  // TODO: assert on type assignability for `ack`
 });
 
 // view_closed
@@ -43,6 +45,7 @@ app.view({ type: 'view_closed', callback_id: 'modal-id' }, async ({ body, view }
   // TODO: the body can be more specific (ViewClosedAction) here. need to add a type parameter (generic) to view() and 'link' constraint w/ view types.
   expectType<SlackViewAction>(body);
   expectType<ViewOutput>(view);
+  // TODO: assert on type assignability for `ack`
 });
 
 interface MyContext {

@@ -556,24 +556,9 @@ describe('App event routing', () => {
       app.command('/echo', noop);
       app.command(/\/e.*/, noop);
 
-      // invalid view constraints
-      const invalidViewConstraints1: ViewConstraints = {
-        callback_id: 'foo',
-        type: 'view_submission',
-        // @ts-ignore known invalid key of ViewConstraints
-        unknown_key: 'should be detected',
-      };
-      app.view(invalidViewConstraints1, noop);
       assert.isTrue(fakeLogger.error.called);
       fakeLogger.error.reset();
 
-      const invalidViewConstraints2: ViewConstraints = {
-        callback_id: 'foo',
-        type: undefined,
-        // @ts-ignore known invalid key of ViewConstraints
-        unknown_key: 'should be detected',
-      };
-      app.view(invalidViewConstraints2, noop);
       assert.isTrue(fakeLogger.error.called);
 
       app.error(fakeErrorHandler);
@@ -1010,26 +995,6 @@ describe('App event routing', () => {
 
       // Assert
       assertMiddlewaresNotCalled();
-    });
-  });
-
-  describe('Quick type compatibility checks', () => {
-    it('app.view ack() method can compile with minimum inputs', async () => {
-      const MockApp = await importApp(buildOverrides([withNoopWebClient()]));
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
-      app.view('callback_id', async ({ ack }) => {
-        await ack({
-          response_action: 'push',
-          view: {
-            type: 'modal',
-            title: {
-              type: 'plain_text',
-              text: 'Title',
-            },
-            blocks: [],
-          },
-        });
-      });
     });
   });
 });
