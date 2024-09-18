@@ -154,11 +154,12 @@ export function createDummyViewSubmissionMiddlewareArgs(
 }
 
 export function createDummyMessageShortcutMiddlewareArgs(
+  callback_id = 'Cb1234',
   shortcut?: MessageShortcut,
 ): SlackShortcutMiddlewareArgs<MessageShortcut> {
   const payload: MessageShortcut = shortcut || {
     type: 'message_action',
-    callback_id: 'Cb1234',
+    callback_id,
     trigger_id: ts,
     message_ts: ts,
     response_url: 'https://slack.com',
@@ -183,11 +184,12 @@ export function createDummyMessageShortcutMiddlewareArgs(
 }
 
 export function createDummyGlobalShortcutMiddlewareArgs(
+  callback_id = 'Cb1234',
   shortcut?: GlobalShortcut,
 ): SlackShortcutMiddlewareArgs<GlobalShortcut> {
   const payload: GlobalShortcut = shortcut || {
     type: 'shortcut',
-    callback_id: 'Cb1234',
+    callback_id,
     trigger_id: ts,
     user: { id: user, username: 'filmaj', team_id: team },
     team: { id: team, domain: 'slack.com' },

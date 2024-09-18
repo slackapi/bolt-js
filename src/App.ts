@@ -713,6 +713,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
     if (unknownConstraintKeys.length > 0) {
+      // TODO:event() will throw an error if you provide an invalid event name; we should align this behaviour.
       this.logger.error(
         `Slack listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
       );

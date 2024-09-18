@@ -470,9 +470,7 @@ describe('App event routing', () => {
 
     it('should acknowledge any of possible events', async () => {
       // Arrange
-      const ackFn = sinon.fake.resolves({});
       const actionFn = sinon.fake.resolves({});
-      const shortcutFn = sinon.fake.resolves({});
       const viewFn = sinon.fake.resolves({});
       const optionsFn = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient()]);
@@ -487,28 +485,6 @@ describe('App event routing', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
 
-      app.use(async ({ next }) => {
-        await ackFn();
-        await next();
-      });
-      app.shortcut({ callback_id: 'message_action_callback_id' }, async () => {
-        await shortcutFn();
-      });
-      app.shortcut({ type: 'message_action', callback_id: 'another_message_action_callback_id' }, async () => {
-        await shortcutFn();
-      });
-      app.shortcut({ type: 'message_action', callback_id: 'does_not_exist' }, async () => {
-        await shortcutFn();
-      });
-      app.shortcut({ callback_id: 'shortcut_callback_id' }, async () => {
-        await shortcutFn();
-      });
-      app.shortcut({ type: 'shortcut', callback_id: 'another_shortcut_callback_id' }, async () => {
-        await shortcutFn();
-      });
-      app.shortcut({ type: 'shortcut', callback_id: 'does_not_exist' }, async () => {
-        await shortcutFn();
-      });
       app.action('block_action_id', async () => {
         await actionFn();
       });

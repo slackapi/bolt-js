@@ -1,14 +1,12 @@
-import assert from 'node:assert';
 import sinon, { type SinonSpy } from 'sinon';
 import {
   FakeReceiver,
   type Override,
   createFakeLogger,
-  createDummyAppMentionEventMiddlewareArgs,
+  createDummyMessageShortcutMiddlewareArgs,
   importApp,
   mergeOverrides,
   noopMiddleware,
-  noopVoid,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,
@@ -29,17 +27,19 @@ function buildOverrides(secondOverrides: Override[]): Override {
 describe('App shortcut() routing', () => {
   let fakeReceiver: FakeReceiver;
   let fakeHandler: SinonSpy;
+  const fakeLogger = createFakeLogger();
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
   let app: App;
 
   beforeEach(async () => {
+    fakeLogger.error.reset();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = await importApp(buildOverrides([]));
     app = new MockApp({
-      logger: createFakeLogger(),
+      logger: fakeLogger,
       receiver: fakeReceiver,
       authorize: sinon.fake.resolves(dummyAuthorizationResult),
     });
@@ -48,23 +48,41 @@ describe('App shortcut() routing', () => {
   it('should route a Slack shortcut event to a handler registered with `shortcut(string)` that matches the callback ID', async () => {
     app.shortcut('my_callback_id', fakeHandler);
     await fakeReceiver.sendEvent({
-      ...createDummyAppMentionEventMiddlewareArgs(),
-      ack: noopVoid,
+      ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
     });
     sinon.assert.called(fakeHandler);
   });
-  it('should route a Slack event to a handler registered with `event(RegExp)`', async () => {
-    app.event(/app_mention/, fakeHandler);
+  it('should route a Slack shortcut event to a handler registered with `shortcut(RegExp)` that matches the callback ID', async () => {
+    app.shortcut(/my_call/, fakeHandler);
     await fakeReceiver.sendEvent({
-      ...createDummyAppMentionEventMiddlewareArgs(),
-      ack: noopVoid,
+      ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
     });
     sinon.assert.called(fakeHandler);
   });
-  it('should throw if provided invalid message subtype event names', async () => {
-    app.event('app_mention', async () => { });
-    app.event('message', async () => { });
-    assert.throws(() => app.event('message.channels', async () => { }));
-    assert.throws(() => app.event(/message\..+/, async () => { }));
+  it('should route a Slack shortcut event to a handler registered with `shortcut({callback_id})` that matches the callback ID', async () => {
+    app.shortcut({ callback_id: 'my_callback_id' }, fakeHandler);
+    await fakeReceiver.sendEvent({
+      ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
+    });
+    sinon.assert.called(fakeHandler);
+  });
+  it('should route a Slack shortcut event to a handler registered with `shortcut({type})` that matches the type', async () => {
+    app.shortcut({ type: 'message_action' }, fakeHandler);
+    await fakeReceiver.sendEvent({
+      ...createDummyMessageShortcutMiddlewareArgs(),
+    });
+    sinon.assert.called(fakeHandler);
+  });
+  it('should route a Slack shortcut event to a handler registered with `shortcut({type, callback_id})` that matches both the type and the callback_id', async () => {
+    app.shortcut({ type: 'message_action', callback_id: 'my_id' }, fakeHandler);
+    await fakeReceiver.sendEvent({
+      ...createDummyMessageShortcutMiddlewareArgs('my_id'),
+    });
+    sinon.assert.called(fakeHandler);
+  });
+  it('should throw if provided a constraint with unknown shortcut constraint keys', async () => {
+    // @ts-ignore providing known invalid shortcut constraint parameter
+    app.shortcut({ id: 'boom' }, fakeHandler);
+    sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
   });
 });
