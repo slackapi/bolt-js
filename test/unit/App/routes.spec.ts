@@ -1,13 +1,14 @@
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import type App from './App';
-import type { ViewConstraints } from './App';
+import type App from '../../../src/App';
+import type { ViewConstraints } from '../../../src/App';
 import {
   FakeReceiver,
   type Override,
   createDummyReceiverEvent,
   createFakeLogger,
+  importApp,
   mergeOverrides,
   noop,
   noopMiddleware,
@@ -15,27 +16,13 @@ import {
   withMemoryStore,
   withNoopAppMetadata,
   withNoopWebClient,
-} from './test-helpers';
-import type { NextFn, ReceiverEvent } from './types';
-
-// Loading the system under test using overrides
-async function importApp(
-  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('./App').default> {
-  return (await rewiremock.module(() => import('./App'), overrides)).default;
-}
+} from '../helpers';
+import type { NextFn, ReceiverEvent } from '../../../src/types';
 
 describe('App event routing', () => {
   let fakeReceiver: FakeReceiver;
   let fakeErrorHandler: SinonSpy;
   let dummyAuthorizationResult: { botToken: string; botId: string };
-
-  beforeEach(() => {
-    fakeReceiver = new FakeReceiver();
-    fakeErrorHandler = sinon.fake();
-    dummyAuthorizationResult = { botToken: '', botId: '' };
-  });
-
   let overrides: Override;
   const baseEvent = createDummyReceiverEvent();
 
@@ -48,6 +35,12 @@ describe('App event routing', () => {
     );
     return overrides;
   }
+
+  beforeEach(() => {
+    fakeReceiver = new FakeReceiver();
+    fakeErrorHandler = sinon.fake();
+    dummyAuthorizationResult = { botToken: '', botId: '' };
+  });
 
   describe('basic pattern coverage', () => {
     function createReceiverEvents(): ReceiverEvent[] {

@@ -1,9 +1,30 @@
-import { expectAssignable, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 import type { SlackViewAction, ViewOutput } from '../..';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
+// invalid view constraints
+expectError(
+  app.view(
+    {
+      callback_id: 'foo',
+      type: 'view_submission',
+      unknown_key: 'should be detected',
+    },
+    async () => { },
+  ),
+);
+expectError(
+  app.view(
+    {
+      callback_id: 'foo',
+      type: undefined,
+      unknown_key: 'should be detected',
+    },
+    async () => { },
+  ),
+);
 // view_submission
 app.view('modal-id', async ({ body, view }) => {
   // TODO: the body can be more specific (ViewSubmitAction) here

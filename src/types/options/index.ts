@@ -143,8 +143,8 @@ export interface DialogSuggestion extends StringIndexed {
 type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggestion'
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
-  ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
-  : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
+    ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
+    : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
 // TODO: why are the next two interfaces identical?
 export interface BlockOptions {
