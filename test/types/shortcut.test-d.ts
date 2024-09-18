@@ -11,8 +11,8 @@ expectError(
   }),
 );
 
+// Shortcut in listener should be MessageShortcut if constraint is type:message_action
 app.shortcut({ type: 'message_action' }, async ({ shortcut, say }) => {
-  // Shortcut in listener should be MessageShortcut if type:message_action
   expectType<MessageShortcut>(shortcut);
   expectType<SayFn>(say);
 });
@@ -29,14 +29,16 @@ app.shortcut({}, async ({ shortcut, say }) => {
   expectType<SayFn | undefined>(say);
 });
 
+// Shortcut in listener should be GlobalShortcut if constraint is type:shortcut
+app.shortcut({ type: 'shortcut' }, async ({ shortcut, say }) => {
+  expectType<GlobalShortcut>(shortcut);
+  expectType<undefined>(say);
+});
 // If shortcut is parameterized with GlobalShortcut, say argument in callback should be type undefined
 app.shortcut<GlobalShortcut>({}, async ({ shortcut, say }) => {
   expectType<undefined>(say);
   expectType<GlobalShortcut>(shortcut);
 });
-
-// TODO: test the Shortcut and Constraints type parameters and how they can rely on each other.
-// relates to https://github.com/slackapi/bolt-js/issues/796; proof out how the Shortcut type parameter can provide nice typing utilities for developers
 
 interface MyContext {
   doesnt: 'matter';

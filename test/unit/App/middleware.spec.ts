@@ -329,16 +329,9 @@ describe('App middleware processing', () => {
       if (error.originals) assert.sameMembers(error.originals, errorsToThrow);
     });
 
-    it('should detect invalid event names', async () => {
-      app.event('app_mention', async () => { });
-      app.event('message', async () => { });
-      assert.throws(() => app.event('message.channels', async () => { }), 'Although the document mentions');
-      assert.throws(() => app.event(/message\..+/, async () => { }), 'Although the document mentions');
-    });
-
     // https://github.com/slackapi/bolt-js/issues/1457
-    it('should not cause a runtime exception if the last listener middleware invokes next()', async () =>
-      await new Promise((resolve, reject) => {
+    it('should not cause a runtime exception if the last listener middleware invokes next()', async () => {
+      await new Promise<void>((resolve, reject) => {
         app.event('app_mention', async ({ next }) => {
           try {
             await next();
@@ -348,7 +341,8 @@ describe('App middleware processing', () => {
           }
         });
         fakeReceiver.sendEvent(createDummyReceiverEvent('app_mention'));
-      }));
+      });
+    });
   });
 
   describe('middleware and listener arguments', () => {

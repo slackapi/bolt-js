@@ -5,11 +5,14 @@ import type {
   BlockAction,
   BlockElementAction,
   EnvelopedEvent,
+  GlobalShortcut,
+  MessageShortcut,
   ReceiverEvent,
   RespondFn,
   SayFn,
   SlackActionMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   ViewSubmitAction,
   ViewOutput,
@@ -102,6 +105,7 @@ export function createDummyBlockActionEventMiddlewareArgs(
     ack,
   };
 }
+
 export function createDummyViewSubmissionMiddlewareArgs(
   // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
   bodyOverrides?: Record<string, any>,
@@ -146,6 +150,57 @@ export function createDummyViewSubmissionMiddlewareArgs(
     body: event,
     respond,
     ack: () => Promise.resolve(),
+  };
+}
+
+export function createDummyMessageShortcutMiddlewareArgs(
+  shortcut?: MessageShortcut,
+): SlackShortcutMiddlewareArgs<MessageShortcut> {
+  const payload: MessageShortcut = shortcut || {
+    type: 'message_action',
+    callback_id: 'Cb1234',
+    trigger_id: ts,
+    message_ts: ts,
+    response_url: 'https://slack.com',
+    message: {
+      type: 'message',
+      ts,
+    },
+    user: { id: user, name: 'filmaj' },
+    channel: { id: channel, name: '#random' },
+    team: { id: team, domain: 'slack.com' },
+    token,
+    action_ts: ts,
+  };
+  return {
+    payload,
+    shortcut: payload,
+    body: payload,
+    respond,
+    ack: () => Promise.resolve(),
+    say,
+  };
+}
+
+export function createDummyGlobalShortcutMiddlewareArgs(
+  shortcut?: GlobalShortcut,
+): SlackShortcutMiddlewareArgs<GlobalShortcut> {
+  const payload: GlobalShortcut = shortcut || {
+    type: 'shortcut',
+    callback_id: 'Cb1234',
+    trigger_id: ts,
+    user: { id: user, username: 'filmaj', team_id: team },
+    team: { id: team, domain: 'slack.com' },
+    token,
+    action_ts: ts,
+  };
+  return {
+    payload,
+    shortcut: payload,
+    body: payload,
+    respond,
+    ack: () => Promise.resolve(),
+    say: undefined,
   };
 }
 

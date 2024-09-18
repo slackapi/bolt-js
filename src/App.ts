@@ -206,7 +206,7 @@ export type ErrorHandler = (error: CodedError) => Promise<void>;
 
 export type ExtendedErrorHandler = (args: ExtendedErrorHandlerArgs) => Promise<void>;
 
-export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {}
+export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler { }
 
 // Used only in this file
 type MessageEventMiddleware<CustomContext extends StringIndexed = StringIndexed> = Middleware<
@@ -566,11 +566,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public stop(...args: any[]): Promise<unknown> {
     return this.receiver.stop(...args);
   }
 
+  // TODO: can constrain EventType here to the set of available slack event types to help autocomplete event names
   public event<EventType extends string = string, MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>, AppCustomContext & MiddlewareCustomContext>[]
@@ -588,21 +588,19 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): void {
     let invalidEventName = false;
     if (typeof eventNameOrPattern === 'string') {
-      const name = eventNameOrPattern as string;
+      const name = eventNameOrPattern;
       invalidEventName = name.startsWith('message.');
     } else if (eventNameOrPattern instanceof RegExp) {
-      const name = (eventNameOrPattern as RegExp).source;
+      const name = eventNameOrPattern.source;
       invalidEventName = name.startsWith('message\\.');
     }
     if (invalidEventName) {
       throw new AppInitializationError(
-        `Although the document mentions "${eventNameOrPattern}",` +
-          'it is not a valid event type. Use "message" instead. ' +
-          'If you want to filter message events, you can use event.channel_type for it.',
+        `Although the document mentions "${eventNameOrPattern}", it is not a valid event type. Use "message" instead. If you want to filter message events, you can use event.channel_type for it.`,
       );
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyEvents,
       matchEventType(eventNameOrPattern),
@@ -721,7 +719,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       return;
     }
 
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyShortcuts,
       matchConstraints(constraints),
@@ -729,8 +728,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
-  // https://web.archive.org/web/20210629110615/https://basarat.gitbook.io/typescript/type-system/generics#motivation-and-samples
   public action<
     Action extends SlackAction = SlackAction,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
@@ -1180,7 +1177,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
                   context,
                   client,
                   logger: this.logger,
-                  next: () => {},
+                  next: () => { },
                 } as AnyMiddlewareArgs & AllMiddlewareArgs),
             );
           });
@@ -1272,7 +1269,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
         'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
-          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
+        'custom receiver. You can find your Signing Secret in your Slack App Settings.',
       );
     }
     this.logger.debug('Initializing HTTPReceiver');
@@ -1366,9 +1363,9 @@ function runAuthTestForBotToken(
   return authorization.botUserId !== undefined && authorization.botId !== undefined
     ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
     : client.auth.test({ token: authorization.botToken }).then((result) => ({
-        botUserId: result.user_id as string,
-        botId: result.bot_id as string,
-      }));
+      botUserId: result.user_id as string,
+      botId: result.bot_id as string,
+    }));
 }
 
 // the shortened type, which is supposed to be used only in this source file

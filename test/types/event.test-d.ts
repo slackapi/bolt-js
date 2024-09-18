@@ -57,3 +57,6 @@ app.event('reaction_removed', async ({ say, event }) => {
   expectType<SayFn>(say);
   expectType<ReactionRemovedEvent>(event);
 });
+
+// TODO: we should not allow providing bogus event names
+// app.event('garbage', async ({ event }) => {});

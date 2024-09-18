@@ -1,0 +1,70 @@
+import assert from 'node:assert';
+import sinon, { type SinonSpy } from 'sinon';
+import {
+  FakeReceiver,
+  type Override,
+  createFakeLogger,
+  createDummyAppMentionEventMiddlewareArgs,
+  importApp,
+  mergeOverrides,
+  noopMiddleware,
+  noopVoid,
+  withConversationContext,
+  withMemoryStore,
+  withNoopAppMetadata,
+  withNoopWebClient,
+} from '../helpers';
+import type App from '../../../src/App';
+
+function buildOverrides(secondOverrides: Override[]): Override {
+  return mergeOverrides(
+    withNoopAppMetadata(),
+    withNoopWebClient(),
+    ...secondOverrides,
+    withMemoryStore(sinon.fake()),
+    withConversationContext(sinon.fake.returns(noopMiddleware)),
+  );
+}
+
+describe('App shortcut() routing', () => {
+  let fakeReceiver: FakeReceiver;
+  let fakeHandler: SinonSpy;
+  let dummyAuthorizationResult: { botToken: string; botId: string };
+  let MockApp: Awaited<ReturnType<typeof importApp>>;
+  let app: App;
+
+  beforeEach(async () => {
+    fakeReceiver = new FakeReceiver();
+    fakeHandler = sinon.fake();
+    dummyAuthorizationResult = { botToken: '', botId: '' };
+    MockApp = await importApp(buildOverrides([]));
+    app = new MockApp({
+      logger: createFakeLogger(),
+      receiver: fakeReceiver,
+      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+    });
+  });
+
+  it('should route a Slack shortcut event to a handler registered with `shortcut(string)` that matches the callback ID', async () => {
+    app.shortcut('my_callback_id', fakeHandler);
+    await fakeReceiver.sendEvent({
+      ...createDummyAppMentionEventMiddlewareArgs(),
+      ack: noopVoid,
+    });
+    sinon.assert.called(fakeHandler);
+  });
+  it('should route a Slack event to a handler registered with `event(RegExp)`', async () => {
+    app.event(/app_mention/, fakeHandler);
+    await fakeReceiver.sendEvent({
+      ...createDummyAppMentionEventMiddlewareArgs(),
+      ack: noopVoid,
+    });
+    sinon.assert.called(fakeHandler);
+  });
+  it('should throw if provided invalid message subtype event names', async () => {
+    app.event('app_mention', async () => { });
+    app.event('message', async () => { });
+    assert.throws(() => app.event('message.channels', async () => { }));
+    assert.throws(() => app.event(/message\..+/, async () => { }));
+  });
+});

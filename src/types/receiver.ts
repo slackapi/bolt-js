@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type App from '../App';
 import type { StringIndexed } from './utilities';
 import type { AckFn } from './index';
@@ -20,12 +19,14 @@ export interface ReceiverEvent {
 
   // The function to acknowledge incoming requests
   // The details of implementation is encapsulated in a receiver
-  // TODO: Make the argument type more specific
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: Make the argument type more specific
   ack: AckFn<any>;
 }
 
 export interface Receiver {
   init(app: App): void;
+  // biome-ignore lint/suspicious/noExplicitAny: different receivers may have different types of arguments
   start(...args: any[]): Promise<unknown>;
+  // biome-ignore lint/suspicious/noExplicitAny: different receivers may have different types of arguments
   stop(...args: any[]): Promise<unknown>;
 }

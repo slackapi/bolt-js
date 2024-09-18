@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import type { ViewConstraints } from '../../../src/App';
@@ -16,7 +15,7 @@ import {
   withMemoryStore,
   withNoopAppMetadata,
   withNoopWebClient,
-} from '../helpers';
+} from './helpers';
 import type { NextFn, ReceiverEvent } from '../../../src/types';
 
 describe('App event routing', () => {
@@ -550,8 +549,6 @@ describe('App event routing', () => {
         },
       );
 
-      app.event('app_home_opened', noop);
-      app.event(/app_home_opened|app_mention/, noop);
       app.message('hello', noop);
       app.command('/echo', noop);
       app.command(/\/e.*/, noop);
