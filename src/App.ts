@@ -796,18 +796,18 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   public options<
-    Source extends OptionsSource = 'block_suggestion',
+    Source extends OptionsSource = 'block_suggestion', // TODO: here, similarly to `message()`, the generic is the string `type` of the payload. in others, like `action()`, it's the entire payload. could we make this consistent?
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  // TODO: reflect the type in constraints to Source
+  // TODO: reflect the type in constraints to Source (this relates to the above TODO, too)
   public options<
     Source extends OptionsSource = OptionsSource,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    constraints: OptionsConstraints,
+    constraints: OptionsConstraints, // TODO: to be able to 'link' listener arguments to the constrains, should pass the Source type in as a generic here
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   // TODO: reflect the type in constraints to Source
@@ -823,8 +823,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         ? { action_id: actionIdOrConstraints }
         : actionIdOrConstraints;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([onlyOptions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
@@ -837,6 +837,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): void;
   public view<
     ViewActionType extends SlackViewAction = SlackViewAction,
+    // TODO: add a type parameter for view constraints; this way we can constrain the handler view arguments based on the type of the constraint, similar to what action() does
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     constraints: ViewConstraints,
@@ -867,8 +868,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyViewActions,
       matchConstraints(constraints),

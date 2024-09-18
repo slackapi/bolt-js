@@ -146,6 +146,7 @@ type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggesti
   ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
   : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
+// TODO: why are the next two interfaces identical?
 export interface BlockOptions {
   options: Option[];
 }
