@@ -1,5 +1,5 @@
 import { expectAssignable, expectError, expectType } from 'tsd';
-import type { AckFn, SlackViewAction, ViewOutput, ViewResponseAction } from '../..';
+import type { SlackViewAction, ViewOutput } from '../..';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
@@ -26,7 +26,7 @@ expectError(
   ),
 );
 // view_submission
-app.view('modal-id', async ({ body, view, ack }) => {
+app.view('modal-id', async ({ body, view }) => {
   // TODO: the body can be more specific (ViewSubmitAction) here
   expectType<SlackViewAction>(body);
   expectType<ViewOutput>(view);
