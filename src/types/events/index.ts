@@ -35,9 +35,6 @@ export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   type: 'event_callback';
   event_id: string;
   event_time: number;
-  // TODO: the two properties below are being deprecated on Feb 24, 2021
-  authed_users?: string[];
-  authed_teams?: string[];
   is_ext_shared_channel?: boolean;
   authorizations?: Authorization[];
 }
