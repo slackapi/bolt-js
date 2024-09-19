@@ -157,8 +157,7 @@ export interface AuthorizeResult {
   userId?: string;
   teamId?: string;
   enterpriseId?: string;
-  // TODO: for better type safety, we may want to revisit this
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
   [key: string]: any;
 }
 
@@ -166,7 +165,8 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
   type?: A['type'];
   block_id?: A extends BlockAction ? string | RegExp : never;
   action_id?: A extends BlockAction ? string | RegExp : never;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // TODO: callback ID doesn't apply to block actions, so the SlackAction generic above is too wide to apply here.
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
 
@@ -175,7 +175,7 @@ export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
   type?: A['type'];
   block_id?: A extends SlackOptions ? string | RegExp : never;
   action_id?: A extends SlackOptions ? string | RegExp : never;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
   callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
 }
 
@@ -770,13 +770,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       (k) => k !== 'action_id' && k !== 'block_id' && k !== 'callback_id' && k !== 'type',
     );
     if (unknownConstraintKeys.length > 0) {
+      // TODO:event() will throw an error if you provide an invalid event name; we should align this behaviour.
       this.logger.error(
         `Action listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
       );
       return;
     }
 
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([onlyActions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
@@ -784,8 +786,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     commandName: string | RegExp,
     ...listeners: Middleware<SlackCommandMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyCommands,
       matchCommandName(commandName),

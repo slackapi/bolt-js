@@ -470,7 +470,6 @@ describe('App event routing', () => {
 
     it('should acknowledge any of possible events', async () => {
       // Arrange
-      const actionFn = sinon.fake.resolves({});
       const viewFn = sinon.fake.resolves({});
       const optionsFn = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient()]);
@@ -485,15 +484,6 @@ describe('App event routing', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
 
-      app.action('block_action_id', async () => {
-        await actionFn();
-      });
-      app.action({ callback_id: 'interactive_message_callback_id' }, async () => {
-        await actionFn();
-      });
-      app.action({ callback_id: 'dialog_submission_callback_id' }, async () => {
-        await actionFn();
-      });
       app.view('view_callback_id', async () => {
         await viewFn();
       });

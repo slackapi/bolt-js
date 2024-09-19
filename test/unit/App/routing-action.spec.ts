@@ -24,7 +24,7 @@ function buildOverrides(secondOverrides: Override[]): Override {
   );
 }
 
-describe('App shortcut() routing', () => {
+describe('App action() routing', () => {
   let fakeReceiver: FakeReceiver;
   let fakeHandler: SinonSpy;
   const fakeLogger = createFakeLogger();
@@ -45,44 +45,37 @@ describe('App shortcut() routing', () => {
     });
   });
 
-  it('should route a block action event to a handler registered with `action(string)` that matches the callback ID', async () => {
-    app.action('my_callback_id', fakeHandler);
+  it('should route a block action event to a handler registered with `action(string)` that matches the action ID', async () => {
+    app.action('my_id', fakeHandler);
     await fakeReceiver.sendEvent({
-      ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
+      ...createDummyBlockActionEventMiddlewareArgs({ action_id: 'my_id' }),
     });
     sinon.assert.called(fakeHandler);
   });
-  it('should route a Slack shortcut event to a handler registered with `shortcut(RegExp)` that matches the callback ID', async () => {
-    app.shortcut(/my_call/, fakeHandler);
+  it('should route a block action event to a handler registered with `action(RegExp)` that matches the action ID', async () => {
+    app.action(/my_action/, fakeHandler);
     await fakeReceiver.sendEvent({
-      ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
+      ...createDummyBlockActionEventMiddlewareArgs({ action_id: 'my_action' }),
     });
     sinon.assert.called(fakeHandler);
   });
-  it('should route a Slack shortcut event to a handler registered with `shortcut({callback_id})` that matches the callback ID', async () => {
-    app.shortcut({ callback_id: 'my_callback_id' }, fakeHandler);
+  it('should route a block action event to a handler registered with `action({block_id})` that matches the block ID', async () => {
+    app.action({ block_id: 'my_id' }, fakeHandler);
     await fakeReceiver.sendEvent({
-      ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
+      ...createDummyBlockActionEventMiddlewareArgs({ block_id: 'my_id' }),
     });
     sinon.assert.called(fakeHandler);
   });
-  it('should route a Slack shortcut event to a handler registered with `shortcut({type})` that matches the type', async () => {
-    app.shortcut({ type: 'message_action' }, fakeHandler);
+  it('should route a block action event to a handler registered with `action({type:block_actions})`', async () => {
+    app.action({ type: 'block_actions' }, fakeHandler);
     await fakeReceiver.sendEvent({
-      ...createDummyMessageShortcutMiddlewareArgs(),
+      ...createDummyBlockActionEventMiddlewareArgs(),
     });
     sinon.assert.called(fakeHandler);
   });
-  it('should route a Slack shortcut event to a handler registered with `shortcut({type, callback_id})` that matches both the type and the callback_id', async () => {
-    app.shortcut({ type: 'message_action', callback_id: 'my_id' }, fakeHandler);
-    await fakeReceiver.sendEvent({
-      ...createDummyMessageShortcutMiddlewareArgs('my_id'),
-    });
-    sinon.assert.called(fakeHandler);
-  });
-  it('should throw if provided a constraint with unknown shortcut constraint keys', async () => {
-    // @ts-ignore providing known invalid shortcut constraint parameter
-    app.shortcut({ id: 'boom' }, fakeHandler);
+  it('should throw if provided a constraint with unknown action constraint keys', async () => {
+    // @ts-ignore providing known invalid action constraint parameter
+    app.action({ id: 'boom' }, fakeHandler);
     sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
   });
 });

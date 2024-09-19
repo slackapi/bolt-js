@@ -71,18 +71,20 @@ export function createDummyAppMentionEventMiddlewareArgs(
     say,
   };
 }
-// TODO: support overloads to support multiple ways of overriding the action? expose action_id, block_id, and the full action too
+interface DummyBlockActionOverride {
+  action_id?: string;
+  block_id?: string;
+  action?: BlockElementAction;
+}
 export function createDummyBlockActionEventMiddlewareArgs(
-  action_id = 'action_id',
-  block_id = 'block_id',
+  actionOverrides?: DummyBlockActionOverride,
   // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
   bodyOverrides?: Record<string, any>,
-  action?: BlockElementAction,
 ): SlackActionMiddlewareArgs<BlockAction> {
-  const act: BlockElementAction = action || {
+  const act: BlockElementAction = actionOverrides?.action || {
     type: 'button',
-    action_id,
-    block_id,
+    action_id: actionOverrides?.action_id || 'action_id',
+    block_id: actionOverrides?.block_id || 'block_id',
     action_ts: ts,
     text: { type: 'plain_text', text: 'hi' },
   };

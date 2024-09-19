@@ -498,12 +498,18 @@ describe('App middleware processing', () => {
         app.error(fakeErrorHandler);
         await fakeReceiver.sendEvent(
           createDummyBlockActionEventMiddlewareArgs(
-            action_id,
-            'bid',
+            {
+              action: {
+                type: 'button',
+                action_id,
+                block_id: 'bid',
+                action_ts: '1',
+                text: { type: 'plain_text', text: 'hi' },
+              },
+            },
             {
               response_url,
             },
-            { type: 'button', action_id, block_id: 'bid', action_ts: '1', text: { type: 'plain_text', text: 'hi' } },
           ),
         );
 
@@ -529,9 +535,17 @@ describe('App middleware processing', () => {
         await fakeReceiver.sendEvent(
           createDummyBlockActionEventMiddlewareArgs(
             {
+              action: {
+                type: 'button',
+                action_id,
+                block_id: 'bid',
+                action_ts: '1',
+                text: { type: 'plain_text', text: 'hi' },
+              },
+            },
+            {
               response_url,
             },
-            { type: 'button', action_id, block_id: 'bid', action_ts: '1', text: { type: 'plain_text', text: 'hi' } },
           ),
         );
 
