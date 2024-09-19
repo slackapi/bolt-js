@@ -14,6 +14,15 @@ export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = Optio
 
 export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
 
+// TODO: more strict typing to allow block/action_id for block_suggestion etc.
+export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
+  type?: A['type'];
+  block_id?: A extends SlackOptions ? string | RegExp : never;
+  action_id?: A extends SlackOptions ? string | RegExp : never;
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
+}
+
 // TODO: why call this 'source'? shouldn't it be Type, since it is just the type value?
 /**
  * All sources from which Slack sends options requests.

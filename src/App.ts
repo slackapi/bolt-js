@@ -1,6 +1,6 @@
-import type { Agent } from 'http';
-import type { SecureContextOptions } from 'tls';
-import util from 'util';
+import type { Agent } from 'node:http';
+import type { SecureContextOptions } from 'node:tls';
+import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
@@ -45,6 +45,7 @@ import HTTPReceiver, { type HTTPReceiverOptions } from './receivers/HTTPReceiver
 import SocketModeReceiver from './receivers/SocketModeReceiver';
 import type {
   AckFn,
+  ActionConstraints,
   AnyMiddlewareArgs,
   BlockAction,
   BlockElementAction,
@@ -57,34 +58,37 @@ import type {
   KnownEventFromType,
   KnownOptionsPayloadFromType,
   Middleware,
+  OptionsConstraints,
   OptionsSource,
   Receiver,
   ReceiverEvent,
   RespondArguments,
   RespondFn,
   SayFn,
+  ShortcutConstraints,
   SlackAction,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
-  SlackOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcut,
   SlackShortcutMiddlewareArgs,
   SlackViewAction,
   SlackViewMiddlewareArgs,
   SlashCommand,
+  ViewConstraints,
   ViewOutput,
   WorkflowStepEdit,
 } from './types';
 import { type AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
 import { isRejected, type StringIndexed } from './types/utilities';
-// eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
-const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
+const packageJson = require('../package.json');
+
+export type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from './types';
 
 // ----------------------------
 // For listener registration methods
-
+// TODO: we have types for this... consolidate
 const validViewTypes = ['view_closed', 'view_submission'];
 
 // ----------------------------
@@ -159,34 +163,6 @@ export interface AuthorizeResult {
   enterpriseId?: string;
   // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
   [key: string]: any;
-}
-
-export interface ActionConstraints<A extends SlackAction = SlackAction> {
-  type?: A['type'];
-  block_id?: A extends BlockAction ? string | RegExp : never;
-  action_id?: A extends BlockAction ? string | RegExp : never;
-  // TODO: callback ID doesn't apply to block actions, so the SlackAction generic above is too wide to apply here.
-  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
-  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
-}
-
-// TODO: more strict typing to allow block/action_id for block_suggestion etc.
-export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
-  type?: A['type'];
-  block_id?: A extends SlackOptions ? string | RegExp : never;
-  action_id?: A extends SlackOptions ? string | RegExp : never;
-  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
-  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
-}
-
-export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
-  type?: S['type'];
-  callback_id?: string | RegExp;
-}
-// TODO: add a type parameter here, just like the above constraint interfaces have.
-export interface ViewConstraints {
-  callback_id?: string | RegExp;
-  type?: 'view_closed' | 'view_submission';
 }
 
 // Passed internally to the handleError method

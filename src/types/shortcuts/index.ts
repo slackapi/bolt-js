@@ -11,6 +11,11 @@ export * from './message-shortcut';
  */
 export type SlackShortcut = GlobalShortcut | MessageShortcut;
 
+export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
+  type?: S['type'];
+  callback_id?: string | RegExp;
+}
+
 /**
  * Arguments which listeners and middleware receive to process a shortcut from Slack.
  *
