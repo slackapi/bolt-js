@@ -1,9 +1,56 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
+import {
+  AssistantThreadsSetStatusResponse,
+  AssistantThreadsSetSuggestedPromptsResponse,
+  AssistantThreadsSetTitleResponse,
+  ChatPostMessageArguments,
+} from '@slack/web-api';
 import processMiddleware from './middleware/process';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
-import { AssistantInitializationError } from './errors';
+import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 
+/**
+ * Configuration object used to instantiate the Assistant
+ */
+export interface AssistantConfig {
+  threadStarted: AssistantThreadStartedMiddleware | AssistantThreadStartedMiddleware[];
+  threadContextChanged: AssistantThreadContextChangedMiddleware | AssistantThreadContextChangedMiddleware[];
+  userMessage: AssistantUserMessageMiddleware | AssistantUserMessageMiddleware[];
+}
+
+/**
+ * Callback utilities
+ */
+interface AssistantUtilityArgs {
+  say: SayFn;
+  setStatus: SetStatusFn;
+  setSuggestedPrompts: SetSuggestedPromptsFn;
+  setTitle: SetTitleFn;
+}
+
+export interface SetStatusFn {
+  (status: string): Promise<AssistantThreadsSetStatusResponse>;
+}
+
+export interface SetSuggestedPromptsFn {
+  (params: SetSuggestedPromptsArguments): Promise<AssistantThreadsSetSuggestedPromptsResponse>;
+}
+
+export interface SetSuggestedPromptsArguments {
+  prompts: [AssistantPrompt, ...AssistantPrompt[]];
+}
+
+interface AssistantPrompt {
+  title: string;
+  message: string;
+}
+
+export interface SetTitleFn {
+  (title: string): Promise<AssistantThreadsSetTitleResponse>;
+}
+
+/**
+ * Middleware
+ */
 export type AssistantThreadStartedMiddleware = Middleware<AssistantThreadStartedMiddlewareArgs>;
 export type AssistantThreadContextChangedMiddleware = Middleware<AssistantThreadContextChangedMiddlewareArgs>;
 export type AssistantUserMessageMiddleware = Middleware<AssistantUserMessageMiddlewareArgs>;
@@ -17,51 +64,6 @@ export type AssistantMiddlewareArgs =
   | AssistantThreadStartedMiddlewareArgs
   | AssistantThreadContextChangedMiddlewareArgs
   | AssistantUserMessageMiddlewareArgs;
-
-// Configuration object used to instantiate the Assistant
-export interface AssistantConfig {
-  threadStarted: AssistantThreadStartedMiddleware | AssistantThreadStartedMiddleware[];
-  threadContextChanged: AssistantThreadContextChangedMiddleware | AssistantThreadContextChangedMiddleware[];
-  userMessage: AssistantUserMessageMiddleware | AssistantUserMessageMiddleware[];
-}
-
-// Utility functions
-export interface SetStatusFn {
-  // (params: SetStatusArguments): Promise<AssistantSetStatusResponse>;
-  (params: SetStatusArguments): Promise<WebAPICallResult>;
-}
-
-export interface SetStatusArguments {
-  status: string;
-}
-
-export interface SetSuggestedPromptsFn {
-  // (params: SetSuggestedPromptsArguments): Promise<AssistantSetSuggestedPromptsResponse>;
-  (params: SetSuggestedPromptsArguments): Promise<WebAPICallResult>;
-}
-
-export interface SetSuggestedPromptsArguments {
-  prompts: {
-    title: string;
-    message: string;
-  }[];
-  title?: string;
-}
-export interface SetTitleFn {
-  // (params: SetTitleArguments): Promise<AssistantSetTitleResponse>;
-  (params: SetTitleArguments): Promise<WebAPICallResult>;
-}
-
-export interface SetTitleArguments {
-  title: string;
-}
-
-interface AssistantUtilityArgs {
-  say: SayFn;
-  setStatus: SetStatusFn;
-  setSuggestedPrompts: SetSuggestedPromptsFn;
-  setTitle: SetTitleFn;
-}
 
 export interface AssistantThreadStartedMiddlewareArgs extends
   Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>, AssistantUtilityArgs {}
@@ -98,16 +100,13 @@ export class Assistant {
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
     return async (args): Promise<any> => {
-      if (isAssistantEvent(args) && matchesConstraints(args)) {
-        return this.processEvent(args);
-      }
+      if (isAssistantEvent(args) && matchesConstraints(args)) return this.processEvent(args);
       return args.next();
     };
   }
 
   private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
     const { payload } = args;
-
     const assistantArgs = prepareAssistantArgs(args);
     const assistantMiddleware = this.getAssistantMiddleware(payload);
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
@@ -131,14 +130,15 @@ export function isAssistantEvent(args: AnyMiddlewareArgs): boolean {
   return ASSISTANT_PAYLOAD_TYPES.has(args.payload.type);
 }
 
-function matchesConstraints(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
-  if (args.payload.type === 'message') {
-    const isThreadMessage = 'channel' in args.payload && 'thread_ts' in args.payload;
-    const inAssistantContainer = ('channel_type' in args.payload && args.payload.channel_type === 'im') &&
-    (!('subtype' in args.payload) || args.payload.subtype === 'file_share');
-    return isThreadMessage && inAssistantContainer;
-  }
-  return true;
+export function matchesConstraints(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
+  return args.payload.type === 'message' ? isAssistantMessage(args.payload) : true;
+}
+
+export function isAssistantMessage(payload: AnyMiddlewareArgs['payload']): boolean {
+  const isThreadMessage = 'channel' in payload && 'thread_ts' in payload;
+  const inAssistantContainer = ('channel_type' in payload && payload.channel_type === 'im') &&
+  (!('subtype' in payload) || payload.subtype === 'file_share');
+  return isThreadMessage && inAssistantContainer;
 }
 
 export function validate(config: AssistantConfig): void {
@@ -209,11 +209,11 @@ function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
-// Utility functions
-
 /**
- * Factory for `say()` utility
+ * Utility functions
  */
+
+// Factory for `say()` utility
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const {
     context,
@@ -232,9 +232,7 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   };
 }
 
-/**
- * Factory for `setStatus()` utility
- */
+// Factory for `setStatus()` utility
 function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const {
     context,
@@ -244,20 +242,15 @@ function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const token = selectToken(context);
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
-  return (params: Parameters<SetStatusFn>[0]) => {
-    const { status } = params;
-    return client.assistant.threads.setStatus({
-      token,
-      channel_id,
-      status,
-      thread_ts,
-    });
-  };
+  return (status: Parameters<SetStatusFn>[0]) => client.assistant.threads.setStatus({
+    token,
+    channel_id,
+    thread_ts,
+    status,
+  });
 }
 
-/**
- * Factory for `setSuggestedPrompts()` utility
- */
+// Factory for `setSuggestedPrompts()` utility
 function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggestedPromptsFn {
   const {
     context,
@@ -268,20 +261,17 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
-    const { prompts, title = '' } = params; // TODO :: conditionally pass title
+    const { prompts } = params;
     return client.assistant.threads.setSuggestedPrompts({
       token,
       channel_id,
-      prompts,
-      title,
       thread_ts,
+      prompts,
     });
   };
 }
 
-/**
- * Factory for `setTitle()` utility
- */
+// Factory for `setTitle()` utility
 function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   const {
     context,
@@ -291,27 +281,38 @@ function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   const token = selectToken(context);
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
-  return (params: Parameters<SetTitleFn>[0]) => {
-    const { title } = params;
-    return client.assistant.threads.setTitle({
-      token,
-      channel_id,
-      title,
-      thread_ts,
-    });
-  };
+  return (title: Parameters<SetTitleFn>[0]) => client.assistant.threads.setTitle({
+    token,
+    channel_id,
+    thread_ts,
+    title,
+  });
 }
 
 function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']) {
-  let channelId: string;
-  let threadTs: string;
+  let channelId: string = '';
+  let threadTs: string = '';
 
+  // assistant_thread_started, asssistant_thread_context_changed
   if ('assistant_thread' in payload) {
     channelId = payload.assistant_thread.channel_id;
     threadTs = payload.assistant_thread.thread_ts;
-  } else { // message
+  }
+
+  // user message in thread
+  if ('channel' in payload && 'thread_ts' in payload && payload.thread_ts !== undefined) {
     channelId = payload.channel;
     threadTs = payload.thread_ts;
+  }
+
+  // throw error if `channel` or `thread_ts` are missing
+  if (!channelId || !threadTs) {
+    const missingProps: string[] = [];
+    [channelId, threadTs].forEach((key) => { if (key) missingProps.push(key); });
+    if (missingProps.length > 0) {
+      const errorMsg = `Assistant message event is missing required properties: ${missingProps.join(', ')}`;
+      throw new AssistantMissingPropertyError(errorMsg);
+    }
   }
 
   return { channelId, threadTs };

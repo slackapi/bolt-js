@@ -312,7 +312,7 @@ describe('Assistant class', () => {
             mockThreadStartedArgs,
           ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
 
-          await threadStartedArgs.setStatus({ status: 'Status set!' });
+          await threadStartedArgs.setStatus('Status set!');
 
           assert(fakeClient.assistant.threads.setStatus.called);
         });
@@ -329,7 +329,7 @@ describe('Assistant class', () => {
             mockThreadStartedArgs,
           ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
 
-          await threadStartedArgs.setSuggestedPrompts({ prompts: [] });
+          await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }] });
 
           assert(fakeClient.assistant.threads.setSuggestedPrompts.called);
         });
@@ -346,7 +346,7 @@ describe('Assistant class', () => {
             mockThreadStartedArgs,
           ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
 
-          await threadStartedArgs.setTitle({ title: 'Title set!' });
+          await threadStartedArgs.setTitle('Title set!');
 
           assert(fakeClient.assistant.threads.setTitle.called);
         });

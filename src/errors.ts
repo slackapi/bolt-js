@@ -19,6 +19,7 @@ export enum ErrorCode {
   AppInitializationError = 'slack_bolt_app_initialization_error',
 
   AssistantInitializationError = 'slack_bolt_assistant_initialization_error',
+  AssistantMissingPropertyError = 'slack_bolt_assistant_missing_property_error',
 
   AuthorizationError = 'slack_bolt_authorization_error',
 
@@ -74,6 +75,10 @@ export class AppInitializationError extends Error implements CodedError {
 
 export class AssistantInitializationError extends Error implements CodedError {
   public code = ErrorCode.AssistantInitializationError;
+}
+
+export class AssistantMissingPropertyError extends Error implements CodedError {
+  public code = ErrorCode.AssistantMissingPropertyError;
 }
 
 export class AuthorizationError extends Error implements CodedError {
