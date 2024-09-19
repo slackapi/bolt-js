@@ -11,6 +11,7 @@ import type {
   RespondFn,
   SayFn,
   SlackActionMiddlewareArgs,
+  SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
@@ -19,6 +20,7 @@ import type {
   ViewSubmitAction,
   ViewOutput,
   BlockSuggestion,
+  SlashCommand,
 } from '../../../src/types';
 
 const ts = '1234.56';
@@ -77,6 +79,35 @@ export function createDummyAppMentionEventMiddlewareArgs(
     message: undefined,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+  };
+}
+
+interface DummyCommandOverride {
+  command?: string;
+  slashCommand?: SlashCommand;
+}
+export function createDummyCommandMiddlewareArgs(commandOverrides?: DummyCommandOverride): SlackCommandMiddlewareArgs {
+  const payload: SlashCommand = commandOverrides?.slashCommand || {
+    token,
+    command: commandOverrides?.command || '/slash',
+    text: 'yo',
+    response_url: 'https://slack.com',
+    trigger_id: ts,
+    user_id: user,
+    user_name: 'filmaj',
+    team_id: team,
+    team_domain: 'slack.com',
+    channel_id: channel,
+    channel_name: '#random',
+    api_app_id: app_id,
+  };
+  return {
+    payload,
+    command: payload,
+    body: payload,
+    respond,
+    say,
+    ack: () => Promise.resolve(),
   };
 }
 
