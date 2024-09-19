@@ -12,18 +12,20 @@ export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = Optio
   ack: OptionsAckFn<Source>;
 }
 
+export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
+
+// TODO: why call this 'source'? shouldn't it be Type, since it is just the type value?
 /**
  * All sources from which Slack sends options requests.
  */
-export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block_suggestion';
-
-export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
+export type OptionsSource = SlackOptions['type'];
 
 // TODO: the following three utility typies could be DRYed up w/ the similar KnownEventFromType utility used in events types
 export interface BasicOptionsPayload<Type extends string = string> {
   type: Type;
   value: string;
 }
+// TODO: Is this useful? Events have something similar
 export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
   ? BasicOptionsPayload<T>
   : KnownOptionsPayloadFromType<T>;
@@ -143,8 +145,8 @@ export interface DialogSuggestion extends StringIndexed {
 type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggestion'
   ? AckFn<XOR<BlockOptions, OptionGroups<BlockOptions>>>
   : Source extends 'interactive_message'
-    ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
-    : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
+  ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
+  : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
 // TODO: why are the next two interfaces identical?
 export interface BlockOptions {
