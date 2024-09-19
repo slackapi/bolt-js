@@ -482,7 +482,6 @@ describe('App event routing', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
 
-      app.message('hello', noop);
       app.command('/echo', noop);
       app.command(/\/e.*/, noop);
       await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));

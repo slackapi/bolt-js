@@ -31,12 +31,16 @@ const say: SayFn = (_msg) => Promise.resolve({ ok: true });
 const respond: RespondFn = (_msg) => Promise.resolve();
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
+interface DummyMessageOverrides {
+  message?: MessageEvent;
+  text?: string;
+}
 export function createDummyMessageEventMiddlewareArgs(
+  msgOverrides?: DummyMessageOverrides,
   // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
   bodyOverrides?: Record<string, any>,
-  event?: MessageEvent,
 ): SlackEventMiddlewareArgs<'message'> {
-  const payload: MessageEvent = event || {
+  const payload: MessageEvent = msgOverrides?.message || {
     type: 'message',
     subtype: undefined,
     event_ts: ts,
@@ -44,6 +48,7 @@ export function createDummyMessageEventMiddlewareArgs(
     channel_type: 'channel',
     user,
     ts,
+    text: msgOverrides?.text || 'hi',
   };
   return {
     payload,

@@ -622,7 +622,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    filter: MessageEventMiddleware,
+    filter: MessageEventMiddleware, // TODO: why do we need this override? shouldnt ...listeners capture this too?
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
@@ -644,7 +644,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
       return patternOrMiddleware;
       // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
-    }) as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    }) as any;
 
     this.listeners.push([
       onlyEvents,

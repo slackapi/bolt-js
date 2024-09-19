@@ -381,17 +381,20 @@ describe('App middleware processing', () => {
         });
         await fakeReceiver.sendEvent({
           ack: noopVoid,
-          ...createDummyMessageEventMiddlewareArgs({
-            authorizations: [
-              {
-                enterprise_id: null,
-                team_id: 'T_this_non_grid_workspace',
-                user_id: 'U_authed_user',
-                is_bot: true,
-                is_enterprise_install: false,
-              },
-            ],
-          }),
+          ...createDummyMessageEventMiddlewareArgs(
+            {},
+            {
+              authorizations: [
+                {
+                  enterprise_id: null,
+                  team_id: 'T_this_non_grid_workspace',
+                  user_id: 'U_authed_user',
+                  is_bot: true,
+                  is_enterprise_install: false,
+                },
+              ],
+            },
+          ),
         });
 
         assert.isTrue(workedAsExpected);
