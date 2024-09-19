@@ -14,6 +14,7 @@ import type {
   SlackEventMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
+  ViewClosedAction,
   ViewSubmitAction,
   ViewOutput,
 } from '../../../src/types';
@@ -110,13 +111,8 @@ export function createDummyBlockActionEventMiddlewareArgs(
   };
 }
 
-export function createDummyViewSubmissionMiddlewareArgs(
-  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
-  bodyOverrides?: Record<string, any>,
-  viewOverrides?: Partial<ViewOutput>,
-  viewEvent?: ViewSubmitAction,
-): SlackViewMiddlewareArgs<ViewSubmitAction> {
-  const payload: ViewOutput = {
+function createDummyViewOutput(viewOverrides?: Partial<ViewOutput>): ViewOutput {
+  return {
     type: 'view',
     id: 'V1234',
     callback_id: 'Cb1234',
@@ -136,16 +132,47 @@ export function createDummyViewSubmissionMiddlewareArgs(
     notify_on_close: false,
     ...viewOverrides,
   };
+}
+
+export function createDummyViewSubmissionMiddlewareArgs(
+  viewOverrides?: Partial<ViewOutput>,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackViewMiddlewareArgs<ViewSubmitAction> {
+  const payload = createDummyViewOutput(viewOverrides);
   const event: ViewSubmitAction = {
-    ...(viewEvent || {
-      type: 'view_submission',
-      team: { id: team, domain: 'slack.com' },
-      user: { id: user, name: 'filmaj' },
-    }),
+    type: 'view_submission',
+    team: { id: team, domain: 'slack.com' },
+    user: { id: user, name: 'filmaj' },
     view: payload,
     api_app_id: app_id,
     token,
     trigger_id: ts,
+    ...bodyOverrides,
+  };
+  return {
+    payload,
+    view: payload,
+    body: event,
+    respond,
+    ack: () => Promise.resolve(),
+  };
+}
+
+export function createDummyViewClosedMiddlewareArgs(
+  viewOverrides?: Partial<ViewOutput>,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackViewMiddlewareArgs<ViewClosedAction> {
+  const payload = createDummyViewOutput(viewOverrides);
+  const event: ViewClosedAction = {
+    type: 'view_closed',
+    team: { id: team, domain: 'slack.com' },
+    user: { id: user, name: 'filmaj' },
+    view: payload,
+    api_app_id: app_id,
+    token,
+    is_cleared: false,
     ...bodyOverrides,
   };
   return {

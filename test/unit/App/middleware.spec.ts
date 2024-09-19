@@ -568,6 +568,11 @@ describe('App middleware processing', () => {
         await fakeReceiver.sendEvent(
           createDummyViewSubmissionMiddlewareArgs(
             {
+              id: 'V111',
+              type: 'modal',
+              callback_id: 'view-id',
+            },
+            {
               response_urls: [
                 {
                   block_id: 'b',
@@ -576,11 +581,6 @@ describe('App middleware processing', () => {
                   response_url: 'https://fake.slack/response_url',
                 },
               ],
-            },
-            {
-              id: 'V111',
-              type: 'modal',
-              callback_id: 'view-id',
             },
           ),
         );
@@ -1069,13 +1069,10 @@ describe('App middleware processing', () => {
         app.error(fakeErrorHandler);
 
         await fakeReceiver.sendEvent(
-          createDummyViewSubmissionMiddlewareArgs(
-            {},
-            {
-              callback_id,
-              app_installed_team_id,
-            },
-          ),
+          createDummyViewSubmissionMiddlewareArgs({
+            callback_id,
+            app_installed_team_id,
+          }),
         );
 
         assert.isTrue(ackCalled);

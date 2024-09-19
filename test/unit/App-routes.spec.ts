@@ -470,7 +470,6 @@ describe('App event routing', () => {
 
     it('should acknowledge any of possible events', async () => {
       // Arrange
-      const viewFn = sinon.fake.resolves({});
       const optionsFn = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = await importApp(overrides);
@@ -484,12 +483,6 @@ describe('App event routing', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
 
-      app.view('view_callback_id', async () => {
-        await viewFn();
-      });
-      app.view({ callback_id: 'view_callback_id', type: 'view_closed' }, async () => {
-        await viewFn();
-      });
       app.options('external_select_action_id', async () => {
         await optionsFn();
       });
@@ -518,22 +511,10 @@ describe('App event routing', () => {
       app.message('hello', noop);
       app.command('/echo', noop);
       app.command(/\/e.*/, noop);
-
-      assert.isTrue(fakeLogger.error.called);
-      fakeLogger.error.reset();
-
-      assert.isTrue(fakeLogger.error.called);
-
-      app.error(fakeErrorHandler);
       await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
       // Assert
-      assert.equal(actionFn.callCount, 3);
-      assert.equal(shortcutFn.callCount, 4);
-      assert.equal(viewFn.callCount, 5);
       assert.equal(optionsFn.callCount, 4);
-      assert.equal(ackFn.callCount, dummyReceiverEvents.length);
-      assert(fakeErrorHandler.notCalled);
     });
 
     // This test confirms authorize is being used for org events

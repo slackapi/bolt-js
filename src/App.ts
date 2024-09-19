@@ -183,7 +183,7 @@ export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
   type?: S['type'];
   callback_id?: string | RegExp;
 }
-
+// TODO: add a type parameter here, just like the above constraint interfaces have.
 export interface ViewConstraints {
   callback_id?: string | RegExp;
   type?: 'view_closed' | 'view_submission';
