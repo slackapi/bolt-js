@@ -12,11 +12,13 @@ import type {
   SayFn,
   SlackActionMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
   ViewClosedAction,
   ViewSubmitAction,
   ViewOutput,
+  BlockSuggestion,
 } from '../../../src/types';
 
 const ts = '1234.56';
@@ -72,6 +74,7 @@ export function createDummyAppMentionEventMiddlewareArgs(
     say,
   };
 }
+
 interface DummyBlockActionOverride {
   action_id?: string;
   block_id?: string;
@@ -108,6 +111,34 @@ export function createDummyBlockActionEventMiddlewareArgs(
     respond,
     say,
     ack,
+  };
+}
+
+interface DummyBlockSuggestionOverride {
+  action_id?: string;
+  block_id?: string;
+  options?: BlockSuggestion;
+}
+export function createDummyBlockSuggestionsMiddlewareArgs(
+  optionsOverrides?: DummyBlockSuggestionOverride,
+): SlackOptionsMiddlewareArgs<BlockSuggestion['type']> {
+  const options: BlockSuggestion = optionsOverrides?.options || {
+    type: 'block_suggestion',
+    action_id: optionsOverrides?.action_id || 'action_id',
+    block_id: optionsOverrides?.block_id || 'block_id',
+    value: 'value',
+    action_ts: ts,
+    api_app_id: app_id,
+    team: { id: team, domain: 'slack.com' },
+    user: { id: user, name: 'filmaj' },
+    token,
+    container: {},
+  };
+  return {
+    payload: options,
+    body: options,
+    options,
+    ack: () => Promise.resolve(),
   };
 }
 

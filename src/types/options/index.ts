@@ -14,7 +14,7 @@ export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = Optio
 
 export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
 
-// TODO: more strict typing to allow block/action_id for block_suggestion etc.
+// TODO: more strict typing to allow block/action_id for block_suggestion - not all of these properties apply to all of the members of the SlackOptions union
 export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
   type?: A['type'];
   block_id?: A extends SlackOptions ? string | RegExp : never;

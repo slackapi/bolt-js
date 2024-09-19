@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
 // TODO: breaking change: remove, unnecessary abstraction, just use Record directly
 /**
@@ -21,6 +20,7 @@ export const isFulfilled = <T>(p: PromiseSettledResult<T>): p is PromiseFulfille
 export const isRejected = <T>(p: PromiseSettledResult<T>): p is PromiseRejectedResult => p.status === 'rejected';
 
 /** Using type parameter T (generic), can distribute the Omit over a union set. */
+// biome-ignore lint/suspicious/noExplicitAny: any is the opposite of never
 type DistributiveOmit<T, K extends PropertyKey> = T extends any ? Omit<T, K> : never;
 
 // The say() utility function binds the message to the same channel as the incoming message that triggered the
@@ -39,6 +39,7 @@ export type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'chann
   text?: string;
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: TODO: check if we can type this more strictly than any
 export type RespondFn = (message: string | RespondArguments) => Promise<any>;
 
 export type AckFn<Response> = (response?: Response) => Promise<void>;

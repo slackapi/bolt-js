@@ -470,7 +470,6 @@ describe('App event routing', () => {
 
     it('should acknowledge any of possible events', async () => {
       // Arrange
-      const optionsFn = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = await importApp(overrides);
       const dummyReceiverEvents = createReceiverEvents();
@@ -483,38 +482,10 @@ describe('App event routing', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
 
-      app.options('external_select_action_id', async () => {
-        await optionsFn();
-      });
-      app.options(
-        {
-          type: 'block_suggestion',
-          action_id: 'external_select_action_id',
-        },
-        async () => {
-          await optionsFn();
-        },
-      );
-      app.options({ callback_id: 'dialog_suggestion_callback_id' }, async () => {
-        await optionsFn();
-      });
-      app.options(
-        {
-          type: 'dialog_suggestion',
-          callback_id: 'dialog_suggestion_callback_id',
-        },
-        async () => {
-          await optionsFn();
-        },
-      );
-
       app.message('hello', noop);
       app.command('/echo', noop);
       app.command(/\/e.*/, noop);
       await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
-
-      // Assert
-      assert.equal(optionsFn.callCount, 4);
     });
 
     // This test confirms authorize is being used for org events

@@ -542,6 +542,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: receivers could accept anything as arguments for stop
   public stop(...args: any[]): Promise<unknown> {
     return this.receiver.stop(...args);
   }
@@ -642,7 +643,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
     }) as any; // FIXME: workaround for TypeScript 4.7 breaking changes
 
     this.listeners.push([
@@ -901,12 +902,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       try {
         authorizeResult = await this.authorize(source, bodyArg);
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
         const e = error as any;
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
         e.code = ErrorCode.AuthorizationError;
-        // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
-        // eslint-disable-next-line consistent-return
         return this.handleError({
           error: e,
           logger: this.logger,
@@ -1004,6 +1003,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       case IncomingEventType.Shortcut:
         payload = bodyArg as SlackShortcutMiddlewareArgs['body'];
         break;
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: usually not great, but we do it here
       case IncomingEventType.Action:
         if (isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) {
           const { actions } = bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'];
@@ -1026,7 +1026,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       /** Respond function might be set below */
       respond?: RespondFn;
       /** Ack function might be set below */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
       ack?: AckFn<any>;
       complete?: FunctionCompleteFn;
       fail?: FunctionFailFn;
@@ -1099,12 +1099,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     if (token !== undefined) {
-      let pool;
+      let pool: WebClientPool | undefined = undefined;
       const clientOptionsCopy = { ...this.clientOptions };
       if (authorizeResult.teamId !== undefined) {
         pool = this.clients[authorizeResult.teamId];
         if (pool === undefined) {
-          // eslint-disable-next-line no-multi-assign
           pool = this.clients[authorizeResult.teamId] = new WebClientPool();
         }
         // Add teamId to clientOptions so it can be automatically added to web-api calls
@@ -1112,7 +1111,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       } else if (authorizeResult.enterpriseId !== undefined) {
         pool = this.clients[authorizeResult.enterpriseId];
         if (pool === undefined) {
-          // eslint-disable-next-line no-multi-assign
           pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
         }
       }
@@ -1165,16 +1163,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           const rejectedListenerResults = settledListenerResults.filter(isRejected);
           if (rejectedListenerResults.length === 1) {
             throw rejectedListenerResults[0].reason;
+            // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
           } else if (rejectedListenerResults.length > 1) {
             throw new MultipleListenerError(rejectedListenerResults.map((rlr) => rlr.reason));
           }
         },
       );
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const e = error as any;
-      // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
-      // eslint-disable-next-line consistent-return
       return this.handleError({
         context,
         error: e,
@@ -1293,11 +1290,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       throw new AppInitializationError(
         `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://slack.dev/bolt-js/concepts/authenticating-oauth for these required fields.\n`,
       );
+      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`You cannot provide both authorize and oauth installer options. ${tokenUsage}`);
+      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize === undefined && usingOauth) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: we know installer is truthy here
       return httpReceiver.installer!.authorize;
+      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && !usingOauth) {
       return authorize as Authorize<boolean>;
     }
@@ -1589,9 +1589,9 @@ function escapeHtml(input: string | undefined | null): string {
 }
 
 function extractFunctionContext(body: StringIndexed) {
-  let functionExecutionId;
-  let functionBotAccessToken;
-  let functionInputs;
+  let functionExecutionId: string | undefined = undefined;
+  let functionBotAccessToken: string | undefined = undefined;
+  let functionInputs: FunctionInputs | undefined = undefined;
 
   // function_executed event
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
