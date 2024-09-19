@@ -498,6 +498,8 @@ describe('App middleware processing', () => {
         app.error(fakeErrorHandler);
         await fakeReceiver.sendEvent(
           createDummyBlockActionEventMiddlewareArgs(
+            action_id,
+            'bid',
             {
               response_url,
             },
