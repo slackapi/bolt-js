@@ -447,7 +447,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Conditionally use a global middleware that ignores events (including messages) that are sent from this app
     if (ignoreSelf) {
-      this.use(ignoreSelfMiddleware());
+      this.use(ignoreSelfMiddleware);
     }
 
     // Use conversation state global middleware
