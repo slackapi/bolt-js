@@ -1,3 +1,5 @@
+[![Open in DevZero](https://assets.devzero.io/open-in-devzero.svg)](https://www.devzero.io/dashboard/recipes/new?repo-url=https://github.com/slackapi/bolt-js)
+
 # Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/static/img/bolt.svg" alt="Bolt logo" width="32"/> for JavaScript
 
 [![codecov](https://codecov.io/gh/slackapi/bolt-js/branch/main/graph/badge.svg?token=x4oCgiexvp)](https://codecov.io/gh/slackapi/bolt-js)
