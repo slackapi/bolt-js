@@ -1,13 +1,51 @@
-import 'mocha';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
 import { assert, AssertionError } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import type { ConversationStore } from './conversation-store';
-import { type Override, createFakeLogger, delay } from './test-helpers';
-import type { AnyMiddlewareArgs, Context, NextFn } from './types';
+import { type Override, createFakeLogger, delay } from './helpers';
+import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 
+/* Testing Harness */
+
+type MiddlewareArgs = AnyMiddlewareArgs & {
+  next: NextFn;
+  context: Context;
+  logger: Logger;
+  client: WebClient;
+};
+
+interface DummyContext<ConversationState> {
+  conversation?: ConversationState;
+  updateConversation?: (c: ConversationState, expiresAt?: number) => Promise<unknown>;
+}
+
+// Loading the system under test using overrides
+async function importConversationStore(
+  overrides: Override = {},
+): Promise<typeof import('../../src/conversation-store')> {
+  return rewiremock.module(() => import('../../src/conversation-store'), overrides);
+}
+
+// Composable overrides
+function withGetTypeAndConversation(spy: SinonSpy): Override {
+  return {
+    './helpers': {
+      getTypeAndConversation: spy,
+    },
+  };
+}
+
+// Fakes
+function createFakeStore(
+  getSpy: SinonSpy = sinon.fake.resolves(undefined),
+  setSpy: SinonSpy = sinon.fake.resolves({}),
+) {
+  return {
+    set: setSpy,
+    get: getSpy,
+  };
+}
 describe('conversationContext middleware', () => {
   it('should forward events that have no conversation ID', async () => {
     // Arrange
@@ -198,7 +236,7 @@ describe('MemoryStore', () => {
       try {
         await store.get('CONVERSATION_ID');
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.instanceOf(error, Error);
         assert.notInstanceOf(error, AssertionError);
@@ -219,7 +257,7 @@ describe('MemoryStore', () => {
       try {
         await store.get(dummyConversationId);
         assert.fail();
-      } catch (error: any) {
+      } catch (error) {
         // Assert
         assert.instanceOf(error, Error);
         assert.notInstanceOf(error, AssertionError);
@@ -227,57 +265,3 @@ describe('MemoryStore', () => {
     });
   });
 });
-
-/* Testing Harness */
-
-type MiddlewareArgs = AnyMiddlewareArgs & {
-  next: NextFn;
-  context: Context;
-  logger: Logger;
-  client: WebClient;
-};
-
-interface DummyContext<ConversationState> {
-  conversation?: ConversationState;
-  updateConversation?: (c: ConversationState, expiresAt?: number) => Promise<unknown>;
-}
-
-// Loading the system under test using overrides
-async function importConversationStore(overrides: Override = {}): Promise<typeof import('./conversation-store')> {
-  return rewiremock.module(() => import('./conversation-store'), overrides);
-}
-
-// Composable overrides
-function withGetTypeAndConversation(spy: SinonSpy): Override {
-  return {
-    './helpers': {
-      getTypeAndConversation: spy,
-    },
-  };
-}
-
-// Fakes
-interface FakeStore extends ConversationStore {
-  set: SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>;
-  get: SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>;
-}
-
-function createFakeStore(
-  getSpy: SinonSpy = sinon.fake.resolves(undefined),
-  setSpy: SinonSpy = sinon.fake.resolves({}),
-): FakeStore {
-  return {
-    // NOTE (Nov 2019): We had to convert to 'unknown' first due to the following error:
-    // src/conversation-store.spec.ts:223:10 - error TS2352: Conversion of type 'SinonSpy<any[], any>' to
-    // type 'SinonSpy<[string, any, (number | undefined)?], Promise<unknown>>' may be a mistake because neither type
-    // sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-    //   Types of property 'firstCall' are incompatible.
-    //     Type 'SinonSpyCall<any[], any>' is not comparable to type 'SinonSpyCall<[string, any, (number | undefined)?],
-    // Promise<unknown>>'.
-    //       Type 'any[]' is not comparable to type '[string, any, (number | undefined)?]'.
-    // 223     set: setSpy as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
-    //              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    set: setSpy as unknown as SinonSpy<Parameters<ConversationStore['set']>, ReturnType<ConversationStore['set']>>,
-    get: getSpy as unknown as SinonSpy<Parameters<ConversationStore['get']>, ReturnType<ConversationStore['get']>>,
-  };
-}

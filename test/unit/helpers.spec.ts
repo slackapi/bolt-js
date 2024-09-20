@@ -1,12 +1,11 @@
-import 'mocha';
 import { assert } from 'chai';
 import {
   IncomingEventType,
   getTypeAndConversation,
   isBodyWithTypeEnterpriseInstall,
   isEventTypeToSkipAuthorize,
-} from './helpers';
-import type { AnyMiddlewareArgs, ReceiverEvent, SlackEventMiddlewareArgs } from './types';
+} from '../../src/helpers';
+import type { AnyMiddlewareArgs, ReceiverEvent, SlackEventMiddlewareArgs } from '../../src/types';
 
 describe('Helpers', () => {
   describe('getTypeAndConversation()', () => {
@@ -48,7 +47,7 @@ describe('Helpers', () => {
       // Arrange
       const conversationId = 'CONVERSATION_ID';
       const dummyActionBodies = createFakeOptions(conversationId);
-      dummyActionBodies.forEach((option) => {
+      for (const option of dummyActionBodies) {
         it(`should find Option type for ${option.type}`, () => {
           // Act
           const typeAndConversation = getTypeAndConversation(option);
@@ -56,13 +55,13 @@ describe('Helpers', () => {
           assert(typeAndConversation.type === IncomingEventType.Options);
           assert(typeAndConversation.conversationId === conversationId);
         });
-      });
+      }
     });
     describe('action types', () => {
       // Arrange
       const conversationId = 'CONVERSATION_ID';
       const dummyActionBodies = createFakeActions(conversationId);
-      dummyActionBodies.forEach((action) => {
+      for (const action of dummyActionBodies) {
         it(`should find Action type for ${action.type}`, () => {
           // Act
           const typeAndConversation = getTypeAndConversation(action);
@@ -70,13 +69,13 @@ describe('Helpers', () => {
           assert(typeAndConversation.type === IncomingEventType.Action);
           assert(typeAndConversation.conversationId === conversationId);
         });
-      });
+      }
     });
     describe('shortcut types', () => {
       // Arrange
       const conversationId = 'CONVERSATION_ID';
       const dummyShortcutBodies = createFakeShortcuts(conversationId);
-      dummyShortcutBodies.forEach((shortcut) => {
+      for (const shortcut of dummyShortcutBodies) {
         it(`should find Shortcut type for ${shortcut.type}`, () => {
           // Act
           const typeAndConversation = getTypeAndConversation(shortcut);
@@ -86,19 +85,19 @@ describe('Helpers', () => {
             assert(typeAndConversation.conversationId === conversationId);
           }
         });
-      });
+      }
     });
     describe('view types', () => {
       // Arrange
       const dummyViewBodies = createFakeViews();
-      dummyViewBodies.forEach((viewBody) => {
+      for (const viewBody of dummyViewBodies) {
         it(`should find Action type for ${viewBody.type}`, () => {
           // Act
           const typeAndConversation = getTypeAndConversation(viewBody);
           // Assert
           assert(typeAndConversation.type === IncomingEventType.ViewAction);
         });
-      });
+      }
     });
     describe('invalid events', () => {
       // Arrange
@@ -204,7 +203,7 @@ describe('Helpers', () => {
     describe('receiver events that can be skipped', () => {
       it('should return truthy when event can be skipped', () => {
         // Arrange
-        const dummyEventBody = { ack: async () => {}, body: { event: { type: 'app_uninstalled' } } } as ReceiverEvent;
+        const dummyEventBody = { ack: async () => { }, body: { event: { type: 'app_uninstalled' } } } as ReceiverEvent;
         // Act
         const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
         // Assert
@@ -213,7 +212,7 @@ describe('Helpers', () => {
 
       it('should return falsy when event can not be skipped', () => {
         // Arrange
-        const dummyEventBody = { ack: async () => {}, body: { event: { type: '' } } } as ReceiverEvent;
+        const dummyEventBody = { ack: async () => { }, body: { event: { type: '' } } } as ReceiverEvent;
         // Act
         const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
         // Assert
@@ -222,7 +221,7 @@ describe('Helpers', () => {
 
       it('should return falsy when event is invalid', () => {
         // Arrange
-        const dummyEventBody = { ack: async () => {}, body: {} } as ReceiverEvent;
+        const dummyEventBody = { ack: async () => { }, body: {} } as ReceiverEvent;
         // Act
         const isEnterpriseInstall = isEventTypeToSkipAuthorize(dummyEventBody);
         // Assert
@@ -232,6 +231,7 @@ describe('Helpers', () => {
   });
 });
 
+// biome-ignore lint/suspicious/noExplicitAny: test utilities can return anything
 function createFakeActions(conversationId: string): any[] {
   return [
     // Body for a dialog submission
@@ -262,6 +262,7 @@ function createFakeActions(conversationId: string): any[] {
   ];
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: test utilities can return anything
 function createFakeShortcuts(conversationId: string): any[] {
   return [
     // Body for a message shortcut
@@ -276,6 +277,7 @@ function createFakeShortcuts(conversationId: string): any[] {
   ];
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: test utilities can return anything
 function createFakeOptions(conversationId: string): any[] {
   return [
     // Body for an options request in an interactive message
@@ -298,6 +300,7 @@ function createFakeOptions(conversationId: string): any[] {
   ];
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: test utilities can return anything
 function createFakeViews(): any[] {
   return [
     // Body for a view_submission event

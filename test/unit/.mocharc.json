@@ -6,7 +6,9 @@
   "spec": [
     "test/unit/App/*.spec.ts",
     "test/unit/CustomFunction.spec.ts",
-    "test/unit/WorkflowStep.spec.ts"
+    "test/unit/WorkflowStep.spec.ts",
+    "test/unit/conversation-store.spec.ts",
+    "test/unit/helpers.spec.ts"
   ],
   "timeout": 3000
 }
