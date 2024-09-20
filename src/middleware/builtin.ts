@@ -285,47 +285,43 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
   };
 }
 
-// TODO: breaking change: why does this method have to be invoked as a function with no args, while other similar
-// method like the `only*` ones do not require that? should make this consistent.
 /**
  * Filters out any event originating from the handling app.
  */
-export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
-  return async (args) => {
-    const botId = args.context.botId as string;
-    const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
+export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
+  const botId = args.context.botId as string;
+  const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
 
-    if (isEventArgs(args)) {
-      if (args.event.type === 'message') {
-        // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
-        // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
-        // TODO: there must be a better way; generics-based types for event and middleware arguments likely the issue
-        // should instead use a discriminated union
-        const message = args.message as unknown as SlackEventMiddlewareArgs<'message'>['message'];
-        if (message !== undefined) {
-        // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
-        // type narrowing
-        // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
-          if (message.subtype === 'bot_message' && message.bot_id === botId) {
-            return;
-          }
+  if (isEventArgs(args)) {
+    if (args.event.type === 'message') {
+      // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
+      // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
+      // TODO: there must be a better way; generics-based types for event and middleware arguments likely the issue
+      // should instead use a discriminated union
+      const message = args.message as unknown as SlackEventMiddlewareArgs<'message'>['message'];
+      if (message !== undefined) {
+      // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
+      // type narrowing
+      // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
+        if (message.subtype === 'bot_message' && message.bot_id === botId) {
+          return;
         }
-      }
-
-      // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
-      // However, some events still must be fired, because they can make sense.
-      const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
-      const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
-
-      if (botUserId !== undefined && 'user' in args.event && args.event.user === botUserId && !isEventShouldBeKept) {
-        return;
       }
     }
 
-    // If all the previous checks didn't skip this message, then its okay to resume to next
-    await args.next();
-  };
-}
+    // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
+    // However, some events still must be fired, because they can make sense.
+    const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
+    const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
+
+    if (botUserId !== undefined && 'user' in args.event && args.event.user === botUserId && !isEventShouldBeKept) {
+      return;
+    }
+  }
+
+  // If all the previous checks didn't skip this message, then its okay to resume to next
+  await args.next();
+};
 
 /**
  * Filters out any message events whose subtype does not match the provided subtype.
@@ -340,40 +336,36 @@ export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'
 
 const slackLink = /<(?<type>[@#!])?(?<link>[^>|]+)(?:\|(?<label>[^>]+))?>/;
 
-// TODO: breaking change: why does this method have to be invoked as a function with no args, while other similar
-// method like the `only*` ones do not require that? should make this consistent.
 /**
  * Filters out any message event whose text does not start with an @-mention of the handling app.
  */
-export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>> {
-  return async ({ message, context, next }) => {
-    // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
-    if (context.botUserId === undefined) {
-      throw new ContextMissingPropertyError(
-        'botUserId',
-        'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
-      );
-    }
+export const directMention: Middleware<SlackEventMiddlewareArgs<'message'>> = async ({ message, context, next }) => {
+  // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
+  if (context.botUserId === undefined) {
+    throw new ContextMissingPropertyError(
+      'botUserId',
+      'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
+    );
+  }
 
-    if (!message || !('text' in message) || message.text === undefined) {
-      return;
-    }
+  if (!message || !('text' in message) || message.text === undefined) {
+    return;
+  }
 
-    // Match the message text with a user mention format
-    const text = message.text.trim();
+  // Match the message text with a user mention format
+  const text = message.text.trim();
 
-    const matches = slackLink.exec(text);
-    if (
-      matches === null || // stop when no matches are found
-      matches.index !== 0 || // stop if match isn't at the beginning
-      // stop if match isn't a user mention with the right user ID
-      matches.groups === undefined ||
-      matches.groups.type !== '@' ||
-      matches.groups.link !== context.botUserId
-    ) {
-      return;
-    }
+  const matches = slackLink.exec(text);
+  if (
+    matches === null || // stop when no matches are found
+    matches.index !== 0 || // stop if match isn't at the beginning
+    // stop if match isn't a user mention with the right user ID
+    matches.groups === undefined ||
+    matches.groups.type !== '@' ||
+    matches.groups.link !== context.botUserId
+  ) {
+    return;
+  }
 
-    await next();
-  };
-}
+  await next();
+};
