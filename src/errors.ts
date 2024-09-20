@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { BufferedIncomingMessage } from './receivers/BufferedIncomingMessage';
 
 export interface CodedError extends Error {
@@ -10,7 +10,7 @@ export interface CodedError extends Error {
   res?: ServerResponse; // HTTPReceiverDeferredRequestError
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: errors can be anything
 export function isCodedError(err: any): err is CodedError {
   return 'code' in err;
 }
