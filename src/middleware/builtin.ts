@@ -39,6 +39,7 @@ type CallbackIdentifiedBody =
   | InteractiveMessageSuggestion
   | DialogSuggestion;
 
+// TODO: consider exporting these type guards for use elsewhere within bolt
 // TODO: is there overlap with `function_executed` event here?
 function isCallbackIdentifiedBody(
   body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],
@@ -58,6 +59,12 @@ function isEventArgs(
   args: AnyMiddlewareArgs,
 ): args is SlackEventMiddlewareArgs {
   return 'event' in args && args.event !== undefined;
+}
+
+function isMessageEventArgs(
+  args: AnyMiddlewareArgs,
+): args is SlackEventMiddlewareArgs<'message'> {
+  return isEventArgs(args) && 'message' in args;
 }
 
 /**
@@ -96,9 +103,9 @@ export const onlyOptions: Middleware<AnyMiddlewareArgs> = async (args) => {
   }
 };
 
+// TODO: event terminology here "event that isn't an event" wat
 /**
  * Middleware that filters out any event that isn't an event
- * TODO:event terminology, "event that isn't an event" caman
  */
 export const onlyEvents: Middleware<AnyMiddlewareArgs> = async (args) => {
   if (isEventArgs(args)) {
@@ -106,6 +113,7 @@ export const onlyEvents: Middleware<AnyMiddlewareArgs> = async (args) => {
   }
 };
 
+// TODO: event terminology "ViewAction" is confusing since "Action" we use for block actions
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
@@ -289,23 +297,14 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
  * Filters out any event originating from the handling app.
  */
 export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
-  const botId = args.context.botId as string;
-  const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
+  const { botId, botUserId } = args.context;
 
   if (isEventArgs(args)) {
-    if (args.event.type === 'message') {
-      // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
-      // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
-      // TODO: there must be a better way; generics-based types for event and middleware arguments likely the issue
-      // should instead use a discriminated union
-      const message = args.message as unknown as SlackEventMiddlewareArgs<'message'>['message'];
-      if (message !== undefined) {
-      // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
-      // type narrowing
+    if (isMessageEventArgs(args)) {
+      const { message } = args;
       // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
-        if (message.subtype === 'bot_message' && message.bot_id === botId) {
-          return;
-        }
+      if (message.subtype === 'bot_message' && message.bot_id === botId) {
+        return;
       }
     }
 

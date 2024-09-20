@@ -5,15 +5,14 @@ import { SayFn } from '../utilities';
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
  */
-export interface SlackEventMiddlewareArgs<EventType extends string = string> {
+export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   payload: EventFromType<EventType>;
-  event: this['payload'];
-  message: EventType extends 'message' ? this['payload'] : undefined;
-  body: EnvelopedEvent<this['payload']>;
-  say: WhenEventHasChannelContext<this['payload'], SayFn>;
+  event: EventFromType<EventType>;
+  body: EnvelopedEvent<EventFromType<EventType>>;
+  say: WhenEventHasChannelContext<EventFromType<EventType>, SayFn>;
   // Add `ack` as undefined for global middleware in TypeScript
   ack?: undefined;
-}
+} & (EventType extends 'message' ? { message: EventFromType<EventType> } : unknown);
 
 interface BaseSlackEvent<T extends string = string> {
   type: T;
