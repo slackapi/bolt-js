@@ -42,7 +42,8 @@ export function verifySlackRequest(options: SlackRequestVerificationOptions): vo
   // Rule 1: Check staleness
   if (requestTimestampSec < fiveMinutesAgoSec) {
     throw new Error(
-      `${verifyErrorPrefix}: x-slack-request-timestamp must differ from system time by no more than ${requestTimestampMaxDeltaMin
+      `${verifyErrorPrefix}: x-slack-request-timestamp must differ from system time by no more than ${
+        requestTimestampMaxDeltaMin
       } minutes or request is stale`,
     );
   }

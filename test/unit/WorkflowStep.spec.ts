@@ -11,25 +11,25 @@ import {
   type WorkflowStepExecuteMiddlewareArgs,
   type WorkflowStepMiddleware,
   type WorkflowStepSaveMiddlewareArgs,
-} from './WorkflowStep';
-import { WorkflowStepInitializationError } from './errors';
-import { type Override, noop } from './test-helpers';
-import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from './types';
+} from '../../src/WorkflowStep';
+import { WorkflowStepInitializationError } from '../../src/errors';
+import { type Override, noopVoid } from './helpers';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
 
-async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('./WorkflowStep')> {
-  return rewiremock.module(() => import('./WorkflowStep'), overrides);
+async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('../../src/WorkflowStep')> {
+  return rewiremock.module(() => import('../../src/WorkflowStep'), overrides);
 }
 
 const MOCK_CONFIG_SINGLE = {
-  edit: noop,
-  save: noop,
-  execute: noop,
+  edit: noopVoid,
+  save: noopVoid,
+  execute: noopVoid,
 };
 
 const MOCK_CONFIG_MULTIPLE = {
-  edit: [noop, noop],
-  save: [noop],
-  execute: [noop, noop, noop],
+  edit: [noopVoid, noopVoid],
+  save: [noopVoid],
+  execute: [noopVoid, noopVoid, noopVoid],
 };
 
 describe('WorkflowStep class', () => {
@@ -172,7 +172,7 @@ describe('WorkflowStep class', () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeSaveArgs = createFakeStepSaveEvent() as unknown as SlackWorkflowStepMiddlewareArgs & AllMiddlewareArgs;
       const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
-        AllMiddlewareArgs; // eslint-disable-line max-len
+        AllMiddlewareArgs;
 
       const { prepareStepArgs } = await importWorkflowStep();
 
@@ -189,31 +189,35 @@ describe('WorkflowStep class', () => {
       const fakeArgs = createFakeStepEditAction();
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const stepArgs = prepareStepArgs(fakeArgs) as AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>;
+      const stepArgs = prepareStepArgs(fakeArgs as AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>);
 
       assert.exists(stepArgs.step);
-      assert.exists(stepArgs.configure);
+      assert.property(stepArgs, 'configure');
     });
 
     it('should augment view_submission with step and update()', async () => {
       const fakeArgs = createFakeStepSaveEvent();
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const stepArgs = prepareStepArgs(fakeArgs) as AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>;
+      const stepArgs = prepareStepArgs(
+        fakeArgs as unknown as AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>,
+      );
 
       assert.exists(stepArgs.step);
-      assert.exists(stepArgs.update);
+      assert.property(stepArgs, 'update');
     });
 
     it('should augment workflow_step_execute with step, complete() and fail()', async () => {
       const fakeArgs = createFakeStepExecuteEvent();
       const { prepareStepArgs } = await importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
-      const stepArgs = prepareStepArgs(fakeArgs) as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>;
+      const stepArgs = prepareStepArgs(
+        fakeArgs as unknown as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>,
+      );
 
       assert.exists(stepArgs.step);
-      assert.exists(stepArgs.complete);
-      assert.exists(stepArgs.fail);
+      assert.property(stepArgs, 'complete');
+      assert.property(stepArgs, 'fail');
     });
   });
 

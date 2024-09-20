@@ -5,7 +5,8 @@
   ],
   "spec": [
     "test/unit/App/*.spec.ts",
-    "test/unit/CustomFunction.spec.ts"
+    "test/unit/CustomFunction.spec.ts",
+    "test/unit/WorkflowStep.spec.ts"
   ],
   "timeout": 3000
 }
