@@ -9,7 +9,7 @@ import {
   ReceiverMultipleAckError,
   UnknownError,
   asCodedError,
-} from './errors';
+} from '../../src/errors';
 
 describe('Errors', () => {
   it('has errors matching codes', () => {
@@ -22,9 +22,9 @@ describe('Errors', () => {
       [ErrorCode.UnknownError]: new UnknownError(new Error('It errored')),
     };
 
-    Object.entries(errorMap).forEach(([code, error]) => {
+    for (const [code, error] of Object.entries(errorMap)) {
       assert.equal((error as CodedError).code, code);
-    });
+    }
   });
 
   it('wraps non-coded errors', () => {

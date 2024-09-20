@@ -4,6 +4,7 @@ import type {
   BaseSlackEvent,
   BlockAction,
   BlockElementAction,
+  Context,
   EnvelopedEvent,
   GlobalShortcut,
   MessageShortcut,
@@ -21,7 +22,12 @@ import type {
   ViewOutput,
   BlockSuggestion,
   SlashCommand,
+  AllMiddlewareArgs,
+  AnyMiddlewareArgs,
 } from '../../../src/types';
+import { createFakeLogger } from '.';
+import sinon, { type SinonSpy } from 'sinon';
+import { WebClient } from '@slack/web-api';
 
 const ts = '1234.56';
 const user = 'U1234';
@@ -32,6 +38,19 @@ const app_id = 'A1234';
 const say: SayFn = (_msg) => Promise.resolve({ ok: true });
 const respond: RespondFn = (_msg) => Promise.resolve();
 const ack: AckFn<void> = (_r?) => Promise.resolve();
+
+export function wrapMiddleware<Args extends SlackEventMiddlewareArgs>(
+  args: Args,
+  ctx?: Context,
+): Args & AllMiddlewareArgs & { next: SinonSpy } {
+  return {
+    ...args,
+    context: ctx || { isEnterpriseInstall: false },
+    logger: createFakeLogger(),
+    client: new WebClient(),
+    next: sinon.fake(),
+  };
+}
 
 interface DummyMessageOverrides {
   message?: MessageEvent;
@@ -61,22 +80,26 @@ export function createDummyMessageEventMiddlewareArgs(
   };
 }
 
+interface DummyAppMentionOverrides {
+  event?: AppMentionEvent;
+  text?: string;
+}
 export function createDummyAppMentionEventMiddlewareArgs(
+  eventOverrides?: DummyAppMentionOverrides,
   // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
   bodyOverrides?: Record<string, any>,
-  event?: AppMentionEvent,
 ): SlackEventMiddlewareArgs<'app_mention'> {
-  const payload: AppMentionEvent = event || {
+  const payload: AppMentionEvent = eventOverrides?.event || {
     type: 'app_mention',
-    text: 'hi',
+    text: eventOverrides?.text || 'hi',
     channel,
     ts,
     event_ts: ts,
   };
   return {
+    message: undefined,
     payload,
     event: payload,
-    message: undefined,
     body: envelopeEvent(payload, bodyOverrides),
     say,
   };
