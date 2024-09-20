@@ -20,10 +20,13 @@
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
     "css-minimizer-webpack-plugin": "^7.0.0",
+    "docusaurus-plugin-typedoc": "^1.0.5",
     "docusaurus-theme-github-codeblock": "^2.0.2",
     "prism-react-renderer": "^2.4.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "typedoc": "^0.26.7",
+    "typedoc-plugin-markdown": "^4.2.7"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.5.2",

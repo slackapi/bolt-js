@@ -91,6 +91,15 @@ const sidebars = {
     },
     { type: 'html', value: '<hr>' },
     'reference',
+    {
+      type: 'category',
+      label: 'Generated Reference',
+      link: {
+        type: 'doc',
+        id: 'generated-reference/index',
+      },
+      items: require('./content/generated-reference/typedoc-sidebar.cjs'),
+    },
     { type: 'html', value: '<hr>' },
     {
       type: 'link',

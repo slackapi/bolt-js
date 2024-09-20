@@ -66,7 +66,15 @@ plugins:
       ],
     },
   ],
-  
+  [
+    'docusaurus-plugin-typedoc',
+    {
+      id: 'generated-reference',
+      entryPoints: ['../src/index.ts'],
+      tsconfig: '../tsconfig.json',
+      out: "./content/generated-reference",
+    },
+  ],
 ],
 
 
