@@ -23,7 +23,6 @@ import type {
   BlockSuggestion,
   SlashCommand,
   AllMiddlewareArgs,
-  AnyMiddlewareArgs,
 } from '../../../src/types';
 import { createFakeLogger } from '.';
 import sinon, { type SinonSpy } from 'sinon';

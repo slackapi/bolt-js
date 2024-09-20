@@ -30,7 +30,7 @@ export {
 export { HTTPResponseAck } from './receivers/HTTPResponseAck';
 
 export {
-  SocketModeFunctions,
+  defaultProcessEventErrorHandler,
   SocketModeReceiverProcessEventErrorHandlerArgs,
 } from './receivers/SocketModeFunctions';
 
