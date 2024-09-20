@@ -9,10 +9,17 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   payload: EventFromType<EventType>;
   event: EventFromType<EventType>;
   body: EnvelopedEvent<EventFromType<EventType>>;
-  say: WhenEventHasChannelContext<EventFromType<EventType>, SayFn>;
-  // Add `ack` as undefined for global middleware in TypeScript
+  // Add `ack` as undefined for global middleware in TypeScript TODO: but why
   ack?: undefined;
-} & (EventType extends 'message' ? { message: EventFromType<EventType> } : unknown);
+} & (EventType extends 'message'
+  // If this is a message event, add a `message` property
+  ? { message: EventFromType<EventType> }
+  : unknown
+) & (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
+  // If this event contains a channel, add a `say` utility function
+  ? { say: SayFn }
+  : unknown
+);
 
 interface BaseSlackEvent<T extends string = string> {
   type: T;
@@ -61,6 +68,3 @@ export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T
  * Type function which tests whether or not the given `Event` contains a channel ID context for where the event
  * occurred, and returns `Type` when the test passes. Otherwise this returns `undefined`.
  */
-type WhenEventHasChannelContext<Event, Type> = Event extends { channel: string } | { item: { channel: string } }
-  ? Type
-  : undefined;
