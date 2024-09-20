@@ -1,4 +1,3 @@
-import 'mocha';
 import { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
@@ -9,17 +8,17 @@ import {
   type CustomFunctionExecuteMiddlewareArgs,
   type CustomFunctionMiddleware,
   type SlackCustomFunctionMiddlewareArgs,
-} from './CustomFunction';
-import { CustomFunctionInitializationError } from './errors';
-import { type Override, createFakeLogger } from './test-helpers';
-import type { AllMiddlewareArgs, Middleware } from './types';
+} from '../../src/CustomFunction';
+import { CustomFunctionInitializationError } from '../../src/errors';
+import { type Override, createFakeLogger } from './helpers';
+import type { AllMiddlewareArgs, Middleware } from '../../src/types';
 
-async function importCustomFunction(overrides: Override = {}): Promise<typeof import('./CustomFunction')> {
-  return rewiremock.module(() => import('./CustomFunction'), overrides);
+async function importCustomFunction(overrides: Override = {}): Promise<typeof import('../../src//CustomFunction')> {
+  return rewiremock.module(() => import('../../src/CustomFunction'), overrides);
 }
 
-const MOCK_FN = async () => {};
-const MOCK_FN_2 = async () => {};
+const MOCK_FN = async () => { };
+const MOCK_FN_2 = async () => { };
 
 const MOCK_MIDDLEWARE_SINGLE = [MOCK_FN];
 const MOCK_MIDDLEWARE_MULTIPLE = [MOCK_FN, MOCK_FN_2];
@@ -106,7 +105,7 @@ describe('CustomFunction class', () => {
       const { validate } = await importCustomFunction();
 
       // intentionally casting to CustomFunctionMiddleware to trigger failure
-      const badMiddleware = [async () => {}, 'not-a-function'] as unknown as CustomFunctionMiddleware;
+      const badMiddleware = [async () => { }, 'not-a-function'] as unknown as CustomFunctionMiddleware;
 
       const validationFn = () => validate('callback_id', badMiddleware);
       const expectedMsg = 'All CustomFunction middleware must be functions';
@@ -215,7 +214,7 @@ describe('CustomFunction class', () => {
       const fn1 = sinon.spy((async ({ next: continuation }) => {
         await continuation();
       }) as Middleware<CustomFunctionExecuteMiddlewareArgs>);
-      const fn2 = sinon.spy(async () => {});
+      const fn2 = sinon.spy(async () => { });
       const fakeMiddleware = [fn1, fn2] as CustomFunctionMiddleware;
 
       await processFunctionMiddleware(fakeArgs, fakeMiddleware);

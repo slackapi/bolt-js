@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FunctionExecutedEvent } from '@slack/types';
 import {
   type FunctionsCompleteErrorResponse,
@@ -17,9 +16,8 @@ import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEv
 /** Interfaces */
 
 interface FunctionCompleteArguments {
-  outputs?: {
-    [key: string]: any;
-  };
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
+  outputs?: Record<string, any>;
 }
 
 export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
@@ -71,7 +69,7 @@ export class CustomFunction {
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => {
+    return async (args): Promise<void> => {
       if (isFunctionEvent(args) && this.matchesConstraints(args)) {
         return this.processEvent(args);
       }
@@ -153,12 +151,12 @@ export function validate(callbackId: string, middleware: CustomFunctionExecuteMi
 
   // Ensure array includes only functions
   if (Array.isArray(middleware)) {
-    middleware.forEach((fn) => {
+    for (const fn of middleware) {
       if (!(fn instanceof Function)) {
         const errorMsg = 'All CustomFunction middleware must be functions';
         throw new CustomFunctionInitializationError(errorMsg);
       }
-    });
+    }
   }
 }
 
