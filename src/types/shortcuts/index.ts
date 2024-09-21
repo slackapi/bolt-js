@@ -16,11 +16,13 @@ export type SlackShortcut = GlobalShortcut | MessageShortcut;
  *
  * The type parameter `Shortcut` represents the entire JSON-encoded request body from Slack.
  */
-export interface SlackShortcutMiddlewareArgs<Shortcut extends SlackShortcut = SlackShortcut> {
+export type SlackShortcutMiddlewareArgs<Shortcut extends SlackShortcut = SlackShortcut> = {
   payload: Shortcut;
-  shortcut: this['payload'];
-  body: this['payload'];
-  say: Shortcut extends MessageShortcut ? SayFn : undefined;
+  shortcut: Shortcut;
+  body: Shortcut;
   respond: RespondFn;
   ack: AckFn<void>;
-}
+} & (Shortcut extends MessageShortcut
+  ? { say: SayFn }
+  : unknown
+);

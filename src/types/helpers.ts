@@ -5,6 +5,7 @@
  */
 export type StringIndexed = Record<string, any>;
 
+// TODO: unclear if this is helpful or just complicates further
 /**
  * Type function which allows either types `T` or `U`, but not both.
  */
