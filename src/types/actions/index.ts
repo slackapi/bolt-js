@@ -35,22 +35,30 @@ export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction 
  * `BlockAction<ElementAction>` can be used to create a type for this parameter based on an element's action type. In
  * this case `ElementAction` must extend `BasicElementAction`.
  */
-export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> {
+export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> = {
   payload: Action extends BlockAction<infer ElementAction>
     ? ElementAction
     : Action extends InteractiveMessage<infer InteractiveAction>
       ? InteractiveAction
       : Action;
-  action: this['payload'];
+  // too bad we can't use `this['payload']` in a type (as opposed to interface) but the use of `& unknown` below is too useful
+  action: Action extends BlockAction<infer ElementAction>
+    ? ElementAction
+    : Action extends InteractiveMessage<infer InteractiveAction>
+      ? InteractiveAction
+      : Action;
   body: Action;
-  // all action types except dialog submission have a channel context
-  say: Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit> ? SayFn : undefined;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
+  // TODO: can we conditionally apply these custom-function-specific properties only in certain situations? how can we get function-scoped interactivity events included in the generics?
   complete?: FunctionCompleteFn;
   fail?: FunctionFailFn;
   inputs?: FunctionInputs;
-}
+} & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
+  // all action types except dialog submission and steps from apps have a channel context
+  ? { say: SayFn }
+  : unknown
+);
 
 /**
  * Type function which given an action `A` returns a corresponding type for the `ack()` function. The function is used
