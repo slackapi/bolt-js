@@ -9,7 +9,7 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   payload: EventFromType<EventType>;
   event: EventFromType<EventType>;
   body: EnvelopedEvent<EventFromType<EventType>>;
-  // Add `ack` as undefined for global middleware in TypeScript TODO: but why
+  // Add `ack` as undefined for global middleware in TypeScript TODO: but why? spend some time digging into this
   ack?: undefined;
 } & (EventType extends 'message'
   // If this is a message event, add a `message` property

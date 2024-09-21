@@ -20,15 +20,14 @@ export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block
 
 export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
 
+// TODO: the following three utility typies could be DRYed up w/ the similar KnownEventFromType utility used in events types
 export interface BasicOptionsPayload<Type extends string = string> {
   type: Type;
   value: string;
 }
-
 export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
   ? BasicOptionsPayload<T>
   : KnownOptionsPayloadFromType<T>;
-
 export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
 
 /**
