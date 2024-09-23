@@ -50,7 +50,7 @@
     "@types/promise.allsettled": "^1.0.3",
     "@types/tsscmp": "^1.0.0",
     "axios": "^1.7.4",
-    "express": "^4.16.4",
+    "express": "^4.20.0",
     "path-to-regexp": "^8.1.0",
     "promise.allsettled": "^1.0.2",
     "raw-body": "^2.3.3",
