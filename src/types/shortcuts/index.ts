@@ -27,7 +27,4 @@ export type SlackShortcutMiddlewareArgs<Shortcut extends SlackShortcut = SlackSh
   body: Shortcut;
   respond: RespondFn;
   ack: AckFn<void>;
-} & (Shortcut extends MessageShortcut
-  ? { say: SayFn }
-  : unknown
-);
+} & (Shortcut extends MessageShortcut ? { say: SayFn } : unknown);

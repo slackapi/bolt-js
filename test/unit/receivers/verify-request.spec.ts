@@ -1,7 +1,6 @@
-import 'mocha';
-import { createHmac } from 'crypto';
+import { createHmac } from 'node:crypto';
 import { assert } from 'chai';
-import { isValidSlackRequest, verifySlackRequest } from './verify-request';
+import { isValidSlackRequest, verifySlackRequest } from '../../../src/receivers/verify-request';
 
 describe('Request verification', async () => {
   const signingSecret = 'secret';
@@ -38,8 +37,9 @@ describe('Request verification', async () => {
           body: rawBody,
         });
       } catch (e) {
-        assert.equal(
-          (e as any).message,
+        assert.propertyVal(
+          e,
+          'message',
           'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
         );
       }
@@ -57,7 +57,7 @@ describe('Request verification', async () => {
           body: rawBody,
         });
       } catch (e) {
-        assert.equal((e as any).message, 'Failed to verify authenticity: signature mismatch');
+        assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
       }
     });
   });

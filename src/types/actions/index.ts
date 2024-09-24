@@ -49,16 +49,16 @@ export interface ActionConstraints<A extends SlackAction = SlackAction> {
  */
 export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> = {
   payload: Action extends BlockAction<infer ElementAction>
-  ? ElementAction
-  : Action extends InteractiveMessage<infer InteractiveAction>
-  ? InteractiveAction
-  : Action;
+    ? ElementAction
+    : Action extends InteractiveMessage<infer InteractiveAction>
+      ? InteractiveAction
+      : Action;
   // too bad we can't use `this['payload']` in a type (as opposed to interface) but the use of `& unknown` below is too useful
   action: Action extends BlockAction<infer ElementAction>
-  ? ElementAction
-  : Action extends InteractiveMessage<infer InteractiveAction>
-  ? InteractiveAction
-  : Action;
+    ? ElementAction
+    : Action extends InteractiveMessage<infer InteractiveAction>
+      ? InteractiveAction
+      : Action;
   body: Action;
   respond: RespondFn;
   ack: ActionAckFn<Action>;
@@ -69,7 +69,7 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
 // TODO: remove workflow step stuff in bolt v5
 } & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
   ? // all action types except dialog submission and steps from apps have a channel context
-  { say: SayFn }
+    { say: SayFn }
   : unknown);
 
 /**
@@ -79,5 +79,5 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
 type ActionAckFn<A extends SlackAction> = A extends InteractiveMessage
   ? AckFn<string | SayArguments>
   : A extends DialogSubmitAction
-  ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
-  : AckFn<void>;
+    ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
+    : AckFn<void>;

@@ -96,7 +96,6 @@ export function createDummyAppMentionEventMiddlewareArgs(
     event_ts: ts,
   };
   return {
-    message: undefined,
     payload,
     event: payload,
     body: envelopeEvent(payload, bodyOverrides),
@@ -322,7 +321,6 @@ export function createDummyGlobalShortcutMiddlewareArgs(
     body: payload,
     respond,
     ack: () => Promise.resolve(),
-    say: undefined,
   };
 }
 
