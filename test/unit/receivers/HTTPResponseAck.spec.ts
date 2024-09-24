@@ -1,11 +1,10 @@
-import 'mocha';
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage, ServerResponse } from 'node:http';
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { ReceiverMultipleAckError } from '../errors';
-import { createFakeLogger } from '../test-helpers';
-import { HTTPModuleFunctions } from './HTTPModuleFunctions';
-import { HTTPResponseAck } from './HTTPResponseAck';
+import { ReceiverMultipleAckError } from '../../../src/errors';
+import { createFakeLogger } from '../helpers';
+import { HTTPModuleFunctions } from '../../../src/receivers/HTTPModuleFunctions';
+import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
 
 describe('HTTPResponseAck', async () => {
   it('should work', async () => {
@@ -25,7 +24,6 @@ describe('HTTPResponseAck', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const spy = sinon.spy();
-    // eslint-disable-next-line no-new
     new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -43,7 +41,6 @@ describe('HTTPResponseAck', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const spy = sinon.spy();
-    // eslint-disable-next-line no-new
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
