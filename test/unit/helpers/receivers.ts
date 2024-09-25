@@ -27,10 +27,11 @@ export class FakeReceiver implements Receiver {
 export class FakeServer extends EventEmitter {
   public on = sinon.fake();
 
-  public listen = sinon.fake(() => {
+  public listen = sinon.fake((_opts: Record<string, unknown>, cb: () => void) => {
     if (this.listeningFailure !== undefined) {
       this.emit('error', this.listeningFailure);
     }
+    if (cb) cb();
   });
 
   // biome-ignore lint/suspicious/noExplicitAny: event handlers could accept anything as parameters

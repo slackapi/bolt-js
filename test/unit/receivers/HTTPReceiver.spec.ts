@@ -1,5 +1,4 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
-import { LogLevel, type Logger } from '@slack/logger';
 import { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
@@ -11,7 +10,16 @@ import {
   CustomRouteInitializationError,
   HTTPReceiverDeferredRequestError,
 } from '../../../src/errors';
-import { FakeServer, type Override, createFakeLogger, mergeOverrides, type noopVoid } from '../helpers';
+import {
+  FakeServer,
+  type Override,
+  createFakeLogger,
+  mergeOverrides,
+  type noopVoid,
+  withHttpsCreateServer,
+  withHttpCreateServer,
+} from '../helpers';
+import type { CustomRoute } from '../../../src/receivers/custom-routes';
 
 // Loading the system under test using overrides
 async function importHTTPReceiver(
@@ -21,25 +29,28 @@ async function importHTTPReceiver(
 }
 
 describe('HTTPReceiver', () => {
-  let httpRequestListener: typeof noopVoid;
+  // TODO: we pick up the socket listener method so we can assert on its behaviour; probably should add tests for it then
+  // let httpRequestListener: typeof noopVoid;
   let fakeServer: FakeServer;
   let fakeCreateServer: sinon.SinonSpy;
+  const noopLogger = createFakeLogger();
+  let overrides: Override;
   beforeEach(() => {
     fakeServer = new FakeServer();
-    fakeCreateServer = sinon.fake((_options: Record<string, unknown>, handler: typeof noopVoid) => {
-      httpRequestListener = handler; // pick up the socket listener method so we can assert on its behaviour
+    fakeCreateServer = sinon.fake((_options: Record<string, unknown>, _handler: typeof noopVoid) => {
+      // TODO: we pick up the socket listener method so we can assert on its behaviour; probably should add tests for it then
+      // httpRequestListener = _handler;
       return fakeServer;
     });
+    overrides = mergeOverrides(
+      withHttpCreateServer(fakeCreateServer),
+      withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+    );
   });
 
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
-    it('should accept supported arguments and use default arguments when not provided', async function() {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should accept supported arguments and use default arguments when not provided', async () => {
       const HTTPReceiver = await importHTTPReceiver(overrides);
 
       const receiver = new HTTPReceiver({
@@ -78,26 +89,21 @@ describe('HTTPReceiver', () => {
       assert.isNotNull(receiver);
     });
 
-    it('should accept a custom port', async function() {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should accept a custom port', async () => {
       const HTTPReceiver = await importHTTPReceiver(overrides);
 
       const defaultPort = new HTTPReceiver({
         signingSecret: 'secret',
       });
       assert.isNotNull(defaultPort);
-      assert.equal((defaultPort as any).port, 3000);
+      assert.propertyVal(defaultPort, 'port', 3000);
 
       const customPort = new HTTPReceiver({
         port: 9999,
         signingSecret: 'secret',
       });
       assert.isNotNull(customPort);
-      assert.equal((customPort as any).port, 9999);
+      assert.propertyVal(customPort, 'port', 9999);
 
       const customPort2 = new HTTPReceiver({
         port: 7777,
@@ -107,7 +113,7 @@ describe('HTTPReceiver', () => {
         },
       });
       assert.isNotNull(customPort2);
-      assert.equal((customPort2 as any).port, 9999);
+      assert.propertyVal(customPort2, 'port', 9999);
     });
 
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
@@ -178,36 +184,27 @@ describe('HTTPReceiver', () => {
     });
   });
   describe('start() method', () => {
-    it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async function() {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async () => {
       const HTTPReceiver = await importHTTPReceiver(overrides);
 
       const defaultPort = new HTTPReceiver({
         signingSecret: 'secret',
       });
       assert.isNotNull(defaultPort);
-      assert.equal((defaultPort as any).port, 3000);
+      assert.propertyVal(defaultPort, 'port', 3000);
       await defaultPort.start(9001);
-      assert.isTrue(this.fakeServer.listen.calledWith(9001));
+      sinon.assert.calledWith(fakeServer.listen, 9001);
       await defaultPort.stop();
+      fakeServer.listen.resetHistory();
       await defaultPort.start('1337');
-      assert.isTrue(this.fakeServer.listen.calledWith(1337));
+      sinon.assert.calledWith(fakeServer.listen, 1337);
       await defaultPort.stop();
     });
   });
   describe('request handling', () => {
     describe('handleInstallPathRequest()', () => {
-      it('should invoke installer handleInstallPath if a request comes into the install path', async function() {
-        // Arrange
+      it('should invoke installer handleInstallPath if a request comes into the install path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const HTTPReceiver = await importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -229,27 +226,16 @@ describe('HTTPReceiver', () => {
         });
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/hiya';
         fakeReq.method = 'GET';
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        const setHeader = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
-        fakeRes.setHeader = setHeader;
-        await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
+        const fakeRes = sinon.createStubInstance(ServerResponse);
+        receiver.requestListener(fakeReq, fakeRes as unknown as ServerResponse);
+        sinon.assert.calledWith(installProviderStub.handleInstallPath, fakeReq, fakeRes);
       });
 
-      it('should use a custom HTML renderer for the install path webpage', async function() {
-        // Arrange
+      it('should use a custom HTML renderer for the install path webpage', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const HTTPReceiver = await importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -276,22 +262,12 @@ describe('HTTPReceiver', () => {
         fakeReq.url = '/hiya';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
-        /* eslint-disable-next-line @typescript-eslint/await-thenable */
-        await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
+        receiver.requestListener(fakeReq, fakeRes);
+        sinon.assert.calledWith(installProviderStub.handleInstallPath, fakeReq, fakeRes);
       });
 
-      it('should redirect installers if directInstall is true', async function() {
-        // Arrange
+      it('should redirect installers if directInstall is true', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const HTTPReceiver = await importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -318,25 +294,16 @@ describe('HTTPReceiver', () => {
         fakeReq.url = '/hiya';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
-        await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
+        receiver.requestListener(fakeReq, fakeRes);
+        sinon.assert.calledWith(installProviderStub.handleInstallPath, fakeReq, fakeRes);
       });
     });
 
     describe('handleInstallRedirectRequest()', () => {
-      it('should invoke installer handler if a request comes into the redirect URI path', async function() {
-        // Arrange
+      it('should invoke installer handler if a request comes into the redirect URI path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
           handleCallback: sinon.stub().resolves() as unknown as Promise<void>,
         });
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const HTTPReceiver = await importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -361,28 +328,18 @@ describe('HTTPReceiver', () => {
         });
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/heyo';
         fakeReq.method = 'GET';
         const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        const writeHead = sinon.fake();
-        const end = sinon.fake();
-        fakeRes.writeHead = writeHead;
-        fakeRes.end = end;
-        /* eslint-disable-next-line @typescript-eslint/await-thenable */
-        await receiver.requestListener(fakeReq, fakeRes);
-        assert(installProviderStub.handleCallback.calledWith(fakeReq, fakeRes, callbackOptions));
+        receiver.requestListener(fakeReq, fakeRes);
+        sinon.assert.calledWith(installProviderStub.handleCallback, fakeReq, fakeRes, callbackOptions);
       });
 
-      it('should invoke installer handler with installURLoptions supplied if state verification is off', async function() {
-        // Arrange
+      it('should invoke installer handler with installURLoptions supplied if state verification is off', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
           handleCallback: sinon.stub().resolves() as unknown as Promise<void>,
         });
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const HTTPReceiver = await importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -415,13 +372,11 @@ describe('HTTPReceiver', () => {
         });
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/heyo';
         fakeReq.method = 'GET';
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        fakeRes.writeHead = sinon.fake();
-        fakeRes.end = sinon.fake();
-        await receiver.requestListener(fakeReq, fakeRes);
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        receiver.requestListener(fakeReq, fakeRes);
         sinon.assert.calledWith(
           installProviderStub.handleCallback,
           fakeReq,
@@ -453,12 +408,12 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -474,8 +429,8 @@ describe('HTTPReceiver', () => {
           customRoutes,
         });
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
         fakeReq.url = '/test?hello=world';
         const tempMatch = matchRegex('/test');
@@ -485,12 +440,12 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -506,8 +461,8 @@ describe('HTTPReceiver', () => {
           customRoutes,
         });
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -517,12 +472,12 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -541,8 +496,8 @@ describe('HTTPReceiver', () => {
           customRoutes,
         });
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -552,13 +507,13 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
-        assert(customRoutes[1].handler.notCalled);
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
+        sinon.assert.notCalled(customRoutes[1].handler);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -577,8 +532,8 @@ describe('HTTPReceiver', () => {
           customRoutes,
         });
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -588,13 +543,13 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'GET';
         receiver.requestListener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
-        assert(customRoutes[1].handler.notCalled);
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
+        sinon.assert.notCalled(customRoutes[1].handler);
 
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        sinon.assert.calledWith(customRoutes[0].handler, expectedMessage, fakeRes);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -602,7 +557,7 @@ describe('HTTPReceiver', () => {
 
       it("should throw an error if customRoutes don't have the required keys", async () => {
         const HTTPReceiver = await importHTTPReceiver();
-        const customRoutes = [{ path: '/test' }] as any;
+        const customRoutes = [{ path: '/test' }] as CustomRoute[];
 
         assert.throws(
           () =>
@@ -616,13 +571,8 @@ describe('HTTPReceiver', () => {
       });
     });
 
-    it("should throw if request doesn't match install path, redirect URI path, or custom routes", async function() {
-      // Arrange
+    it("should throw if request doesn't match install path, redirect URI path, or custom routes", async () => {
       const installProviderStub = sinon.createStubInstance(InstallProvider);
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const HTTPReceiver = await importHTTPReceiver(overrides);
 
       const metadata = 'this is bat country';
@@ -651,13 +601,11 @@ describe('HTTPReceiver', () => {
       assert.isNotNull(receiver);
       receiver.installer = installProviderStub as unknown as InstallProvider;
 
-      const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+      const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
       fakeReq.url = '/nope';
       fakeReq.method = 'GET';
 
-      const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-      fakeRes.writeHead = sinon.fake();
-      fakeRes.end = sinon.fake();
+      const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
     });

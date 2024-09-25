@@ -6,6 +6,7 @@
   "spec": [
     "test/unit/App/*.spec.ts",
     "test/unit/receivers/HTTPModuleFunctions.spec.ts",
+    "test/unit/receivers/HTTPReceiver.spec.ts",
     "test/unit/receivers/HTTPResponseAck.spec.ts",
     "test/unit/receivers/SocketModeFunctions.spec.ts",
     "test/unit/receivers/SocketModeReceiver.spec.ts",
