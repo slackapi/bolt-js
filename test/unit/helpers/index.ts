@@ -18,6 +18,8 @@ export function delay(ms = 0): Promise<void> {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: mock function can accept anything
+export const noopSync = (..._args: any[]) => { };
+// biome-ignore lint/suspicious/noExplicitAny: mock function can accept anything
 export const noop = (_args: any) => Promise.resolve({});
 // biome-ignore lint/suspicious/noExplicitAny: mock function can accept anything
 export const noopVoid = (_args: any) => Promise.resolve();

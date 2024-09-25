@@ -8,6 +8,7 @@
     "test/unit/receivers/HTTPModuleFunctions.spec.ts",
     "test/unit/receivers/HTTPResponseAck.spec.ts",
     "test/unit/receivers/SocketModeFunctions.spec.ts",
+    "test/unit/receivers/SocketModeReceiver.spec.ts",
     "test/unit/receivers/verify-request.spec.ts",
     "test/unit/*.spec.ts"
   ],

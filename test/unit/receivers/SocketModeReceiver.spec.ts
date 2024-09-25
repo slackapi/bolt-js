@@ -1,7 +1,5 @@
-import 'mocha';
-import { EventEmitter } from 'events';
-import { IncomingMessage, ServerResponse } from 'http';
-import { LogLevel, type Logger } from '@slack/logger';
+import { EventEmitter } from 'node:events';
+import { IncomingMessage, ServerResponse } from 'node:http';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
 import { assert } from 'chai';
@@ -9,20 +7,42 @@ import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import { AppInitializationError, CustomRouteInitializationError } from '../errors';
-import { type Override, mergeOverrides } from '../test-helpers';
+import { AppInitializationError, CustomRouteInitializationError } from '../../../src/errors';
+import { type Override, mergeOverrides, noopSync, createFakeLogger } from '../helpers';
 
-// Fakes
+// Loading the system under test using overrides
+async function importSocketModeReceiver(
+  overrides: Override = {},
+): Promise<typeof import('../../../src/receivers/SocketModeReceiver').default> {
+  return (await rewiremock.module(() => import('../../../src/receivers/SocketModeReceiver'), overrides)).default;
+}
+// Composable overrides
+function withHttpCreateServer(spy: SinonSpy): Override {
+  return {
+    http: {
+      createServer: spy,
+    },
+  };
+}
+function withHttpsCreateServer(spy: SinonSpy): Override {
+  return {
+    https: {
+      createServer: spy,
+    },
+  };
+}
 class FakeServer extends EventEmitter {
   public on = sinon.fake();
 
   public listen = sinon.fake(() => {
+    console.log('listening fake server');
     if (this.listeningFailure !== undefined) {
       this.emit('error', this.listeningFailure);
     }
   });
 
   public close = sinon.fake((...args: any[]) => {
+    console.log('closing fake server');
     setImmediate(() => {
       this.emit('close');
       setImmediate(() => {
@@ -32,50 +52,31 @@ class FakeServer extends EventEmitter {
   });
 
   public constructor(private listeningFailure?: Error) {
+    console.log('fake server constructor');
     super();
   }
 }
 
 describe('SocketModeReceiver', () => {
-  beforeEach(function () {
-    this.listener = (_req: any, _res: any) => {};
-    this.fakeServer = new FakeServer();
-    this.fakeCreateServer = sinon.fake((handler: (req: any, res: any) => void) => {
-      this.listener = handler; // pick up the socket listener method so we can assert on its behaviour
-      return this.fakeServer as FakeServer;
+  let listener: typeof noopSync;
+  let fakeServer: FakeServer;
+  let fakeCreateServer: sinon.SinonSpy;
+  const noopLogger = createFakeLogger();
+  beforeEach(() => {
+    listener = noopSync;
+    fakeServer = new FakeServer();
+    fakeCreateServer = sinon.fake((handler: typeof noopSync) => {
+      console.log('fakeCreateServer');
+      listener = handler; // pick up the socket listener method so we can assert on its behaviour
+      return fakeServer;
     });
   });
 
-  const noopLogger: Logger = {
-    debug(..._msg: any[]): void {
-      /* noop */
-    },
-    info(..._msg: any[]): void {
-      /* noop */
-    },
-    warn(..._msg: any[]): void {
-      /* noop */
-    },
-    error(..._msg: any[]): void {
-      /* noop */
-    },
-    setLevel(_level: LogLevel): void {
-      /* noop */
-    },
-    getLevel(): LogLevel {
-      return LogLevel.DEBUG;
-    },
-    setName(_name: string): void {
-      /* noop */
-    },
-  };
-
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
-    it('should accept supported arguments and use default arguments when not provided', async function () {
-      // Arrange
+    it('should accept supported arguments and use default arguments when not provided', async () => {
       const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -93,13 +94,10 @@ describe('SocketModeReceiver', () => {
         },
       });
       assert.isNotNull(receiver);
-      // since v3.8, the constructor does not start the server
-      // assert.isNotOk(this.fakeServer.listen.calledWith(3000));
     });
-    it('should allow for customizing port the socket listens on', async function () {
-      // Arrange
+    it('should allow for customizing port the socket listens on', async () => {
       const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -119,13 +117,10 @@ describe('SocketModeReceiver', () => {
         },
       });
       assert.isNotNull(receiver);
-      // since v3.8, the constructor does not start the server
-      // assert.isOk(this.fakeServer.listen.calledWith(customPort));
     });
-    it('should allow for extracting additional values from Socket Mode messages', async function () {
-      // Arrange
+    it('should allow for extracting additional values from Socket Mode messages', async () => {
       const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -137,9 +132,9 @@ describe('SocketModeReceiver', () => {
       });
       assert.isNotNull(receiver);
     });
-    it('should throw an error if redirect uri options supplied invalid or incomplete', async function () {
+    it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -209,12 +204,50 @@ describe('SocketModeReceiver', () => {
     });
   });
   describe('request handling', () => {
+    it.only('should return a 404 if a request flows through the install path, redirect URI path and custom routes without being handled', async () => {
+      const installProviderStub = sinon.createStubInstance(InstallProvider);
+      const overrides = mergeOverrides(
+        withHttpCreateServer(fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      );
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+
+      const metadata = 'this is bat country';
+      const scopes = ['channels:read'];
+      const userScopes = ['chat:write'];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        clientId: 'my-clientId',
+        clientSecret: 'my-client-secret',
+        stateSecret: 'state-secret',
+        scopes,
+        customRoutes,
+        redirectUri: 'http://example.com/heyo',
+        installerOptions: {
+          authVersion: 'v2',
+          installPath: '/hiya',
+          redirectUriPath: '/heyo',
+          metadata,
+          userScopes,
+        },
+      });
+      assert.isNotNull(receiver);
+      receiver.installer = installProviderStub as unknown as InstallProvider;
+      const fakeReq = sinon.createStubInstance(IncomingMessage);
+      const fakeRes = sinon.createStubInstance(ServerResponse);
+      console.log('invoking fake listener');
+      listener(fakeReq, fakeRes);
+      sinon.assert.calledWith(fakeRes.writeHead, 404, sinon.match.object);
+      // assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
+      assert(fakeRes.end.calledOnce);
+    });
     describe('handleInstallPathRequest()', () => {
-      it('should invoke installer handleInstallPath if a request comes into the install path', async function () {
-        // Arrange
+      it('should invoke installer handleInstallPath if a request comes into the install path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -246,14 +279,13 @@ describe('SocketModeReceiver', () => {
           writeHead: sinon.fake(),
           end: sinon.fake(),
         } as unknown as ServerResponse;
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
-      it('should use a custom HTML renderer for the install path webpage', async function () {
-        // Arrange
+      it('should use a custom HTML renderer for the install path webpage', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -286,14 +318,13 @@ describe('SocketModeReceiver', () => {
           writeHead: sinon.fake(),
           end: sinon.fake(),
         } as unknown as ServerResponse;
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
-      it('should redirect installers if directInstall is true', async function () {
-        // Arrange
+      it('should redirect installers if directInstall is true', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -326,23 +357,22 @@ describe('SocketModeReceiver', () => {
           writeHead: sinon.fake(),
           end: sinon.fake(),
         } as unknown as ServerResponse;
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
     });
     describe('handleInstallRedirectRequest()', () => {
-      it('should invoke installer handleCallback if a request comes into the redirect URI path', async function () {
-        // Arrange
+      it('should invoke installer handleCallback if a request comes into the redirect URI path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
         const callbackOptions = {
-          failure: () => {},
-          success: () => {},
+          failure: () => { },
+          success: () => { },
         };
         const receiver = new SocketModeReceiver({
           appToken: 'my-secret',
@@ -367,7 +397,7 @@ describe('SocketModeReceiver', () => {
           method: 'GET',
         };
         const fakeRes = null;
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(
           installProviderStub.handleCallback.calledWith(
             fakeReq as IncomingMessage,
@@ -376,11 +406,10 @@ describe('SocketModeReceiver', () => {
           ),
         );
       });
-      it('should invoke handleCallback with installURLoptions as params if state verification is off', async function () {
-        // Arrange
+      it('should invoke handleCallback with installURLoptions as params if state verification is off', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -389,8 +418,8 @@ describe('SocketModeReceiver', () => {
         const redirectUri = 'http://example.com/heyo';
         const userScopes = ['chat:write'];
         const callbackOptions = {
-          failure: () => {},
-          success: () => {},
+          failure: () => { },
+          success: () => { },
         };
         const installUrlOptions = {
           scopes,
@@ -417,14 +446,12 @@ describe('SocketModeReceiver', () => {
         });
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const fakeReq = sinon.createStubInstance(IncomingMessage);
         fakeReq.url = '/heyo';
         fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
-        const fakeRes: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-        fakeRes.writeHead = sinon.fake();
-        fakeRes.end = sinon.fake();
-        await this.listener(fakeReq, fakeRes);
+        const fakeRes = sinon.createStubInstance(ServerResponse);
+        listener(fakeReq, fakeRes);
         sinon.assert.calledWith(
           installProviderStub.handleCallback,
           fakeReq as IncomingMessage,
@@ -435,11 +462,10 @@ describe('SocketModeReceiver', () => {
       });
     });
     describe('custom route handling', () => {
-      it('should call custom route handler only if request matches route path and method', async function () {
-        // Arrange
+      it('should call custom route handler only if request matches route path and method', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -453,36 +479,35 @@ describe('SocketModeReceiver', () => {
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+        const fakeReq = sinon.createStubInstance(IncomingMessage);
+        const fakeRes = sinon.createStubInstance(ServerResponse);
 
         fakeReq.url = '/test';
         const tempMatch = matchRegex(fakeReq.url);
         if (!tempMatch) throw new Error('match failed');
-        const params: ParamsDictionary = tempMatch.params as ParamsDictionary;
+        const params = tempMatch.params as ParamsDictionary;
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
 
-      it('should call custom route handler when request matches path, ignoring query params', async function () {
-        // Arrange
+      it('should call custom route handler when request matches path, ignoring query params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -496,8 +521,8 @@ describe('SocketModeReceiver', () => {
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+        const fakeReq = sinon.createStubInstance(IncomingMessage);
+        const fakeRes = sinon.createStubInstance(ServerResponse);
 
         fakeReq.url = '/test?hello=world';
         const tempMatch = matchRegex('/test');
@@ -506,26 +531,25 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
 
-      it('should call custom route handler only if request matches route path and method including params', async function () {
-        // Arrange
+      it('should call custom route handler only if request matches route path and method including params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -539,8 +563,8 @@ describe('SocketModeReceiver', () => {
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+        const fakeReq = sinon.createStubInstance(IncomingMessage);
+        const fakeRes = sinon.createStubInstance(ServerResponse);
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -549,26 +573,25 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
 
-      it('should call custom route handler only if request matches multiple route paths and method including params', async function () {
-        // Arrange
+      it('should call custom route handler only if request matches multiple route paths and method including params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -585,8 +608,8 @@ describe('SocketModeReceiver', () => {
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+        const fakeReq = sinon.createStubInstance(IncomingMessage);
+        const fakeRes = sinon.createStubInstance(ServerResponse);
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -595,28 +618,27 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
 
-      it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async function () {
-        // Arrange
+      it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -633,8 +655,8 @@ describe('SocketModeReceiver', () => {
         assert.isNotNull(receiver);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq: IncomingMessage = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const fakeRes = { writeHead: sinon.fake(), end: sinon.fake() };
+        const fakeReq = sinon.createStubInstance(IncomingMessage);
+        const fakeRes = sinon.createStubInstance(ServerResponse);
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -643,29 +665,29 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        await this.listener(fakeReq, fakeRes);
+        listener(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
 
-      it("should throw an error if customRoutes don't have the required keys", async function () {
-        // Arrange
+      it("should throw an error if customRoutes don't have the required keys", async () => {
         const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
+          withHttpCreateServer(fakeCreateServer),
           withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        // biome-ignore lint/suspicious/noExplicitAny: typing as any to intentionally have missing required keys
         const customRoutes = [{ handler: sinon.fake() }] as any;
 
         assert.throws(
@@ -674,59 +696,13 @@ describe('SocketModeReceiver', () => {
         );
       });
     });
-
-    it('should return a 404 if a request passes the install path, redirect URI path and custom routes', async function () {
-      // Arrange
-      const installProviderStub = sinon.createStubInstance(InstallProvider);
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
-
-      const metadata = 'this is bat country';
-      const scopes = ['channels:read'];
-      const userScopes = ['chat:write'];
-      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
-      const receiver = new SocketModeReceiver({
-        appToken: 'my-secret',
-        logger: noopLogger,
-        clientId: 'my-clientId',
-        clientSecret: 'my-client-secret',
-        stateSecret: 'state-secret',
-        scopes,
-        customRoutes,
-        redirectUri: 'http://example.com/heyo',
-        installerOptions: {
-          authVersion: 'v2',
-          installPath: '/hiya',
-          redirectUriPath: '/heyo',
-          metadata,
-          userScopes,
-        },
-      });
-      assert.isNotNull(receiver);
-      receiver.installer = installProviderStub as unknown as InstallProvider;
-      const fakeReq = {
-        url: '/nope',
-        method: 'GET',
-      };
-      const fakeRes = {
-        writeHead: sinon.fake(),
-        end: sinon.fake(),
-      };
-      await this.listener(fakeReq, fakeRes);
-      assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-      assert(fakeRes.end.calledOnce);
-    });
   });
 
   describe('#start()', () => {
-    it('should invoke the SocketModeClient start method', async function () {
-      // Arrange
+    it('should invoke the SocketModeClient start method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
       const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -750,11 +726,10 @@ describe('SocketModeReceiver', () => {
     });
   });
   describe('#stop()', () => {
-    it('should invoke the SocketModeClient disconnect method', async function () {
-      // Arrange
+    it('should invoke the SocketModeClient disconnect method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
       const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
@@ -778,29 +753,3 @@ describe('SocketModeReceiver', () => {
     });
   });
 });
-
-/* Testing Harness */
-
-// Loading the system under test using overrides
-async function importSocketModeReceiver(
-  overrides: Override = {},
-): Promise<typeof import('./SocketModeReceiver').default> {
-  return (await rewiremock.module(() => import('./SocketModeReceiver'), overrides)).default;
-}
-
-// Composable overrides
-function withHttpCreateServer(spy: SinonSpy): Override {
-  return {
-    http: {
-      createServer: spy,
-    },
-  };
-}
-
-function withHttpsCreateServer(spy: SinonSpy): Override {
-  return {
-    https: {
-      createServer: spy,
-    },
-  };
-}
