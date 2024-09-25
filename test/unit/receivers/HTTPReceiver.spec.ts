@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { LogLevel, type Logger } from '@slack/logger';
 import { InstallProvider } from '@slack/oauth';
@@ -12,7 +11,7 @@ import {
   CustomRouteInitializationError,
   HTTPReceiverDeferredRequestError,
 } from '../../../src/errors';
-import { type Override, mergeOverrides } from '../helpers';
+import { FakeServer, type Override, mergeOverrides } from '../helpers';
 
 // Loading the system under test using overrides
 async function importHTTPReceiver(

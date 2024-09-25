@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../../../src/errors';
 import { createFakeLogger } from '../helpers';
 import type { BufferedIncomingMessage } from '../../../src/receivers/BufferedIncomingMessage';
-import { HTTPModuleFunctions as func } from '../../../src/receivers/HTTPModuleFunctions';
+import * as func from '../../../src/receivers/HTTPModuleFunctions';
 
 describe('HTTPModuleFunctions', async () => {
   describe('Request header extraction', async () => {

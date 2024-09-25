@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import { ReceiverMultipleAckError } from '../../../src/errors';
 import { createFakeLogger } from '../helpers';
-import { HTTPModuleFunctions } from '../../../src/receivers/HTTPModuleFunctions';
+import * as HTTPModuleFunctions from '../../../src/receivers/HTTPModuleFunctions';
 import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
 
 describe('HTTPResponseAck', async () => {

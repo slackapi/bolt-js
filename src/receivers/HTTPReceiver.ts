@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   type IncomingMessage,
   type RequestListener,
@@ -6,14 +5,14 @@ import {
   type ServerOptions,
   type ServerResponse,
   createServer,
-} from 'http';
+} from 'node:http';
 import {
   type Server as HTTPSServer,
   type ServerOptions as HTTPSServerOptions,
   createServer as createHttpsServer,
-} from 'https';
-import type { ListenOptions } from 'net';
-import { URL } from 'url';
+} from 'node:https';
+import type { ListenOptions } from 'node:net';
+import { URL } from 'node:url';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import {
   type CallbackOptions,
@@ -29,12 +28,7 @@ import { type CodedError, HTTPReceiverDeferredRequestError, ReceiverInconsistent
 import type { Receiver, ReceiverEvent } from '../types';
 import type { StringIndexed } from '../types/utilities';
 import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
-import {
-  type ReceiverDispatchErrorHandlerArgs,
-  type ReceiverProcessEventErrorHandlerArgs,
-  type ReceiverUnhandledRequestHandlerArgs,
-  HTTPModuleFunctions as httpFunc,
-} from './HTTPModuleFunctions';
+import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import { type CustomRoute, type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
@@ -96,10 +90,11 @@ export interface HTTPReceiverOptions {
   installerOptions?: HTTPReceiverInstallerOptions;
   customPropertiesExtractor?: (request: BufferedIncomingMessage) => StringIndexed;
   // NOTE: As http.RequestListener is not an async function, this cannot be async
-  dispatchErrorHandler?: (args: ReceiverDispatchErrorHandlerArgs) => void;
-  processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  dispatchErrorHandler?: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => void;
+  processEventErrorHandler?: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  // TODO: the next note is not true
   // NOTE: As we use setTimeout under the hood, this cannot be async
-  unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
 }
 
@@ -166,11 +161,11 @@ export default class HTTPReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: BufferedIncomingMessage) => StringIndexed;
 
-  private dispatchErrorHandler: (args: ReceiverDispatchErrorHandlerArgs) => void;
+  private dispatchErrorHandler: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => void;
 
-  private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  private processEventErrorHandler: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
-  private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  private unhandledRequestHandler: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
 
   private unhandledRequestTimeoutMillis: number;
 
@@ -340,11 +335,11 @@ export default class HTTPReceiver implements Receiver {
       let listenOptions: ListenOptions | number = this.port;
       if (portOrListenOptions !== undefined) {
         if (typeof portOrListenOptions === 'number') {
-          listenOptions = portOrListenOptions as number;
+          listenOptions = portOrListenOptions;
         } else if (typeof portOrListenOptions === 'string') {
-          listenOptions = Number(portOrListenOptions) as number;
+          listenOptions = Number(portOrListenOptions);
         } else if (typeof portOrListenOptions === 'object') {
-          listenOptions = portOrListenOptions as ListenOptions;
+          listenOptions = portOrListenOptions;
         }
       }
       this.server.listen(listenOptions, () => {
@@ -382,8 +377,9 @@ export default class HTTPReceiver implements Receiver {
 
     // NOTE: the domain and scheme are irrelevant here.
     // The URL object is only used to safely obtain the path to match
+    // TODO: we should add error handling for requests with falsy URLs / methods - could remove the cast here as a result.
     const { pathname: path } = new URL(req.url as string, 'http://localhost');
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: TODO: check for falsy method to remove the non null assertion
     const method = req.method!.toUpperCase();
 
     if (this.endpoints.includes(path) && method === 'POST') {
@@ -392,8 +388,8 @@ export default class HTTPReceiver implements Receiver {
     }
 
     if (this.installer !== undefined && method === 'GET') {
-      // When installer is defined then installPath and installRedirectUriPath are always defined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // TODO: it'd be better to check for falsiness and raise a readable error in any case, which lets us remove the non-null assertion
+      // biome-ignore lint/style/noNonNullAssertion: When installer is defined then installPath and installRedirectUriPath are always defined
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
 
       // Visiting the installation endpoint
@@ -447,7 +443,7 @@ export default class HTTPReceiver implements Receiver {
           req,
         );
       } catch (err) {
-        const e = err as any;
+        const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
         } else {
@@ -464,7 +460,7 @@ export default class HTTPReceiver implements Receiver {
       try {
         body = httpFunc.parseHTTPRequestBody(bufferedReq);
       } catch (err) {
-        const e = err as any;
+        const e = err as Error;
         this.logger.warn(`Malformed request body: ${e.message}`);
         httpFunc.buildNoBodyResponse(res, 400);
         return;
