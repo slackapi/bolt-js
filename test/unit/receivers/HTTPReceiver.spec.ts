@@ -11,7 +11,7 @@ import {
   CustomRouteInitializationError,
   HTTPReceiverDeferredRequestError,
 } from '../../../src/errors';
-import { FakeServer, type Override, mergeOverrides } from '../helpers';
+import { FakeServer, type Override, createFakeLogger, mergeOverrides, type noopVoid } from '../helpers';
 
 // Loading the system under test using overrides
 async function importHTTPReceiver(
@@ -21,38 +21,16 @@ async function importHTTPReceiver(
 }
 
 describe('HTTPReceiver', () => {
-  beforeEach(function() {
-    this.listener = (_req: any, _res: any) => { };
-    this.fakeServer = new FakeServer();
-    this.fakeCreateServer = sinon.fake((_: any, handler: (req: any, res: any) => void) => {
-      this.listener = handler; // pick up the socket listener method so we can assert on its behaviour
-      return this.fakeServer as FakeServer;
+  let httpRequestListener: typeof noopVoid;
+  let fakeServer: FakeServer;
+  let fakeCreateServer: sinon.SinonSpy;
+  beforeEach(() => {
+    fakeServer = new FakeServer();
+    fakeCreateServer = sinon.fake((_options: Record<string, unknown>, handler: typeof noopVoid) => {
+      httpRequestListener = handler; // pick up the socket listener method so we can assert on its behaviour
+      return fakeServer;
     });
   });
-
-  const noopLogger: Logger = {
-    debug(..._msg: any[]): void {
-      /* noop */
-    },
-    info(..._msg: any[]): void {
-      /* noop */
-    },
-    warn(..._msg: any[]): void {
-      /* noop */
-    },
-    error(..._msg: any[]): void {
-      /* noop */
-    },
-    setLevel(_level: LogLevel): void {
-      /* noop */
-    },
-    getLevel(): LogLevel {
-      return LogLevel.DEBUG;
-    },
-    setName(_name: string): void {
-      /* noop */
-    },
-  };
 
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations

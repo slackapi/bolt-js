@@ -427,9 +427,11 @@ export default class HTTPReceiver implements Receiver {
   }
 
   private handleIncomingEvent(req: IncomingMessage, res: ServerResponse) {
-    // Wrapped in an async closure for ease of using await
+    // TODO:: this essentially ejects functionality out of the event loop, doesn't seem like a good idea unless intentional? should review
+    // NOTE: Wrapped in an async closure for ease of using await
     (async () => {
       let bufferedReq: BufferedIncomingMessage;
+      // biome-ignore lint/suspicious/noExplicitAny: http request bodies could be anything
       let body: any;
 
       // Verify authenticity
@@ -521,13 +523,14 @@ export default class HTTPReceiver implements Receiver {
   }
 
   private handleInstallPathRequest(req: IncomingMessage, res: ServerResponse) {
-    // Wrapped in an async closure for ease of using await
+    // TODO:: this essentially ejects functionality out of the event loop, doesn't seem like a good idea unless intentional? should review
+    // NOTE: Wrapped in an async closure for ease of using await
     (async () => {
       try {
-        /* eslint-disable @typescript-eslint/no-non-null-assertion */
+        // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
         await this.installer!.handleInstallPath(req, res, this.installPathOptions, this.installUrlOptions);
       } catch (err) {
-        const e = err as any;
+        const e = err as Error;
         this.logger.error(
           `An unhandled error occurred while Bolt processed a request to the installation path (${e.message})`,
         );
@@ -539,13 +542,14 @@ export default class HTTPReceiver implements Receiver {
   private handleInstallRedirectRequest(req: IncomingMessage, res: ServerResponse) {
     // This function is only called from within unboundRequestListener after checking that installer is defined, and
     // when installer is defined then installCallbackOptions is always defined too.
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     const [installer, installCallbackOptions, installUrlOptions] = [
+      // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
       this.installer!,
+      // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
       this.installCallbackOptions!,
+      // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
       this.installUrlOptions!,
     ];
-    /* eslint-enable @typescript-eslint/no-non-null-assertion */
     const errorHandler = (err: Error) => {
       this.logger.error(
         'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',

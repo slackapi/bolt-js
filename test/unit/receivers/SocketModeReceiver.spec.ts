@@ -29,21 +29,22 @@ describe('SocketModeReceiver', () => {
   let fakeServer: FakeServer;
   let fakeCreateServer: sinon.SinonSpy;
   const noopLogger = createFakeLogger();
+  let overrides: Override;
   beforeEach(() => {
     fakeServer = new FakeServer();
     fakeCreateServer = sinon.fake((handler: typeof noopVoid) => {
       socketModeHttpServerHandler = handler; // pick up the socket-mode receiver's HTTP request handler so we can assert on its behaviour
       return fakeServer;
     });
+    overrides = mergeOverrides(
+      withHttpCreateServer(fakeCreateServer),
+      withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+    );
   });
 
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments and use default arguments when not provided', async () => {
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
@@ -61,10 +62,6 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should allow for customizing port the socket listens on', async () => {
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
       const customPort = 1337;
@@ -84,10 +81,6 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should allow for extracting additional values from Socket Mode messages', async () => {
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
@@ -98,10 +91,6 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
       const clientId = 'my-clientId';
       const clientSecret = 'my-clientSecret';
@@ -171,10 +160,6 @@ describe('SocketModeReceiver', () => {
   describe('request handling', () => {
     it('should return a 404 if a request flows through the install path, redirect URI path and custom routes without being handled', async () => {
       const installProviderStub = sinon.createStubInstance(InstallProvider);
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
       const metadata = 'this is bat country';
@@ -211,10 +196,6 @@ describe('SocketModeReceiver', () => {
     describe('handleInstallPathRequest()', () => {
       it('should invoke installer handleInstallPath if a request comes into the install path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -249,10 +230,6 @@ describe('SocketModeReceiver', () => {
       });
       it('should use a custom HTML renderer for the install path webpage', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -288,10 +265,6 @@ describe('SocketModeReceiver', () => {
       });
       it('should redirect installers if directInstall is true', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -329,10 +302,6 @@ describe('SocketModeReceiver', () => {
     describe('handleInstallRedirectRequest()', () => {
       it('should invoke installer handleCallback if a request comes into the redirect URI path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
         const callbackOptions = {
@@ -373,10 +342,6 @@ describe('SocketModeReceiver', () => {
       });
       it('should invoke handleCallback with installURLoptions as params if state verification is off', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -429,10 +394,6 @@ describe('SocketModeReceiver', () => {
     describe('custom route handling', () => {
       it('should call custom route handler only if request matches route path and method', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
@@ -471,10 +432,6 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler when request matches path, ignoring query params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
@@ -513,10 +470,6 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler only if request matches route path and method including params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
@@ -555,10 +508,6 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler only if request matches multiple route paths and method including params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [
           { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
@@ -602,10 +551,6 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         const customRoutes = [
           { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
@@ -647,10 +592,6 @@ describe('SocketModeReceiver', () => {
       });
 
       it("should throw an error if customRoutes don't have the required keys", async () => {
-        const overrides = mergeOverrides(
-          withHttpCreateServer(fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
         // biome-ignore lint/suspicious/noExplicitAny: typing as any to intentionally have missing required keys
         const customRoutes = [{ handler: sinon.fake() }] as any;
@@ -666,10 +607,6 @@ describe('SocketModeReceiver', () => {
   describe('#start()', () => {
     it('should invoke the SocketModeClient start method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
@@ -693,10 +630,6 @@ describe('SocketModeReceiver', () => {
   describe('#stop()', () => {
     it('should invoke the SocketModeClient disconnect method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
-      const overrides = mergeOverrides(
-        withHttpCreateServer(fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
