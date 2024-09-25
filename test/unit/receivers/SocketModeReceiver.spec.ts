@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
@@ -6,9 +5,17 @@ import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import rewiremock from 'rewiremock';
-import sinon, { type SinonSpy } from 'sinon';
+import sinon from 'sinon';
 import { AppInitializationError, CustomRouteInitializationError } from '../../../src/errors';
-import { type Override, mergeOverrides, noopSync, createFakeLogger } from '../helpers';
+import {
+  FakeServer,
+  type Override,
+  mergeOverrides,
+  type noopVoid,
+  createFakeLogger,
+  withHttpCreateServer,
+  withHttpsCreateServer,
+} from '../helpers';
 
 // Loading the system under test using overrides
 async function importSocketModeReceiver(
@@ -16,58 +23,16 @@ async function importSocketModeReceiver(
 ): Promise<typeof import('../../../src/receivers/SocketModeReceiver').default> {
   return (await rewiremock.module(() => import('../../../src/receivers/SocketModeReceiver'), overrides)).default;
 }
-// Composable overrides
-function withHttpCreateServer(spy: SinonSpy): Override {
-  return {
-    http: {
-      createServer: spy,
-    },
-  };
-}
-function withHttpsCreateServer(spy: SinonSpy): Override {
-  return {
-    https: {
-      createServer: spy,
-    },
-  };
-}
-class FakeServer extends EventEmitter {
-  public on = sinon.fake();
-
-  public listen = sinon.fake(() => {
-    console.log('listening fake server');
-    if (this.listeningFailure !== undefined) {
-      this.emit('error', this.listeningFailure);
-    }
-  });
-
-  public close = sinon.fake((...args: any[]) => {
-    console.log('closing fake server');
-    setImmediate(() => {
-      this.emit('close');
-      setImmediate(() => {
-        args[0]();
-      });
-    });
-  });
-
-  public constructor(private listeningFailure?: Error) {
-    console.log('fake server constructor');
-    super();
-  }
-}
 
 describe('SocketModeReceiver', () => {
-  let listener: typeof noopSync;
+  let socketModeHttpServerHandler: typeof noopVoid;
   let fakeServer: FakeServer;
   let fakeCreateServer: sinon.SinonSpy;
   const noopLogger = createFakeLogger();
   beforeEach(() => {
-    listener = noopSync;
     fakeServer = new FakeServer();
-    fakeCreateServer = sinon.fake((handler: typeof noopSync) => {
-      console.log('fakeCreateServer');
-      listener = handler; // pick up the socket listener method so we can assert on its behaviour
+    fakeCreateServer = sinon.fake((handler: typeof noopVoid) => {
+      socketModeHttpServerHandler = handler; // pick up the socket-mode receiver's HTTP request handler so we can assert on its behaviour
       return fakeServer;
     });
   });
@@ -204,7 +169,7 @@ describe('SocketModeReceiver', () => {
     });
   });
   describe('request handling', () => {
-    it.only('should return a 404 if a request flows through the install path, redirect URI path and custom routes without being handled', async () => {
+    it('should return a 404 if a request flows through the install path, redirect URI path and custom routes without being handled', async () => {
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(
         withHttpCreateServer(fakeCreateServer),
@@ -236,11 +201,11 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = sinon.createStubInstance(IncomingMessage);
+      fakeReq.url = '/nope';
+      fakeReq.method = 'GET';
       const fakeRes = sinon.createStubInstance(ServerResponse);
-      console.log('invoking fake listener');
-      listener(fakeReq, fakeRes);
+      await socketModeHttpServerHandler(fakeReq, fakeRes);
       sinon.assert.calledWith(fakeRes.writeHead, 404, sinon.match.object);
-      // assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
       assert(fakeRes.end.calledOnce);
     });
     describe('handleInstallPathRequest()', () => {
@@ -279,7 +244,7 @@ describe('SocketModeReceiver', () => {
           writeHead: sinon.fake(),
           end: sinon.fake(),
         } as unknown as ServerResponse;
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
       it('should use a custom HTML renderer for the install path webpage', async () => {
@@ -318,7 +283,7 @@ describe('SocketModeReceiver', () => {
           writeHead: sinon.fake(),
           end: sinon.fake(),
         } as unknown as ServerResponse;
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
       it('should redirect installers if directInstall is true', async () => {
@@ -357,7 +322,7 @@ describe('SocketModeReceiver', () => {
           writeHead: sinon.fake(),
           end: sinon.fake(),
         } as unknown as ServerResponse;
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
     });
@@ -397,7 +362,7 @@ describe('SocketModeReceiver', () => {
           method: 'GET',
         };
         const fakeRes = null;
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(
           installProviderStub.handleCallback.calledWith(
             fakeReq as IncomingMessage,
@@ -451,7 +416,7 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
         const fakeRes = sinon.createStubInstance(ServerResponse);
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         sinon.assert.calledWith(
           installProviderStub.handleCallback,
           fakeReq as IncomingMessage,
@@ -489,17 +454,17 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
@@ -531,17 +496,17 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
@@ -573,17 +538,17 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'POST';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
@@ -618,19 +583,19 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });
@@ -665,18 +630,18 @@ describe('SocketModeReceiver', () => {
         fakeReq.headers = { host: 'localhost' };
 
         fakeReq.method = 'GET';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
         assert(customRoutes[1].handler.notCalled);
 
         fakeReq.method = 'POST';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
         assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
 
         fakeReq.method = 'UNHANDLED_METHOD';
-        listener(fakeReq, fakeRes);
+        await socketModeHttpServerHandler(fakeReq, fakeRes);
         assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
         assert(fakeRes.end.called);
       });

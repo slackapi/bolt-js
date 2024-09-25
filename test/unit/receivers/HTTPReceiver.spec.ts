@@ -1,68 +1,29 @@
-import 'mocha';
-import { EventEmitter } from 'events';
-import { IncomingMessage, ServerResponse } from 'http';
+import { EventEmitter } from 'node:events';
+import { IncomingMessage, ServerResponse } from 'node:http';
 import { LogLevel, type Logger } from '@slack/logger';
 import { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import rewiremock from 'rewiremock';
-import sinon, { type SinonSpy } from 'sinon';
-import { AppInitializationError, CustomRouteInitializationError, HTTPReceiverDeferredRequestError } from '../errors';
-import { type Override, mergeOverrides } from '../test-helpers';
-
-/* Testing Harness */
+import sinon from 'sinon';
+import {
+  AppInitializationError,
+  CustomRouteInitializationError,
+  HTTPReceiverDeferredRequestError,
+} from '../../../src/errors';
+import { type Override, mergeOverrides } from '../helpers';
 
 // Loading the system under test using overrides
-async function importHTTPReceiver(overrides: Override = {}): Promise<typeof import('./HTTPReceiver').default> {
-  return (await rewiremock.module(() => import('./HTTPReceiver'), overrides)).default;
-}
-
-// Composable overrides
-function withHttpCreateServer(spy: SinonSpy): Override {
-  return {
-    http: {
-      createServer: spy,
-    },
-  };
-}
-
-function withHttpsCreateServer(spy: SinonSpy): Override {
-  return {
-    https: {
-      createServer: spy,
-    },
-  };
-}
-
-// Fakes
-class FakeServer extends EventEmitter {
-  public on = sinon.fake();
-
-  public listen = sinon.fake((_listenOptions: any, cb: any) => {
-    if (this.listeningFailure !== undefined) {
-      this.emit('error', this.listeningFailure);
-    }
-    cb();
-  });
-
-  public close = sinon.fake((...args: any[]) => {
-    setImmediate(() => {
-      this.emit('close');
-      setImmediate(() => {
-        args[0]();
-      });
-    });
-  });
-
-  public constructor(private listeningFailure?: Error) {
-    super();
-  }
+async function importHTTPReceiver(
+  overrides: Override = {},
+): Promise<typeof import('../../../src/receivers/HTTPReceiver').default> {
+  return (await rewiremock.module(() => import('../../../src/receivers/HTTPReceiver'), overrides)).default;
 }
 
 describe('HTTPReceiver', () => {
-  beforeEach(function () {
-    this.listener = (_req: any, _res: any) => {};
+  beforeEach(function() {
+    this.listener = (_req: any, _res: any) => { };
     this.fakeServer = new FakeServer();
     this.fakeCreateServer = sinon.fake((_: any, handler: (req: any, res: any) => void) => {
       this.listener = handler; // pick up the socket listener method so we can assert on its behaviour
@@ -96,7 +57,7 @@ describe('HTTPReceiver', () => {
 
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
-    it('should accept supported arguments and use default arguments when not provided', async function () {
+    it('should accept supported arguments and use default arguments when not provided', async function() {
       // Arrange
       const overrides = mergeOverrides(
         withHttpCreateServer(this.fakeCreateServer),
@@ -140,7 +101,7 @@ describe('HTTPReceiver', () => {
       assert.isNotNull(receiver);
     });
 
-    it('should accept a custom port', async function () {
+    it('should accept a custom port', async function() {
       // Arrange
       const overrides = mergeOverrides(
         withHttpCreateServer(this.fakeCreateServer),
@@ -240,7 +201,7 @@ describe('HTTPReceiver', () => {
     });
   });
   describe('start() method', () => {
-    it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async function () {
+    it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async function() {
       // Arrange
       const overrides = mergeOverrides(
         withHttpCreateServer(this.fakeCreateServer),
@@ -263,7 +224,7 @@ describe('HTTPReceiver', () => {
   });
   describe('request handling', () => {
     describe('handleInstallPathRequest()', () => {
-      it('should invoke installer handleInstallPath if a request comes into the install path', async function () {
+      it('should invoke installer handleInstallPath if a request comes into the install path', async function() {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
@@ -305,7 +266,7 @@ describe('HTTPReceiver', () => {
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
 
-      it('should use a custom HTML renderer for the install path webpage', async function () {
+      it('should use a custom HTML renderer for the install path webpage', async function() {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
@@ -347,7 +308,7 @@ describe('HTTPReceiver', () => {
         assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
       });
 
-      it('should redirect installers if directInstall is true', async function () {
+      it('should redirect installers if directInstall is true', async function() {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider);
         const overrides = mergeOverrides(
@@ -390,7 +351,7 @@ describe('HTTPReceiver', () => {
     });
 
     describe('handleInstallRedirectRequest()', () => {
-      it('should invoke installer handler if a request comes into the redirect URI path', async function () {
+      it('should invoke installer handler if a request comes into the redirect URI path', async function() {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
           handleCallback: sinon.stub().resolves() as unknown as Promise<void>,
@@ -436,7 +397,7 @@ describe('HTTPReceiver', () => {
         assert(installProviderStub.handleCallback.calledWith(fakeReq, fakeRes, callbackOptions));
       });
 
-      it('should invoke installer handler with installURLoptions supplied if state verification is off', async function () {
+      it('should invoke installer handler with installURLoptions supplied if state verification is off', async function() {
         // Arrange
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
           handleCallback: sinon.stub().resolves() as unknown as Promise<void>,
@@ -678,7 +639,7 @@ describe('HTTPReceiver', () => {
       });
     });
 
-    it("should throw if request doesn't match install path, redirect URI path, or custom routes", async function () {
+    it("should throw if request doesn't match install path, redirect URI path, or custom routes", async function() {
       // Arrange
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const overrides = mergeOverrides(

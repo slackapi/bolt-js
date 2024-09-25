@@ -158,7 +158,6 @@ export default class SocketModeReceiver implements Receiver {
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       this.httpServerPort = installerOptions.port === undefined ? 3000 : installerOptions.port;
       this.httpServer = createServer(async (req, res) => {
-        console.log('responding to req', req);
         // biome-ignore lint/style/noNonNullAssertion: method should always be defined for an HTTP request right?
         const method = req.method!.toUpperCase();
 
