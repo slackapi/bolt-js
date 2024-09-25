@@ -1,17 +1,17 @@
 import type { Option } from '@slack/types';
 import { expectAssignable, expectType } from 'tsd';
-import App from '../../src/App';
 import type {
   AckFn,
   BlockOptions,
   BlockSuggestion,
-  DialogOptions,
   DialogOptionGroups,
+  DialogOptions,
   DialogSuggestion,
   InteractiveMessageSuggestion,
   MessageOptions,
   OptionGroups,
 } from '../..';
+import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 

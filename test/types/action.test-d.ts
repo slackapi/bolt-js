@@ -1,5 +1,5 @@
 import { expectAssignable, expectError, expectType } from 'tsd';
-import type { SlackAction, BlockElementAction, DialogSubmitAction, InteractiveAction } from '../../';
+import type { BlockElementAction, DialogSubmitAction, InteractiveAction, SlackAction } from '../../';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });

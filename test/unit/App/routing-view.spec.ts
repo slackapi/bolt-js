@@ -1,10 +1,11 @@
 import sinon, { type SinonSpy } from 'sinon';
+import type App from '../../../src/App';
 import {
   FakeReceiver,
   type Override,
-  createFakeLogger,
-  createDummyViewSubmissionMiddlewareArgs,
   createDummyViewClosedMiddlewareArgs,
+  createDummyViewSubmissionMiddlewareArgs,
+  createFakeLogger,
   importApp,
   mergeOverrides,
   noopMiddleware,
@@ -13,7 +14,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
-import type App from '../../../src/App';
 
 function buildOverrides(secondOverrides: Override[]): Override {
   return mergeOverrides(

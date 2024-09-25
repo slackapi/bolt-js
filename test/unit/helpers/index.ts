@@ -1,7 +1,7 @@
 import { ConsoleLogger } from '@slack/logger';
 import sinon from 'sinon';
-import type { NextFn } from '../../../src/types';
 import type { ConversationStore } from '../../../src/conversation-store';
+import type { NextFn } from '../../../src/types';
 
 export * from './app';
 export * from './events';

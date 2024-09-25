@@ -1,104 +1,69 @@
-import 'mocha';
-import { EventEmitter } from 'events';
-import { Readable } from 'stream';
-import { LogLevel, type Logger } from '@slack/logger';
+import type { Server } from 'node:http';
+import type { Server as HTTPSServer } from 'node:https';
+import { Readable } from 'node:stream';
+import type { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { Application, IRouter, Request, Response } from 'express';
 import rewiremock from 'rewiremock';
-import sinon, { type SinonFakeTimers, type SinonSpy } from 'sinon';
-import App from '../App';
+import sinon, { type SinonFakeTimers } from 'sinon';
+import App from '../../../src/App';
 import {
   AppInitializationError,
   AuthorizationError,
-  type CodedError,
   ErrorCode,
   ReceiverInconsistentStateError,
-} from '../errors';
-import { type Override, createFakeLogger, mergeOverrides } from '../test-helpers';
-import { HTTPModuleFunctions as httpFunc } from './HTTPModuleFunctions';
-
+} from '../../../src/errors';
 import ExpressReceiver, {
   respondToSslCheck,
   respondToUrlVerification,
   verifySignatureAndParseRawBody,
   buildBodyParserMiddleware,
-} from './ExpressReceiver';
+} from '../../../src/receivers/ExpressReceiver';
+import * as httpFunc from '../../../src/receivers/HTTPModuleFunctions';
+import type { ReceiverEvent } from '../../../src/types';
+import {
+  FakeServer,
+  type Override,
+  createFakeLogger,
+  mergeOverrides,
+  withHttpCreateServer,
+  withHttpsCreateServer,
+} from '../helpers';
 
-// Fakes
-class FakeServer extends EventEmitter {
-  public on = sinon.fake();
+// Loading the system under test using overrides
+async function importExpressReceiver(
+  overrides: Override = {},
+): Promise<typeof import('../../../src/receivers/ExpressReceiver').default> {
+  return (await rewiremock.module(() => import('../../../src/receivers/ExpressReceiver'), overrides)).default;
+}
 
-  public listen = sinon.fake((...args: any[]) => {
-    if (this.listeningFailure !== undefined) {
-      this.emit('error', this.listeningFailure);
-      return;
-    }
-    setImmediate(() => {
-      args[1]();
-    });
-  });
-
-  public close = sinon.fake((...args: any[]) => {
-    setImmediate(() => {
-      this.emit('close');
-      setImmediate(() => {
-        args[0](this.closingFailure);
-      });
-    });
-  });
-
-  public constructor(
-    private listeningFailure?: Error,
-    private closingFailure?: Error,
-  ) {
-    super();
-  }
+// biome-ignore lint/suspicious/noExplicitAny: accept any kind of mock response
+function buildResponseToVerify(result: any): Response {
+  return {
+    status: (code: number) => {
+      result.code = code;
+      return {
+        send: () => {
+          result.sent = true;
+        },
+      } as Response;
+    },
+  } as Response;
 }
 
 describe('ExpressReceiver', () => {
-  beforeEach(function () {
-    this.fakeServer = new FakeServer();
-    this.fakeCreateServer = sinon.fake.returns(this.fakeServer);
+  const noopLogger = createFakeLogger();
+  let fakeServer: FakeServer;
+  let fakeCreateServer: sinon.SinonSpy;
+  let overrides: Override;
+  beforeEach(() => {
+    fakeServer = new FakeServer();
+    fakeCreateServer = sinon.fake.returns(fakeServer);
+    overrides = mergeOverrides(
+      withHttpCreateServer(fakeCreateServer),
+      withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+    );
   });
-
-  const noopLogger: Logger = {
-    debug(..._msg: any[]): void {
-      /* noop */
-    },
-    info(..._msg: any[]): void {
-      /* noop */
-    },
-    warn(..._msg: any[]): void {
-      /* noop */
-    },
-    error(..._msg: any[]): void {
-      /* noop */
-    },
-    setLevel(_level: LogLevel): void {
-      /* noop */
-    },
-    getLevel(): LogLevel {
-      return LogLevel.DEBUG;
-    },
-    setName(_name: string): void {
-      /* noop */
-    },
-  };
-
-  function buildResponseToVerify(result: any): Response {
-    return {
-      status: (code: number) => {
-        // eslint-disable-next-line no-param-reassign
-        result.code = code;
-        return {
-          send: () => {
-            // eslint-disable-next-line no-param-reassign
-            result.sent = true;
-          },
-        } as any as Response;
-      },
-    } as any as Response;
-  }
 
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
@@ -121,14 +86,14 @@ describe('ExpressReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should accept custom Express app / router', async () => {
-      const app: Application = {
+      const app = {
         use: sinon.fake(),
-      } as unknown as Application;
-      const router: IRouter = {
+      };
+      const router = {
         get: sinon.fake(),
         post: sinon.fake(),
         use: sinon.fake(),
-      } as unknown as IRouter;
+      };
       const receiver = new ExpressReceiver({
         signingSecret: 'my-secret',
         logger: noopLogger,
@@ -142,13 +107,13 @@ describe('ExpressReceiver', () => {
           authVersion: 'v2',
           userScopes: ['chat:write'],
         },
-        app,
-        router,
+        app: app as unknown as Application,
+        router: router as unknown as IRouter,
       });
       assert.isNotNull(receiver);
-      assert((app.use as any).calledOnce);
-      assert((router.get as any).called);
-      assert((router.post as any).calledOnce);
+      sinon.assert.calledOnce(app.use);
+      sinon.assert.calledOnce(router.get);
+      sinon.assert.calledOnce(router.post);
     });
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const clientId = 'my-clientId';
@@ -218,47 +183,36 @@ describe('ExpressReceiver', () => {
   });
 
   describe('#start()', () => {
-    it('should start listening for requests using the built-in HTTP server', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should start listening for requests using the built-in HTTP server', async () => {
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
-      // Act
       const server = await receiver.start(port);
 
-      // Assert
-      assert(this.fakeCreateServer.calledOnce);
-      assert.strictEqual(server, this.fakeServer);
-      assert(this.fakeServer.listen.calledWith(port));
+      sinon.assert.calledOnce(fakeCreateServer);
+      assert.strictEqual(server, fakeServer as unknown as Server);
+      sinon.assert.calledWith(fakeServer.listen, port);
     });
-    it('should start listening for requests using the built-in HTTPS (TLS) server when given TLS server options', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
+    it('should start listening for requests using the built-in HTTPS (TLS) server when given TLS server options', async () => {
+      overrides = mergeOverrides(
         withHttpCreateServer(sinon.fake.throws('Should not be used.')),
-        withHttpsCreateServer(this.fakeCreateServer),
+        withHttpsCreateServer(fakeCreateServer),
       );
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       const tlsOptions = { key: '', cert: '' };
 
-      // Act
       const server = await receiver.start(port, tlsOptions);
 
-      // Assert
-      assert(this.fakeCreateServer.calledOnceWith(tlsOptions));
-      assert.strictEqual(server, this.fakeServer);
-      assert(this.fakeServer.listen.calledWith(port));
+      sinon.assert.calledWith(fakeCreateServer, tlsOptions);
+      assert.strictEqual(server, fakeServer as unknown as HTTPSServer);
+      sinon.assert.calledWith(fakeServer.listen, port);
     });
     it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async () => {
-      // Arrange
       const fakeCreateFailingServer = sinon.fake.returns(new FakeServer(new Error('fake listening error')));
-      const overrides = mergeOverrides(
+      overrides = mergeOverrides(
         withHttpCreateServer(fakeCreateFailingServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
@@ -266,21 +220,18 @@ describe('ExpressReceiver', () => {
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
-      // Act
       let caughtError: Error | undefined;
       try {
         await receiver.start(port);
-      } catch (error: any) {
-        caughtError = error;
+      } catch (error) {
+        caughtError = error as Error;
       }
 
-      // Assert
       assert.instanceOf(caughtError, Error);
     });
     it('should reject with an error when the built-in HTTP server returns undefined', async () => {
-      // Arrange
       const fakeCreateUndefinedServer = sinon.fake.returns(undefined);
-      const overrides = mergeOverrides(
+      overrides = mergeOverrides(
         withHttpCreateServer(fakeCreateUndefinedServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
@@ -288,264 +239,190 @@ describe('ExpressReceiver', () => {
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
-      // Act
       let caughtError: Error | undefined;
       try {
         await receiver.start(port);
-      } catch (error: any) {
-        caughtError = error;
+      } catch (error) {
+        caughtError = error as Error;
       }
 
-      // Assert
       assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
+      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
     });
-    it('should reject with an error when starting and the server was already previously started', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
-      // Act
       let caughtError: Error | undefined;
       await receiver.start(port);
       try {
         await receiver.start(port);
-      } catch (error: any) {
-        caughtError = error;
+      } catch (error) {
+        caughtError = error as Error;
       }
 
-      // Assert
       assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
+      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
     });
   });
 
   describe('#stop()', () => {
-    it('should stop listening for requests when a built-in HTTP server is already started', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should stop listening for requests when a built-in HTTP server is already started', async () => {
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       await receiver.start(port);
 
-      // Act
       await receiver.stop();
-
-      // Assert
-      // As long as control reaches this point, the test passes
-      assert.isOk(true);
     });
-    it('should reject when a built-in HTTP server is not started', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should reject when a built-in HTTP server is not started', async () => {
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
 
-      // Act
       let caughtError: Error | undefined;
       try {
         await receiver.stop();
-      } catch (error: any) {
-        caughtError = error;
+      } catch (error) {
+        caughtError = error as Error;
       }
 
-      // Assert
-      // As long as control reaches this point, the test passes
       assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.equal((caughtError as CodedError).code, ErrorCode.ReceiverInconsistentStateError);
+      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
     });
-    it('should reject when a built-in HTTP server raises an error when closing', async function () {
-      // Arrange
-      this.fakeServer = new FakeServer(
+    it('should reject when a built-in HTTP server raises an error when closing', async () => {
+      fakeServer = new FakeServer(
         undefined,
         new Error('this error will be raised by the underlying HTTP server during close()'),
       );
-      this.fakeCreateServer = sinon.fake.returns(this.fakeServer);
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
+      fakeCreateServer = sinon.fake.returns(fakeServer);
+      overrides = mergeOverrides(
+        withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       await receiver.start(12345);
 
-      // Act
       let caughtError: Error | undefined;
       try {
         await receiver.stop();
-      } catch (error: any) {
-        caughtError = error;
+      } catch (error) {
+        caughtError = error as Error;
       }
 
-      // Assert
-      // As long as control reaches this point, the test passes
       assert.instanceOf(caughtError, Error);
       assert.equal(caughtError?.message, 'this error will be raised by the underlying HTTP server during close()');
     });
   });
 
   describe('#requestHandler()', () => {
-    before(function () {
-      this.extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
-      this.extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
-      this.buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
-      this.buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
-      this.processStub = sinon.stub().resolves({});
-      this.ackStub = function ackStub() {};
-      this.ackStub.prototype.bind = function () {
-        return this;
-      };
-      this.ackStub.prototype.ack = sinon.spy();
+    const extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
+    const extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
+    const buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
+    const buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
+    const processStub = sinon.stub<[ReceiverEvent]>().resolves({});
+    const ackStub = function ackStub() {};
+    ackStub.prototype.bind = function () {
+      return this;
+    };
+    ackStub.prototype.ack = sinon.spy();
+    beforeEach(() => {
+      overrides = mergeOverrides(
+        withHttpCreateServer(fakeCreateServer),
+        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+        { './HTTPResponseAck': { HTTPResponseAck: ackStub } },
+      );
     });
     afterEach(() => {
       sinon.reset();
     });
-    after(function () {
-      this.extractRetryNumStub.restore();
-      this.extractRetryReasonStub.restore();
-      this.buildNoBodyResponseStub.restore();
-      this.buildContentResponseStub.restore();
+    after(() => {
+      extractRetryNumStub.restore();
+      extractRetryReasonStub.restore();
+      buildNoBodyResponseStub.restore();
+      buildContentResponseStub.restore();
     });
-    it('should not build an HTTP response if processBeforeResponse=false', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
-      );
+    it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
-      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
-      // Act
       const req = { body: {} } as Request;
       const resp = { send: () => {} } as Response;
       await receiver.requestHandler(req, resp);
 
-      // Assert
-      assert(this.buildContentResponseStub.notCalled, 'HTTPFunction buildContentResponse called incorrectly');
+      sinon.assert.notCalled(buildContentResponseStub);
     });
-    it('should build an HTTP response if processBeforeResponse=true', async function () {
-      // Arrange
-      this.processStub.callsFake((event: any) => {
-        // eslint-disable-next-line no-param-reassign
+    it('should build an HTTP response if processBeforeResponse=true', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: TODO: dig in to see what this type actually is supposed to be
+      processStub.callsFake((event: any) => {
         event.ack.storedResponse = 'something';
         return Promise.resolve({});
       });
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
-      );
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
-      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
-      // Act
       const req = { body: {} } as Request;
       const resp = { send: () => {} } as Response;
       await receiver.requestHandler(req, resp);
-      // Assert
-      assert(this.buildContentResponseStub.called, 'HTTPFunction buildContentResponse not called incorrectly');
+      sinon.assert.called(buildContentResponseStub);
     });
-    it('should throw and build an HTTP 500 response with no body if processEvent raises an uncoded Error or a coded, non-Authorization Error', async function () {
-      // Arrange
-      this.processStub.callsFake(() => Promise.reject(new Error('uh oh')));
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
-      );
+    it('should throw and build an HTTP 500 response with no body if processEvent raises an uncoded Error or a coded, non-Authorization Error', async () => {
+      processStub.callsFake(() => Promise.reject(new Error('uh oh')));
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
-      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
-      // Act
       const req = { body: {} } as Request;
-      let writeHeadStatus = 0;
       const resp = {
-        send: () => {},
-        writeHead: (status: number) => {
-          writeHeadStatus = status;
-        },
-        end: () => {},
-      } as unknown as Response;
-      await receiver.requestHandler(req, resp);
-
-      // Assert
-      assert.equal(writeHeadStatus, 500);
+        send: sinon.fake(),
+        writeHead: sinon.fake(),
+        end: sinon.fake(),
+      };
+      await receiver.requestHandler(req, resp as unknown as Response);
+      sinon.assert.calledWith(resp.writeHead, 500);
     });
-    it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async function () {
-      // Arrange
-      this.processStub.callsFake(() => Promise.reject(new AuthorizationError('uh oh', new Error())));
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        { './HTTPResponseAck': { HTTPResponseAck: this.ackStub } },
-      );
+    it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async () => {
+      processStub.callsFake(() => Promise.reject(new AuthorizationError('uh oh', new Error())));
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
-      const app = sinon.createStubInstance(App, { processEvent: this.processStub }) as unknown as App;
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
-      // Act
       const req = { body: {} } as Request;
-      let writeHeadStatus = 0;
       const resp = {
-        send: () => {},
-        writeHead: (status: number) => {
-          writeHeadStatus = status;
-        },
-        end: () => {},
-      } as unknown as Response;
-      await receiver.requestHandler(req, resp);
-      // Assert
-      assert.equal(writeHeadStatus, 401);
+        send: sinon.fake(),
+        writeHead: sinon.fake(),
+        end: sinon.fake(),
+      };
+      await receiver.requestHandler(req, resp as unknown as Response);
+      sinon.assert.calledWith(resp.writeHead, 401);
     });
   });
 
   describe('oauth support', () => {
     describe('install path route', () => {
-      it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async function () {
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
+      it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async () => {
         const ER = await importExpressReceiver(overrides);
         const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '' });
-        const handleStub = sinon.stub(receiver.installer as any, 'handleInstallPath').resolves();
+        const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleInstallPath').resolves();
 
-        // Act
         const req = { body: {}, url: 'http://localhost/slack/install', method: 'GET' } as Request;
         const resp = { send: () => {} } as Response;
         const next = sinon.spy();
+        // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
         (receiver.router as any).handle(req, resp, next);
 
-        // Assert
-        assert(handleStub.calledWith(req, resp), 'installer.handleInstallPath not called');
+        sinon.assert.calledWith(handleStub, req, resp);
       });
     });
     describe('redirect path route', () => {
-      it('should call installer.handleCallback with callbackOptions when HTTP request hits the redirect URI path and stateVerification=true', async function () {
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
+      it('should call installer.handleCallback with callbackOptions when HTTP request hits the redirect URI path and stateVerification=true', async () => {
         const ER = await importExpressReceiver(overrides);
         const callbackOptions = {};
         const scopes = ['some'];
@@ -561,21 +438,16 @@ describe('ExpressReceiver', () => {
           scopes,
           installerOptions,
         });
-        const handleStub = sinon.stub(receiver.installer as any, 'handleCallback').resolves('poop');
+        const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleCallback').resolves();
 
-        // Act
         const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
         const resp = { send: () => {} } as Response;
+        // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
         (receiver.router as any).handle(req, resp, () => {});
 
-        // Assert
-        assert(handleStub.calledWith(req, resp, callbackOptions), 'installer.handleCallback not called');
+        sinon.assert.calledWith(handleStub, req, resp, callbackOptions);
       });
-      it('should call installer.handleCallback with callbackOptions and installUrlOptions when HTTP request hits the redirect URI path and stateVerification=false', async function () {
-        const overrides = mergeOverrides(
-          withHttpCreateServer(this.fakeCreateServer),
-          withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-        );
+      it('should call installer.handleCallback with callbackOptions and installUrlOptions when HTTP request hits the redirect URI path and stateVerification=false', async () => {
         const ER = await importExpressReceiver(overrides);
         const callbackOptions = {};
         const scopes = ['some'];
@@ -591,134 +463,75 @@ describe('ExpressReceiver', () => {
           scopes,
           installerOptions,
         });
-        const handleStub = sinon.stub(receiver.installer as any, 'handleCallback').resolves('poop');
+        const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleCallback').resolves();
 
-        // Act
         const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
         const resp = { send: () => {} } as Response;
+        // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
         (receiver.router as any).handle(req, resp, () => {});
 
-        // Assert
-        assert(
-          handleStub.calledWith(req, resp, callbackOptions, sinon.match({ scopes })),
-          'installer.handleCallback not called',
-        );
+        sinon.assert.calledWith(handleStub, req, resp, callbackOptions, sinon.match({ scopes }));
       });
     });
   });
 
   describe('state management for built-in server', () => {
-    it('should be able to start after it was stopped', async function () {
-      // Arrange
-      const overrides = mergeOverrides(
-        withHttpCreateServer(this.fakeCreateServer),
-        withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
-      );
+    it('should be able to start after it was stopped', async () => {
       const ER = await importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       await receiver.start(port);
       await receiver.stop();
-
-      // Act
       await receiver.start(port);
-
-      // Assert
-      // As long as control reaches this point, the test passes
-      assert.isOk(true);
     });
   });
 
   describe('built-in middleware', () => {
     describe('ssl_check request handler', () => {
-      it('should handle valid requests', async () => {
-        // Arrange
+      it('should handle valid ssl_check requests and not call next()', async () => {
         const req = { body: { ssl_check: 1 } } as Request;
-        let sent = false;
         const resp = {
-          send: () => {
-            sent = true;
-          },
-        } as Response;
-        let errorResult: any;
-        const next = (error: any) => {
-          errorResult = error;
+          send: sinon.fake(),
         };
-
-        // Act
-        respondToSslCheck(req, resp, next);
-
-        // Assert
-        assert.isTrue(sent);
-        assert.isUndefined(errorResult);
+        const next = sinon.spy();
+        respondToSslCheck(req, resp as unknown as Response, next);
+        sinon.assert.called(resp.send);
+        sinon.assert.notCalled(next);
       });
 
       it('should work with other requests', async () => {
-        // Arrange
         const req = { body: { type: 'block_actions' } } as Request;
-        let sent = false;
         const resp = {
-          send: () => {
-            sent = true;
-          },
-        } as Response;
-        let errorResult: any;
-        const next = (error: any) => {
-          errorResult = error;
+          send: sinon.fake(),
         };
-
-        // Act
-        respondToSslCheck(req, resp, next);
-
-        // Assert
-        assert.isFalse(sent);
-        assert.isUndefined(errorResult);
+        const next = sinon.spy();
+        respondToSslCheck(req, resp as unknown as Response, next);
+        sinon.assert.notCalled(resp.send);
+        sinon.assert.called(next);
       });
     });
 
     describe('url_verification request handler', () => {
       it('should handle valid requests', async () => {
-        // Arrange
         const req = { body: { type: 'url_verification', challenge: 'this is it' } } as Request;
-        let sentBody;
         const resp = {
-          json: (body) => {
-            sentBody = body;
-          },
-        } as Response;
-        let errorResult: any;
-        const next = (error: any) => {
-          errorResult = error;
+          json: sinon.fake(),
         };
-
-        // Act
-        respondToUrlVerification(req, resp, next);
-
-        // Assert
-        assert.equal(JSON.stringify(sentBody), JSON.stringify({ challenge: 'this is it' }));
-        assert.isUndefined(errorResult);
+        const next = sinon.spy();
+        respondToUrlVerification(req, resp as unknown as Response, next);
+        sinon.assert.calledWith(resp.json, sinon.match({ challenge: 'this is it' }));
+        sinon.assert.notCalled(next);
       });
 
       it('should work with other requests', async () => {
-        // Arrange
         const req = { body: { ssl_check: 1 } } as Request;
-        let sentBody;
         const resp = {
-          json: (body) => {
-            sentBody = body;
-          },
-        } as Response;
-        let errorResult: any;
-        const next = (error: any) => {
-          errorResult = error;
+          json: sinon.fake(),
         };
-
-        // Act
-        respondToUrlVerification(req, resp, next);
-
-        // Assert
-        assert.isUndefined(sentBody);
-        assert.isUndefined(errorResult);
+        const next = sinon.spy();
+        respondToUrlVerification(req, resp as unknown as Response, next);
+        sinon.assert.notCalled(resp.json);
+        sinon.assert.called(next);
       });
     });
   });
@@ -747,7 +560,8 @@ describe('ExpressReceiver', () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
-      (reqAsStream as { [key: string]: any }).headers = {
+      // biome-ignore lint/suspicious/noExplicitAny: mock requests can be anything
+      (reqAsStream as Record<string, any>).headers = {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': requestTimestamp,
         'content-type': 'application/x-www-form-urlencoded',
@@ -757,7 +571,8 @@ describe('ExpressReceiver', () => {
     }
 
     function buildGCPRequest(): Request {
-      const untypedReq: { [key: string]: any } = {
+      // biome-ignore lint/suspicious/noExplicitAny: mock requests can be anything
+      const untypedReq: Record<string, any> = {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
@@ -774,23 +589,24 @@ describe('ExpressReceiver', () => {
 
     async function runWithValidRequest(
       req: Request,
+      // biome-ignore lint/suspicious/noExplicitAny: mock requests can be anything
       state: any,
       signingSecretFn?: () => PromiseLike<string>,
     ): Promise<void> {
-      // Arrange
       const resp = buildResponseToVerify(state);
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const next = (error: any) => {
-        // eslint-disable-next-line no-param-reassign
         state.error = error;
       };
 
       // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecretFn || signingSecret);
-      await verifier(req, resp, next);
+      verifier(req, resp, next);
     }
 
     it('should verify requests', async () => {
-      const state: any = {};
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
+      const state: Record<string, any> = {};
       await runWithValidRequest(buildExpressRequest(), state);
       // Assert
       assert.isUndefined(state.error);
@@ -1099,27 +915,3 @@ describe('ExpressReceiver', () => {
     });
   });
 });
-
-/* Testing Harness */
-
-// Loading the system under test using overrides
-async function importExpressReceiver(overrides: Override = {}): Promise<typeof import('./ExpressReceiver').default> {
-  return (await rewiremock.module(() => import('./ExpressReceiver'), overrides)).default;
-}
-
-// Composable overrides
-function withHttpCreateServer(spy: SinonSpy): Override {
-  return {
-    http: {
-      createServer: spy,
-    },
-  };
-}
-
-function withHttpsCreateServer(spy: SinonSpy): Override {
-  return {
-    https: {
-      createServer: spy,
-    },
-  };
-}

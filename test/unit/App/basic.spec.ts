@@ -5,6 +5,7 @@ import { ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
 import {
   FakeReceiver,
+  createFakeConversationStore,
   createFakeLogger,
   importApp,
   mergeOverrides,
@@ -15,7 +16,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
   withSuccessfulBotUserFetchingWebClient,
-  createFakeConversationStore,
 } from '../helpers';
 
 const fakeAppToken = 'xapp-1234';
@@ -46,11 +46,11 @@ describe('App basic features', () => {
 
     describe('with a custom port value in Socket Mode', () => {
       const installationStore = {
-        storeInstallation: async () => { },
+        storeInstallation: async () => {},
         fetchInstallation: async () => {
           throw new Error('Failed fetching installation');
         },
-        deleteInstallation: async () => { },
+        deleteInstallation: async () => {},
       };
       it('should accept a port value at the top-level', async () => {
         const MockApp = await importApp(overrides);

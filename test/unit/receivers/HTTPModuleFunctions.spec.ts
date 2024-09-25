@@ -4,9 +4,9 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../../../src/errors';
-import { createFakeLogger } from '../helpers';
 import type { BufferedIncomingMessage } from '../../../src/receivers/BufferedIncomingMessage';
 import * as func from '../../../src/receivers/HTTPModuleFunctions';
+import { createFakeLogger } from '../helpers';
 
 describe('HTTPModuleFunctions', async () => {
   describe('Request header extraction', async () => {

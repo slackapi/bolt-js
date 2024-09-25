@@ -1,5 +1,5 @@
-import App from '../../src/App';
 import { expectAssignable } from 'tsd';
+import App from '../../src/App';
 import { onlyCommands, onlyViewActions } from '../../src/middleware/builtin';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });

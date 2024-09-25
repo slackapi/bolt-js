@@ -28,7 +28,7 @@
     "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
-    "lint": "npx @biomejs/biome check --write docs src types-tests",
+    "lint": "npx @biomejs/biome check --write docs src test types-tests",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
     "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
     "test:coverage": "c8 npm run test:unit",

@@ -1,8 +1,8 @@
-import sinon, { type SinonSpy } from 'sinon';
 import { EventEmitter } from 'node:events';
-import type { Override } from './app';
+import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import type { Receiver, ReceiverEvent } from '../../../src/types';
+import type { Override } from './app';
 
 export class FakeReceiver implements Receiver {
   private bolt: App | undefined;
@@ -39,12 +39,15 @@ export class FakeServer extends EventEmitter {
     setImmediate(() => {
       this.emit('close');
       setImmediate(() => {
-        args[0]();
+        args[0](this.closingFailure);
       });
     });
   });
 
-  public constructor(private listeningFailure?: Error) {
+  public constructor(
+    private listeningFailure?: Error,
+    private closingFailure?: Error,
+  ) {
     super();
   }
 }

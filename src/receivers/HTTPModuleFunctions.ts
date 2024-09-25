@@ -213,7 +213,7 @@ export const defaultUnhandledRequestHandler = (args: ReceiverUnhandledRequestHan
   const { logger, response } = args;
   logger.error(
     'An incoming event was not acknowledged within 3 seconds. ' +
-    'Ensure that the ack() argument is called in a listener.',
+      'Ensure that the ack() argument is called in a listener.',
   );
 
   // Check if the response has already been sent

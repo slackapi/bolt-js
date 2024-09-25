@@ -1,15 +1,13 @@
-import crypto from 'crypto';
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { type Server, type ServerOptions, createServer } from 'http';
-import type { IncomingMessage, ServerResponse } from 'http';
+import crypto from 'node:crypto';
+import { type Server, type ServerOptions, createServer } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import {
   type Server as HTTPSServer,
   type ServerOptions as HTTPSServerOptions,
   createServer as createHttpsServer,
-} from 'https';
-import type { ListenOptions } from 'net';
-import querystring from 'querystring';
+} from 'node:https';
+import type { ListenOptions } from 'node:net';
+import querystring from 'node:querystring';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import {
   type CallbackOptions,
@@ -32,12 +30,7 @@ import type App from '../App';
 import { type CodedError, ReceiverAuthenticityError, ReceiverInconsistentStateError } from '../errors';
 import type { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import type { StringIndexed } from '../types/utilities';
-import {
-  type ReceiverDispatchErrorHandlerArgs,
-  type ReceiverProcessEventErrorHandlerArgs,
-  type ReceiverUnhandledRequestHandlerArgs,
-  HTTPModuleFunctions as httpFunc,
-} from './HTTPModuleFunctions';
+import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
@@ -79,7 +72,7 @@ const missingServerErrorDescription =
   'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 export const respondToSslCheck: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.ssl_check) {
+  if (req.body?.ssl_check) {
     res.send();
     return;
   }
@@ -87,7 +80,7 @@ export const respondToSslCheck: RequestHandler = (req, res, next) => {
 };
 
 export const respondToUrlVerification: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.type && req.body.type === 'url_verification') {
+  if (req.body?.type && req.body.type === 'url_verification') {
     res.json({ challenge: req.body.challenge });
     return;
   }
@@ -117,12 +110,12 @@ export interface ExpressReceiverOptions {
   app?: Application;
   router?: IRouter;
   customPropertiesExtractor?: (request: Request) => StringIndexed;
-  dispatchErrorHandler?: (args: ReceiverDispatchErrorHandlerArgs) => Promise<void>;
-  processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  dispatchErrorHandler?: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => Promise<void>;
+  processEventErrorHandler?: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
   // NOTE: for the compatibility with HTTPResponseAck, this handler is not async
   // If we receive requests to provide async version of this handler,
   // we can add a different name function for it.
-  unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
 }
 
@@ -171,11 +164,11 @@ export default class ExpressReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: Request) => StringIndexed;
 
-  private dispatchErrorHandler: (args: ReceiverDispatchErrorHandlerArgs) => Promise<void>;
+  private dispatchErrorHandler: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => Promise<void>;
 
-  private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  private processEventErrorHandler: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
-  private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  private unhandledRequestHandler: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
 
   private unhandledRequestTimeoutMillis: number;
 

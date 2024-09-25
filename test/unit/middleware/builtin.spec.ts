@@ -1,12 +1,12 @@
+import { SlackEvent } from '@slack/types';
 // import type { SlackEvent } from '@slack/types';
 // import { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
+import type { SlackEventMiddlewareArgs } from '../../../src/types';
 // import sinon from 'sinon';
 // import { ErrorCode } from '../../../src/errors';
 import { type Override, createDummyMessageEventMiddlewareArgs, wrapMiddleware } from '../helpers';
-import { SlackEvent } from '@slack/types';
-import type { SlackEventMiddlewareArgs } from '../../../src/types';
 // import type { NextFn, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs } from '../../../src/types';
 // import type { SlashCommand } from '../../../src/types/command';
 // import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from '../../../src/middleware/builtin';

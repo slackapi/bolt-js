@@ -1,4 +1,3 @@
-import { expectAssignable, expectError, expectNotType, expectType } from 'tsd';
 import type {
   AllMessageEvents,
   BotMessageEvent,
@@ -11,6 +10,7 @@ import type {
   MessageRepliedEvent,
   ThreadBroadcastMessageEvent,
 } from '@slack/types';
+import { expectAssignable, expectError, expectNotType, expectType } from 'tsd';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });

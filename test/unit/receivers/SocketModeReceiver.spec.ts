@@ -10,9 +10,9 @@ import { AppInitializationError, CustomRouteInitializationError } from '../../..
 import {
   FakeServer,
   type Override,
+  createFakeLogger,
   mergeOverrides,
   type noopVoid,
-  createFakeLogger,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
@@ -305,8 +305,8 @@ describe('SocketModeReceiver', () => {
         const SocketModeReceiver = await importSocketModeReceiver(overrides);
 
         const callbackOptions = {
-          failure: () => { },
-          success: () => { },
+          failure: () => {},
+          success: () => {},
         };
         const receiver = new SocketModeReceiver({
           appToken: 'my-secret',
@@ -348,8 +348,8 @@ describe('SocketModeReceiver', () => {
         const redirectUri = 'http://example.com/heyo';
         const userScopes = ['chat:write'];
         const callbackOptions = {
-          failure: () => { },
-          success: () => { },
+          failure: () => {},
+          success: () => {},
         };
         const installUrlOptions = {
           scopes,

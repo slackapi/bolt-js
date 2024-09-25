@@ -3,8 +3,8 @@ import type { WebClient } from '@slack/web-api';
 import { assert, AssertionError } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
-import { type Override, createFakeLogger, delay } from './helpers';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
+import { type Override, createFakeLogger, delay } from './helpers';
 
 /* Testing Harness */
 

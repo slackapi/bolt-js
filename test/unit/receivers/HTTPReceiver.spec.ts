@@ -10,16 +10,16 @@ import {
   CustomRouteInitializationError,
   HTTPReceiverDeferredRequestError,
 } from '../../../src/errors';
+import type { CustomRoute } from '../../../src/receivers/custom-routes';
 import {
   FakeServer,
   type Override,
   createFakeLogger,
   mergeOverrides,
   type noopVoid,
-  withHttpsCreateServer,
   withHttpCreateServer,
+  withHttpsCreateServer,
 } from '../helpers';
-import type { CustomRoute } from '../../../src/receivers/custom-routes';
 
 // Loading the system under test using overrides
 async function importHTTPReceiver(

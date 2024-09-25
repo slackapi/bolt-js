@@ -13,8 +13,8 @@ import {
   type WorkflowStepSaveMiddlewareArgs,
 } from '../../src/WorkflowStep';
 import { WorkflowStepInitializationError } from '../../src/errors';
-import { type Override, noopVoid } from './helpers';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
+import { type Override, noopVoid } from './helpers';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('../../src/WorkflowStep')> {
   return rewiremock.module(() => import('../../src/WorkflowStep'), overrides);
@@ -114,7 +114,7 @@ describe('WorkflowStep class', () => {
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = {
-        edit: async () => { },
+        edit: async () => {},
       } as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
@@ -127,9 +127,9 @@ describe('WorkflowStep class', () => {
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = {
-        edit: async () => { },
+        edit: async () => {},
         save: {},
-        execute: async () => { },
+        execute: async () => {},
       } as unknown as WorkflowStepConfig;
 
       const validationFn = () => validate('callback_id', badConfig);
@@ -301,7 +301,7 @@ describe('WorkflowStep class', () => {
       const fn1 = sinon.spy((async ({ next: continuation }) => {
         await continuation();
       }) as Middleware<WorkflowStepEdit>);
-      const fn2 = sinon.spy(async () => { });
+      const fn2 = sinon.spy(async () => {});
       const fakeMiddleware = [fn1, fn2] as WorkflowStepMiddleware;
 
       await processStepMiddleware(fakeArgs, fakeMiddleware);

@@ -1,4 +1,3 @@
-import { expectType } from 'tsd';
 import type {
   AppMentionEvent,
   PinAddedEvent,
@@ -9,6 +8,7 @@ import type {
   UserProfileChangedEvent,
   UserStatusChangedEvent,
 } from '@slack/types';
+import { expectType } from 'tsd';
 import type { SayFn } from '../../';
 import App from '../../src/App';
 

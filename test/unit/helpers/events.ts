@@ -1,9 +1,14 @@
 import type { AppMentionEvent, MessageEvent } from '@slack/types';
+import { WebClient } from '@slack/web-api';
+import sinon, { type SinonSpy } from 'sinon';
+import { createFakeLogger } from '.';
 import type {
   AckFn,
+  AllMiddlewareArgs,
   BaseSlackEvent,
   BlockAction,
   BlockElementAction,
+  BlockSuggestion,
   Context,
   EnvelopedEvent,
   GlobalShortcut,
@@ -17,16 +22,11 @@ import type {
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
-  ViewClosedAction,
-  ViewSubmitAction,
-  ViewOutput,
-  BlockSuggestion,
   SlashCommand,
-  AllMiddlewareArgs,
+  ViewClosedAction,
+  ViewOutput,
+  ViewSubmitAction,
 } from '../../../src/types';
-import { createFakeLogger } from '.';
-import sinon, { type SinonSpy } from 'sinon';
-import { WebClient } from '@slack/web-api';
 
 const ts = '1234.56';
 const user = 'U1234';

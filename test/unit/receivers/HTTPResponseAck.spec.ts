@@ -2,9 +2,9 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { ReceiverMultipleAckError } from '../../../src/errors';
-import { createFakeLogger } from '../helpers';
 import * as HTTPModuleFunctions from '../../../src/receivers/HTTPModuleFunctions';
 import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
+import { createFakeLogger } from '../helpers';
 
 describe('HTTPResponseAck', async () => {
   it('should work', async () => {

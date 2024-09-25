@@ -1,10 +1,11 @@
 import assert from 'node:assert';
 import sinon, { type SinonSpy } from 'sinon';
+import type App from '../../../src/App';
 import {
   FakeReceiver,
   type Override,
-  createFakeLogger,
   createDummyAppMentionEventMiddlewareArgs,
+  createFakeLogger,
   importApp,
   mergeOverrides,
   noopMiddleware,
@@ -14,7 +15,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
-import type App from '../../../src/App';
 
 function buildOverrides(secondOverrides: Override[]): Override {
   return mergeOverrides(
@@ -62,9 +62,9 @@ describe('App event() routing', () => {
     sinon.assert.called(fakeHandler);
   });
   it('should throw if provided invalid message subtype event names', async () => {
-    app.event('app_mention', async () => { });
-    app.event('message', async () => { });
-    assert.throws(() => app.event('message.channels', async () => { }));
-    assert.throws(() => app.event(/message\..+/, async () => { }));
+    app.event('app_mention', async () => {});
+    app.event('message', async () => {});
+    assert.throws(() => app.event('message.channels', async () => {}));
+    assert.throws(() => app.event(/message\..+/, async () => {}));
   });
 });

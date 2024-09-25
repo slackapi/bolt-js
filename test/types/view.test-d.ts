@@ -12,7 +12,7 @@ expectError(
       type: 'view_submission',
       unknown_key: 'should be detected',
     },
-    async () => { },
+    async () => {},
   ),
 );
 expectError(
@@ -22,7 +22,7 @@ expectError(
       type: undefined,
       unknown_key: 'should be detected',
     },
-    async () => { },
+    async () => {},
   ),
 );
 // view_submission

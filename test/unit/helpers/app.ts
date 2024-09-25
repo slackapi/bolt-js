@@ -1,5 +1,5 @@
-import rewiremock from 'rewiremock';
 import type { WebClientOptions } from '@slack/web-api';
+import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
 
 /*
@@ -7,7 +7,7 @@ import sinon, { type SinonSpy } from 'sinon';
  */
 
 // biome-ignore lint/suspicious/noExplicitAny: module overrides can be anything
-export interface Override extends Record<string, Record<string, any>> { }
+export interface Override extends Record<string, Record<string, any>> {}
 
 export function mergeOverrides(...overrides: Override[]): Override {
   let currentOverrides: Override = {};
@@ -46,7 +46,7 @@ export async function importApp(
 export function withNoopWebClient(): Override {
   return {
     '@slack/web-api': {
-      WebClient: class { },
+      WebClient: class {},
     },
   };
 }

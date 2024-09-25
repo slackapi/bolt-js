@@ -1,9 +1,10 @@
+import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
-import type { WebClient } from '@slack/web-api';
 import type App from '../../../src/App';
 import { type ExtendedErrorHandlerArgs, LogLevel } from '../../../src/App';
 import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedError } from '../../../src/errors';
+import type { NextFn, ReceiverEvent, SayFn } from '../../../src/types';
 import {
   FakeReceiver,
   type Override,
@@ -27,7 +28,6 @@ import {
   withPostMessage,
   withSuccessfulBotUserFetchingWebClient,
 } from '../helpers';
-import type { NextFn, ReceiverEvent, SayFn } from '../../../src/types';
 
 describe('App middleware processing', () => {
   let fakeReceiver: FakeReceiver;
@@ -188,16 +188,16 @@ describe('App middleware processing', () => {
        */
       const assertOrderMiddleware =
         (orderDown: number, orderUp: number) =>
-          async ({ next }: { next?: NextFn }) => {
-            await delay(10);
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderDown);
-            if (next !== undefined) {
-              await next();
-            }
-            middlewareCount += 1;
-            assert.equal(middlewareCount, orderUp);
-          };
+        async ({ next }: { next?: NextFn }) => {
+          await delay(10);
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderDown);
+          if (next !== undefined) {
+            await next();
+          }
+          middlewareCount += 1;
+          assert.equal(middlewareCount, orderUp);
+        };
 
       app.use(assertOrderMiddleware(1, 8));
       app.message(message, assertOrderMiddleware(3, 6), assertOrderMiddleware(4, 5));
