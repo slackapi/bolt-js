@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import querystring from 'querystring';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import tsscmp from 'tsscmp';
@@ -284,7 +283,6 @@ export default class AwsLambdaReceiver implements Receiver {
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private getRawBody(awsEvent: AwsEvent): string {
     if (typeof awsEvent.body === 'undefined' || awsEvent.body == null) {
       return '';
@@ -295,7 +293,6 @@ export default class AwsLambdaReceiver implements Receiver {
     return awsEvent.body;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private parseRequestBody(stringBody: string, contentType: string | undefined, logger: Logger): any {
     if (contentType === 'application/x-www-form-urlencoded') {
       const parsedBody = querystring.parse(stringBody);

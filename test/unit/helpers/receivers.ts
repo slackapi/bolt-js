@@ -1,4 +1,5 @@
 import { EventEmitter } from 'node:events';
+import crypto from 'node:crypto';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import type { Receiver, ReceiverEvent } from '../../../src/types';
@@ -64,5 +65,37 @@ export function withHttpsCreateServer(spy: SinonSpy): Override {
     'node:https': {
       createServer: spy,
     },
+  };
+}
+
+export function createDummyAWSPayload(
+  // biome-ignore lint/suspicious/noExplicitAny: HTTP request bodies can be anything
+  body: any,
+  timestamp: number = Math.floor(Date.now() / 1000),
+  headers?: Record<string, string>,
+  isBase64Encoded = false,
+) {
+  const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
+  const realBody = isBase64Encoded ? Buffer.from(body).toString('base64') : body;
+  return {
+    resource: '/slack/events',
+    path: '/slack/events',
+    httpMethod: 'POST',
+    headers: headers || {
+      Accept: 'application/json,*/*',
+      'Content-Type': 'application/json',
+      Host: 'xxx.execute-api.ap-northeast-1.amazonaws.com',
+      'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+      'X-Slack-Request-Timestamp': `${timestamp}`,
+      'X-Slack-Signature': `v0=${signature}`,
+    },
+    multiValueHeaders: {},
+    queryStringParameters: null,
+    multiValueQueryStringParameters: null,
+    pathParameters: null,
+    stageVariables: null,
+    requestContext: {},
+    body: realBody,
+    isBase64Encoded,
   };
 }
