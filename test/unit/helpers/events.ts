@@ -1,4 +1,4 @@
-import type { AppMentionEvent, MessageEvent } from '@slack/types';
+import type { AppMentionEvent, Block, KnownBlock, MessageEvent } from '@slack/types';
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import { createFakeLogger } from '.';
@@ -54,6 +54,7 @@ export function wrapMiddleware<Args extends SlackEventMiddlewareArgs>(
 interface DummyMessageOverrides {
   message?: MessageEvent;
   text?: string;
+  blocks?: (KnownBlock | Block)[];
 }
 export function createDummyMessageEventMiddlewareArgs(
   msgOverrides?: DummyMessageOverrides,
@@ -69,6 +70,7 @@ export function createDummyMessageEventMiddlewareArgs(
     user,
     ts,
     text: msgOverrides?.text || 'hi',
+    blocks: msgOverrides?.blocks || [],
   };
   return {
     payload,

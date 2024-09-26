@@ -1,43 +1,29 @@
-import crypto from 'crypto';
-import { LogLevel, type Logger } from '@slack/logger';
+import crypto from 'node:crypto';
 import { assert } from 'chai';
 import sinon from 'sinon';
-import 'mocha';
-import type { WebClientOptions } from '@slack/web-api';
-import rewiremock from 'rewiremock';
-import { type Override, mergeOverrides } from '../test-helpers';
-import AwsLambdaReceiver, { type AwsHandler } from './AwsLambdaReceiver';
+import {
+  createFakeLogger,
+  importApp,
+  mergeOverrides,
+  noopVoid,
+  withNoopAppMetadata,
+  withNoopWebClient,
+} from '../helpers';
+import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 
-const noop = () => Promise.resolve(undefined);
+const fakeAuthTestResponse = {
+  ok: true,
+  enterprise_id: 'E111',
+  team_id: 'T111',
+  bot_id: 'B111',
+  user_id: 'W111',
+};
+const appOverrides = mergeOverrides(withNoopAppMetadata(), withNoopWebClient(fakeAuthTestResponse));
 
 describe('AwsLambdaReceiver', () => {
-  beforeEach(() => {});
+  const noopLogger = createFakeLogger();
 
-  const noopLogger: Logger = {
-    debug(..._msg: any[]): void {
-      /* noop */
-    },
-    info(..._msg: any[]): void {
-      /* noop */
-    },
-    warn(..._msg: any[]): void {
-      /* noop */
-    },
-    error(..._msg: any[]): void {
-      /* noop */
-    },
-    setLevel(_level: LogLevel): void {
-      /* noop */
-    },
-    getLevel(): LogLevel {
-      return LogLevel.DEBUG;
-    },
-    setName(_name: string): void {
-      /* noop */
-    },
-  };
-
-  it('should instantiate with default logger', async (): Promise<void> => {
+  it('should instantiate with default logger', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -45,16 +31,16 @@ describe('AwsLambdaReceiver', () => {
     assert.isNotNull(awsReceiver);
   });
 
-  it('should have start method', async (): Promise<void> => {
+  it('should have start method', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
     });
-    const startedHandler: AwsHandler = await awsReceiver.start();
+    const startedHandler = await awsReceiver.start();
     assert.isNotNull(startedHandler);
   });
 
-  it('should have stop method', async (): Promise<void> => {
+  it('should have stop method', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -63,13 +49,14 @@ describe('AwsLambdaReceiver', () => {
     await awsReceiver.stop();
   });
 
-  it('should accept events', async (): Promise<void> => {
+  it('should accept events', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000);
+    // TODO: use event test helpers instead
     const body = JSON.stringify({
       token: 'fixed-value',
       team_id: 'T111',
@@ -101,6 +88,7 @@ describe('AwsLambdaReceiver', () => {
       event_context: '1-app_mention-T111-C111',
     });
     const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
+    // TODO: create an aws event factory test helper thing?
     const awsEvent = {
       resource: '/slack/events',
       path: '/slack/events',
@@ -122,25 +110,26 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response1.statusCode, 404);
-    const App = await importApp();
+    const App = await importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
     });
-    app.event('app_mention', noop);
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    app.event('app_mention', noopVoid);
+    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response2.statusCode, 200);
   });
 
-  it('should accept proxy events with lowercase header properties', async (): Promise<void> => {
+  it('should accept proxy events with lowercase header properties', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
     });
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000);
+    // TODO: use test helper
     const body = JSON.stringify({
       token: 'fixed-value',
       team_id: 'T111',
@@ -172,6 +161,7 @@ describe('AwsLambdaReceiver', () => {
       event_context: '1-app_mention-T111-C111',
     });
     const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
+    // TODO: factor out into helper
     const awsEvent = {
       resource: '/slack/events',
       path: '/slack/events',
@@ -193,19 +183,19 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response1.statusCode, 404);
-    const App = await importApp();
+    const App = await importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
     });
-    app.event('app_mention', noop);
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    app.event('app_mention', noopVoid);
+    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response2.statusCode, 200);
   });
 
-  it('should accept interactivity requests', async (): Promise<void> => {
+  it('should accept interactivity requests', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -236,9 +226,9 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response1.statusCode, 404);
-    const App = await importApp();
+    const App = await importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
@@ -246,11 +236,11 @@ describe('AwsLambdaReceiver', () => {
     app.shortcut('bolt-js-aws-lambda-shortcut', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response2.statusCode, 200);
   });
 
-  it('should accept slash commands', async (): Promise<void> => {
+  it('should accept slash commands', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -281,9 +271,9 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response1.statusCode, 404);
-    const App = await importApp();
+    const App = await importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
@@ -291,7 +281,7 @@ describe('AwsLambdaReceiver', () => {
     app.command('/hello-bolt-js', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response2.statusCode, 200);
   });
 
@@ -354,11 +344,11 @@ describe('AwsLambdaReceiver', () => {
       body: Buffer.from(body).toString('base64'),
       isBase64Encoded: true,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response1.statusCode, 404);
   });
 
-  it('should accept ssl_check requests', async (): Promise<void> => {
+  it('should accept ssl_check requests', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -384,7 +374,7 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response.statusCode, 200);
   });
 
@@ -394,7 +384,7 @@ describe('AwsLambdaReceiver', () => {
     type: 'url_verification',
   });
 
-  it('should accept url_verification requests', async (): Promise<void> => {
+  it('should accept url_verification requests', async () => {
     const timestamp = Math.floor(Date.now() / 1000);
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
@@ -426,11 +416,11 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response.statusCode, 200);
   });
 
-  it('should detect invalid signature', async (): Promise<void> => {
+  it('should detect invalid signature', async () => {
     const spy = sinon.spy();
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
@@ -464,12 +454,12 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response.statusCode, 401);
     assert(spy.calledOnce);
   });
 
-  it('should detect too old request timestamp', async (): Promise<void> => {
+  it('should detect too old request timestamp', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -501,7 +491,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response.statusCode, 401);
   });
 
@@ -533,46 +523,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {}, (_error, _result) => { });
     assert.equal(response.statusCode, 200);
   });
 });
-
-// Composable overrides
-function withNoopWebClient(): Override {
-  return {
-    '@slack/web-api': {
-      WebClient: class {
-        public token?: string;
-
-        public constructor(token?: string, _options?: WebClientOptions) {
-          this.token = token;
-        }
-
-        public auth = {
-          test: sinon.fake.resolves({
-            enterprise_id: 'E111',
-            team_id: 'T111',
-            bot_id: 'B111',
-            user_id: 'W111',
-          }),
-        };
-      },
-    },
-  };
-}
-
-function withNoopAppMetadata(): Override {
-  return {
-    '@slack/web-api': {
-      addAppMetadata: sinon.fake(),
-    },
-  };
-}
-
-// Loading the system under test using overrides
-async function importApp(
-  overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('../App').default> {
-  return (await rewiremock.module(() => import('../App'), overrides)).default;
-}

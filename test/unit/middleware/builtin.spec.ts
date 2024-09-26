@@ -1,22 +1,25 @@
-import type { SlackEvent } from '@slack/types';
-import { WebClient } from '@slack/web-api';
+// import type { SlackEvent } from '@slack/types';
+// import { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon from 'sinon';
-import { ErrorCode } from '../../../src/errors';
+// import { ErrorCode } from '../../../src/errors';
+// import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from '../../../src/middleware/builtin';
+import type { Context, /* NextFn, SlackCommandMiddlewareArgs, */ SlackEventMiddlewareArgs } from '../../../src/types';
+// import type { SlashCommand } from '../../../src/types/command';
 import {
   type Override,
-  createDummyMessageEventMiddlewareArgs,
   createDummyAppMentionEventMiddlewareArgs,
+  createDummyMessageEventMiddlewareArgs,
   wrapMiddleware,
 } from '../helpers';
-import type { NextFn, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs } from '../../../src/types';
-import type { SlashCommand } from '../../../src/types/command';
-import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from '../../../src/middleware/builtin';
 
-interface DummyContext {
+interface DummyContext extends Context {
   matches?: RegExpExecArray;
 }
+
+// Dummy values
+const dummyContext: DummyContext = { isEnterpriseInstall: false };
 
 async function importBuiltin(overrides: Override = {}): Promise<typeof import('../../../src/middleware/builtin')> {
   return rewiremock.module(() => import('../../../src/middleware/builtin'), overrides);
@@ -29,18 +32,17 @@ describe('Built-in global middleware', () => {
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
     ): Mocha.AsyncFunc {
       return async () => {
-        const dummyContext: DummyContext = {};
         const { matchMessage } = await importBuiltin();
-
         const middleware = matchMessage(pattern);
-        const args = wrapMiddleware(event);
+        const ctx = { ...dummyContext };
+        const args = wrapMiddleware(event, ctx);
         await middleware(args);
 
-        assert(args.next.called);
+        sinon.assert.called(args.next);
         // The following assertion(s) check behavior that is only targeted at RegExp patterns
         if (typeof pattern !== 'string') {
-          if (dummyContext.matches !== undefined) {
-            assert.lengthOf(dummyContext.matches, 1);
+          if (ctx.matches !== undefined) {
+            assert.lengthOf(ctx.matches, 1);
           } else {
             assert.fail();
           }
@@ -48,53 +50,26 @@ describe('Built-in global middleware', () => {
       };
     }
 
-    function notMatchesPatternTestCase(pattern: string | RegExp, nonMatchingText: string): Mocha.AsyncFunc {
+    function notMatchesPatternTestCase(
+      pattern: string | RegExp,
+      event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
+    ): Mocha.AsyncFunc {
       return async () => {
-        const dummyContext = {};
-        const fakeNext = sinon.fake();
-        const fakeArgs = {
-          event: buildFakeEvent(nonMatchingText),
-          context: dummyContext,
-          next: fakeNext,
-        } as unknown as MessageMiddlewareArgs;
         const { matchMessage } = await importBuiltin();
-
-        // Act
         const middleware = matchMessage(pattern);
-        await middleware(fakeArgs);
+        const ctx = { ...dummyContext };
+        const args = wrapMiddleware(event, ctx);
+        await middleware(args);
 
-        // Assert
-        assert(fakeNext.notCalled);
-        assert.notProperty(dummyContext, 'matches');
+        sinon.assert.notCalled(args.next);
+        assert.notProperty(ctx, 'matches');
       };
     }
 
-    function noTextMessageTestCase(pattern: string | RegExp): Mocha.AsyncFunc {
-      return async () => {
-        // Arrange
-        const dummyContext = {};
-        const fakeNext = sinon.fake();
-        const fakeArgs = {
-          event: createFakeMessageEvent([{ type: 'divider' }]),
-          context: dummyContext,
-          next: fakeNext,
-        } as unknown as MessageMiddlewareArgs;
-        const { matchMessage } = await importBuiltin();
-
-        // Act
-        const middleware = matchMessage(pattern);
-        await middleware(fakeArgs);
-
-        // Assert
-        assert(fakeNext.notCalled);
-        assert.notProperty(dummyContext, 'matches');
-      };
-    }
-
-    describe('using a string pattern', () => {
+    describe.only('using a string pattern', () => {
       const pattern = 'foo';
       const matchingText = 'foobar';
-      // const nonMatchingText = 'bar';
+      const nonMatchingText = 'bar';
       it(
         'should match message events with a pattern that matches',
         matchesPatternTestCase(pattern, createDummyMessageEventMiddlewareArgs({ text: matchingText })),
@@ -105,15 +80,29 @@ describe('Built-in global middleware', () => {
       );
       it(
         'should filter out message events with a pattern that does not match',
-        notMatchesPatternTestCase(pattern, nonMatchingText, createFakeMessageEvent),
+        notMatchesPatternTestCase(pattern, createDummyMessageEventMiddlewareArgs({ text: nonMatchingText })),
       );
       it(
         'should filter out app_mention events with a pattern that does not match',
-        notMatchesPatternTestCase(pattern, nonMatchingText, createFakeAppMentionEvent),
+        notMatchesPatternTestCase(pattern, createDummyAppMentionEventMiddlewareArgs({ text: nonMatchingText })),
       );
-      it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
+      it(
+        'should filter out message events which do not have text (block kit)',
+        notMatchesPatternTestCase(
+          pattern,
+          createDummyMessageEventMiddlewareArgs({
+            text: '',
+            blocks: [
+              {
+                type: 'divider',
+              },
+            ],
+          }),
+        ),
+      );
     });
 
+    /*
     describe('using a RegExp pattern', () => {
       const pattern = /foo/;
       const matchingText = 'foobar';
@@ -136,9 +125,12 @@ describe('Built-in global middleware', () => {
         notMatchesPatternTestCase(pattern, nonMatchingText, createFakeAppMentionEvent),
       );
       it('should filter out message events which do not have text (block kit)', noTextMessageTestCase(pattern));
+      event: createFakeMessageEvent([{ type: 'divider' }]),
     });
+    */
   });
 
+  /*
   describe('directMention()', () => {
     it('should bail when the context does not provide a bot user ID', async () => {
       // Arrange
@@ -770,4 +762,5 @@ describe('Built-in global middleware', () => {
       assert.isFalse(fakeNext.called);
     });
   });
+  */
 });

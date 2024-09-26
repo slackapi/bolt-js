@@ -21,12 +21,12 @@ export { default as AwsLambdaReceiver, AwsLambdaReceiverOptions } from './receiv
 
 export { BufferedIncomingMessage } from './receivers/BufferedIncomingMessage';
 export {
-  HTTPModuleFunctions,
   RequestVerificationOptions,
   ReceiverDispatchErrorHandlerArgs,
   ReceiverProcessEventErrorHandlerArgs,
   ReceiverUnhandledRequestHandlerArgs,
 } from './receivers/HTTPModuleFunctions';
+export * as HTTPModuleFunctions from './receivers/HTTPModuleFunctions';
 export { HTTPResponseAck } from './receivers/HTTPResponseAck';
 
 export {
