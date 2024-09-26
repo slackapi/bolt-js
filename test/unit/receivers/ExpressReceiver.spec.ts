@@ -322,8 +322,8 @@ describe('ExpressReceiver', () => {
     const buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
     const buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
     const processStub = sinon.stub<[ReceiverEvent]>().resolves({});
-    const ackStub = function ackStub() { };
-    ackStub.prototype.bind = function() {
+    const ackStub = function ackStub() {};
+    ackStub.prototype.bind = function () {
       return this;
     };
     ackStub.prototype.ack = sinon.spy();
@@ -350,7 +350,7 @@ describe('ExpressReceiver', () => {
       receiver.init(app);
 
       const req = { body: {} } as Request;
-      const resp = { send: () => { } } as Response;
+      const resp = { send: () => {} } as Response;
       await receiver.requestHandler(req, resp);
 
       sinon.assert.notCalled(buildContentResponseStub);
@@ -367,7 +367,7 @@ describe('ExpressReceiver', () => {
       receiver.init(app);
 
       const req = { body: {} } as Request;
-      const resp = { send: () => { } } as Response;
+      const resp = { send: () => {} } as Response;
       await receiver.requestHandler(req, resp);
       sinon.assert.called(buildContentResponseStub);
     });
@@ -413,7 +413,7 @@ describe('ExpressReceiver', () => {
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleInstallPath').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/install', method: 'GET' } as Request;
-        const resp = { send: () => { } } as Response;
+        const resp = { send: () => {} } as Response;
         const next = sinon.spy();
         // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
         (receiver.router as any).handle(req, resp, next);
@@ -441,9 +441,9 @@ describe('ExpressReceiver', () => {
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleCallback').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
-        const resp = { send: () => { } } as Response;
+        const resp = { send: () => {} } as Response;
         // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
-        (receiver.router as any).handle(req, resp, () => { });
+        (receiver.router as any).handle(req, resp, () => {});
 
         sinon.assert.calledWith(handleStub, req, resp, callbackOptions);
       });
@@ -466,9 +466,9 @@ describe('ExpressReceiver', () => {
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleCallback').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
-        const resp = { send: () => { } } as Response;
+        const resp = { send: () => {} } as Response;
         // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
-        (receiver.router as any).handle(req, resp, () => { });
+        (receiver.router as any).handle(req, resp, () => {});
 
         sinon.assert.calledWith(handleStub, req, resp, callbackOptions, sinon.match({ scopes }));
       });

@@ -94,10 +94,10 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-  | string
-  | {
-    [endpointType: string]: string;
-  };
+    | string
+    | {
+        [endpointType: string]: string;
+      };
   signatureVerification?: boolean;
   processBeforeResponse?: boolean;
   clientId?: string;
@@ -217,9 +217,9 @@ export default class ExpressReceiver implements Receiver {
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     this.router = router !== undefined ? router : Router();
-    endpointList.forEach((endpoint) => {
+    for (const endpoint of endpointList) {
       this.router.post(endpoint, ...expressMiddleware);
-    });
+    }
 
     this.customPropertiesExtractor = customPropertiesExtractor;
     this.dispatchErrorHandler = dispatchErrorHandler;
@@ -457,21 +457,11 @@ function buildVerificationBodyParserMiddleware(
   signingSecret: string | (() => PromiseLike<string>),
 ): RequestHandler {
   return async (req, res, next): Promise<void> => {
-    let stringBody: string;
-    // TODO: DRY this up
-    // On some environments like GCP (Google Cloud Platform),
-    // req.body can be pre-parsed and be passed as req.rawBody here
-    const preparsedRawBody: any = (req as any).rawBody;
-    if (preparsedRawBody !== undefined) {
-      stringBody = preparsedRawBody.toString();
-    } else {
-      stringBody = (await rawBody(req)).toString();
-    }
-
     // *** Parsing body ***
     // As the verification passed, parse the body as an object and assign it to req.body
-    // Following middlewares can expect `req.body` is already a parsed one.
+    const stringBody = await parseExpressRequestRawBody(req);
 
+    // Following middlewares can expect `req.body` is already parsed.
     try {
       // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
       // and overwrites `req.body` with the parsed JS object.
@@ -498,6 +488,7 @@ function buildVerificationBodyParserMiddleware(
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: errors can be anything
 function logError(logger: Logger, message: string, error: any): void {
   const logMessage =
     'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
@@ -544,6 +535,7 @@ function verifyRequestSignature(
 export function verifySignatureAndParseBody(
   signingSecret: string,
   body: string,
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: headers should only be of a certain type, but some other functions here expect a more complicated type. revisit to type properly later.
   headers: Record<string, any>,
 ): AnyMiddlewareArgs['body'] {
   // *** Request verification ***
@@ -559,13 +551,8 @@ export function verifySignatureAndParseBody(
 }
 
 export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
-  return async (req, res, next): Promise<void> => {
-    let stringBody: string;
-    if ('rawBody' in req && req.rawBody) {
-      stringBody = req.rawBody.toString();
-    } else {
-      stringBody = (await rawBody(req)).toString();
-    }
+  return async (req, res, next) => {
+    const stringBody = await parseExpressRequestRawBody(req);
     try {
       const { 'content-type': contentType } = req.headers;
       req.body = parseRequestBody(stringBody, contentType);
@@ -580,6 +567,7 @@ export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
 function parseRequestBody(stringBody: string, contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
     const parsedBody = querystring.parse(stringBody);
@@ -592,4 +580,13 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
   }
 
   return JSON.parse(stringBody);
+}
+
+// On some environments like GCP (Google Cloud Platform),
+// req.body can be pre-parsed and be passed as req.rawBody
+async function parseExpressRequestRawBody(req: Parameters<RequestHandler>[0]): Promise<string> {
+  if ('rawBody' in req && req.rawBody) {
+    return Promise.resolve(req.rawBody.toString());
+  }
+  return (await rawBody(req)).toString();
 }
