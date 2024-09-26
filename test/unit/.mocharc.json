@@ -1,15 +1,10 @@
 {
-  "require": ["ts-node/register", "source-map-support/register"],
+  "require": [
+    "ts-node/register",
+    "source-map-support/register"
+  ],
   "spec": [
-    "test/unit/App/*.spec.ts",
-    "test/unit/receivers/ExpressReceiver.spec.ts",
-    "test/unit/receivers/HTTPModuleFunctions.spec.ts",
-    "test/unit/receivers/HTTPReceiver.spec.ts",
-    "test/unit/receivers/HTTPResponseAck.spec.ts",
-    "test/unit/receivers/SocketModeFunctions.spec.ts",
-    "test/unit/receivers/SocketModeReceiver.spec.ts",
-    "test/unit/receivers/verify-request.spec.ts",
-    "test/unit/*.spec.ts"
+    "test/unit/**/*.spec.ts"
   ],
   "timeout": 3000
 }
