@@ -1,10 +1,5 @@
 {
-  "require": [
-    "ts-node/register",
-    "source-map-support/register"
-  ],
-  "spec": [
-    "test/unit/**/*.spec.ts"
-  ],
+  "require": ["ts-node/register", "source-map-support/register"],
+  "spec": ["test/unit/**/*.spec.ts"],
   "timeout": 3000
 }

@@ -1,4 +1,4 @@
-import type { ServerResponse } from 'http';
+import type { ServerResponse } from 'node:http';
 import { CustomRouteInitializationError } from '../errors';
 import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 
@@ -19,12 +19,13 @@ export function buildReceiverRoutes(customRoutes: CustomRoute[]): ReceiverRoutes
 
   validateCustomRoutes(customRoutes);
 
-  customRoutes.forEach((r) => {
+  for (const r of customRoutes) {
     const methodObj = Array.isArray(r.method)
-      ? r.method.reduce((o, key) => ({ ...o, [key.toUpperCase()]: r.handler }), {})
+      ? // biome-ignore lint/performance/noAccumulatingSpread: TODO: apparently this is a perf hit?
+        r.method.reduce((o, key) => ({ ...o, [key.toUpperCase()]: r.handler }), {})
       : { [r.method.toUpperCase()]: r.handler };
     routes[r.path] = routes[r.path] ? { ...routes[r.path], ...methodObj } : methodObj;
-  });
+  }
 
   return routes;
 }
@@ -34,13 +35,13 @@ function validateCustomRoutes(customRoutes: CustomRoute[]): void {
   const missingKeys: (keyof CustomRoute)[] = [];
 
   // Check for missing required keys
-  customRoutes.forEach((route) => {
-    requiredKeys.forEach((key) => {
+  for (const route of customRoutes) {
+    for (const key of requiredKeys) {
       if (route[key] === undefined && !missingKeys.includes(key)) {
         missingKeys.push(key);
       }
-    });
-  });
+    }
+  }
 
   if (missingKeys.length > 0) {
     const errorMsg = `One or more routes in customRoutes are missing required keys: ${missingKeys.join(', ')}`;

@@ -29,12 +29,13 @@ export interface WorkflowStepEdit {
   workflow_step: {
     workflow_id: string;
     step_id: string;
-    inputs: {
-      [key: string]: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    inputs: Record<
+      string,
+      {
+        // biome-ignore lint/suspicious/noExplicitAny: input parameters can accept anything
         value: any;
-      };
-    };
+      }
+    >;
     outputs: {
       name: string;
       type: string;

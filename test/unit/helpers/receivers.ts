@@ -1,5 +1,5 @@
-import { EventEmitter } from 'node:events';
 import crypto from 'node:crypto';
+import { EventEmitter } from 'node:events';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import type { Receiver, ReceiverEvent } from '../../../src/types';

@@ -13,6 +13,7 @@ export interface AckArgs {
   httpResponse: ServerResponse;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
 export type HTTResponseBody = any;
 
 export class HTTPResponseAck {
@@ -32,6 +33,7 @@ export class HTTPResponseAck {
 
   private noAckTimeoutId?: NodeJS.Timeout;
 
+  // biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
   public storedResponse: any;
 
   public constructor(args: AckArgs) {

@@ -1,5 +1,5 @@
-import crypto from 'crypto';
-import querystring from 'querystring';
+import crypto from 'node:crypto';
+import querystring from 'node:querystring';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import tsscmp from 'tsscmp';
 import type App from '../App';
@@ -17,6 +17,7 @@ export interface AwsEventV1 {
   isBase64Encoded: boolean;
   pathParameters: AwsEventStringParameters | null;
   queryStringParameters: AwsEventStringParameters | null;
+  // biome-ignore lint/suspicious/noExplicitAny: request contexts can be anything
   requestContext: any;
   stageVariables: AwsEventStringParameters | null;
   // v1-only properties:
@@ -33,6 +34,7 @@ export interface AwsEventV2 {
   isBase64Encoded: boolean;
   pathParameters?: AwsEventStringParameters;
   queryStringParameters?: AwsEventStringParameters;
+  // biome-ignore lint/suspicious/noExplicitAny: request contexts can be anything
   requestContext: any;
   stageVariables?: AwsEventStringParameters;
   // v2-only properties:
@@ -43,6 +45,7 @@ export interface AwsEventV2 {
   version: string;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: userland function results can be anything
 export type AwsCallback = (error?: Error | string | null, result?: any) => void;
 
 export interface ReceiverInvalidRequestSignatureHandlerArgs {
@@ -65,6 +68,7 @@ export interface AwsResponse {
   isBase64Encoded?: boolean;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: request context can be anything
 export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
@@ -156,6 +160,7 @@ export default class AwsLambdaReceiver implements Receiver {
     this.app = app;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: what should the REceiver interface here be? probably needs work
   public start(..._args: any[]): Promise<AwsHandler> {
     return new Promise((resolve, reject) => {
       try {
@@ -167,7 +172,7 @@ export default class AwsLambdaReceiver implements Receiver {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: what should the REceiver interface here be? probably needs work
   public stop(..._args: any[]): Promise<void> {
     return new Promise((resolve, _reject) => {
       resolve();
@@ -175,11 +180,13 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   public toHandler(): AwsHandler {
+    // biome-ignore lint/suspicious/noExplicitAny: request context can be anything
     return async (awsEvent: AwsEvent, _awsContext: any, _awsCallback: AwsCallback): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
       const rawBody = this.getRawBody(awsEvent);
 
+      // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
       const body: any = this.parseRequestBody(
         rawBody,
         this.getHeaderValue(awsEvent.headers, 'Content-Type'),
@@ -234,7 +241,8 @@ export default class AwsLambdaReceiver implements Receiver {
       }, 3001);
 
       // Structure the ReceiverEvent
-      let storedResponse;
+      // biome-ignore lint/suspicious/noExplicitAny: request responses can be anything
+      let storedResponse: any;
       const event: ReceiverEvent = {
         body,
         ack: async (response) => {
@@ -293,6 +301,7 @@ export default class AwsLambdaReceiver implements Receiver {
     return awsEvent.body;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
   private parseRequestBody(stringBody: string, contentType: string | undefined, logger: Logger): any {
     if (contentType === 'application/x-www-form-urlencoded') {
       const parsedBody = querystring.parse(stringBody);
@@ -315,7 +324,6 @@ export default class AwsLambdaReceiver implements Receiver {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private isValidRequestSignature(
     signingSecret: string,
     body: string,
@@ -343,7 +351,6 @@ export default class AwsLambdaReceiver implements Receiver {
     return true;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private getHeaderValue(headers: AwsEvent['headers'], key: string): string | undefined {
     const caseInsensitiveKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
     return caseInsensitiveKey !== undefined ? headers[caseInsensitiveKey] : undefined;
