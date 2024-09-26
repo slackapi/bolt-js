@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
   createFakeLogger,
   importApp,
@@ -9,7 +10,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
-import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 
 const fakeAuthTestResponse = {
   ok: true,
@@ -110,7 +110,7 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp(appOverrides);
     const app = new App({
@@ -118,7 +118,7 @@ describe('AwsLambdaReceiver', () => {
       receiver: awsReceiver,
     });
     app.event('app_mention', noopVoid);
-    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -183,7 +183,7 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp(appOverrides);
     const app = new App({
@@ -191,7 +191,7 @@ describe('AwsLambdaReceiver', () => {
       receiver: awsReceiver,
     });
     app.event('app_mention', noopVoid);
-    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -226,7 +226,7 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp(appOverrides);
     const app = new App({
@@ -236,7 +236,7 @@ describe('AwsLambdaReceiver', () => {
     app.shortcut('bolt-js-aws-lambda-shortcut', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -271,7 +271,7 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
     const App = await importApp(appOverrides);
     const app = new App({
@@ -281,7 +281,7 @@ describe('AwsLambdaReceiver', () => {
     app.command('/hello-bolt-js', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -344,7 +344,7 @@ describe('AwsLambdaReceiver', () => {
       body: Buffer.from(body).toString('base64'),
       isBase64Encoded: true,
     };
-    const response1 = await handler(awsEvent, {}, (_error, _result) => { });
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
   });
 
@@ -374,7 +374,7 @@ describe('AwsLambdaReceiver', () => {
       body,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => { });
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -416,7 +416,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => { });
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -454,7 +454,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => { });
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 401);
     assert(spy.calledOnce);
   });
@@ -491,7 +491,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => { });
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 401);
   });
 
@@ -523,7 +523,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => { });
+    const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
   });
 });

@@ -1,10 +1,18 @@
-import type { AppMentionEvent, Block, KnownBlock, MessageEvent } from '@slack/types';
+import type {
+  AppHomeOpenedEvent,
+  AppMentionEvent,
+  Block,
+  KnownBlock,
+  MessageEvent,
+  ReactionAddedEvent,
+} from '@slack/types';
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import { createFakeLogger } from '.';
 import type {
   AckFn,
   AllMiddlewareArgs,
+  AnyMiddlewareArgs,
   BaseSlackEvent,
   BlockAction,
   BlockElementAction,
@@ -38,22 +46,106 @@ const say: SayFn = (_msg) => Promise.resolve({ ok: true });
 const respond: RespondFn = (_msg) => Promise.resolve();
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
-export function wrapMiddleware<Args extends SlackEventMiddlewareArgs>(
+export function wrapMiddleware<Args extends AnyMiddlewareArgs>(
   args: Args,
   ctx?: Context,
 ): Args & AllMiddlewareArgs & { next: SinonSpy } {
-  return {
+  const wrapped = {
     ...args,
     context: ctx || { isEnterpriseInstall: false },
     logger: createFakeLogger(),
     client: new WebClient(),
     next: sinon.fake(),
   };
+  return wrapped;
+}
+
+interface DummyAppHomeOpenedOverrides {
+  channel?: string;
+  user?: string;
+}
+export function createDummyAppHomeOpenedEventMiddlewareArgs(
+  eventOverrides?: DummyAppHomeOpenedOverrides,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackEventMiddlewareArgs<'app_home_opened'> {
+  const event: AppHomeOpenedEvent = {
+    type: 'app_home_opened',
+    channel: eventOverrides?.channel || channel,
+    user: eventOverrides?.user || user,
+    tab: 'home',
+    event_ts: ts,
+  };
+  return {
+    payload: event,
+    event,
+    body: envelopeEvent(event, bodyOverrides),
+    say,
+  };
+}
+
+interface DummyMemberChannelOverrides<T> {
+  type: T;
+  channel?: string;
+  user?: string;
+  team?: string;
+}
+type MemberChannelEventTypes = 'member_joined_channel' | 'member_left_channel';
+export function createDummyMemberChannelEventMiddlewareArgs(
+  eventOverrides: DummyMemberChannelOverrides<MemberChannelEventTypes>,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackEventMiddlewareArgs<MemberChannelEventTypes> {
+  const event = {
+    type: eventOverrides.type,
+    user: eventOverrides?.user || user,
+    channel: eventOverrides?.channel || channel,
+    channel_type: 'channel',
+    team: eventOverrides?.team || team,
+    event_ts: ts,
+  };
+  return {
+    payload: event,
+    event,
+    body: envelopeEvent(event, bodyOverrides),
+    say,
+  };
+}
+
+interface DummyReactionAddedOverrides {
+  channel?: string;
+  user?: string;
+  reaction?: string;
+}
+export function createDummyReactionAddedEventMiddlewareArgs(
+  eventOverrides?: DummyReactionAddedOverrides,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackEventMiddlewareArgs<'reaction_added'> {
+  const event: ReactionAddedEvent = {
+    type: 'reaction_added',
+    user: eventOverrides?.user || user,
+    reaction: eventOverrides?.reaction || 'lol',
+    item_user: 'wut',
+    item: {
+      type: 'message',
+      channel: eventOverrides?.channel || channel,
+      ts,
+    },
+    event_ts: ts,
+  };
+  return {
+    payload: event,
+    event,
+    body: envelopeEvent(event, bodyOverrides),
+    say,
+  };
 }
 
 interface DummyMessageOverrides {
   message?: MessageEvent;
   text?: string;
+  user?: string;
   blocks?: (KnownBlock | Block)[];
 }
 export function createDummyMessageEventMiddlewareArgs(
@@ -67,7 +159,7 @@ export function createDummyMessageEventMiddlewareArgs(
     event_ts: ts,
     channel,
     channel_type: 'channel',
-    user,
+    user: msgOverrides?.user || user,
     ts,
     text: msgOverrides?.text || 'hi',
     blocks: msgOverrides?.blocks || [],

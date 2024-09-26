@@ -304,12 +304,16 @@ export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
       }
     }
 
-    // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
+    // It's an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
     // However, some events still must be fired, because they can make sense.
     const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
-    const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
 
-    if (botUserId !== undefined && 'user' in args.event && args.event.user === botUserId && !isEventShouldBeKept) {
+    if (
+      botUserId !== undefined &&
+      'user' in args.event &&
+      args.event.user === botUserId &&
+      !eventsWhichShouldBeKept.includes(args.event.type)
+    ) {
       return;
     }
   }
@@ -318,6 +322,7 @@ export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
   await args.next();
 };
 
+// TODO: breaking change: constrain the subtype argument to be a valid message subtype
 /**
  * Filters out any message events whose subtype does not match the provided subtype.
  */

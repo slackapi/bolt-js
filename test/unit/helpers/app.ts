@@ -1,4 +1,4 @@
-import type { WebClientOptions, AuthTestResponse } from '@slack/web-api';
+import type { AuthTestResponse, WebClientOptions } from '@slack/web-api';
 import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
 
@@ -7,7 +7,7 @@ import sinon, { type SinonSpy } from 'sinon';
  */
 
 // biome-ignore lint/suspicious/noExplicitAny: module overrides can be anything
-export interface Override extends Record<string, Record<string, any>> { }
+export interface Override extends Record<string, Record<string, any>> {}
 
 export function mergeOverrides(...overrides: Override[]): Override {
   let currentOverrides: Override = {};
@@ -48,17 +48,17 @@ export function withNoopWebClient(authTestResponse?: AuthTestResponse): Override
     '@slack/web-api': {
       WebClient: authTestResponse
         ? class {
-          public token?: string;
+            public token?: string;
 
-          public constructor(token?: string, _options?: WebClientOptions) {
-            this.token = token;
+            public constructor(token?: string, _options?: WebClientOptions) {
+              this.token = token;
+            }
+
+            public auth = {
+              test: sinon.fake.resolves(authTestResponse),
+            };
           }
-
-          public auth = {
-            test: sinon.fake.resolves(authTestResponse),
-          };
-        }
-        : class { },
+        : class {},
     },
   };
 }
