@@ -10,15 +10,15 @@ import { StringIndexed } from '../types/helpers';
 
 export interface AwsEvent {
   body: string | null;
-  headers: any;
+  headers: Record<string, string>;
   multiValueHeaders: any;
   httpMethod: string;
   isBase64Encoded: boolean;
   path: string;
-  pathParameters: any | null;
-  queryStringParameters: any | null;
-  multiValueQueryStringParameters: any | null;
-  stageVariables: any | null;
+  pathParameters: any;
+  queryStringParameters: Record<string, string>;
+  multiValueQueryStringParameters: any;
+  stageVariables: any;
   requestContext: any;
   resource: string;
 }
@@ -117,7 +117,8 @@ export default class AwsLambdaReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;
-    this.logger = logger ??
+    this.logger =
+      logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -135,9 +136,7 @@ export default class AwsLambdaReceiver implements Receiver {
     this.app = app;
   }
 
-  public start(
-    ..._args: any[]
-  ): Promise<AwsHandler> {
+  public start(..._args: any[]): Promise<AwsHandler> {
     return new Promise((resolve, reject) => {
       try {
         const handler = this.toHandler();
@@ -149,20 +148,14 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public stop(
-    ..._args: any[]
-  ): Promise<void> {
+  public stop(..._args: any[]): Promise<void> {
     return new Promise((resolve, _reject) => {
       resolve();
     });
   }
 
   public toHandler(): AwsHandler {
-    return async (
-      awsEvent: AwsEvent,
-      _awsContext: any,
-      _awsCallback: AwsCallback,
-    ): Promise<AwsResponse> => {
+    return async (awsEvent: AwsEvent, _awsContext: any, _awsCallback: AwsCallback): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
       const rawBody = this.getRawBody(awsEvent);
@@ -215,7 +208,7 @@ export default class AwsLambdaReceiver implements Receiver {
         if (!isAcknowledged) {
           this.logger.error(
             'An incoming event was not acknowledged within 3 seconds. ' +
-              'Ensure that the ack() argument is called in a listener.',
+            'Ensure that the ack() argument is called in a listener.',
           );
         }
       }, 3001);
@@ -335,6 +328,8 @@ export default class AwsLambdaReceiver implements Receiver {
   private defaultInvalidRequestSignatureHandler(args: ReceiverInvalidRequestSignatureHandlerArgs): void {
     const { signature, ts } = args;
 
-    this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
+    this.logger.info(
+      `Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`,
+    );
   }
 }
