@@ -458,6 +458,7 @@ function buildVerificationBodyParserMiddleware(
 ): RequestHandler {
   return async (req, res, next): Promise<void> => {
     let stringBody: string;
+    // TODO: DRY this up
     // On some environments like GCP (Google Cloud Platform),
     // req.body can be pre-parsed and be passed as req.rawBody here
     const preparsedRawBody: any = (req as any).rawBody;
@@ -514,8 +515,7 @@ function verifyRequestSignature(
   }
 
   const ts = Number(requestTimestamp);
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(ts)) {
+  if (Number.isNaN(ts)) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Timestamp is invalid.');
   }
 
@@ -561,11 +561,8 @@ export function verifySignatureAndParseBody(
 export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
   return async (req, res, next): Promise<void> => {
     let stringBody: string;
-    // On some environments like GCP (Google Cloud Platform),
-    // req.body can be pre-parsed and be passed as req.rawBody here
-    const preparsedRawBody: any = (req as any).rawBody;
-    if (preparsedRawBody !== undefined) {
-      stringBody = preparsedRawBody.toString();
+    if ('rawBody' in req && req.rawBody) {
+      stringBody = req.rawBody.toString();
     } else {
       stringBody = (await rawBody(req)).toString();
     }
@@ -585,7 +582,6 @@ export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
 
 function parseRequestBody(stringBody: string, contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
-    // TODO: querystring is deprecated since Node.js v17
     const parsedBody = querystring.parse(stringBody);
 
     if (typeof parsedBody.payload === 'string') {

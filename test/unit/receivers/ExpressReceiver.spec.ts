@@ -322,8 +322,8 @@ describe('ExpressReceiver', () => {
     const buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
     const buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
     const processStub = sinon.stub<[ReceiverEvent]>().resolves({});
-    const ackStub = function ackStub() {};
-    ackStub.prototype.bind = function () {
+    const ackStub = function ackStub() { };
+    ackStub.prototype.bind = function() {
       return this;
     };
     ackStub.prototype.ack = sinon.spy();
@@ -350,7 +350,7 @@ describe('ExpressReceiver', () => {
       receiver.init(app);
 
       const req = { body: {} } as Request;
-      const resp = { send: () => {} } as Response;
+      const resp = { send: () => { } } as Response;
       await receiver.requestHandler(req, resp);
 
       sinon.assert.notCalled(buildContentResponseStub);
@@ -367,7 +367,7 @@ describe('ExpressReceiver', () => {
       receiver.init(app);
 
       const req = { body: {} } as Request;
-      const resp = { send: () => {} } as Response;
+      const resp = { send: () => { } } as Response;
       await receiver.requestHandler(req, resp);
       sinon.assert.called(buildContentResponseStub);
     });
@@ -413,7 +413,7 @@ describe('ExpressReceiver', () => {
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleInstallPath').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/install', method: 'GET' } as Request;
-        const resp = { send: () => {} } as Response;
+        const resp = { send: () => { } } as Response;
         const next = sinon.spy();
         // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
         (receiver.router as any).handle(req, resp, next);
@@ -441,9 +441,9 @@ describe('ExpressReceiver', () => {
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleCallback').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
-        const resp = { send: () => {} } as Response;
+        const resp = { send: () => { } } as Response;
         // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
-        (receiver.router as any).handle(req, resp, () => {});
+        (receiver.router as any).handle(req, resp, () => { });
 
         sinon.assert.calledWith(handleStub, req, resp, callbackOptions);
       });
@@ -466,9 +466,9 @@ describe('ExpressReceiver', () => {
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleCallback').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/oauth_redirect', method: 'GET' } as Request;
-        const resp = { send: () => {} } as Response;
+        const resp = { send: () => { } } as Response;
         // biome-ignore lint/suspicious/noExplicitAny: TODO: better way to get a reference to handle? dealing with express internals, unclear
-        (receiver.router as any).handle(req, resp, () => {});
+        (receiver.router as any).handle(req, resp, () => { });
 
         sinon.assert.calledWith(handleStub, req, resp, callbackOptions, sinon.match({ scopes }));
       });
@@ -598,31 +598,28 @@ describe('ExpressReceiver', () => {
       const next = (error: any) => {
         state.error = error;
       };
-
-      // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecretFn || signingSecret);
-      verifier(req, resp, next);
+      await verifier(req, resp, next);
     }
 
     it('should verify requests', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
-      const state: Record<string, any> = {};
+      const state: any = {};
       await runWithValidRequest(buildExpressRequest(), state);
-      // Assert
       assert.isUndefined(state.error);
     });
 
     it('should verify requests on GCP', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state);
-      // Assert
       assert.isUndefined(state.error);
     });
 
     it('should verify requests on GCP using async signingSecret', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state, () => Promise.resolve(signingSecret));
-      // Assert
       assert.isUndefined(state.error);
     });
 
@@ -630,21 +627,21 @@ describe('ExpressReceiver', () => {
     // parse error
 
     it('should verify requests and then catch parse failures', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       const req = buildExpressRequest();
       req.headers['content-type'] = undefined;
       await runWithValidRequest(req, state);
-      // Assert
       assert.equal(state.code, 400);
       assert.equal(state.sent, true);
     });
 
     it('should verify requests on GCP and then catch parse failures', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       const req = buildGCPRequest();
       req.headers['content-type'] = undefined;
       await runWithValidRequest(req, state);
-      // Assert
       assert.equal(state.code, 400);
       assert.equal(state.sent, true);
     });
@@ -653,17 +650,12 @@ describe('ExpressReceiver', () => {
     // verifyContentTypeAbsence
 
     async function verifyRequestsWithoutContentTypeHeader(req: Request): Promise<void> {
-      // Arrange
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const result: any = {};
       const resp = buildResponseToVerify(result);
-
       const next = sinon.fake();
-
-      // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
-
-      // Assert
       assert.equal(result.code, 400);
       assert.equal(result.sent, true);
     }
@@ -672,7 +664,8 @@ describe('ExpressReceiver', () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
-      (reqAsStream as { [key: string]: any }).headers = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      (reqAsStream as any).headers = {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': requestTimestamp,
         // 'content-type': 'application/x-www-form-urlencoded',
@@ -682,7 +675,8 @@ describe('ExpressReceiver', () => {
     });
 
     it('should verify parse request body without content-type header on GCP', async () => {
-      const untypedReq: { [key: string]: any } = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      const untypedReq: any = {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
@@ -698,16 +692,12 @@ describe('ExpressReceiver', () => {
     // verifyMissingHeaderDetection
 
     async function verifyMissingHeaderDetection(req: Request): Promise<void> {
-      // Arrange
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
       const result: any = {};
       const resp = buildResponseToVerify(result);
       const next = sinon.fake();
-
-      // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
-
-      // Assert
       assert.equal(result.code, 401);
       assert.equal(result.sent, true);
     }
@@ -716,7 +706,8 @@ describe('ExpressReceiver', () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
-      (reqAsStream as { [key: string]: any }).headers = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      (reqAsStream as any).headers = {
         // 'x-slack-signature': signature ,
         'x-slack-request-timestamp': requestTimestamp,
         'content-type': 'application/x-www-form-urlencoded',
@@ -728,7 +719,8 @@ describe('ExpressReceiver', () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
-      (reqAsStream as { [key: string]: any }).headers = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      (reqAsStream as any).headers = {
         'x-slack-signature': signature,
         /* 'x-slack-request-timestamp': requestTimestamp, */
         'content-type': 'application/x-www-form-urlencoded',
@@ -737,11 +729,11 @@ describe('ExpressReceiver', () => {
     });
 
     it('should detect headers missing on GCP', async () => {
-      const untypedReq: { [key: string]: any } = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      const untypedReq: any = {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
-          /* 'x-slack-request-timestamp': requestTimestamp, */
           'content-type': 'application/x-www-form-urlencoded',
         },
       };
@@ -752,17 +744,12 @@ describe('ExpressReceiver', () => {
     // verifyInvalidTimestampError
 
     async function verifyInvalidTimestampError(req: Request): Promise<void> {
-      // Arrange
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
       const result: any = {};
       const resp = buildResponseToVerify(result);
       const next = sinon.fake();
-
-      // Act
-
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
-
-      // Assert
       assert.equal(result.code, 401);
       assert.equal(result.sent, true);
     }
@@ -771,7 +758,8 @@ describe('ExpressReceiver', () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
-      (reqAsStream as { [key: string]: any }).headers = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      (reqAsStream as any).headers = {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': 'Hello there!',
         'content-type': 'application/x-www-form-urlencoded',
@@ -783,19 +771,14 @@ describe('ExpressReceiver', () => {
     // verifyTooOldTimestampError
 
     async function verifyTooOldTimestampError(req: Request): Promise<void> {
-      // Arrange
       // restore the valid clock
       clock.restore();
-
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
       const result: any = {};
       const resp = buildResponseToVerify(result);
       const next = sinon.fake();
-
-      // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       await verifier(req, resp, next);
-
-      // Assert
       assert.equal(result.code, 401);
       assert.equal(result.sent, true);
     }
@@ -812,17 +795,13 @@ describe('ExpressReceiver', () => {
     // verifySignatureMismatch
 
     async function verifySignatureMismatch(req: Request): Promise<void> {
-      // Arrange
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
       const result: any = {};
       const resp = buildResponseToVerify(result);
       const next = sinon.fake();
-
-      // Act
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret);
       verifier(req, resp, next);
       await verifier(req, resp, next);
-
-      // Assert
       assert.equal(result.code, 401);
       assert.equal(result.sent, true);
     }
@@ -831,7 +810,8 @@ describe('ExpressReceiver', () => {
       const reqAsStream = new Readable();
       reqAsStream.push(body);
       reqAsStream.push(null); // indicate EOF
-      (reqAsStream as { [key: string]: any }).headers = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      (reqAsStream as any).headers = {
         'x-slack-signature': signature,
         'x-slack-request-timestamp': requestTimestamp + 10,
         'content-type': 'application/x-www-form-urlencoded',
@@ -841,7 +821,8 @@ describe('ExpressReceiver', () => {
     });
 
     it('should detect signature mismatch on GCP', async () => {
-      const untypedReq: { [key: string]: any } = {
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      const untypedReq: any = {
         rawBody: body,
         headers: {
           'x-slack-signature': signature,
@@ -855,63 +836,67 @@ describe('ExpressReceiver', () => {
   });
 
   describe('buildBodyParserMiddleware', () => {
-    beforeEach(function () {
-      this.req = { body: {}, headers: { 'content-type': 'application/json' } } as Request;
-      this.res = { send: () => {} } as Response;
-      this.next = sinon.spy();
+    // biome-ignore lint/suspicious/noExplicitAny: requests can be anything when testing
+    let req: any = { body: {}, headers: { 'content-type': 'application/json' } };
+    const res = { send: sinon.spy() };
+    const next = sinon.spy();
+    beforeEach(() => {
+      req = { body: {}, headers: { 'content-type': 'application/json' } };
+      res.send.resetHistory();
+      next.resetHistory();
     });
-    it('should JSON.parse a stringified rawBody if exists on a application/json request', async function () {
-      this.req.rawBody = '{"awesome": true}';
+    it('should JSON.parse a stringified rawBody if exists on a application/json request', async () => {
+      req.rawBody = '{"awesome": true}';
       const parser = buildBodyParserMiddleware(createFakeLogger());
-      await parser(this.req, this.res, this.next);
-      assert(this.next.called, 'next() was not called');
-      assert.equal(this.req.body.awesome, true, 'request body JSON was not parsed');
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.awesome, true, 'request body JSON was not parsed');
     });
-    it('should querystring.parse a stringified rawBody if exists on a application/x-www-form-urlencoded request', async function () {
-      this.req.headers['content-type'] = 'application/x-www-form-urlencoded';
-      this.req.rawBody = 'awesome=true';
+    it('should querystring.parse a stringified rawBody if exists on a application/x-www-form-urlencoded request', async () => {
+      req.headers['content-type'] = 'application/x-www-form-urlencoded';
+      req.rawBody = 'awesome=true';
       const parser = buildBodyParserMiddleware(createFakeLogger());
-      await parser(this.req, this.res, this.next);
-      assert(this.next.called, 'next() was not called');
-      assert.equal(this.req.body.awesome, 'true', 'request body form-urlencoded was not parsed');
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.awesome, 'true', 'request body form-urlencoded was not parsed');
     });
-    it('should JSON.parse a stringified rawBody payload if exists on a application/x-www-form-urlencoded request', async function () {
-      this.req.headers['content-type'] = 'application/x-www-form-urlencoded';
-      this.req.rawBody = 'payload=%7B%22awesome%22:true%7D';
+    it('should JSON.parse a stringified rawBody payload if exists on a application/x-www-form-urlencoded request', async () => {
+      req.headers['content-type'] = 'application/x-www-form-urlencoded';
+      req.rawBody = 'payload=%7B%22awesome%22:true%7D';
       const parser = buildBodyParserMiddleware(createFakeLogger());
-      await parser(this.req, this.res, this.next);
-      assert(this.next.called, 'next() was not called');
-      assert.equal(this.req.body.awesome, true, 'request body form-urlencoded was not parsed');
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.awesome, true, 'request body form-urlencoded was not parsed');
     });
-    it('should JSON.parse a body if exists on a application/json request', async function () {
-      this.req = new Readable();
-      this.req.push('{"awesome": true}');
-      this.req.push(null);
-      this.req.headers = { 'content-type': 'application/json' };
+    it('should JSON.parse a body if exists on a application/json request', async () => {
+      req = new Readable();
+      req.push('{"awesome": true}');
+      req.push(null);
+      req.headers = { 'content-type': 'application/json' };
       const parser = buildBodyParserMiddleware(createFakeLogger());
-      await parser(this.req, this.res, this.next);
-      assert(this.next.called, 'next() was not called');
-      assert.equal(this.req.body.awesome, true, 'request body JSON was not parsed');
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.awesome, true, 'request body JSON was not parsed');
     });
-    it('should querystring.parse a body if exists on a application/x-www-form-urlencoded request', async function () {
-      this.req = new Readable();
-      this.req.push('awesome=true');
-      this.req.push(null);
-      this.req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+    it('should querystring.parse a body if exists on a application/x-www-form-urlencoded request', async () => {
+      req = new Readable();
+      req.push('awesome=true');
+      req.push(null);
+      req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
       const parser = buildBodyParserMiddleware(createFakeLogger());
-      await parser(this.req, this.res, this.next);
-      assert(this.next.called, 'next() was not called');
-      assert.equal(this.req.body.awesome, 'true', 'request body form-urlencoded was not parsed');
+      await parser(req, res as unknown as Response, next);
+      assert(next.called, 'next() was not called');
+      assert.equal(req.body.awesome, 'true', 'request body form-urlencoded was not parsed');
     });
-    it('should JSON.parse a body payload if exists on a application/x-www-form-urlencoded request', async function () {
-      this.req = new Readable();
-      this.req.push('payload=%7B%22awesome%22:true%7D');
-      this.req.push(null);
-      this.req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+    it('should JSON.parse a body payload if exists on a application/x-www-form-urlencoded request', async () => {
+      req = new Readable();
+      req.push('payload=%7B%22awesome%22:true%7D');
+      req.push(null);
+      req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
       const parser = buildBodyParserMiddleware(createFakeLogger());
-      await parser(this.req, this.res, this.next);
-      assert(this.next.called, 'next() was not called');
-      assert.equal(this.req.body.awesome, true, 'request body form-urlencoded was not parsed');
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.awesome, true, 'request body form-urlencoded was not parsed');
     });
   });
 });
