@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-/* eslint-disable import/no-internal-modules */
 import './utils/env';
 import { App, type BlockAction, type BotMessageEvent, LogLevel, subtype } from '@slack/bolt';
 
@@ -77,6 +74,7 @@ app.event('team_join', async ({ event, client, logger }) => {
 });
 
 app.message(subtype('bot_message'), async ({ message, logger }) => {
+  // TODO: the need to cast here is due to https://github.com/slackapi/bolt-js/issues/796
   const botMessage = message as BotMessageEvent;
   logger.info(`The bot user ${botMessage.user} said ${botMessage.text}`);
 });
@@ -132,14 +130,10 @@ app.action<BlockAction>(
 );
 
 // Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered
-app.action('approve_button', async ({ ack, say }) => {
+app.action<BlockAction>('approve_button', async ({ ack, say }) => {
   // Acknowledge action request
   await ack();
-  // `say` is possibly undefined because an action could come from a surface where we cannot post message, e.g. a view.
-  // we will use a non-null assertion (!) to tell TypeScript to ignore the fact it may be undefined,
-  // but take care about the originating surface for these events when using these utilities!
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await say!('Request approved 👍');
+  await say('Request approved 👍');
 });
 
 (async () => {

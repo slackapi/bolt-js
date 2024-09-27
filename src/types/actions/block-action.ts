@@ -248,6 +248,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     id: string;
     name: string;
   };
+  // TODO: breaking change: this should not be optional, but should be conditionally tacked on based on the specific block_action subtype
   message?: {
     type: 'message';
     user?: string; // undocumented that this is optional, it won't be there for bot messages
