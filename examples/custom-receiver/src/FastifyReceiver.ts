@@ -1,4 +1,4 @@
-import type { Server } from 'http';
+import type { Server } from 'node:http';
 import {
   type App,
   type BufferedIncomingMessage,
@@ -14,10 +14,13 @@ import {
   HTTPModuleFunctions as httpFunc,
 } from '@slack/bolt';
 import { ConsoleLogger, type LogLevel, type Logger } from '@slack/logger';
-/* eslint-disable node/no-extraneous-import */
-/* eslint-disable import/no-extraneous-dependencies */
 import { type CallbackOptions, type InstallPathOptions, InstallProvider } from '@slack/oauth';
 import Fastify, { type FastifyInstance } from 'fastify';
+
+type CustomPropertiesExtractor = (
+  request: BufferedIncomingMessage,
+  // biome-ignore lint/suspicious/noExplicitAny: custom properties can be anything
+) => Record<string, any>;
 
 export interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
@@ -50,10 +53,7 @@ export interface FastifyReceiverOptions {
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
   fastify?: FastifyInstance;
-  customPropertiesExtractor?: (
-    request: BufferedIncomingMessage,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Record<string, any>;
+  customPropertiesExtractor?: CustomPropertiesExtractor;
   processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
@@ -75,10 +75,7 @@ export default class FastifyReceiver implements Receiver {
 
   private unhandledRequestTimeoutMillis: number;
 
-  private customPropertiesExtractor: (
-    request: BufferedIncomingMessage,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Record<string, any>;
+  private customPropertiesExtractor: CustomPropertiesExtractor;
 
   private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
@@ -184,7 +181,7 @@ export default class FastifyReceiver implements Receiver {
       const req = request.raw;
       const res = response.raw;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
       (req as any).rawBody = Buffer.from(request.body as string);
       // Verify authenticity
       let bufferedReq: BufferedIncomingMessage;
@@ -198,8 +195,7 @@ export default class FastifyReceiver implements Receiver {
           req,
         );
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const e = err as any;
+        const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
         } else {
@@ -210,13 +206,12 @@ export default class FastifyReceiver implements Receiver {
       }
 
       // Parse request body
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
       let body: any;
       try {
         body = httpFunc.parseHTTPRequestBody(bufferedReq);
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const e = err as any;
+        const e = err as Error;
         this.logger.warn(`Malformed request body: ${e.message}`);
         httpFunc.buildNoBodyResponse(res, 400);
         return;

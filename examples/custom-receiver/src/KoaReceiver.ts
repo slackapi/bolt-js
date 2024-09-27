@@ -1,4 +1,4 @@
-import { type Server, createServer } from 'http';
+import { type Server, createServer } from 'node:http';
 import Router from '@koa/router';
 import {
   type App,
@@ -15,8 +15,6 @@ import {
   HTTPModuleFunctions as httpFunc,
 } from '@slack/bolt';
 import { ConsoleLogger, type LogLevel, type Logger } from '@slack/logger';
-/* eslint-disable node/no-extraneous-import */
-/* eslint-disable import/no-extraneous-dependencies */
 import { type CallbackOptions, type InstallPathOptions, InstallProvider } from '@slack/oauth';
 import Koa from 'koa';
 
@@ -36,6 +34,11 @@ export interface InstallerOptions {
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
 }
 
+type CustomPropertiesExtractor = (
+  request: BufferedIncomingMessage,
+  // biome-ignore lint/suspicious/noExplicitAny: custom app properties can be anything
+) => Record<string, any>;
+
 export interface KoaReceiverOptions {
   signingSecret: string | (() => PromiseLike<string>);
   logger?: Logger;
@@ -52,10 +55,7 @@ export interface KoaReceiverOptions {
   installerOptions?: InstallerOptions;
   koa?: Koa;
   router?: Router;
-  customPropertiesExtractor?: (
-    request: BufferedIncomingMessage,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Record<string, any>;
+  customPropertiesExtractor?: CustomPropertiesExtractor;
   processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
@@ -77,10 +77,7 @@ export default class KoaReceiver implements Receiver {
 
   private unhandledRequestTimeoutMillis: number;
 
-  private customPropertiesExtractor: (
-    request: BufferedIncomingMessage,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Record<string, any>;
+  private customPropertiesExtractor: CustomPropertiesExtractor;
 
   private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
@@ -189,8 +186,7 @@ export default class KoaReceiver implements Receiver {
           req,
         );
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const e = err as any;
+        const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
         } else {
@@ -201,13 +197,12 @@ export default class KoaReceiver implements Receiver {
       }
 
       // Parse request body
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
       let body: any;
       try {
         body = httpFunc.parseHTTPRequestBody(bufferedReq);
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const e = err as any;
+        const e = err as Error;
         this.logger.warn(`Malformed request body: ${e.message}`);
         httpFunc.buildNoBodyResponse(res, 400);
         return;

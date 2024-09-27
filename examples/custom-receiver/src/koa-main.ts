@@ -1,16 +1,13 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable import/no-internal-modules */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/extensions */
-/* eslint-disable node/no-extraneous-import */
-/* eslint-disable import/no-extraneous-dependencies */
-
 import Router from '@koa/router';
 import { App, FileInstallationStore } from '@slack/bolt';
 import { ConsoleLogger, LogLevel } from '@slack/logger';
 import { FileStateStore } from '@slack/oauth';
 import Koa from 'koa';
 import KoaReceiver from './KoaReceiver';
+
+if (!process.env.SLACK_SIGNING_SECRET) {
+  throw new Error('SLACK_SIGNING_SECRET environment variable not found!');
+}
 
 const logger = new ConsoleLogger();
 logger.setLevel(LogLevel.DEBUG);
@@ -22,8 +19,7 @@ router.get('/', async (ctx) => {
 });
 
 const receiver = new KoaReceiver({
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  signingSecret: process.env.SLACK_SIGNING_SECRET!,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['commands', 'chat:write', 'app_mentions:read'],
