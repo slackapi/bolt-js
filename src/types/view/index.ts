@@ -7,7 +7,7 @@ import { AckFn, RespondFn } from '../utilities';
 export type SlackViewAction =
   | ViewSubmitAction
   | ViewClosedAction
-  | ViewWorkflowStepSubmitAction
+  | ViewWorkflowStepSubmitAction // TODO: remove workflow step stuff in bolt v5
   | ViewWorkflowStepClosedAction;
 // <ViewAction extends SlackViewAction = ViewSubmitAction>
 /**
@@ -101,8 +101,9 @@ export interface ViewClosedAction {
  * A Slack view_submission step from app event
  *
  * This describes the additional JSON-encoded body details for a step's view_submission event
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
  */
-
 export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
   trigger_id: string;
   response_urls?: ViewResponseUrl[];
@@ -117,6 +118,8 @@ export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
  * A Slack view_closed step from app event
  *
  * This describes the additional JSON-encoded body details for a step's view_closed event
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
  */
 export interface ViewWorkflowStepClosedAction extends ViewClosedAction {
   workflow_step: {
@@ -131,6 +134,7 @@ export interface ViewStateSelectedOption {
   value: string;
 }
 
+// TODO: this should probably exist in @slack/types
 export interface UploadedFile {
   id: string;
   created: number;

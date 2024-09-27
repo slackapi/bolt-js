@@ -534,6 +534,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * Register WorkflowStep middleware
    *
    * @param workflowStep global workflow step middleware function
+   * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+   * version.
    */
   public step(workflowStep: WorkflowStep): this {
     const m = workflowStep.getMiddleware();
@@ -1009,6 +1011,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
+    // TODO: remove workflow step stuff in bolt v5
     let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
     | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers

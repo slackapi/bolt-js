@@ -42,6 +42,7 @@ export enum ErrorCode {
    */
   UnknownError = 'slack_bolt_unknown_error',
 
+  // TODO: remove workflow step stuff in bolt v5
   WorkflowStepInitializationError = 'slack_bolt_workflow_step_initialization_error',
 
   CustomFunctionInitializationError = 'slack_bolt_custom_function_initialization_error',
@@ -155,7 +156,10 @@ export class MultipleListenerError extends Error implements CodedError {
     this.originals = originals;
   }
 }
-
+/**
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export class WorkflowStepInitializationError extends Error implements CodedError {
   public code = ErrorCode.WorkflowStepInitializationError;
 }

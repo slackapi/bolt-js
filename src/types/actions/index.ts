@@ -9,6 +9,7 @@ import { FunctionInputs } from '../events';
 export * from './block-action';
 export * from './interactive-message';
 export * from './dialog-action';
+// TODO: remove workflow step stuff in bolt v5
 export * from './workflow-step-edit';
 
 /**
@@ -25,6 +26,7 @@ export * from './workflow-step-edit';
  * offered when no generic parameter is bound would be limited to BasicElementAction rather than the union of known
  * actions - ElementAction.
  */
+// TODO: remove workflow step stuff in bolt v5
 export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | WorkflowStepEdit;
 
 /**
@@ -54,6 +56,7 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
   complete?: FunctionCompleteFn;
   fail?: FunctionFailFn;
   inputs?: FunctionInputs;
+// TODO: remove workflow step stuff in bolt v5
 } & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
   // all action types except dialog submission and steps from apps have a channel context
   ? { say: SayFn }
