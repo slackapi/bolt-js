@@ -14,7 +14,7 @@ const app = new App({
 
 // Listen to slash command
 // Post a message with Message Metadata
-app.command('/post', async ({ ack, command, say }) => {
+app.command('/post', async ({ ack, say }) => {
   await ack();
   await say({
     text: 'Message Metadata Posting',
