@@ -9,16 +9,16 @@ import type {
   MessageEvent,
   MessageRepliedEvent,
   ThreadBroadcastMessageEvent,
-} from '@slack/types';
-import { expectAssignable, expectError, expectNotType, expectType } from 'tsd';
-import App from '../../src/App';
+} from "@slack/types";
+import { expectAssignable, expectError, expectNotType, expectType } from "tsd";
+import App from "../../src/App";
 
-const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
+const app = new App({ token: "TOKEN", signingSecret: "Signing Secret" });
 
 // TODO: asserting on the types of event sub-properties is a responsibility of the `@slack/types` package, not bolt.
 // e.g. message.user, message.team, etc.
 //
-// Types for generic message listeners, i.e. MessageEvent aka GenericMessageEvent
+// Types for generic message listeners, i.e. MessageEvent
 app.message(async ({ message }) => {
   expectType<MessageEvent>(message);
 
@@ -38,7 +38,7 @@ app.message(async ({ message }) => {
     // (in @slack/types) have a `team` property - is that correct? Also the GenericMessageEvent has team as optional.
     expectType<string | undefined>(message.team);
   }
-  if (message.subtype === 'bot_message') {
+  if (message.subtype === "bot_message") {
     expectType<BotMessageEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
@@ -46,20 +46,20 @@ app.message(async ({ message }) => {
     expectType<string | undefined>(message.user);
     expectType<string>(message.channel);
   }
-  if (message.subtype === 'ekm_access_denied') {
+  if (message.subtype === "ekm_access_denied") {
     expectType<EKMAccessDeniedMessageEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
     expectType<string>(message.channel);
   }
-  if (message.subtype === 'me_message') {
+  if (message.subtype === "me_message") {
     expectType<MeMessageEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
     expectType<string>(message.user);
     expectType<string>(message.channel);
   }
-  if (message.subtype === 'message_replied') {
+  if (message.subtype === "message_replied") {
     expectType<MessageRepliedEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
@@ -67,21 +67,21 @@ app.message(async ({ message }) => {
     expectType<string>(message.message.thread_ts);
     // expectType<string>(message.message.text); // TODO: womp womp https://github.com/slackapi/bolt-js/issues/1572
   }
-  if (message.subtype === 'message_changed') {
+  if (message.subtype === "message_changed") {
     expectType<MessageChangedEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
     expectType<string>(message.channel);
     expectType<AllMessageEvents>(message.message);
   }
-  if (message.subtype === 'message_deleted') {
+  if (message.subtype === "message_deleted") {
     expectType<MessageDeletedEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
     expectType<string>(message.channel);
     expectType<string>(message.ts);
   }
-  if (message.subtype === 'thread_broadcast') {
+  if (message.subtype === "thread_broadcast") {
     expectType<ThreadBroadcastMessageEvent>(message);
     expectNotType<MessageEvent>(message);
     // TODO: move these assertions to `@slack/types`
@@ -97,7 +97,7 @@ app.message(async ({ message }) => {
 });
 
 interface MyContext {
-  doesnt: 'matter';
+  doesnt: "matter";
 }
 // Ensure custom context assigned to individual middleware is honoured
 app.message<MyContext>(async ({ context }) => {

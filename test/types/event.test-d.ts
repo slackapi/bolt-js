@@ -1,5 +1,6 @@
 import type {
   AppMentionEvent,
+  MessageEvent,
   PinAddedEvent,
   PinRemovedEvent,
   ReactionAddedEvent,
@@ -13,6 +14,12 @@ import type { SayFn } from '../../';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
+
+app.event('message', async ({ event, say, message }) => {
+  expectType<MessageEvent>(event);
+  expectType<MessageEvent>(message);
+  expectType<SayFn>(say);
+});
 
 app.event('app_mention', async ({ event }) => {
   expectType<AppMentionEvent>(event);
