@@ -1,7 +1,10 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
-    "ignore": ["docs/_site"]
+    "ignore": [
+      "docs/_site",
+      "examples/**/dist"
+    ]
   },
   "formatter": {
     "enabled": true,
