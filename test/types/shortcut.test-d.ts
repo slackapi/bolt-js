@@ -23,20 +23,27 @@ app.shortcut<MessageShortcut>({}, async ({ shortcut, say }) => {
   expectType<SayFn>(say);
 });
 
-// If the constraint is unspecific, say may be undefined and the shortcut is the more general SlackShortcut type
-app.shortcut({}, async ({ shortcut, say }) => {
+// If the constraint is unspecific, say will be unavailable
+expectError(app.shortcut({}, async ({ say }) => say()));
+
+// If the constraint is unspecific, the shortcut is the more general SlackShortcut type
+app.shortcut({}, async ({ shortcut }) => {
   expectType<SlackShortcut>(shortcut);
-  expectType<SayFn | undefined>(say);
 });
 
+// `say` in listener should be unavailable if constraint is type:shortcut
+expectError(app.shortcut({ type: 'shortcut' }, async ({ say }) => say()));
+
 // Shortcut in listener should be GlobalShortcut if constraint is type:shortcut
-app.shortcut({ type: 'shortcut' }, async ({ shortcut, say }) => {
+app.shortcut({ type: 'shortcut' }, async ({ shortcut }) => {
   expectType<GlobalShortcut>(shortcut);
-  expectType<undefined>(say);
 });
-// If shortcut is parameterized with GlobalShortcut, say argument in callback should be type undefined
-app.shortcut<GlobalShortcut>({}, async ({ shortcut, say }) => {
-  expectType<undefined>(say);
+
+// If shortcut is parameterized with GlobalShortcut, say argument in callback should not be available
+expectError(app.shortcut<GlobalShortcut>({}, async ({ say }) => say()));
+
+// If shortcut is parameterized with GlobalShortcut, shortcut parameter should be of type GlobalShortcut
+app.shortcut<GlobalShortcut>({}, async ({ shortcut }) => {
   expectType<GlobalShortcut>(shortcut);
 });
 

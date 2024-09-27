@@ -246,7 +246,7 @@ describe('AwsLambdaReceiver', () => {
         'X-Slack-Signature': `v0=${signature}XXXXXXXX`, // invalid signature
       },
       multiValueHeaders: {},
-      queryStringParameters: null,
+      queryStringParameters: {},
       multiValueQueryStringParameters: null,
       pathParameters: null,
       stageVariables: null,

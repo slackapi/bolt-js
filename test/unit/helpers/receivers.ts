@@ -90,7 +90,7 @@ export function createDummyAWSPayload(
       'X-Slack-Signature': `v0=${signature}`,
     },
     multiValueHeaders: {},
-    queryStringParameters: null,
+    queryStringParameters: {},
     multiValueQueryStringParameters: null,
     pathParameters: null,
     stageVariables: null,
