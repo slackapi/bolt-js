@@ -25,9 +25,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - name: Print eslint version
-        run: ./node_modules/.bin/eslint -v
-      - run: npm run build
       - run: npm test
       - name: Upload coverage to Codecov
         if: matrix.node-version == '22.x'
