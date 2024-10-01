@@ -8,19 +8,40 @@ import { Receiver, ReceiverEvent } from '../types/receiver';
 import { ReceiverMultipleAckError } from '../errors';
 import { StringIndexed } from '../types/helpers';
 
-export interface AwsEvent {
+export type AwsEvent = AwsEventV1 | AwsEventV2;
+type AwsEventStringParameters = Record<string, string | undefined>;
+type AwsEventMultiValueStringParameters = Record<string, string[] | undefined>;
+export interface AwsEventV1 {
+  // properties shared w/ v2:
   body: string | null;
-  headers: Record<string, string>;
-  multiValueHeaders: any;
-  httpMethod: string;
+  headers: AwsEventStringParameters;
   isBase64Encoded: boolean;
-  path: string;
-  pathParameters: any;
-  queryStringParameters: Record<string, string>;
-  multiValueQueryStringParameters: any;
-  stageVariables: any;
+  pathParameters: AwsEventStringParameters | null;
+  queryStringParameters: AwsEventStringParameters | null;
   requestContext: any;
+  stageVariables: AwsEventStringParameters | null;
+  // v1-only properties:
+  httpMethod: string;
+  multiValueHeaders: AwsEventMultiValueStringParameters;
+  multiValueQueryStringParameters: AwsEventMultiValueStringParameters;
+  path: string;
   resource: string;
+}
+export interface AwsEventV2 {
+  // properties shared w/ v1:
+  body?: string;
+  headers: AwsEventStringParameters;
+  isBase64Encoded: boolean;
+  pathParameters?: AwsEventStringParameters;
+  queryStringParameters?: AwsEventStringParameters;
+  requestContext: any;
+  stageVariables?: AwsEventStringParameters;
+  // v2-only properties:
+  cookies?: string[];
+  rawPath: string;
+  rawQueryString: string;
+  routeKey: string;
+  version: string;
 }
 
 export type AwsCallback = (error?: Error | string | null, result?: any) => void;
@@ -117,8 +138,7 @@ export default class AwsLambdaReceiver implements Receiver {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;
-    this.logger =
-      logger ??
+    this.logger = logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -252,7 +272,13 @@ export default class AwsLambdaReceiver implements Receiver {
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         return { statusCode: 500, body: 'Internal server error' };
       }
-      this.logger.info(`No request handler matched the request: ${awsEvent.path}`);
+      let path: string;
+      if ('path' in awsEvent) {
+        path = awsEvent.path;
+      } else {
+        path = awsEvent.rawPath;
+      }
+      this.logger.info(`No request handler matched the request: ${path}`);
       return { statusCode: 404, body: '' };
     };
   }
@@ -320,7 +346,7 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private getHeaderValue(headers: Record<string, any>, key: string): string | undefined {
+  private getHeaderValue(headers: AwsEvent['headers'], key: string): string | undefined {
     const caseInsensitiveKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
     return caseInsensitiveKey !== undefined ? headers[caseInsensitiveKey] : undefined;
   }
