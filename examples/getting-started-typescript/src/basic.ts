@@ -115,11 +115,11 @@ app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
     await ack();
     try {
       // Make sure the event is not in a view
-      if (body.message) {
+      if (body.message && body.channel) {
         await client.reactions.add({
           name: 'white_check_mark',
-          timestamp: body.message?.ts,
-          channel: body.channel!.id, // if the body has a message, we know it has a channel, too.
+          timestamp: body.message.ts,
+          channel: body.channel.id, // if the body has a message, we know it has a channel, too.
         });
       }
     } catch (error) {
