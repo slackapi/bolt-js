@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
+import type { AwsEvent } from '../../../src/receivers/AwsLambdaReceiver';
 import type { Receiver, ReceiverEvent } from '../../../src/types';
 import type { Override } from './app';
 
@@ -74,7 +75,7 @@ export function createDummyAWSPayload(
   timestamp: number = Math.floor(Date.now() / 1000),
   headers?: Record<string, string>,
   isBase64Encoded = false,
-) {
+): AwsEvent {
   const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
   const realBody = isBase64Encoded ? Buffer.from(body).toString('base64') : body;
   return {
@@ -91,7 +92,7 @@ export function createDummyAWSPayload(
     },
     multiValueHeaders: {},
     queryStringParameters: {},
-    multiValueQueryStringParameters: null,
+    multiValueQueryStringParameters: {},
     pathParameters: null,
     stageVariables: null,
     requestContext: {},

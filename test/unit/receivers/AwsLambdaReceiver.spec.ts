@@ -247,7 +247,7 @@ describe('AwsLambdaReceiver', () => {
       },
       multiValueHeaders: {},
       queryStringParameters: {},
-      multiValueQueryStringParameters: null,
+      multiValueQueryStringParameters: {},
       pathParameters: null,
       stageVariables: null,
       requestContext: {},
