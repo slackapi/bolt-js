@@ -76,30 +76,22 @@ export interface StepFailArguments {
 /** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
  * version.
  */
-export interface StepConfigureFn {
-  (params: StepConfigureArguments): Promise<ViewsOpenResponse>;
-}
+export type StepConfigureFn = (params: StepConfigureArguments) => Promise<ViewsOpenResponse>;
 
 /** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
  * version.
  */
-export interface StepUpdateFn {
-  (params?: StepUpdateArguments): Promise<WorkflowsUpdateStepResponse>;
-}
+export type StepUpdateFn = (params?: StepUpdateArguments) => Promise<WorkflowsUpdateStepResponse>;
 
 /** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
  * version.
  */
-export interface StepCompleteFn {
-  (params?: StepCompleteArguments): Promise<WorkflowsStepCompletedResponse>;
-}
+export type StepCompleteFn = (params?: StepCompleteArguments) => Promise<WorkflowsStepCompletedResponse>;
 
 /** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
  * version.
  */
-export interface StepFailFn {
-  (params: StepFailArguments): Promise<WorkflowsStepFailedResponse>;
-}
+export type StepFailFn = (params: StepFailArguments) => Promise<WorkflowsStepFailedResponse>;
 
 /** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
  * version.

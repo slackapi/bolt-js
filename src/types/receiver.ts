@@ -1,6 +1,6 @@
 import type App from '../App';
-import type { StringIndexed } from './utilities';
 import type { AckFn } from './index';
+import type { StringIndexed } from './utilities';
 
 export interface ReceiverEvent {
   // Parsed HTTP request body / Socket Mode message body

@@ -81,7 +81,7 @@ import type {
   WorkflowStepEdit,
 } from './types';
 import { type AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
-import { isRejected, type StringIndexed } from './types/utilities';
+import { type StringIndexed, isRejected } from './types/utilities';
 const packageJson = require('../package.json');
 
 export type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from './types';

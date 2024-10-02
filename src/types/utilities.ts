@@ -3,6 +3,7 @@ import type { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/w
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
  */
+// biome-ignore lint/suspicious/noExplicitAny: we're being quite explicit here
 export type StringIndexed = Record<string, any>;
 
 // TODO: unclear if this is helpful or just complicates further
@@ -12,7 +13,6 @@ export type StringIndexed = Record<string, any>;
 export type XOR<T, U> = T | U extends Record<string, unknown> ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 
 type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Type predicate for use with `Promise.allSettled` for filtering for resolved results. */
 export const isFulfilled = <T>(p: PromiseSettledResult<T>): p is PromiseFulfilledResult<T> => p.status === 'fulfilled';

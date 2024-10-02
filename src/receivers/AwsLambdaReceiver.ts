@@ -4,8 +4,8 @@ import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import tsscmp from 'tsscmp';
 import type App from '../App';
 import { ReceiverMultipleAckError } from '../errors';
-import type { StringIndexed } from '../types/utilities';
 import type { Receiver, ReceiverEvent } from '../types/receiver';
+import type { StringIndexed } from '../types/utilities';
 
 export type AwsEvent = AwsEventV1 | AwsEventV2;
 type AwsEventStringParameters = Record<string, string | undefined>;
@@ -235,7 +235,7 @@ export default class AwsLambdaReceiver implements Receiver {
         if (!isAcknowledged) {
           this.logger.error(
             'An incoming event was not acknowledged within 3 seconds. ' +
-            'Ensure that the ack() argument is called in a listener.',
+              'Ensure that the ack() argument is called in a listener.',
           );
         }
       }, 3001);

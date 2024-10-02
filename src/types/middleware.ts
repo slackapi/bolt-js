@@ -3,9 +3,9 @@ import type { WebClient } from '@slack/web-api';
 import type { SlackActionMiddlewareArgs } from './actions';
 import type { SlackCommandMiddlewareArgs } from './command';
 import type { FunctionInputs, SlackEventMiddlewareArgs } from './events';
-import type { StringIndexed } from './utilities';
 import type { SlackOptionsMiddlewareArgs } from './options';
 import type { SlackShortcutMiddlewareArgs } from './shortcuts';
+import type { StringIndexed } from './utilities';
 import type { SlackViewMiddlewareArgs } from './view';
 
 // TODO: rename this to AnyListenerArgs, and all the constituent types

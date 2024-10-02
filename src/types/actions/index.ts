@@ -66,7 +66,7 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
   complete?: FunctionCompleteFn;
   fail?: FunctionFailFn;
   inputs?: FunctionInputs;
-// TODO: remove workflow step stuff in bolt v5
+  // TODO: remove workflow step stuff in bolt v5
 } & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
   ? // all action types except dialog submission and steps from apps have a channel context
     // TODO: not exactly true: a block action could occur from a view. should improve this.
