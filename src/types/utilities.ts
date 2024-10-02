@@ -1,5 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
+// TODO: breaking change: remove, unnecessary abstraction, just use Record directly
+/**
+ * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
+ */
+export type StringIndexed = Record<string, any>;
+
+// TODO: unclear if this is helpful or just complicates further
+/**
+ * Type function which allows either types `T` or `U`, but not both.
+ */
+export type XOR<T, U> = T | U extends Record<string, unknown>
+  ? (Without<T, U> & U) | (Without<U, T> & T)
+  : T | U;
+
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Type predicate for use with `Promise.allSettled` for filtering for resolved results. */
 export const isFulfilled = <T>(p:PromiseSettledResult<T>): p is PromiseFulfilledResult<T> => p.status === 'fulfilled';
