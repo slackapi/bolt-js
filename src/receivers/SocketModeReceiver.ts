@@ -11,7 +11,7 @@ import { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import App from '../App';
 import { CodedError } from '../errors';
 import { Receiver, ReceiverEvent } from '../types';
-import { StringIndexed } from '../types/helpers';
+import { StringIndexed } from '../types/utilities';
 import { buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import {

@@ -6,7 +6,7 @@ import tsscmp from 'tsscmp';
 import App from '../App';
 import { Receiver, ReceiverEvent } from '../types/receiver';
 import { ReceiverMultipleAckError } from '../errors';
-import { StringIndexed } from '../types/helpers';
+import { StringIndexed } from '../types/utilities';
 
 export type AwsEvent = AwsEventV1 | AwsEventV2;
 type AwsEventStringParameters = Record<string, string | undefined>;

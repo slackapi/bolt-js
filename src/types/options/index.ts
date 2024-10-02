@@ -1,6 +1,5 @@
 import { Option, PlainTextElement } from '@slack/types';
-import { StringIndexed, XOR } from '../helpers';
-import { AckFn } from '../utilities';
+import { StringIndexed, XOR, AckFn } from '../utilities';
 import { ViewOutput } from '../view/index';
 
 /**

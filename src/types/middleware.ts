@@ -1,6 +1,6 @@
 import { WebClient } from '@slack/web-api';
 import { Logger } from '@slack/logger';
-import { StringIndexed } from './helpers';
+import { StringIndexed } from './utilities';
 import { FunctionInputs, SlackEventMiddlewareArgs } from './events';
 import { SlackActionMiddlewareArgs } from './actions';
 import { SlackCommandMiddlewareArgs } from './command';

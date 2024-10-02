@@ -1,6 +1,5 @@
 import { SlackEvent } from '@slack/types';
-import { StringIndexed } from '../helpers';
-import { SayFn } from '../utilities';
+import { StringIndexed, SayFn } from '../utilities';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.

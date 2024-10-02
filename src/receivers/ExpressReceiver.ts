@@ -19,7 +19,7 @@ import {
 } from '../errors';
 import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
 import { verifyRedirectOpts } from './verify-redirect-opts';
-import { StringIndexed } from '../types/helpers';
+import { StringIndexed } from '../types/utilities';
 import { HTTPModuleFunctions as httpFunc, ReceiverDispatchErrorHandlerArgs, ReceiverProcessEventErrorHandlerArgs, ReceiverUnhandledRequestHandlerArgs } from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 
