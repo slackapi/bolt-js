@@ -1,5 +1,5 @@
 import './utils/env';
-import { App, type BlockAction, type BotMessageEvent, LogLevel, subtype } from '@slack/bolt';
+import { App, type BlockAction, type types, LogLevel, subtype } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -75,7 +75,7 @@ app.event('team_join', async ({ event, client, logger }) => {
 
 app.message(subtype('bot_message'), async ({ message, logger }) => {
   // TODO: the need to cast here is due to https://github.com/slackapi/bolt-js/issues/796
-  const botMessage = message as BotMessageEvent;
+  const botMessage = message as types.BotMessageEvent;
   logger.info(`The bot user ${botMessage.user} said ${botMessage.text}`);
 });
 
