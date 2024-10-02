@@ -65,4 +65,4 @@ export {
   InstallProviderOptions,
 } from '@slack/oauth';
 
-export * from '@slack/types';
+export * as types from '@slack/types';
