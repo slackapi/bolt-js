@@ -42,17 +42,17 @@ app.event('app_home_opened', async ({ event, client }) => {
   await client.views.publish({
     user_id: event.user,
     view: {
-      "type": "home",
-      "blocks": [
+      type: 'home',
+      blocks: [
         {
-          "type": "section",
-          "block_id": "section678",
-          "text": {
-            "type": "mrkdwn",
-            "text": "App Home Published"
+          type: 'section',
+          block_id: 'section678',
+          text: {
+            type: 'mrkdwn',
+            text: 'App Home Published',
           },
-        }
-      ]
+        },
+      ],
     },
   });
 });
@@ -75,65 +75,64 @@ app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client })
     const result = await client.views.open({
       trigger_id: shortcut.trigger_id,
       view: {
-        type: "modal",
+        type: 'modal',
         title: {
-          type: "plain_text",
-          text: "My App"
+          type: 'plain_text',
+          text: 'My App',
         },
         close: {
-          type: "plain_text",
-          text: "Close"
+          type: 'plain_text',
+          text: 'Close',
         },
         blocks: [
           {
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
-              text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
-            }
+              type: 'mrkdwn',
+              text: 'About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>.',
+            },
           },
           {
-            type: "context",
+            type: 'context',
             elements: [
               {
-                type: "mrkdwn",
-                text: "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
-              }
-            ]
-          }
-        ]
-      }
+                type: 'mrkdwn',
+                text: 'Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>',
+              },
+            ],
+          },
+        ],
+      },
     });
   } catch (error) {
     console.error(error);
   }
 });
 
-
 // subscribe to 'app_mention' event in your App config
 // need app_mentions:read and chat:write scopes
 app.event('app_mention', async ({ event, context, client, say }) => {
   try {
     await say({
-      "blocks": [
+      blocks: [
         {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": `Thanks for the mention <@${event.user}>! Click my fancy button`
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `Thanks for the mention <@${event.user}>! Click my fancy button`,
           },
-          "accessory": {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "text": "Button",
-              "emoji": true
+          accessory: {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'Button',
+              emoji: true,
             },
-            "value": "click_me_123",
-            "action_id": "first_button"
-          }
-        }
-      ]
+            value: 'click_me_123',
+            action_id: 'first_button',
+          },
+        },
+      ],
     });
   } catch (error) {
     console.error(error);
@@ -146,25 +145,25 @@ app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   // no need to directly use 'chat.postMessage', no need to include token
   await say({
-    "blocks": [
+    blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Thanks for the mention <@${message.user}>! Click my fancy button`
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Thanks for the mention <@${message.user}>! Click my fancy button`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Button",
-            "emoji": true
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Button',
+            emoji: true,
           },
-          "value": "click_me_123",
-          "action_id": "first_button"
-        }
-      }
-    ]
+          value: 'click_me_123',
+          action_id: 'first_button',
+        },
+      },
+    ],
   });
 });
 

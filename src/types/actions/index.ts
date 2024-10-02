@@ -1,10 +1,10 @@
-import { BlockAction } from './block-action';
-import { InteractiveMessage } from './interactive-message';
-import { WorkflowStepEdit } from './workflow-step-edit';
-import { DialogSubmitAction, DialogValidation } from './dialog-action';
-import { SayFn, SayArguments, RespondFn, AckFn } from '../utilities';
-import { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
-import { FunctionInputs } from '../events';
+import type { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
+import type { FunctionInputs } from '../events';
+import type { AckFn, RespondFn, SayArguments, SayFn } from '../utilities';
+import type { BlockAction } from './block-action';
+import type { DialogSubmitAction, DialogValidation } from './dialog-action';
+import type { InteractiveMessage } from './interactive-message';
+import type { WorkflowStepEdit } from './workflow-step-edit';
 
 export * from './block-action';
 export * from './interactive-message';
@@ -29,6 +29,16 @@ export * from './workflow-step-edit';
 // TODO: remove workflow step stuff in bolt v5
 export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | WorkflowStepEdit;
 
+export interface ActionConstraints<A extends SlackAction = SlackAction> {
+  type?: A['type'];
+  block_id?: A extends BlockAction ? string | RegExp : never;
+  action_id?: A extends BlockAction ? string | RegExp : never;
+  // TODO: callback ID doesn't apply to block actions, so the SlackAction generic above is too wide to apply here.
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
+}
+
+// TODO: the words (terminology) that follow don't make much sense. What differentiates SlackAction, BlockAction, ElementAction and BasicElementAction?
 /**
  * Arguments which listeners and middleware receive to process an action from Slack's Block Kit interactive components,
  * message actions, dialogs, or legacy interactive messages.
@@ -56,12 +66,12 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
   complete?: FunctionCompleteFn;
   fail?: FunctionFailFn;
   inputs?: FunctionInputs;
-// TODO: remove workflow step stuff in bolt v5
+  // TODO: remove workflow step stuff in bolt v5
 } & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
-  // all action types except dialog submission and steps from apps have a channel context
-  ? { say: SayFn }
-  : unknown
-);
+  ? // all action types except dialog submission and steps from apps have a channel context
+    // TODO: not exactly true: a block action could occur from a view. should improve this.
+    { say: SayFn }
+  : unknown);
 
 /**
  * Type function which given an action `A` returns a corresponding type for the `ack()` function. The function is used

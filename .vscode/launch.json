@@ -10,22 +10,14 @@
       "name": "Spec tests",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "stopOnEntry": false,
-      "args": [
-        "--config",
-        ".mocharc.json",
-        "--no-timeouts",
-        "src/*.spec.ts",
-        "src/**/*.spec.ts"
-      ],
+      "args": ["--config", ".mocharc.json", "--no-timeouts", "src/*.spec.ts", "src/**/*.spec.ts"],
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": null,
       "env": {
         "NODE_ENV": "testing",
         "TS_NODE_PROJECT": "tsconfig.test.json"
       },
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }
