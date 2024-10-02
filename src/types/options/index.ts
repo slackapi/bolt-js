@@ -1,6 +1,6 @@
-import { Option, PlainTextElement } from '@slack/types';
-import { StringIndexed, XOR, AckFn } from '../utilities';
-import { ViewOutput } from '../view/index';
+import type { Option, PlainTextElement } from '@slack/types';
+import type { AckFn, StringIndexed, XOR } from '../utilities';
+import type { ViewOutput } from '../view/index';
 
 /**
  * Arguments which listeners and middleware receive to process an options request from Slack
@@ -12,18 +12,29 @@ export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = Optio
   ack: OptionsAckFn<Source>;
 }
 
+export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
+
+// TODO: more strict typing to allow block/action_id for block_suggestion - not all of these properties apply to all of the members of the SlackOptions union
+export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
+  type?: A['type'];
+  block_id?: A extends SlackOptions ? string | RegExp : never;
+  action_id?: A extends SlackOptions ? string | RegExp : never;
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
+}
+
+// TODO: why call this 'source'? shouldn't it be Type, since it is just the type value?
 /**
  * All sources from which Slack sends options requests.
  */
-export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block_suggestion';
-
-export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
+export type OptionsSource = SlackOptions['type'];
 
 // TODO: the following three utility typies could be DRYed up w/ the similar KnownEventFromType utility used in events types
 export interface BasicOptionsPayload<Type extends string = string> {
   type: Type;
   value: string;
 }
+// TODO: Is this useful? Events have something similar
 export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
   ? BasicOptionsPayload<T>
   : KnownOptionsPayloadFromType<T>;
@@ -146,6 +157,7 @@ type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggesti
     ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
     : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
+// TODO: why are the next two interfaces identical?
 export interface BlockOptions {
   options: Option[];
 }
@@ -160,7 +172,7 @@ export interface DialogOptions {
 }
 export interface OptionGroups<Options> {
   option_groups: ({
-    label: PlainTextElement
+    label: PlainTextElement;
   } & Options)[];
 }
 export interface DialogOptionGroups<Options> {

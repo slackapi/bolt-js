@@ -1,6 +1,7 @@
-import { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
-import { AckFn, RespondFn } from '../utilities';
+import type { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
+import type { AckFn, RespondFn } from '../utilities';
 
+// TODO: terminology. 'action' does not belong here.
 /**
  * Known view action types
  */
@@ -10,6 +11,12 @@ export type SlackViewAction =
   | ViewWorkflowStepSubmitAction // TODO: remove workflow step stuff in bolt v5
   | ViewWorkflowStepClosedAction;
 // <ViewAction extends SlackViewAction = ViewSubmitAction>
+// TODO: add a type parameter here, just like the other constraint interfaces have.
+export interface ViewConstraints {
+  callback_id?: string | RegExp;
+  type?: 'view_closed' | 'view_submission';
+}
+
 /**
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */

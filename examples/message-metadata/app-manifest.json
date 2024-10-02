@@ -1,51 +1,41 @@
 {
   "display_information": {
-      "name": "Message Metadata Example"
+    "name": "Message Metadata Example"
   },
   "features": {
-      "bot_user": {
-          "display_name": "Message Metadata Bot",
-          "always_online": false
-      },
-      "slash_commands": [
-          {
-              "command": "/post",
-              "description": "Post Message Metadata",
-              "should_escape": false
-          }
-      ]
+    "bot_user": {
+      "display_name": "Message Metadata Bot",
+      "always_online": false
+    },
+    "slash_commands": [
+      {
+        "command": "/post",
+        "description": "Post Message Metadata",
+        "should_escape": false
+      }
+    ]
   },
   "oauth_config": {
-      "redirect_urls": [
-          "https://localhost"
-      ],
-      "scopes": {
-          "bot": [
-              "metadata.message:read",
-              "chat:write",
-              "commands"
-          ]
-      }
+    "redirect_urls": ["https://localhost"],
+    "scopes": {
+      "bot": ["metadata.message:read", "chat:write", "commands"]
+    }
   },
   "settings": {
-      "event_subscriptions": {
-          "bot_events": [
-              "message_metadata_deleted",
-              "message_metadata_posted",
-              "message_metadata_updated"
-          ],
-          "metadata_subscriptions": [
-              {
-                  "app_id": "[app id]",
-                  "event_type": "my_event"
-              }
-          ]
-      },
-      "interactivity": {
-          "is_enabled": true
-      },
-      "org_deploy_enabled": false,
-      "socket_mode_enabled": true,
-      "token_rotation_enabled": false
+    "event_subscriptions": {
+      "bot_events": ["message_metadata_deleted", "message_metadata_posted", "message_metadata_updated"],
+      "metadata_subscriptions": [
+        {
+          "app_id": "[app id]",
+          "event_type": "my_event"
+        }
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false
   }
 }

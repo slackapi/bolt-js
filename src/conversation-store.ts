@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Middleware, AnyMiddlewareArgs } from './types';
 import { getTypeAndConversation } from './helpers';
+import type { AnyMiddlewareArgs, Middleware } from './types';
 
 /**
  * Storage backend used by the conversation context middleware
  */
+// biome-ignore lint/suspicious/noExplicitAny: user-defined convo values can be anything
 export interface ConversationStore<ConversationState = any> {
   // NOTE: expiresAt is in milliseconds
   set(conversationId: string, value: ConversationState, expiresAt?: number): Promise<unknown>;
@@ -17,6 +17,7 @@ export interface ConversationStore<ConversationState = any> {
  * This should not be used in situations where there is more than once instance of the app running because state will
  * not be shared amongst the processes.
  */
+// biome-ignore lint/suspicious/noExplicitAny: user-defined convo values can be anything
 export class MemoryStore<ConversationState = any> implements ConversationStore<ConversationState> {
   private state: Map<string, { value: ConversationState; expiresAt?: number }> = new Map();
 
@@ -53,19 +54,20 @@ export class MemoryStore<ConversationState = any> implements ConversationStore<C
  * @param store storage backend used to store and retrieve all conversation state
  * @param logger a logger
  */
+// biome-ignore lint/suspicious/noExplicitAny: user-defined convo values can be anything
 export function conversationContext<ConversationState = any>(
   store: ConversationStore<ConversationState>,
 ): Middleware<AnyMiddlewareArgs> {
   return async ({ body, context, next, logger }) => {
     const { conversationId } = getTypeAndConversation(body);
     if (conversationId !== undefined) {
-      context.updateConversation = (conversation: ConversationState,
-        expiresAt?:number) => store.set(conversationId, conversation, expiresAt);
+      context.updateConversation = (conversation: ConversationState, expiresAt?: number) =>
+        store.set(conversationId, conversation, expiresAt);
       try {
         context.conversation = await store.get(conversationId);
         logger.debug(`Conversation context loaded for ID: ${conversationId}`);
       } catch (error) {
-        const e = error as any;
+        const e = error as Error;
         if (e.message !== undefined && e.message !== 'Conversation not found') {
           // The conversation data can be expired - error: Conversation expired
           logger.debug(`Conversation context failed loading for ID: ${conversationId}, error: ${e.message}`);

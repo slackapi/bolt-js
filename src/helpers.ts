@@ -1,27 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  SlackEventMiddlewareArgs,
-  SlackCommandMiddlewareArgs,
-  SlackOptionsMiddlewareArgs,
-  SlackActionMiddlewareArgs,
-  SlackShortcutMiddlewareArgs,
-  SlackAction,
-  OptionsSource,
-  MessageShortcut,
+import type {
   AnyMiddlewareArgs,
+  MessageShortcut,
+  OptionsSource,
   ReceiverEvent,
+  SlackAction,
+  SlackActionMiddlewareArgs,
+  SlackCommandMiddlewareArgs,
+  SlackEventMiddlewareArgs,
+  SlackOptionsMiddlewareArgs,
+  SlackShortcutMiddlewareArgs,
 } from './types';
 
 /**
  * Internal data type for capturing the class of event processed in App#onIncomingEvent()
  */
 export enum IncomingEventType {
-  Event,
-  Action,
-  Command,
-  Options,
-  ViewAction,
-  Shortcut,
+  Event = 0,
+  Action = 1,
+  Command = 2,
+  Options = 3,
+  ViewAction = 4, // TODO: terminology: ViewAction? Why Action?
+  Shortcut = 5,
 }
 
 // ----------------------------
@@ -35,6 +34,7 @@ const eventTypesToSkipAuthorize = ['app_uninstalled', 'tokens_revoked'];
  * This is analogous to WhenEventHasChannelContext and the conditional type that checks SlackAction for a channel
  * context.
  */
+// biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
 export function getTypeAndConversation(body: any): { type?: IncomingEventType; conversationId?: string } {
   if (body.event !== undefined) {
     const { event } = body as SlackEventMiddlewareArgs<string>['body'];
@@ -59,7 +59,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       // Using non-null assertion (!) because the alternative is to use `foundConversation: (string | undefined)`, which
       // impedes the very useful type checker help above that ensures the value is only defined to strings, not
       // undefined. This is safe when used in combination with the || operator with a default value.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: TODO: revisit this and use the types
       return foundConversationId! || undefined;
     })();
 

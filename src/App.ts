@@ -1,78 +1,101 @@
-import { Agent } from 'http';
-import { SecureContextOptions } from 'tls';
-import util from 'util';
-import { WebClient, ChatPostMessageArguments, addAppMetadata, WebClientOptions } from '@slack/web-api';
-import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import SocketModeReceiver from './receivers/SocketModeReceiver';
-import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
-import { isRejected, StringIndexed } from './types/utilities';
+import type { Agent } from 'node:http';
+import type { SecureContextOptions } from 'node:tls';
+import util from 'node:util';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import {
+  CustomFunction,
+  type CustomFunctionMiddleware,
+  type FunctionCompleteFn,
+  type FunctionFailFn,
+} from './CustomFunction';
+import type { WorkflowStep } from './WorkflowStep';
+import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
+import {
+  AppInitializationError,
+  type CodedError,
+  ErrorCode,
+  InvalidCustomPropertyError,
+  MultipleListenerError,
+  asCodedError,
+} from './errors';
+import {
+  IncomingEventType,
+  assertNever,
+  getTypeAndConversation,
+  isBodyWithTypeEnterpriseInstall,
+  isEventTypeToSkipAuthorize,
+} from './helpers';
 import {
   ignoreSelf as ignoreSelfMiddleware,
-  onlyActions,
-  matchConstraints,
-  onlyCommands,
   matchCommandName,
-  onlyOptions,
-  onlyShortcuts,
-  onlyEvents,
+  matchConstraints,
   matchEventType,
   matchMessage,
+  onlyActions,
+  onlyCommands,
+  onlyEvents,
+  onlyOptions,
+  onlyShortcuts,
   onlyViewActions,
 } from './middleware/builtin';
 import processMiddleware from './middleware/process';
-import { ConversationStore, conversationContext, MemoryStore } from './conversation-store';
-import { WorkflowStep } from './WorkflowStep';
-import {
-  Middleware,
+import HTTPReceiver, { type HTTPReceiverOptions } from './receivers/HTTPReceiver';
+import SocketModeReceiver from './receivers/SocketModeReceiver';
+import type {
+  AckFn,
+  ActionConstraints,
   AnyMiddlewareArgs,
+  BlockAction,
+  BlockElementAction,
+  Context,
+  DialogSubmitAction,
+  EventTypePattern,
+  FunctionInputs,
+  InteractiveAction,
+  InteractiveMessage,
+  KnownEventFromType,
+  KnownOptionsPayloadFromType,
+  Middleware,
+  OptionsConstraints,
+  OptionsSource,
+  Receiver,
+  ReceiverEvent,
+  RespondArguments,
+  RespondFn,
+  SayFn,
+  ShortcutConstraints,
+  SlackAction,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
-  SlackShortcutMiddlewareArgs,
-  SlackViewMiddlewareArgs,
-  SlackAction,
-  EventTypePattern,
   SlackShortcut,
-  Context,
-  SayFn,
-  AckFn,
-  RespondFn,
-  OptionsSource,
-  BlockAction,
-  InteractiveMessage,
+  SlackShortcutMiddlewareArgs,
   SlackViewAction,
-  Receiver,
-  ReceiverEvent,
-  RespondArguments,
-  DialogSubmitAction,
-  BlockElementAction,
-  InteractiveAction,
-  ViewOutput,
-  KnownOptionsPayloadFromType,
-  KnownEventFromType,
+  SlackViewMiddlewareArgs,
   SlashCommand,
+  ViewConstraints,
+  ViewOutput,
   WorkflowStepEdit,
-  SlackOptions,
-  FunctionInputs,
 } from './types';
-import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
-import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
-import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
-import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
-// eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
-const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
+import { type AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
+import { type StringIndexed, isRejected } from './types/utilities';
+const packageJson = require('../package.json');
+
+export type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from './types';
 
 // ----------------------------
 // For listener registration methods
-
+// TODO: we have types for this... consolidate
 const validViewTypes = ['view_closed', 'view_submission'];
 
 // ----------------------------
 // For the constructor
 
-const tokenUsage = 'Apps used in a single workspace can be initialized with a token. Apps used in many workspaces ' +
+const tokenUsage =
+  'Apps used in a single workspace can be initialized with a token. Apps used in many workspaces ' +
   'should be initialized with oauth installer options or authorize.';
 
 /** App initialization options */
@@ -86,7 +109,7 @@ export interface AppOptions {
   clientId?: HTTPReceiverOptions['clientId'];
   clientSecret?: HTTPReceiverOptions['clientSecret'];
   stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
-  redirectUri?: HTTPReceiverOptions['redirectUri']
+  redirectUri?: HTTPReceiverOptions['redirectUri'];
   installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
   scopes?: HTTPReceiverOptions['scopes'];
   installerOptions?: HTTPReceiverOptions['installerOptions'];
@@ -114,9 +137,10 @@ export interface AppOptions {
 export { LogLevel, Logger } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
-export interface Authorize<IsEnterpriseInstall extends boolean = false> {
-  (source: AuthorizeSourceData<IsEnterpriseInstall>, body?: AnyMiddlewareArgs['body']): Promise<AuthorizeResult>;
-}
+export type Authorize<IsEnterpriseInstall extends boolean = false> = (
+  source: AuthorizeSourceData<IsEnterpriseInstall>,
+  body?: AnyMiddlewareArgs['body'],
+) => Promise<AuthorizeResult>;
 
 /** Authorization function inputs - authenticated data about an event for the authorization function */
 export interface AuthorizeSourceData<IsEnterpriseInstall extends boolean = false> {
@@ -137,36 +161,8 @@ export interface AuthorizeResult {
   userId?: string;
   teamId?: string;
   enterpriseId?: string;
-  // TODO: for better type safety, we may want to revisit this
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
   [key: string]: any;
-}
-
-export interface ActionConstraints<A extends SlackAction = SlackAction> {
-  type?: A['type'];
-  block_id?: A extends BlockAction ? string | RegExp : never;
-  action_id?: A extends BlockAction ? string | RegExp : never;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
-}
-
-// TODO: more strict typing to allow block/action_id for block_suggestion etc.
-export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
-  type?: A['type'];
-  block_id?: A extends SlackOptions ? string | RegExp : never;
-  action_id?: A extends SlackOptions ? string | RegExp : never;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
-}
-
-export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
-  type?: S['type'];
-  callback_id?: string | RegExp;
-}
-
-export interface ViewConstraints {
-  callback_id?: string | RegExp;
-  type?: 'view_closed' | 'view_submission';
 }
 
 // Passed internally to the handleError method
@@ -182,21 +178,17 @@ export interface ExtendedErrorHandlerArgs extends AllErrorHandlerArgs {
   error: CodedError; // asCodedError has been called
 }
 
-export interface ErrorHandler {
-  (error: CodedError): Promise<void>;
-}
+export type ErrorHandler = (error: CodedError) => Promise<void>;
 
-export interface ExtendedErrorHandler {
-  (args: ExtendedErrorHandlerArgs): Promise<void>;
-}
+export type ExtendedErrorHandler = (args: ExtendedErrorHandlerArgs) => Promise<void>;
 
-export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {
-}
+export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {}
 
 // Used only in this file
-type MessageEventMiddleware<
-    CustomContext extends StringIndexed = StringIndexed,
-> = Middleware<SlackEventMiddlewareArgs<'message'>, CustomContext>;
+type MessageEventMiddleware<CustomContext extends StringIndexed = StringIndexed> = Middleware<
+  SlackEventMiddlewareArgs<'message'>,
+  CustomContext
+>;
 
 class WebClientPool {
   private pool: { [token: string]: WebClient } = {};
@@ -387,8 +379,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       this.developerMode &&
       this.installerOptions &&
       (typeof this.installerOptions.callbackOptions === 'undefined' ||
-      (typeof this.installerOptions.callbackOptions !== 'undefined' &&
-      typeof this.installerOptions.callbackOptions.failure === 'undefined'))
+        (typeof this.installerOptions.callbackOptions !== 'undefined' &&
+          typeof this.installerOptions.callbackOptions.failure === 'undefined'))
     ) {
       // add a custom failure callback for Developer Mode in case they are using OAuth
       this.logger.debug('adding Developer Mode custom OAuth failure handler');
@@ -436,11 +428,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       this.initialized = false;
       // You need to run `await app.init();` on your own
     } else {
-      this.authorize = this.initAuthorizeInConstructor(
-        token,
-        authorize,
-        argAuthorization,
-      );
+      this.authorize = this.initAuthorizeInConstructor(token, authorize, argAuthorization);
       this.initialized = true;
     }
 
@@ -464,10 +452,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   public async init(): Promise<void> {
     this.initialized = true;
     try {
-      const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(
-        this.argToken,
-        this.argAuthorize,
-      );
+      const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(this.argToken, this.argAuthorize);
       if (initializedAuthorize !== undefined) {
         this.authorize = initializedAuthorize;
         return;
@@ -484,14 +469,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
             };
           }
         }
-        this.authorize = singleAuthorization(
-          this.client,
-          authorization,
-          this.tokenVerificationEnabled,
-        );
+        this.authorize = singleAuthorization(this.client, authorization, this.tokenVerificationEnabled);
         this.initialized = true;
       } else {
-        this.logger.error('Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues');
+        this.logger.error(
+          'Something has gone wrong. Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues',
+        );
         assertNever();
       }
     } catch (e) {
@@ -531,8 +514,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
- * Register CustomFunction middleware
- */
+   * Register CustomFunction middleware
+   */
   public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
     const fn = new CustomFunction(callbackId, listeners, this.webClientOptions);
     const m = fn.getMiddleware();
@@ -559,49 +542,42 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     return this.receiver.start(...args) as ReturnType<HTTPReceiver['start']>;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: receivers could accept anything as arguments for stop
   public stop(...args: any[]): Promise<unknown> {
     return this.receiver.stop(...args);
   }
 
-  public event<
-      EventType extends string = string,
-      MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
+  // TODO: can constrain EventType here to the set of available slack event types to help autocomplete event names
+  public event<EventType extends string = string, MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<EventType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  public event<
-      EventType extends RegExp = RegExp,
-      MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
+  public event<EventType extends RegExp = RegExp, MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     eventName: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   public event<
-      EventType extends EventTypePattern = EventTypePattern,
-      MiddlewareCustomContext extends StringIndexed = StringIndexed,
+    EventType extends EventTypePattern = EventTypePattern,
+    MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     eventNameOrPattern: EventType,
     ...listeners: Middleware<SlackEventMiddlewareArgs<string>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
     let invalidEventName = false;
     if (typeof eventNameOrPattern === 'string') {
-      const name = eventNameOrPattern as string;
+      const name = eventNameOrPattern;
       invalidEventName = name.startsWith('message.');
     } else if (eventNameOrPattern instanceof RegExp) {
-      const name = (eventNameOrPattern as RegExp).source;
+      const name = eventNameOrPattern.source;
       invalidEventName = name.startsWith('message\\.');
     }
     if (invalidEventName) {
       throw new AppInitializationError(
-        `Although the document mentions "${eventNameOrPattern}",` +
-          'it is not a valid event type. Use "message" instead. ' +
-          'If you want to filter message events, you can use event.channel_type for it.',
+        `Although the document mentions "${eventNameOrPattern}", it is not a valid event type. Use "message" instead. If you want to filter message events, you can use event.channel_type for it.`,
       );
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyEvents,
       matchEventType(eventNameOrPattern),
@@ -613,18 +589,16 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    *
    * @param listeners Middlewares that process and react to a message event
    */
-  public message<
-      MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]): void;
+  public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
+    ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
+  ): void;
   /**
    *
    * @param pattern Used for filtering out messages that don't match.
    * Strings match via {@link String.prototype.includes}.
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
-  public message<
-      MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
+  public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     pattern: string | RegExp,
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
@@ -636,9 +610,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * via {@link String.prototype.includes}.
    * @param listeners Middlewares that process and react to the message events that matched the provided pattern.
    */
-  public message<
-      MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
+  public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     filter: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
     pattern: string | RegExp,
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
@@ -649,10 +621,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * {@link AllMiddlewareArgs.next} if there is no match. See {@link directMention} for an example.
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
-  public message<
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
-    filter: MessageEventMiddleware,
+  public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
+    filter: MessageEventMiddleware, // TODO: why do we need this override? shouldnt ...listeners capture this too?
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
@@ -661,14 +631,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * all remaining patterns and middlewares will be skipped.
    * @param patternsOrMiddleware A mix of patterns and/or middlewares.
    */
-  public message<
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
+  public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
   ): void;
-  public message<
-    MiddlewareCustomContext extends StringIndexed = StringIndexed,
-  >(
+  // TODO: expose a type parameter for overriding the MessageEvent type (just like shortcut() and action() does) https://github.com/slackapi/bolt-js/issues/796
+  public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
   ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
@@ -676,8 +643,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+      // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    }) as any;
 
     this.listeners.push([
       onlyEvents,
@@ -699,7 +666,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     constraints: Constraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<
+      SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>,
+      AppCustomContext & MiddlewareCustomContext
+    >[]
   ): void;
   public shortcut<
     Shortcut extends SlackShortcut = SlackShortcut,
@@ -707,23 +677,28 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     callbackIdOrConstraints: string | RegExp | Constraints,
-    ...listeners: Middleware<SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<
+      SlackShortcutMiddlewareArgs<Extract<Shortcut, { type: Constraints['type'] }>>,
+      AppCustomContext & MiddlewareCustomContext
+    >[]
   ): void {
-    const constraints: ShortcutConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
-      { callback_id: callbackIdOrConstraints } :
-      callbackIdOrConstraints;
+    const constraints: ShortcutConstraints =
+      typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)
+        ? { callback_id: callbackIdOrConstraints }
+        : callbackIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
     if (unknownConstraintKeys.length > 0) {
+      // TODO:event() will throw an error if you provide an invalid event name; we should align this behaviour.
       this.logger.error(
         `Slack listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
       );
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyShortcuts,
       matchConstraints(constraints),
@@ -731,8 +706,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
 
-  // NOTE: this is what's called a convenience generic, so that types flow more easily without casting.
-  // https://web.archive.org/web/20210629110615/https://basarat.gitbook.io/typescript/type-system/generics#motivation-and-samples
   public action<
     Action extends SlackAction = SlackAction,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
@@ -747,7 +720,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   >(
     constraints: Constraints,
     // NOTE: Extract<> is able to return the whole union when type: undefined. Why?
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<
+      SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>,
+      AppCustomContext & MiddlewareCustomContext
+    >[]
   ): void;
   public action<
     Action extends SlackAction = SlackAction,
@@ -755,37 +731,40 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     actionIdOrConstraints: string | RegExp | Constraints,
-    ...listeners: Middleware<SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>, AppCustomContext & MiddlewareCustomContext>[]
+    ...listeners: Middleware<
+      SlackActionMiddlewareArgs<Extract<Action, { type: Constraints['type'] }>>,
+      AppCustomContext & MiddlewareCustomContext
+    >[]
   ): void {
     // Normalize Constraints
-    const constraints: ActionConstraints = typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints) ?
-      { action_id: actionIdOrConstraints } :
-      actionIdOrConstraints;
+    const constraints: ActionConstraints =
+      typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)
+        ? { action_id: actionIdOrConstraints }
+        : actionIdOrConstraints;
 
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter(
       (k) => k !== 'action_id' && k !== 'block_id' && k !== 'callback_id' && k !== 'type',
     );
     if (unknownConstraintKeys.length > 0) {
+      // TODO:event() will throw an error if you provide an invalid event name; we should align this behaviour.
       this.logger.error(
         `Action listener cannot be attached using unknown constraint keys: ${unknownConstraintKeys.join(', ')}`,
       );
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([onlyActions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
   public command<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    commandName: string | RegExp, ...listeners: Middleware<
-    SlackCommandMiddlewareArgs,
-    AppCustomContext & MiddlewareCustomContext
-    >[]
+    commandName: string | RegExp,
+    ...listeners: Middleware<SlackCommandMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyCommands,
       matchCommandName(commandName),
@@ -794,18 +773,18 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   public options<
-    Source extends OptionsSource = 'block_suggestion',
+    Source extends OptionsSource = 'block_suggestion', // TODO: here, similarly to `message()`, the generic is the string `type` of the payload. in others, like `action()`, it's the entire payload. could we make this consistent?
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     actionId: string | RegExp,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
-  // TODO: reflect the type in constraints to Source
+  // TODO: reflect the type in constraints to Source (this relates to the above TODO, too)
   public options<
     Source extends OptionsSource = OptionsSource,
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
-    constraints: OptionsConstraints,
+    constraints: OptionsConstraints, // TODO: to be able to 'link' listener arguments to the constrains, should pass the Source type in as a generic here
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   // TODO: reflect the type in constraints to Source
@@ -816,13 +795,13 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     actionIdOrConstraints: string | RegExp | OptionsConstraints,
     ...listeners: Middleware<SlackOptionsMiddlewareArgs<Source>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    const constraints: OptionsConstraints = typeof actionIdOrConstraints === 'string' ||
-      util.types.isRegExp(actionIdOrConstraints) ?
-      { action_id: actionIdOrConstraints } :
-      actionIdOrConstraints;
+    const constraints: OptionsConstraints =
+      typeof actionIdOrConstraints === 'string' || util.types.isRegExp(actionIdOrConstraints)
+        ? { action_id: actionIdOrConstraints }
+        : actionIdOrConstraints;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([onlyOptions, matchConstraints(constraints), ..._listeners] as Middleware<AnyMiddlewareArgs>[]);
   }
 
@@ -835,6 +814,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): void;
   public view<
     ViewActionType extends SlackViewAction = SlackViewAction,
+    // TODO: add a type parameter for view constraints; this way we can constrain the handler view arguments based on the type of the constraint, similar to what action() does
     MiddlewareCustomContext extends StringIndexed = StringIndexed,
   >(
     constraints: ViewConstraints,
@@ -847,9 +827,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     callbackIdOrConstraints: string | RegExp | ViewConstraints,
     ...listeners: Middleware<SlackViewMiddlewareArgs<ViewActionType>, AppCustomContext & MiddlewareCustomContext>[]
   ): void {
-    const constraints: ViewConstraints = typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints) ?
-      { callback_id: callbackIdOrConstraints, type: 'view_submission' } :
-      callbackIdOrConstraints;
+    const constraints: ViewConstraints =
+      typeof callbackIdOrConstraints === 'string' || util.types.isRegExp(callbackIdOrConstraints)
+        ? { callback_id: callbackIdOrConstraints, type: 'view_submission' }
+        : callbackIdOrConstraints;
     // Fail early if the constraints contain invalid keys
     const unknownConstraintKeys = Object.keys(constraints).filter((k) => k !== 'callback_id' && k !== 'type');
     if (unknownConstraintKeys.length > 0) {
@@ -864,8 +845,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _listeners = listeners as any; // FIXME: workaround for TypeScript 4.7 breaking changes
+    // biome-ignore lint/suspicious/noExplicitAny: FIXME: workaround for TypeScript 4.7 breaking changes
+    const _listeners = listeners as any;
     this.listeners.push([
       onlyViewActions,
       matchConstraints(constraints),
@@ -921,12 +902,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       try {
         authorizeResult = await this.authorize(source, bodyArg);
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
         const e = error as any;
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
         e.code = ErrorCode.AuthorizationError;
-        // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
-        // eslint-disable-next-line consistent-return
         return this.handleError({
           error: e,
           logger: this.logger,
@@ -973,12 +952,16 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     const { functionExecutionId, functionBotAccessToken, functionInputs } = extractFunctionContext(body);
     if (functionExecutionId) {
       context.functionExecutionId = functionExecutionId;
-      if (functionInputs) { context.functionInputs = functionInputs; }
+      if (functionInputs) {
+        context.functionInputs = functionInputs;
+      }
     }
 
     // Attach and make available the JIT/function-related token on context
     if (this.attachFunctionToken) {
-      if (functionBotAccessToken) { context.functionBotAccessToken = functionBotAccessToken; }
+      if (functionBotAccessToken) {
+        context.functionBotAccessToken = functionBotAccessToken;
+      }
     }
 
     // Factory for say() utility
@@ -999,9 +982,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     // TODO: remove workflow step stuff in bolt v5
-    let payload: DialogSubmitAction | WorkflowStepEdit | SlackShortcut | KnownEventFromType<string> | SlashCommand
-    | KnownOptionsPayloadFromType<string> | BlockElementAction | ViewOutput | InteractiveAction;
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
+    let payload:
+      | DialogSubmitAction
+      | WorkflowStepEdit
+      | SlackShortcut
+      | KnownEventFromType<string>
+      | SlashCommand
+      | KnownOptionsPayloadFromType<string>
+      | BlockElementAction
+      | ViewOutput
+      | InteractiveAction;
     switch (type) {
       case IncomingEventType.Event:
         payload = (bodyArg as SlackEventMiddlewareArgs['body']).event;
@@ -1010,23 +1001,21 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         payload = (bodyArg as SlackViewMiddlewareArgs['body']).view;
         break;
       case IncomingEventType.Shortcut:
-        payload = (bodyArg as SlackShortcutMiddlewareArgs['body']);
+        payload = bodyArg as SlackShortcutMiddlewareArgs['body'];
         break;
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: usually not great, but we do it here
       case IncomingEventType.Action:
         if (isBlockActionOrInteractiveMessageBody(bodyArg as SlackActionMiddlewareArgs['body'])) {
-          const { actions } = (bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']);
+          const { actions } = bodyArg as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body'];
           [payload] = actions;
           break;
         }
-        // If above conditional does not hit, fall through to fallback payload in default block below
+      // If above conditional does not hit, fall through to fallback payload in default block below
       default:
-        payload = (bodyArg as (
-          | Exclude<
-          AnyMiddlewareArgs,
-          SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs
-          >
+        payload = bodyArg as (
+          | Exclude<AnyMiddlewareArgs, SlackEventMiddlewareArgs | SlackActionMiddlewareArgs | SlackViewMiddlewareArgs>
           | SlackActionMiddlewareArgs<Exclude<SlackAction, BlockAction | InteractiveMessage>>
-        )['body']);
+        )['body'];
         break;
     }
     // NOTE: the following doesn't work because... distributive?
@@ -1037,7 +1026,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       /** Respond function might be set below */
       respond?: RespondFn;
       /** Ack function might be set below */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
       ack?: AckFn<any>;
       complete?: FunctionCompleteFn;
       fail?: FunctionFailFn;
@@ -1110,12 +1099,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     if (token !== undefined) {
-      let pool;
+      let pool: WebClientPool | undefined = undefined;
       const clientOptionsCopy = { ...this.clientOptions };
       if (authorizeResult.teamId !== undefined) {
         pool = this.clients[authorizeResult.teamId];
         if (pool === undefined) {
-          // eslint-disable-next-line no-multi-assign
           pool = this.clients[authorizeResult.teamId] = new WebClientPool();
         }
         // Add teamId to clientOptions so it can be automatically added to web-api calls
@@ -1123,7 +1111,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       } else if (authorizeResult.enterpriseId !== undefined) {
         pool = this.clients[authorizeResult.enterpriseId];
         if (pool === undefined) {
-          // eslint-disable-next-line no-multi-assign
           pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
         }
       }
@@ -1161,13 +1148,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
               this.logger,
               // When all the listener middleware are done processing,
               // `listener` here will be called with a noop `next` fn
-              async () => listener({
-                ...(listenerArgs as AnyMiddlewareArgs),
-                context,
-                client,
-                logger: this.logger,
-                next: () => {},
-              } as AnyMiddlewareArgs & AllMiddlewareArgs),
+              async () =>
+                listener({
+                  ...(listenerArgs as AnyMiddlewareArgs),
+                  context,
+                  client,
+                  logger: this.logger,
+                  next: () => {},
+                } as AnyMiddlewareArgs & AllMiddlewareArgs),
             );
           });
 
@@ -1175,16 +1163,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           const rejectedListenerResults = settledListenerResults.filter(isRejected);
           if (rejectedListenerResults.length === 1) {
             throw rejectedListenerResults[0].reason;
+            // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
           } else if (rejectedListenerResults.length > 1) {
             throw new MultipleListenerError(rejectedListenerResults.map((rlr) => rlr.reason));
           }
         },
       );
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const e = error as any;
-      // disabling due to https://github.com/typescript-eslint/typescript-eslint/issues/1277
-      // eslint-disable-next-line consistent-return
       return this.handleError({
         context,
         error: e,
@@ -1200,9 +1187,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   private handleError(args: AllErrorHandlerArgs): Promise<void> {
     const { error, ...rest } = args;
 
-    return this.extendedErrorHandler && this.hasCustomErrorHandler ?
-      this.errorHandler({ error: asCodedError(error), ...rest }) :
-      this.errorHandler(asCodedError(error));
+    return this.extendedErrorHandler && this.hasCustomErrorHandler
+      ? this.errorHandler({ error: asCodedError(error), ...rest })
+      : this.errorHandler(asCodedError(error));
   }
 
   // ---------------------
@@ -1235,7 +1222,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
     if (this.socketMode === true) {
       if (appToken === undefined) {
-        throw new AppInitializationError('You must provide an appToken when socketMode is set to true. To generate an appToken see: https://api.slack.com/apis/connections/socket#token');
+        throw new AppInitializationError(
+          'You must provide an appToken when socketMode is set to true. To generate an appToken see: https://api.slack.com/apis/connections/socket#token',
+        );
       }
       this.logger.debug('Initializing SocketModeReceiver');
       return new SocketModeReceiver({
@@ -1279,16 +1268,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     });
   }
 
-  private initAuthorizeIfNoTokenIsGiven(
-    token?: string,
-    authorize?: Authorize,
-  ): Authorize<boolean> | undefined {
+  private initAuthorizeIfNoTokenIsGiven(token?: string, authorize?: Authorize): Authorize<boolean> | undefined {
     let usingOauth = false;
-    const httpReceiver = (this.receiver as HTTPReceiver);
-    if (
-      httpReceiver.installer !== undefined &&
-      httpReceiver.installer.authorize !== undefined
-    ) {
+    const httpReceiver = this.receiver as HTTPReceiver;
+    if (httpReceiver.installer !== undefined && httpReceiver.installer.authorize !== undefined) {
       // This supports using the built-in HTTPReceiver, declaring your own HTTPReceiver
       // and theoretically, doing a fully custom (non-Express.js) receiver that implements OAuth
       usingOauth = true;
@@ -1307,11 +1290,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       throw new AppInitializationError(
         `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://slack.dev/bolt-js/concepts/authenticating-oauth for these required fields.\n`,
       );
+      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`You cannot provide both authorize and oauth installer options. ${tokenUsage}`);
+      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize === undefined && usingOauth) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: we know installer is truthy here
       return httpReceiver.installer!.authorize;
+      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && !usingOauth) {
       return authorize as Authorize<boolean>;
     }
@@ -1323,19 +1309,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     authorize?: Authorize<boolean>,
     authorization?: Authorization,
   ): Authorize<boolean> {
-    const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(
-      token,
-      authorize,
-    );
+    const initializedAuthorize = this.initAuthorizeIfNoTokenIsGiven(token, authorize);
     if (initializedAuthorize !== undefined) {
       return initializedAuthorize;
     }
     if (token !== undefined && authorization !== undefined) {
-      return singleAuthorization(
-        this.client,
-        authorization,
-        this.tokenVerificationEnabled,
-      );
+      return singleAuthorization(this.client, authorization, this.tokenVerificationEnabled);
     }
     const hasToken = token !== undefined && token.length > 0;
     const errorMessage = `Something has gone wrong in #initAuthorizeInConstructor method (hasToken: ${hasToken}, authorize: ${authorize}). Please report this issue to the maintainers. https://github.com/slackapi/bolt-js/issues`;
@@ -1360,12 +1339,12 @@ function runAuthTestForBotToken(
   authorization: Partial<AuthorizeResult> & { botToken: Required<AuthorizeResult>['botToken'] },
 ): Promise<{ botUserId: string; botId: string }> {
   // TODO: warn when something needed isn't found
-  return authorization.botUserId !== undefined && authorization.botId !== undefined ?
-    Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId }) :
-    client.auth.test({ token: authorization.botToken }).then((result) => ({
-      botUserId: result.user_id as string,
-      botId: result.bot_id as string,
-    }));
+  return authorization.botUserId !== undefined && authorization.botId !== undefined
+    ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
+    : client.auth.test({ token: authorization.botToken }).then((result) => ({
+        botUserId: result.user_id as string,
+        botId: result.bot_id as string,
+      }));
 }
 
 // the shortened type, which is supposed to be used only in this source file
@@ -1390,9 +1369,8 @@ function singleAuthorization(
   if (tokenVerificationEnabled) {
     // call auth.test immediately
     cachedAuthTestResult = runAuthTestForBotToken(client, authorization);
-    return async ({ isEnterpriseInstall }) => buildAuthorizeResult(
-      isEnterpriseInstall, cachedAuthTestResult, authorization,
-    );
+    return async ({ isEnterpriseInstall }) =>
+      buildAuthorizeResult(isEnterpriseInstall, cachedAuthTestResult, authorization);
   }
   return async ({ isEnterpriseInstall }) => {
     // hold off calling auth.test API until the first access to authorize function
@@ -1434,11 +1412,7 @@ function buildSource<IsEnterpriseInstall extends boolean>(
     }
 
     const parseTeamId = (
-      bodyAs:
-      | SlackAction
-      | SlackViewAction
-      | SlackShortcut
-      | KnownOptionsPayloadFromType<OptionsSource>,
+      bodyAs: SlackAction | SlackViewAction | SlackShortcut | KnownOptionsPayloadFromType<OptionsSource>,
     ): string | undefined => {
       // When the app is installed using org-wide deployment, team property will be null
       if (typeof bodyAs.team !== 'undefined' && bodyAs.team !== null) {
@@ -1604,7 +1578,8 @@ function buildRespondFn(
 
 function escapeHtml(input: string | undefined | null): string {
   if (input) {
-    return input.replace(/&/g, '&amp;')
+    return input
+      .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
@@ -1614,9 +1589,9 @@ function escapeHtml(input: string | undefined | null): string {
 }
 
 function extractFunctionContext(body: StringIndexed) {
-  let functionExecutionId;
-  let functionBotAccessToken;
-  let functionInputs;
+  let functionExecutionId: string | undefined = undefined;
+  let functionBotAccessToken: string | undefined = undefined;
+  let functionInputs: FunctionInputs | undefined = undefined;
 
   // function_executed event
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
