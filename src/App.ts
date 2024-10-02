@@ -6,7 +6,7 @@ import { Logger, LogLevel, ConsoleLogger } from '@slack/logger';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
 import HTTPReceiver, { HTTPReceiverOptions } from './receivers/HTTPReceiver';
-import { isRejected } from './types/utilities';
+import { isRejected, StringIndexed } from './types/utilities';
 import {
   ignoreSelf as ignoreSelfMiddleware,
   onlyActions,
@@ -60,7 +60,6 @@ import {
 import { IncomingEventType, getTypeAndConversation, assertNever, isBodyWithTypeEnterpriseInstall, isEventTypeToSkipAuthorize } from './helpers';
 import { CodedError, asCodedError, AppInitializationError, MultipleListenerError, ErrorCode, InvalidCustomPropertyError } from './errors';
 import { AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
-import { StringIndexed } from './types/helpers';
 import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
 import { Assistant } from './Assistant';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs

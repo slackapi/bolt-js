@@ -17,7 +17,7 @@ import {
   CodedError,
 } from '../errors';
 import { CustomRoute, buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
-import { StringIndexed } from '../types/helpers';
+import { StringIndexed } from '../types/utilities';
 import { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import {
   HTTPModuleFunctions as httpFunc,

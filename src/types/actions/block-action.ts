@@ -1,5 +1,5 @@
 import { PlainTextElement, Confirmation, Option, RichTextBlock } from '@slack/types';
-import { StringIndexed } from '../helpers';
+import { StringIndexed } from '../utilities';
 import { ViewOutput, ViewStateValue } from '../view';
 
 /**
