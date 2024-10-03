@@ -18,10 +18,10 @@ export * from './workflow-step-edit';
  * TODO: BlockAction's default generic parameter (ElementAction) might be too specific to allow for this type to be used
  * as a constraint on SlackActionMiddlewareArgs' Action generic parameter.
  *
- * If someone were to instantiate SlackActionMiddlewareArgs<BlockAction<SomeNewAction>>, would it work? We need it to
+ * If someone were to instantiate `SlackActionMiddlewareArgs<BlockAction<SomeNewAction>>`, would it work? We need it to
  * work as long as SomeNewAction implements BasicElementAction.
  *
- * We don't want to substitute BlockAction with BlockAction<BasicElementAction> here because that means the completions
+ * We don't want to substitute BlockAction with `BlockAction<BasicElementAction>` here because that means the completions
  * offered when no generic parameter is bound would be limited to BasicElementAction rather than the union of known
  * actions - ElementAction.
  */
@@ -59,5 +59,5 @@ export interface SlackActionMiddlewareArgs<Action extends SlackAction = SlackAct
 type ActionAckFn<A extends SlackAction> = A extends InteractiveMessage
   ? AckFn<string | SayArguments>
   : A extends DialogSubmitAction
-    ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
-    : AckFn<void>;
+  ? AckFn<DialogValidation> // message action and block actions don't accept any value in the ack response
+  : AckFn<void>;

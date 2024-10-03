@@ -28,8 +28,12 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.5.2",
     "@docusaurus/types": "3.5.2",
+    "@tsconfig/recommended": "^1.0.7",
+    "docusaurus-plugin-typedoc": "^1.0.5",
     "stylelint": "^16.9.0",
-    "stylelint-config-standard": "^36.0.1"
+    "stylelint-config-standard": "^36.0.1",
+    "typedoc": "^0.26.7",
+    "typedoc-plugin-markdown": "^4.2.9"
   },
   "browserslist": {
     "production": [

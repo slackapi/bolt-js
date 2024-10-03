@@ -2,4 +2,7 @@ node_modules/
 .docusaurus
 .DS_Store
 build/
+content/ref
 .stylelintrc.json
+_site
+Gemfile.lock

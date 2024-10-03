@@ -49,25 +49,29 @@ const config = {
     ],
   ],
 
-plugins:
-['docusaurus-theme-github-codeblock',
-  [
-    '@docusaurus/plugin-client-redirects',
-    {
-      redirects: [
-        {
-          to: '/getting-started',
-          from: ['/tutorial/getting-started'],
-        },
-        {
-          to: '/',
-          from: ['/concepts','/concepts/advanced','/concepts/basic'],
-        },
-      ],
-    },
+  plugins: [
+    'docusaurus-theme-github-codeblock',
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/getting-started',
+            from: ['/tutorial/getting-started'],
+          },
+          {
+            to: '/',
+            from: ['/concepts', '/concepts/advanced', '/concepts/basic'],
+          },
+        ],
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      { id: 'bolt-js', entryPoints: ['../src/index.ts'], tsconfig: '../tsconfig.json', out: './content/ref' },
+    ],
   ],
   
-],
 
 
   themeConfig:
