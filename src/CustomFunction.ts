@@ -42,7 +42,7 @@ export type AllCustomFunctionMiddlewareArgs<
   T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
 > = T & AllMiddlewareArgs;
 
-export type CustomFunctionOptions = { autoAcknowledge: boolean };
+export type CustomFunctionOptions<AutoAck extends boolean = true> = { autoAcknowledge: AutoAck };
 
 /*
  * Middleware that filters out messages that don't match pattern
@@ -55,23 +55,25 @@ export function matchFunction(callbackId: string): Middleware<SlackCustomFunctio
   };
 }
 
-export function isCustomFunctionOptions(
-  optionOrListener: CustomFunctionOptions | Middleware<CustomFunctionExecuteMiddlewareArgs>,
-): optionOrListener is CustomFunctionOptions {
+export function isCustomFunctionOptions<AutoAck extends boolean = true>(
+  optionOrListener: CustomFunctionOptions<AutoAck> | Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>,
+): optionOrListener is CustomFunctionOptions<AutoAck> {
   return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
 }
-
 /** Class */
-
-export class CustomFunction {
+export class CustomFunction<AutoAck extends boolean = true> {
   /** Function callback_id */
   public callbackId: string;
 
-  private listeners: CustomFunctionMiddleware;
+  private listeners: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[];
 
-  private options: CustomFunctionOptions;
+  private options: CustomFunctionOptions<AutoAck>;
 
-  public constructor(callbackId: string, listeners: CustomFunctionMiddleware, options: CustomFunctionOptions) {
+  public constructor(
+    callbackId: string,
+    listeners: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[],
+    options: CustomFunctionOptions<AutoAck>,
+  ) {
     validate(callbackId, listeners);
 
     this.callbackId = callbackId;
@@ -99,7 +101,10 @@ export class CustomFunction {
 }
 
 /** Helper Functions */
-export function validate(callbackId: string, middleware: CustomFunctionMiddleware): void {
+export function validate<AutoAck extends boolean = true>(
+  callbackId: string,
+  middleware: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[],
+): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'CustomFunction expects a callback_id as the first argument';

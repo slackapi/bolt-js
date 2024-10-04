@@ -522,26 +522,35 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function(callbackId: string, options: CustomFunctionOptions, ...listeners: CustomFunctionMiddleware): this;
-  public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this;
-  public function(
+  public function<AutoAck extends boolean>(
     callbackId: string,
-    ...optionOrListeners: (CustomFunctionOptions | Middleware<CustomFunctionExecuteMiddlewareArgs>)[]
+    options: CustomFunctionOptions,
+    ...listeners: CustomFunctionMiddleware
+  ): this;
+  public function<AutoAck extends boolean>(callbackId: string, ...listeners: CustomFunctionMiddleware): this;
+  public function<AutoAck extends boolean>(
+    callbackId: string,
+    ...optionOrListeners: (CustomFunctionOptions<AutoAck> | Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>)[]
   ): this {
-    const baseOpts: {
-      options: CustomFunctionOptions;
-      listeners: Middleware<CustomFunctionExecuteMiddlewareArgs>[];
-    } = { options: { autoAcknowledge: true }, listeners: [] };
-    const { options, listeners } = optionOrListeners.reduce((args, optionOrListener) => {
-      if (isCustomFunctionOptions(optionOrListener)) {
-        args.options = optionOrListener;
-      } else {
-        args.listeners.push(optionOrListener);
-      }
-      return args;
-    }, baseOpts);
+    const possibleOpts = optionOrListeners[0];
+    let options: CustomFunctionOptions<AutoAck>;
+    if (isCustomFunctionOptions<AutoAck>(possibleOpts)) {
+      options = possibleOpts;
+    } else {
+      // TODO: fix this casting; edge case is if dev specifically sets AutoAck generic as false, this true assignment is invalid according to TS.
+      options = { autoAcknowledge: true } as CustomFunctionOptions<AutoAck>;
+    }
+    const listeners = optionOrListeners.reduce<Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[]>(
+      (acc, cur) => {
+        if (!isCustomFunctionOptions(cur)) {
+          acc.push(cur);
+        }
+        return acc;
+      },
+      [],
+    );
 
-    const fn = new CustomFunction(callbackId, listeners, options);
+    const fn = new CustomFunction<AutoAck>(callbackId, listeners, options);
     this.listeners.push(fn.getListeners());
     return this;
   }
