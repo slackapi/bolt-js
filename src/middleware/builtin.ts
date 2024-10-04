@@ -120,6 +120,16 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs> = async (args) => {
 };
 
 /**
+ * Middleware that auto acknowledges the request received
+ */
+export const autoAcknowledge: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('ack' in args && args.ack !== undefined) {
+    await args.ack();
+  }
+  await args.next();
+};
+
+/**
  * Middleware that checks for matches given constraints
  */
 export function matchConstraints(

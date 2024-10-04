@@ -380,7 +380,6 @@ describe('App middleware processing', () => {
           workedAsExpected = true;
         });
         await fakeReceiver.sendEvent({
-          ack: noopVoid,
           ...createDummyMessageEventMiddlewareArgs(
             {},
             {
@@ -419,7 +418,6 @@ describe('App middleware processing', () => {
 
         // The authorize must be called for other events
         await fakeReceiver.sendEvent({
-          ack: noopVoid,
           ...createDummyAppMentionEventMiddlewareArgs(),
         });
         assert.equal(authorizeCallCount, 1);
@@ -463,7 +461,6 @@ describe('App middleware processing', () => {
 
         // The authorize must be called for other events
         await fakeReceiver.sendEvent({
-          ack: noopVoid,
           ...createDummyAppMentionEventMiddlewareArgs(),
         });
         assert.equal(authorizeCallCount, 1);

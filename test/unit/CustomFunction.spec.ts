@@ -26,33 +26,33 @@ const MOCK_MIDDLEWARE_MULTIPLE = [MOCK_FN, MOCK_FN_2];
 describe('CustomFunction class', () => {
   describe('constructor', () => {
     it('should accept single function as middleware', async () => {
-      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
+      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
       assert.isNotNull(fn);
     });
 
     it('should accept multiple functions as middleware', async () => {
-      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE, {});
+      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE, { autoAcknowledge: true });
       assert.isNotNull(fn);
     });
   });
 
-  describe('getMiddleware', () => {
+  describe('getListeners', () => {
     it('should not call next if a function_executed event', async () => {
       const cbId = 'test_executed_callback_id';
-      const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, {});
-      const middleware = fn.getMiddleware();
+      const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
+      const listeners = fn.getListeners();
       const fakeEditArgs = createFakeFunctionExecutedEvent(cbId);
 
       const fakeNext = sinon.spy();
       fakeEditArgs.next = fakeNext;
 
-      await middleware(fakeEditArgs);
+      await listeners(fakeEditArgs);
 
       assert(fakeNext.notCalled, 'next called!');
     });
 
     it('should call next if valid custom function but mismatched callback_id', async () => {
-      const fn = new CustomFunction('bad_executed_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
+      const fn = new CustomFunction('bad_executed_callback_id', MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
       const middleware = fn.getMiddleware();
       const fakeEditArgs = createFakeFunctionExecutedEvent();
 
@@ -65,7 +65,7 @@ describe('CustomFunction class', () => {
     });
 
     it('should call next if not a function executed event', async () => {
-      const fn = new CustomFunction('test_view_callback_id', MOCK_MIDDLEWARE_SINGLE, {});
+      const fn = new CustomFunction('test_view_callback_id', MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
       const middleware = fn.getMiddleware();
       const fakeViewArgs = createFakeViewEvent() as unknown as SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs;
 
@@ -252,6 +252,7 @@ function createFakeFunctionExecutedEvent(callbackId?: string): AllCustomFunction
     ...base,
   } as const;
   return {
+    ack: () => Promise.resolve(),
     body: {
       api_app_id: 'A1234',
       event,
