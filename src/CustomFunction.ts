@@ -23,11 +23,14 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
-export type CustomFunctionExecuteMiddlewareArgs<AutoAck extends boolean = true> = SlackEventMiddlewareArgs<'function_executed', AutoAck> & {
+export type CustomFunctionExecuteMiddlewareArgs<AutoAck extends boolean = true> = SlackEventMiddlewareArgs<
+  'function_executed',
+  AutoAck
+> & {
   inputs: FunctionExecutedEvent['inputs'];
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
-}
+};
 
 /** Types */
 
@@ -53,7 +56,7 @@ export function matchFunction(callbackId: string): Middleware<SlackCustomFunctio
 }
 
 export function isCustomFunctionOptions(
-  optionOrListener: CustomFunctionOptions |  Middleware<CustomFunctionExecuteMiddlewareArgs>,
+  optionOrListener: CustomFunctionOptions | Middleware<CustomFunctionExecuteMiddlewareArgs>,
 ): optionOrListener is CustomFunctionOptions {
   return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
 }
@@ -96,7 +99,7 @@ export class CustomFunction {
 }
 
 /** Helper Functions */
-export function validate(callbackId: string, middleware: CustomFunctionExecuteMiddleware): void {
+export function validate(callbackId: string, middleware: CustomFunctionMiddleware): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'CustomFunction expects a callback_id as the first argument';

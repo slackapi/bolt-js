@@ -188,7 +188,7 @@ export type ErrorHandler = (error: CodedError) => Promise<void>;
 
 export type ExtendedErrorHandler = (args: ExtendedErrorHandlerArgs) => Promise<void>;
 
-export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {}
+export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler { }
 
 // Used only in this file
 type MessageEventMiddleware<CustomContext extends StringIndexed = StringIndexed> = Middleware<
@@ -522,23 +522,24 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function(callbackId: string, options: CustomFunctionOptions, ...listeners: CustomFunctionMiddleware ): this;
+  public function(callbackId: string, options: CustomFunctionOptions, ...listeners: CustomFunctionMiddleware): this;
   public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this;
   public function(
     callbackId: string,
     ...optionOrListeners: (CustomFunctionOptions | Middleware<CustomFunctionExecuteMiddlewareArgs>)[]
   ): this {
-    const { options, listeners } = optionOrListeners.reduce(
-      (args, optionOrListener) => {
-        if (isCustomFunctionOptions(optionOrListener)) {
-          args.options = optionOrListener;
-        } else {
-          args.listeners.push(optionOrListener);
-        }
-        return args;
-      },
-      { options: { autoAcknowledge: true }, listeners: [] },
-    );
+    const baseOpts: {
+      options: CustomFunctionOptions;
+      listeners: Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+    } = { options: { autoAcknowledge: true }, listeners: [] };
+    const { options, listeners } = optionOrListeners.reduce((args, optionOrListener) => {
+      if (isCustomFunctionOptions(optionOrListener)) {
+        args.options = optionOrListener;
+      } else {
+        args.listeners.push(optionOrListener);
+      }
+      return args;
+    }, baseOpts);
 
     const fn = new CustomFunction(callbackId, listeners, options);
     this.listeners.push(fn.getListeners());
@@ -1090,8 +1091,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
-      const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs;
-      eventListenerArgs.event = eventListenerArgs.payload;
+      const eventListenerArgs = {
+        event: listenerArgs.payload,
+        ...listenerArgs,
+      } as SlackEventMiddlewareArgs;
       if (eventListenerArgs.event.type === 'message') {
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
         messageEventListenerArgs.message = messageEventListenerArgs.payload;
@@ -1172,7 +1175,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
                   context,
                   client,
                   logger: this.logger,
-                  next: () => {},
+                  next: () => { },
                 } as AnyMiddlewareArgs & AllMiddlewareArgs),
             );
           });
@@ -1263,7 +1266,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
         'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
-          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
+        'custom receiver. You can find your Signing Secret in your Slack App Settings.',
       );
     }
     this.logger.debug('Initializing HTTPReceiver');
@@ -1360,9 +1363,9 @@ function runAuthTestForBotToken(
   return authorization.botUserId !== undefined && authorization.botId !== undefined
     ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
     : client.auth.test({ token: authorization.botToken }).then((result) => ({
-        botUserId: result.user_id as string,
-        botId: result.bot_id as string,
-      }));
+      botUserId: result.user_id as string,
+      botId: result.bot_id as string,
+    }));
 }
 
 // the shortened type, which is supposed to be used only in this source file
