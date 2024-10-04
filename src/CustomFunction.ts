@@ -42,7 +42,7 @@ export type AllCustomFunctionMiddlewareArgs<
   T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
 > = T & AllMiddlewareArgs;
 
-export type CustomFunctionOptions<AutoAck extends boolean = true> = { autoAcknowledge: AutoAck };
+export type CustomFunctionOptions<AutoAck extends boolean> = { autoAcknowledge: AutoAck };
 
 /*
  * Middleware that filters out messages that don't match pattern

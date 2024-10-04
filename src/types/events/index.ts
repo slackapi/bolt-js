@@ -10,11 +10,11 @@ export type SlackEventMiddlewareArgs<EventType extends string = string, AutoAck 
   body: EnvelopedEvent<EventFromType<EventType>>;
 } & (EventType extends 'message'
   ? // If this is a message event, add a `message` property
-  { message: EventFromType<EventType> }
+    { message: EventFromType<EventType> }
   : unknown) &
   (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
     ? // If this event contains a channel, add a `say` utility function
-    { say: SayFn }
+      { say: SayFn }
     : unknown) &
   (AutoAck extends true ? unknown : { ack: AckFn<void> });
 
