@@ -6,13 +6,12 @@ import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addApp
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import {
   CustomFunction,
-  type CustomFunctionExecuteMiddlewareArgs,
-  type CustomFunctionOptions,
   type FunctionCompleteFn,
   type FunctionFailFn,
+  type SlackCustomFunctionMiddlewareArgs,
   createFunctionComplete,
   createFunctionFail,
-  isCustomFunctionOptions,
+  isSlackCustomFunctionMiddlewareArgsOptions,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
@@ -75,6 +74,7 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcut,
   SlackShortcutMiddlewareArgs,
@@ -499,7 +499,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param m global middleware function
    */
   public use<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    m: Middleware<AnyMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>,
+    m: Middleware<AnyMiddlewareArgs<{ autoAcknowledge: false }>, AppCustomContext & MiddlewareCustomContext>,
   ): this {
     this.middleware.push(m as Middleware<AnyMiddlewareArgs>);
     return this;
@@ -521,30 +521,30 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function<AutoAck extends boolean>(
+  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
     callbackId: string,
-    options: CustomFunctionOptions<AutoAck>,
-    ...listeners: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[]
+    options: Options,
+    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[]
   ): this;
-  public function<AutoAck extends boolean>(
+  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
     callbackId: string,
-    ...listeners: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[]
+    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[]
   ): this;
-  public function<AutoAck extends boolean>(
+  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
     callbackId: string,
-    ...optionOrListeners: (CustomFunctionOptions<AutoAck> | Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>)[]
+    ...optionOrListeners: (Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>)[]
   ): this {
     // TODO: fix this casting; edge case is if dev specifically sets AutoAck generic as false, this true assignment is invalid according to TS.
-    const options = isCustomFunctionOptions<AutoAck>(optionOrListeners[0])
+    const options = isSlackCustomFunctionMiddlewareArgsOptions<Options>(optionOrListeners[0])
       ? optionOrListeners[0]
-      : ({ autoAcknowledge: true } as CustomFunctionOptions<AutoAck>);
+      : ({ autoAcknowledge: true } as Options);
     const listeners = optionOrListeners.filter(
-      (optionOrListener): optionOrListener is Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>> => {
-        return !isCustomFunctionOptions(optionOrListener);
+      (optionOrListener): optionOrListener is Middleware<SlackCustomFunctionMiddlewareArgs<Options>> => {
+        return !isSlackCustomFunctionMiddlewareArgsOptions<Options>(optionOrListener);
       },
     );
 
-    const fn = new CustomFunction<AutoAck>(callbackId, listeners, options);
+    const fn = new CustomFunction<Options>(callbackId, listeners, options);
     this.listeners.push(fn.getListeners());
     return this;
   }
@@ -1048,18 +1048,28 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
-    const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
-      /** Say function might be set below */
-      say?: SayFn;
-      /** Respond function might be set below */
-      respond?: RespondFn;
-      /** Ack function might be set below */
-      // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
-      ack: AckFn<any>;
-      complete?: FunctionCompleteFn;
-      fail?: FunctionFailFn;
-      inputs?: FunctionInputs;
-    } = {
+    const listenerArgs:
+      | (Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+          /** Say function might be set below */
+          say?: SayFn;
+          /** Respond function might be set below */
+          respond?: RespondFn;
+          /** Ack function might be set below */
+          // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
+          ack: AckFn<any>;
+          complete?: FunctionCompleteFn;
+          fail?: FunctionFailFn;
+          inputs?: FunctionInputs;
+        })
+      | {
+          /** Say function might be set below */
+          say?: SayFn;
+          /** Respond function might be set below */
+          respond?: RespondFn;
+          complete?: FunctionCompleteFn;
+          fail?: FunctionFailFn;
+          inputs?: FunctionInputs;
+        } = {
       body: bodyArg,
       ack,
       payload,

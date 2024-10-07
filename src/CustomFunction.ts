@@ -6,7 +6,13 @@ import {
   CustomFunctionInitializationError,
 } from './errors';
 import { autoAcknowledge, matchEventType, onlyEvents } from './middleware/builtin';
-import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
+import type {
+  AnyMiddlewareArgs,
+  Context,
+  Middleware,
+  SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
+} from './types';
 
 /** Interfaces */
 
@@ -14,6 +20,8 @@ interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
 }
+
+/** Types */
 
 export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
 
@@ -23,26 +31,21 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
-export type CustomFunctionExecuteMiddlewareArgs<AutoAck extends boolean = true> = SlackEventMiddlewareArgs<
-  'function_executed',
-  AutoAck
-> & {
+export type SlackCustomFunctionMiddlewareArgsOptions = { autoAcknowledge: boolean };
+
+export type SlackCustomFunctionMiddlewareArgs<
+  Options extends SlackCustomFunctionMiddlewareArgsOptions = { autoAcknowledge: true },
+> = SlackEventMiddlewareArgs<'function_executed', Options> & {
   inputs: FunctionExecutedEvent['inputs'];
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
 };
 
-/** Types */
-
-export type SlackCustomFunctionMiddlewareArgs = CustomFunctionExecuteMiddlewareArgs;
-
-export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
-
-export type AllCustomFunctionMiddlewareArgs<
-  T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
-> = T & AllMiddlewareArgs;
-
-export type CustomFunctionOptions<AutoAck extends boolean> = { autoAcknowledge: AutoAck };
+export function isSlackCustomFunctionMiddlewareArgsOptions<
+  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
+>(optionOrListener: Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>): optionOrListener is Options {
+  return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
+}
 
 /*
  * Middleware that filters out messages that don't match pattern
@@ -55,24 +58,19 @@ export function matchFunction(callbackId: string): Middleware<SlackCustomFunctio
   };
 }
 
-export function isCustomFunctionOptions<AutoAck extends boolean = true>(
-  optionOrListener: CustomFunctionOptions<AutoAck> | Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>,
-): optionOrListener is CustomFunctionOptions<AutoAck> {
-  return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
-}
 /** Class */
-export class CustomFunction<AutoAck extends boolean = true> {
+export class CustomFunction<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }> {
   /** Function callback_id */
   public callbackId: string;
 
-  private listeners: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[];
+  private listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[];
 
-  private options: CustomFunctionOptions<AutoAck>;
+  private options: Options;
 
   public constructor(
     callbackId: string,
-    listeners: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[],
-    options: CustomFunctionOptions<AutoAck>,
+    listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[],
+    options: Options,
   ) {
     validate(callbackId, listeners);
 
@@ -101,9 +99,9 @@ export class CustomFunction<AutoAck extends boolean = true> {
 }
 
 /** Helper Functions */
-export function validate<AutoAck extends boolean = true>(
+export function validate<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
   callbackId: string,
-  middleware: Middleware<CustomFunctionExecuteMiddlewareArgs<AutoAck>>[],
+  middleware: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[],
 ): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {

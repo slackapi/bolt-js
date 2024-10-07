@@ -9,6 +9,7 @@ import type {
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import { createFakeLogger } from '.';
+import type { SlackCustomFunctionMiddlewareArgs } from '../../../src/CustomFunction';
 import type {
   AckFn,
   AllMiddlewareArgs,
@@ -27,6 +28,7 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
@@ -81,7 +83,6 @@ export function createDummyAppHomeOpenedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
-    ack,
   };
 }
 
@@ -110,7 +111,6 @@ export function createDummyMemberChannelEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
-    ack,
   };
 }
 
@@ -141,7 +141,6 @@ export function createDummyReactionAddedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
-    ack,
   };
 }
 
@@ -173,7 +172,6 @@ export function createDummyMessageEventMiddlewareArgs(
     message: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
-    ack,
   };
 }
 
@@ -198,7 +196,6 @@ export function createDummyAppMentionEventMiddlewareArgs(
     event: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
-    ack,
   };
 }
 
@@ -268,6 +265,82 @@ export function createDummyBlockActionEventMiddlewareArgs(
     say,
     ack,
   };
+}
+
+export function createDummyCustomFunctionMiddlewareArgs<Options extends SlackEventMiddlewareArgsOptions>(
+  callbackId = 'reverse',
+  options: Options = { autoAcknowledge: true } as Options,
+): SlackCustomFunctionMiddlewareArgs<Options> {
+  const inputs = { stringToReverse: 'hello' };
+  const testFunction = {
+    id: 'Fn111',
+    callback_id: callbackId,
+    title: callbackId,
+    description: 'Takes a string and reverses it',
+    type: 'app',
+    input_parameters: [
+      {
+        type: 'string',
+        name: 'stringToReverse',
+        description: 'The string to reverse',
+        title: 'String To Reverse',
+        is_required: true,
+      },
+    ],
+    output_parameters: [
+      {
+        type: 'string',
+        name: 'reverseString',
+        description: 'The string in reverse',
+        title: 'Reverse String',
+        is_required: true,
+      },
+    ],
+    app_id: 'A111',
+    date_updated: 1659054991,
+    date_deleted: 0,
+    date_created: 1725987754,
+  };
+
+  const event = {
+    type: 'function_executed',
+    function: testFunction,
+    inputs,
+    function_execution_id: 'Fx111',
+    workflow_execution_id: 'Wf111',
+    event_ts: '1659055013.509853',
+    bot_access_token: 'xwfp-valid',
+  } as const;
+
+  const body = {
+    token: 'verification_token',
+    team_id: 'T111',
+    api_app_id: 'A111',
+    event,
+    event_id: 'Ev111',
+    event_time: 1659055013,
+    type: 'event_callback',
+  } as const;
+
+  if (options.autoAcknowledge) {
+    return {
+      ack: () => Promise.resolve(),
+      body,
+      complete: () => Promise.resolve({ ok: true }),
+      event,
+      fail: () => Promise.resolve({ ok: true }),
+      inputs,
+      payload: event,
+    };
+  }
+  return {
+    body,
+    complete: () => Promise.resolve({ ok: true }),
+    event,
+    fail: () => Promise.resolve({ ok: true }),
+    inputs,
+    payload: event,
+  } as SlackCustomFunctionMiddlewareArgs<Options>;
 }
 
 interface DummyBlockSuggestionOverride {

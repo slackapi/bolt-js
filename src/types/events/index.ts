@@ -1,10 +1,15 @@
 import type { SlackEvent } from '@slack/types';
 import type { AckFn, SayFn, StringIndexed } from '../utilities';
 
+export type SlackEventMiddlewareArgsOptions = { autoAcknowledge: boolean };
+
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
  */
-export type SlackEventMiddlewareArgs<EventType extends string = string, AutoAck extends boolean = true> = {
+export type SlackEventMiddlewareArgs<
+  EventType extends string = string,
+  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
+> = {
   payload: EventFromType<EventType>;
   event: EventFromType<EventType>;
   body: EnvelopedEvent<EventFromType<EventType>>;
@@ -16,7 +21,7 @@ export type SlackEventMiddlewareArgs<EventType extends string = string, AutoAck 
     ? // If this event contains a channel, add a `say` utility function
       { say: SayFn }
     : unknown) &
-  (AutoAck extends true ? unknown : { ack: AckFn<void> });
+  (Options['autoAcknowledge'] extends true ? unknown : { ack: AckFn<void> });
 
 export interface BaseSlackEvent<T extends string = string> {
   type: T;
