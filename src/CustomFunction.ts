@@ -41,9 +41,9 @@ export type SlackCustomFunctionMiddlewareArgs<
   fail: FunctionFailFn;
 };
 
-export function isSlackCustomFunctionMiddlewareArgsOptions<
-  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
->(optionOrListener: Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>): optionOrListener is Options {
+export function isSlackCustomFunctionMiddlewareArgsOptions<Options extends SlackEventMiddlewareArgsOptions>(
+  optionOrListener: Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>,
+): optionOrListener is Options {
   return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
 }
 

@@ -986,7 +986,7 @@ describe('App middleware processing', () => {
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
         app.use(async ({ ack, next }) => {
-          if (ack) {
+          if (ack !== noopVoid) {
             // this should be called even if app.view listeners do not exist
             await ack();
             return;

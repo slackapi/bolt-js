@@ -1048,28 +1048,18 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
     // NOTE: the following doesn't work because... distributive?
     // const listenerArgs: Partial<AnyMiddlewareArgs> = {
-    const listenerArgs:
-      | (Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
-          /** Say function might be set below */
-          say?: SayFn;
-          /** Respond function might be set below */
-          respond?: RespondFn;
-          /** Ack function might be set below */
-          // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
-          ack: AckFn<any>;
-          complete?: FunctionCompleteFn;
-          fail?: FunctionFailFn;
-          inputs?: FunctionInputs;
-        })
-      | {
-          /** Say function might be set below */
-          say?: SayFn;
-          /** Respond function might be set below */
-          respond?: RespondFn;
-          complete?: FunctionCompleteFn;
-          fail?: FunctionFailFn;
-          inputs?: FunctionInputs;
-        } = {
+    const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
+      /** Say function might be set below */
+      say?: SayFn;
+      /** Respond function might be set below */
+      respond?: RespondFn;
+      /** Ack function might be set below */
+      // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
+      ack: AckFn<any>;
+      complete?: FunctionCompleteFn;
+      fail?: FunctionFailFn;
+      inputs?: FunctionInputs;
+    } = {
       body: bodyArg,
       ack,
       payload,
@@ -1104,10 +1094,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
-      const eventListenerArgs = {
-        event: listenerArgs.payload,
-        ...listenerArgs,
-      } as SlackEventMiddlewareArgs;
+      // TODO: assignment by reference to set properties of listenerArgs is error prone, there is a better way to do this!
+      const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
+      eventListenerArgs.event = eventListenerArgs.payload;
       if (eventListenerArgs.event.type === 'message') {
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
         messageEventListenerArgs.message = messageEventListenerArgs.payload;

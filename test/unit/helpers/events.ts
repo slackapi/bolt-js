@@ -267,15 +267,20 @@ export function createDummyBlockActionEventMiddlewareArgs(
   };
 }
 
-export function createDummyCustomFunctionMiddlewareArgs<Options extends SlackEventMiddlewareArgsOptions>(
-  callbackId = 'reverse',
+export function createDummyCustomFunctionMiddlewareArgs<
+  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
+>(
+  data: {
+    callbackId: string;
+    inputs?: Record<string, string | number | boolean>;
+  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' } },
   options: Options = { autoAcknowledge: true } as Options,
 ): SlackCustomFunctionMiddlewareArgs<Options> {
-  const inputs = { stringToReverse: 'hello' };
+  data.inputs = data.inputs ? data.inputs : { stringToReverse: 'hello' };
   const testFunction = {
     id: 'Fn111',
-    callback_id: callbackId,
-    title: callbackId,
+    callback_id: data.callbackId,
+    title: data.callbackId,
     description: 'Takes a string and reverses it',
     type: 'app',
     input_parameters: [
@@ -305,7 +310,7 @@ export function createDummyCustomFunctionMiddlewareArgs<Options extends SlackEve
   const event = {
     type: 'function_executed',
     function: testFunction,
-    inputs,
+    inputs: data.inputs,
     function_execution_id: 'Fx111',
     workflow_execution_id: 'Wf111',
     event_ts: '1659055013.509853',
@@ -324,23 +329,23 @@ export function createDummyCustomFunctionMiddlewareArgs<Options extends SlackEve
 
   if (options.autoAcknowledge) {
     return {
-      ack: () => Promise.resolve(),
       body,
       complete: () => Promise.resolve({ ok: true }),
       event,
       fail: () => Promise.resolve({ ok: true }),
-      inputs,
+      inputs: data.inputs,
       payload: event,
-    };
+    } as SlackCustomFunctionMiddlewareArgs<Options>;
   }
   return {
+    ack: () => Promise.resolve(),
     body,
     complete: () => Promise.resolve({ ok: true }),
     event,
     fail: () => Promise.resolve({ ok: true }),
-    inputs,
+    inputs: data.inputs,
     payload: event,
-  } as SlackCustomFunctionMiddlewareArgs<Options>;
+  };
 }
 
 interface DummyBlockSuggestionOverride {
