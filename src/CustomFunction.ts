@@ -31,10 +31,8 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
-export type SlackCustomFunctionMiddlewareArgsOptions = { autoAcknowledge: boolean };
-
 export type SlackCustomFunctionMiddlewareArgs<
-  Options extends SlackCustomFunctionMiddlewareArgsOptions = { autoAcknowledge: true },
+  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
 > = SlackEventMiddlewareArgs<'function_executed', Options> & {
   inputs: FunctionExecutedEvent['inputs'];
   complete: FunctionCompleteFn;
