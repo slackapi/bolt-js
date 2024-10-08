@@ -1094,7 +1094,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
-      // TODO: assignment by reference to set properties of listenerArgs is error prone, there is a better way to do this!
+      // TODO: assigning eventListenerArgs by reference to set properties of listenerArgs is error prone, there should be a better way to do this!
       const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
       eventListenerArgs.event = eventListenerArgs.payload;
       if (eventListenerArgs.event.type === 'message') {
