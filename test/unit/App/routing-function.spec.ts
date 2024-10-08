@@ -79,5 +79,33 @@ describe('App function() routing', () => {
       });
       sinon.assert.called(testHandler);
     });
+
+    it('should route a function executed event to a handler and auto ack by default', async () => {
+      app.function('my_id', fakeHandler);
+      const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
+      let isAck = false;
+      await fakeReceiver.sendEvent({
+        ack: async () => {
+          isAck = true;
+        },
+        body: args.body,
+      });
+      sinon.assert.called(fakeHandler);
+      assert.isTrue(isAck);
+    });
+
+    it('should route a function executed event to a handler and NOT auto ack if autoAcknowledge is false', async () => {
+      app.function('my_id', { autoAcknowledge: false }, fakeHandler);
+      const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
+      let isAck = false;
+      await fakeReceiver.sendEvent({
+        ack: async () => {
+          isAck = true;
+        },
+        body: args.body,
+      });
+      sinon.assert.called(fakeHandler);
+      assert.isFalse(isAck);
+    });
   });
 });
