@@ -271,12 +271,14 @@ export function createDummyCustomFunctionMiddlewareArgs<
   Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
 >(
   data: {
-    callbackId: string;
+    callbackId?: string;
     inputs?: Record<string, string | number | boolean>;
-  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' } },
-  options: Options = { autoAcknowledge: true } as Options,
+    options?: Options;
+  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' }, options: { autoAcknowledge: true } as Options },
 ): SlackCustomFunctionMiddlewareArgs<Options> {
+  data.callbackId = data.callbackId ? data.callbackId : 'reverse';
   data.inputs = data.inputs ? data.inputs : { stringToReverse: 'hello' };
+  data.options = data.options ? data.options : ({ autoAcknowledge: true } as Options);
   const testFunction = {
     id: 'Fn111',
     callback_id: data.callbackId,
@@ -327,7 +329,7 @@ export function createDummyCustomFunctionMiddlewareArgs<
     type: 'event_callback',
   } as const;
 
-  if (options.autoAcknowledge) {
+  if (data.options.autoAcknowledge) {
     return {
       body,
       complete: () => Promise.resolve({ ok: true }),

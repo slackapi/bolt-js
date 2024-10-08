@@ -48,7 +48,10 @@ describe('App function() routing', () => {
   describe('for function executed events', () => {
     it('should route a function executed event to a handler registered with `function(string)` that matches the callback ID', async () => {
       app.function('my_id', fakeHandler);
-      const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' }, { autoAcknowledge: false });
+      const args = createDummyCustomFunctionMiddlewareArgs({
+        callbackId: 'my_id',
+        options: { autoAcknowledge: false },
+      });
       await fakeReceiver.sendEvent({
         ack: args.ack,
         body: args.body,
@@ -58,16 +61,18 @@ describe('App function() routing', () => {
 
     it('should route a function executed event to a handler with the proper arguments', async () => {
       const testInputs = { test: true };
-      const testHandler = sinon.spy(async ({ inputs, complete, fail }) => {
-        assert(inputs === testInputs);
-        assert(typeof complete === 'function');
-        assert(typeof fail === 'function');
+      const testHandler = sinon.spy(async ({ inputs, complete, fail, client }) => {
+        assert.equal(inputs, testInputs);
+        assert.typeOf(complete, 'function');
+        assert.typeOf(fail, 'function');
+        assert.equal(client.token, 'xwfp-valid');
       });
       app.function('my_id', testHandler);
-      const args = createDummyCustomFunctionMiddlewareArgs(
-        { callbackId: 'my_id', inputs: testInputs },
-        { autoAcknowledge: false },
-      );
+      const args = createDummyCustomFunctionMiddlewareArgs({
+        callbackId: 'my_id',
+        inputs: testInputs,
+        options: { autoAcknowledge: false },
+      });
       await fakeReceiver.sendEvent({
         ack: args.ack,
         body: args.body,
