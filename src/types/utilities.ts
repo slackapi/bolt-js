@@ -1,4 +1,6 @@
 import type { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
+import type { SlackEventMiddlewareArgs, SlackEventMiddlewareArgsOptions } from './events';
+import type { Middleware } from './middleware';
 // TODO: breaking change: remove, unnecessary abstraction, just use Record directly
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
@@ -43,3 +45,10 @@ export type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'chann
 export type RespondFn = (message: string | RespondArguments) => Promise<any>;
 
 export type AckFn<Response> = (response?: Response) => Promise<void>;
+
+export function isSlackEventMiddlewareArgsOptions<
+  Options extends SlackEventMiddlewareArgsOptions,
+  EventMiddlewareArgs extends SlackEventMiddlewareArgs,
+>(optionOrListener: Options | Middleware<EventMiddlewareArgs>): optionOrListener is Options {
+  return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
+}

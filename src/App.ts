@@ -11,7 +11,6 @@ import {
   type SlackCustomFunctionMiddlewareArgs,
   createFunctionComplete,
   createFunctionFail,
-  isSlackCustomFunctionMiddlewareArgsOptions,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
@@ -86,7 +85,7 @@ import type {
   WorkflowStepEdit,
 } from './types';
 import { type AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
-import { type StringIndexed, isRejected } from './types/utilities';
+import { type StringIndexed, isRejected, isSlackEventMiddlewareArgsOptions } from './types/utilities';
 const packageJson = require('../package.json');
 
 export type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from './types';
@@ -535,12 +534,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     ...optionOrListeners: (Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>)[]
   ): this {
     // TODO: fix this casting; edge case is if dev specifically sets AutoAck generic as false, this true assignment is invalid according to TS.
-    const options = isSlackCustomFunctionMiddlewareArgsOptions<Options>(optionOrListeners[0])
+    const options = isSlackEventMiddlewareArgsOptions(optionOrListeners[0])
       ? optionOrListeners[0]
       : ({ autoAcknowledge: true } as Options);
     const listeners = optionOrListeners.filter(
       (optionOrListener): optionOrListener is Middleware<SlackCustomFunctionMiddlewareArgs<Options>> => {
-        return !isSlackCustomFunctionMiddlewareArgsOptions<Options>(optionOrListener);
+        return !isSlackEventMiddlewareArgsOptions(optionOrListener);
       },
     );
 

@@ -41,12 +41,6 @@ export type SlackCustomFunctionMiddlewareArgs<
   fail: FunctionFailFn;
 };
 
-export function isSlackCustomFunctionMiddlewareArgsOptions<Options extends SlackEventMiddlewareArgsOptions>(
-  optionOrListener: Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>,
-): optionOrListener is Options {
-  return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
-}
-
 /*
  * Middleware that filters out function scoped events that do not match the provided callback ID
  */

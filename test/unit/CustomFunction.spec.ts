@@ -6,7 +6,6 @@ import {
   type SlackCustomFunctionMiddlewareArgs,
   createFunctionComplete,
   createFunctionFail,
-  isSlackCustomFunctionMiddlewareArgsOptions,
   matchFunction,
   validate,
 } from '../../src/CustomFunction';
@@ -90,18 +89,6 @@ describe('CustomFunction', () => {
       const validationFn = () => validate('callback_id', badMiddleware);
       const expectedMsg = 'All CustomFunction middleware must be functions';
       assert.throws(validationFn, CustomFunctionInitializationError, expectedMsg);
-    });
-  });
-
-  describe(isSlackCustomFunctionMiddlewareArgsOptions.name, () => {
-    it('should return true if object is SlackCustomFunctionMiddlewareArgsOptions', async () => {
-      const actual = isSlackCustomFunctionMiddlewareArgsOptions({ autoAcknowledge: true });
-      assert.isTrue(actual);
-    });
-
-    it('should return false if object is Middleware', async () => {
-      const actual = isSlackCustomFunctionMiddlewareArgsOptions(async () => {});
-      assert.isFalse(actual);
     });
   });
 
