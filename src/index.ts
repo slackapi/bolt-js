@@ -74,3 +74,4 @@ export {
 } from '@slack/oauth';
 
 export * as types from '@slack/types';
+export * as webApi from '@slack/web-api';
