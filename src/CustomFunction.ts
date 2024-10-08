@@ -48,7 +48,7 @@ export function isSlackCustomFunctionMiddlewareArgsOptions<Options extends Slack
 }
 
 /*
- * Middleware that filters out messages that don't match pattern
+ * Middleware that filters out function scoped events that do not match the provided callback ID
  */
 export function matchFunction(callbackId: string): Middleware<SlackCustomFunctionMiddlewareArgs> {
   return async ({ payload, next }) => {
