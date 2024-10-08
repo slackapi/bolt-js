@@ -1,5 +1,5 @@
 import './utils/env';
-import { App, type BlockAction, type types, LogLevel, subtype } from '@slack/bolt';
+import { App, type BlockAction, LogLevel, subtype, type types } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
