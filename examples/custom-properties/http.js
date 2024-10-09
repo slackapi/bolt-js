@@ -6,15 +6,15 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     customPropertiesExtractor: (req) => {
       return {
-        "headers": req.headers,
-        "foo": "bar",
+        headers: req.headers,
+        foo: 'bar',
       };
     },
     // other custom handlers
     dispatchErrorHandler: ({ error, logger, response }) => {
       logger.error(`dispatch error: ${error}`);
       response.writeHead(404);
-      response.write("Something is wrong!");
+      response.write('Something is wrong!');
       response.end();
     },
     processEventErrorHandler: ({ error, logger, response }) => {

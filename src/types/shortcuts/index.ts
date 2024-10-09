@@ -1,6 +1,6 @@
-import { MessageShortcut } from './message-shortcut';
-import { GlobalShortcut } from './global-shortcut';
-import { SayFn, RespondFn, AckFn } from '../utilities';
+import type { AckFn, RespondFn, SayFn } from '../utilities';
+import type { GlobalShortcut } from './global-shortcut';
+import type { MessageShortcut } from './message-shortcut';
 
 // export * from './message-action';
 export * from './global-shortcut';
@@ -11,16 +11,20 @@ export * from './message-shortcut';
  */
 export type SlackShortcut = GlobalShortcut | MessageShortcut;
 
+export interface ShortcutConstraints<S extends SlackShortcut = SlackShortcut> {
+  type?: S['type'];
+  callback_id?: string | RegExp;
+}
+
 /**
  * Arguments which listeners and middleware receive to process a shortcut from Slack.
  *
  * The type parameter `Shortcut` represents the entire JSON-encoded request body from Slack.
  */
-export interface SlackShortcutMiddlewareArgs<Shortcut extends SlackShortcut = SlackShortcut> {
+export type SlackShortcutMiddlewareArgs<Shortcut extends SlackShortcut = SlackShortcut> = {
   payload: Shortcut;
-  shortcut: this['payload'];
-  body: this['payload'];
-  say: Shortcut extends MessageShortcut ? SayFn : undefined;
+  shortcut: Shortcut;
+  body: Shortcut;
   respond: RespondFn;
   ack: AckFn<void>;
-}
+} & (Shortcut extends MessageShortcut ? { say: SayFn } : unknown);

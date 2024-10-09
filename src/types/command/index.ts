@@ -1,5 +1,4 @@
-import { StringIndexed } from '../helpers';
-import { SayFn, RespondFn, RespondArguments, AckFn } from '../utilities';
+import type { AckFn, RespondArguments, RespondFn, SayFn, StringIndexed } from '../utilities';
 
 /**
  * Arguments which listeners and middleware receive to process a slash command from Slack.

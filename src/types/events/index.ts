@@ -1,24 +1,25 @@
-import { SlackEvent } from '@slack/types';
-import { StringIndexed } from '../helpers';
-import { SayFn } from '../utilities';
-
-// TODO: for backwards compatibility; remove at next major (breaking change)
-export * from '@slack/types';
+import type { SlackEvent } from '@slack/types';
+import type { SayFn, StringIndexed } from '../utilities';
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
  */
-export interface SlackEventMiddlewareArgs<EventType extends string = string> {
+export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   payload: EventFromType<EventType>;
-  event: this['payload'];
-  message: EventType extends 'message' ? this['payload'] : undefined;
-  body: EnvelopedEvent<this['payload']>;
-  say: WhenEventHasChannelContext<this['payload'], SayFn>;
-  // Add `ack` as undefined for global middleware in TypeScript
+  event: EventFromType<EventType>;
+  body: EnvelopedEvent<EventFromType<EventType>>;
+  // Add `ack` as undefined for global middleware in TypeScript TODO: but why? spend some time digging into this
   ack?: undefined;
-}
+} & (EventType extends 'message'
+  ? // If this is a message event, add a `message` property
+    { message: EventFromType<EventType> }
+  : unknown) &
+  (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
+    ? // If this event contains a channel, add a `say` utility function
+      { say: SayFn }
+    : unknown);
 
-interface BaseSlackEvent<T extends string = string> {
+export interface BaseSlackEvent<T extends string = string> {
   type: T;
 }
 export type EventTypePattern = string | RegExp;
@@ -38,9 +39,6 @@ export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   type: 'event_callback';
   event_id: string;
   event_time: number;
-  // TODO: the two properties below are being deprecated on Feb 24, 2021
-  authed_users?: string[];
-  authed_teams?: string[];
   is_ext_shared_channel?: boolean;
   authorizations?: Authorization[];
 }
@@ -59,15 +57,12 @@ interface Authorization {
  * When the string matches known event(s) from the `SlackEvent` union, only those types are returned (also as a union).
  * Otherwise, the `BasicSlackEvent<T>` type is returned.
  */
-export type EventFromType<T extends string> = KnownEventFromType<T> extends never ?
-  BaseSlackEvent<T> :
-  KnownEventFromType<T>;
+export type EventFromType<T extends string> = KnownEventFromType<T> extends never
+  ? BaseSlackEvent<T>
+  : KnownEventFromType<T>;
 export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
 
 /**
  * Type function which tests whether or not the given `Event` contains a channel ID context for where the event
  * occurred, and returns `Type` when the test passes. Otherwise this returns `undefined`.
  */
-type WhenEventHasChannelContext<Event, Type> = Event extends { channel: string } | { item: { channel: string } }
-  ? Type
-  : undefined;

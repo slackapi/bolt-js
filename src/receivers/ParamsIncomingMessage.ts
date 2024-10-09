@@ -1,5 +1,5 @@
-import { IncomingMessage } from 'http';
-import { ParamsDictionary } from 'express-serve-static-core';
+import type { IncomingMessage } from 'node:http';
+import type { ParamsDictionary } from 'express-serve-static-core';
 
 export interface ParamsIncomingMessage extends IncomingMessage {
   /**

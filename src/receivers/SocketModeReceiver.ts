@@ -1,23 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { URL } from 'url';
-import { createServer, ServerResponse, Server } from 'http';
-import { SocketModeClient } from '@slack/socket-mode';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
-import { AppsConnectionsOpenResponse } from '@slack/web-api';
-import { match } from 'path-to-regexp';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParamsIncomingMessage } from './ParamsIncomingMessage';
-import App from '../App';
-import { CodedError } from '../errors';
-import { Receiver, ReceiverEvent } from '../types';
-import { StringIndexed } from '../types/helpers';
-import { buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
-import { verifyRedirectOpts } from './verify-redirect-opts';
+import { type Server, type ServerResponse, createServer } from 'node:http';
+import { URL } from 'node:url';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import {
-  SocketModeFunctions as socketModeFunc,
-  SocketModeReceiverProcessEventErrorHandlerArgs,
+  type CallbackOptions,
+  type InstallPathOptions,
+  InstallProvider,
+  type InstallProviderOptions,
+  type InstallURLOptions,
+} from '@slack/oauth';
+import { SocketModeClient } from '@slack/socket-mode';
+import type { AppsConnectionsOpenResponse } from '@slack/web-api';
+import type { ParamsDictionary } from 'express-serve-static-core';
+import { match } from 'path-to-regexp';
+import type App from '../App';
+import type { CodedError } from '../errors';
+import type { Receiver, ReceiverEvent } from '../types';
+import type { StringIndexed } from '../types/utilities';
+import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
+import {
+  type SocketModeReceiverProcessEventErrorHandlerArgs,
+  defaultProcessEventErrorHandler,
 } from './SocketModeFunctions';
+import { type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
@@ -33,6 +38,7 @@ export interface SocketModeReceiverOptions {
   installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
   customRoutes?: CustomRoute[];
+  // biome-ignore lint/suspicious/noExplicitAny: user-provided custom properties can be anything
   customPropertiesExtractor?: (args: any) => StringIndexed;
   processEventErrorHandler?: (args: SocketModeReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 }
@@ -98,7 +104,7 @@ export default class SocketModeReceiver implements Receiver {
     installerOptions = {},
     customRoutes = [],
     customPropertiesExtractor = (_args) => ({}),
-    processEventErrorHandler = socketModeFunc.defaultProcessEventErrorHandler,
+    processEventErrorHandler = defaultProcessEventErrorHandler,
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
@@ -107,11 +113,13 @@ export default class SocketModeReceiver implements Receiver {
       clientOptions: installerOptions.clientOptions,
     });
 
-    this.logger = logger ?? (() => {
-      const defaultLogger = new ConsoleLogger();
-      defaultLogger.setLevel(logLevel);
-      return defaultLogger;
-    })();
+    this.logger =
+      logger ??
+      (() => {
+        const defaultLogger = new ConsoleLogger();
+        defaultLogger.setLevel(logLevel);
+        return defaultLogger;
+      })();
     this.routes = buildReceiverRoutes(customRoutes);
     this.processEventErrorHandler = processEventErrorHandler;
 
@@ -121,9 +129,9 @@ export default class SocketModeReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-       (installerOptions.stateVerification === false || // state store not needed
-         stateSecret !== undefined ||
-          installerOptions.stateStore !== undefined) // user provided state store
+      (installerOptions.stateVerification === false || // state store not needed
+        stateSecret !== undefined ||
+        installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -150,7 +158,7 @@ export default class SocketModeReceiver implements Receiver {
       const installPath = installerOptions.installPath === undefined ? '/slack/install' : installerOptions.installPath;
       this.httpServerPort = installerOptions.port === undefined ? 3000 : installerOptions.port;
       this.httpServer = createServer(async (req, res) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // biome-ignore lint/style/noNonNullAssertion: method should always be defined for an HTTP request right?
         const method = req.method!.toUpperCase();
 
         // Handle OAuth-related requests
@@ -163,8 +171,9 @@ export default class SocketModeReceiver implements Receiver {
             redirectUri,
           };
           // Installation has been initiated
-          const redirectUriPath = installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
-          if (req.url && req.url.startsWith(redirectUriPath)) {
+          const redirectUriPath =
+            installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
+          if (req.url?.startsWith(redirectUriPath)) {
             const { stateVerification, callbackOptions } = installerOptions;
             if (stateVerification === false) {
               // if stateVerification is disabled make install options available to handler
@@ -176,7 +185,7 @@ export default class SocketModeReceiver implements Receiver {
             return;
           }
           // Visiting the installation endpoint
-          if (req.url && req.url.startsWith(installPath)) {
+          if (req.url?.startsWith(installPath)) {
             const { installPathOptions } = installerOptions;
             await this.installer.handleInstallPath(req, res, installPathOptions, installUrlOptions);
             return;

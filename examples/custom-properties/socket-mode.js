@@ -6,11 +6,11 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
     customPropertiesExtractor: ({ type, body }) => {
       return {
-        "socket_mode_payload_type": type,
-        "socket_mode_payload": body,
-        "foo": "bar",
+        socket_mode_payload_type: type,
+        socket_mode_payload: body,
+        foo: 'bar',
       };
-    }
+    },
   }),
 });
 

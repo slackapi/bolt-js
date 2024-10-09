@@ -1,29 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { WorkflowStepExecuteEvent } from '@slack/types';
-import {
-  KnownBlock,
+import type { WorkflowStepExecuteEvent } from '@slack/types';
+import type {
   Block,
+  KnownBlock,
   ViewsOpenResponse,
-  WorkflowsUpdateStepResponse,
   WorkflowsStepCompletedResponse,
   WorkflowsStepFailedResponse,
+  WorkflowsUpdateStepResponse,
 } from '@slack/web-api';
-import {
-  Middleware,
+import { WorkflowStepInitializationError } from './errors';
+import processMiddleware from './middleware/process';
+import type {
   AllMiddlewareArgs,
   AnyMiddlewareArgs,
-  SlackActionMiddlewareArgs,
-  SlackViewMiddlewareArgs,
-  WorkflowStepEdit,
   Context,
+  Middleware,
+  SlackActionMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackViewMiddlewareArgs,
   ViewWorkflowStepSubmitAction,
+  WorkflowStepEdit,
 } from './types';
-import processMiddleware from './middleware/process';
-import { WorkflowStepInitializationError } from './errors';
 
 /** Interfaces */
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface StepConfigureArguments {
   blocks: (KnownBlock | Block)[];
   private_metadata?: string;
@@ -31,16 +33,20 @@ export interface StepConfigureArguments {
   external_id?: string;
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface StepUpdateArguments {
-  inputs?: {
-    [key: string]: {
+  inputs?: Record<
+    string,
+    {
+      // biome-ignore lint/suspicious/noExplicitAny: user-defined workflow inputs could be anything
       value: any;
       skip_variable_replacement?: boolean;
-      variables?: {
-        [key: string]: any;
-      };
-    };
-  };
+      // biome-ignore lint/suspicious/noExplicitAny: user-defined workflow inputs could be anything
+      variables?: Record<string, any>;
+    }
+  >;
   outputs?: {
     name: string;
     type: string;
@@ -50,50 +56,71 @@ export interface StepUpdateArguments {
   step_image_url?: string;
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface StepCompleteArguments {
-  outputs?: {
-    [key: string]: any;
-  };
+  // biome-ignore lint/suspicious/noExplicitAny: user-defined workflow outputs could be anything
+  outputs?: Record<string, any>;
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface StepFailArguments {
   error: {
     message: string;
   };
 }
 
-export interface StepConfigureFn {
-  (params: StepConfigureArguments): Promise<ViewsOpenResponse>;
-}
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
+export type StepConfigureFn = (params: StepConfigureArguments) => Promise<ViewsOpenResponse>;
 
-export interface StepUpdateFn {
-  (params?: StepUpdateArguments): Promise<WorkflowsUpdateStepResponse>;
-}
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
+export type StepUpdateFn = (params?: StepUpdateArguments) => Promise<WorkflowsUpdateStepResponse>;
 
-export interface StepCompleteFn {
-  (params?: StepCompleteArguments): Promise<WorkflowsStepCompletedResponse>;
-}
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
+export type StepCompleteFn = (params?: StepCompleteArguments) => Promise<WorkflowsStepCompletedResponse>;
 
-export interface StepFailFn {
-  (params: StepFailArguments): Promise<WorkflowsStepFailedResponse>;
-}
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
+export type StepFailFn = (params: StepFailArguments) => Promise<WorkflowsStepFailedResponse>;
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface WorkflowStepConfig {
   edit: WorkflowStepEditMiddleware | WorkflowStepEditMiddleware[];
   save: WorkflowStepSaveMiddleware | WorkflowStepSaveMiddleware[];
   execute: WorkflowStepExecuteMiddleware | WorkflowStepExecuteMiddleware[];
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface WorkflowStepEditMiddlewareArgs extends SlackActionMiddlewareArgs<WorkflowStepEdit> {
   step: WorkflowStepEdit['workflow_step'];
   configure: StepConfigureFn;
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface WorkflowStepSaveMiddlewareArgs extends SlackViewMiddlewareArgs<ViewWorkflowStepSubmitAction> {
   step: ViewWorkflowStepSubmitAction['workflow_step'];
   update: StepUpdateFn;
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export interface WorkflowStepExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'workflow_step_execute'> {
   step: WorkflowStepExecuteEvent['workflow_step'];
   complete: StepCompleteFn;
@@ -102,20 +129,38 @@ export interface WorkflowStepExecuteMiddlewareArgs extends SlackEventMiddlewareA
 
 /** Types */
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export type SlackWorkflowStepMiddlewareArgs =
   | WorkflowStepEditMiddlewareArgs
   | WorkflowStepSaveMiddlewareArgs
   | WorkflowStepExecuteMiddlewareArgs;
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export type WorkflowStepEditMiddleware = Middleware<WorkflowStepEditMiddlewareArgs>;
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export type WorkflowStepSaveMiddleware = Middleware<WorkflowStepSaveMiddlewareArgs>;
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export type WorkflowStepExecuteMiddleware = Middleware<WorkflowStepExecuteMiddlewareArgs>;
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export type WorkflowStepMiddleware =
   | WorkflowStepEditMiddleware[]
   | WorkflowStepSaveMiddleware[]
   | WorkflowStepExecuteMiddleware[];
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export type AllWorkflowStepMiddlewareArgs<T extends SlackWorkflowStepMiddlewareArgs = SlackWorkflowStepMiddlewareArgs> =
   T & AllMiddlewareArgs;
 
@@ -123,8 +168,9 @@ export type AllWorkflowStepMiddlewareArgs<T extends SlackWorkflowStepMiddlewareA
 
 const VALID_PAYLOAD_TYPES = new Set(['workflow_step_edit', 'workflow_step', 'workflow_step_execute']);
 
-/** Class */
-
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export class WorkflowStep {
   /** Step callback_id */
   private callbackId: string;
@@ -150,7 +196,7 @@ export class WorkflowStep {
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => {
+    return async (args): Promise<void> => {
       if (isStepEvent(args) && this.matchesConstraints(args)) {
         return this.processEvent(args);
       }
@@ -185,6 +231,9 @@ export class WorkflowStep {
 
 /** Helper Functions */
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export function validate(callbackId: string, config: WorkflowStepConfig): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
@@ -201,11 +250,11 @@ export function validate(callbackId: string, config: WorkflowStepConfig): void {
   // Check for missing required keys
   const requiredKeys: (keyof WorkflowStepConfig)[] = ['save', 'edit', 'execute'];
   const missingKeys: (keyof WorkflowStepConfig)[] = [];
-  requiredKeys.forEach((key) => {
+  for (const key of requiredKeys) {
     if (config[key] === undefined) {
       missingKeys.push(key);
     }
-  });
+  }
 
   if (missingKeys.length > 0) {
     const errorMsg = `WorkflowStep is missing required keys: ${missingKeys.join(', ')}`;
@@ -214,16 +263,18 @@ export function validate(callbackId: string, config: WorkflowStepConfig): void {
 
   // Ensure a callback or an array of callbacks is present
   const requiredFns: (keyof WorkflowStepConfig)[] = ['save', 'edit', 'execute'];
-  requiredFns.forEach((fn) => {
+  for (const fn of requiredFns) {
     if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
       const errorMsg = `WorkflowStep ${fn} property must be a function or an array of functions`;
       throw new WorkflowStepInitializationError(errorMsg);
     }
-  });
+  }
 }
 
 /**
  * `processStepMiddleware()` invokes each callback for lifecycle event
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
  * @param args workflow_step_edit action
  */
 export async function processStepMiddleware(
@@ -236,13 +287,15 @@ export async function processStepMiddleware(
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
-    await processMiddleware(
-      callbacks, args, context, client, logger,
-      async () => lastCallback({ ...args, context, client, logger }),
+    await processMiddleware(callbacks, args, context, client, logger, async () =>
+      lastCallback({ ...args, context, client, logger }),
     );
   }
 }
 
+/** @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 export function isStepEvent(args: AnyMiddlewareArgs): args is AllWorkflowStepMiddlewareArgs {
   return VALID_PAYLOAD_TYPES.has(args.payload.type);
 }
@@ -263,15 +316,16 @@ function createStepConfigure(args: AllWorkflowStepMiddlewareArgs<WorkflowStepEdi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepConfigureFn>[0]) => client.views.open({
-    token,
-    trigger_id,
-    view: {
-      callback_id,
-      type: 'workflow_step',
-      ...params,
-    },
-  });
+  return (params: Parameters<StepConfigureFn>[0]) =>
+    client.views.open({
+      token,
+      trigger_id,
+      view: {
+        callback_id,
+        type: 'workflow_step',
+        ...params,
+      },
+    });
 }
 
 /**
@@ -288,11 +342,12 @@ function createStepUpdate(args: AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMi
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepUpdateFn>[0] = {}) => client.workflows.updateStep({
-    token,
-    workflow_step_edit_id,
-    ...params,
-  });
+  return (params: Parameters<StepUpdateFn>[0] = {}) =>
+    client.workflows.updateStep({
+      token,
+      workflow_step_edit_id,
+      ...params,
+    });
 }
 
 /**
@@ -309,11 +364,12 @@ function createStepComplete(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExec
   } = args;
   const token = selectToken(context);
 
-  return (params: Parameters<StepCompleteFn>[0] = {}) => client.workflows.stepCompleted({
-    token,
-    workflow_step_execute_id,
-    ...params,
-  });
+  return (params: Parameters<StepCompleteFn>[0] = {}) =>
+    client.workflows.stepCompleted({
+      token,
+      workflow_step_execute_id,
+      ...params,
+    });
 }
 
 /**
@@ -345,10 +401,13 @@ function createStepFail(args: AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteM
  *  1. removes the next() passed in from App-level middleware processing
  *    - events will *not* continue down global middleware chain to subsequent listeners
  *  2. augments args with step lifecycle-specific properties/utilities
- * */
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
+ */
 // TODO :: refactor to incorporate a generic parameter
-export function prepareStepArgs(args: any): AllWorkflowStepMiddlewareArgs {
+export function prepareStepArgs(args: AllWorkflowStepMiddlewareArgs): AllWorkflowStepMiddlewareArgs {
   const { next: _next, ...stepArgs } = args;
+  // biome-ignore lint/suspicious/noExplicitAny: need to use any as the cases of the switch that follows dont narrow to the specific required args type. use type predicates for each workflow_step event args in the switch to get rid of this any.
   const preparedArgs: any = { ...stepArgs };
 
   switch (preparedArgs.payload.type) {

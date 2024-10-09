@@ -3,3 +3,5 @@ node_modules/
 .DS_Store
 build/
 .stylelintrc.json
+_site
+Gemfile.lock

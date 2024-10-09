@@ -4,25 +4,25 @@
   "description": "Example app using OAuth",
   "main": "app.js",
   "scripts": {
-    "lint": "eslint --fix --ext .ts src",
-    "build": "npm run lint && tsc -p .",
-    "build:watch": "npm run lint && tsc -w -p .",
+    "build": "tsc -p .",
+    "build:watch": "tsc -w -p .",
     "koa": "npm run build && node dist/koa-main.js",
     "fastify": "npm run build && node dist/fastify-main.js"
   },
   "license": "MIT",
   "dependencies": {
-    "@koa/router": "^10.1.1",
-    "@slack/logger": "^3.0.0",
-    "@slack/oauth": "^2.5.0",
-    "dotenv": "^8.2.0",
-    "fastify": "^3.27.4",
-    "koa": "^2.13.4"
+    "@koa/router": "^13",
+    "@slack/bolt": "^3",
+    "@slack/logger": "^4.0.0",
+    "@slack/oauth": "^3",
+    "dotenv": "^16",
+    "fastify": "^5",
+    "koa": "^2"
   },
   "devDependencies": {
-    "@types/koa__router": "^8.0.11",
-    "@types/node": "^14.14.35",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
+    "@types/koa__router": "^12",
+    "@types/node": "^18",
+    "ts-node": "^10",
+    "typescript": "5.3.3"
   }
 }

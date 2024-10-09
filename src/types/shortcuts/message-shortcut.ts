@@ -3,6 +3,7 @@
  *
  * This describes the entire JSON-encoded body of a request from Slack message actions.
  */
+// TODO: move this to slack/types
 export interface MessageShortcut {
   type: 'message_action';
   callback_id: string;
@@ -15,7 +16,7 @@ export interface MessageShortcut {
     user?: string; // undocumented that this is optional, it won't be there for bot messages
     ts: string;
     text?: string; // undocumented that this is optional, but how could it exist on block kit based messages?
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: TODO: should try to type this more specifically for messages, maybe?
     [key: string]: any;
   };
   user: {

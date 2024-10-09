@@ -6,10 +6,10 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     customPropertiesExtractor: (req) => {
       return {
-        "headers": req.headers,
-        "foo": "bar",
+        headers: req.headers,
+        foo: 'bar',
       };
-    }
+    },
   }),
 });
 

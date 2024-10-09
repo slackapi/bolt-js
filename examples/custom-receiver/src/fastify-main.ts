@@ -1,15 +1,12 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable import/no-internal-modules */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/extensions */
-/* eslint-disable node/no-extraneous-import */
-/* eslint-disable import/no-extraneous-dependencies */
-
-import Fastify from 'fastify';
 import { App, FileInstallationStore } from '@slack/bolt';
-import { FileStateStore } from '@slack/oauth';
 import { ConsoleLogger, LogLevel } from '@slack/logger';
+import { FileStateStore } from '@slack/oauth';
+import Fastify from 'fastify';
 import FastifyReceiver from './FastifyReceiver';
+
+if (!process.env.SLACK_SIGNING_SECRET) {
+  throw new Error('SLACK_SIGNING_SECRET environment variable not found!');
+}
 
 const logger = new ConsoleLogger();
 logger.setLevel(LogLevel.DEBUG);
@@ -21,8 +18,7 @@ fastify.get('/', async (_, res) => {
 });
 
 const receiver = new FastifyReceiver({
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  signingSecret: process.env.SLACK_SIGNING_SECRET!,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   scopes: ['commands', 'chat:write', 'app_mentions:read'],

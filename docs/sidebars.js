@@ -39,7 +39,7 @@ const sidebars = {
         'basic/custom-steps',
         'basic/options',
         'basic/authenticating-oauth',
-        'basic/socket-mode'
+        'basic/socket-mode',
       ],
     },
     {
@@ -62,10 +62,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Deployments',
-      items: [
-        'deployments/aws-lambda',
-        'deployments/heroku'
-      ],
+      items: ['deployments/aws-lambda', 'deployments/heroku'],
     },
     {
       type: 'category',
@@ -86,7 +83,8 @@ const sidebars = {
         'tutorial/getting-started-http',
         'tutorial/hubot-migration',
         'tutorial/migration-v2',
-        'tutorial/migration-v3'
+        'tutorial/migration-v3',
+        'tutorial/migration-v4',
       ],
     },
     { type: 'html', value: '<hr>' },
@@ -107,7 +105,6 @@ const sidebars = {
       label: 'Contributors Guide',
       href: 'https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md',
     },
-
   ],
 };
 

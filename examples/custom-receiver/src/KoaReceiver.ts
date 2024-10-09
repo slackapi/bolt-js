@@ -1,24 +1,22 @@
-/* eslint-disable node/no-extraneous-import */
-/* eslint-disable import/no-extraneous-dependencies */
-import { InstallProvider, CallbackOptions, InstallPathOptions } from '@slack/oauth';
-import { ConsoleLogger, LogLevel, Logger } from '@slack/logger';
+import { type Server, createServer } from 'node:http';
 import Router from '@koa/router';
-import Koa from 'koa';
-import { Server, createServer } from 'http';
 import {
-  App,
-  CodedError,
-  Receiver,
-  ReceiverEvent,
-  ReceiverInconsistentStateError,
-  HTTPModuleFunctions as httpFunc,
+  type App,
+  type BufferedIncomingMessage,
+  type CodedError,
   HTTPResponseAck,
-  InstallProviderOptions,
-  InstallURLOptions,
-  BufferedIncomingMessage,
-  ReceiverProcessEventErrorHandlerArgs,
-  ReceiverUnhandledRequestHandlerArgs,
+  type InstallProviderOptions,
+  type InstallURLOptions,
+  type Receiver,
+  type ReceiverEvent,
+  ReceiverInconsistentStateError,
+  type ReceiverProcessEventErrorHandlerArgs,
+  type ReceiverUnhandledRequestHandlerArgs,
+  HTTPModuleFunctions as httpFunc,
 } from '@slack/bolt';
+import { ConsoleLogger, type LogLevel, type Logger } from '@slack/logger';
+import { type CallbackOptions, type InstallPathOptions, InstallProvider } from '@slack/oauth';
+import Koa from 'koa';
 
 export interface InstallerOptions {
   stateStore?: InstallProviderOptions['stateStore']; // default ClearStateStore
@@ -36,6 +34,11 @@ export interface InstallerOptions {
   authorizationUrl?: InstallProviderOptions['authorizationUrl'];
 }
 
+type CustomPropertiesExtractor = (
+  request: BufferedIncomingMessage,
+  // biome-ignore lint/suspicious/noExplicitAny: custom app properties can be anything
+) => Record<string, any>;
+
 export interface KoaReceiverOptions {
   signingSecret: string | (() => PromiseLike<string>);
   logger?: Logger;
@@ -52,13 +55,8 @@ export interface KoaReceiverOptions {
   installerOptions?: InstallerOptions;
   koa?: Koa;
   router?: Router;
-  customPropertiesExtractor?: (
-    request: BufferedIncomingMessage
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Record<string, any>;
-  processEventErrorHandler?: (
-    args: ReceiverProcessEventErrorHandlerArgs
-  ) => Promise<boolean>;
+  customPropertiesExtractor?: CustomPropertiesExtractor;
+  processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
@@ -79,10 +77,7 @@ export default class KoaReceiver implements Receiver {
 
   private unhandledRequestTimeoutMillis: number;
 
-  private customPropertiesExtractor: (
-    request: BufferedIncomingMessage
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Record<string, any>;
+  private customPropertiesExtractor: CustomPropertiesExtractor;
 
   private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
@@ -103,15 +98,15 @@ export default class KoaReceiver implements Receiver {
   public constructor(options: KoaReceiverOptions) {
     this.signatureVerification = options.signatureVerification ?? true;
     this.signingSecretProvider = options.signingSecret;
-    this.customPropertiesExtractor = options.customPropertiesExtractor !== undefined ?
-      options.customPropertiesExtractor :
-      (_) => ({});
+    this.customPropertiesExtractor =
+      options.customPropertiesExtractor !== undefined ? options.customPropertiesExtractor : (_) => ({});
     this.path = options.path ?? '/slack/events';
     this.unhandledRequestTimeoutMillis = options.unhandledRequestTimeoutMillis ?? 3001;
 
     this.koa = options.koa ?? new Koa();
     this.router = options.router ?? new Router();
-    this.logger = options.logger ??
+    this.logger =
+      options.logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         if (options.logLevel) {
@@ -124,16 +119,10 @@ export default class KoaReceiver implements Receiver {
     this.unhandledRequestHandler = options.unhandledRequestHandler ?? httpFunc.defaultUnhandledRequestHandler;
 
     this.installerOptions = options.installerOptions;
-    if (
-      this.installerOptions &&
-      this.installerOptions.installPath === undefined
-    ) {
+    if (this.installerOptions && this.installerOptions.installPath === undefined) {
       this.installerOptions.installPath = '/slack/install';
     }
-    if (
-      this.installerOptions &&
-      this.installerOptions.redirectUriPath === undefined
-    ) {
+    if (this.installerOptions && this.installerOptions.redirectUriPath === undefined) {
       this.installerOptions.redirectUriPath = '/slack/oauth_redirect';
     }
     if (options.clientId && options.clientSecret) {
@@ -159,9 +148,10 @@ export default class KoaReceiver implements Receiver {
 
   private async signingSecret(): Promise<string> {
     if (this._signingSecret === undefined) {
-      this._signingSecret = typeof this.signingSecretProvider === 'string' ?
-        this.signingSecretProvider :
-        await this.signingSecretProvider();
+      this._signingSecret =
+        typeof this.signingSecretProvider === 'string'
+          ? this.signingSecretProvider
+          : await this.signingSecretProvider();
     }
     return this._signingSecret;
   }
@@ -175,18 +165,10 @@ export default class KoaReceiver implements Receiver {
       this.installerOptions.redirectUriPath
     ) {
       this.router.get(this.installerOptions.installPath, async (ctx) => {
-        await this.installer?.handleInstallPath(
-          ctx.req,
-          ctx.res,
-          this.installerOptions?.installPathOptions,
-        );
+        await this.installer?.handleInstallPath(ctx.req, ctx.res, this.installerOptions?.installPathOptions);
       });
       this.router.get(this.installerOptions.redirectUriPath, async (ctx) => {
-        await this.installer?.handleCallback(
-          ctx.req,
-          ctx.res,
-          this.installerOptions?.callbackOptions,
-        );
+        await this.installer?.handleCallback(ctx.req, ctx.res, this.installerOptions?.callbackOptions);
       });
     }
 
@@ -204,8 +186,7 @@ export default class KoaReceiver implements Receiver {
           req,
         );
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const e = err as any;
+        const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
         } else {
@@ -216,13 +197,12 @@ export default class KoaReceiver implements Receiver {
       }
 
       // Parse request body
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
       let body: any;
       try {
         body = httpFunc.parseHTTPRequestBody(bufferedReq);
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const e = err as any;
+        const e = err as Error;
         this.logger.warn(`Malformed request body: ${e.message}`);
         httpFunc.buildNoBodyResponse(res, 400);
         return;
@@ -282,7 +262,7 @@ export default class KoaReceiver implements Receiver {
     });
   }
 
-  public start(port: number = 3000): Promise<Server> {
+  public start(port = 3000): Promise<Server> {
     // Enable routes
     this.koa.use(this.router.routes()).use(this.router.allowedMethods());
 

@@ -14,6 +14,7 @@ jobs:
         node-version: [18.x, 20.x, 22.x]
         example:
           - examples/getting-started-typescript
+          - examples/custom-receiver
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4

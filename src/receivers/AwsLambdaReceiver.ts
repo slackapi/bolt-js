@@ -1,28 +1,51 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import querystring from 'querystring';
-import crypto from 'crypto';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
+import crypto from 'node:crypto';
+import querystring from 'node:querystring';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import tsscmp from 'tsscmp';
-import App from '../App';
-import { Receiver, ReceiverEvent } from '../types/receiver';
+import type App from '../App';
 import { ReceiverMultipleAckError } from '../errors';
-import { StringIndexed } from '../types/helpers';
+import type { Receiver, ReceiverEvent } from '../types/receiver';
+import type { StringIndexed } from '../types/utilities';
 
-export interface AwsEvent {
+export type AwsEvent = AwsEventV1 | AwsEventV2;
+type AwsEventStringParameters = Record<string, string | undefined>;
+type AwsEventMultiValueStringParameters = Record<string, string[] | undefined>;
+export interface AwsEventV1 {
+  // properties shared w/ v2:
   body: string | null;
-  headers: any;
-  multiValueHeaders: any;
-  httpMethod: string;
+  headers: AwsEventStringParameters;
   isBase64Encoded: boolean;
-  path: string;
-  pathParameters: any | null;
-  queryStringParameters: any | null;
-  multiValueQueryStringParameters: any | null;
-  stageVariables: any | null;
+  pathParameters: AwsEventStringParameters | null;
+  queryStringParameters: AwsEventStringParameters | null;
+  // biome-ignore lint/suspicious/noExplicitAny: request contexts can be anything
   requestContext: any;
+  stageVariables: AwsEventStringParameters | null;
+  // v1-only properties:
+  httpMethod: string;
+  multiValueHeaders: AwsEventMultiValueStringParameters;
+  multiValueQueryStringParameters: AwsEventMultiValueStringParameters;
+  path: string;
   resource: string;
 }
+export interface AwsEventV2 {
+  // properties shared w/ v1:
+  body?: string;
+  headers: AwsEventStringParameters;
+  isBase64Encoded: boolean;
+  pathParameters?: AwsEventStringParameters;
+  queryStringParameters?: AwsEventStringParameters;
+  // biome-ignore lint/suspicious/noExplicitAny: request contexts can be anything
+  requestContext: any;
+  stageVariables?: AwsEventStringParameters;
+  // v2-only properties:
+  cookies?: string[];
+  rawPath: string;
+  rawQueryString: string;
+  routeKey: string;
+  version: string;
+}
 
+// biome-ignore lint/suspicious/noExplicitAny: userland function results can be anything
 export type AwsCallback = (error?: Error | string | null, result?: any) => void;
 
 export interface ReceiverInvalidRequestSignatureHandlerArgs {
@@ -45,6 +68,7 @@ export interface AwsResponse {
   isBase64Encoded?: boolean;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: request context can be anything
 export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
@@ -85,6 +109,7 @@ export interface AwsLambdaReceiverOptions {
    */
   customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
   invalidRequestSignatureHandler?: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
+  unhandledRequestTimeoutMillis?: number;
 }
 
 /*
@@ -98,13 +123,19 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private app?: App;
 
-  private logger: Logger;
+  private _logger: Logger;
+
+  get logger() {
+    return this._logger;
+  }
 
   private signatureVerification: boolean;
 
   private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
 
   private invalidRequestSignatureHandler: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
+
+  private unhandledRequestTimeoutMillis: number;
 
   public constructor({
     signingSecret,
@@ -113,11 +144,14 @@ export default class AwsLambdaReceiver implements Receiver {
     signatureVerification = true,
     customPropertiesExtractor = (_) => ({}),
     invalidRequestSignatureHandler,
+    unhandledRequestTimeoutMillis = 3001,
   }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;
-    this.logger = logger ??
+    this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
+    this._logger =
+      logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -135,9 +169,8 @@ export default class AwsLambdaReceiver implements Receiver {
     this.app = app;
   }
 
-  public start(
-    ..._args: any[]
-  ): Promise<AwsHandler> {
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: what should the REceiver interface here be? probably needs work
+  public start(..._args: any[]): Promise<AwsHandler> {
     return new Promise((resolve, reject) => {
       try {
         const handler = this.toHandler();
@@ -148,25 +181,21 @@ export default class AwsLambdaReceiver implements Receiver {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public stop(
-    ..._args: any[]
-  ): Promise<void> {
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: what should the REceiver interface here be? probably needs work
+  public stop(..._args: any[]): Promise<void> {
     return new Promise((resolve, _reject) => {
       resolve();
     });
   }
 
   public toHandler(): AwsHandler {
-    return async (
-      awsEvent: AwsEvent,
-      _awsContext: any,
-      _awsCallback: AwsCallback,
-    ): Promise<AwsResponse> => {
+    // biome-ignore lint/suspicious/noExplicitAny: request context can be anything
+    return async (awsEvent: AwsEvent, _awsContext: any, _awsCallback: AwsCallback): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
       const rawBody = this.getRawBody(awsEvent);
 
+      // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
       const body: any = this.parseRequestBody(
         rawBody,
         this.getHeaderValue(awsEvent.headers, 'Content-Type'),
@@ -214,14 +243,14 @@ export default class AwsLambdaReceiver implements Receiver {
       const noAckTimeoutId = setTimeout(() => {
         if (!isAcknowledged) {
           this.logger.error(
-            'An incoming event was not acknowledged within 3 seconds. ' +
-              'Ensure that the ack() argument is called in a listener.',
+            `An incoming event was not acknowledged within ${this.unhandledRequestTimeoutMillis} ms. Ensure that the ack() argument is called in a listener.`,
           );
         }
-      }, 3001);
+      }, this.unhandledRequestTimeoutMillis);
 
       // Structure the ReceiverEvent
-      let storedResponse;
+      // biome-ignore lint/suspicious/noExplicitAny: request responses can be anything
+      let storedResponse: any;
       const event: ReceiverEvent = {
         body,
         ack: async (response) => {
@@ -259,12 +288,19 @@ export default class AwsLambdaReceiver implements Receiver {
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         return { statusCode: 500, body: 'Internal server error' };
       }
-      this.logger.info(`No request handler matched the request: ${awsEvent.path}`);
+      // No matching handler; clear ack warning timeout and return a 404.
+      clearTimeout(noAckTimeoutId);
+      let path: string;
+      if ('path' in awsEvent) {
+        path = awsEvent.path;
+      } else {
+        path = awsEvent.rawPath;
+      }
+      this.logger.info(`No request handler matched the request: ${path}`);
       return { statusCode: 404, body: '' };
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private getRawBody(awsEvent: AwsEvent): string {
     if (typeof awsEvent.body === 'undefined' || awsEvent.body == null) {
       return '';
@@ -275,7 +311,7 @@ export default class AwsLambdaReceiver implements Receiver {
     return awsEvent.body;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
   private parseRequestBody(stringBody: string, contentType: string | undefined, logger: Logger): any {
     if (contentType === 'application/x-www-form-urlencoded') {
       const parsedBody = querystring.parse(stringBody);
@@ -298,7 +334,6 @@ export default class AwsLambdaReceiver implements Receiver {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private isValidRequestSignature(
     signingSecret: string,
     body: string,
@@ -326,8 +361,7 @@ export default class AwsLambdaReceiver implements Receiver {
     return true;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  private getHeaderValue(headers: Record<string, any>, key: string): string | undefined {
+  private getHeaderValue(headers: AwsEvent['headers'], key: string): string | undefined {
     const caseInsensitiveKey = Object.keys(headers).find((it) => key.toLowerCase() === it.toLowerCase());
     return caseInsensitiveKey !== undefined ? headers[caseInsensitiveKey] : undefined;
   }
@@ -335,6 +369,8 @@ export default class AwsLambdaReceiver implements Receiver {
   private defaultInvalidRequestSignatureHandler(args: ReceiverInvalidRequestSignatureHandlerArgs): void {
     const { signature, ts } = args;
 
-    this.logger.info(`Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`);
+    this.logger.info(
+      `Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`,
+    );
   }
 }

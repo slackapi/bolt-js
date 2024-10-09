@@ -1,20 +1,20 @@
-import { IncomingMessage, ServerResponse } from 'http';
-import { Logger } from '@slack/logger';
-import { AckFn } from '../types';
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { Logger } from '@slack/logger';
 import { ReceiverMultipleAckError } from '../errors';
-import { HTTPModuleFunctions as httpFunc, ReceiverUnhandledRequestHandlerArgs } from './HTTPModuleFunctions';
+import type { AckFn } from '../types';
+import * as httpFunc from './HTTPModuleFunctions';
 
 export interface AckArgs {
   logger: Logger;
   processBeforeResponse: boolean;
-  unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
-  httpRequest: IncomingMessage,
-  httpResponse: ServerResponse,
+  httpRequest: IncomingMessage;
+  httpResponse: ServerResponse;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type HTTResponseBody = any | string | undefined;
+// biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
+export type HTTResponseBody = any;
 
 export class HTTPResponseAck {
   private logger: Logger;
@@ -23,7 +23,7 @@ export class HTTPResponseAck {
 
   private processBeforeResponse: boolean;
 
-  private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  private unhandledRequestHandler: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
 
   private unhandledRequestTimeoutMillis: number;
 
@@ -33,8 +33,8 @@ export class HTTPResponseAck {
 
   private noAckTimeoutId?: NodeJS.Timeout;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public storedResponse: any | string | undefined;
+  // biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
+  public storedResponse: any;
 
   public constructor(args: AckArgs) {
     this.logger = args.logger;

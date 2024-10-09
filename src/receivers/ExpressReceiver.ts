@@ -1,27 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { createServer, Server, ServerOptions } from 'http';
-import type { IncomingMessage, ServerResponse } from 'http';
-import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
-import { ListenOptions } from 'net';
-import querystring from 'querystring';
-import crypto from 'crypto';
-import express, { Request, Response, Application, RequestHandler, Router, IRouter } from 'express';
+import crypto from 'node:crypto';
+import { type Server, type ServerOptions, createServer } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import {
+  type Server as HTTPSServer,
+  type ServerOptions as HTTPSServerOptions,
+  createServer as createHttpsServer,
+} from 'node:https';
+import type { ListenOptions } from 'node:net';
+import querystring from 'node:querystring';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import {
+  type CallbackOptions,
+  type InstallPathOptions,
+  InstallProvider,
+  type InstallProviderOptions,
+  type InstallURLOptions,
+} from '@slack/oauth';
+import express, {
+  type Request,
+  type Response,
+  type Application,
+  type RequestHandler,
+  Router,
+  type IRouter,
+} from 'express';
 import rawBody from 'raw-body';
 import tsscmp from 'tsscmp';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
-import App from '../App';
-import {
-  ReceiverAuthenticityError,
-  ReceiverInconsistentStateError,
-  CodedError,
-} from '../errors';
-import { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
-import { verifyRedirectOpts } from './verify-redirect-opts';
-import { StringIndexed } from '../types/helpers';
-import { HTTPModuleFunctions as httpFunc, ReceiverDispatchErrorHandlerArgs, ReceiverProcessEventErrorHandlerArgs, ReceiverUnhandledRequestHandlerArgs } from './HTTPModuleFunctions';
+import type App from '../App';
+import { type CodedError, ReceiverAuthenticityError, ReceiverInconsistentStateError } from '../errors';
+import type { AnyMiddlewareArgs, Receiver, ReceiverEvent } from '../types';
+import type { StringIndexed } from '../types/utilities';
+import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -57,10 +68,11 @@ const httpsOptionKeys = [
   'sessionIdContext',
 ];
 
-const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+const missingServerErrorDescription =
+  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 export const respondToSslCheck: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.ssl_check) {
+  if (req.body?.ssl_check) {
     res.send();
     return;
   }
@@ -68,7 +80,7 @@ export const respondToSslCheck: RequestHandler = (req, res, next) => {
 };
 
 export const respondToUrlVerification: RequestHandler = (req, res, next) => {
-  if (req.body && req.body.type && req.body.type === 'url_verification') {
+  if (req.body?.type && req.body.type === 'url_verification') {
     res.json({ challenge: req.body.challenge });
     return;
   }
@@ -82,10 +94,10 @@ export interface ExpressReceiverOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   endpoints?:
-  | string
-  | {
-    [endpointType: string]: string;
-  };
+    | string
+    | {
+        [endpointType: string]: string;
+      };
   signatureVerification?: boolean;
   processBeforeResponse?: boolean;
   clientId?: string;
@@ -98,12 +110,12 @@ export interface ExpressReceiverOptions {
   app?: Application;
   router?: IRouter;
   customPropertiesExtractor?: (request: Request) => StringIndexed;
-  dispatchErrorHandler?: (args: ReceiverDispatchErrorHandlerArgs) => Promise<void>;
-  processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  dispatchErrorHandler?: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => Promise<void>;
+  processEventErrorHandler?: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
   // NOTE: for the compatibility with HTTPResponseAck, this handler is not async
   // If we receive requests to provide async version of this handler,
   // we can add a different name function for it.
-  unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
 }
 
@@ -152,11 +164,11 @@ export default class ExpressReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: Request) => StringIndexed;
 
-  private dispatchErrorHandler: (args: ReceiverDispatchErrorHandlerArgs) => Promise<void>;
+  private dispatchErrorHandler: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => Promise<void>;
 
-  private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  private processEventErrorHandler: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
-  private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  private unhandledRequestHandler: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
 
   private unhandledRequestTimeoutMillis: number;
 
@@ -192,9 +204,9 @@ export default class ExpressReceiver implements Receiver {
     }
 
     this.signatureVerification = signatureVerification;
-    const bodyParser = this.signatureVerification ?
-      buildVerificationBodyParserMiddleware(this.logger, signingSecret) :
-      buildBodyParserMiddleware(this.logger);
+    const bodyParser = this.signatureVerification
+      ? buildVerificationBodyParserMiddleware(this.logger, signingSecret)
+      : buildBodyParserMiddleware(this.logger);
     const expressMiddleware: RequestHandler[] = [
       bodyParser,
       respondToSslCheck,
@@ -205,9 +217,9 @@ export default class ExpressReceiver implements Receiver {
 
     const endpointList = typeof endpoints === 'string' ? [endpoints] : Object.values(endpoints);
     this.router = router !== undefined ? router : Router();
-    endpointList.forEach((endpoint) => {
+    for (const endpoint of endpointList) {
       this.router.post(endpoint, ...expressMiddleware);
-    });
+    }
 
     this.customPropertiesExtractor = customPropertiesExtractor;
     this.dispatchErrorHandler = dispatchErrorHandler;
@@ -254,9 +266,8 @@ export default class ExpressReceiver implements Receiver {
     // Add OAuth routes to receiver
     if (this.installer !== undefined) {
       const { installer } = this;
-      const redirectUriPath = installerOptions.redirectUriPath === undefined ?
-        '/slack/oauth_redirect' :
-        installerOptions.redirectUriPath;
+      const redirectUriPath =
+        installerOptions.redirectUriPath === undefined ? '/slack/oauth_redirect' : installerOptions.redirectUriPath;
       const { callbackOptions, stateVerification } = installerOptions;
       this.router.use(redirectUriPath, async (req, res) => {
         try {
@@ -355,8 +366,8 @@ export default class ExpressReceiver implements Receiver {
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn:
-      typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
-      typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
+      | typeof createServer<typeof IncomingMessage, typeof ServerResponse>
+      | typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Look for HTTPS-specific serverOptions to determine which factory function to use
     if (Object.keys(serverOptions).filter((k) => httpsOptionKeys.includes(k)).length > 0) {
@@ -412,7 +423,9 @@ export default class ExpressReceiver implements Receiver {
   // generic types
   public stop(): Promise<void> {
     if (this.server === undefined) {
-      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'),
+      );
     }
     return new Promise((resolve, reject) => {
       this.server?.close((error) => {
@@ -444,20 +457,11 @@ function buildVerificationBodyParserMiddleware(
   signingSecret: string | (() => PromiseLike<string>),
 ): RequestHandler {
   return async (req, res, next): Promise<void> => {
-    let stringBody: string;
-    // On some environments like GCP (Google Cloud Platform),
-    // req.body can be pre-parsed and be passed as req.rawBody here
-    const preparsedRawBody: any = (req as any).rawBody;
-    if (preparsedRawBody !== undefined) {
-      stringBody = preparsedRawBody.toString();
-    } else {
-      stringBody = (await rawBody(req)).toString();
-    }
-
     // *** Parsing body ***
     // As the verification passed, parse the body as an object and assign it to req.body
-    // Following middlewares can expect `req.body` is already a parsed one.
+    const stringBody = await parseExpressRequestRawBody(req);
 
+    // Following middlewares can expect `req.body` is already parsed.
     try {
       // This handler parses `req.body` or `req.rawBody`(on Google Could Platform)
       // and overwrites `req.body` with the parsed JS object.
@@ -484,10 +488,10 @@ function buildVerificationBodyParserMiddleware(
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: errors can be anything
 function logError(logger: Logger, message: string, error: any): void {
-  const logMessage = 'code' in error ?
-    `${message} (code: ${error.code}, message: ${error.message})` :
-    `${message} (error: ${error})`;
+  const logMessage =
+    'code' in error ? `${message} (code: ${error.code}, message: ${error.message})` : `${message} (error: ${error})`;
   logger.warn(logMessage);
 }
 
@@ -502,8 +506,7 @@ function verifyRequestSignature(
   }
 
   const ts = Number(requestTimestamp);
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(ts)) {
+  if (Number.isNaN(ts)) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Timestamp is invalid.');
   }
 
@@ -532,6 +535,7 @@ function verifyRequestSignature(
 export function verifySignatureAndParseBody(
   signingSecret: string,
   body: string,
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: headers should only be of a certain type, but some other functions here expect a more complicated type. revisit to type properly later.
   headers: Record<string, any>,
 ): AnyMiddlewareArgs['body'] {
   // *** Request verification ***
@@ -547,16 +551,8 @@ export function verifySignatureAndParseBody(
 }
 
 export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
-  return async (req, res, next): Promise<void> => {
-    let stringBody: string;
-    // On some environments like GCP (Google Cloud Platform),
-    // req.body can be pre-parsed and be passed as req.rawBody here
-    const preparsedRawBody: any = (req as any).rawBody;
-    if (preparsedRawBody !== undefined) {
-      stringBody = preparsedRawBody.toString();
-    } else {
-      stringBody = (await rawBody(req)).toString();
-    }
+  return async (req, res, next) => {
+    const stringBody = await parseExpressRequestRawBody(req);
     try {
       const { 'content-type': contentType } = req.headers;
       req.body = parseRequestBody(stringBody, contentType);
@@ -571,9 +567,9 @@ export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
 function parseRequestBody(stringBody: string, contentType: string | undefined): any {
   if (contentType === 'application/x-www-form-urlencoded') {
-    // TODO: querystring is deprecated since Node.js v17
     const parsedBody = querystring.parse(stringBody);
 
     if (typeof parsedBody.payload === 'string') {
@@ -584,4 +580,13 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
   }
 
   return JSON.parse(stringBody);
+}
+
+// On some environments like GCP (Google Cloud Platform),
+// req.body can be pre-parsed and be passed as req.rawBody
+async function parseExpressRequestRawBody(req: Parameters<RequestHandler>[0]): Promise<string> {
+  if ('rawBody' in req && req.rawBody) {
+    return Promise.resolve(req.rawBody.toString());
+  }
+  return (await rawBody(req)).toString();
 }

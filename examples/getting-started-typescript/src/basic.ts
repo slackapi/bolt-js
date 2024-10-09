@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-/* eslint-disable import/no-internal-modules */
 import './utils/env';
-import { App, LogLevel, subtype, BotMessageEvent, BlockAction } from '@slack/bolt';
+import { App, type BlockAction, LogLevel, subtype, type types } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -25,7 +22,7 @@ app.message(':wave:', async ({ message, say }) => {
  */
 // Listens for messages containing "knock knock" and responds with an italicized "who's there?"
 app.message('knock knock', async ({ say }) => {
-  await say('_Who\'s there?_');
+  await say("_Who's there?_");
 });
 
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
@@ -35,22 +32,24 @@ app.event('reaction_added', async ({ event, client }) => {
     await client.chat.postMessage({
       text: 'Pick a reminder date',
       channel: event.item.channel,
-      blocks: [{
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'Pick a date for me to remind you',
-        },
-        accessory: {
-          type: 'datepicker',
-          action_id: 'datepicker_remind',
-          initial_date: '2019-04-28',
-          placeholder: {
-            type: 'plain_text',
-            text: 'Select a date',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'Pick a date for me to remind you',
+          },
+          accessory: {
+            type: 'datepicker',
+            action_id: 'datepicker_remind',
+            initial_date: '2019-04-28',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+            },
           },
         },
-      }],
+      ],
     });
   }
 });
@@ -75,7 +74,8 @@ app.event('team_join', async ({ event, client, logger }) => {
 });
 
 app.message(subtype('bot_message'), async ({ message, logger }) => {
-  const botMessage = (message as BotMessageEvent);
+  // TODO: the need to cast here is due to https://github.com/slackapi/bolt-js/issues/796
+  const botMessage = message as types.BotMessageEvent;
   logger.info(`The bot user ${botMessage.user} said ${botMessage.text}`);
 });
 
@@ -110,32 +110,30 @@ app.action('approve_button', async ({ ack }) => {
 
 // Your listener function will only be called when the action_id matches 'select_user'
 // AND the block_id matches 'assign_ticket'
-app.action<BlockAction>({ action_id: 'select_user', block_id: 'assign_ticket' },
+app.action<BlockAction>(
+  { action_id: 'select_user', block_id: 'assign_ticket' },
   async ({ body, client, ack, logger }) => {
     await ack();
     try {
       // Make sure the event is not in a view
-      if (body.message) {
+      if (body.message && body.channel) {
         await client.reactions.add({
           name: 'white_check_mark',
-          timestamp: body.message?.ts,
-          channel: body.channel?.id,
+          timestamp: body.message.ts,
+          channel: body.channel.id, // if the body has a message, we know it has a channel, too.
         });
       }
     } catch (error) {
       logger.error(error);
     }
-  });
+  },
+);
 
 // Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered
-app.action('approve_button', async ({ ack, say }) => {
+app.action<BlockAction>('approve_button', async ({ ack, say }) => {
   // Acknowledge action request
   await ack();
-  // `say` is possibly undefined because an action could come from a surface where we cannot post message, e.g. a view.
-  // we will use a non-null assertion (!) to tell TypeScript to ignore the fact it may be undefined,
-  // but take care about the originating surface for these events when using these utilities!
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await say!('Request approved 👍');
+  await say('Request approved 👍');
 });
 
 (async () => {

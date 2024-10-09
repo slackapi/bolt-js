@@ -1,40 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { FunctionExecutedEvent } from '@slack/types';
+import type { FunctionExecutedEvent } from '@slack/types';
 import {
+  type FunctionsCompleteErrorResponse,
+  type FunctionsCompleteSuccessResponse,
   WebClient,
-  FunctionsCompleteErrorResponse,
-  FunctionsCompleteSuccessResponse,
-  WebClientOptions,
+  type WebClientOptions,
 } from '@slack/web-api';
 import {
-  Middleware,
-  AllMiddlewareArgs,
-  AnyMiddlewareArgs,
-  SlackEventMiddlewareArgs,
-  Context,
-} from './types';
+  CustomFunctionCompleteFailError,
+  CustomFunctionCompleteSuccessError,
+  CustomFunctionInitializationError,
+} from './errors';
 import processMiddleware from './middleware/process';
-import { CustomFunctionCompleteFailError, CustomFunctionCompleteSuccessError, CustomFunctionInitializationError } from './errors';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
 
 /** Interfaces */
 
 interface FunctionCompleteArguments {
-  outputs?: {
-    [key: string]: any;
-  };
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
+  outputs?: Record<string, any>;
 }
 
-export interface FunctionCompleteFn {
-  (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
-}
+export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
 
 interface FunctionFailArguments {
   error: string;
 }
 
-export interface FunctionFailFn {
-  (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
-}
+export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
 export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
   inputs: FunctionExecutedEvent['inputs'];
@@ -50,8 +42,9 @@ type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewar
 
 export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
 
-export type AllCustomFunctionMiddlewareArgs
-  <T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs> = T & AllMiddlewareArgs;
+export type AllCustomFunctionMiddlewareArgs<
+  T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
+> = T & AllMiddlewareArgs;
 
 /** Constants */
 
@@ -67,11 +60,7 @@ export class CustomFunction {
 
   private middleware: CustomFunctionMiddleware;
 
-  public constructor(
-    callbackId: string,
-    middleware: CustomFunctionExecuteMiddleware,
-    clientOptions: WebClientOptions,
-  ) {
+  public constructor(callbackId: string, middleware: CustomFunctionExecuteMiddleware, clientOptions: WebClientOptions) {
     validate(callbackId, middleware);
 
     this.appWebClientOptions = clientOptions;
@@ -80,7 +69,7 @@ export class CustomFunction {
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => {
+    return async (args): Promise<void> => {
       if (isFunctionEvent(args) && this.matchesConstraints(args)) {
         return this.processEvent(args);
       }
@@ -114,16 +103,17 @@ export class CustomFunction {
       throw new CustomFunctionCompleteSuccessError(errorMsg);
     }
 
-    return (params: Parameters<FunctionCompleteFn>[0] = {}) => client.functions.completeSuccess({
-      token,
-      outputs: params.outputs || {},
-      function_execution_id: functionExecutionId,
-    });
+    return (params: Parameters<FunctionCompleteFn>[0] = {}) =>
+      client.functions.completeSuccess({
+        token,
+        outputs: params.outputs || {},
+        function_execution_id: functionExecutionId,
+      });
   }
 
   /**
- * Factory for `fail()` utility
- */
+   * Factory for `fail()` utility
+   */
   public static createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
     const token = selectToken(context);
     const { functionExecutionId } = context;
@@ -161,12 +151,12 @@ export function validate(callbackId: string, middleware: CustomFunctionExecuteMi
 
   // Ensure array includes only functions
   if (Array.isArray(middleware)) {
-    middleware.forEach((fn) => {
+    for (const fn of middleware) {
       if (!(fn instanceof Function)) {
         const errorMsg = 'All CustomFunction middleware must be functions';
         throw new CustomFunctionInitializationError(errorMsg);
       }
-    });
+    }
   }
 }
 
@@ -182,9 +172,8 @@ export async function processFunctionMiddleware(
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
-    await processMiddleware(
-      callbacks, args, context, client, logger,
-      async () => lastCallback({ ...args, context, client, logger }),
+    await processMiddleware(callbacks, args, context, client, logger, async () =>
+      lastCallback({ ...args, context, client, logger }),
     );
   }
 }
@@ -205,7 +194,8 @@ function selectToken(context: Context): string | undefined {
  *  2. augments args with step lifecycle-specific properties/utilities
  * */
 export function enrichFunctionArgs(
-  args: AllCustomFunctionMiddlewareArgs, webClientOptions: WebClientOptions,
+  args: AllCustomFunctionMiddlewareArgs,
+  webClientOptions: WebClientOptions,
 ): AllCustomFunctionMiddlewareArgs {
   const { next: _next, ...functionArgs } = args;
   const enrichedArgs = { ...functionArgs };

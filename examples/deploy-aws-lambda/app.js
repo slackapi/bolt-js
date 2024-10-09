@@ -25,29 +25,29 @@ app.message('hello', async ({ message, say }) => {
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: 'button_click',
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
 // Listens for an action from a button click
 app.action('button_click', async ({ body, ack, say }) => {
   await ack();
-  
+
   await say(`<@${body.user.id}> clicked the button`);
 });
 
@@ -61,4 +61,4 @@ app.message('goodbye', async ({ message, say }) => {
 module.exports.handler = async (event, context, callback) => {
   const handler = await awsLambdaReceiver.start();
   return handler(event, context, callback);
-}
+};

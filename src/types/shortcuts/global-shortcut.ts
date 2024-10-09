@@ -3,6 +3,7 @@
  *
  * This describes the entire JSON-encoded body of a request from Slack global shortcuts.
  */
+// TODO: move this to slack/types
 export interface GlobalShortcut {
   type: 'shortcut';
   callback_id: string;
