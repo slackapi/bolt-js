@@ -32,6 +32,7 @@ import {
 import {
   autoAcknowledge,
   ignoreSelf as ignoreSelfMiddleware,
+  isSlackEventMiddlewareArgsOptions,
   matchCommandName,
   matchConstraints,
   matchEventType,
@@ -85,7 +86,7 @@ import type {
   WorkflowStepEdit,
 } from './types';
 import { type AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
-import { type StringIndexed, isRejected, isSlackEventMiddlewareArgsOptions } from './types/utilities';
+import { type StringIndexed, isRejected } from './types/utilities';
 const packageJson = require('../package.json');
 
 export type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from './types';

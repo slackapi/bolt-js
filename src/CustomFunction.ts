@@ -42,7 +42,7 @@ export type SlackCustomFunctionMiddlewareArgs<
 /*
  * Middleware that filters out function scoped events that do not match the provided callback ID
  */
-export function matchFunction(callbackId: string): Middleware<SlackCustomFunctionMiddlewareArgs> {
+export function matchCallbackId(callbackId: string): Middleware<SlackCustomFunctionMiddlewareArgs> {
   return async ({ payload, next }) => {
     if (payload.function.callback_id === callbackId) {
       await next();
@@ -76,7 +76,7 @@ export class CustomFunction<Options extends SlackEventMiddlewareArgsOptions = { 
       return [
         onlyEvents,
         matchEventType('function_executed'),
-        matchFunction(this.callbackId),
+        matchCallbackId(this.callbackId),
         autoAcknowledge,
         ...this.listeners,
       ] as Middleware<AnyMiddlewareArgs>[];
@@ -84,7 +84,7 @@ export class CustomFunction<Options extends SlackEventMiddlewareArgsOptions = { 
     return [
       onlyEvents,
       matchEventType('function_executed'),
-      matchFunction(this.callbackId),
+      matchCallbackId(this.callbackId),
       ...this.listeners,
     ] as Middleware<AnyMiddlewareArgs>[];
   }

@@ -15,6 +15,7 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewAction,
@@ -61,6 +62,13 @@ function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs 
 
 function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
   return isEventArgs(args) && 'message' in args;
+}
+
+export function isSlackEventMiddlewareArgsOptions<
+  Options extends SlackEventMiddlewareArgsOptions,
+  EventMiddlewareArgs extends SlackEventMiddlewareArgs,
+>(optionOrListener: Options | Middleware<EventMiddlewareArgs>): optionOrListener is Options {
+  return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
 }
 
 /**

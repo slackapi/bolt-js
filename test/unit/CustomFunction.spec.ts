@@ -6,7 +6,7 @@ import {
   type SlackCustomFunctionMiddlewareArgs,
   createFunctionComplete,
   createFunctionFail,
-  matchFunction,
+  matchCallbackId,
   validate,
 } from '../../src/CustomFunction';
 import { CustomFunctionInitializationError } from '../../src/errors';
@@ -44,7 +44,7 @@ describe('CustomFunction', () => {
       const listeners = fn.getListeners();
       assert.equal(listeners[0], onlyEvents);
       assert.equal(listeners[1].toString(), matchEventType('function_executed').toString());
-      assert.equal(listeners[2].toString(), matchFunction(cbId).toString());
+      assert.equal(listeners[2].toString(), matchCallbackId(cbId).toString());
       assert.equal(listeners[3], autoAcknowledge);
       assert.equal(listeners[4], MOCK_FN);
     });
@@ -55,7 +55,7 @@ describe('CustomFunction', () => {
       const listeners = fn.getListeners();
       assert.equal(listeners[0], onlyEvents);
       assert.equal(listeners[1].toString(), matchEventType('function_executed').toString());
-      assert.equal(listeners[2].toString(), matchFunction(cbId).toString());
+      assert.equal(listeners[2].toString(), matchCallbackId(cbId).toString());
       assert.equal(listeners[3], MOCK_FN);
     });
   });
