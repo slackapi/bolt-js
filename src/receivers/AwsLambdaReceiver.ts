@@ -109,6 +109,7 @@ export interface AwsLambdaReceiverOptions {
    */
   customPropertiesExtractor?: (request: AwsEvent) => StringIndexed;
   invalidRequestSignatureHandler?: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
+  unhandledRequestTimeoutMillis?: number;
 }
 
 /*
@@ -122,13 +123,19 @@ export default class AwsLambdaReceiver implements Receiver {
 
   private app?: App;
 
-  private logger: Logger;
+  private _logger: Logger;
+
+  get logger() {
+    return this._logger;
+  }
 
   private signatureVerification: boolean;
 
   private customPropertiesExtractor: (request: AwsEvent) => StringIndexed;
 
   private invalidRequestSignatureHandler: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
+
+  private unhandledRequestTimeoutMillis: number;
 
   public constructor({
     signingSecret,
@@ -137,11 +144,13 @@ export default class AwsLambdaReceiver implements Receiver {
     signatureVerification = true,
     customPropertiesExtractor = (_) => ({}),
     invalidRequestSignatureHandler,
+    unhandledRequestTimeoutMillis = 3001,
   }: AwsLambdaReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;
-    this.logger =
+    this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
+    this._logger =
       logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
@@ -234,11 +243,10 @@ export default class AwsLambdaReceiver implements Receiver {
       const noAckTimeoutId = setTimeout(() => {
         if (!isAcknowledged) {
           this.logger.error(
-            'An incoming event was not acknowledged within 3 seconds. ' +
-              'Ensure that the ack() argument is called in a listener.',
+            `An incoming event was not acknowledged within ${this.unhandledRequestTimeoutMillis} ms. Ensure that the ack() argument is called in a listener.`,
           );
         }
-      }, 3001);
+      }, this.unhandledRequestTimeoutMillis);
 
       // Structure the ReceiverEvent
       // biome-ignore lint/suspicious/noExplicitAny: request responses can be anything
@@ -280,6 +288,8 @@ export default class AwsLambdaReceiver implements Receiver {
         this.logger.debug(`Error details: ${err}, storedResponse: ${storedResponse}`);
         return { statusCode: 500, body: 'Internal server error' };
       }
+      // No matching handler; clear ack warning timeout and return a 404.
+      clearTimeout(noAckTimeoutId);
       let path: string;
       if ('path' in awsEvent) {
         path = awsEvent.path;
