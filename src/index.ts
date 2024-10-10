@@ -47,6 +47,14 @@ export {
 } from './receivers/custom-routes';
 
 export {
+  Assistant,
+  AssistantConfig,
+  AssistantThreadContextChangedMiddleware,
+  AssistantThreadStartedMiddleware,
+  AssistantUserMessageMiddleware,
+} from './Assistant';
+
+export {
   WorkflowStep,
   WorkflowStepConfig,
   WorkflowStepEditMiddleware,
