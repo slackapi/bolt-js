@@ -5,7 +5,15 @@ import {
   ChatPostMessageArguments,
 } from '@slack/web-api';
 import processMiddleware from './middleware/process';
-import { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
+import {
+  AllMiddlewareArgs,
+  AnyMiddlewareArgs,
+  Context,
+  MessageMetadataEventPayloadObject,
+  Middleware,
+  SayFn,
+  SlackEventMiddlewareArgs,
+} from './types';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 
 /**
@@ -21,10 +29,26 @@ export interface AssistantConfig {
  * Callback utilities
  */
 interface AssistantUtilityArgs {
+  getThreadContext: GetThreadContextFn;
+  saveThreadContext: SaveThreadContextFn;
   say: SayFn;
   setStatus: SetStatusFn;
   setSuggestedPrompts: SetSuggestedPromptsFn;
   setTitle: SetTitleFn;
+}
+
+export interface GetThreadContextFn {
+  (): Promise<AssistantThreadContext>;
+}
+
+export interface AssistantThreadContext {
+  channel_id?: string;
+  team_id?: string;
+  enterprise_id?: string | null;
+}
+
+export interface SaveThreadContextFn {
+  (): Promise<void>;
 }
 
 export interface SetStatusFn {
@@ -179,6 +203,8 @@ export function prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
   const preparedArgs: AllAssistantMiddlewareArgs = { ...assistantArgs };
 
   preparedArgs.say = createSay(preparedArgs);
+  preparedArgs.getThreadContext = createGetThreadContext(preparedArgs);
+  preparedArgs.saveThreadContext = createSaveThreadContext(preparedArgs);
   preparedArgs.setStatus = createSetStatus(preparedArgs);
   preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
   preparedArgs.setTitle = createSetTitle(preparedArgs);
@@ -212,6 +238,80 @@ function selectToken(context: Context): string | undefined {
 /**
  * Utility functions
  */
+
+// Factory for `getThreadContext()` utility
+function createGetThreadContext(args: AllAssistantMiddlewareArgs): GetThreadContextFn {
+  const {
+    context,
+    client,
+    payload,
+  } = args;
+  const token = selectToken(context);
+  const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
+
+  return async () => {
+    // Retrieve the current thread history
+    const thread = await client.conversations.replies({
+      token,
+      channel,
+      ts: thread_ts,
+      oldest: thread_ts,
+      include_all_metadata: true,
+      limit: 4,
+    });
+
+    if (!thread.messages) return {};
+
+    // Find the first message in the thread that holds the current context using metadata.
+    // See createSaveThreadContext below for a description and explanation for this approach.
+    const initialMsg = thread.messages.find((m) => !m.subtype && m.user === context.botUserId);
+    const threadContext = initialMsg && initialMsg.metadata ? initialMsg.metadata.event_payload : null;
+
+    return threadContext || {};
+  };
+}
+
+// Factory for `saveThreadContext()` utility
+function createSaveThreadContext(args: AllAssistantMiddlewareArgs): SaveThreadContextFn {
+  const {
+    context,
+    client,
+    payload,
+  } = args;
+  const token = selectToken(context);
+  const { channelId: channel, threadTs: thread_ts, context: threadContext } = extractThreadInfo(payload);
+
+  return async () => {
+    // Retrieve first several messages from the current Assistant thread
+    const thread = await client.conversations.replies({
+      token,
+      channel,
+      ts: thread_ts,
+      oldest: thread_ts,
+      include_all_metadata: true,
+      limit: 4,
+    });
+
+    if (!thread.messages) return;
+
+    // Find and update the initial Assistant message with the new context to ensure the
+    // thread always contains the most recent context that user is sending messages from.
+    const initialMsg = thread.messages.find((m) => !m.subtype && m.user === context.botUserId);
+    if (initialMsg) {
+      const { ts, text, blocks } = initialMsg as any; // TODO : TS
+      await client.chat.update({
+        channel,
+        ts,
+        text,
+        blocks,
+        metadata: {
+          event_type: 'assistant_thread_context',
+          event_payload: threadContext as MessageMetadataEventPayloadObject, // TODO : TS
+        },
+      });
+    }
+  };
+}
 
 // Factory for `say()` utility
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
@@ -292,11 +392,13 @@ function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
 function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']) {
   let channelId: string = '';
   let threadTs: string = '';
+  let context: AssistantThreadContext = {};
 
   // assistant_thread_started, asssistant_thread_context_changed
   if ('assistant_thread' in payload) {
     channelId = payload.assistant_thread.channel_id;
     threadTs = payload.assistant_thread.thread_ts;
+    context = payload.assistant_thread.context;
   }
 
   // user message in thread
@@ -315,5 +417,5 @@ function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']) {
     }
   }
 
-  return { channelId, threadTs };
+  return { channelId, threadTs, context };
 }
