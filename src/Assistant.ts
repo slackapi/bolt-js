@@ -9,19 +9,20 @@ import {
   AllMiddlewareArgs,
   AnyMiddlewareArgs,
   Context,
-  MessageMetadataEventPayloadObject,
   Middleware,
   SayFn,
   SlackEventMiddlewareArgs,
 } from './types';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
+import { AssistantThreadContext, AssistantThreadContextStore, DefaultThreadContextStore } from './AssistantThreadContextStore';
 
 /**
  * Configuration object used to instantiate the Assistant
  */
 export interface AssistantConfig {
+  threadContextStore?: AssistantThreadContextStore;
   threadStarted: AssistantThreadStartedMiddleware | AssistantThreadStartedMiddleware[];
-  threadContextChanged: AssistantThreadContextChangedMiddleware | AssistantThreadContextChangedMiddleware[];
+  threadContextChanged?: AssistantThreadContextChangedMiddleware | AssistantThreadContextChangedMiddleware[];
   userMessage: AssistantUserMessageMiddleware | AssistantUserMessageMiddleware[];
 }
 
@@ -38,17 +39,11 @@ interface AssistantUtilityArgs {
 }
 
 export interface GetThreadContextFn {
-  (): Promise<AssistantThreadContext>;
-}
-
-export interface AssistantThreadContext {
-  channel_id?: string;
-  team_id?: string;
-  enterprise_id?: string | null;
+  (args: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext>;
 }
 
 export interface SaveThreadContextFn {
-  (): Promise<void>;
+  (args: AllAssistantMiddlewareArgs): Promise<void>;
 }
 
 export interface SetStatusFn {
@@ -103,6 +98,8 @@ T & AllMiddlewareArgs;
 const ASSISTANT_PAYLOAD_TYPES = new Set(['assistant_thread_started', 'assistant_thread_context_changed', 'message']);
 
 export class Assistant {
+  private threadContextStore: AssistantThreadContextStore;
+
   /** 'assistant_thread_started' */
   private threadStarted: AssistantThreadStartedMiddleware[];
 
@@ -115,8 +112,14 @@ export class Assistant {
   public constructor(config: AssistantConfig) {
     validate(config);
 
-    const { threadStarted, threadContextChanged, userMessage } = config;
+    const {
+      threadContextStore = new DefaultThreadContextStore(),
+      threadStarted,
+      threadContextChanged = threadContextStore.save,
+      userMessage,
+    } = config;
 
+    this.threadContextStore = threadContextStore;
     this.threadStarted = Array.isArray(threadStarted) ? threadStarted : [threadStarted];
     this.threadContextChanged = Array.isArray(threadContextChanged) ? threadContextChanged : [threadContextChanged];
     this.userMessage = Array.isArray(userMessage) ? userMessage : [userMessage];
@@ -131,7 +134,7 @@ export class Assistant {
 
   private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
     const { payload } = args;
-    const assistantArgs = prepareAssistantArgs(args);
+    const assistantArgs = this.prepareAssistantArgs(args);
     const assistantMiddleware = this.getAssistantMiddleware(payload);
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
   }
@@ -147,6 +150,26 @@ export class Assistant {
       default:
         return [];
     }
+  }
+
+  /**
+ * `prepareAssistantArgs()` takes in an assistant's args and:
+ *  1. removes the next() passed in from App-level middleware processing
+ *    - events will *not* continue down global middleware chain to subsequent listeners
+ *  2. augments args with assistant-specific properties/utilities
+ * */
+  private prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
+    const { next: _next, ...assistantArgs } = args;
+    const preparedArgs: AllAssistantMiddlewareArgs = { ...assistantArgs };
+
+    preparedArgs.getThreadContext = () => this.threadContextStore.get(preparedArgs);
+    preparedArgs.saveThreadContext = () => this.threadContextStore.save(preparedArgs);
+    preparedArgs.say = createSay(preparedArgs);
+    preparedArgs.setStatus = createSetStatus(preparedArgs);
+    preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
+    preparedArgs.setTitle = createSetTitle(preparedArgs);
+
+    return preparedArgs;
   }
 }
 
@@ -173,7 +196,7 @@ export function validate(config: AssistantConfig): void {
   }
 
   // Check for missing required keys
-  const requiredKeys: (keyof AssistantConfig)[] = ['threadStarted', 'threadContextChanged', 'userMessage'];
+  const requiredKeys: (keyof AssistantConfig)[] = ['threadStarted', 'userMessage'];
   const missingKeys: (keyof AssistantConfig)[] = [];
   requiredKeys.forEach((key) => { if (config[key] === undefined) missingKeys.push(key); });
 
@@ -183,33 +206,13 @@ export function validate(config: AssistantConfig): void {
   }
 
   // Ensure a callback or an array of callbacks is present
-  const requiredFns: (keyof AssistantConfig)[] = ['threadStarted', 'threadContextChanged', 'userMessage'];
+  const requiredFns: (keyof AssistantConfig)[] = ['threadStarted', 'userMessage'];
   requiredFns.forEach((fn) => {
     if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
       const errorMsg = `Assistant ${fn} property must be a function or an array of functions`;
       throw new AssistantInitializationError(errorMsg);
     }
   });
-}
-
-/**
- * `prepareAssistantArgs()` takes in an assistant's args and:
- *  1. removes the next() passed in from App-level middleware processing
- *    - events will *not* continue down global middleware chain to subsequent listeners
- *  2. augments args with assistant-specific properties/utilities
- * */
-export function prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
-  const { next: _next, ...assistantArgs } = args;
-  const preparedArgs: AllAssistantMiddlewareArgs = { ...assistantArgs };
-
-  preparedArgs.say = createSay(preparedArgs);
-  preparedArgs.getThreadContext = createGetThreadContext(preparedArgs);
-  preparedArgs.saveThreadContext = createSaveThreadContext(preparedArgs);
-  preparedArgs.setStatus = createSetStatus(preparedArgs);
-  preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
-  preparedArgs.setTitle = createSetTitle(preparedArgs);
-
-  return preparedArgs;
 }
 
 /**
@@ -238,80 +241,6 @@ function selectToken(context: Context): string | undefined {
 /**
  * Utility functions
  */
-
-// Factory for `getThreadContext()` utility
-function createGetThreadContext(args: AllAssistantMiddlewareArgs): GetThreadContextFn {
-  const {
-    context,
-    client,
-    payload,
-  } = args;
-  const token = selectToken(context);
-  const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
-
-  return async () => {
-    // Retrieve the current thread history
-    const thread = await client.conversations.replies({
-      token,
-      channel,
-      ts: thread_ts,
-      oldest: thread_ts,
-      include_all_metadata: true,
-      limit: 4,
-    });
-
-    if (!thread.messages) return {};
-
-    // Find the first message in the thread that holds the current context using metadata.
-    // See createSaveThreadContext below for a description and explanation for this approach.
-    const initialMsg = thread.messages.find((m) => !m.subtype && m.user === context.botUserId);
-    const threadContext = initialMsg && initialMsg.metadata ? initialMsg.metadata.event_payload : null;
-
-    return threadContext || {};
-  };
-}
-
-// Factory for `saveThreadContext()` utility
-function createSaveThreadContext(args: AllAssistantMiddlewareArgs): SaveThreadContextFn {
-  const {
-    context,
-    client,
-    payload,
-  } = args;
-  const token = selectToken(context);
-  const { channelId: channel, threadTs: thread_ts, context: threadContext } = extractThreadInfo(payload);
-
-  return async () => {
-    // Retrieve first several messages from the current Assistant thread
-    const thread = await client.conversations.replies({
-      token,
-      channel,
-      ts: thread_ts,
-      oldest: thread_ts,
-      include_all_metadata: true,
-      limit: 4,
-    });
-
-    if (!thread.messages) return;
-
-    // Find and update the initial Assistant message with the new context to ensure the
-    // thread always contains the most recent context that user is sending messages from.
-    const initialMsg = thread.messages.find((m) => !m.subtype && m.user === context.botUserId);
-    if (initialMsg) {
-      const { ts, text, blocks } = initialMsg as any; // TODO : TS
-      await client.chat.update({
-        channel,
-        ts,
-        text,
-        blocks,
-        metadata: {
-          event_type: 'assistant_thread_context',
-          event_payload: threadContext as MessageMetadataEventPayloadObject, // TODO : TS
-        },
-      });
-    }
-  };
-}
 
 // Factory for `say()` utility
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
@@ -389,7 +318,7 @@ function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   });
 }
 
-function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']) {
+export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']): { channelId: string, threadTs: string, context: AssistantThreadContext } {
   let channelId: string = '';
   let threadTs: string = '';
   let context: AssistantThreadContext = {};
