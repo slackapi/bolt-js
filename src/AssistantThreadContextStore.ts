@@ -1,9 +1,17 @@
 import { MessageMetadataEventPayloadObject } from '@slack/types';
-import { AllAssistantMiddlewareArgs, extractThreadInfo, GetThreadContextFn, SaveThreadContextFn } from './Assistant';
+import { AllAssistantMiddlewareArgs, extractThreadInfo } from './Assistant';
 
 export interface AssistantThreadContextStore {
   get: GetThreadContextFn;
   save: SaveThreadContextFn;
+}
+
+export interface GetThreadContextFn {
+  (args: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext>;
+}
+
+export interface SaveThreadContextFn {
+  (args: AllAssistantMiddlewareArgs): Promise<void>;
 }
 
 export interface AssistantThreadContext {
@@ -16,9 +24,6 @@ export class DefaultThreadContextStore implements AssistantThreadContextStore {
   private context: AssistantThreadContext = {};
 
   public async save(args: AllAssistantMiddlewareArgs): Promise<void> {
-    console.log('***********************************************');
-    console.log('DEFAULT THREAD CONTEXT STORE : SAVE CALLED');
-    console.log('***********************************************');
     const { context, client, payload } = args;
     const { channelId: channel, threadTs: thread_ts, context: threadContext } = extractThreadInfo(payload);
 
@@ -50,15 +55,15 @@ export class DefaultThreadContextStore implements AssistantThreadContextStore {
       });
     }
 
-    console.log('context that was saved => ', threadContext);
     this.context = threadContext;
   }
 
   // public async get(args: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext> {
   public async get(args: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext> {
-    console.log('***********************************************');
-    console.log('DEFAULT THREAD CONTEXT STORE : GET CALLED');
-    console.log('***********************************************');
+    if (this.context.channel_id) {
+      return this.context;
+    }
+
     const { context, client, payload } = args;
     const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
 
@@ -78,8 +83,6 @@ export class DefaultThreadContextStore implements AssistantThreadContextStore {
     const initialMsg = thread.messages.find((m) => !m.subtype && m.user === context.botUserId);
     const threadContext = initialMsg && initialMsg.metadata ? initialMsg.metadata.event_payload : null;
 
-    console.log('get: this.context => ', this.context);
     return threadContext || {};
   }
-  // }
 }

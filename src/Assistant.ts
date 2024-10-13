@@ -14,7 +14,13 @@ import {
   SlackEventMiddlewareArgs,
 } from './types';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
-import { AssistantThreadContext, AssistantThreadContextStore, DefaultThreadContextStore } from './AssistantThreadContextStore';
+import {
+  AssistantThreadContext,
+  AssistantThreadContextStore,
+  DefaultThreadContextStore,
+  GetThreadContextFn,
+  SaveThreadContextFn,
+} from './AssistantThreadContextStore';
 
 /**
  * Configuration object used to instantiate the Assistant
@@ -36,14 +42,6 @@ interface AssistantUtilityArgs {
   setStatus: SetStatusFn;
   setSuggestedPrompts: SetSuggestedPromptsFn;
   setTitle: SetTitleFn;
-}
-
-export interface GetThreadContextFn {
-  (args: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext>;
-}
-
-export interface SaveThreadContextFn {
-  (args: AllAssistantMiddlewareArgs): Promise<void>;
 }
 
 export interface SetStatusFn {
@@ -115,7 +113,11 @@ export class Assistant {
     const {
       threadContextStore = new DefaultThreadContextStore(),
       threadStarted,
-      threadContextChanged = threadContextStore.save,
+      // When `threadContextChanged` method is not provided, fallback to
+      // AssistantContextStore's save method. If a custom store has also not
+      // been provided, the default save context-via-metadata approach is used.
+      // See DefaultThreadContextStore for details of this implementation.
+      threadContextChanged = (args) => threadContextStore.save(args),
       userMessage,
     } = config;
 
@@ -126,7 +128,7 @@ export class Assistant {
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => {
+    return async (args): Promise<any> => { // TODO : TS
       if (isAssistantEvent(args) && matchesConstraints(args)) return this.processEvent(args);
       return args.next();
     };
@@ -139,6 +141,9 @@ export class Assistant {
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
   }
 
+  /**
+   * `getAssistantMiddleware()` returns the Assistant instance's middleware
+   */
   private getAssistantMiddleware(payload: AllAssistantMiddlewareArgs['payload']): AssistantMiddleware {
     switch (payload.type) {
       case 'assistant_thread_started':
@@ -153,14 +158,14 @@ export class Assistant {
   }
 
   /**
- * `prepareAssistantArgs()` takes in an assistant's args and:
- *  1. removes the next() passed in from App-level middleware processing
- *    - events will *not* continue down global middleware chain to subsequent listeners
- *  2. augments args with assistant-specific properties/utilities
+ * `prepareAssistantArgs()` takes the event arguments and:
+ *  1. Removes the next() passed in from App-level middleware processing, thus preventing
+ *  events from continuing down the global middleware chain to subsequent listeners
+ *  2. Adds assistant-specific utilities (i.e., helper methods)
  * */
-  private prepareAssistantArgs(args: any): AllAssistantMiddlewareArgs {
+  private prepareAssistantArgs(args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>): AllAssistantMiddlewareArgs {
     const { next: _next, ...assistantArgs } = args;
-    const preparedArgs: AllAssistantMiddlewareArgs = { ...assistantArgs };
+    const preparedArgs = { ...assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'> };
 
     preparedArgs.getThreadContext = () => this.threadContextStore.get(preparedArgs);
     preparedArgs.saveThreadContext = () => this.threadContextStore.save(preparedArgs);
@@ -173,14 +178,26 @@ export class Assistant {
   }
 }
 
+/**
+ * `isAssistantEvent()` determines if incoming event is a supported
+ * Assistant event type.
+ */
 export function isAssistantEvent(args: AnyMiddlewareArgs): boolean {
   return ASSISTANT_PAYLOAD_TYPES.has(args.payload.type);
 }
 
+/**
+ * `matchesConstraints()` determines if the incoming event payload
+ * is related to the Assistant.
+ */
 export function matchesConstraints(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
   return args.payload.type === 'message' ? isAssistantMessage(args.payload) : true;
 }
 
+/**
+ * `isAssistantMessage()` evaluates if the message payload is associated
+ * with the Assistant container.
+ */
 export function isAssistantMessage(payload: AnyMiddlewareArgs['payload']): boolean {
   const isThreadMessage = 'channel' in payload && 'thread_ts' in payload;
   const inAssistantContainer = ('channel_type' in payload && payload.channel_type === 'im') &&
@@ -188,6 +205,9 @@ export function isAssistantMessage(payload: AnyMiddlewareArgs['payload']): boole
   return isThreadMessage && inAssistantContainer;
 }
 
+/**
+ * `validate()` determines if the provided AssistantConfig is a valid configuration.
+ */
 export function validate(config: AssistantConfig): void {
   // Ensure assistant config object is passed in
   if (typeof config !== 'object') {
@@ -216,7 +236,7 @@ export function validate(config: AssistantConfig): void {
 }
 
 /**
- * `processAssistantMiddleware()` invokes each callback for event
+ * `processAssistantMiddleware()` invokes each callback for the given event
  */
 export async function processAssistantMiddleware(
   args: AllAssistantMiddlewareArgs,
@@ -242,7 +262,11 @@ function selectToken(context: Context): string | undefined {
  * Utility functions
  */
 
-// Factory for `say()` utility
+/**
+ * Creates utility `say()` to easily respond to wherever the message
+ * was received. Alias for `postMessage()`.
+ * https://api.slack.com/methods/chat.postMessage
+ */
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const {
     context,
@@ -261,7 +285,10 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   };
 }
 
-// Factory for `setStatus()` utility
+/**
+ * Creates utility `setStatus()` to set the status and indicate active processing.
+ * https://api.slack.com/methods/assistant.threads.setStatus
+ */
 function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const {
     context,
@@ -279,7 +306,10 @@ function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   });
 }
 
-// Factory for `setSuggestedPrompts()` utility
+/**
+ * Creates utility `setSuggestedPrompts()` to provides prompts for the user to select from.
+ * https://api.slack.com/methods/assistant.threads.setSuggestedPrompts
+ */
 function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggestedPromptsFn {
   const {
     context,
@@ -300,7 +330,10 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
   };
 }
 
-// Factory for `setTitle()` utility
+/**
+ * Creates utility `setTitle()` to set the title of the Assistant thread
+ * https://api.slack.com/methods/assistant.threads.setTitle
+ */
 function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   const {
     context,
@@ -318,6 +351,10 @@ function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   });
 }
 
+/**
+ * `extractThreadInfo()` parses an incoming payload and returns relevant
+ * details about the thread
+*/
 export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']): { channelId: string, threadTs: string, context: AssistantThreadContext } {
   let channelId: string = '';
   let threadTs: string = '';
