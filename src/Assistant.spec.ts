@@ -16,6 +16,7 @@ import {
 import { Override } from './test-helpers';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, AssistantThreadStartedEvent, Middleware, SlackEventMiddlewareArgs } from './types';
 import { AssistantInitializationError } from './errors';
+import { AssistantThreadContextStore, AssistantThreadContext } from './AssistantThreadContextStore';
 
 async function importAssistant(overrides: Override = {}): Promise<typeof import('./Assistant')> {
   return rewiremock.module(() => import('./Assistant'), overrides);
@@ -68,7 +69,7 @@ describe('Assistant class', () => {
         } as unknown as AssistantConfig;
 
         const validationFn = () => validate(badConfig);
-        const expectedMsg = 'Assistant is missing required keys: threadContextChanged, userMessage';
+        const expectedMsg = 'Assistant is missing required keys: userMessage';
         assert.throws(validationFn, AssistantInitializationError, expectedMsg);
       });
 
@@ -231,12 +232,13 @@ describe('Assistant class', () => {
           unknown as AssistantThreadContextChangedMiddlewareArgs & AllMiddlewareArgs;
         const mockUserMessageArgs = createMockUserMessageEvent() as
           unknown as AssistantUserMessageMiddlewareArgs & AllMiddlewareArgs;
+        const mockThreadContextStore = createMockThreadContextStore();
 
         const { prepareAssistantArgs } = await importAssistant();
 
-        const threadStartedArgs = prepareAssistantArgs(mockThreadStartedArgs);
-        const threadContextChangedArgs = prepareAssistantArgs(mockThreadContextChangedArgs);
-        const userMessageArgs = prepareAssistantArgs(mockUserMessageArgs);
+        const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+        const threadContextChangedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadContextChangedArgs);
+        const userMessageArgs = prepareAssistantArgs(mockThreadContextStore, mockUserMessageArgs);
 
         assert.notExists(threadStartedArgs.next);
         assert.notExists(threadContextChangedArgs.next);
@@ -245,10 +247,9 @@ describe('Assistant class', () => {
 
       it('should augment assistant_thread_started args with utilities', async () => {
         const mockArgs = createMockThreadStartedEvent();
+        const mockThreadContextStore = createMockThreadContextStore();
         const { prepareAssistantArgs } = await importAssistant();
-        // casting to returned type because prepareAssistantArgs isn't built to do so
-        const assistantArgs = prepareAssistantArgs(mockArgs) as
-          AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
+        const assistantArgs = prepareAssistantArgs(mockThreadContextStore, mockArgs as any);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -258,10 +259,9 @@ describe('Assistant class', () => {
 
       it('should augment assistant_thread_context_changed args with utilities', async () => {
         const mockArgs = createMockThreadContextChangedEvent();
+        const mockThreadContextStore = createMockThreadContextStore();
         const { prepareAssistantArgs } = await importAssistant();
-        // casting to returned type because prepareAssistantArgs isn't built to do so
-        const assistantArgs = prepareAssistantArgs(mockArgs) as
-          AllAssistantMiddlewareArgs<AssistantThreadContextChangedMiddlewareArgs>;
+        const assistantArgs = prepareAssistantArgs(mockThreadContextStore, mockArgs as any);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -271,10 +271,9 @@ describe('Assistant class', () => {
 
       it('should augment message args with utilities', async () => {
         const mockArgs = createMockUserMessageEvent();
+        const mockThreadContextStore = createMockThreadContextStore();
         const { prepareAssistantArgs } = await importAssistant();
-        // casting to returned type because prepareAssistantArgs isn't built to do so
-        const assistantArgs = prepareAssistantArgs(mockArgs) as
-          AllAssistantMiddlewareArgs<AssistantUserMessageMiddlewareArgs>;
+        const assistantArgs = prepareAssistantArgs(mockThreadContextStore, mockArgs as any);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -288,12 +287,10 @@ describe('Assistant class', () => {
 
           const fakeClient = { chat: { postMessage: sinon.spy() } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
 
           const { prepareAssistantArgs } = await importAssistant();
-          // casting to returned type because prepareAssistantArgs isn't built to do so
-          const threadStartedArgs = prepareAssistantArgs(
-            mockThreadStartedArgs,
-          ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
+          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.say('Say called!');
 
@@ -305,12 +302,10 @@ describe('Assistant class', () => {
 
           const fakeClient = { assistant: { threads: { setStatus: sinon.spy() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
 
           const { prepareAssistantArgs } = await importAssistant();
-          // casting to returned type because prepareAssistantArgs isn't built to do so
-          const threadStartedArgs = prepareAssistantArgs(
-            mockThreadStartedArgs,
-          ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
+          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setStatus('Status set!');
 
@@ -322,12 +317,10 @@ describe('Assistant class', () => {
 
           const fakeClient = { assistant: { threads: { setSuggestedPrompts: sinon.spy() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
 
           const { prepareAssistantArgs } = await importAssistant();
-          // casting to returned type because prepareAssistantArgs isn't built to do so
-          const threadStartedArgs = prepareAssistantArgs(
-            mockThreadStartedArgs,
-          ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
+          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }] });
 
@@ -339,12 +332,10 @@ describe('Assistant class', () => {
 
           const fakeClient = { assistant: { threads: { setTitle: sinon.spy() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
 
           const { prepareAssistantArgs } = await importAssistant();
-          // casting to returned type because prepareAssistantArgs isn't built to do so
-          const threadStartedArgs = prepareAssistantArgs(
-            mockThreadStartedArgs,
-          ) as AllAssistantMiddlewareArgs<AssistantThreadStartedMiddlewareArgs>;
+          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setTitle('Title set!');
 
@@ -441,5 +432,16 @@ function createGenericEvent() {
       type: '',
     },
     context: {},
+  };
+}
+
+function createMockThreadContextStore(): AssistantThreadContextStore {
+  return {
+    async get(_: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext> {
+      return {};
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async save(_: AllAssistantMiddlewareArgs): Promise<void> {
+    },
   };
 }

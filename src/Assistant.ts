@@ -8,7 +8,6 @@ import processMiddleware from './middleware/process';
 import {
   AllMiddlewareArgs,
   AnyMiddlewareArgs,
-  Context,
   Middleware,
   SayFn,
   SlackEventMiddlewareArgs,
@@ -128,7 +127,7 @@ export class Assistant {
   }
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
-    return async (args): Promise<any> => { // TODO : TS
+    return async (args): Promise<void> => {
       if (isAssistantEvent(args) && matchesConstraints(args)) return this.processEvent(args);
       return args.next();
     };
@@ -136,7 +135,7 @@ export class Assistant {
 
   private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
     const { payload } = args;
-    const assistantArgs = this.prepareAssistantArgs(args);
+    const assistantArgs = prepareAssistantArgs(this.threadContextStore, args);
     const assistantMiddleware = this.getAssistantMiddleware(payload);
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
   }
@@ -156,26 +155,30 @@ export class Assistant {
         return [];
     }
   }
+}
 
-  /**
+/**
  * `prepareAssistantArgs()` takes the event arguments and:
  *  1. Removes the next() passed in from App-level middleware processing, thus preventing
  *  events from continuing down the global middleware chain to subsequent listeners
  *  2. Adds assistant-specific utilities (i.e., helper methods)
  * */
-  private prepareAssistantArgs(args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>): AllAssistantMiddlewareArgs {
-    const { next: _next, ...assistantArgs } = args;
-    const preparedArgs = { ...assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'> };
+export function prepareAssistantArgs(
+  threadContextStore: AssistantThreadContextStore,
+  args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>,
+): AllAssistantMiddlewareArgs {
+  const { next: _next, ...assistantArgs } = args;
+  const preparedArgs = { ...assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'> };
 
-    preparedArgs.getThreadContext = () => this.threadContextStore.get(preparedArgs);
-    preparedArgs.saveThreadContext = () => this.threadContextStore.save(preparedArgs);
-    preparedArgs.say = createSay(preparedArgs);
-    preparedArgs.setStatus = createSetStatus(preparedArgs);
-    preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
-    preparedArgs.setTitle = createSetTitle(preparedArgs);
+  // Do not pass preparedArgs (ie, do not add utilities to get/save)
+  preparedArgs.getThreadContext = () => threadContextStore.get(args);
+  preparedArgs.saveThreadContext = () => threadContextStore.save(args);
 
-    return preparedArgs;
-  }
+  preparedArgs.say = createSay(preparedArgs);
+  preparedArgs.setStatus = createSetStatus(preparedArgs);
+  preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
+  preparedArgs.setTitle = createSetTitle(preparedArgs);
+  return preparedArgs;
 }
 
 /**
@@ -227,6 +230,7 @@ export function validate(config: AssistantConfig): void {
 
   // Ensure a callback or an array of callbacks is present
   const requiredFns: (keyof AssistantConfig)[] = ['threadStarted', 'userMessage'];
+  if ('threadContextChanged' in config) requiredFns.push('threadContextChanged');
   requiredFns.forEach((fn) => {
     if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
       const errorMsg = `Assistant ${fn} property must be a function or an array of functions`;
@@ -254,10 +258,6 @@ export async function processAssistantMiddleware(
   }
 }
 
-function selectToken(context: Context): string | undefined {
-  return context.botToken !== undefined ? context.botToken : context.userToken;
-}
-
 /**
  * Utility functions
  */
@@ -269,17 +269,15 @@ function selectToken(context: Context): string | undefined {
  */
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const {
-    context,
     client,
     payload,
   } = args;
-  const token = selectToken(context);
   const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (message: Parameters<SayFn>[0]) => {
     const postMessageArgument: ChatPostMessageArguments = typeof message === 'string' ?
-      { token, text: message, channel, thread_ts } :
-      { ...message, token, channel, thread_ts };
+      { text: message, channel, thread_ts } :
+      { ...message, channel, thread_ts };
 
     return client.chat.postMessage(postMessageArgument);
   };
@@ -291,15 +289,12 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
  */
 function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const {
-    context,
     client,
     payload,
   } = args;
-  const token = selectToken(context);
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (status: Parameters<SetStatusFn>[0]) => client.assistant.threads.setStatus({
-    token,
     channel_id,
     thread_ts,
     status,
@@ -312,17 +307,14 @@ function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
  */
 function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggestedPromptsFn {
   const {
-    context,
     client,
     payload,
   } = args;
-  const token = selectToken(context);
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
     const { prompts } = params;
     return client.assistant.threads.setSuggestedPrompts({
-      token,
       channel_id,
       thread_ts,
       prompts,
@@ -336,15 +328,12 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
  */
 function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   const {
-    context,
     client,
     payload,
   } = args;
-  const token = selectToken(context);
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (title: Parameters<SetTitleFn>[0]) => client.assistant.threads.setTitle({
-    token,
     channel_id,
     thread_ts,
     title,
