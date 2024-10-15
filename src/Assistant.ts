@@ -237,6 +237,38 @@ export function validate(config: AssistantConfig): void {
       throw new AssistantInitializationError(errorMsg);
     }
   });
+
+  // Validate threadContextStore
+  if (config.threadContextStore) {
+    // Ensure assistant config object is passed in
+    if (typeof config.threadContextStore !== 'object') {
+      const errorMsg = 'Assistant expects threadContextStore to be a configuration object';
+      throw new AssistantInitializationError(errorMsg);
+    }
+
+    // Check for missing required keys
+    const requiredContextKeys: (keyof AssistantThreadContextStore)[] = ['get', 'save'];
+    const missingContextKeys: (keyof AssistantThreadContextStore)[] = [];
+    requiredContextKeys.forEach((k) => {
+      if (config.threadContextStore && config.threadContextStore[k] === undefined) {
+        missingContextKeys.push(k);
+      }
+    });
+
+    if (missingContextKeys.length > 0) {
+      const errorMsg = `threadContextStore is missing required keys: ${missingContextKeys.join(', ')}`;
+      throw new AssistantInitializationError(errorMsg);
+    }
+
+    // Ensure properties of context store are functions
+    const requiredStoreFns: (keyof AssistantThreadContextStore)[] = ['get', 'save'];
+    requiredStoreFns.forEach((fn) => {
+      if (config.threadContextStore && typeof config.threadContextStore[fn] !== 'function') {
+        const errorMsg = `threadContextStore ${fn} property must be a function`;
+        throw new AssistantInitializationError(errorMsg);
+      }
+    });
+  }
 }
 
 /**
