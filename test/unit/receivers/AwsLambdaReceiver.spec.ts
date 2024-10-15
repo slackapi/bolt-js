@@ -51,7 +51,7 @@ describe('AwsLambdaReceiver', () => {
     await awsReceiver.stop();
   });
 
-  it('should accept events', async () => {
+  it('should return a 404 if app has no registered handlers for an incoming event, and return a 200 if app does have registered handlers', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -281,5 +281,26 @@ describe('AwsLambdaReceiver', () => {
     const awsEvent = createDummyAWSPayload(urlVerificationBody);
     const response = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response.statusCode, 200);
+  });
+
+  it('should not log an error regarding ack timeout if app has no handlers registered', async () => {
+    const delay = 10;
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: '',
+      signatureVerification: false,
+      logger: noopLogger,
+      unhandledRequestTimeoutMillis: delay,
+    });
+    const handler = awsReceiver.toHandler();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const args = createDummyAppMentionEventMiddlewareArgs();
+    const body = JSON.stringify(args.body);
+    const awsEvent = createDummyAWSPayload(body, timestamp);
+    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    assert.equal(response1.statusCode, 404);
+    await new Promise((res) => {
+      setTimeout(res, delay + 2);
+    });
+    sinon.assert.notCalled(awsReceiver.logger.error as sinon.SinonSpy);
   });
 });

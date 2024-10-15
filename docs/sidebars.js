@@ -84,6 +84,7 @@ const sidebars = {
         'tutorial/hubot-migration',
         'tutorial/migration-v2',
         'tutorial/migration-v3',
+        'tutorial/migration-v4',
       ],
     },
     { type: 'html', value: '<hr>' },
