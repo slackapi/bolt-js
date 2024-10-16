@@ -224,7 +224,7 @@ describe('Assistant class', () => {
   });
 
   describe('processEvent', () => {
-    describe('prepareAssistantArgs', () => {
+    describe('enrichAssistantArgs', () => {
       it('should remove next() from all original event args', async () => {
         const mockThreadStartedArgs = createMockThreadStartedEvent() as
           unknown as AssistantThreadStartedMiddlewareArgs & AllMiddlewareArgs;
@@ -234,11 +234,11 @@ describe('Assistant class', () => {
           unknown as AssistantUserMessageMiddlewareArgs & AllMiddlewareArgs;
         const mockThreadContextStore = createMockThreadContextStore();
 
-        const { prepareAssistantArgs } = await importAssistant();
+        const { enrichAssistantArgs } = await importAssistant();
 
-        const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
-        const threadContextChangedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadContextChangedArgs);
-        const userMessageArgs = prepareAssistantArgs(mockThreadContextStore, mockUserMessageArgs);
+        const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+        const threadContextChangedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadContextChangedArgs);
+        const userMessageArgs = enrichAssistantArgs(mockThreadContextStore, mockUserMessageArgs);
 
         assert.notExists(threadStartedArgs.next);
         assert.notExists(threadContextChangedArgs.next);
@@ -248,8 +248,8 @@ describe('Assistant class', () => {
       it('should augment assistant_thread_started args with utilities', async () => {
         const mockArgs = createMockThreadStartedEvent();
         const mockThreadContextStore = createMockThreadContextStore();
-        const { prepareAssistantArgs } = await importAssistant();
-        const assistantArgs = prepareAssistantArgs(mockThreadContextStore, mockArgs as any);
+        const { enrichAssistantArgs } = await importAssistant();
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, mockArgs as any);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -260,8 +260,8 @@ describe('Assistant class', () => {
       it('should augment assistant_thread_context_changed args with utilities', async () => {
         const mockArgs = createMockThreadContextChangedEvent();
         const mockThreadContextStore = createMockThreadContextStore();
-        const { prepareAssistantArgs } = await importAssistant();
-        const assistantArgs = prepareAssistantArgs(mockThreadContextStore, mockArgs as any);
+        const { enrichAssistantArgs } = await importAssistant();
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, mockArgs as any);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -272,8 +272,8 @@ describe('Assistant class', () => {
       it('should augment message args with utilities', async () => {
         const mockArgs = createMockUserMessageEvent();
         const mockThreadContextStore = createMockThreadContextStore();
-        const { prepareAssistantArgs } = await importAssistant();
-        const assistantArgs = prepareAssistantArgs(mockThreadContextStore, mockArgs as any);
+        const { enrichAssistantArgs } = await importAssistant();
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, mockArgs as any);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -334,8 +334,8 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { prepareAssistantArgs } = await importAssistant();
-          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.say('Say called!');
 
@@ -349,8 +349,8 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { prepareAssistantArgs } = await importAssistant();
-          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setStatus('Status set!');
 
@@ -364,8 +364,8 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { prepareAssistantArgs } = await importAssistant();
-          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }] });
 
@@ -379,8 +379,8 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { prepareAssistantArgs } = await importAssistant();
-          const threadStartedArgs = prepareAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setTitle('Title set!');
 

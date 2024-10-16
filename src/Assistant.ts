@@ -81,6 +81,7 @@ export type AssistantMiddlewareArgs =
   | AssistantThreadContextChangedMiddlewareArgs
   | AssistantUserMessageMiddlewareArgs;
 
+// TODO : revisit Omit of `say`, as it's added on as part of the enrichment step
 export interface AssistantThreadStartedMiddlewareArgs extends
   Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>, AssistantUtilityArgs {}
 export interface AssistantThreadContextChangedMiddlewareArgs extends
@@ -137,7 +138,7 @@ export class Assistant {
 
   private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
     const { payload } = args;
-    const assistantArgs = prepareAssistantArgs(this.threadContextStore, args);
+    const assistantArgs = enrichAssistantArgs(this.threadContextStore, args);
     const assistantMiddleware = this.getAssistantMiddleware(payload);
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
   }
@@ -160,12 +161,12 @@ export class Assistant {
 }
 
 /**
- * `prepareAssistantArgs()` takes the event arguments and:
+ * `enrichAssistantArgs()` takes the event arguments and:
  *  1. Removes the next() passed in from App-level middleware processing, thus preventing
  *  events from continuing down the global middleware chain to subsequent listeners
  *  2. Adds assistant-specific utilities (i.e., helper methods)
  * */
-export function prepareAssistantArgs(
+export function enrichAssistantArgs(
   threadContextStore: AssistantThreadContextStore,
   args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>,
 ): AllAssistantMiddlewareArgs {
