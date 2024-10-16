@@ -15,7 +15,7 @@ import {
 } from './Assistant';
 import { Override } from './test-helpers';
 import { AllMiddlewareArgs, AnyMiddlewareArgs, AssistantThreadStartedEvent, Middleware, SlackEventMiddlewareArgs } from './types';
-import { AssistantInitializationError } from './errors';
+import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import { AssistantThreadContextStore, AssistantThreadContext } from './AssistantThreadContextStore';
 
 async function importAssistant(overrides: Override = {}): Promise<typeof import('./Assistant')> {
@@ -152,7 +152,7 @@ describe('Assistant class', () => {
 
     describe('matchesConstraints', () => {
       it('should return true if recognized assistant message', async () => {
-        const mockUserMessageArgs = createMockUserMessageEvent() as unknown as AnyMiddlewareArgs;
+        const mockUserMessageArgs = createMockUserMessageEvent() as unknown as AssistantMiddlewareArgs;
         const { matchesConstraints } = await importAssistant();
         const eventMatchesConstraints = matchesConstraints(mockUserMessageArgs);
 
@@ -281,6 +281,51 @@ describe('Assistant class', () => {
         assert.exists(assistantArgs.setTitle);
       });
 
+      describe('extractThreadInfo', () => {
+        it('should return expected channelId, threadTs, and context for `assistant_thread_started` event', async () => {
+          const mockThreadStartedEvent = createMockThreadStartedEvent() as unknown as AssistantThreadStartedMiddlewareArgs; // eslint-disable-line max-len
+          const { payload } = mockThreadStartedEvent;
+          const { extractThreadInfo } = await importAssistant();
+          const { channelId, threadTs, context } = extractThreadInfo(payload);
+
+          assert.equal(payload.assistant_thread.channel_id, channelId);
+          assert.equal(payload.assistant_thread.thread_ts, threadTs);
+          assert.deepEqual(payload.assistant_thread.context, context);
+        });
+
+        it('should return expected channelId, threadTs, and context for `assistant_thread_context_changed` event', async () => {
+          const mockThreadChangedEvent = createMockThreadContextChangedEvent() as unknown as AssistantThreadContextChangedMiddlewareArgs; // eslint-disable-line max-len
+          const { payload } = mockThreadChangedEvent;
+          const { extractThreadInfo } = await importAssistant();
+          const { channelId, threadTs, context } = extractThreadInfo(payload);
+
+          assert.equal(payload.assistant_thread.channel_id, channelId);
+          assert.equal(payload.assistant_thread.thread_ts, threadTs);
+          assert.deepEqual(payload.assistant_thread.context, context);
+        });
+
+        it('should return expected channelId and threadTs for `message` event', async () => {
+          const mockUserMessageEvent = createMockUserMessageEvent();
+          const { payload } = mockUserMessageEvent as any;
+          const { extractThreadInfo } = await importAssistant();
+          const { channelId, threadTs, context } = extractThreadInfo(payload);
+
+          assert.equal(payload.channel, channelId);
+          assert.equal(payload.thread_ts, threadTs);
+          assert.isEmpty(context);
+        });
+
+        it('should throw error if `channel_id` or `thread_ts` are missing', async () => {
+          const { payload } = createMockThreadStartedEvent() as unknown as AssistantThreadStartedMiddlewareArgs; // eslint-disable-line max-len
+          payload.assistant_thread.channel_id = '';
+          const { extractThreadInfo } = await importAssistant();
+
+          const extractThreadInfoFn = () => extractThreadInfo(payload);
+          const expectedMsg = 'Assistant message event is missing required properties: channel_id';
+          assert.throws(extractThreadInfoFn, AssistantMissingPropertyError, expectedMsg);
+        });
+      });
+
       describe('assistant args/utilities', () => {
         it('say should call chat.postMessage', async () => {
           const mockThreadStartedArgs = createMockThreadStartedEvent() as unknown as AssistantMiddlewareArgs & AllMiddlewareArgs; // eslint-disable-line max-len
@@ -375,8 +420,8 @@ function createMockThreadStartedEvent() {
           team_id: '',
           enterprise_id: '',
         },
-        channel_id: '',
-        thread_ts: '',
+        channel_id: 'D01234567AR',
+        thread_ts: '1234567890.123456',
       },
       event_ts: '',
     },
@@ -395,8 +440,8 @@ function createMockThreadContextChangedEvent() {
           team_id: '',
           enterprise_id: '',
         },
-        channel_id: '',
-        thread_ts: '',
+        channel_id: 'D01234567AR',
+        thread_ts: '1234567890.123456',
       },
       event_ts: '',
     },

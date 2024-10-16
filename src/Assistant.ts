@@ -43,15 +43,15 @@ interface AssistantUtilityArgs {
   setTitle: SetTitleFn;
 }
 
-export interface SetStatusFn {
+interface SetStatusFn {
   (status: string): Promise<AssistantThreadsSetStatusResponse>;
 }
 
-export interface SetSuggestedPromptsFn {
+interface SetSuggestedPromptsFn {
   (params: SetSuggestedPromptsArguments): Promise<AssistantThreadsSetSuggestedPromptsResponse>;
 }
 
-export interface SetSuggestedPromptsArguments {
+interface SetSuggestedPromptsArguments {
   prompts: [AssistantPrompt, ...AssistantPrompt[]];
 }
 
@@ -60,7 +60,7 @@ interface AssistantPrompt {
   message: string;
 }
 
-export interface SetTitleFn {
+interface SetTitleFn {
   (title: string): Promise<AssistantThreadsSetTitleResponse>;
 }
 
@@ -128,7 +128,9 @@ export class Assistant {
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
     return async (args): Promise<void> => {
-      if (isAssistantEvent(args) && matchesConstraints(args)) return this.processEvent(args);
+      if (isAssistantEvent(args) && matchesConstraints(args)) {
+        return this.processEvent(args);
+      }
       return args.next();
     };
   }
@@ -185,7 +187,7 @@ export function prepareAssistantArgs(
  * `isAssistantEvent()` determines if incoming event is a supported
  * Assistant event type.
  */
-export function isAssistantEvent(args: AnyMiddlewareArgs): boolean {
+export function isAssistantEvent(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
   return ASSISTANT_PAYLOAD_TYPES.has(args.payload.type);
 }
 
@@ -193,7 +195,7 @@ export function isAssistantEvent(args: AnyMiddlewareArgs): boolean {
  * `matchesConstraints()` determines if the incoming event payload
  * is related to the Assistant.
  */
-export function matchesConstraints(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
+export function matchesConstraints(args: AssistantMiddlewareArgs): args is AssistantMiddlewareArgs {
   return args.payload.type === 'message' ? isAssistantMessage(args.payload) : true;
 }
 
@@ -397,7 +399,8 @@ export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']
   // throw error if `channel` or `thread_ts` are missing
   if (!channelId || !threadTs) {
     const missingProps: string[] = [];
-    [channelId, threadTs].forEach((key) => { if (key) missingProps.push(key); });
+    if (!channelId) missingProps.push('channel_id');
+    if (!threadTs) missingProps.push('thread_ts');
     if (missingProps.length > 0) {
       const errorMsg = `Assistant message event is missing required properties: ${missingProps.join(', ')}`;
       throw new AssistantMissingPropertyError(errorMsg);
