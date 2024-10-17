@@ -204,11 +204,11 @@ describe('Assistant class', () => {
       });
 
       it('should augment assistant_thread_started args with utilities', async () => {
-        const mockArgs = {};
+        const { payload } = createDummyAssistantThreadStartedEventMiddlewareArgs();
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
-        // casting here as we are intentionally passing in a wrong argument type to validate runtime behaviour
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, mockArgs as AllAssistantMiddlewareArgs);
+        // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -217,11 +217,11 @@ describe('Assistant class', () => {
       });
 
       it('should augment assistant_thread_context_changed args with utilities', async () => {
-        const mockArgs = {};
+        const { payload } = createDummyAssistantThreadContextChangedEventMiddlewareArgs();
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
-        // casting here as we are intentionally passing in a wrong argument type to validate runtime behaviour
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, mockArgs as AllAssistantMiddlewareArgs);
+        // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -230,11 +230,11 @@ describe('Assistant class', () => {
       });
 
       it('should augment message args with utilities', async () => {
-        const mockArgs = {};
+        const { payload } = createDummyAssistantUserMessageEventMiddlewareArgs();
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
-        // casting here as we are intentionally passing in a wrong argument type to validate runtime behaviour
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, mockArgs as AllAssistantMiddlewareArgs);
+        // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);

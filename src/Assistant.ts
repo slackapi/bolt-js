@@ -162,7 +162,7 @@ export class Assistant {
  * */
 export function enrichAssistantArgs(
   threadContextStore: AssistantThreadContextStore,
-  args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>,
+  args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, // TODO: the type here states that these args already have the assistant utilities present? the type here needs likely changing.
 ): AllAssistantMiddlewareArgs {
   const { next: _next, ...assistantArgs } = args;
   const preparedArgs = { ...(assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'>) };
