@@ -1,15 +1,22 @@
-import { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
-import { AckFn, RespondFn } from '../utilities';
+import type { Block, KnownBlock, PlainTextElement, RichTextBlock, View } from '@slack/types';
+import type { AckFn, RespondFn } from '../utilities';
 
+// TODO: terminology. 'action' does not belong here.
 /**
  * Known view action types
  */
 export type SlackViewAction =
   | ViewSubmitAction
   | ViewClosedAction
-  | ViewWorkflowStepSubmitAction
+  | ViewWorkflowStepSubmitAction // TODO: remove workflow step stuff in bolt v5
   | ViewWorkflowStepClosedAction;
 // <ViewAction extends SlackViewAction = ViewSubmitAction>
+// TODO: add a type parameter here, just like the other constraint interfaces have.
+export interface ViewConstraints {
+  callback_id?: string | RegExp;
+  type?: 'view_closed' | 'view_submission';
+}
+
 /**
  * Arguments which listeners and middleware receive to process a view submission event from Slack.
  */
@@ -21,6 +28,7 @@ export interface SlackViewMiddlewareArgs<ViewActionType extends SlackViewAction 
   respond: RespondFn;
 }
 
+// TODO: @slack/types probably has something very close to this
 interface PlainTextElementOutput {
   type: 'plain_text';
   text: string;
@@ -34,6 +42,7 @@ export interface ViewResponseUrl {
   response_url: string;
 }
 
+// TODO: "Action" naming here is confusing. this is a view submisson event. already exists in @slack/types
 /**
  * A Slack view_submission event wrapped in the standard metadata.
  *
@@ -99,8 +108,9 @@ export interface ViewClosedAction {
  * A Slack view_submission step from app event
  *
  * This describes the additional JSON-encoded body details for a step's view_submission event
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
  */
-
 export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
   trigger_id: string;
   response_urls?: ViewResponseUrl[];
@@ -115,6 +125,8 @@ export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
  * A Slack view_closed step from app event
  *
  * This describes the additional JSON-encoded body details for a step's view_closed event
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
  */
 export interface ViewWorkflowStepClosedAction extends ViewClosedAction {
   workflow_step: {
@@ -129,6 +141,7 @@ export interface ViewStateSelectedOption {
   value: string;
 }
 
+// TODO: this should probably exist in @slack/types
 export interface UploadedFile {
   id: string;
   created: number;

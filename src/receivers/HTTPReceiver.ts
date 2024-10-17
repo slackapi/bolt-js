@@ -1,31 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { createServer, Server, ServerOptions, RequestListener, IncomingMessage, ServerResponse } from 'http';
-import { createServer as createHttpsServer, Server as HTTPSServer, ServerOptions as HTTPSServerOptions } from 'https';
-import { ListenOptions } from 'net';
-import { URL } from 'url';
-import { Logger, ConsoleLogger, LogLevel } from '@slack/logger';
-import { InstallProvider, CallbackOptions, InstallProviderOptions, InstallURLOptions, InstallPathOptions } from '@slack/oauth';
+import {
+  type IncomingMessage,
+  type RequestListener,
+  type Server,
+  type ServerOptions,
+  type ServerResponse,
+  createServer,
+} from 'node:http';
+import {
+  type Server as HTTPSServer,
+  type ServerOptions as HTTPSServerOptions,
+  createServer as createHttpsServer,
+} from 'node:https';
+import type { ListenOptions } from 'node:net';
+import { URL } from 'node:url';
+import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import {
+  type CallbackOptions,
+  type InstallPathOptions,
+  InstallProvider,
+  type InstallProviderOptions,
+  type InstallURLOptions,
+} from '@slack/oauth';
+import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParamsIncomingMessage } from './ParamsIncomingMessage';
-import { verifyRedirectOpts } from './verify-redirect-opts';
-import App from '../App';
-import { Receiver, ReceiverEvent } from '../types';
-import {
-  ReceiverInconsistentStateError,
-  HTTPReceiverDeferredRequestError,
-  CodedError,
-} from '../errors';
-import { CustomRoute, buildReceiverRoutes, ReceiverRoutes } from './custom-routes';
-import { StringIndexed } from '../types/helpers';
-import { BufferedIncomingMessage } from './BufferedIncomingMessage';
-import {
-  HTTPModuleFunctions as httpFunc,
-  ReceiverDispatchErrorHandlerArgs,
-  ReceiverProcessEventErrorHandlerArgs,
-  ReceiverUnhandledRequestHandlerArgs,
-} from './HTTPModuleFunctions';
+import type App from '../App';
+import { type CodedError, HTTPReceiverDeferredRequestError, ReceiverInconsistentStateError } from '../errors';
+import type { Receiver, ReceiverEvent } from '../types';
+import type { StringIndexed } from '../types/utilities';
+import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
+import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
+import { type CustomRoute, type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
+import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -61,7 +68,8 @@ const httpsOptionKeys = [
   'sessionIdContext',
 ];
 
-const missingServerErrorDescription = 'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
+const missingServerErrorDescription =
+  'The receiver cannot be started because private state was mutated. Please report this to the maintainers.';
 
 // All the available arguments in the constructor
 export interface HTTPReceiverOptions {
@@ -82,10 +90,11 @@ export interface HTTPReceiverOptions {
   installerOptions?: HTTPReceiverInstallerOptions;
   customPropertiesExtractor?: (request: BufferedIncomingMessage) => StringIndexed;
   // NOTE: As http.RequestListener is not an async function, this cannot be async
-  dispatchErrorHandler?: (args: ReceiverDispatchErrorHandlerArgs) => void;
-  processEventErrorHandler?: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  dispatchErrorHandler?: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => void;
+  processEventErrorHandler?: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  // TODO: the next note is not true
   // NOTE: As we use setTimeout under the hood, this cannot be async
-  unhandledRequestHandler?: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
 }
 
@@ -152,11 +161,11 @@ export default class HTTPReceiver implements Receiver {
 
   private customPropertiesExtractor: (request: BufferedIncomingMessage) => StringIndexed;
 
-  private dispatchErrorHandler: (args: ReceiverDispatchErrorHandlerArgs) => void;
+  private dispatchErrorHandler: (args: httpFunc.ReceiverDispatchErrorHandlerArgs) => void;
 
-  private processEventErrorHandler: (args: ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  private processEventErrorHandler: (args: httpFunc.ReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
 
-  private unhandledRequestHandler: (args: ReceiverUnhandledRequestHandlerArgs) => void;
+  private unhandledRequestHandler: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
 
   private unhandledRequestTimeoutMillis: number;
 
@@ -186,7 +195,8 @@ export default class HTTPReceiver implements Receiver {
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
-    this.logger = logger ??
+    this.logger =
+      logger ??
       (() => {
         const defaultLogger = new ConsoleLogger();
         defaultLogger.setLevel(logLevel);
@@ -204,9 +214,9 @@ export default class HTTPReceiver implements Receiver {
     if (
       clientId !== undefined &&
       clientSecret !== undefined &&
-       (this.stateVerification === false || // state store not needed
-         stateSecret !== undefined ||
-          installerOptions.stateStore !== undefined) // user provided state store
+      (this.stateVerification === false || // state store not needed
+        stateSecret !== undefined ||
+        installerOptions.stateStore !== undefined) // user provided state store
     ) {
       this.installer = new InstallProvider({
         clientId,
@@ -265,8 +275,8 @@ export default class HTTPReceiver implements Receiver {
     serverOptions: ServerOptions | HTTPSServerOptions = {},
   ): Promise<Server | HTTPSServer> {
     let createServerFn:
-    typeof createServer<typeof IncomingMessage, typeof ServerResponse> |
-    typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
+      | typeof createServer<typeof IncomingMessage, typeof ServerResponse>
+      | typeof createHttpsServer<typeof IncomingMessage, typeof ServerResponse> = createServer;
 
     // Decide which kind of server, HTTP or HTTPS, by searching for any keys in the serverOptions that are exclusive
     // to HTTPS
@@ -325,11 +335,11 @@ export default class HTTPReceiver implements Receiver {
       let listenOptions: ListenOptions | number = this.port;
       if (portOrListenOptions !== undefined) {
         if (typeof portOrListenOptions === 'number') {
-          listenOptions = portOrListenOptions as number;
+          listenOptions = portOrListenOptions;
         } else if (typeof portOrListenOptions === 'string') {
-          listenOptions = Number(portOrListenOptions) as number;
+          listenOptions = Number(portOrListenOptions);
         } else if (typeof portOrListenOptions === 'object') {
-          listenOptions = portOrListenOptions as ListenOptions;
+          listenOptions = portOrListenOptions;
         }
       }
       this.server.listen(listenOptions, () => {
@@ -346,7 +356,9 @@ export default class HTTPReceiver implements Receiver {
   // generic types
   public stop(): Promise<void> {
     if (this.server === undefined) {
-      return Promise.reject(new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'));
+      return Promise.reject(
+        new ReceiverInconsistentStateError('The receiver cannot be stopped because it was not started.'),
+      );
     }
     return new Promise((resolve, reject) => {
       this.server?.close((error) => {
@@ -365,8 +377,9 @@ export default class HTTPReceiver implements Receiver {
 
     // NOTE: the domain and scheme are irrelevant here.
     // The URL object is only used to safely obtain the path to match
+    // TODO: we should add error handling for requests with falsy URLs / methods - could remove the cast here as a result.
     const { pathname: path } = new URL(req.url as string, 'http://localhost');
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: TODO: check for falsy method to remove the non null assertion
     const method = req.method!.toUpperCase();
 
     if (this.endpoints.includes(path) && method === 'POST') {
@@ -375,8 +388,8 @@ export default class HTTPReceiver implements Receiver {
     }
 
     if (this.installer !== undefined && method === 'GET') {
-      // When installer is defined then installPath and installRedirectUriPath are always defined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // TODO: it'd be better to check for falsiness and raise a readable error in any case, which lets us remove the non-null assertion
+      // biome-ignore lint/style/noNonNullAssertion: When installer is defined then installPath and installRedirectUriPath are always defined
       const [installPath, installRedirectUriPath] = [this.installPath!, this.installRedirectUriPath!];
 
       // Visiting the installation endpoint
@@ -414,9 +427,11 @@ export default class HTTPReceiver implements Receiver {
   }
 
   private handleIncomingEvent(req: IncomingMessage, res: ServerResponse) {
-    // Wrapped in an async closure for ease of using await
+    // TODO:: this essentially ejects functionality out of the event loop, doesn't seem like a good idea unless intentional? should review
+    // NOTE: Wrapped in an async closure for ease of using await
     (async () => {
       let bufferedReq: BufferedIncomingMessage;
+      // biome-ignore lint/suspicious/noExplicitAny: http request bodies could be anything
       let body: any;
 
       // Verify authenticity
@@ -430,7 +445,7 @@ export default class HTTPReceiver implements Receiver {
           req,
         );
       } catch (err) {
-        const e = err as any;
+        const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
         } else {
@@ -447,7 +462,7 @@ export default class HTTPReceiver implements Receiver {
       try {
         body = httpFunc.parseHTTPRequestBody(bufferedReq);
       } catch (err) {
-        const e = err as any;
+        const e = err as Error;
         this.logger.warn(`Malformed request body: ${e.message}`);
         httpFunc.buildNoBodyResponse(res, 400);
         return;
@@ -508,19 +523,17 @@ export default class HTTPReceiver implements Receiver {
   }
 
   private handleInstallPathRequest(req: IncomingMessage, res: ServerResponse) {
-    // Wrapped in an async closure for ease of using await
+    // TODO:: this essentially ejects functionality out of the event loop, doesn't seem like a good idea unless intentional? should review
+    // NOTE: Wrapped in an async closure for ease of using await
     (async () => {
       try {
-        /* eslint-disable @typescript-eslint/no-non-null-assertion */
-        await this.installer!.handleInstallPath(
-          req,
-          res,
-          this.installPathOptions,
-          this.installUrlOptions,
-        );
+        // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
+        await this.installer!.handleInstallPath(req, res, this.installPathOptions, this.installUrlOptions);
       } catch (err) {
-        const e = err as any;
-        this.logger.error(`An unhandled error occurred while Bolt processed a request to the installation path (${e.message})`);
+        const e = err as Error;
+        this.logger.error(
+          `An unhandled error occurred while Bolt processed a request to the installation path (${e.message})`,
+        );
         this.logger.debug(`Error details: ${e}`);
       }
     })();
@@ -529,13 +542,14 @@ export default class HTTPReceiver implements Receiver {
   private handleInstallRedirectRequest(req: IncomingMessage, res: ServerResponse) {
     // This function is only called from within unboundRequestListener after checking that installer is defined, and
     // when installer is defined then installCallbackOptions is always defined too.
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     const [installer, installCallbackOptions, installUrlOptions] = [
+      // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
       this.installer!,
+      // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
       this.installCallbackOptions!,
+      // biome-ignore lint/style/noNonNullAssertion: TODO: should check for falsiness
       this.installUrlOptions!,
     ];
-    /* eslint-enable @typescript-eslint/no-non-null-assertion */
     const errorHandler = (err: Error) => {
       this.logger.error(
         'HTTPReceiver encountered an unexpected error while handling the OAuth install redirect. Please report to the maintainers.',

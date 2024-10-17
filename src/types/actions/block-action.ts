@@ -1,6 +1,6 @@
-import { PlainTextElement, Confirmation, Option, RichTextBlock } from '@slack/types';
-import { StringIndexed } from '../helpers';
-import { ViewOutput, ViewStateValue } from '../view';
+import type { Confirmation, Option, PlainTextElement, RichTextBlock } from '@slack/types';
+import type { StringIndexed } from '../utilities';
+import type { ViewOutput, ViewStateValue } from '../view';
 
 /**
  * All known actions from in Slack's interactive elements
@@ -248,12 +248,13 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
     id: string;
     name: string;
   };
+  // TODO: breaking change: this should not be optional, but should be conditionally tacked on based on the specific block_action subtype
   message?: {
     type: 'message';
     user?: string; // undocumented that this is optional, it won't be there for bot messages
     ts: string;
     text?: string; // undocumented that this is optional, but how could it exist on block kit based messages?
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: TODO: poorly typed message here
     [key: string]: any;
   };
   view?: ViewOutput;
@@ -272,8 +273,7 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   // TODO: we'll need to fill this out a little more carefully in the future, possibly using a generic parameter
   container: StringIndexed;
 
-  // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
   app_unfurl?: any;
 
   // exists for enterprise installs

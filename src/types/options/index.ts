@@ -1,7 +1,6 @@
-import { Option, PlainTextElement } from '@slack/types';
-import { StringIndexed, XOR } from '../helpers';
-import { AckFn } from '../utilities';
-import { ViewOutput } from '../view/index';
+import type { Option, PlainTextElement } from '@slack/types';
+import type { AckFn, StringIndexed, XOR } from '../utilities';
+import type { ViewOutput } from '../view/index';
 
 /**
  * Arguments which listeners and middleware receive to process an options request from Slack
@@ -13,22 +12,32 @@ export interface SlackOptionsMiddlewareArgs<Source extends OptionsSource = Optio
   ack: OptionsAckFn<Source>;
 }
 
+export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
+
+// TODO: more strict typing to allow block/action_id for block_suggestion - not all of these properties apply to all of the members of the SlackOptions union
+export interface OptionsConstraints<A extends SlackOptions = SlackOptions> {
+  type?: A['type'];
+  block_id?: A extends SlackOptions ? string | RegExp : never;
+  action_id?: A extends SlackOptions ? string | RegExp : never;
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: for better type safety, we may want to revisit this
+  callback_id?: Extract<A, { callback_id?: string }> extends any ? string | RegExp : never;
+}
+
+// TODO: why call this 'source'? shouldn't it be Type, since it is just the type value?
 /**
  * All sources from which Slack sends options requests.
  */
-export type OptionsSource = 'interactive_message' | 'dialog_suggestion' | 'block_suggestion';
+export type OptionsSource = SlackOptions['type'];
 
-export type SlackOptions = BlockSuggestion | InteractiveMessageSuggestion | DialogSuggestion;
-
+// TODO: the following three utility typies could be DRYed up w/ the similar KnownEventFromType utility used in events types
 export interface BasicOptionsPayload<Type extends string = string> {
   type: Type;
   value: string;
 }
-
+// TODO: Is this useful? Events have something similar
 export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
   ? BasicOptionsPayload<T>
   : KnownOptionsPayloadFromType<T>;
-
 export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
 
 /**
@@ -148,6 +157,7 @@ type OptionsAckFn<Source extends OptionsSource> = Source extends 'block_suggesti
     ? AckFn<XOR<MessageOptions, OptionGroups<MessageOptions>>>
     : AckFn<XOR<DialogOptions, DialogOptionGroups<DialogOptions>>>;
 
+// TODO: why are the next two interfaces identical?
 export interface BlockOptions {
   options: Option[];
 }
@@ -162,65 +172,11 @@ export interface DialogOptions {
 }
 export interface OptionGroups<Options> {
   option_groups: ({
-    label: PlainTextElement
+    label: PlainTextElement;
   } & Options)[];
 }
 export interface DialogOptionGroups<Options> {
   option_groups: ({
     label: string;
   } & Options)[];
-}
-
-// Don't delete the following interface for backward-compatibility
-// We may remove it in v4 or newer
-
-/**
- * A request for options for a select menu with an external data source, wrapped in the standard metadata. The menu
- * can have a source of Slack's Block Kit external select elements, dialogs, or legacy interactive components.
- *
- * This describes the entire JSON-encoded body of a request.
- * @deprecated You can use more specific types such as BlockSuggestionPayload
- */
-export interface OptionsRequest<Source extends OptionsSource = OptionsSource> extends StringIndexed {
-  value: string;
-  type: Source;
-  team: {
-    id: string;
-    domain: string;
-    enterprise_id?: string; // undocumented
-    enterprise_name?: string; // undocumented
-  } | null;
-  channel?: {
-    id: string;
-    name: string;
-  };
-  user: {
-    id: string;
-    name: string;
-    team_id?: string; // undocumented
-  };
-  token: string;
-
-  name: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-  callback_id: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-  action_ts: Source extends 'interactive_message' | 'dialog_suggestion' ? string : never;
-
-  message_ts: Source extends 'interactive_message' ? string : never;
-  attachment_id: Source extends 'interactive_message' ? string : never;
-
-  api_app_id: Source extends 'block_suggestion' ? string : never;
-  action_id: Source extends 'block_suggestion' ? string : never;
-  block_id: Source extends 'block_suggestion' ? string : never;
-  container: Source extends 'block_suggestion' ? StringIndexed : never;
-
-  // this appears in the block_suggestions schema, but we're not sure when its present or what its type would be
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app_unfurl?: any;
-
-  // exists for enterprise installs
-  is_enterprise_install?: boolean;
-  enterprise?: {
-    id: string;
-    name: string;
-  };
 }

@@ -1,19 +1,15 @@
-import { ChatUpdateArguments } from '@slack/web-api';
-import { Block, KnownBlock, MessageMetadataEventPayloadObject } from '@slack/types';
-import { AllAssistantMiddlewareArgs, extractThreadInfo } from './Assistant';
+import type { MessageMetadataEventPayloadObject } from '@slack/types';
+import type { Block, ChatUpdateArguments, KnownBlock } from '@slack/web-api';
+import { type AllAssistantMiddlewareArgs, extractThreadInfo } from './Assistant';
 
 export interface AssistantThreadContextStore {
   get: GetThreadContextFn;
   save: SaveThreadContextFn;
 }
 
-export interface GetThreadContextFn {
-  (args: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext>;
-}
+export type GetThreadContextFn = (args: AllAssistantMiddlewareArgs) => Promise<AssistantThreadContext>;
 
-export interface SaveThreadContextFn {
-  (args: AllAssistantMiddlewareArgs): Promise<void>;
-}
+export type SaveThreadContextFn = (args: AllAssistantMiddlewareArgs) => Promise<void>;
 
 export interface AssistantThreadContext {
   channel_id?: string;
@@ -49,7 +45,7 @@ export class DefaultThreadContextStore implements AssistantThreadContextStore {
     // Find the first message in the thread that holds the current context using metadata.
     // See createSaveThreadContext below for a description and explanation for this approach.
     const initialMsg = thread.messages.find((m) => !('subtype' in m) && m.user === context.botUserId);
-    const threadContext = initialMsg && initialMsg.metadata ? initialMsg.metadata.event_payload : null;
+    const threadContext = initialMsg?.metadata ? initialMsg.metadata.event_payload : null;
 
     return threadContext || {};
   }
@@ -74,20 +70,17 @@ export class DefaultThreadContextStore implements AssistantThreadContextStore {
     // Find and update the initial Assistant message with the new context to ensure the
     // thread always contains the most recent context that user is sending messages from.
     const initialMsg = thread.messages.find((m) => !('subtype' in m) && m.user === context.botUserId);
-    if (initialMsg && initialMsg.ts) {
+    if (initialMsg?.ts) {
       const params: ChatUpdateArguments = {
         channel,
         ts: initialMsg.ts,
         text: initialMsg.text,
+        blocks: initialMsg.blocks ? (initialMsg.blocks as (Block | KnownBlock)[]) : [],
         metadata: {
           event_type: 'assistant_thread_context',
           event_payload: threadContext as MessageMetadataEventPayloadObject,
         },
       };
-
-      if (initialMsg.blocks) {
-        params.blocks = initialMsg.blocks as (KnownBlock | Block)[];
-      }
 
       await client.chat.update(params);
     }

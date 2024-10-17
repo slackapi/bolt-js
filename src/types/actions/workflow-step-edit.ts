@@ -2,6 +2,8 @@
  * A Slack step from app action wrapped in the standard metadata.
  *
  * This describes the entire JSON-encoded body of a request from Slack step from app actions.
+ * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
+ * version.
  */
 export interface WorkflowStepEdit {
   type: 'workflow_step_edit';
@@ -27,12 +29,13 @@ export interface WorkflowStepEdit {
   workflow_step: {
     workflow_id: string;
     step_id: string;
-    inputs: {
-      [key: string]: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    inputs: Record<
+      string,
+      {
+        // biome-ignore lint/suspicious/noExplicitAny: input parameters can accept anything
         value: any;
-      };
-    };
+      }
+    >;
     outputs: {
       name: string;
       type: string;

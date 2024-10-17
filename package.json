@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "3.22.0",
+  "version": "4.0.0-rc.5",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -21,18 +21,18 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">=14.21.3",
-    "npm": ">=6.14.18"
+    "node": ">=18",
+    "npm": ">=8.6.0"
   },
   "scripts": {
     "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
-    "build:clean": "shx rm -rf ./dist ./coverage ./.nyc_output",
-    "lint": "eslint --fix --ext .ts src",
-    "mocha": "TS_NODE_PROJECT=tsconfig.json nyc mocha --config .mocharc.json \"src/**/*.spec.ts\"",
-    "test": "npm run build && npm run lint && npm run mocha && npm run test:types",
-    "test:coverage": "npm run mocha && nyc report --reporter=text",
-    "test:types": "tsd",
+    "build:clean": "shx rm -rf ./dist ./coverage",
+    "lint": "npx @biomejs/biome check --write docs src test examples",
+    "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
+    "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
+    "test:coverage": "c8 npm run test:unit",
+    "test:types": "tsd --files test/types",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": "slackapi/bolt",
@@ -42,48 +42,34 @@
   },
   "dependencies": {
     "@slack/logger": "^4.0.0",
-    "@slack/oauth": "^2.6.3",
-    "@slack/socket-mode": "^1.3.6",
+    "@slack/oauth": "^3",
+    "@slack/socket-mode": "^2.0.2",
     "@slack/types": "^2.13.0",
-    "@slack/web-api": "^6.13.0",
-    "@types/express": "^4.16.1",
-    "@types/promise.allsettled": "^1.0.3",
-    "@types/tsscmp": "^1.0.0",
+    "@slack/web-api": "^7",
+    "@types/express": "^4.17.21",
     "axios": "^1.7.4",
-    "express": "^4.21.0",
+    "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
-    "promise.allsettled": "^1.0.2",
-    "raw-body": "^2.3.3",
+    "raw-body": "^3",
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
     "@types/node": "22.7.5",
     "@types/sinon": "^7.0.11",
-    "@typescript-eslint/eslint-plugin": "^4.4.1",
-    "@typescript-eslint/parser": "^4.4.0",
+    "@types/tsscmp": "^1.0.0",
+    "c8": "^10.1.2",
     "chai": "~4.3.0",
-    "eslint": "^7.26.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-airbnb-typescript": "^12.3.1",
-    "eslint-plugin-import": "^2.28.0",
-    "eslint-plugin-jsdoc": "^30.6.1",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-react": "^7.29.3",
-    "eslint-plugin-react-hooks": "^4.3.0",
     "mocha": "^10.2.0",
-    "nyc": "^15.1.0",
     "rewiremock": "^3.13.4",
     "shx": "^0.3.2",
     "sinon": "^18.0.1",
     "source-map-support": "^0.5.12",
     "ts-node": "^10.9.2",
-    "tsd": "^0.22.0",
-    "typescript": "4.8.4"
-  },
-  "tsd": {
-    "directory": "types-tests"
+    "tsd": "^0.31.2",
+    "typescript": "5.3.3"
   }
 }

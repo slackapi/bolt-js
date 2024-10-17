@@ -1,120 +1,122 @@
-/* eslint-disable @typescript-eslint/dot-notation */
-import { SlackEvent } from '@slack/types';
-import {
-  Middleware,
+import type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from '../App';
+import { ContextMissingPropertyError } from '../errors';
+import type {
   AnyMiddlewareArgs,
+  BlockElementAction,
+  BlockSuggestion,
+  DialogSubmitAction,
+  DialogSuggestion,
+  EventTypePattern,
+  GlobalShortcut,
+  InteractiveMessage,
+  InteractiveMessageSuggestion,
+  MessageShortcut,
+  Middleware,
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
-  SlackViewMiddlewareArgs,
-  SlackAction,
-  SlackShortcut,
-  SlashCommand,
-  SlackOptions,
-  BlockSuggestion,
-  InteractiveMessageSuggestion,
-  DialogSuggestion,
-  InteractiveMessage,
-  DialogSubmitAction,
-  GlobalShortcut,
-  MessageShortcut,
-  BlockElementAction,
   SlackViewAction,
-  EventTypePattern,
-  ViewOutput,
+  SlackViewMiddlewareArgs,
 } from '../types';
-import { ActionConstraints, ViewConstraints, ShortcutConstraints, OptionsConstraints } from '../App';
-import { ContextMissingPropertyError } from '../errors';
+
+/** Type predicate that can narrow payloads block action or suggestion payloads */
+function isBlockPayload(
+  payload:
+    | SlackActionMiddlewareArgs['payload']
+    | SlackOptionsMiddlewareArgs['payload']
+    | SlackViewMiddlewareArgs['payload'],
+): payload is BlockElementAction | BlockSuggestion {
+  return 'action_id' in payload && payload.action_id !== undefined;
+}
+
+type CallbackIdentifiedBody =
+  | InteractiveMessage
+  | DialogSubmitAction
+  | MessageShortcut
+  | GlobalShortcut
+  | InteractiveMessageSuggestion
+  | DialogSuggestion;
+
+// TODO: consider exporting these type guards for use elsewhere within bolt
+// TODO: is there overlap with `function_executed` event here?
+function isCallbackIdentifiedBody(
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],
+): body is CallbackIdentifiedBody {
+  return 'callback_id' in body && body.callback_id !== undefined;
+}
+
+// TODO: clarify terminology used internally: event vs. body vs. payload
+/** Type predicate that can narrow event bodies to ones containing Views */
+function isViewBody(
+  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
+): body is SlackViewAction {
+  return 'view' in body && body.view !== undefined;
+}
+
+function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
+  return 'event' in args && args.event !== undefined;
+}
+
+function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
+  return isEventArgs(args) && 'message' in args;
+}
 
 /**
  * Middleware that filters out any event that isn't an action
  */
-export const onlyActions: Middleware<AnyMiddlewareArgs & { action?: SlackAction }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { action, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-actions
-  if (action === undefined) {
-    return;
+export const onlyActions: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('action' in args && args.action) {
+    await args.next();
   }
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a shortcut
  */
-export const onlyShortcuts: Middleware<AnyMiddlewareArgs & { shortcut?: SlackShortcut }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { shortcut, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-shortcuts
-  if (shortcut === undefined) {
-    return;
+export const onlyShortcuts: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('shortcut' in args && args.shortcut) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't a command
  */
-export const onlyCommands: Middleware<AnyMiddlewareArgs & { command?: SlashCommand }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { command, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-commands
-  if (command === undefined) {
-    return;
+export const onlyCommands: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('command' in args && args.command) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
  * Middleware that filters out any event that isn't an options
  */
-export const onlyOptions: Middleware<AnyMiddlewareArgs & { options?: SlackOptions }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { options, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-options requests
-  if (options === undefined) {
-    return;
+export const onlyOptions: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('options' in args && args.options) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
+// TODO: event terminology here "event that isn't an event" wat
 /**
  * Middleware that filters out any event that isn't an event
  */
-export const onlyEvents: Middleware<AnyMiddlewareArgs & { event?: SlackEvent }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { event, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out any non-events
-  if (event === undefined) {
-    return;
+export const onlyEvents: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if (isEventArgs(args)) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
+// TODO: event terminology "ViewAction" is confusing since "Action" we use for block actions
 /**
  * Middleware that filters out any event that isn't a view_submission or view_closed event
  */
-export const onlyViewActions: Middleware<AnyMiddlewareArgs & { view?: ViewOutput }> = async (args) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { view, next } = args as any; // FIXME: workaround for TypeScript 4.7 breaking changes
-  // Filter out anything that doesn't have a view
-  if (view === undefined) {
-    return;
+export const onlyViewActions: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('view' in args) {
+    await args.next();
   }
-
-  // It matches so we should continue down this middleware listener chain
-  await next();
 };
 
 /**
@@ -144,7 +146,7 @@ export function matchConstraints(
           tempMatches = payload.block_id.match(constraints.block_id);
 
           if (tempMatches !== null) {
-            context['blockIdMatches'] = tempMatches;
+            context.blockIdMatches = tempMatches;
           } else {
             return;
           }
@@ -161,7 +163,7 @@ export function matchConstraints(
           tempMatches = payload.action_id.match(constraints.action_id);
 
           if (tempMatches !== null) {
-            context['actionIdMatches'] = tempMatches;
+            context.actionIdMatches = tempMatches;
           } else {
             return;
           }
@@ -171,12 +173,12 @@ export function matchConstraints(
 
     // Check callback_id
     if ('callback_id' in constraints && constraints.callback_id !== undefined) {
-      let callbackId: string = '';
+      let callbackId = '';
 
       if (isViewBody(body)) {
-        callbackId = body['view']['callback_id'];
+        callbackId = body.view.callback_id;
       } else if (isCallbackIdentifiedBody(body)) {
-        callbackId = body['callback_id'];
+        callbackId = body.callback_id;
       } else {
         return;
       }
@@ -189,7 +191,7 @@ export function matchConstraints(
         tempMatches = callbackId.match(constraints.callback_id);
 
         if (tempMatches !== null) {
-          context['callbackIdMatches'] = tempMatches;
+          context.callbackIdMatches = tempMatches;
         } else {
           return;
         }
@@ -227,7 +229,7 @@ export function matchMessage(
       tempMatches = event.text.match(pattern);
 
       if (tempMatches !== null) {
-        context['matches'] = tempMatches;
+        context.matches = tempMatches;
       } else {
         return;
       }
@@ -277,7 +279,7 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
       tempMatches = event.type.match(pattern);
 
       if (tempMatches !== null) {
-        context['matches'] = tempMatches;
+        context.matches = tempMatches;
       } else {
         return;
       }
@@ -287,48 +289,40 @@ export function matchEventType(pattern: EventTypePattern): Middleware<SlackEvent
   };
 }
 
-// TODO: breaking change: why does this method have to be invoked as a function with no args, while other similar
-// method like the `only*` ones do not require that? should make this consistent.
 /**
  * Filters out any event originating from the handling app.
  */
-export function ignoreSelf(): Middleware<AnyMiddlewareArgs> {
-  return async (args) => {
-    const botId = args.context.botId as string;
-    const botUserId = args.context.botUserId !== undefined ? (args.context.botUserId as string) : undefined;
+export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
+  const { botId, botUserId } = args.context;
 
-    if (isEventArgs(args)) {
-      if (args.event.type === 'message') {
-        // Once we've narrowed the type down to SlackEventMiddlewareArgs, there's no way to further narrow it down to
-        // SlackEventMiddlewareArgs<'message'> without a cast, so the following couple lines do that.
-        // TODO: there must be a better way; generics-based types for event and middleware arguments likely the issue
-        // should instead use a discriminated union
-        const message = args.message as unknown as SlackEventMiddlewareArgs<'message'>['message'];
-        if (message !== undefined) {
-        // TODO: revisit this once we have all the message subtypes defined to see if we can do this better with
-        // type narrowing
-        // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
-          if (message.subtype === 'bot_message' && message.bot_id === botId) {
-            return;
-          }
-        }
-      }
-
-      // Its an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
-      // However, some events still must be fired, because they can make sense.
-      const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
-      const isEventShouldBeKept = eventsWhichShouldBeKept.includes(args.event.type);
-
-      if (botUserId !== undefined && 'user' in args.event && args.event.user === botUserId && !isEventShouldBeKept) {
+  if (isEventArgs(args)) {
+    if (isMessageEventArgs(args)) {
+      const { message } = args;
+      // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
+      if (message.subtype === 'bot_message' && message.bot_id === botId) {
         return;
       }
     }
 
-    // If all the previous checks didn't skip this message, then its okay to resume to next
-    await args.next();
-  };
-}
+    // It's an Events API event that isn't of type message, but the user ID might match our own app. Filter these out.
+    // However, some events still must be fired, because they can make sense.
+    const eventsWhichShouldBeKept = ['member_joined_channel', 'member_left_channel'];
 
+    if (
+      botUserId !== undefined &&
+      'user' in args.event &&
+      args.event.user === botUserId &&
+      !eventsWhichShouldBeKept.includes(args.event.type)
+    ) {
+      return;
+    }
+  }
+
+  // If all the previous checks didn't skip this message, then its okay to resume to next
+  await args.next();
+};
+
+// TODO: breaking change: constrain the subtype argument to be a valid message subtype
 /**
  * Filters out any message events whose subtype does not match the provided subtype.
  */
@@ -342,75 +336,36 @@ export function subtype(subtype1: string): Middleware<SlackEventMiddlewareArgs<'
 
 const slackLink = /<(?<type>[@#!])?(?<link>[^>|]+)(?:\|(?<label>[^>]+))?>/;
 
-// TODO: breaking change: why does this method have to be invoked as a function with no args, while other similar
-// method like the `only*` ones do not require that? should make this consistent.
 /**
  * Filters out any message event whose text does not start with an @-mention of the handling app.
  */
-export function directMention(): Middleware<SlackEventMiddlewareArgs<'message'>> {
-  return async ({ message, context, next }) => {
-    // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
-    if (context.botUserId === undefined) {
-      throw new ContextMissingPropertyError(
-        'botUserId',
-        'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
-      );
-    }
+export const directMention: Middleware<SlackEventMiddlewareArgs<'message'>> = async ({ message, context, next }) => {
+  // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
+  if (context.botUserId === undefined) {
+    throw new ContextMissingPropertyError(
+      'botUserId',
+      'Cannot match direct mentions of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
+    );
+  }
 
-    if (!message || !('text' in message) || message.text === undefined) {
-      return;
-    }
+  if (!message || !('text' in message) || message.text === undefined) {
+    return;
+  }
 
-    // Match the message text with a user mention format
-    const text = message.text.trim();
+  // Match the message text with a user mention format
+  const text = message.text.trim();
 
-    const matches = slackLink.exec(text);
-    if (
-      matches === null || // stop when no matches are found
-      matches.index !== 0 || // stop if match isn't at the beginning
-      // stop if match isn't a user mention with the right user ID
-      matches.groups === undefined ||
-      matches.groups.type !== '@' ||
-      matches.groups.link !== context.botUserId
-    ) {
-      return;
-    }
+  const matches = slackLink.exec(text);
+  if (
+    matches === null || // stop when no matches are found
+    matches.index !== 0 || // stop if match isn't at the beginning
+    // stop if match isn't a user mention with the right user ID
+    matches.groups === undefined ||
+    matches.groups.type !== '@' ||
+    matches.groups.link !== context.botUserId
+  ) {
+    return;
+  }
 
-    await next();
-  };
-}
-
-function isBlockPayload(
-  payload:
-  | SlackActionMiddlewareArgs['payload']
-  | SlackOptionsMiddlewareArgs['payload']
-  | SlackViewMiddlewareArgs['payload'],
-): payload is BlockElementAction | BlockSuggestion {
-  return (payload as BlockElementAction | BlockSuggestion).action_id !== undefined;
-}
-
-type CallbackIdentifiedBody =
-  | InteractiveMessage
-  | DialogSubmitAction
-  | MessageShortcut
-  | GlobalShortcut
-  | InteractiveMessageSuggestion
-  | DialogSuggestion;
-
-function isCallbackIdentifiedBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackShortcutMiddlewareArgs['body'],
-): body is CallbackIdentifiedBody {
-  return (body as CallbackIdentifiedBody).callback_id !== undefined;
-}
-
-function isViewBody(
-  body: SlackActionMiddlewareArgs['body'] | SlackOptionsMiddlewareArgs['body'] | SlackViewMiddlewareArgs['body'],
-): body is SlackViewAction {
-  return (body as SlackViewAction).view !== undefined;
-}
-
-function isEventArgs(
-  args: AnyMiddlewareArgs,
-): args is SlackEventMiddlewareArgs {
-  return (args as SlackEventMiddlewareArgs).event !== undefined;
-}
+  await next();
+};
