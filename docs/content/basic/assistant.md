@@ -99,6 +99,4 @@ const assistant = new Assistant({
 });
 ```
 
-`DefaultThreadContextStore` is not intended for use in production. For production apps, we recommend creating a class that inherits `AssistantThreadContextStore`.
-
 For a fully functional example, please refer to the [Bolt for JavaScript Assistant template](https://github.com/slack-samples/bolt-js-assistant-template) on GitHub.
