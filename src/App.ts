@@ -63,6 +63,7 @@ import { StringIndexed } from './types/helpers';
 // eslint-disable-next-line import/order
 import allSettled = require('promise.allsettled'); // eslint-disable-line @typescript-eslint/no-require-imports
 import { FunctionCompleteFn, FunctionFailFn, CustomFunction, CustomFunctionMiddleware } from './CustomFunction';
+import { Assistant } from './Assistant';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-commonjs
 const packageJson = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -516,6 +517,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     m: Middleware<AnyMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>,
   ): this {
     this.middleware.push(m as Middleware<AnyMiddlewareArgs>);
+    return this;
+  }
+
+  /**
+   * Register Assistant middleware
+   *
+   * @param assistant global assistant middleware function
+   */
+  public assistant(assistant: Assistant): this {
+    const m = assistant.getMiddleware();
+    this.middleware.push(m);
     return this;
   }
 
