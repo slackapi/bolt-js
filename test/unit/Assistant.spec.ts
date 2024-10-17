@@ -27,7 +27,7 @@ async function importAssistant(overrides: Override = {}): Promise<typeof import(
   return rewiremock.module(() => import('../../src/Assistant'), overrides);
 }
 
-const MOCK_FN = async () => { };
+const MOCK_FN = async () => {};
 
 const MOCK_CONFIG_SINGLE = {
   threadStarted: MOCK_FN,
@@ -70,7 +70,7 @@ describe('Assistant class', () => {
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = {
-          threadStarted: async () => { },
+          threadStarted: async () => {},
         } as unknown as AssistantConfig;
 
         const validationFn = () => validate(badConfig);
@@ -83,9 +83,9 @@ describe('Assistant class', () => {
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = {
-          threadStarted: async () => { },
+          threadStarted: async () => {},
           threadContextChanged: {},
-          userMessage: async () => { },
+          userMessage: async () => {},
         } as unknown as AssistantConfig;
 
         const validationFn = () => validate(badConfig);
@@ -363,7 +363,7 @@ describe('Assistant class', () => {
         const fn1 = sinon.spy((async ({ next: continuation }) => {
           await continuation();
         }) as Middleware<AssistantThreadStartedEvent>);
-        const fn2 = sinon.spy(async () => { });
+        const fn2 = sinon.spy(async () => {});
         const fakeMiddleware = [fn1, fn2] as AssistantMiddleware;
 
         await processAssistantMiddleware(mockThreadContextChangedArgs, fakeMiddleware);
@@ -380,6 +380,6 @@ function createMockThreadContextStore(): AssistantThreadContextStore {
     async get(_: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext> {
       return {};
     },
-    async save(_: AllAssistantMiddlewareArgs): Promise<void> { },
+    async save(_: AllAssistantMiddlewareArgs): Promise<void> {},
   };
 }

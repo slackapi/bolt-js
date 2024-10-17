@@ -9,14 +9,18 @@ describe('DefaultThreadContextStore class', () => {
   describe('get', () => {
     it('should retrieve message metadata if context not already saved to instance', async () => {
       const mockContextStore = new DefaultThreadContextStore();
-      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+      const botUserId = 'U1234';
+      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs(), {
+        botUserId,
+        isEnterpriseInstall: false,
+      });
       const mockThreadContext = { channel_id: '123', thread_ts: '123', enterprise_id: null };
       const fakeClient = {
         conversations: {
           replies: sinon.fake.returns({
             messages: [
               {
-                user: 'U12345',
+                user: botUserId,
                 ts: '12345',
                 metadata: { event_payload: mockThreadContext },
               },
@@ -125,9 +129,13 @@ describe('DefaultThreadContextStore class', () => {
 
     it('should update first bot message metadata with threadContext', async () => {
       const mockContextStore = new DefaultThreadContextStore();
-      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+      const botUserId = 'U1234';
+      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs(), {
+        botUserId,
+        isEnterpriseInstall: false,
+      });
       const fakeClient = {
-        conversations: { replies: sinon.fake.returns({ messages: [{ user: 'U12345', ts: '12345', text: 'foo' }] }) },
+        conversations: { replies: sinon.fake.returns({ messages: [{ user: botUserId, ts: '12345', text: 'foo' }] }) },
         chat: { update: sinon.fake() },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
@@ -136,6 +144,7 @@ describe('DefaultThreadContextStore class', () => {
         channel: channelId,
         ts: '12345',
         text: 'foo',
+        blocks: [],
         metadata: {
           event_type: 'assistant_thread_context',
           event_payload: context,

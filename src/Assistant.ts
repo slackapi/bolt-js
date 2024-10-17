@@ -74,14 +74,14 @@ export type AssistantMiddlewareArgs =
 // TODO: revisit Omit of `say`, as it's added on as part of the enrichment step
 export interface AssistantThreadStartedMiddlewareArgs
   extends Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>,
-  AssistantUtilityArgs { }
+    AssistantUtilityArgs {}
 export interface AssistantThreadContextChangedMiddlewareArgs
   extends Omit<SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, 'say'>,
-  AssistantUtilityArgs { }
+    AssistantUtilityArgs {}
 // TODO: extending from SlackEventMiddlewareArgs<'message'> likely insufficient as not all message event payloads contain thread_ts - whereas assistant user message events do. Likely need to narrow this down further.
 export interface AssistantUserMessageMiddlewareArgs
   extends Omit<SlackEventMiddlewareArgs<'message'>, 'say'>,
-  AssistantUtilityArgs { }
+    AssistantUtilityArgs {}
 
 export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> = T &
   AllMiddlewareArgs;
