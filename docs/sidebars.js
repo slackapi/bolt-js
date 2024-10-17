@@ -57,6 +57,7 @@ const sidebars = {
         'advanced/logging',
         'advanced/custom-routes',
         'advanced/receiver',
+        'advanced/app-assistant'
       ],
     },
     {
