@@ -9,15 +9,13 @@ import {
   type AssistantConfig,
   type AssistantMiddleware,
   type AssistantMiddlewareArgs,
-  type AssistantThreadContextChangedMiddlewareArgs,
-  type AssistantThreadStartedMiddlewareArgs,
-  type AssistantUserMessageMiddlewareArgs,
 } from '../../src/Assistant';
 import type { AssistantThreadContext, AssistantThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from '../../src/errors';
-import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SlackEventMiddlewareArgs } from '../../src/types';
+import type { Middleware } from '../../src/types';
 import {
   type Override,
+  createDummyAppMentionEventMiddlewareArgs,
   createDummyAssistantThreadContextChangedEventMiddlewareArgs,
   createDummyAssistantThreadStartedEventMiddlewareArgs,
   createDummyAssistantUserMessageEventMiddlewareArgs,
@@ -29,7 +27,7 @@ async function importAssistant(overrides: Override = {}): Promise<typeof import(
   return rewiremock.module(() => import('../../src/Assistant'), overrides);
 }
 
-const MOCK_FN = async () => {};
+const MOCK_FN = async () => { };
 
 const MOCK_CONFIG_SINGLE = {
   threadStarted: MOCK_FN,
@@ -72,7 +70,7 @@ describe('Assistant class', () => {
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = {
-          threadStarted: async () => {},
+          threadStarted: async () => { },
         } as unknown as AssistantConfig;
 
         const validationFn = () => validate(badConfig);
@@ -85,9 +83,9 @@ describe('Assistant class', () => {
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = {
-          threadStarted: async () => {},
+          threadStarted: async () => { },
           threadContextChanged: {},
-          userMessage: async () => {},
+          userMessage: async () => { },
         } as unknown as AssistantConfig;
 
         const validationFn = () => validate(badConfig);
@@ -130,7 +128,7 @@ describe('Assistant class', () => {
       });
 
       it('should return false if not a recognized assistant event', async () => {
-        const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
+        const fakeMessageArgs = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs());
         const { isAssistantEvent } = await importAssistant();
         assert.isFalse(isAssistantEvent(fakeMessageArgs));
       });
@@ -140,7 +138,7 @@ describe('Assistant class', () => {
       it('should return true if recognized assistant message', async () => {
         const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
         const { matchesConstraints } = await importAssistant();
-        assert(matchesConstraints(mockUserMessageArgs));
+        assert.ok(matchesConstraints(mockUserMessageArgs));
       });
 
       it('should return false if not supported message subtype', async () => {
@@ -365,7 +363,7 @@ describe('Assistant class', () => {
         const fn1 = sinon.spy((async ({ next: continuation }) => {
           await continuation();
         }) as Middleware<AssistantThreadStartedEvent>);
-        const fn2 = sinon.spy(async () => {});
+        const fn2 = sinon.spy(async () => { });
         const fakeMiddleware = [fn1, fn2] as AssistantMiddleware;
 
         await processAssistantMiddleware(mockThreadContextChangedArgs, fakeMiddleware);
@@ -382,6 +380,6 @@ function createMockThreadContextStore(): AssistantThreadContextStore {
     async get(_: AllAssistantMiddlewareArgs): Promise<AssistantThreadContext> {
       return {};
     },
-    async save(_: AllAssistantMiddlewareArgs): Promise<void> {},
+    async save(_: AllAssistantMiddlewareArgs): Promise<void> { },
   };
 }

@@ -74,14 +74,14 @@ export type AssistantMiddlewareArgs =
 // TODO: revisit Omit of `say`, as it's added on as part of the enrichment step
 export interface AssistantThreadStartedMiddlewareArgs
   extends Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>,
-    AssistantUtilityArgs {}
+  AssistantUtilityArgs { }
 export interface AssistantThreadContextChangedMiddlewareArgs
   extends Omit<SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, 'say'>,
-    AssistantUtilityArgs {}
+  AssistantUtilityArgs { }
 // TODO: extending from SlackEventMiddlewareArgs<'message'> likely insufficient as not all message event payloads contain thread_ts - whereas assistant user message events do. Likely need to narrow this down further.
 export interface AssistantUserMessageMiddlewareArgs
   extends Omit<SlackEventMiddlewareArgs<'message'>, 'say'>,
-    AssistantUtilityArgs {}
+  AssistantUtilityArgs { }
 
 export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> = T &
   AllMiddlewareArgs;
@@ -203,7 +203,7 @@ export function isAssistantMessage(payload: AnyMiddlewareArgs['payload']): boole
   const inAssistantContainer =
     'channel_type' in payload &&
     payload.channel_type === 'im' &&
-    (!('subtype' in payload) || payload.subtype === 'file_share');
+    (!('subtype' in payload) || payload.subtype === 'file_share' || payload.subtype === undefined); // TODO: undefined subtype is a limitation of message event, needs fixing (see https://github.com/slackapi/node-slack-sdk/issues/1904)
   return isThreadMessage && inAssistantContainer;
 }
 

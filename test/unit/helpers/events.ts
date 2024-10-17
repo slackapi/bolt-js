@@ -157,6 +157,7 @@ interface DummyMessageOverrides {
   blocks?: (KnownBlock | Block)[];
   channel_type?: GenericMessageEvent['channel_type'];
   thread_ts?: string;
+  subtype?: GenericMessageEvent['subtype'];
 }
 export function createDummyMessageEventMiddlewareArgs(
   msgOverrides?: DummyMessageOverrides,
@@ -165,7 +166,7 @@ export function createDummyMessageEventMiddlewareArgs(
 ): SlackEventMiddlewareArgs<'message'> {
   const payload: MessageEvent = msgOverrides?.message || {
     type: 'message',
-    subtype: undefined,
+    subtype: msgOverrides?.subtype || undefined,
     event_ts: ts,
     channel,
     channel_type: msgOverrides?.channel_type || 'channel',

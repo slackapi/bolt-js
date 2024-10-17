@@ -1,7 +1,7 @@
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { type AllAssistantMiddlewareArgs, extractThreadInfo } from '../../src/Assistant';
+import { extractThreadInfo } from '../../src/Assistant';
 import { DefaultThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { createDummyAssistantThreadStartedEventMiddlewareArgs, wrapMiddleware } from './helpers';
 
