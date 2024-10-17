@@ -19,7 +19,7 @@ Agents and assistants comprise a new messaging experience for Slack. If you're u
   * [`chat:write`](https://api.slack.com/scopes/chat:write)
   * [`im:history`](https://api.slack.com/scopes/im:history)
 
-3 Within the App Settings **Event Subscriptions** page, subscribe to the following events: 
+3. Within the App Settings **Event Subscriptions** page, subscribe to the following events: 
   * [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started)
   * [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed)
   * [`message.im`](https://api.slack.com/events/message.im)
@@ -51,14 +51,14 @@ const assistant = new Assistant({
 |`threadContextStore` | Optional, but recommended | When provided, must have the required methods to get and save thread context, which will override the `getThreadContext` and `saveThreadContext` utilities. <br/> <br/> If not provided, a `DefaultAssistantContextStore` instance is used.
 | `threadStarted` | Required | Executes when the user opens the assistant container or otherwise begins a new chat, thus sending the [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event.
 | `threadContextChanged` | Optional | Executes when a user switches channels while the assistant container is open, thus sending the [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event. <br/> <br/>  If not provided, context will be saved using the AssistantContextStore's `save` method (either the `DefaultAssistantContextStore` instance or provided `threadContextStore`).
-| `userMessage` | Required |  Executes when a [message](https://api.slack.com/events/message), thus sending the [`message.im`](https://api.slack.com/events/message.im) event. These messages do not contain a subtype and must be deduced based on their shape and metadata (if provided). Bolt handles this deduction out of the box for those using the `Assistant` class.
+| `userMessage` | Required |  Executes when a [message](https://api.slack.com/events/message) is received, thus sending the [`message.im`](https://api.slack.com/events/message.im) event. These messages do not contain a subtype and must be deduced based on their shape and metadata (if provided). Bolt handles this deduction out of the box for those using the `Assistant` class.
 
 ### Utilities 
 
 Utility | Description
 |---|---|
 | `getThreadContext` | Alias for `AssistantContextStore.get()` method. Executed if custom `AssistantContextStore` value is provided.  <br/><br/>  If not provided, the `DefaultAssistantContextStore` instance will retrieve the most recent context saved to the instance.
-| `saveThreadContext` | Alias for `AssistantContextStore.save()`. Executed if `AssistantContextStore` value is provided. <br/> <br/> If not provided, the `DefaultAssistantContextStore` instance will save  the `assistant_thread.context` to the instance and attach it to the initial assistant message that was sent to the thread.
+| `saveThreadContext` | Alias for `AssistantContextStore.save()`. Executed if `AssistantContextStore` value is provided. <br/> <br/> If not provided, the `DefaultAssistantContextStore` instance will save the `assistant_thread.context` to the instance and attach it to the initial assistant message that was sent to the thread.
 | `say(message: string)` | Alias for the `postMessage` method.<br/><br/> Sends a message to the current assistant thread.
 | `setTitle(title: string)` | [Sets the title](https://api.slack.com/methods/assistant.threads.setTitle) of the assistant thread to capture the initial topic/question.
 | `setStatus(status: string)` | Sets the [status](https://api.slack.com/methods/assistant.threads.setStatus) of the assistant to give the appearance of active processing.
