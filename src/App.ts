@@ -4,6 +4,7 @@ import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import type { Assistant } from './Assistant';
 import {
   CustomFunction,
   type CustomFunctionMiddleware,
@@ -82,7 +83,6 @@ import type {
   WorkflowStepEdit,
 } from './types';
 import { contextBuiltinKeys } from './types';
-import type { Assistant } from './Assistant';
 import { type StringIndexed, isRejected } from './types/utilities';
 const packageJson = require('../package.json');
 
@@ -184,7 +184,7 @@ export type ErrorHandler = (error: CodedError) => Promise<void>;
 
 export type ExtendedErrorHandler = (args: ExtendedErrorHandlerArgs) => Promise<void>;
 
-export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler { }
+export interface AnyErrorHandler extends ErrorHandler, ExtendedErrorHandler {}
 
 // Used only in this file
 type MessageEventMiddleware<CustomContext extends StringIndexed = StringIndexed> = Middleware<
@@ -1167,7 +1167,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
                   context,
                   client,
                   logger: this.logger,
-                  next: () => { },
+                  next: () => {},
                 } as AnyMiddlewareArgs & AllMiddlewareArgs),
             );
           });
@@ -1258,7 +1258,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
         'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
-        'custom receiver. You can find your Signing Secret in your Slack App Settings.',
+          'custom receiver. You can find your Signing Secret in your Slack App Settings.',
       );
     }
     this.logger.debug('Initializing HTTPReceiver');
@@ -1355,9 +1355,9 @@ function runAuthTestForBotToken(
   return authorization.botUserId !== undefined && authorization.botId !== undefined
     ? Promise.resolve({ botUserId: authorization.botUserId, botId: authorization.botId })
     : client.auth.test({ token: authorization.botToken }).then((result) => ({
-      botUserId: result.user_id as string,
-      botId: result.bot_id as string,
-    }));
+        botUserId: result.user_id as string,
+        botId: result.bot_id as string,
+      }));
 }
 
 // the shortened type, which is supposed to be used only in this source file

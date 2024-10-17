@@ -1,7 +1,10 @@
 import type {
   AppHomeOpenedEvent,
   AppMentionEvent,
+  AssistantThreadContextChangedEvent,
+  AssistantThreadStartedEvent,
   Block,
+  GenericMessageEvent,
   KnownBlock,
   MessageEvent,
   ReactionAddedEvent,
@@ -9,6 +12,11 @@ import type {
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import { createFakeLogger } from '.';
+import type {
+  AssistantThreadContextChangedMiddlewareArgs,
+  AssistantThreadStartedMiddlewareArgs,
+  AssistantUserMessageMiddlewareArgs,
+} from '../../../src/Assistant';
 import type {
   AckFn,
   AllMiddlewareArgs,
@@ -147,6 +155,8 @@ interface DummyMessageOverrides {
   text?: string;
   user?: string;
   blocks?: (KnownBlock | Block)[];
+  channel_type?: GenericMessageEvent['channel_type'];
+  thread_ts?: string;
 }
 export function createDummyMessageEventMiddlewareArgs(
   msgOverrides?: DummyMessageOverrides,
@@ -158,11 +168,12 @@ export function createDummyMessageEventMiddlewareArgs(
     subtype: undefined,
     event_ts: ts,
     channel,
-    channel_type: 'channel',
+    channel_type: msgOverrides?.channel_type || 'channel',
     user: msgOverrides?.user || user,
     ts,
     text: msgOverrides?.text || 'hi',
     blocks: msgOverrides?.blocks || [],
+    ...(msgOverrides?.thread_ts ? { thread_ts: msgOverrides.thread_ts } : {}),
   };
   return {
     payload,
@@ -196,7 +207,70 @@ export function createDummyAppMentionEventMiddlewareArgs(
     say,
   };
 }
+function enrichDummyAssistantMiddlewareArgs() {
+  return {
+    getThreadContext: sinon.spy(),
+    saveThreadContext: sinon.spy(),
+    setStatus: sinon.spy(),
+    setSuggestedPrompts: sinon.spy(),
+    setTitle: sinon.spy(),
+  };
+}
+export function createDummyAssistantThreadContextChangedEventMiddlewareArgs(
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): AssistantThreadContextChangedMiddlewareArgs {
+  const payload: AssistantThreadContextChangedEvent = {
+    type: 'assistant_thread_context_changed',
+    assistant_thread: {
+      channel_id: channel,
+      context: { channel_id: channel, team_id: team },
+      user_id: user,
+      thread_ts: ts,
+    },
+    event_ts: ts,
+  };
+  return {
+    payload,
+    event: payload,
+    body: envelopeEvent(payload, bodyOverrides),
+    say,
+    ...enrichDummyAssistantMiddlewareArgs(),
+  };
+}
+export function createDummyAssistantThreadStartedEventMiddlewareArgs(
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): AssistantThreadStartedMiddlewareArgs {
+  const payload: AssistantThreadStartedEvent = {
+    type: 'assistant_thread_started',
+    assistant_thread: {
+      channel_id: channel,
+      context: { channel_id: channel, team_id: team },
+      user_id: user,
+      thread_ts: ts,
+    },
+    event_ts: ts,
+  };
+  return {
+    payload,
+    event: payload,
+    body: envelopeEvent(payload, bodyOverrides),
+    say,
+    ...enrichDummyAssistantMiddlewareArgs(),
+  };
+}
 
+export function createDummyAssistantUserMessageEventMiddlewareArgs(
+  msgOverrides?: DummyMessageOverrides,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): AssistantUserMessageMiddlewareArgs {
+  return {
+    ...createDummyMessageEventMiddlewareArgs(msgOverrides || { thread_ts: ts, channel_type: 'im' }, bodyOverrides),
+    ...enrichDummyAssistantMiddlewareArgs(),
+  };
+}
 interface DummyCommandOverride {
   command?: string;
   slashCommand?: SlashCommand;

@@ -13,7 +13,7 @@ import { CustomFunctionInitializationError } from '../../src/errors';
 import type { AllMiddlewareArgs, Middleware } from '../../src/types';
 import { type Override, createFakeLogger } from './helpers';
 
-async function importCustomFunction(overrides: Override = {}): Promise<typeof import('../../src//CustomFunction')> {
+async function importCustomFunction(overrides: Override = {}): Promise<typeof import('../../src/CustomFunction')> {
   return rewiremock.module(() => import('../../src/CustomFunction'), overrides);
 }
 

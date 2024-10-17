@@ -1,25 +1,19 @@
-import {
+import type {
   AssistantThreadsSetStatusResponse,
   AssistantThreadsSetSuggestedPromptsResponse,
   AssistantThreadsSetTitleResponse,
   ChatPostMessageArguments,
 } from '@slack/web-api';
-import processMiddleware from './middleware/process';
 import {
-  AllMiddlewareArgs,
-  AnyMiddlewareArgs,
-  Middleware,
-  SayFn,
-  SlackEventMiddlewareArgs,
-} from './types';
-import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
-import {
-  AssistantThreadContext,
-  AssistantThreadContextStore,
+  type AssistantThreadContext,
+  type AssistantThreadContextStore,
   DefaultThreadContextStore,
-  GetThreadContextFn,
-  SaveThreadContextFn,
+  type GetThreadContextFn,
+  type SaveThreadContextFn,
 } from './AssistantThreadContextStore';
+import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
+import processMiddleware from './middleware/process';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
 
 /**
  * Configuration object used to instantiate the Assistant
@@ -43,13 +37,11 @@ interface AssistantUtilityArgs {
   setTitle: SetTitleFn;
 }
 
-interface SetStatusFn {
-  (status: string): Promise<AssistantThreadsSetStatusResponse>;
-}
+type SetStatusFn = (status: string) => Promise<AssistantThreadsSetStatusResponse>;
 
-interface SetSuggestedPromptsFn {
-  (params: SetSuggestedPromptsArguments): Promise<AssistantThreadsSetSuggestedPromptsResponse>;
-}
+type SetSuggestedPromptsFn = (
+  params: SetSuggestedPromptsArguments,
+) => Promise<AssistantThreadsSetSuggestedPromptsResponse>;
 
 interface SetSuggestedPromptsArguments {
   prompts: [AssistantPrompt, ...AssistantPrompt[]];
@@ -60,9 +52,7 @@ interface AssistantPrompt {
   message: string;
 }
 
-interface SetTitleFn {
-  (title: string): Promise<AssistantThreadsSetTitleResponse>;
-}
+type SetTitleFn = (title: string) => Promise<AssistantThreadsSetTitleResponse>;
 
 /**
  * Middleware
@@ -81,16 +71,20 @@ export type AssistantMiddlewareArgs =
   | AssistantThreadContextChangedMiddlewareArgs
   | AssistantUserMessageMiddlewareArgs;
 
-// TODO : revisit Omit of `say`, as it's added on as part of the enrichment step
-export interface AssistantThreadStartedMiddlewareArgs extends
-  Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>, AssistantUtilityArgs {}
-export interface AssistantThreadContextChangedMiddlewareArgs extends
-  Omit<SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, 'say'>, AssistantUtilityArgs {}
-export interface AssistantUserMessageMiddlewareArgs extends
-  Omit<SlackEventMiddlewareArgs, 'say'>, AssistantUtilityArgs {}
+// TODO: revisit Omit of `say`, as it's added on as part of the enrichment step
+export interface AssistantThreadStartedMiddlewareArgs
+  extends Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>,
+    AssistantUtilityArgs {}
+export interface AssistantThreadContextChangedMiddlewareArgs
+  extends Omit<SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, 'say'>,
+    AssistantUtilityArgs {}
+// TODO: extending from SlackEventMiddlewareArgs<'message'> likely insufficient as not all message event payloads contain thread_ts - whereas assistant user message events do. Likely need to narrow this down further.
+export interface AssistantUserMessageMiddlewareArgs
+  extends Omit<SlackEventMiddlewareArgs<'message'>, 'say'>,
+    AssistantUtilityArgs {}
 
-export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> =
-T & AllMiddlewareArgs;
+export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> = T &
+  AllMiddlewareArgs;
 
 /** Constants */
 const ASSISTANT_PAYLOAD_TYPES = new Set(['assistant_thread_started', 'assistant_thread_context_changed', 'message']);
@@ -171,7 +165,7 @@ export function enrichAssistantArgs(
   args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>,
 ): AllAssistantMiddlewareArgs {
   const { next: _next, ...assistantArgs } = args;
-  const preparedArgs = { ...assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'> };
+  const preparedArgs = { ...(assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'>) };
 
   // Do not pass preparedArgs (ie, do not add utilities to get/save)
   preparedArgs.getThreadContext = () => threadContextStore.get(args);
@@ -206,8 +200,10 @@ export function matchesConstraints(args: AssistantMiddlewareArgs): args is Assis
  */
 export function isAssistantMessage(payload: AnyMiddlewareArgs['payload']): boolean {
   const isThreadMessage = 'channel' in payload && 'thread_ts' in payload;
-  const inAssistantContainer = ('channel_type' in payload && payload.channel_type === 'im') &&
-  (!('subtype' in payload) || payload.subtype === 'file_share');
+  const inAssistantContainer =
+    'channel_type' in payload &&
+    payload.channel_type === 'im' &&
+    (!('subtype' in payload) || payload.subtype === 'file_share');
   return isThreadMessage && inAssistantContainer;
 }
 
@@ -224,7 +220,9 @@ export function validate(config: AssistantConfig): void {
   // Check for missing required keys
   const requiredKeys: (keyof AssistantConfig)[] = ['threadStarted', 'userMessage'];
   const missingKeys: (keyof AssistantConfig)[] = [];
-  requiredKeys.forEach((key) => { if (config[key] === undefined) missingKeys.push(key); });
+  for (const key of requiredKeys) {
+    if (config[key] === undefined) missingKeys.push(key);
+  }
 
   if (missingKeys.length > 0) {
     const errorMsg = `Assistant is missing required keys: ${missingKeys.join(', ')}`;
@@ -234,12 +232,12 @@ export function validate(config: AssistantConfig): void {
   // Ensure a callback or an array of callbacks is present
   const requiredFns: (keyof AssistantConfig)[] = ['threadStarted', 'userMessage'];
   if ('threadContextChanged' in config) requiredFns.push('threadContextChanged');
-  requiredFns.forEach((fn) => {
+  for (const fn of requiredFns) {
     if (typeof config[fn] !== 'function' && !Array.isArray(config[fn])) {
       const errorMsg = `Assistant ${fn} property must be a function or an array of functions`;
       throw new AssistantInitializationError(errorMsg);
     }
-  });
+  }
 
   // Validate threadContextStore
   if (config.threadContextStore) {
@@ -252,11 +250,11 @@ export function validate(config: AssistantConfig): void {
     // Check for missing required keys
     const requiredContextKeys: (keyof AssistantThreadContextStore)[] = ['get', 'save'];
     const missingContextKeys: (keyof AssistantThreadContextStore)[] = [];
-    requiredContextKeys.forEach((k) => {
+    for (const k of requiredContextKeys) {
       if (config.threadContextStore && config.threadContextStore[k] === undefined) {
         missingContextKeys.push(k);
       }
-    });
+    }
 
     if (missingContextKeys.length > 0) {
       const errorMsg = `threadContextStore is missing required keys: ${missingContextKeys.join(', ')}`;
@@ -265,12 +263,12 @@ export function validate(config: AssistantConfig): void {
 
     // Ensure properties of context store are functions
     const requiredStoreFns: (keyof AssistantThreadContextStore)[] = ['get', 'save'];
-    requiredStoreFns.forEach((fn) => {
+    for (const fn of requiredStoreFns) {
       if (config.threadContextStore && typeof config.threadContextStore[fn] !== 'function') {
         const errorMsg = `threadContextStore ${fn} property must be a function`;
         throw new AssistantInitializationError(errorMsg);
       }
-    });
+    }
   }
 }
 
@@ -286,9 +284,8 @@ export async function processAssistantMiddleware(
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
-    await processMiddleware(
-      callbacks, args, context, client, logger,
-      async () => lastCallback({ ...args, context, client, logger }),
+    await processMiddleware(callbacks, args, context, client, logger, async () =>
+      lastCallback({ ...args, context, client, logger }),
     );
   }
 }
@@ -303,16 +300,12 @@ export async function processAssistantMiddleware(
  * https://api.slack.com/methods/chat.postMessage
  */
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
-  const {
-    client,
-    payload,
-  } = args;
+  const { client, payload } = args;
   const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (message: Parameters<SayFn>[0]) => {
-    const postMessageArgument: ChatPostMessageArguments = typeof message === 'string' ?
-      { text: message, channel, thread_ts } :
-      { ...message, channel, thread_ts };
+    const postMessageArgument: ChatPostMessageArguments =
+      typeof message === 'string' ? { text: message, channel, thread_ts } : { ...message, channel, thread_ts };
 
     return client.chat.postMessage(postMessageArgument);
   };
@@ -323,17 +316,15 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
  * https://api.slack.com/methods/assistant.threads.setStatus
  */
 function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
-  const {
-    client,
-    payload,
-  } = args;
+  const { client, payload } = args;
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
-  return (status: Parameters<SetStatusFn>[0]) => client.assistant.threads.setStatus({
-    channel_id,
-    thread_ts,
-    status,
-  });
+  return (status: Parameters<SetStatusFn>[0]) =>
+    client.assistant.threads.setStatus({
+      channel_id,
+      thread_ts,
+      status,
+    });
 }
 
 /**
@@ -341,10 +332,7 @@ function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
  * https://api.slack.com/methods/assistant.threads.setSuggestedPrompts
  */
 function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggestedPromptsFn {
-  const {
-    client,
-    payload,
-  } = args;
+  const { client, payload } = args;
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
@@ -362,26 +350,28 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
  * https://api.slack.com/methods/assistant.threads.setTitle
  */
 function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
-  const {
-    client,
-    payload,
-  } = args;
+  const { client, payload } = args;
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
-  return (title: Parameters<SetTitleFn>[0]) => client.assistant.threads.setTitle({
-    channel_id,
-    thread_ts,
-    title,
-  });
+  return (title: Parameters<SetTitleFn>[0]) =>
+    client.assistant.threads.setTitle({
+      channel_id,
+      thread_ts,
+      title,
+    });
 }
 
 /**
  * `extractThreadInfo()` parses an incoming payload and returns relevant
  * details about the thread
-*/
-export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']): { channelId: string, threadTs: string, context: AssistantThreadContext } {
-  let channelId: string = '';
-  let threadTs: string = '';
+ */
+export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']): {
+  channelId: string;
+  threadTs: string;
+  context: AssistantThreadContext;
+} {
+  let channelId = '';
+  let threadTs = '';
   let context: AssistantThreadContext = {};
 
   // assistant_thread_started, asssistant_thread_context_changed
