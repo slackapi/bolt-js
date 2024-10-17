@@ -28,9 +28,7 @@ Agents and assistants comprise a new messaging experience for Slack. If you're u
 You _could_ implement your own assistants by [listening](/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 :::
 
-## The `Assistant` class
-
-### Instance structure
+## The `Assistant` class instance
 
 ```ts
 const assistant = new Assistant({
@@ -44,32 +42,14 @@ const assistant = new Assistant({
 });
 ```
 
-### The `AssistantConfig` configuration object
-
-| Property | Required? | Description | 
-|---|---|---|
-|`threadContextStore` | Optional, but recommended | When provided, must have the required methods to get and save thread context, which will override the `getThreadContext` and `saveThreadContext` utilities. <br/> <br/> If not provided, a `DefaultAssistantContextStore` instance is used.
-| `threadStarted` | Required | Executes when the user opens the assistant container or otherwise begins a new chat, thus sending the [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event.
-| `threadContextChanged` | Optional | Executes when a user switches channels while the assistant container is open, thus sending the [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event. <br/> <br/>  If not provided, context will be saved using the AssistantContextStore's `save` method (either the `DefaultAssistantContextStore` instance or provided `threadContextStore`).
-| `userMessage` | Required |  Executes when a [message](https://api.slack.com/events/message) is received, thus sending the [`message.im`](https://api.slack.com/events/message.im) event. These messages do not contain a subtype and must be deduced based on their shape and metadata (if provided). Bolt handles this deduction out of the box for those using the `Assistant` class.
-
-### Utilities 
-
-Utility | Description
-|---|---|
-| `getThreadContext` | Alias for `AssistantContextStore.get()` method. Executed if custom `AssistantContextStore` value is provided.  <br/><br/>  If not provided, the `DefaultAssistantContextStore` instance will retrieve the most recent context saved to the instance.
-| `saveThreadContext` | Alias for `AssistantContextStore.save()`. Executed if `AssistantContextStore` value is provided. <br/> <br/> If not provided, the `DefaultAssistantContextStore` instance will save the `assistant_thread.context` to the instance and attach it to the initial assistant message that was sent to the thread.
-| `say(message: string)` | Alias for the `postMessage` method.<br/><br/> Sends a message to the current assistant thread.
-| `setTitle(title: string)` | [Sets the title](https://api.slack.com/methods/assistant.threads.setTitle) of the assistant thread to capture the initial topic/question.
-| `setStatus(status: string)` | Sets the [status](https://api.slack.com/methods/assistant.threads.setStatus) of the assistant to give the appearance of active processing.
-| `setSuggestedPrompts({ prompts: [{ title: string; message: string; }]` |  Provides the user up to 4 optional, preset [prompts](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts) to choose from.
+You can store context through the `threadContextStore` property but it must feature `get` and `save` methods. If not provided, a `DefaultThreadContextStore` instance is utilized instead, which is a reference implementation that relies on storing and retrieving message metadata as the context changes.
 
 ## Handling a new thread
 
 The `threadStarted` event handler allows your app to respond to new threads opened by users. In the example below, the app is sending a message — containing context message metadata — to the user, along with a single [prompt](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts).
 
 ```js
-const assistant = new Assistant({
+...
   threadStarted: async ({ event, say, setSuggestedPrompts, saveThreadContext }) => {
     const { context } = event.assistant_thread;
 
@@ -95,19 +75,7 @@ const assistant = new Assistant({
 When a user opens an assistant thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
 :::
 
-
 ## Handling context changes 
-
-You can store context through the `threadContextStore` property but it must feature `get` and `save` methods.
-
-```js
-threadContextStore: {
-  get: async ({ context, client, payload }) => {},
-  save: async ({ context, client, payload }) => {},
-  },
-```
-
-If not provided, a `DefaultThreadContextStore` instance is utilized instead, which is a reference implementation that relies on storing and retrieving message metadata as the context changes. 
 
 When the user switches channels, the `assistant_thread_context_changed` event will be sent to your app. Capture this with the `threadContextChanged` handler.
 

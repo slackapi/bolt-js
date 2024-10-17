@@ -40,6 +40,7 @@ const sidebars = {
         'basic/options',
         'basic/authenticating-oauth',
         'basic/socket-mode',
+        'basic/app-assistant'
       ],
     },
     {
@@ -57,7 +58,6 @@ const sidebars = {
         'advanced/logging',
         'advanced/custom-routes',
         'advanced/receiver',
-        'advanced/app-assistant'
       ],
     },
     {
