@@ -4,6 +4,7 @@ import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
 import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import type { Assistant } from './Assistant';
 import {
   CustomFunction,
   type FunctionCompleteFn,
@@ -32,7 +33,6 @@ import {
 import {
   autoAcknowledge,
   ignoreSelf as ignoreSelfMiddleware,
-  isSlackEventMiddlewareArgsOptions,
   matchCommandName,
   matchConstraints,
   matchEventType,
@@ -502,6 +502,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     m: Middleware<AnyMiddlewareArgs<{ autoAcknowledge: false }>, AppCustomContext & MiddlewareCustomContext>,
   ): this {
     this.middleware.push(m as Middleware<AnyMiddlewareArgs>);
+    return this;
+  }
+
+  /**
+   * Register Assistant middleware
+   *
+   * @param assistant global assistant middleware function
+   */
+  public assistant(assistant: Assistant): this {
+    const m = assistant.getMiddleware();
+    this.middleware.push(m);
     return this;
   }
 
