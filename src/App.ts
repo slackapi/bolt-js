@@ -33,6 +33,7 @@ import {
 import {
   autoAcknowledge,
   ignoreSelf as ignoreSelfMiddleware,
+  isSlackEventMiddlewareArgsOptions,
   matchCommandName,
   matchConstraints,
   matchEventType,

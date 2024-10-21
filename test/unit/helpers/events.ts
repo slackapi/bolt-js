@@ -12,12 +12,12 @@ import type {
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import { createFakeLogger } from '.';
-import type { SlackCustomFunctionMiddlewareArgs } from '../../../src/CustomFunction';
 import type {
   AssistantThreadContextChangedMiddlewareArgs,
   AssistantThreadStartedMiddlewareArgs,
   AssistantUserMessageMiddlewareArgs,
 } from '../../../src/Assistant';
+import type { SlackCustomFunctionMiddlewareArgs } from '../../../src/CustomFunction';
 import type {
   AckFn,
   AllMiddlewareArgs,
