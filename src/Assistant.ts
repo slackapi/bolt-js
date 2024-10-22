@@ -375,7 +375,11 @@ export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']
   let context: AssistantThreadContext = {};
 
   // assistant_thread_started, asssistant_thread_context_changed
-  if ('assistant_thread' in payload) {
+  if (
+    'assistant_thread' in payload &&
+    'channel_id' in payload.assistant_thread &&
+    'thread_ts' in payload.assistant_thread
+  ) {
     channelId = payload.assistant_thread.channel_id;
     threadTs = payload.assistant_thread.thread_ts;
     context = payload.assistant_thread.context;
