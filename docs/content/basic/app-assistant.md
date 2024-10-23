@@ -33,22 +33,26 @@ You _could_ implement your own assistants by [listening](/concepts/event-listeni
 The [`Assistant`](/reference#the-assistantconfig-configuration-object) can be used to handle the incoming events expected from a user interacting with an assistant in Slack. A typical flow would look like:
 
 1. [The user starts a thread](#handling-new-thread). The `Assistant` class handles the incoming [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event.
-2. [The thread context may change at any point](#handling-context-changes). The `Assistant` class can handle any incoming [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) events. The class also provides a default `context` store to keep track of those changes as the user moves through Slack.
+2. [The thread context may change at any point](#handling-thread-context-changes). The `Assistant` class can handle any incoming [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) events. The class also provides a default `context` store to keep track of thread context changes as the user moves through Slack.
 3. [The user responds](#handling-user-response). The `Assistant` class handles the incoming [`message.im`](https://api.slack.com/events/message.im) event. 
 
 ```ts
 const assistant = new Assistant({
+  // If you prefer to not use the provided DefaultThreadContextStore, 
+  // you can use your own optional threadContextStore 
   threadContextStore: {
     get: async ({ context, client, payload }) => {},
     save: async ({ context, client, payload }) => {},
   },
   threadStarted: async ({ say, saveThreadContext, setStatus, setSuggestedPrompts, setTitle }) => {},
+  // threadContextChanged is optional
+  // If you use your own optional threadContextStore you likely won't use it
   threadContextChanged: async ({ say, setStatus, setSuggestedPrompts, setTitle }) => {},
   userMessage: async ({ say, getThreadContext, setStatus, setSuggestedPrompts, setTitle }) => {},
 });
 ```
 
-While the `assistant_thread_started` and `assistant_thread_context_changed` events do provide Slack-client context information, the `message.im` event does not. Any subsequent user message events won't contain context data. For that reason, Bolt not only provides a way to store context — the `threadContextStore` property — but it also provides a `DefaultThreadContextStore` instance that is utilized by default. This implementation relies on storing and retrieving [message metadata](https://api.slack.com/metadata/using) as the user interacts with the assistant. 
+While the `assistant_thread_started` and `assistant_thread_context_changed` events do provide Slack-client thread context information, the `message.im` event does not. Any subsequent user message events won't contain thread context data. For that reason, Bolt not only provides a way to store thread context — the `threadContextStore` property — but it also provides a `DefaultThreadContextStore` instance that is utilized by default. This implementation relies on storing and retrieving [message metadata](https://api.slack.com/metadata/using) as the user interacts with the assistant. 
 
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
@@ -60,7 +64,7 @@ Be sure to give the [assistants reference docs](/reference#assistants) a look!
 
 When the user opens a new thread with your assistant, the [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
 
-In the example below, the app is sending a message — containing context [message metadata](https://api.slack.com/metadata/using) — to the user, along with a single [prompt](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts).
+In the example below, the app is sending a message — containing thread context [message metadata](https://api.slack.com/metadata/using) — to the user, along with a single [prompt](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts).
 
 ```js
 ...
@@ -71,8 +75,6 @@ In the example below, the app is sending a message — containing context [messa
       text: 'Hi, how can I help?',
       metadata: { event_type: 'assistant_thread_context', event_payload: context },
     });
-
-    await saveThreadContext();
 
     const prompts = [{
       title: 'Fun Slack fact',
@@ -89,19 +91,19 @@ In the example below, the app is sending a message — containing context [messa
 When a user opens an assistant thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
 :::
 
-## Handling context changes {#handling-context-changes}
+## Handling thread context changes {#handling-thread-context-changes}
 
 When the user switches channels, the [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event will be sent to your app. Capture this with the `threadContextChanged` handler.
 
 ```js
 ...
-    threadContextChanged: async ({ saveThreadContext }) => {
+  threadContextChanged: async ({ saveThreadContext }) => {
     await saveThreadContext();
   },
 ...
 ```
 
-If you use the built-in `AssistantThreadContextStore` without any custom configuration the updated context data is automatically saved as message metadata on the first reply from the assistant bot.
+If you use the built-in `AssistantThreadContextStore` without any custom configuration the updated thread context data is automatically saved as [message metadata](https://api.slack.com/metadata/using) on the first reply from the assistant bot.
 
 ## Handling the user response {#handling-user-response}
 
@@ -110,7 +112,7 @@ When the user messages your assistant, the [`message.im`](https://api.slack.com/
 The `setTitle` and `setStatus` [utilities](/reference#the-assistantconfig-configuration-object) are useful in curating the user experience. 
 
 :::warning
-Messages sent to the assistant do not contain a subtype and must be deduced based on their shape and any provided [metadata](https://api.slack.com/metadata/using).
+Messages sent to the assistant do not contain a subtype and must be deduced based on their shape and any provided [message metadata](https://api.slack.com/metadata/using).
 :::
 
  ```js
@@ -118,41 +120,46 @@ Messages sent to the assistant do not contain a subtype and must be deduced base
   userMessage: async ({ client, message, say, setTitle, setStatus }) => {
     const { channel, thread_ts } = message;
 
-    // Set the title of the Assistant thread to capture the initial topic/question
-    await setTitle(message.text);
+    try {
+      // Set the status of the Assistant to give the appearance of active processing.
+      await setStatus('is typing..');
 
-    // Set the status of the Assistant to give the appearance of active processing.
-    await setStatus('is typing..');
+      // Retrieve the Assistant thread history for context of question being asked
+      const thread = await client.conversations.replies({
+        channel,
+        ts: thread_ts,
+        oldest: thread_ts,
+      });
 
-    // Retrieve the Assistant thread history for context of question being asked
-    const thread = await client.conversations.replies({
-      channel,
-      ts: thread_ts,
-      oldest: thread_ts,
-    });
+      // Prepare and tag each message for LLM processing
+      const userMessage = { role: 'user', content: message.text };
+      const threadHistory = thread.messages.map((m) => {
+        const role = m.bot_id ? 'assistant' : 'user';
+        return { role, content: m.text };
+      });
 
-    // Prepare and tag each message for LLM processing
-    const userMessage = { role: 'user', content: message.text };
-    const threadHistory = thread.messages.map((m) => {
-      const role = m.bot_id ? 'assistant' : 'user';
-      return { role, content: m.text };
-    });
+      const messages = [
+        { role: 'system', content: DEFAULT_SYSTEM_CONTENT },
+        ...threadHistory,
+        userMessage,
+      ];
 
-    const messages = [
-      { role: 'system', content: DEFAULT_SYSTEM_CONTENT },
-      ...threadHistory,
-      userMessage,
-    ];
+      // Send message history and newest question to LLM
+      const llmResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        n: 1,
+        messages,
+      });
 
-    // Send message history and newest question to LLM
-    const llmResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      n: 1,
-      messages,
-    });
+      // Provide a response to the user
+      await say(llmResponse.choices[0].message.content);
+      
+    } catch (e) {
+      console.error(e);
 
-    // Provide a response to the user
-    await say(llmResponse.choices[0].message.content);
+      // Send message to advise user and clear processing status if a failure occurs
+      await say({ text: 'Sorry, something went wrong!' });
+    }
   },
 });
 
