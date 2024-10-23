@@ -40,6 +40,7 @@ const sidebars = {
         'basic/options',
         'basic/authenticating-oauth',
         'basic/socket-mode',
+        'basic/app-assistant'
       ],
     },
     {
