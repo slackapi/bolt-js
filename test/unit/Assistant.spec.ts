@@ -194,9 +194,12 @@ describe('Assistant class', () => {
 
         const { enrichAssistantArgs } = await importAssistant();
 
-        const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
-        const threadContextChangedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadContextChangedArgs);
-        const userMessageArgs = enrichAssistantArgs(mockThreadContextStore, mockUserMessageArgs);
+        const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+        const threadContextChangedArgs = await enrichAssistantArgs(
+          mockThreadContextStore,
+          mockThreadContextChangedArgs,
+        );
+        const userMessageArgs = await enrichAssistantArgs(mockThreadContextStore, mockUserMessageArgs);
 
         assert.notExists(threadStartedArgs.next);
         assert.notExists(threadContextChangedArgs.next);
@@ -208,7 +211,9 @@ describe('Assistant class', () => {
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
+        const assistantArgs = await enrichAssistantArgs(mockThreadContextStore, {
+          payload,
+        } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -221,7 +226,9 @@ describe('Assistant class', () => {
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
+        const assistantArgs = await enrichAssistantArgs(mockThreadContextStore, {
+          payload,
+        } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -234,7 +241,9 @@ describe('Assistant class', () => {
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
+        const assistantArgs = await enrichAssistantArgs(mockThreadContextStore, {
+          payload,
+        } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -299,7 +308,7 @@ describe('Assistant class', () => {
           const mockThreadContextStore = createMockThreadContextStore();
 
           const { enrichAssistantArgs } = await importAssistant();
-          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.say('Say called!');
 
@@ -314,7 +323,7 @@ describe('Assistant class', () => {
           const mockThreadContextStore = createMockThreadContextStore();
 
           const { enrichAssistantArgs } = await importAssistant();
-          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setStatus('Status set!');
 
@@ -329,7 +338,7 @@ describe('Assistant class', () => {
           const mockThreadContextStore = createMockThreadContextStore();
 
           const { enrichAssistantArgs } = await importAssistant();
-          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }] });
 
@@ -344,7 +353,7 @@ describe('Assistant class', () => {
           const mockThreadContextStore = createMockThreadContextStore();
 
           const { enrichAssistantArgs } = await importAssistant();
-          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+          const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setTitle('Title set!');
 
