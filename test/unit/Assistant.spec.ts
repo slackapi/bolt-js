@@ -315,6 +315,53 @@ describe('Assistant class', () => {
           sinon.assert.called(fakeClient.chat.postMessage);
         });
 
+        it('say should be called with message_metadata that includes thread context', async () => {
+          const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+
+          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
+
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+
+          await threadStartedArgs.say('Say called!');
+
+          const {
+            payload: {
+              assistant_thread: { channel_id, thread_ts, context },
+            },
+          } = mockThreadStartedArgs;
+
+          const expectedParams = {
+            text: 'Say called!',
+            channel: channel_id,
+            thread_ts,
+            metadata: {
+              event_type: 'assistant_thread_context',
+              event_payload: context,
+            },
+          };
+
+          sinon.assert.calledWith(fakeClient.chat.postMessage, expectedParams);
+        });
+
+        it('say should get context from store if no thread context is included in event', async () => {
+          const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+          mockThreadStartedArgs.payload.assistant_thread.context = {};
+
+          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = { save: sinon.spy(), get: sinon.spy() };
+
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = await enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+
+          await threadStartedArgs.say('Say called!');
+
+          sinon.assert.calledOnce(mockThreadContextStore.get);
+        });
+
         it('setStatus should call assistant.threads.setStatus', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
