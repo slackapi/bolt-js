@@ -3,6 +3,7 @@ import type {
   AssistantThreadsSetSuggestedPromptsResponse,
   AssistantThreadsSetTitleResponse,
   ChatPostMessageArguments,
+  MessageMetadataEventPayloadObject,
 } from '@slack/web-api';
 import {
   type AssistantThreadContext,
@@ -301,11 +302,19 @@ export async function processAssistantMiddleware(
  */
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const { client, payload } = args;
-  const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
+  const { channelId: channel, threadTs: thread_ts, context } = extractThreadInfo(payload);
 
-  return (message: Parameters<SayFn>[0]) => {
+  return async (message: Parameters<SayFn>[0]) => {
+    const threadContext = context.channel_id ? context : await args.getThreadContext(args);
     const postMessageArgument: ChatPostMessageArguments =
       typeof message === 'string' ? { text: message, channel, thread_ts } : { ...message, channel, thread_ts };
+
+    if (threadContext) {
+      postMessageArgument.metadata = {
+        event_type: 'assistant_thread_context',
+        event_payload: threadContext as MessageMetadataEventPayloadObject,
+      };
+    }
 
     return client.chat.postMessage(postMessageArgument);
   };
