@@ -1,6 +1,5 @@
 ---
-title: Listening and responding to custom steps
-sidebar_label: Custom Steps
+title: Custom Steps
 lang: en
 slug: /concepts/custom-steps
 ---
@@ -65,7 +64,7 @@ Example app manifest definition
 
 ---
 
-### Listening to custom step interactivity events
+## Listening to custom step interactivity events
 
 Your app's custom steps may create interactivity points for users, for example: Post a message with a button
 

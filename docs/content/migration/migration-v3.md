@@ -1,6 +1,6 @@
 ---
 title: Migrating to V3
-slug: migration-v3
+slug: /tutorial/migration-v3
 lang: en
 ---
 

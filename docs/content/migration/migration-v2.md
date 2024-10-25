@@ -1,7 +1,7 @@
 ---
 title: Migrating to V2
-slug: migration-v2
-lang: en---
+slug: /tutorial/migration-v2
+lang: en
 ---
 
 This guide will walk you through the process of updating your app from using `@slack/bolt@1.x` to `@slack/bolt@2.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes.

@@ -64,7 +64,6 @@ const sidebars = {
         "concepts/authorization",
         "concepts/authenticating-oauth",
         "concepts/token-rotation",
-        "concepts/conversation-store",
       ],
     },
     {
@@ -76,15 +75,19 @@ const sidebars = {
       type: "category",
       label: "Migration Guides",
       items: [
-        "tutorial/migration-v2",
-        "tutorial/migration-v3",
-        "tutorial/migration-v4",
+        "migration/migration-v2",
+        "migration/migration-v3",
+        "migration/migration-v4",
       ],
     },
     {
       type: "category",
       label: "Legacy",
-      items: ["tutorial/hubot-migration", "steps/steps"],
+      items: [
+        "legacy/hubot-migration",
+        "legacy/steps-from-apps",
+        "legacy/conversation-store",
+      ],
     },
     { type: "html", value: "<hr>" },
     "reference",

@@ -1,6 +1,6 @@
 ---
 title: Migrating to V4
-slug: migration-v4
+slug: /tutorial/migration-v4
 lang: en
 ---
 

@@ -113,3 +113,9 @@ html[data-theme="dark"] .navbar-github-link::before {
   font-weight: bold;
   color: #000;
 }
+
+.tabs-container {
+  border: 2px solid var(--ifm-hr-background-color); /* Adjust the color and thickness as needed */
+  border-radius: 5px; /* To give rounded corners */
+  padding: 0.5em; /* To add spacing inside the tab */
+}

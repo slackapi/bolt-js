@@ -1,15 +1,13 @@
 ---
 title: Migrating apps from Hubot to Bolt for JavaScript
-slug: hubot-migration
+slug: /tutorial/hubot-migration
 lang: en
-layout: tutorial
 ---
 
 Bolt was created to reduce the time and complexity it takes to build Slack apps. It provides Slack developers a single interface to build using modern features and best practices. This guide is meant to step you through the process of migrating your app from using [Hubot](https://hubot.github.com/docs/) to Bolt for JavaScript.
 
 If you already have an [app with a bot user](https://api.slack.com/bot-users#getting-started) or if you’re looking for code samples that translate Hubot code to Bolt for JavaScript code, you may find it valuable to start by reading through the [example script in the Bolt for JavaScript repository](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js).
  
-
 ---
 
 ### Setting the stage {#setting-the-stage}

@@ -12,7 +12,7 @@ You’ll notice in all `action()` examples, `ack()` is used. It is required to c
 
 :::info
 
-Since v2, message shortcuts (previously message actions) now use the `shortcut()` method instead of the `action()` method. View the [migration guide for V2](/tutorial/migration-v2) to learn about the changes.
+Since v2, message shortcuts (previously message actions) now use the `shortcut()` method instead of the `action()` method. View the [migration guide for V2](/migration/migration-v2) to learn about the changes.
 
 :::
 
