@@ -354,6 +354,9 @@ describe('Assistant class', () => {
           const { enrichAssistantArgs } = await importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
+          // Verify that get is not called prior to say being used
+          sinon.assert.notCalled(mockThreadContextStore.get);
+
           await threadStartedArgs.say('Say called!');
 
           sinon.assert.calledOnce(mockThreadContextStore.get);
