@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/web-api
 ---
 
-You can call [any Web API method](https://api.slack.com/methods) using the [`WebClient`](https://tools.slack.dev/node-slack-sdk/web-api) provided to your app's listeners as `client`. This uses either the token that initialized your app **or** the token that is returned from the [`authorize`](/concepts/authorization) function for the incoming event. The built-in [OAuth support](/concepts/authenticating-oauth) handles the second case by default.
+You can call any [Web API method](https://api.slack.com/methods) using the [`WebClient`](https://tools.slack.dev/node-slack-sdk/web-api) provided to your app's listeners as `client`. This uses either the token that initialized your app **or** the token that is returned from the [`authorize`](/concepts/authorization) function for the incoming event. The built-in [OAuth support](/concepts/authenticating-oauth) handles the second case by default.
 
 Your Bolt app also has a top-level `app.client` which you can manually pass the `token` parameter. If the incoming request is not authorized or you're calling a method from outside of a listener, use the top-level `app.client`.
 
