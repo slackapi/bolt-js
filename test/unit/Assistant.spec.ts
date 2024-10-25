@@ -208,7 +208,9 @@ describe('Assistant class', () => {
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, {
+          payload,
+        } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -221,7 +223,9 @@ describe('Assistant class', () => {
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, {
+          payload,
+        } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -234,7 +238,9 @@ describe('Assistant class', () => {
         const mockThreadContextStore = createMockThreadContextStore();
         const { enrichAssistantArgs } = await importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
-        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, { payload } as AllAssistantMiddlewareArgs);
+        const assistantArgs = enrichAssistantArgs(mockThreadContextStore, {
+          payload,
+        } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
@@ -304,6 +310,56 @@ describe('Assistant class', () => {
           await threadStartedArgs.say('Say called!');
 
           sinon.assert.called(fakeClient.chat.postMessage);
+        });
+
+        it('say should be called with message_metadata that includes thread context', async () => {
+          const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+
+          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
+
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+
+          await threadStartedArgs.say('Say called!');
+
+          const {
+            payload: {
+              assistant_thread: { channel_id, thread_ts, context },
+            },
+          } = mockThreadStartedArgs;
+
+          const expectedParams = {
+            text: 'Say called!',
+            channel: channel_id,
+            thread_ts,
+            metadata: {
+              event_type: 'assistant_thread_context',
+              event_payload: context,
+            },
+          };
+
+          sinon.assert.calledWith(fakeClient.chat.postMessage, expectedParams);
+        });
+
+        it('say should get context from store if no thread context is included in event', async () => {
+          const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+          mockThreadStartedArgs.payload.assistant_thread.context = {};
+
+          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = { save: sinon.spy(), get: sinon.spy() };
+
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+
+          // Verify that get is not called prior to say being used
+          sinon.assert.notCalled(mockThreadContextStore.get);
+
+          await threadStartedArgs.say('Say called!');
+
+          sinon.assert.calledOnce(mockThreadContextStore.get);
         });
 
         it('setStatus should call assistant.threads.setStatus', async () => {
