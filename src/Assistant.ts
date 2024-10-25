@@ -133,7 +133,7 @@ export class Assistant {
 
   private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
     const { payload } = args;
-    const assistantArgs = await enrichAssistantArgs(this.threadContextStore, args);
+    const assistantArgs = enrichAssistantArgs(this.threadContextStore, args);
     const assistantMiddleware = this.getAssistantMiddleware(payload);
     return processAssistantMiddleware(assistantArgs, assistantMiddleware);
   }
@@ -161,10 +161,10 @@ export class Assistant {
  *  events from continuing down the global middleware chain to subsequent listeners
  *  2. Adds assistant-specific utilities (i.e., helper methods)
  * */
-export async function enrichAssistantArgs(
+export function enrichAssistantArgs(
   threadContextStore: AssistantThreadContextStore,
   args: AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, // TODO: the type here states that these args already have the assistant utilities present? the type here needs likely changing.
-): Promise<AllAssistantMiddlewareArgs> {
+): AllAssistantMiddlewareArgs {
   const { next: _next, ...assistantArgs } = args;
   const preparedArgs = { ...(assistantArgs as Exclude<AllAssistantMiddlewareArgs<AssistantMiddlewareArgs>, 'next'>) };
 
@@ -172,7 +172,7 @@ export async function enrichAssistantArgs(
   preparedArgs.getThreadContext = () => threadContextStore.get(args);
   preparedArgs.saveThreadContext = () => threadContextStore.save(args);
 
-  preparedArgs.say = await createSay(preparedArgs);
+  preparedArgs.say = createSay(preparedArgs);
   preparedArgs.setStatus = createSetStatus(preparedArgs);
   preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
   preparedArgs.setTitle = createSetTitle(preparedArgs);
@@ -300,19 +300,21 @@ export async function processAssistantMiddleware(
  * was received. Alias for `postMessage()`.
  * https://api.slack.com/methods/chat.postMessage
  */
-async function createSay(args: AllAssistantMiddlewareArgs): Promise<SayFn> {
+function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const { client, payload } = args;
   const { channelId: channel, threadTs: thread_ts, context } = extractThreadInfo(payload);
-  const threadContext = context.channel_id ? context : await args.getThreadContext(args);
 
-  return (message: Parameters<SayFn>[0]) => {
+  return async (message: Parameters<SayFn>[0]) => {
+    const threadContext = context.channel_id ? context : await args.getThreadContext(args);
     const postMessageArgument: ChatPostMessageArguments =
       typeof message === 'string' ? { text: message, channel, thread_ts } : { ...message, channel, thread_ts };
 
-    postMessageArgument.metadata = {
-      event_type: 'assistant_thread_context',
-      event_payload: threadContext as MessageMetadataEventPayloadObject,
-    };
+    if (threadContext) {
+      postMessageArgument.metadata = {
+        event_type: 'assistant_thread_context',
+        event_payload: threadContext as MessageMetadataEventPayloadObject,
+      };
+    }
 
     return client.chat.postMessage(postMessageArgument);
   };
