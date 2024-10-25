@@ -1,5 +1,6 @@
 ---
 title: Listening and responding to custom steps
+sidebar_label: Custom Steps
 lang: en
 slug: /concepts/custom-steps
 ---
