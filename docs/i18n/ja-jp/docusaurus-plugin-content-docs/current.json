@@ -20,39 +20,39 @@
     "description": "The label for link Contributors Guide in sidebar sidebarJSBolt, linking to https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md"
   },
   "sidebar.sidebarJSBolt.category.Slack API calls": {
-    "message": "Slack API calls",
+    "message": "Slack API コール",
     "description": "The label for category Slack API calls in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.Events": {
-    "message": "Events",
+    "message": "イベント API",
     "description": "The label for category Events in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.Interactivity & Shortcuts": {
-    "message": "Interactivity & Shortcuts",
+    "message": "インタラクティビティ & ショートカット",
     "description": "The label for category Interactivity & Shortcuts in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.App Configuration": {
-    "message": "App Configuration",
+    "message": "App の設定",
     "description": "The label for category App Configuration in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.Middleware & Context": {
-    "message": "Middleware & Context",
+    "message": "ミドルウェア & コンテキスト",
     "description": "The label for category Middleware & Context in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.Authorization & Security": {
-    "message": "Authorization & Security",
+    "message": "認可 & セキュリティ",
     "description": "The label for category Authorization & Security in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.Migration Guides": {
-    "message": "Migration Guides",
+    "message": "マイグレーションガイド",
     "description": "The label for category Migration Guides in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.category.Legacy": {
-    "message": "Legacy",
+    "message": "レガシー（非推奨）",
     "description": "The label for category Legacy in sidebar sidebarJSBolt"
   },
   "sidebar.sidebarJSBolt.link.Release notes": {
-    "message": "Release notes",
+    "message": "リリースノート",
     "description": "The label for link Release notes in sidebar sidebarJSBolt, linking to https://github.com/slackapi/bolt-js/releases"
   },
   "sidebar.sidebarJSBolt.doc.Bolt for JavaScript": {
