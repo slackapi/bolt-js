@@ -27,7 +27,7 @@
     "message": "イベント API",
     "description": "The label for category Events in sidebar sidebarJSBolt"
   },
-  "sidebar.sidebarJSBolt.category.Interactivity & Shortcuts": {
+  "sidebar.sidebarJSBolt.category.App UI & Interactivity": {
     "message": "インタラクティビティ & ショートカット",
     "description": "The label for category Interactivity & Shortcuts in sidebar sidebarJSBolt"
   },

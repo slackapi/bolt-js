@@ -26,28 +26,3 @@ app.event('team_join', async ({ event, client, logger }) => {
   }
 });
 ```
-
-<details>
-<summary>
-メッセージのサブタイプのフィルタリング
-</summary>
-
-`message()` リスナーは `event('message')` と等価の機能を提供します。
-
-イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `message_changed` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
-
-```javascript
-// パッケージから subtype をインポート
-const { App, subtype } = require('@slack/bolt');
-
-// user からのメッセージの編集と一致
-app.message(subtype('message_changed'), ({ event, logger }) => {
-  // この if 文は TypeScript でコードを書く際に必要
-  if (event.subtype === 'message_changed'
-    && !event.message.subtype
-    && !event.previous_message.subtype) {
-    logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
-  }
-});
-```
-</details>

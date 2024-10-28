@@ -1,10 +1,10 @@
 ---
-title: Listening and responding to options
+title: Listening & responding to select menu options
 lang: en
 slug: /concepts/options
 ---
 
-The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](/concepts/action-listening),
+The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](/concepts/actions),
 an `action_id` or constraints object is required.
 
 While it's recommended to use `action_id` for `external_select` menus, dialogs do not yet support Block Kit so you'll have to 

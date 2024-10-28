@@ -1,5 +1,5 @@
 ---
-title: Updating and pushing views
+title: Updating & pushing views
 lang: en
 slug: /concepts/updating-pushing-views
 ---

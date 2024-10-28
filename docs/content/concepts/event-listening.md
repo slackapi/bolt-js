@@ -26,28 +26,3 @@ app.event('team_join', async ({ event, client, logger }) => {
   }
 });
 ```
-
-<details>
-<summary>
-Filtering on message subtypes
-</summary>
-
-A `message()` listener is equivalent to `event('message')`
-
-You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
-
-```javascript
-// Import subtype from the package
-const { App, subtype } = require('@slack/bolt');
-
-// Matches all message changes from users
-app.message(subtype('message_changed'), ({ event, logger }) => {
-  // This if statement is required in TypeScript code
-  if (event.subtype === 'message_changed'
-    && !event.message.subtype
-    && !event.previous_message.subtype) {
-    logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
-  }
-});
-```
-</details>

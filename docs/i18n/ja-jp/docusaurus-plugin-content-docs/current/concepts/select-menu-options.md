@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/options
 ---
 
-`options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様](/concepts/action-listening)に、文字列型の `action_id` または制約付きオブジェクトが必要です。
+`options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様](/concepts/actions)に、文字列型の `action_id` または制約付きオブジェクトが必要です。
 
 `external_select` メニューには `action_id` を使用することをおすすめしますが、ダイアログはまだ Block Kit をサポートしていないため、制約オブジェクトを用いて `callback_id` でフィルタリングする必要があります。
 

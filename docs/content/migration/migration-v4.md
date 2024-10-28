@@ -94,7 +94,7 @@ import { defaultProcessEventHandler } from '@slack/bolt';
 
 ### 🏭 Built-in middleware changes {#built-in-middleware-changes}
 
-Two [built-in middlewares](../reference#built-in-listener-middleware-functions), `ignoreSelf` and `directMention`, previously needed to be invoked as a function in order to _return_ a middleware. These two built-in middlewares were not parameterized in the sense that they should just be used directly; as a result, you no longer should invoke them and instead pass them directly.
+Two [built-in middlewares](../reference#built-in-middleware-functions), `ignoreSelf` and `directMention`, previously needed to be invoked as a function in order to _return_ a middleware. These two built-in middlewares were not parameterized in the sense that they should just be used directly; as a result, you no longer should invoke them and instead pass them directly.
 
 As an example, previously you may have leveraged `directMention` like this:
 

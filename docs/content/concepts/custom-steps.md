@@ -68,7 +68,7 @@ Example app manifest definition
 
 Your app's custom steps may create interactivity points for users, for example: Post a message with a button
 
-If such interaction points originate from a custom step execution, the events sent to your app representing the end-user interaction with these points are considered to be _function-scoped interactivity events_. These interactivity events can be handled by your app using the same concepts we covered earlier, such as [Listening to actions](/concepts/action-listening).
+If such interaction points originate from a custom step execution, the events sent to your app representing the end-user interaction with these points are considered to be _function-scoped interactivity events_. These interactivity events can be handled by your app using the same concepts we covered earlier, such as [Listening to actions](/concepts/actions).
 
 _function-scoped interactivity events_ will contain data related to the custom step (`function_executed` event) they were spawned from, such as custom step `inputs` and access to `complete()` and `fail()` listener arguments.
 

@@ -1,5 +1,5 @@
 ---
-title: Listening and responding to shortcuts
+title: Listening & responding to shortcuts
 lang: en
 slug: /concepts/shortcuts
 ---

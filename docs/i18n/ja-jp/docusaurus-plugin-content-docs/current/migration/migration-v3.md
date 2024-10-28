@@ -1,6 +1,6 @@
 ---
 title: 3.x マイグレーションガイド
-slug: migration-v3
+slug: /tutorial/migration-v3
 lang: ja-jp
 ---
 # 3.x マイグレーションガイド

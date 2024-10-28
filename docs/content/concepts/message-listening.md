@@ -4,9 +4,9 @@ lang: en
 slug: /concepts/message-listening
 ---
 
-To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message`.
+To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message` .A `message()` listener is equivalent to `event('message')`
 
-`message()` accepts an optional `pattern` parameter of type `string` or `RegExp` object which filters out any messages that don’t match the pattern.
+The `message()` listener accepts an optional `pattern` parameter of type `string` or `RegExp` object which filters out any messages that don’t match the pattern.
 
 ```javascript
 // This will match any message that contains 👋
@@ -21,10 +21,7 @@ app.message(':wave:', async ({ message, say }) => {
 });
 ```
 
-<details>
-<summary>
-Using a RegExp pattern
-</summary>
+## Using a RegExp pattern {#using-regexp}
 
 A RegExp pattern can be used instead of a string for more granular matching.
 
@@ -38,4 +35,22 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
   await say(`${greeting}, how are you?`);
 });
 ```
-</details>
+
+## Filtering on event subtypes {#filtering-event-subtypes}
+
+You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
+
+```javascript
+// Import subtype from the package
+const { App, subtype } = require('@slack/bolt');
+
+// Matches all message changes from users
+app.message(subtype('message_changed'), ({ event, logger }) => {
+  // This if statement is required in TypeScript code
+  if (event.subtype === 'message_changed'
+    && !event.message.subtype
+    && !event.previous_message.subtype) {
+    logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+  }
+});
+```
