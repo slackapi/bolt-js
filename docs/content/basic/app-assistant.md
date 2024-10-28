@@ -103,17 +103,20 @@ When the user switches channels, the [`assistant_thread_context_changed`](https:
 ...
 ```
 
-If you use the built-in `AssistantThreadContextStore` without any custom configuration the updated thread context data is automatically saved as [message metadata](https://api.slack.com/metadata/using) on the first reply from the assistant bot.
+If you use the built-in `AssistantThreadContextStore` without any custom configuration, you can skip this — the updated thread context data is automatically saved as [message metadata](https://api.slack.com/metadata/using) on the first reply from the assistant bot.
 
 ## Handling the user response {#handling-user-response}
 
 When the user messages your assistant, the [`message.im`](https://api.slack.com/events/message.im) event will be sent to your app. Capture this with the `userMessage` handler. 
 
-The `setTitle` and `setStatus` [utilities](/reference#the-assistantconfig-configuration-object) are useful in curating the user experience. 
+Messages sent to the assistant do not contain a [subtype](https://api.slack.com/events/message#subtypes) and must be deduced based on their shape and any provided [message metadata](https://api.slack.com/metadata/using).
 
-:::warning
-Messages sent to the assistant do not contain a subtype and must be deduced based on their shape and any provided [message metadata](https://api.slack.com/metadata/using).
-:::
+There are three [utilities](/reference#the-assistantconfig-configuration-object) that are particularly useful in curating the user experience:
+* `say`
+* `setTitle`
+* `setStatus`
+
+The following example uses the [OpenAI API client](https://platform.openai.com/docs/api-reference/introduction), but you can substitute it with the AI client of your choice.
 
  ```js
  ...
@@ -166,14 +169,10 @@ Messages sent to the assistant do not contain a subtype and must be deduced base
 app.assistant(assistant);
 ```
 
-## Full example
-
-<details>
-<summary>App Agent & Assistant Template</summary>
+## Full example : App Agent & Assistant Template
 
 Below is the `app.js` file of the [App Agent & Assistant Template repo](https://github.com/slack-samples/bolt-js-assistant-template/) we've created for you to build off of. 
 
 ```js reference title="app.js"
 https://github.com/slack-samples/bolt-js-assistant-template/blob/main/app.js
 ```
-</details>

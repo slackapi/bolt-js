@@ -151,13 +151,13 @@ Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://to
 
 :::
 
-## Assistants
+## Agents & Assistants
 
 ### The `AssistantConfig` configuration object
 
 | Property | Required? | Description | 
 |---|---|---|
-|`threadContextStore` | Optional, but recommended | When provided, must have the required methods to get and save thread context, which will override the `getThreadContext` and `saveThreadContext` utilities. <br/> <br/> If not provided, a `DefaultAssistantContextStore` instance is used.
+|`threadContextStore` | Optional | When provided, must have the required methods to get and save thread context, which will override the `getThreadContext` and `saveThreadContext` utilities. <br/> <br/> If not provided, a `DefaultAssistantContextStore` instance is used.
 | `threadStarted` | Required | Executes when the user opens the assistant container or otherwise begins a new chat, thus sending the [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event.
 | `threadContextChanged` | Optional | Executes when a user switches channels while the assistant container is open, thus sending the [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event. <br/> <br/>  If not provided, context will be saved using the AssistantContextStore's `save` method (either the `DefaultAssistantContextStore` instance or provided `threadContextStore`).
 | `userMessage` | Required |  Executes when a [message](https://api.slack.com/events/message) is received, thus sending the [`message.im`](https://api.slack.com/events/message.im) event. These messages do not contain a subtype and must be deduced based on their shape and metadata (if provided). Bolt handles this deduction out of the box for those using the `Assistant` class.
@@ -171,7 +171,7 @@ Utility | Description
 | `say(message: string)` | Alias for the `postMessage` method.<br/><br/> Sends a message to the current assistant thread.
 | `setTitle(title: string)` | [Sets the title](https://api.slack.com/methods/assistant.threads.setTitle) of the assistant thread to capture the initial topic/question.
 | `setStatus(status: string)` | Sets the [status](https://api.slack.com/methods/assistant.threads.setStatus) of the assistant to give the appearance of active processing.
-| `setSuggestedPrompts({ prompts: [{ title: string; message: string; }]` |  Provides the user up to 4 optional, preset [prompts](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts) to choose from.
+| `setSuggestedPrompts({ prompts: [{ title: string; message: string; }] })` | Provides the user up to 4 optional, preset [prompts](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts) to choose from.
 
 ## Framework error types
 Bolt includes a set of error types to make errors easier to handle, with more specific contextual information. Below is a non-exhaustive list of error codes you may run into during development:
