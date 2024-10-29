@@ -57,7 +57,7 @@ const config = {
         redirects: [
           {
             to: '/getting-started',
-            from: ['/tutorial/getting-started','/tutorial/getting-started-http'],
+            from: ['/tutorial/getting-started', '/tutorial/getting-started-http'],
           },
           {
             to: '/concepts/steps-from-apps',
@@ -65,15 +65,12 @@ const config = {
               '/concepts/creating-steps',
               '/concepts/adding-editing-steps',
               '/concepts/saving-steps',
-              '/concepts/executing-steps'
+              '/concepts/executing-steps',
             ],
           },
           {
             to: '/concepts/actions',
-            from: [
-              '/concepts/action-listening',
-              '/concepts/action-responding'
-            ],
+            from: ['/concepts/action-listening', '/concepts/action-responding'],
           },
           {
             to: '/',
