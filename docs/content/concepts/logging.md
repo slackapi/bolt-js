@@ -18,10 +18,7 @@ const app = new App({
 });
 ```
 
-<details>
-<summary>
-Sending log output somewhere besides the console
-</summary>
+## Sending log output somewhere besides the console
 
 If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a custom logger. A custom logger must implement specific methods (known as the `Logger` interface):
 
@@ -57,4 +54,3 @@ const app = new App({
   },
 });
 ```
-</details>

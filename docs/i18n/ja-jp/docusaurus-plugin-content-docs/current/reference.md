@@ -1,24 +1,11 @@
 ---
-title: リファレンス
+title: リファレンス（Appインターフェイスと設定）
+sidebar_label: リファレンス
 slug: reference
 permalink: /reference
 ---
 
-# リファレンス（Appインターフェイスと設定）
-
 このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
-
-- [リスナー関数](#listener-functions)
-  - [メソッド](#methods)
-  - [リスナー関数の引数](#listener-function-arguments)
-  - [リスナーミドルウェアとの違い](#difference-from-listener-middleware)
-- [初期化オプション](#initialization-options)
-  - [レシーバーオプション](#receiver-options)
-  - [Appオプション](#app-options)
-- [フレームワークのエラー](#framework-error-types)
-  - [クライアント側のエラー](#client-errors)
-
----
 
 ## リスナー関数 {#listener-functions}
 Slack アプリは通常、Slack からのイベント情報を受け取ったり、それに応答を返したりします。受信するイベントは 1 つの場合もあれば、多数の場合もあります。例えば、Events API のイベント（アプリに関連するリンクが共有されたときなど）や、ユーザーがアプリのショートカットを実行するイベントを受け取ったりします。Slack からのリクエストの種類に応じて、それぞれ異なるメソッドが用意されています。これらのメソッドに、それらのイベントを処理したり応答を返したりするための**リスナー関数**を渡します。
@@ -33,7 +20,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 | `app.action(actionId, fn);`     | Block Kit エレメントから送信される `action` イベントをリッスンします。このイベントにはユーザーのボタン操作、メニュー選択、日付ピッカーの操作などがあります。`actionId` は文字列型で、アプリがビュー内に含めたブロックエレメントに指定した一意の `action_id` の値と一致する必要があります。ここでいう「ビュー」とは、メッセージ、モーダル、アプリのホームタブのことを指します。アクションエレメントを `input` ブロックに配置した場合はイベントがトリガーされないことに注意してください。
 | `app.shortcut(callbackId, fn);` | グローバルショートカットまたはメッセージショートカットの呼び出しをリッスンします。`callbackId` は文字列または正規表現で、アプリの設定で指定したショートカットの `callback_id` にマッチする必要があります。
 | `app.view(callbackId, fn);`     | `view_submission` イベントと `view_closed` イベントをリッスンします。`view_submission` イベントは、アプリが開いたモーダルでユーザーがデータ送信の操作をしたときに発生します。`view_closed` イベントは、ユーザーがデータ送信を実行せずにモーダルを閉じたときに発生します。
-| `app.step(workflowStep)` | `WorkflowStep` のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには `edit`、`save`、`execute` の 3 種類があります。ワークフローステップについて詳しくは、[ドキュメント](/concepts/adding-editing-steps)を参照してください。
+| `app.step(workflowStep)` | `WorkflowStep` のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには `edit`、`save`、`execute` の 3 種類があります。ワークフローステップについて詳しくは、[ドキュメント](/concepts/steps-from-apps)を参照してください。
 | `app.command(commandName, fn);` | Slash コマンドの呼び出しをリッスンします。`commandName` は文字列型で、アプリの設定で指定したスラッシュコマンドと一致する必要があります。スラッシュコマンドの名前では `/` を最初に配置します（例 : `/helpdesk`）。
 | `app.options(actionId, fn);`    | 外部データソースを使用するセレクトメニューなどから送られる選択肢読み込みのリクエストをリッスンします。使う機会は多くありませんが、`app.action` と混同しないようにしましょう。`actionId` は文字列型で、アプリがビュー内に[外部データソースを使用するセレクトメニュー](https://api.slack.com/reference/block-kit/block-elements#external_select)を含めるときに指定した`action_id` と一致する必要があります。
 
@@ -134,7 +121,7 @@ Bolt では、さまざまなエラーが定義されています。これらに
 | `ReceiverMultipleAckError` | Receiver 内で、すでに確認が済んでいるリクエストに対してアプリがさらに `ack()` を呼んだ場合にスローされるエラーです。現在、デフォルトの `HTTPReceiver` でのみ使用されます。 |
 | `ReceiverAuthenticityError` | アプリのリクエストの署名が検証できないときにスローされるエラーです。このエラーには、失敗した理由を示す情報が含まれます（例 : タイムスタンプが有効でない、ヘッダーに抜けがある、署名シークレットが有効でない）。
 | `MultipleListenerError` | 単一のイベントに対して複数のリスナーでの処理中に複数のエラーが発生した場合にスローされるエラーです。個々のエラーを配列に収めた `originals` プロパティを持ちます。 |
-| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/concepts/creating-steps)を参照してください。  |
+| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/concepts/steps-from-apps)を参照してください。  |
 | `UnknownError` | フレームワーク内でスローされる、特定のエラーコードを持たないエラーです。`original` プロパティで詳細を確認できます。 |
 
 > [errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts) のコードで、エラー定義の部分とコンストラクターの部分を読み、参考にしてみてください。

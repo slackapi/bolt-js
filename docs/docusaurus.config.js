@@ -60,12 +60,20 @@ const config = {
             from: ['/tutorial/getting-started','/tutorial/getting-started-http'],
           },
           {
-            to: '/concepts/steps',
+            to: '/legacy/steps-from-apps',
             from: [
+              '/concepts/steps',
               '/concepts/creating-steps',
               '/concepts/adding-editing-steps',
               '/concepts/saving-steps',
               '/concepts/executing-steps'
+            ],
+          },
+          {
+            to: '/concepts/actions',
+            from: [
+              '/concepts/action-listening',
+              '/concepts/action-responding'
             ],
           },
           {

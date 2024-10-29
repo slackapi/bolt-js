@@ -10,7 +10,7 @@ There’s a collection of [built-in listener middleware](/reference#built-in-lis
 
 But of course, you can write your own middleware for more custom functionality. While writing your own middleware, your function must call `await next()` to pass control to the next middleware, or `throw` to pass an error back up the previously-executed middleware chain.
 
-As an example, let’s say your listener should only deal with messages from humans. You can write a listener middleware th
+As an example, let’s say your listener should only deal with messages from humans. You can write a listener middleware that excludes any bot messages.
 
 ```javascript
 // Listener middleware that filters out messages with 'bot_message' subtype

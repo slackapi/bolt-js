@@ -131,7 +131,7 @@ To listen for events happening in a Slack workspace (like when a message is post
 
 For those just starting, we recommend using [Socket Mode](https://api.slack.com/apis/connections/socket). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall. 
 
-That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku)), or apps intended for distribution via the Slack App Directory.
+That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku) to stably respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Martketplace.
 
 We've provided instructions for both ways in this guide.
 
@@ -141,18 +141,18 @@ import TabItem from '@theme/TabItem';
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
 
-1. Head to your app's configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable.
+1. Head to your app's configuration page (click on the app [from your app settings page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable.
 
 2. Go to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use that in just a moment.
 
-Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**.
+3. Finally, it's time to tell Slack what events we'd like to listen for. Under **Event Subscriptions**, toggle the switch labeled **Enable Events**.
 
 When an event occurs, Slack will send your app information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
 
 </TabItem>
 <TabItem value="http" label="HTTP">
 
-1. Go back to your app configuration page (click on the app from your [app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
+1. Go back to your app configuration page (click on the app from your [app settings page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
 
 2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡
 
@@ -196,6 +196,11 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN // add this
 });
 ```
+
+</TabItem>
+<TabItem value="http" label="HTTP">
+
+Carry on!
 
 </TabItem>
 </Tabs>
