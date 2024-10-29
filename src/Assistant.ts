@@ -45,11 +45,16 @@ type SetSuggestedPromptsFn = (
 ) => Promise<AssistantThreadsSetSuggestedPromptsResponse>;
 
 interface SetSuggestedPromptsArguments {
+  /** @description Prompt suggestions that appear when opening assistant thread. */
   prompts: [AssistantPrompt, ...AssistantPrompt[]];
+  /** @description Title for the prompts. */
+  title?: string;
 }
 
 interface AssistantPrompt {
+  /** @description Title of the prompt. */
   title: string;
+  /** @description Message of the prompt. */
   message: string;
 }
 
@@ -345,11 +350,12 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
-    const { prompts } = params;
+    const { prompts, title } = params;
     return client.assistant.threads.setSuggestedPrompts({
       channel_id,
       thread_ts,
       prompts,
+      title,
     });
   };
 }

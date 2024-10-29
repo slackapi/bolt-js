@@ -387,7 +387,7 @@ describe('Assistant class', () => {
           const { enrichAssistantArgs } = await importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
-          await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }] });
+          await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }], title: '' });
 
           sinon.assert.called(fakeClient.assistant.threads.setSuggestedPrompts);
         });
