@@ -23,10 +23,7 @@ const app = new App({
 })();
 ```
 
-<details>
-<summary>
-ソケットモードレシーバーのカスタム初期化
-</summary>
+## ソケットモードレシーバーのカスタム初期化
 
 以下のように `@slack/bolt` から `SocketModeReceiver` を import して、カスタムされたインスタンスとして定義することができます。
 
@@ -54,5 +51,3 @@ const app = new App({
   console.log('⚡️ Bolt app started');
 })();
 ```
-
-</details>

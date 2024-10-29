@@ -15,10 +15,7 @@ app.message('knock knock', async ({ message, say }) => {
 });
 ```
 
-<details>
-<summary>
-Sending a message with blocks
-</summary>
+## Sending a message with blocks
 
 `say()` accepts more complex message payloads to make it easy to add functionality and structure to your messages.
 
@@ -49,4 +46,3 @@ app.event('reaction_added', async ({ event, say }) => {
   }
 });
 ```
-</details>

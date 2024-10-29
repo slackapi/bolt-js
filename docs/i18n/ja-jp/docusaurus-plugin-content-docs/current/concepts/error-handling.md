@@ -54,10 +54,7 @@ app.error(async (error) => {
 });
 ```
 
-<details>
-<summary>
-エラーハンドラーでのさらなるデータの参照
-</summary>
+## エラーハンドラーでのさらなるデータの参照
 
 グローバルエラーハンドラーの中で、リクエストからのデータをログ出力したい場合もあるでしょう。あるいは単に Bolt に設定した `logger` を利用したい場合もあるでしょう。
 
@@ -84,5 +81,3 @@ app.error(async ({ error, logger, context, body }) => {
   }
 });
 ```
-
-</details>

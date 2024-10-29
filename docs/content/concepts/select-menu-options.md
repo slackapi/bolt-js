@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/options
 ---
 
-The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](/concepts/actions),
+The `options()` method listens for incoming option request payloads from Slack. Similar to the [`action()`](/concepts/actions) method,
 an `action_id` or constraints object is required.
 
 While it's recommended to use `action_id` for `external_select` menus, dialogs do not yet support Block Kit so you'll have to 

@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/web-api
 ---
 
-[Web API メソッド](https://api.slack.com/methods)を呼び出すには、リスナー関数の引数に `client` として提供されている [`WebClient`](https://tools.slack.dev/node-slack-sdk/web-api) を使用します。このインスタンスが使用するトークンは、Bolt アプリの初期化時に指定されたもの <b>もしくは</b> Slack からのリクエストに対して [`authorize` 関数](/concepts/authorization)から返されたものが設定されます。組み込みの [OAuth サポート](/concepts/authenticating-oauth)は、この後者のケースをデフォルトでハンドリングします。
+[Web API メソッド](https://api.slack.com/methods)を呼び出すには、リスナー関数の引数に `client` として提供されている [`WebClient`](https://tools.slack.dev/node-slack-sdk/web-api) を使用します。このインスタンスが使用するトークンは、Bolt アプリの初期化時に指定されたもの **もしくは** Slack からのリクエストに対して [`authorize` 関数](/concepts/authorization)から返されたものが設定されます。組み込みの [OAuth サポート](/concepts/authenticating-oauth)は、この後者のケースをデフォルトでハンドリングします。
 
 Bolt アプリケーションは、トップレベルに `app.client` も持っています。このインスタンスには、トークンをメソッド呼び出しのパラメーターとして都度指定します。Slack からのリクエストが authorize されないユースケースや、リスナー関数の外で Web API を呼び出したい場合は、このトップレベルの `app.client` を使用します。
 

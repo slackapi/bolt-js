@@ -60,8 +60,9 @@ const config = {
             from: ['/tutorial/getting-started','/tutorial/getting-started-http'],
           },
           {
-            to: '/concepts/steps-from-apps',
+            to: '/legacy/steps-from-apps',
             from: [
+              '/concepts/steps',
               '/concepts/creating-steps',
               '/concepts/adding-editing-steps',
               '/concepts/saving-steps',

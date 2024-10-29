@@ -15,10 +15,7 @@ app.message('knock knock', async ({ message, say }) => {
 });
 ```
 
-<details>
-<summary>
-ブロックを用いたメッセージの送信
-</summary>
+## ブロックを用いたメッセージの送信
 
 `say()` は、より複雑なメッセージペイロードを受け付けるので、メッセージに機能やリッチな構造を与えることが容易です。
 
@@ -49,4 +46,3 @@ app.event('reaction_added', async ({ event, say }) => {
   }
 });
 ```
-</details>

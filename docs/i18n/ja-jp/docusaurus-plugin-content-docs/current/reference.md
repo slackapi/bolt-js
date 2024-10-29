@@ -1,10 +1,9 @@
 ---
-title: リファレンス
+title: リファレンス（Appインターフェイスと設定）
+sidebar_label: リファレンス
 slug: reference
 permalink: /reference
 ---
-
-# リファレンス（Appインターフェイスと設定）
 
 このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
 
@@ -108,7 +107,11 @@ App オプションは、`App` のコンストラクターに渡します。`rec
 | `deferInitialization` | アプリの初期化を遅延させる真偽値です。有効にすると非同期の `App#init()` メソッドを手動で呼び出す必要があります。 また `init()` メソッドは `App#start()` を実行する前に呼び出さなければなりません。 デフォルトは `false` です。 |
 | `signatureVerification` | Boltが着信リクエストでSlackの署名を検証する必要があるかどうかを決定するブール値。 デフォルトは`true`です。 |
 
-> Bolt のclientは [Node Slack SDK](https://tools.slack.dev/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
+:::tip 
+
+Bolt のclientは [Node Slack SDK](https://tools.slack.dev/node-slack-sdk) の `WebClient` のインスタンスです。そのため、Node Slack SDK のドキュメントも合わせて参照すると、開発時の理解に役立つでしょう。
+
+:::
 
 ## フレームワークのエラー {#framework-error-types}
 

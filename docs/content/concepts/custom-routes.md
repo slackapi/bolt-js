@@ -48,11 +48,7 @@ const app = new App({
 })();
 ```
 
-<details>
-<summary>
-Custom ExpressReceiver routes
-</summary>
-
+## Custom ExpressReceiver routes
 
 Adding custom HTTP routes is quite straightforward when using Bolt’s built-in ExpressReceiver. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which additional routes and middleware can be added.
 
@@ -92,4 +88,3 @@ receiver.router.post('/secret-page', (req, res) => {
   console.log('⚡️ Bolt app started');
 })();
 ```
-</details>

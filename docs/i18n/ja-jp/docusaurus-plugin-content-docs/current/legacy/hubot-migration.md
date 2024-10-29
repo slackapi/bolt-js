@@ -3,7 +3,6 @@ title: Hubot から Bolt に移行する方法
 slug: hubot-migration
 lang: ja-jp
 ---
-# Hubot のアプリを Bolt に移行する方法
 
 Bolt は、Slack アプリを構築する時間と手間を減らすために作成されたフレームワークで、Slack 開発者のみなさんに最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot で作成されたアプリを Bolt アプリに](https://hubot.github.com/docs/)移行するプロセスを順を追って説明します。
 
@@ -11,7 +10,7 @@ Bolt は、Slack アプリを構築する時間と手間を減らすために作
  
 ---
 
-### まずはじめに {#setting-the-stage}
+## まずはじめに {#setting-the-stage}
 Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握しているとさらに理解を深めることができるでしょう。Slack の Hubot アダプターは、　WebSocket をベースとした [RTM API](https://api.slack.com/rtm) と接続するように実装されているので、Hubot アプリには一連のワークスペースイベントが一気にストリーミングされます。そして、RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでおすすめできません。
 
 デフォルトの Bolt レシーバーは、[Events API](https://api.slack.com/events-api) をサポートするように構築されています。これは、HTTP ベースのイベントサブスクリプションを使用して Bolt アプリに JSON ペイロードを送信します。Events API には、RTM にはない新機能のイベントも含まれており、より細かい制御が可能でスケーラブルですのでほとんどのユースケースで推奨されています。しかし例外として、RTM API を使用し続けなければならない理由の 1 つに、アプリをホストしているサーバーにファイアウォールがあり、HTTP 送信リクエストのみを許可して、受信リクエストを許可しないというようなケースが挙げられます。
@@ -23,10 +22,10 @@ Bolt アプリを作成する前に考慮に入れた方がよい違いがほか
 
 ---
 
-### ボットの設定 {#configuring-your-bot}
-ボットユーザーを持つ既存の Slack アプリをお持ちの方は, 次のセクションに進むことができます。わからない場合は、[App Management ページ](https://api.slack.com/apps) に移動し、自分の Hubot アプリがあるかどうかを確認してください。ある場合は、そのアプリの認証情報をそのまま使用できます (次のセクションに進んでください)。ない場合は、下記の手順通りに進めていきましょう。
+## ボットの設定 {#configuring-your-bot}
+ボットユーザーを持つ既存の Slack アプリをお持ちの方は, 次のセクションに進むことができます。わからない場合は、[app settings ページ](https://api.slack.com/apps) に移動し、自分の Hubot アプリがあるかどうかを確認してください。ある場合は、そのアプリの認証情報をそのまま使用できます (次のセクションに進んでください)。ない場合は、下記の手順通りに進めていきましょう。
 
-#### Slack アプリを作成する
+## Slack アプリを作成する
 まず最初に、Slack アプリを作成します。
 
 :::tip
@@ -41,17 +40,21 @@ Bolt アプリを作成する前に考慮に入れた方がよい違いがほか
 
 ひと通り確認し、アプリのアイコンと説明を追加したら、アプリの構成 🔩 を始めましょう。
 
-#### ボットユーザーを追加する
+### ボットユーザーを追加する
 Slack では、Hubot アプリはユーザーとの対話型のボットユーザーを採用しています。
 
 新しいアプリにボットユーザーを追加するには、左側のサイドバーの **Bot Users** をクリックしてから、**Add A Bot User** をクリックします。表示名とユーザー名を指定して、**Add Bot User** をクリックします。その他のフィールドの詳しい情報は、[API サイト](https://api.slack.com/bot-users#creating-bot-user) をご覧ください。
 
-### ボットの設定 {#configure-what-your-bot-will-hear}
+## ボットの設定 {#configure-what-your-bot-will-hear}
 [Events API](https://api.slack.com/bot-users#app-mentions-response) は、ボットの目と耳に相当します。これによりボットは、投稿されたメッセージ、チャンネルの変更、Slack で発生するその他のアクティビティに反応することができます。
 
-> ⚠️ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](/getting-started) と [イベントの設定](/getting-started#setting-up-events) を参考にしてください。
+:::warning 
 
-#### メッセージのリスニング
+ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](/getting-started) と [イベントの設定](/getting-started#setting-up-events) を参考にしてください。
+
+:::
+
+### メッセージのリスニング
 すべての Hubot アプリは、デフォルトでメッセージをリッスンできるので、ボットユーザーがそうするように設定する必要があります。
 
 [イベントの設定](/getting-started#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリッスン)、`message group` (プライベートチャンネルのメッセージをリッスン)、`message.im` (アプリのホーム/DM スペースのメッセージをリッスン)、`message.mpim` (マルチパーソン DM のメッセージをリッスン）。
@@ -60,7 +63,7 @@ Slack では、Hubot アプリはユーザーとの対話型のボットユー�
 
 ボットにリッスンさせるメッセージイベントの種類を追加して、**Save Changes** をクリックします。
 
-#### その他のイベントのリッスン
+### その他のイベントのリッスン
 使用していた機能に応じて、Hubot アプリはほかのイベントにも応答していたかもしれません。スクリプトを調べて、`react`、`respond`、`presenceChange` が使用されている箇所を特定してください。
 - アプリで `respond` が使用されている場合、`app_mention` イベントをサブスクライブします。これで、ボットユーザーがメンションされる時をリッスンします。
 - アプリで `react` が使用されている場合、`reaction_added` イベントをサブスクライブします。これにより、ボットユーザーがいるチャンネルのメッセージにリアクションが追加される時をリッスンします。
@@ -74,41 +77,57 @@ Bolt に追加された利点として、どの [Events API イベント](https:
 
 アプリの機能に対応するイベントを追加 し終えたら、**Save Changes** をクリックします。
 
-### スクリプトインターフェイスの変更 {#changes-to-script-interfaces}
+## スクリプトインターフェイスの変更 {#changes-to-script-interfaces}
 Bolt のインターフェイスは、可能な限り Slack API 言語に適合するように設計されましたが、Hubot は複数のサービスを抽象化するために一般化された言語を使用して設計されました。インターフェイスは似ていますが、Hubot スクリプトを Bolt スクリプトに変換するには、いくらかコードを変更する必要があります。
 
 Bolt は、`res` を使用せず、Slack からの raw リクエストを公開しません。代わりに、`payload` 使ってペイロードボディを取得したり、`say()` を使ってメッセージを送信するといった一般的な機能を使用したりできます。
 
-> ⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、[Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています。](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js)
+:::tip
 
-#### `message()` を使用したパターンのリスニング
+⚙わかりやすくするために、サンプルスクリプトを Github 上に作成しました。このスクリプトは、[Bolt 用に書かれた機能と同等のものを使用している Hubot のコア機能を紹介しています。](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js)
+
+:::
+
+### `message()` を使用したパターンのリスニング
 Hubot スクリプトは、`hear()` を使用して、一致するパターンを持つメッセージをリッスンします。代わりに、 Bolt は `message()` を使用して、そのパターンの `string` または `RegExp` を受け入れます。
 
-> 👨‍💻👩‍💻コードで `hear()` を使用している箇所はすべて、`message()` を使用するように変更してください。
+:::tip
+
+👨‍💻👩‍💻コードで `hear()` を使用している箇所はすべて、`message()` を使用するように変更してください。
+
+:::
 
 [メッセージのリスニングについてもっと詳しく読む](/concepts/message-listening).
 
-#### `say()` および `respond()` を使用したメッセージで応答する
+### `say()` および `respond()` を使用したメッセージで応答する
 Hubot スクリプトは、`send()` を使用してメッセージを同じ会話に送信し、`reply()` を使用して、元のメッセージを送信したユーザー宛の@メンションを付けて、メッセージを同じ会話上に送信します。
 
 Bolt は、`send()` の代わりに `say()` を使用し、`respond()` を使用して `response_url` で返信を送信します。返信の冒頭にメンションを追加するには、`context` オブジェクトにあるユーザー ID を使用できます。たとえば、メッセージイベントの場合は次のようにできます: `say('<@${message.user}>Hello :wave:')`
 
 Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()` を使用すると [ボタン、メニューの選択、デートピッカー](https://api.slack.com/messaging/interactivity#interaction) といったインタラクティブなコンポーネントを付けてメッセージを送信できます。
 
-> 👨‍💻👩‍💻コードで `send()` が使用されている箇所はすべて `say()` に変更してください
+:::tip 
+
+👨‍💻👩‍💻コードで `send()` が使用されている箇所はすべて `say()` に変更してください
+
+:::
 
 [メッセージへの応答についてもっと詳しく読む](/concepts/message-sending).
 
-#### `respond` と `react`
+### `respond` と `react`
 前のセクションで、Hubot スクリプトで `respond()` が使用されている場合は `app_mention` イベントを、`react()` が使用されている場合は `reaction_added` をサブスクライブするようにアプリを設定しました。
 
 Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリッスンできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
 
-> 👨‍💻👩‍💻コードで `respond()` が使用されている箇所はすべて、app.event ('app_mention') を使用するように変更してください。`react` が使用されている箇所はすべて `app.event('reaction_added')` に変更してください。
+:::tip
+
+👨‍💻👩‍💻コードで `respond()` が使用されている箇所はすべて、app.event ('app_mention') を使用するように変更してください。`react` が使用されている箇所はすべて `app.event('reaction_added')` に変更してください。
+
+:::
 
 [イベントのリッスンについてもっと詳しく読む](/concepts/event-listening).
 
-### Bolt で Web API メソッドを使用する {#using-web-api-methods-with-bolt-for-javascript}
+## Bolt で Web API メソッドを使用する {#using-web-api-methods-with-bolt-for-javascript}
 Hubot では、`@slack/client` から `WebClient` パッケージをインポートする必要がありました。Bolt では、`app.client` からアクセスできる `WebClient` インスタンスがデフォルトでインポートされます。
 
 組み込みの `WebClient` を使用するには、アプリをインスタンス化するために使用されるトークン、またはリクエストの送信元のチームに関連付けられているトークンを渡す必要があります。これは、リスナー関数に渡された `context` オブジェクトにあります。たとえば、メッセージにリアクションを追加するには、次を使用します:
@@ -129,11 +148,15 @@ app.message('react', async ({ message, context, logger }) => {
 });
 ```
 
-> 👨‍💻👩‍💻`app.client` で組み込みのクライアントを使用するように、Web API 呼び出しを変更してください。
+:::tip
+
+👨‍💻👩‍💻`app.client` で組み込みのクライアントを使用するように、Web API 呼び出しを変更してください。
+
+:::
 
 [Bolt での Web API の使用についてもっと詳しく読む。](/concepts/web-api)
 
-### Bolt でのミドルウェアの使用 {#using-middleware-with-bolt-for-javascript}
+## Bolt でのミドルウェアの使用 {#using-middleware-with-bolt-for-javascript}
 Hubot には、受信 (リスナーが呼び出される前に実行される)、リスナー (一致するすべてのリスナーに対して実行される)、応答 (送信されるすべての応答に対して実行される) という 3 種類のミドルウェアがあります。
 
 Bolt には、グローバルとリスナーという 2 種類のミドルウェアしかありません。
@@ -146,7 +169,7 @@ Bolt では、グローバルとリスナーというミドルウェアはいず
 
 ミドルウェアがイベントの後処理を実行する必要がある場合、`undefined` で呼び出すのではなく、後処理関数を使用して `await next()` を呼び出すことができます。後処理関数は、ミドルウェア関数が `await next()` を呼び出すのと同じ方法で` done()` を呼び出す必要があります(`Error` で呼び出すことも可能) 。
 
-### Brain を conversation store に移行する {#migrating-the-brain-to-the-conversation-store}
+## Brain を conversation store に移行する {#migrating-the-brain-to-the-conversation-store}
 Hubot には、brain と呼ばれるメモリ内ストレージがあります。これによって、Hubot スクリプトはデータの基本部分を `get` および `set` することができます。Bolt は、conversation store と呼ばれる、`get()`/`set()` インターフェイスを含むグローバルミドルウェアを使用します。
 
 デフォルトの組み込み conversation store は Hubot に似たメモリ内ストレージを使用し、ミリ秒単位で有効期限を設定できます。conversation の状態情報を get および set する方法は 2 つあります。
@@ -157,7 +180,7 @@ Hubot には、brain と呼ばれるメモリ内ストレージがあります�
 
 [会話ストアについてもっと詳しく読む](/concepts/conversation-store).
 
-### 次のステップ {#next-steps}
+## 次のステップ {#next-steps}
 ここまで来れば、きっと Hubot アプリを Bolt アプリに変換できているはずです！✨⚡
 
 新しくなってよりクールになった Bolt アプリを、さらにパワーアップしていくこともできます。
