@@ -46,6 +46,7 @@ type SetSuggestedPromptsFn = (
 
 interface SetSuggestedPromptsArguments {
   prompts: [AssistantPrompt, ...AssistantPrompt[]];
+  title?: string;
 }
 
 interface AssistantPrompt {
@@ -345,11 +346,12 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
-    const { prompts } = params;
+    const { prompts, title } = params;
     return client.assistant.threads.setSuggestedPrompts({
       channel_id,
       thread_ts,
       prompts,
+      ...(title && { title }),
     });
   };
 }
