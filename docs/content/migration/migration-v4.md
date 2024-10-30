@@ -28,7 +28,7 @@ This guide will walk you through the process of updating your app from using `@s
 
 ---
 
-## ⬆️  Minimum Node version {#minimum-node-version}
+## ⬆️ Minimum Node version {#minimum-node-version}
 
 `@slack/bolt@4.x` requires a minimum Node version of `18` and minimum npm version of `8.6.0` .
 

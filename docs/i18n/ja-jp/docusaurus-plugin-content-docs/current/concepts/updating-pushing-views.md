@@ -10,7 +10,7 @@ slug: /concepts/updating-pushing-views
 
 モーダルの更新には、組み込みの API クライアントを使って `views.update` を呼び出します。この API 呼び出しには、そのモーダルを開いたときに生成された `view_id` と、更新後の内容を表現する `blocks` の配列を含む新しい `view` を渡します。ユーザーが既存のモーダル内の要素とインタラクションを行なった（例：ボタンを押す、メニューから選択する）ことをトリガーにビューを更新する場合、そのリクエストの `body` に `view_id` が含まれます。
 
-## `views.push` 
+## `views.push`
 
 モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて `views.push` を呼び出します。この API 呼び出しには、有効な `trigger_id` と、新しく生成する [ビュー部分のペイロード](https://api.slack.com/reference/block-kit/views)を渡します。`views.push` の引数は [モーダルを開始するとき](/concepts/creating-modals)と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
 
