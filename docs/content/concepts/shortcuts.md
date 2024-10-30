@@ -76,59 +76,55 @@ app.shortcut('open_modal', async ({ shortcut, ack, client, logger }) => {
 });
 ```
 
-<details>
-  <summary>
-  Listening to shortcuts using a constraint object
-  </summary>
+## Listening to shortcuts using a constraint object
 
-  You can use a constraints object to listen to `callback_id` and `type` values. Constraints in the object can be of type string or RegExp object.
+You can use a constraints object to listen to `callback_id` and `type` values. Constraints in the object can be of type string or RegExp object.
   
-  ```javascript
-  // Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
-  app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, client, logger }) => {
-    try {
-      // Acknowledge shortcut request
-      await ack();
+```javascript
+// Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
+app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ shortcut, ack, client, logger }) => {
+  try {
+    // Acknowledge shortcut request
+    await ack();
 
-      // Call the views.open method using one of the built-in WebClients
-      const result = await client.views.open({
-        trigger_id: shortcut.trigger_id,
-        view: {
-          type: "modal",
-          title: {
-            type: "plain_text",
-            text: "My App"
-          },
-          close: {
-            type: "plain_text",
-            text: "Close"
-          },
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
-              }
-            },
-            {
-              type: "context",
-              elements: [
-                {
-                  type: "mrkdwn",
-                  text: "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
-                }
-              ]
+    // Call the views.open method using one of the built-in WebClients
+    const result = await client.views.open({
+      trigger_id: shortcut.trigger_id,
+      view: {
+        type: "modal",
+        title: {
+          type: "plain_text",
+          text: "My App"
+        },
+        close: {
+          type: "plain_text",
+          text: "Close"
+        },
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
             }
-          ]
-        }
-      });
+          },
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
+              }
+            ]
+          }
+        ]
+      }
+    });
 
-      logger.info(result);
-    }
-    catch (error) {
-      logger.error(error);
-    }
-  });
-  ```
-</details>
+    logger.info(result);
+  }
+  catch (error) {
+    logger.error(error);
+  }
+});
+```

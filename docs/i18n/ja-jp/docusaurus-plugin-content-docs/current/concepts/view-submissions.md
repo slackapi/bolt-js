@@ -14,7 +14,7 @@ slug: /concepts/view-submissions
 
 ---
 
-##### モーダル送信でのビューの更新
+## モーダル送信でのビューの更新
 
 `view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` という `response_action` と新しく作成した `view` を指定します。
 
@@ -33,7 +33,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 
 ---
 
-##### モーダルを閉じるときのハンドリング
+## モーダルを閉じるときのハンドリング
 
 💡 `view_closed` リクエストをリッスンするとき、`callback_id` と `type: 'view_closed'` を含むオブジェクトの指定が必要です。以下の例を参照してください。
 

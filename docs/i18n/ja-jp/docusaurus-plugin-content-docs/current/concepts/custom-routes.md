@@ -48,10 +48,7 @@ const app = new App({
 })();
 ```
 
-<details>
-<summary>
-カスタム ExpressReceiver ルート
-</summary>
+## カスタム ExpressReceiver ルート
 
 Bolt の組み込みの `ExpressReceiver` を使っているなら、カスタムの HTTP ルートを追加するのはとても簡単です。`v2.1.0` から `ExpressReceiver` には `router` というプロパティが追加されています。これは、さらにルートを追加できるように `App` 内部で保持している Express の [Router](http://expressjs.com/en/4x/api.html#router) を public にしたものです。
 
@@ -89,4 +86,3 @@ receiver.router.post('/secret-page', (req, res) => {
   console.log('⚡️ Bolt app started');
 })();
 ```
-</details>

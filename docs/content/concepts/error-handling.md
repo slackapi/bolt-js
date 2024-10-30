@@ -62,10 +62,7 @@ app.error(async (error) => {
 });
 ```
 
-<details>
-<summary>
-Accessing more data in the error handler
-</summary>
+## Accessing more data in the error handler
 
 There may be cases where you need to log additional data from a request in the global error handler. Or you may simply wish to have access to the `logger` you've passed into Bolt.
 
@@ -91,4 +88,3 @@ app.error(async ({ error, logger, context, body }) => {
   }
 });
 ```
-</details>

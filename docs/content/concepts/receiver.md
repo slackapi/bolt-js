@@ -107,7 +107,7 @@ class SimpleReceiver  {
     })
   }
 
-  // This is a very simple implementation. Look at the ExpressReceiver source for more detail
+  // This is a simple implementation. Look at the ExpressReceiver source for more detail
   async requestHandler(req, res) {
     let ackCalled = false;
     // Assume parseBody function exists to parse incoming requests

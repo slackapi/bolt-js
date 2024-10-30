@@ -29,10 +29,7 @@ app.function('sample_custom_step', async ({ inputs, complete, fail, logger }) =>
 });
 ```
 
-<details>
-<summary>
-Example app manifest definition
-</summary>
+### Example app manifest definition
 
 ```json
 ...
@@ -59,8 +56,6 @@ Example app manifest definition
     }
 }
 ```
-
-</details>
 
 ---
 
@@ -131,10 +126,7 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
 });
 ```
 
-<details>
-<summary>
-Example app manifest definition
-</summary>
+### Example app manifest definition
 
 ```json
 ...
@@ -161,7 +153,5 @@ Example app manifest definition
     }
 }
 ```
-
-</details>
 
 Learn more about responding to interactivity, see the [Slack API documentation](https://api.slack.com/automation/functions/custom-bolt#interactivity).

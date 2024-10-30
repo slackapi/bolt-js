@@ -26,13 +26,13 @@ This guide will walk you through the process of updating your app from using `@s
 - 🚳 [Steps From Apps related types, methods and constants were marked as deprecated](#sfa-deprecation).
 - 📦 [The `@slack/web-api` package leveraged within bolt-js is now exported under the `webApi` namespace](#web-api-export).
 
-## Details
+---
 
-### ⬆️  Minimum Node version {#minimum-node-version}
+## ⬆️ Minimum Node version {#minimum-node-version}
 
 `@slack/bolt@4.x` requires a minimum Node version of `18` and minimum npm version of `8.6.0` .
 
-### 🚥 Changes to middleware argument types {#middleware-arg-types}
+## 🚥 Changes to middleware argument types {#middleware-arg-types}
 
 This change primarily applies to TypeScript users.
 
@@ -52,21 +52,21 @@ type SomeMiddlewareArgs<EventType extends string = string> = {
 
 With the above, now when a message payload is wrapped in middleware arguments, it will contain an appropriate `message` property, whereas a non-message payload will be intersected with `unknown` - effectively a type "noop." No more e.g. `say: undefined` or `message: undefined` to deal with!
 
-### 🌐 `@slack/web-api` v7 upgrade {#web-api-v7}
+## 🌐 `@slack/web-api` v7 upgrade {#web-api-v7}
 
 All bolt handlers are [provided a convenience `client` argument](../concepts/web-api) that developers can use to make API requests to [Slack's public HTTP APIs][methods]. This `client` is powered by [the `@slack/web-api` package][web-api]. In bolt v4, `web-api` has been upgraded from v6 to v7.
 
 More APIs! Better argument type safety! And a whole slew of other changes, too. Many of these changes won't affect JavaScript application builders, but if you are building a bolt app using TypeScript, you may see some compilation issues. Head over to [the `@slack/web-api` v6 -> v7 migration guide](https://github.com/slackapi/node-slack-sdk/wiki/Migration-Guide-for-web%E2%80%90api-v7) to get the details on what changed and how to migrate to v7.
 
-### 🔌 `@slack/socket-mode` v2 upgrade {#socket-mode-v2}
+## 🔌 `@slack/socket-mode` v2 upgrade {#socket-mode-v2}
 
 While the breaking changes from this upgrade should be shielded from most bolt-js users, if you are using [the `SocketModeReceiver` or setting `socketMode: true`](../concepts/socket-mode) _and_ attach custom code to how the `SocketModeReceiver` operates, we suggest you read through [the `@slack/socket-mode` v1 -> v2 migration guide](https://github.com/slackapi/node-slack-sdk/wiki/Migration-Guide-for-socket%E2%80%90mode-2.0), just in case.
 
-### 🚅 `express` v5 upgrade {#express-v5}
+## 🚅 `express` v5 upgrade {#express-v5}
 
 For those building bolt-js apps using the `ExpressReceiver`, the packaged `express` version has been upgraded to v5. Best to check [the list of breaking changes in `express` v5](https://github.com/expressjs/express/blob/5.x/History.md#500--2024-09-10) and keep tabs on [express#5944](https://github.com/expressjs/express/issues/5944), which tracks the creation of an `express` v4 -> v5 migration guide.
 
-### 🍽️ `@slack/types` exported as a named `types` export {#types-named-export}
+## 🍽️ `@slack/types` exported as a named `types` export {#types-named-export}
 
 We are slowly moving more core Slack domain object types and interfaces into [the utility package `@slack/types`][types]. For example, recently we shuffled [Slack Events API payloads](https://api.slack.com/events) from bolt-js over to `@slack/types`. Similar moves will continue as we improve bolt-js. Ideally, we'd like for everyone - ourselves as Slack employees but of course you as well, dear developer - to leverage these types when modeling Slack domain objects.
 
@@ -78,7 +78,7 @@ import { App, type types } from '@slack/bolt';
 // Now you can get references to e.g. `types.BotMessageEvent`
 ```
 
-### 🧘 `SocketModeFunctions` class disassembled {#socketmodefunctions}
+## 🧘 `SocketModeFunctions` class disassembled {#socketmodefunctions}
 
 If you previously imported the `SocketModeFunctions` class, you likely only did so to get a reference to the single static method available on this class: [`defaultProcessEventErrorHandler`](https://github.com/slackapi/bolt-js/blob/cd662ed540aa40b5cf20b4d5c21b0008db8ed427/src/receivers/SocketModeFunctions.ts#L13). Instead, you can now directly import the named `defaultProcessEventErrorHandler` export instead:
 
@@ -92,7 +92,7 @@ SocketModeFunctions.defaultProcessEventErrorHandler
 import { defaultProcessEventHandler } from '@slack/bolt';
 ```
 
-### 🏭 Built-in middleware changes {#built-in-middleware-changes}
+## 🏭 Built-in middleware changes {#built-in-middleware-changes}
 
 Two [built-in middlewares](../reference#built-in-middleware-functions), `ignoreSelf` and `directMention`, previously needed to be invoked as a function in order to _return_ a middleware. These two built-in middlewares were not parameterized in the sense that they should just be used directly; as a result, you no longer should invoke them and instead pass them directly.
 
@@ -112,7 +112,7 @@ app.message(directMention, async (args) => {
 });
 ```
 
-### 🌩️ `AwsEvent` interface changes {#awsevent-changes}
+## 🌩️ `AwsEvent` interface changes {#awsevent-changes}
 
 For users of the `AwsLambdaReceiver` and TypeScript, [we previously modeled, rather simplistically, the AWS event payloads](https://github.com/slackapi/bolt-js/blob/cd662ed540aa40b5cf20b4d5c21b0008db8ed427/src/receivers/AwsLambdaReceiver.ts#L11-L24): liberal use of `any` and in certain cases, incorrect property types altogether. We've now improved these to be more accurate and to take into account the two versions of API Gateway payloads that AWS supports (v1 and v2). Details for these changes are available in [#2277](https://github.com/slackapi/bolt-js/pull/2277).
 
@@ -131,17 +131,17 @@ if ('path' in awsEvent) {
 this.logger.info(`No request handler matched the request: ${path}`);
 ```
 
-### 🧹 Removed deprecations {#removed-deprecations}
+## 🧹 Removed deprecations {#removed-deprecations}
 
 - The deprecated type `KnownKeys` was removed. Admittedly, it wasn't very useful: `export type KnownKeys<_T> = never;`
 - The deprecated types `VerifyOptions` and `OptionsRequest` were removed.
 - The deprecated methods `extractRetryNum`, `extractRetryReason`, `defaultRenderHtmlForInstallPath`, `renderHtmlForInstallPath` and `verify` were removed.
 
-### 🚳 Steps From Apps related deprecations {#sfa-deprecation}
+## 🚳 Steps From Apps related deprecations {#sfa-deprecation}
 
 A variety of methods, constants and types related to Steps From Apps were deprecated and will be removed in bolt-js v5.
 
-### 📦 `@slack/web-api` exported as `webApi` {#web-api-export}
+## 📦 `@slack/web-api` exported as `webApi` {#web-api-export}
 
 To help application developers keep versions of various `@slack/*` dependencies in sync with those used by bolt-js, `@slack/web-api` is now exported from bolt-js under the `webApi` export. Unless applications have specific version needs from the `@slack/web-api` package, apps should be able to import `web-api` from bolt instead:
 

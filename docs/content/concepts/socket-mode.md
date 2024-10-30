@@ -23,10 +23,7 @@ const app = new App({
 })();
 ```
 
-<details>
-<summary>
-Custom SocketMode Receiver
-</summary>
+## Custom SocketMode Receiver
 
 You can define a custom `SocketModeReceiver` by importing it from `@slack/bolt`.
 
@@ -54,5 +51,3 @@ const app = new App({
   console.log('⚡️ Bolt app started');
 })();
 ```
-
-</details>

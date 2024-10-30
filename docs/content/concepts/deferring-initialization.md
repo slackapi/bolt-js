@@ -8,7 +8,7 @@ Bolt offers a way to defer full initialization via the `deferInitialization` opt
 
 :::info
 
-If you call `start()` before `init()`, Bolt will raise an exception._
+If you call `start()` before `init()`, Bolt will raise an exception.
 
 :::
 

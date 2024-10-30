@@ -64,7 +64,6 @@ app.action('approve_button', async ({ ack, say }) => {
 });
 ```
 
-
 ### Using the `respond()` utility 
 
 Since `respond()` is a utility for calling the `response_url`, it behaves in the same way. You can pass a JSON object with a new message payload that will be published back to the source of the original interaction with optional properties like `response_type` (which has a value of `in_channel` or `ephemeral`), `replace_original`, and `delete_original`.

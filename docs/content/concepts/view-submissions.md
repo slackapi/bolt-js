@@ -10,7 +10,7 @@ Slack will send a `view_submission` request when a user submits a view. To recei
 If the `notify_on_close` field of a view has been set to `true`, Slack will also send a `view_closed` request if a user clicks the close button. See the section on **Handling views on close** for more detail.
 To listen to either a `view_submission` request or `view_closed` request, you can use the built-in `view()` method.
 
-`view()` requires a `callback_id` of type `string` or `RegExp` or a constraint object with properties `type` and `callback_id`. 
+The `view()` method requires a `callback_id` of type `string` or `RegExp` or a constraint object with properties `type` and `callback_id`. 
 
 ---
 
@@ -35,9 +35,11 @@ Read more about view submissions in our [API documentation](https://api.slack.co
 
 ## Handling views on close
 
-💡 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this:
+When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this.
 
+:::tip 
 See the [API documentation](https://api.slack.com/surfaces/modals/using#modal_cancellations) for more information about `view_closed`.
+:::
 
 #### Handle a `view_closed` request
 

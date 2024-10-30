@@ -4,7 +4,9 @@ lang: en
 slug: /concepts/conversation-store
 ---
 
-Bolt for JavaScript includes support for a store, which sets and retrieves state related to a conversation. Conversation stores have two methods:
+Bolt for JavaScript includes support for a store, which sets and retrieves state related to a conversation. 
+
+Conversation stores have two methods:
 * `set()` modifies conversation state. `set()` requires a `conversationId` of type string, `value` of any type, and an optional `expiresAt` of type number. `set()` returns a `Promise`.
 * `get()` fetches conversation state from the store. `get()` requires a `conversationId` of type string and returns a Promise with the conversation’s state.
 

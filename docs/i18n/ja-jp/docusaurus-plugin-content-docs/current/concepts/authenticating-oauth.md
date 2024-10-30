@@ -170,10 +170,7 @@ const app = new App({
 });
 ```
 
-<details>
-<summary>
-OAuth デフォルト設定をカスタマイズ
-</summary>
+## OAuth デフォルト設定をカスタマイズ
 
 `installerOptions` を使って OAuth モジュールのデフォルト設定を上書きすることができます。このカスタマイズされた設定は `App` の初期化時に渡します。以下の情報を変更可能です:
 
@@ -238,4 +235,3 @@ const app = new App({
   }
 });
 ```
-</details>

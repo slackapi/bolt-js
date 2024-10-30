@@ -8,7 +8,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Slack Developer Tools',
+  title: 'Bolt for JavaScript',
   tagline: 'Official frameworks, libraries, and SDKs for Slack developers',
   favicon: 'img/favicon.ico',
 
@@ -60,8 +60,9 @@ const config = {
             from: ['/tutorial/getting-started', '/tutorial/getting-started-http'],
           },
           {
-            to: '/concepts/steps-from-apps',
+            to: '/legacy/steps-from-apps',
             from: [
+              '/concepts/steps',
               '/concepts/creating-steps',
               '/concepts/adding-editing-steps',
               '/concepts/saving-steps',
