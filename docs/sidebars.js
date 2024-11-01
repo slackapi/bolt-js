@@ -33,6 +33,7 @@ const sidebars = {
         'concepts/publishing-views',
       ],
     },
+    'concepts/assistant',
     'concepts/custom-steps',
     {
       type: 'category',
