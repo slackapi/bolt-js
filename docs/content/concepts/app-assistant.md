@@ -73,7 +73,6 @@ In the example below, the app is sending a message — containing thread context
 
     await say({
       text: 'Hi, how can I help?',
-      metadata: { event_type: 'assistant_thread_context', event_payload: context },
     });
 
     const prompts = [{
