@@ -34,6 +34,7 @@ const sidebars = {
       ],
     },
     'concepts/custom-steps',
+    'concepts/assistant',
     {
       type: 'category',
       label: 'App Configuration',
