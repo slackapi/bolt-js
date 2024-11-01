@@ -2,7 +2,7 @@
 
 This README describes how the Japanese documentation is created. Please read the [/docs README](./docs/README) for information on _all_ the documentation.
 
-[Docusaurus](https://docusaurus.io) supports using different languages. Each language is a different version of the same site. The English site is the default. The English page will be viewable if the page is not translated into Japanese. 
+[Docusaurus](https://docusaurus.io) supports using different languages. Each language is a different version of the same site. The English site is the default. The English page will be viewable if the page is not translated into Japanese. You do not need to place the English page on the Japanese side of the site though! It is automatically pulled during the build process. 
 
 There will be English pages on the Japanese site of the pages are not translated yet. Japanese readers will not miss any content, but they may be confused seeing English and Japanese mixed together. Please give us your thoughts on this setup.
 
