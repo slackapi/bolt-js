@@ -33,8 +33,8 @@ const sidebars = {
         'concepts/publishing-views',
       ],
     },
+    'concepts/app-assistant',
     'concepts/custom-steps',
-    'concepts/assistant',
     {
       type: 'category',
       label: 'App Configuration',
