@@ -64,16 +64,14 @@ Be sure to give the [assistants reference docs](/reference#assistants) a look!
 
 When the user opens a new thread with your assistant, the [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
 
-In the example below, the app is sending a message — containing thread context [message metadata](https://api.slack.com/metadata/using) — to the user, along with a single [prompt](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts).
+In the example below, the app is sending a message — containing thread context [message metadata](https://api.slack.com/metadata/using) behind the scenes — to the user, along with a single [prompt](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts).
 
 ```js
 ...
   threadStarted: async ({ event, say, setSuggestedPrompts, saveThreadContext }) => {
     const { context } = event.assistant_thread;
 
-    await say({
-      text: 'Hi, how can I help?',
-    });
+    await say('Hi, how can I help?');
 
     const prompts = [{
       title: 'Fun Slack fact',
@@ -81,7 +79,7 @@ In the example below, the app is sending a message — containing thread context
     }];
 
     // Provide the user up to 4 optional, preset prompts to choose from.
-    await setSuggestedPrompts({ prompts });
+    await setSuggestedPrompts({ prompts, title: 'Here are some suggested options:' });
   },
 ...
 ```
@@ -160,7 +158,7 @@ The following example uses the [OpenAI API client](https://platform.openai.com/d
       console.error(e);
 
       // Send message to advise user and clear processing status if a failure occurs
-      await say({ text: 'Sorry, something went wrong!' });
+      await say('Sorry, something went wrong!');
     }
   },
 });
