@@ -1,20 +1,17 @@
 ---
-title: Heroku Platform
+title: Deploying to Heroku
 lang: en
 ---
 
-# Deploying to Heroku
+This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
+
+When you’re finished, you’ll have this ⚡️[Deploying to Heroku app](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-heroku) to run, modify, and make your own.
 
 :::warning
 
  Using Heroku dynos to complete this tutorial counts towards your usage. [Delete your app](https://devcenter.heroku.com/articles/heroku-cli-commands#heroku-apps-destroy) as soon as you are done to control costs.
 
- :::
-
-This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
-
-
-When you’re finished, you’ll have this ⚡️[Deploying to Heroku app](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-heroku) to run, modify, and make your own.
+:::
 
 ---
 
@@ -40,7 +37,7 @@ Now that you have an app, let's prepare it for Heroku.
 
 Heroku is a flexible platform that requires some configuration to host your app. In this section, we'll update your Bolt app to support Heroku.
 
-**1. Use a Git repository**
+### 1. Use a Git repository
 
 :::info 
 
@@ -50,7 +47,7 @@ Skip this step if you used `git clone` in the previous section because you alrea
 
 Before you can deploy your app to Heroku, you'll need a Git repository. If you aren't already using Git, you'll need to [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [create a Git repository](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository).
 
-**2. Add a `Procfile`**
+### Add a `Procfile`
 
 Every Heroku app uses a special file called `Procfile` that tells Heroku how to start your app. The contents of the file will depend on whether or not you are using Socket Mode.
 
@@ -87,7 +84,7 @@ Are you following this guide with an existing Bolt app? If so, please review the
 
 Now we can set up the Heroku tools on your local machine. These tools will help you manage, deploy, and debug your app on Heroku's platform.
 
-**1. Install the Heroku CLI**
+### 1. Install the Heroku CLI
 
 The Heroku tools are available as a Command Line Interface (CLI). Go ahead and [install the Heroku CLI for macOS, Windows, or Linux](https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up). On macOS, you can run the command:
 
@@ -107,7 +104,7 @@ If the `heroku` command is not found, refresh your path by opening a new termina
 
 :::
 
-**2. Log into the Heroku CLI**
+### 2. Log into the Heroku CLI
 
 The Heroku CLI connects your local machine with your Heroku account. [Sign up for a free Heroku account](https://heroku.com) and then log into the Heroku CLI with the following command:
 
@@ -120,7 +117,7 @@ If you're behind a firewall, you may need to [set the proxy environment variable
 
 :::
 
-**3. Confirm you're logged into the Heroku CLI**
+### 3. Confirm you're logged into the Heroku CLI
 
 Check that you're logged in by displaying the account currently connected to your Heroku CLI:
 
@@ -144,7 +141,7 @@ Eligible students can apply for platform credits through the [Heroku for GitHub 
 
 :::
 
-**1. Create an app on Heroku**
+### 1. Create an app on Heroku
 
 Create an app on Heroku with a unique name:
 
@@ -172,7 +169,7 @@ After your app is created, you'll be given some information that we'll use in th
 - Web address is `https://sharp-rain-871.herokuapp.com/`
 - Empty Git remote is `https://git.heroku.com/sharp-rain-871.git`
 
-**2. Confirm Heroku Git remote**
+### 2. Confirm Heroku Git remote
 
 The Heroku CLI automatically adds a Git remote called `heroku` to your local repository. You can list your Git remotes to confirm `heroku` exists:
 
@@ -182,7 +179,7 @@ git remote -v
 # heroku	https://git.heroku.com/sharp-rain-871.git (push)
 ```
 
-**3. Set environment variables on Heroku**
+### 3. Set environment variables on Heroku
 
 Now you'll need to add your Slack app credentials to your Heroku app:
 
@@ -205,7 +202,7 @@ Now that we have prepared your local app and created a Heroku app, the next step
 
 To deploy the app, we're going to push your local code to Heroku, update your Slack app's settings, and say "hello" to your Heroku app. ✨
 
-**1. Deploy the app to Heroku**
+### 1. Deploy the app to Heroku
 
 When deploying an app to Heroku, you'll typically use the `git push` command. This will push your code from your local repository to your `heroku` remote repository.
 
@@ -227,7 +224,7 @@ Finally, we need to start a web server instance using the Heroku CLI:
 heroku ps:scale web=1
 ```
 
-**2. Update your Slack app's settings**
+### 2. Update your Slack app's settings
 
 Now we need to use your Heroku web address as your **Request URL**, which is where Slack will send events and actions.
 
@@ -263,7 +260,7 @@ Heroku Eco Dyno apps sleep when inactive. 💤 If your verification fails, pleas
 
 :::
 
-**3. Test your Slack app**
+### 3. Test your Slack app
 
 Your app is now deployed and Slack is updated, so let's try it out!
 
