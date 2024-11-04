@@ -353,7 +353,7 @@ export function createDummyCustomFunctionMiddlewareArgs<
     options?: Options;
   } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' }, options: { autoAcknowledge: true } as Options },
 ): SlackCustomFunctionMiddlewareArgs<Options> {
-  data.callbackId = data.callbackId ? data.callbackId : 'reverse';
+  data.callbackId = data.callbackId || 'reverse';
   data.inputs = data.inputs ? data.inputs : { stringToReverse: 'hello' };
   data.options = data.options ? data.options : ({ autoAcknowledge: true } as Options);
   const testFunction = {
