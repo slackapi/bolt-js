@@ -77,6 +77,10 @@ const navbar = {
       target: '_self',
     },
     {
+      type: 'localeDropdown',
+      position: 'right',
+    },
+    {
       'aria-label': 'GitHub Repository',
       className: 'navbar-github-link',
       href: 'https://github.com/slackapi',
