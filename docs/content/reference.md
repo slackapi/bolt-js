@@ -22,7 +22,7 @@ Below is the current list of methods that accept listener functions. These metho
 | `app.action(actionId, fn);`     | Listens for an action event from a Block Kit element, such as a user interaction with a button, select menu, or datepicker. The `actionId` identifier is a `string` that should match the unique `action_id` included when your app sends the element to a view. Note that a view can be a message, modal, or app home. Note that action elements included in an `input` block do not trigger any events.
 | `app.shortcut(callbackId, fn);` | Listens for global or message shortcut invocation. The `callbackId` is a `string` or `RegExp` that must match a shortcut `callback_id` specified within your app's configuration.
 | `app.view(callbackId, fn);`     | Listens for `view_submission` and `view_closed` events. `view_submission` events are sent when a user submits a modal that your app opened. `view_closed` events are sent when a user closes the modal rather than submits it.
-| `app.step(workflowStep)` | Listen and responds to steps from apps events using the callbacks passed in an instance of `WorkflowStep`. Callbacks include three callbacks: `edit`, `save`, and `execute`. More information on steps from apps can be found [in the documentation](/concepts/adding-editing-steps).
+| `app.step(workflowStep)` | Listen and responds to steps from apps events using the callbacks passed in an instance of `WorkflowStep`. Callbacks include three callbacks: `edit`, `save`, and `execute`. More information on steps from apps can be found [in the documentation](/concepts/steps-from-apps).
 | `app.command(commandName, fn);` | Listens for slash command invocations. The `commandName` is a `string` that must match a slash command specified in your app's configuration. Slash command names should be prefaced with a `/` (ex: `/helpdesk`).
 | `app.options(actionId, fn);`    | Listens for options requests (from select menus with an external data source). This isn't often used, and shouldn't be mistaken with `app.action`. The `actionId` identifier is a `string` that matches the unique `action_id` included when you app sends a [select with an external data source](https://api.slack.com/reference/block-kit/block-elements#external_select).
 
@@ -151,6 +151,28 @@ Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://to
 
 :::
 
+## Agents & Assistants
+
+### The `AssistantConfig` configuration object
+
+| Property | Required? | Description | 
+|---|---|---|
+|`threadContextStore` | Optional | When provided, must have the required methods to get and save thread context, which will override the `getThreadContext` and `saveThreadContext` utilities. <br/> <br/> If not provided, a `DefaultAssistantContextStore` instance is used.
+| `threadStarted` | Required | Executes when the user opens the assistant container or otherwise begins a new chat, thus sending the [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event.
+| `threadContextChanged` | Optional | Executes when a user switches channels while the assistant container is open, thus sending the [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event. <br/> <br/>  If not provided, context will be saved using the AssistantContextStore's `save` method (either the `DefaultAssistantContextStore` instance or provided `threadContextStore`).
+| `userMessage` | Required |  Executes when a [message](https://api.slack.com/events/message) is received, thus sending the [`message.im`](https://api.slack.com/events/message.im) event. These messages do not contain a subtype and must be deduced based on their shape and metadata (if provided). Bolt handles this deduction out of the box for those using the `Assistant` class.
+
+### Assistant utilities 
+
+Utility | Description
+|---|---|
+| `getThreadContext` | Alias for `AssistantContextStore.get()` method. Executed if custom `AssistantContextStore` value is provided.  <br/><br/>  If not provided, the `DefaultAssistantContextStore` instance will retrieve the most recent context saved to the instance.
+| `saveThreadContext` | Alias for `AssistantContextStore.save()`. Executed if `AssistantContextStore` value is provided. <br/> <br/> If not provided, the `DefaultAssistantContextStore` instance will save the `assistant_thread.context` to the instance and attach it to the initial assistant message that was sent to the thread.
+| `say(message: string)` | Alias for the `postMessage` method.<br/><br/> Sends a message to the current assistant thread.
+| `setTitle(title: string)` | [Sets the title](https://api.slack.com/methods/assistant.threads.setTitle) of the assistant thread to capture the initial topic/question.
+| `setStatus(status: string)` | Sets the [status](https://api.slack.com/methods/assistant.threads.setStatus) of the assistant to give the appearance of active processing.
+| `setSuggestedPrompts({ prompts: [{ title: string; message: string; }] })` | Provides the user up to 4 optional, preset [prompts](https://api.slack.com/methods/assistant.threads.setSuggestedPrompts) to choose from.
+
 ## Framework error types
 Bolt includes a set of error types to make errors easier to handle, with more specific contextual information. Below is a non-exhaustive list of error codes you may run into during development:
 
@@ -162,7 +184,7 @@ Bolt includes a set of error types to make errors easier to handle, with more sp
 | `ReceiverMultipleAckError` | Error thrown within Receiver when your app calls `ack()` when that request has previously been acknowledged. Currently only used in the default `HTTPReceiver`. |
 | `ReceiverAuthenticityError` | Error thrown when your app's request signature could not be verified. The error includes information on why it failed, such as an invalid timestamp, missing headers, or invalid signing secret.
 | `MultipleListenerError` | Thrown when multiple errors occur when processing multiple listeners for a single event. Includes an `originals` property with an array of the individual errors. |
-| `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep` instance. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on steps from apps [can be found in the documentation](/concepts/steps).  |
+| `WorkflowStepInitializationError` | Error thrown when configuration options are invalid or missing when instantiating a new `WorkflowStep` instance. This could be scenarios like not including a `callback_id`, or not including a configuration object. More information on steps from apps [can be found in the documentation](/concepts/steps-from-apps).  |
 | `UnknownError` | An error that was thrown inside the framework but does not have a specified error code. Contains an `original` property with more details. |
 
 :::info 

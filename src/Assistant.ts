@@ -3,6 +3,7 @@ import type {
   AssistantThreadsSetSuggestedPromptsResponse,
   AssistantThreadsSetTitleResponse,
   ChatPostMessageArguments,
+  MessageMetadataEventPayloadObject,
 } from '@slack/web-api';
 import {
   type AssistantThreadContext,
@@ -44,11 +45,16 @@ type SetSuggestedPromptsFn = (
 ) => Promise<AssistantThreadsSetSuggestedPromptsResponse>;
 
 interface SetSuggestedPromptsArguments {
+  /** @description Prompt suggestions that appear when opening assistant thread. */
   prompts: [AssistantPrompt, ...AssistantPrompt[]];
+  /** @description Title for the prompts. */
+  title?: string;
 }
 
 interface AssistantPrompt {
+  /** @description Title of the prompt. */
   title: string;
+  /** @description Message of the prompt. */
   message: string;
 }
 
@@ -301,11 +307,19 @@ export async function processAssistantMiddleware(
  */
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const { client, payload } = args;
-  const { channelId: channel, threadTs: thread_ts } = extractThreadInfo(payload);
+  const { channelId: channel, threadTs: thread_ts, context } = extractThreadInfo(payload);
 
-  return (message: Parameters<SayFn>[0]) => {
+  return async (message: Parameters<SayFn>[0]) => {
+    const threadContext = context.channel_id ? context : await args.getThreadContext(args);
     const postMessageArgument: ChatPostMessageArguments =
       typeof message === 'string' ? { text: message, channel, thread_ts } : { ...message, channel, thread_ts };
+
+    if (threadContext) {
+      postMessageArgument.metadata = {
+        event_type: 'assistant_thread_context',
+        event_payload: threadContext as MessageMetadataEventPayloadObject,
+      };
+    }
 
     return client.chat.postMessage(postMessageArgument);
   };
@@ -336,11 +350,12 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
   return (params: Parameters<SetSuggestedPromptsFn>[0]) => {
-    const { prompts } = params;
+    const { prompts, title } = params;
     return client.assistant.threads.setSuggestedPrompts({
       channel_id,
       thread_ts,
       prompts,
+      title,
     });
   };
 }
@@ -375,7 +390,11 @@ export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']
   let context: AssistantThreadContext = {};
 
   // assistant_thread_started, asssistant_thread_context_changed
-  if ('assistant_thread' in payload) {
+  if (
+    'assistant_thread' in payload &&
+    'channel_id' in payload.assistant_thread &&
+    'thread_ts' in payload.assistant_thread
+  ) {
     channelId = payload.assistant_thread.channel_id;
     threadTs = payload.assistant_thread.thread_ts;
     context = payload.assistant_thread.context;

@@ -3,16 +3,13 @@ title: AWS Lambda へのデプロイ
 lang: ja-jp
 ---
 
-# AWS Lambda へのデプロイ
-
 このガイドでは、Bolt for JavaScript、[Serverless Framework](https://serverless.com/)、[AWS Lambda](https://aws.amazon.com/lambda/) を使った Slack アプリの準備とデプロイの方法について説明します。
-
 
 この手順を全て終わらせたら、あなたはきっと⚡️ [Deploying to AWS Lambda](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda) のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
 
 ---
 
-### AWS Lambda のセットアップ {#set-up-aws-lambda}
+## AWS Lambda のセットアップ {#set-up-aws-lambda}
 
 [AWS Lambda](https://aws.amazon.com/lambda/) はサーバーレスの Function-as-a-Service（FaaS）プラットフォームです。AWS Lambda を利用すると、サーバーを管理することなく、コードを実行することができます。このセクションでは、ローカルマシンから AWS Lambda にアクセスするための設定を行います。
 
@@ -22,7 +19,7 @@ lang: ja-jp
 
 :::
 
-**1. AWS アカウントを作成する**
+### 1. AWS アカウントを作成する
 
 AWS アカウントをまだ持っていない場合は、[アカウントを作成](https://aws.amazon.com/)する必要があります。画面に表示される案内に沿って作成しましょう。
 
@@ -32,7 +29,7 @@ AWS アカウントをまだ持っていない場合は、[アカウントを作
 
 :::
 
-**2. AWS のアクセスキーを作成する**
+### 2. AWS のアクセスキーを作成する
 
 Lambda へのデプロイでは、プログラムから AWS アカウントにアクセスする手段が必要になります。AWS の世界では、このために**アクセスキー ID** と**シークレットアクセスキー**が必要です。
 
@@ -44,13 +41,13 @@ Lambda へのデプロイでは、プログラムから AWS アカウントに�
 
 :::
 
-**3. AWS CLI をインストールする**
+### 3. AWS CLI をインストールする
 
 AWS では [macOS、Windows、Linux](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。
 
 macOS では、[最新の .pkg インストーラーをダウンロード](https://awscli.amazonaws.com/AWSCLIV2.pkg)して AWS CLI をインストールできます。
 
-**4. AWS プロファイルを構成する**
+### 4. AWS プロファイルを構成する
 
 AWS CLI を使ってプロファイルを構成します。プロファイルはローカルマシンに置かれ、アクセスキーのペアを保管します。この CLI やその他のツールは、このプロファイルを使って AWS にアクセスします。
 
@@ -74,11 +71,9 @@ aws configure
 
 ---
 
-### Serverless Framework をセットアップする {#set-up-serverless-framework}
+## Serverless Framework をセットアップする {#set-up-serverless-framework}
 
 [Serverless Framework](https://serverless.com/) では、AWS Lambda 向けのアプリの設定、デバッグ、デプロイを簡単に行うためのツールが用意されています。
-
-**1. Serverless Framework CLI をインストールする**
 
 Serverless でも macOS、Windows、Linux にインストールして利用できるコマンドラインインターフェイス（CLI）のツールが用意されています。インストールするには Serverless の[入門ガイド（英語）](https://www.serverless.com/framework/docs/getting-started/) をお読みください。
 
@@ -92,7 +87,7 @@ Serverless のツールのセットアップが完了しました。次に、AWS
 
 ---
 
-### Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
+## Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
 まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド](/getting-started)を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
 
@@ -110,9 +105,9 @@ Bolt アプリを用意できました。次に AWS Lambda と Serverless Framew
 
 ---
 
-### アプリをセットアップする {#prepare-the-app}
+## アプリをセットアップする {#prepare-the-app}
 
-**1. アプリを AWS Lambda に対応させる**
+### 1. アプリを AWS Lambda に対応させる
 
 デフォルトでは、入門ガイドの Bolt サンプルアプリはソケットモードを使用しています。WebSocket イベントの代わりに HTTP リクエストをリッスンするため、 `app.js` の設定を変更しましょう。
 
@@ -174,7 +169,7 @@ module.exports.handler = async (event, context, callback) => {
 
 完成したアプリのソースコードは、⚡️[deploy-aws-lambda](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js) のサンプルのようになります。
 
-**2. serverless.yml を追加する**
+### 2. serverless.yml を追加する
 
 Serverless Framework のプロジェクトでは、アプリの設定とデプロイに `serverless.yml` ファイルを使用します。
 
@@ -206,7 +201,7 @@ plugins:
 
 :::
 
-**3. serverless-offline モジュールをインストールする**
+### 3. serverless-offline モジュールをインストールする
 
 ローカルでの開発を容易にするため、`serverless-offline` モジュールを使ってデプロイ対象の関数をエミュレートできるようにしましょう。
 
@@ -220,11 +215,11 @@ npm install --save-dev serverless-offline
 
 ---
 
-### アプリをローカルで実行する {#run-the-app-locally}
+## アプリをローカルで実行する {#run-the-app-locally}
 
 アプリを AWS Lambda 関数に応答させるための準備が完了したので、次にローカルでアプリを実行できるように環境を設定します。
 
-**1. ローカルのサーバーを起動する**
+### 1. ローカルのサーバーを起動する
 
 まず、アプリの起動と AWS Lambda 関数のイベントをリッスンするため、`serverless offline` コマンドを実行します。
 
@@ -250,7 +245,7 @@ ngrok http 3000
 
 :::
 
-**2. リクエスト URL を変更する**
+### 2. リクエスト URL を変更する
 
 次に、[Slack アプリの設定](https://api.slack.com/apps)を開き、**リクエスト URL** を ngrok のウェブアドレスに変更します。
 
@@ -268,7 +263,7 @@ ngrok http 3000
 
 ![「Event Subscriptions」ページ](/img/event-subscriptions-page.png "「Event Subscriptions」ページ")
 
-**3. Slack アプリをテストする**
+### 3. Slack アプリをテストする
 
 Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド](/getting-started)のとおり、アプリから応答があるはずです。
 
@@ -285,13 +280,13 @@ Slack アプリをテストします。今作った Bolt アプリを Slack の�
 
 ---
 
-### アプリをデプロイする {#deploy-the-app}
+## アプリをデプロイする {#deploy-the-app}
 
 今までローカルでアプリを実行し、 Slack ワークスペースでテストをしてきました。さて、動作するアプリができたので、デプロイしてみましょう!
 
 AWS Lambda 向けのアプリのプロビジョニング、パッケージング、デプロイには、Serverless Framework のツールが利用できます。アプリのデプロイが完了したら、アプリのリクエスト URL を更新して、「hello」と入力した時にアプリが応答できるようにします。✨
 
-**1. AWS Lambda にアプリをデプロイする**
+### 1. AWS Lambda にアプリをデプロイする
 
 次のコマンドを使って AWS Lambda にアプリをデプロイします。
 
@@ -312,7 +307,7 @@ serverless deploy
 
 :::
 
-**2. Slack アプリの設定を更新する**
+### 2. Slack アプリの設定を更新する
 
 Slack からのイベントやアクションの送信先となる**リクエスト URL** に、発行された AWS Lambda の**エンドポイント**を指定します。[Slack アプリの構成](https://api.slack.com/apps)を開き、先ほどコピーしたエンドポイントを**リクエスト URL** に貼りつけます。
 
@@ -324,7 +319,7 @@ Slack からのイベントやアクションの送信先となる**リクエス
 
 ![「Event Subscriptions」ページ](/img/event-subscriptions-page.png "「Event Subscriptions」ページ")
 
-**3. Slack アプリをテストする**
+### 3. Slack アプリをテストする
 
 アプリのデプロイと、Slack の設定の更新が完了しました。動作を試してみましょう。
 
@@ -333,7 +328,7 @@ Slack からのイベントやアクションの送信先となる**リクエス
 > 👩‍💻 hello<br/>
 > 🤖 Hey there @Jane!
 
-**4. 更新をデプロイする**
+### 4. 更新をデプロイする
 
 Slack アプリの開発を継続していくなら、更新したアプリをデプロイする必要が出てくるでしょう。それをやってみるために、「goodbye」というメッセージに応答するようにアプリを変更してみましょう。
 
@@ -355,11 +350,15 @@ serverless deploy
 
 デプロイが完了したら、アプリを参加させた Slack チャンネルを開いて、半角の小文字で「goodbye」と入力してみましょう。Slack アプリに「See you later」と表示されるはずです。
 
-> ⛳️ 一つの関数に小さな変更を加える場合、その関数だけをデプロイするためにより高速な `serverless deploy function -f my-function` を実行することができます。より詳細なヘルプを見るには `serverless help deploy function` を実行してください。
+:::tip
+
+一つの関数に小さな変更を加える場合、その関数だけをデプロイするためにより高速な `serverless deploy function -f my-function` を実行することができます。より詳細なヘルプを見るには `serverless help deploy function` を実行してください。
+
+:::
 
 ---
 
-### 次のステップ {#next-steps}
+## 次のステップ {#next-steps}
 
 ⚡️[AWS Lambda を使った最初の Bolt for JavaScript アプリ](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda)をデプロイできました。🚀
 
