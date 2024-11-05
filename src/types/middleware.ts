@@ -1,21 +1,23 @@
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
+import type { SlackCustomFunctionMiddlewareArgs } from '../CustomFunction';
 import type { SlackActionMiddlewareArgs } from './actions';
 import type { SlackCommandMiddlewareArgs } from './command';
-import type { FunctionInputs, SlackEventMiddlewareArgs } from './events';
+import type { FunctionInputs, SlackEventMiddlewareArgs, SlackEventMiddlewareArgsOptions } from './events';
 import type { SlackOptionsMiddlewareArgs } from './options';
 import type { SlackShortcutMiddlewareArgs } from './shortcuts';
 import type { StringIndexed } from './utilities';
 import type { SlackViewMiddlewareArgs } from './view';
 
 // TODO: rename this to AnyListenerArgs, and all the constituent types
-export type AnyMiddlewareArgs =
-  | SlackEventMiddlewareArgs
+export type AnyMiddlewareArgs<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }> =
+  | SlackEventMiddlewareArgs<string, Options>
   | SlackActionMiddlewareArgs
   | SlackCommandMiddlewareArgs
   | SlackOptionsMiddlewareArgs
   | SlackViewMiddlewareArgs
-  | SlackShortcutMiddlewareArgs;
+  | SlackShortcutMiddlewareArgs
+  | SlackCustomFunctionMiddlewareArgs<Options>;
 
 export interface AllMiddlewareArgs<CustomContext = StringIndexed> {
   context: Context & CustomContext;
