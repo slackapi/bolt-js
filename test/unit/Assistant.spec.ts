@@ -101,6 +101,7 @@ describe('Assistant class', () => {
       const middleware = assistant.getMiddleware();
       const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
       await middleware(fakeMessageArgs);
+      sinon.assert.notCalled(fakeMessageArgs.ack);
       sinon.assert.called(fakeMessageArgs.next);
     });
 
@@ -109,6 +110,7 @@ describe('Assistant class', () => {
       const middleware = assistant.getMiddleware();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       await middleware(mockThreadStartedArgs);
+      sinon.assert.called(mockThreadStartedArgs.ack);
       sinon.assert.notCalled(mockThreadStartedArgs.next);
     });
 
@@ -424,6 +426,7 @@ describe('Assistant class', () => {
 
         await processAssistantMiddleware(mockThreadContextChangedArgs, fakeMiddleware);
 
+        sinon.assert.called(mockThreadContextChangedArgs.ack);
         assert(fn1.called);
         assert(fn2.called);
       });

@@ -13,6 +13,7 @@ import {
   type SaveThreadContextFn,
 } from './AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
+import { autoAcknowledge } from './middleware/builtin';
 import processMiddleware from './middleware/process';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
 
@@ -286,7 +287,7 @@ export async function processAssistantMiddleware(
   middleware: AssistantMiddleware,
 ): Promise<void> {
   const { context, client, logger } = args;
-  const callbacks = [...middleware] as Middleware<AnyMiddlewareArgs>[];
+  const callbacks = [autoAcknowledge, ...middleware] as Middleware<AnyMiddlewareArgs>[];
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
