@@ -232,6 +232,7 @@ describe('Built-in global middleware', () => {
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs(), ctx);
         await builtins.ignoreSelf(args);
         sinon.assert.called(args.next);
+        sinon.assert.notCalled(args.ack);
       });
 
       it('should ignore message events identified as a bot message from the same bot ID as this app', async () => {
@@ -252,6 +253,7 @@ describe('Built-in global middleware', () => {
           ctx,
         );
         await builtins.ignoreSelf(args);
+        sinon.assert.called(args.ack);
         sinon.assert.notCalled(args.next);
       });
 
@@ -259,6 +261,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext, botUserId: fakeBotUserId };
         const args = wrapMiddleware(createDummyReactionAddedEventMiddlewareArgs({ user: fakeBotUserId }), ctx);
         await builtins.ignoreSelf(args);
+        sinon.assert.called(args.ack);
         sinon.assert.notCalled(args.next);
       });
 
@@ -266,6 +269,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext, botUserId: fakeBotUserId, botId: fakeBotUserId };
         const args = wrapMiddleware(createDummyReactionAddedEventMiddlewareArgs({ user: fakeBotUserId }), ctx);
         await builtins.ignoreSelf(args);
+        sinon.assert.called(args.ack);
         sinon.assert.notCalled(args.next);
       });
 
@@ -279,6 +283,7 @@ describe('Built-in global middleware', () => {
 
         await Promise.all(listOfFakeArgs.map(builtins.ignoreSelf));
         for (const args of listOfFakeArgs) {
+          sinon.assert.notCalled(args.ack);
           sinon.assert.called(args.next);
         }
       });

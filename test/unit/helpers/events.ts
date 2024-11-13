@@ -59,13 +59,14 @@ const ack: AckFn<void> = (_r?) => Promise.resolve();
 export function wrapMiddleware<Args extends AnyMiddlewareArgs>(
   args: Args,
   ctx?: Context,
-): Args & AllMiddlewareArgs & { next: SinonSpy } {
+): Args & AllMiddlewareArgs & { next: SinonSpy; ack: SinonSpy } {
   const wrapped = {
     ...args,
     context: ctx || { isEnterpriseInstall: false },
     logger: createFakeLogger(),
     client: new WebClient(),
     next: sinon.fake(),
+    ack: sinon.fake(),
   };
   return wrapped;
 }
