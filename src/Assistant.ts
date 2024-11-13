@@ -10,8 +10,6 @@ import {
   type AssistantThreadContext,
   type AssistantThreadContextStore,
   DefaultThreadContextStore,
-  type GetThreadContextFn,
-  type SaveThreadContextFn,
 } from './AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import { autoAcknowledge, isEventArgs, isMessageEventArgs, safelyAcknowledge } from './middleware/builtin';
@@ -32,14 +30,16 @@ export interface AssistantConfig {
  * Callback utilities
  */
 interface AssistantUtilityArgs {
-  getThreadContext: GetThreadContextFn;
-  saveThreadContext: SaveThreadContextFn;
+  getThreadContext: GetThreadContextUtilFn;
+  saveThreadContext: SaveThreadContextUtilFn;
   say: SayFn;
   setStatus: SetStatusFn;
   setSuggestedPrompts: SetSuggestedPromptsFn;
   setTitle: SetTitleFn;
 }
 
+type GetThreadContextUtilFn = () => Promise<AssistantThreadContext>;
+type SaveThreadContextUtilFn = () => Promise<void>;
 type SetStatusFn = (status: string) => Promise<AssistantThreadsSetStatusResponse>;
 
 type SetSuggestedPromptsFn = (
@@ -328,7 +328,7 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const { channelId: channel, threadTs: thread_ts, context } = extractThreadInfo(payload);
 
   return async (message: Parameters<SayFn>[0]) => {
-    const threadContext = context.channel_id ? context : await args.getThreadContext(args);
+    const threadContext = context.channel_id ? context : await args.getThreadContext();
     const postMessageArgument: ChatPostMessageArguments =
       typeof message === 'string' ? { text: message, channel, thread_ts } : { ...message, channel, thread_ts };
 
