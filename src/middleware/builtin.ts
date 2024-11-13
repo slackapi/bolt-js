@@ -56,11 +56,11 @@ function isViewBody(
   return 'view' in body && body.view !== undefined;
 }
 
-function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
+export function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
   return 'event' in args && args.event !== undefined;
 }
 
-function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
+export function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
   return isEventArgs(args) && 'message' in args;
 }
 
@@ -131,10 +131,14 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs> = async (args) => {
  * Middleware that auto acknowledges the request received
  */
 export const autoAcknowledge: Middleware<AnyMiddlewareArgs> = async (args) => {
+  await safelyAcknowledge(args);
+  await args.next();
+};
+
+export const safelyAcknowledge: Middleware<AnyMiddlewareArgs> = async (args) => {
   if ('ack' in args && args.ack !== undefined) {
     await args.ack();
   }
-  await args.next();
 };
 
 /**
@@ -318,6 +322,7 @@ export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
       const { message } = args;
       // Look for an event that is identified as a bot message from the same bot ID as this app, and return to skip
       if (message.subtype === 'bot_message' && message.bot_id === botId) {
+        await safelyAcknowledge(args);
         return;
       }
     }
@@ -332,6 +337,7 @@ export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
       args.event.user === botUserId &&
       !eventsWhichShouldBeKept.includes(args.event.type)
     ) {
+      await safelyAcknowledge(args);
       return;
     }
   }
