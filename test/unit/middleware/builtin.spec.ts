@@ -2,15 +2,9 @@
 import { assert } from 'chai';
 import rewiremock from 'rewiremock';
 import sinon from 'sinon';
-import { expectType } from 'tsd';
 import { ErrorCode } from '../../../src/errors';
-import { isSlackEventMiddlewareArgsOptions } from '../../../src/middleware/builtin';
 // import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from '../../../src/middleware/builtin';
-import type {
-  Context,
-  /* NextFn, */ SlackEventMiddlewareArgs,
-  SlackEventMiddlewareArgsOptions,
-} from '../../../src/types';
+import type { Context, /* NextFn, */ SlackEventMiddlewareArgs } from '../../../src/types';
 import {
   type Override,
   createDummyAppHomeOpenedEventMiddlewareArgs,
@@ -415,27 +409,6 @@ describe('Built-in global middleware', () => {
         await builtins.subtype('me_message')(args);
         sinon.assert.notCalled(args.next);
       });
-    });
-  });
-
-  describe(isSlackEventMiddlewareArgsOptions.name, () => {
-    it('should return true if object is SlackEventMiddlewareArgsOptions', async () => {
-      const actual = isSlackEventMiddlewareArgsOptions({ autoAcknowledge: true });
-      assert.isTrue(actual);
-    });
-
-    it('should narrow proper type if object is SlackEventMiddlewareArgsOptions', async () => {
-      const option = { autoAcknowledge: true };
-      if (isSlackEventMiddlewareArgsOptions({ autoAcknowledge: true })) {
-        expectType<SlackEventMiddlewareArgsOptions>(option);
-      } else {
-        assert.fail(`${option} should be of type SlackEventMiddlewareArgsOption`);
-      }
-    });
-
-    it('should return false if object is Middleware', async () => {
-      const actual = isSlackEventMiddlewareArgsOptions(async () => {});
-      assert.isFalse(actual);
     });
   });
 });

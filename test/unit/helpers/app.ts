@@ -58,13 +58,7 @@ export function withNoopWebClient(authTestResponse?: AuthTestResponse): Override
               test: sinon.fake.resolves(authTestResponse),
             };
           }
-        : class {
-            public token?: string;
-
-            public constructor(token?: string, _options?: WebClientOptions) {
-              this.token = token;
-            }
-          },
+        : class {},
     },
   };
 }
