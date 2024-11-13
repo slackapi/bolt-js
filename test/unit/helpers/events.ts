@@ -6,6 +6,7 @@ import type {
   Block,
   GenericMessageEvent,
   KnownBlock,
+  MessageChangedEvent,
   MessageEvent,
   ReactionAddedEvent,
 } from '@slack/types';
@@ -188,6 +189,61 @@ export function createDummyMessageEventMiddlewareArgs(
   };
 }
 
+export interface DummyMessageChangedOverrides {
+  channel_type?: GenericMessageEvent['channel_type'];
+  message?: DummyMessageOverrides;
+  previous_message?: DummyMessageOverrides;
+}
+
+export function createDummyMessageChangedEventMiddlewareArgs(
+  msgOverrides?: DummyMessageChangedOverrides,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackEventMiddlewareArgs<'message'> {
+  const dummyMessage: MessageEvent = msgOverrides?.message?.subtype || {
+    type: 'message',
+    subtype: msgOverrides?.message?.subtype || undefined,
+    event_ts: ts,
+    channel,
+    channel_type: msgOverrides?.message?.channel_type || 'channel',
+    user: msgOverrides?.message?.user || user,
+    ts,
+    text: msgOverrides?.message?.text || 'hi',
+    blocks: msgOverrides?.message?.blocks || [],
+    ...(msgOverrides?.message?.thread_ts ? { thread_ts: msgOverrides?.message?.thread_ts } : {}),
+  };
+  const dummyPreviousMessage: MessageEvent = msgOverrides?.previous_message?.subtype || {
+    type: 'message',
+    subtype: msgOverrides?.previous_message?.subtype || undefined,
+    event_ts: ts,
+    channel,
+    channel_type: msgOverrides?.previous_message?.channel_type || 'channel',
+    user: msgOverrides?.previous_message?.user || user,
+    ts,
+    text: msgOverrides?.previous_message?.text || 'hi',
+    blocks: msgOverrides?.previous_message?.blocks || [],
+    ...(msgOverrides?.previous_message?.thread_ts ? { thread_ts: msgOverrides?.previous_message?.thread_ts } : {}),
+  };
+  const payload: MessageChangedEvent = {
+    type: 'message',
+    subtype: 'message_changed',
+    event_ts: ts,
+    hidden: true,
+    channel,
+    channel_type: msgOverrides?.channel_type || 'channel',
+    ts,
+    message: dummyMessage,
+    previous_message: dummyPreviousMessage,
+  };
+  return {
+    payload,
+    event: payload,
+    message: payload,
+    body: envelopeEvent(payload, bodyOverrides),
+    say,
+  };
+}
+
 interface DummyAppMentionOverrides {
   event?: AppMentionEvent;
   text?: string;
@@ -275,6 +331,21 @@ export function createDummyAssistantUserMessageEventMiddlewareArgs(
     ...createDummyMessageEventMiddlewareArgs(msgOverrides || { thread_ts: ts, channel_type: 'im' }, bodyOverrides),
     ...enrichDummyAssistantMiddlewareArgs(),
   };
+}
+
+export function createDummyAssistantMessageChangedEventMiddlewareArgs(
+  msgOverrides?: DummyMessageChangedOverrides,
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackEventMiddlewareArgs<'message'> {
+  return createDummyMessageChangedEventMiddlewareArgs(
+    msgOverrides || {
+      channel_type: 'im',
+      message: { thread_ts: ts, channel_type: 'im' },
+      previous_message: { thread_ts: ts, channel_type: 'im' },
+    },
+    bodyOverrides,
+  );
 }
 
 interface DummyCommandOverride {

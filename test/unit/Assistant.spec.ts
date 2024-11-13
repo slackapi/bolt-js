@@ -8,17 +8,19 @@ import {
   Assistant,
   type AssistantConfig,
   type AssistantMiddleware,
-  type AssistantMiddlewareArgs,
 } from '../../src/Assistant';
 import type { AssistantThreadContext, AssistantThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from '../../src/errors';
+import { autoAcknowledge } from '../../src/middleware/builtin';
 import type { Middleware } from '../../src/types';
 import {
   type Override,
   createDummyAppMentionEventMiddlewareArgs,
+  createDummyAssistantMessageChangedEventMiddlewareArgs,
   createDummyAssistantThreadContextChangedEventMiddlewareArgs,
   createDummyAssistantThreadStartedEventMiddlewareArgs,
   createDummyAssistantUserMessageEventMiddlewareArgs,
+  createDummyMessageChangedEventMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
   wrapMiddleware,
 } from './helpers';
@@ -105,7 +107,7 @@ describe('Assistant class', () => {
       sinon.assert.called(fakeMessageArgs.next);
     });
 
-    it('should not call next if a assistant event', async () => {
+    it('should not call next if assistant_thread_started_event', async () => {
       const assistant = new Assistant(MOCK_CONFIG_SINGLE);
       const middleware = assistant.getMiddleware();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
@@ -114,72 +116,125 @@ describe('Assistant class', () => {
       sinon.assert.notCalled(mockThreadStartedArgs.next);
     });
 
-    describe('isAssistantEvent', () => {
-      it('should return true if recognized assistant event', async () => {
-        const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+    it('should not call next if assistant_thread_context_changed_event', async () => {
+      const assistant = new Assistant(MOCK_CONFIG_SINGLE);
+      const middleware = assistant.getMiddleware();
+      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadContextChangedEventMiddlewareArgs());
+      await middleware(mockThreadStartedArgs);
+      sinon.assert.called(mockThreadStartedArgs.ack);
+      sinon.assert.notCalled(mockThreadStartedArgs.next);
+    });
+
+    it('should not call next if assistant_message_event', async () => {
+      const assistant = new Assistant(MOCK_CONFIG_SINGLE);
+      const middleware = assistant.getMiddleware();
+      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
+      await middleware(mockThreadStartedArgs);
+      sinon.assert.called(mockThreadStartedArgs.ack);
+      sinon.assert.notCalled(mockThreadStartedArgs.next);
+    });
+
+    it('should not call next if message changed by assistant event', async () => {
+      const assistant = new Assistant(MOCK_CONFIG_SINGLE);
+      const middleware = assistant.getMiddleware();
+      const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantMessageChangedEventMiddlewareArgs());
+      await middleware(mockThreadStartedArgs);
+      sinon.assert.called(mockThreadStartedArgs.ack);
+      sinon.assert.notCalled(mockThreadStartedArgs.next);
+    });
+
+    describe('isAssistantThreadContextChangedEvent', () => {
+      it('should return true if recognized assistant_thread_context_changed_event', async () => {
         const mockThreadContextChangedArgs = wrapMiddleware(
           createDummyAssistantThreadContextChangedEventMiddlewareArgs(),
         );
-        const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
-
-        const { isAssistantEvent } = await importAssistant();
-
-        assert(isAssistantEvent(mockThreadStartedArgs));
-        assert(isAssistantEvent(mockThreadContextChangedArgs));
-        assert(isAssistantEvent(mockUserMessageArgs));
+        const { isAssistantThreadContextChangedEvent } = await importAssistant();
+        assert(isAssistantThreadContextChangedEvent(mockThreadContextChangedArgs));
       });
 
-      it('should return false if not a recognized assistant event', async () => {
+      it('should return false if not a recognized assistant_thread_context_changed_event', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs());
-        const { isAssistantEvent } = await importAssistant();
-        assert.isFalse(isAssistantEvent(fakeMessageArgs));
+        const { isAssistantThreadContextChangedEvent } = await importAssistant();
+        assert.isFalse(isAssistantThreadContextChangedEvent(fakeMessageArgs));
       });
     });
 
-    describe('matchesConstraints', () => {
-      it('should return true if recognized assistant message', async () => {
-        const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
-        const { matchesConstraints } = await importAssistant();
-        assert.ok(matchesConstraints(mockUserMessageArgs));
-      });
-
-      it('should return false if not supported message subtype', async () => {
-        const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
-        const { matchesConstraints } = await importAssistant();
-        // casting here as we intentionally are providing type-mismatched argument as a runtime test
-        assert.isFalse(matchesConstraints(fakeMessageArgs as unknown as AssistantMiddlewareArgs));
-      });
-
-      it('should return true if not message event', async () => {
+    describe('isAssistantThreadStartedEvent', () => {
+      it('should return true if recognized assistant_thread_started_event', async () => {
         const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
-        const { matchesConstraints } = await importAssistant();
-        assert(matchesConstraints(mockThreadStartedArgs));
+        const { isAssistantThreadStartedEvent } = await importAssistant();
+
+        assert(isAssistantThreadStartedEvent(mockThreadStartedArgs));
+      });
+
+      it('should return false if not a recognized assistant_thread_started_event', async () => {
+        const fakeMessageArgs = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs());
+        const { isAssistantThreadStartedEvent } = await importAssistant();
+        assert.isFalse(isAssistantThreadStartedEvent(fakeMessageArgs));
       });
     });
 
-    describe('isAssistantMessage', () => {
-      it('should return true if assistant message event', async () => {
+    describe('isUserMessageEventInAssistantThread', () => {
+      it('should return true if assistant_message_event', async () => {
         const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
-        const { isAssistantMessage } = await importAssistant();
-        assert(isAssistantMessage(mockUserMessageArgs.payload));
+        const { isUserMessageEventInAssistantThread } = await importAssistant();
+        assert(isUserMessageEventInAssistantThread(mockUserMessageArgs));
       });
 
       it('should return false if not correct subtype', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ thread_ts: '1234.56' }));
-        const { isAssistantMessage } = await importAssistant();
-        assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
+        const { isUserMessageEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isUserMessageEventInAssistantThread(fakeMessageArgs));
       });
 
       it('should return false if thread_ts is missing', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
-        const { isAssistantMessage } = await importAssistant();
-        assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
+        const { isUserMessageEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isUserMessageEventInAssistantThread(fakeMessageArgs));
       });
 
       it('should return false if channel_type is incorrect', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ channel_type: 'mpim' }));
-        const { isAssistantMessage } = await importAssistant();
-        assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
+        const { isUserMessageEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isUserMessageEventInAssistantThread(fakeMessageArgs));
+      });
+
+      it('should return false if not message event', async () => {
+        const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+        const { isUserMessageEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isUserMessageEventInAssistantThread(mockThreadStartedArgs));
+      });
+    });
+
+    describe('isOtherMessageSubEventInAssistantThread', () => {
+      it('should return true if message changed by assistant event', async () => {
+        const mockUserMessageArgs = wrapMiddleware(createDummyAssistantMessageChangedEventMiddlewareArgs());
+        const { isOtherMessageSubEventInAssistantThread } = await importAssistant();
+        assert(isOtherMessageSubEventInAssistantThread(mockUserMessageArgs));
+      });
+
+      it('should return false if message changed not by assistant event', async () => {
+        const mockUserMessageArgs = wrapMiddleware(createDummyMessageChangedEventMiddlewareArgs());
+        const { isOtherMessageSubEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isOtherMessageSubEventInAssistantThread(mockUserMessageArgs));
+      });
+
+      it('should return false if assistant_message_event', async () => {
+        const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
+        const { isOtherMessageSubEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isOtherMessageSubEventInAssistantThread(mockUserMessageArgs));
+      });
+
+      it('should return false if assistant_thread_started_event', async () => {
+        const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+        const { isOtherMessageSubEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isOtherMessageSubEventInAssistantThread(mockThreadStartedArgs));
+      });
+
+      it('should return false if assistant_thread_context_changed_event', async () => {
+        const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadContextChangedEventMiddlewareArgs());
+        const { isOtherMessageSubEventInAssistantThread } = await importAssistant();
+        assert.isFalse(isOtherMessageSubEventInAssistantThread(mockThreadStartedArgs));
       });
     });
   });
@@ -422,7 +477,7 @@ describe('Assistant class', () => {
           await continuation();
         }) as Middleware<AssistantThreadStartedEvent>);
         const fn2 = sinon.spy(async () => {});
-        const fakeMiddleware = [fn1, fn2] as AssistantMiddleware;
+        const fakeMiddleware = [autoAcknowledge, fn1, fn2] as AssistantMiddleware;
 
         await processAssistantMiddleware(mockThreadContextChangedArgs, fakeMiddleware);
 

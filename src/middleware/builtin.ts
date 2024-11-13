@@ -56,11 +56,11 @@ function isViewBody(
   return 'view' in body && body.view !== undefined;
 }
 
-function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
+export function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs {
   return 'event' in args && args.event !== undefined;
 }
 
-function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
+export function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
   return isEventArgs(args) && 'message' in args;
 }
 

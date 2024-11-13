@@ -1,4 +1,5 @@
 import type {
+  AllMessageEvents,
   AssistantThreadsSetStatusResponse,
   AssistantThreadsSetSuggestedPromptsResponse,
   AssistantThreadsSetTitleResponse,
@@ -13,7 +14,7 @@ import {
   type SaveThreadContextFn,
 } from './AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
-import { autoAcknowledge } from './middleware/builtin';
+import { autoAcknowledge, isEventArgs, isMessageEventArgs, safelyAcknowledge } from './middleware/builtin';
 import processMiddleware from './middleware/process';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
 
@@ -93,9 +94,6 @@ export interface AssistantUserMessageMiddlewareArgs
 export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> = T &
   AllMiddlewareArgs;
 
-/** Constants */
-const ASSISTANT_PAYLOAD_TYPES = new Set(['assistant_thread_started', 'assistant_thread_context_changed', 'message']);
-
 export class Assistant {
   private threadContextStore: AssistantThreadContextStore;
 
@@ -130,34 +128,26 @@ export class Assistant {
 
   public getMiddleware(): Middleware<AnyMiddlewareArgs> {
     return async (args): Promise<void> => {
-      if (isAssistantEvent(args) && matchesConstraints(args)) {
-        return this.processEvent(args);
+      if (isAssistantThreadStartedEvent(args)) {
+        return this.processEvent(args, [autoAcknowledge, ...this.threadStarted]);
+      }
+      if (isAssistantThreadContextChangedEvent(args)) {
+        return this.processEvent(args, [autoAcknowledge, ...this.threadContextChanged]);
+      }
+      if (isUserMessageEventInAssistantThread(args)) {
+        return this.processEvent(args, [autoAcknowledge, ...this.userMessage]);
+      }
+      if (isOtherMessageSubEventInAssistantThread(args)) {
+        // ignore self message_changed, message_deleted, etc.
+        return await safelyAcknowledge(args);
       }
       return args.next();
     };
   }
 
-  private async processEvent(args: AllAssistantMiddlewareArgs): Promise<void> {
-    const { payload } = args;
+  private async processEvent(args: AllAssistantMiddlewareArgs, middlewares: AssistantMiddleware): Promise<void> {
     const assistantArgs = enrichAssistantArgs(this.threadContextStore, args);
-    const assistantMiddleware = this.getAssistantMiddleware(payload);
-    return processAssistantMiddleware(assistantArgs, assistantMiddleware);
-  }
-
-  /**
-   * `getAssistantMiddleware()` returns the Assistant instance's middleware
-   */
-  private getAssistantMiddleware(payload: AllAssistantMiddlewareArgs['payload']): AssistantMiddleware {
-    switch (payload.type) {
-      case 'assistant_thread_started':
-        return this.threadStarted;
-      case 'assistant_thread_context_changed':
-        return this.threadContextChanged;
-      case 'message':
-        return this.userMessage;
-      default:
-        return [];
-    }
+    return processAssistantMiddleware(assistantArgs, middlewares);
   }
 }
 
@@ -185,33 +175,60 @@ export function enrichAssistantArgs(
   return preparedArgs;
 }
 
-/**
- * `isAssistantEvent()` determines if incoming event is a supported
- * Assistant event type.
- */
-export function isAssistantEvent(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
-  return ASSISTANT_PAYLOAD_TYPES.has(args.payload.type);
+export function isAssistantThreadStartedEvent(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
+  if (isEventArgs(args)) {
+    return args.payload.type === 'assistant_thread_started';
+  }
+  return false;
 }
 
-/**
- * `matchesConstraints()` determines if the incoming event payload
- * is related to the Assistant.
- */
-export function matchesConstraints(args: AssistantMiddlewareArgs): args is AssistantMiddlewareArgs {
-  return args.payload.type === 'message' ? isAssistantMessage(args.payload) : true;
+export function isAssistantThreadContextChangedEvent(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
+  if (isEventArgs(args)) {
+    return args.payload.type === 'assistant_thread_context_changed';
+  }
+  return false;
 }
 
-/**
- * `isAssistantMessage()` evaluates if the message payload is associated
- * with the Assistant container.
- */
-export function isAssistantMessage(payload: AnyMiddlewareArgs['payload']): boolean {
-  const isThreadMessage = 'channel' in payload && 'thread_ts' in payload;
-  const inAssistantContainer =
-    'channel_type' in payload &&
-    payload.channel_type === 'im' &&
-    (!('subtype' in payload) || payload.subtype === 'file_share' || payload.subtype === undefined); // TODO: undefined subtype is a limitation of message event, needs fixing (see https://github.com/slackapi/node-slack-sdk/issues/1904)
-  return isThreadMessage && inAssistantContainer;
+export function isMessageEventInAssistantThread(args: AnyMiddlewareArgs): boolean {
+  if (isMessageEventArgs(args)) {
+    return args.event.channel_type === 'im';
+  }
+  return false;
+}
+
+export function isUserMessageEventInAssistantThread(args: AnyMiddlewareArgs): args is AllAssistantMiddlewareArgs {
+  if (isMessageEventInAssistantThread(args)) {
+    return (
+      (!('subtype' in args.payload) || [undefined, 'file_share'].includes(args.payload.subtype)) &&
+      'thread_ts' in args.payload &&
+      args.payload.thread_ts !== undefined &&
+      !('bot_id' in args.payload)
+    );
+  }
+  return false;
+}
+
+export function isOtherMessageSubEventInAssistantThread(args: AnyMiddlewareArgs): boolean {
+  // message_changed, message_deleted etc.
+  if (isMessageEventInAssistantThread(args)) {
+    return (
+      !isUserMessageEventInAssistantThread(args) &&
+      (('message' in args.payload && isOtherMessageSubEvent(args.payload.message)) ||
+        ('previous_message' in args.payload && isOtherMessageSubEvent(args.payload.previous_message)))
+    );
+  }
+  return false;
+}
+
+function isOtherMessageSubEvent(message: AllMessageEvents | (AllMessageEvents & { thread_ts: string })): boolean {
+  if ('thread_ts' in message) {
+    return true;
+  }
+  if ('subtype' in message) {
+    // TODO: add assistant_app_thread as a valid message event subtype
+    return (message.subtype as string) === 'assistant_app_thread';
+  }
+  return false;
 }
 
 /**
@@ -287,7 +304,7 @@ export async function processAssistantMiddleware(
   middleware: AssistantMiddleware,
 ): Promise<void> {
   const { context, client, logger } = args;
-  const callbacks = [autoAcknowledge, ...middleware] as Middleware<AnyMiddlewareArgs>[];
+  const callbacks = [...middleware] as Middleware<AnyMiddlewareArgs>[];
   const lastCallback = callbacks.pop();
 
   if (lastCallback !== undefined) {
