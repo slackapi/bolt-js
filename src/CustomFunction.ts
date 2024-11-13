@@ -1,18 +1,17 @@
 import type { FunctionExecutedEvent } from '@slack/types';
-import type { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse, WebClient } from '@slack/web-api';
+import {
+  type FunctionsCompleteErrorResponse,
+  type FunctionsCompleteSuccessResponse,
+  WebClient,
+  type WebClientOptions,
+} from '@slack/web-api';
 import {
   CustomFunctionCompleteFailError,
   CustomFunctionCompleteSuccessError,
   CustomFunctionInitializationError,
 } from './errors';
-import { autoAcknowledge, matchEventType, onlyEvents } from './middleware/builtin';
-import type {
-  AnyMiddlewareArgs,
-  Context,
-  Middleware,
-  SlackEventMiddlewareArgs,
-  SlackEventMiddlewareArgsOptions,
-} from './types';
+import processMiddleware from './middleware/process';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
 
 /** Interfaces */
 
@@ -20,8 +19,6 @@ interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
 }
-
-/** Types */
 
 export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
 
@@ -31,70 +28,115 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
-export type SlackCustomFunctionMiddlewareArgs<
-  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
-> = SlackEventMiddlewareArgs<'function_executed', Options> & {
+export interface CustomFunctionExecuteMiddlewareArgs extends SlackEventMiddlewareArgs<'function_executed'> {
   inputs: FunctionExecutedEvent['inputs'];
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
-};
-
-/*
- * Middleware that filters out function scoped events that do not match the provided callback ID
- */
-export function matchCallbackId(callbackId: string): Middleware<SlackCustomFunctionMiddlewareArgs> {
-  return async ({ payload, next }) => {
-    if (payload.function.callback_id === callbackId) {
-      await next();
-    }
-  };
 }
 
+/** Types */
+
+export type SlackCustomFunctionMiddlewareArgs = CustomFunctionExecuteMiddlewareArgs;
+
+type CustomFunctionExecuteMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+
+export type CustomFunctionMiddleware = Middleware<CustomFunctionExecuteMiddlewareArgs>[];
+
+export type AllCustomFunctionMiddlewareArgs<
+  T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
+> = T & AllMiddlewareArgs;
+
+/** Constants */
+
+const VALID_PAYLOAD_TYPES = new Set(['function_executed']);
+
 /** Class */
-export class CustomFunction<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }> {
+
+export class CustomFunction {
   /** Function callback_id */
   public callbackId: string;
 
-  private listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[];
+  private appWebClientOptions: WebClientOptions;
 
-  private options: Options;
+  private middleware: CustomFunctionMiddleware;
 
-  public constructor(
-    callbackId: string,
-    listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[],
-    options: Options,
-  ) {
-    validate(callbackId, listeners);
+  public constructor(callbackId: string, middleware: CustomFunctionExecuteMiddleware, clientOptions: WebClientOptions) {
+    validate(callbackId, middleware);
 
+    this.appWebClientOptions = clientOptions;
     this.callbackId = callbackId;
-    this.listeners = listeners;
-    this.options = options;
+    this.middleware = middleware;
   }
 
-  public getListeners(): Middleware<AnyMiddlewareArgs>[] {
-    if (this.options.autoAcknowledge) {
-      return [
-        onlyEvents,
-        matchEventType('function_executed'),
-        matchCallbackId(this.callbackId),
-        autoAcknowledge,
-        ...this.listeners,
-      ] as Middleware<AnyMiddlewareArgs>[];
+  public getMiddleware(): Middleware<AnyMiddlewareArgs> {
+    return async (args): Promise<void> => {
+      if (isFunctionEvent(args) && this.matchesConstraints(args)) {
+        return this.processEvent(args);
+      }
+      return args.next();
+    };
+  }
+
+  private matchesConstraints(args: SlackCustomFunctionMiddlewareArgs): boolean {
+    return args.payload.function.callback_id === this.callbackId;
+  }
+
+  private async processEvent(args: AllCustomFunctionMiddlewareArgs): Promise<void> {
+    const functionArgs = enrichFunctionArgs(args, this.appWebClientOptions);
+    const functionMiddleware = this.getFunctionMiddleware();
+    return processFunctionMiddleware(functionArgs, functionMiddleware);
+  }
+
+  private getFunctionMiddleware(): CustomFunctionMiddleware {
+    return this.middleware;
+  }
+
+  /**
+   * Factory for `complete()` utility
+   */
+  public static createFunctionComplete(context: Context, client: WebClient): FunctionCompleteFn {
+    const token = selectToken(context);
+    const { functionExecutionId } = context;
+
+    if (!functionExecutionId) {
+      const errorMsg = 'No function_execution_id found';
+      throw new CustomFunctionCompleteSuccessError(errorMsg);
     }
-    return [
-      onlyEvents,
-      matchEventType('function_executed'),
-      matchCallbackId(this.callbackId),
-      ...this.listeners,
-    ] as Middleware<AnyMiddlewareArgs>[];
+
+    return (params: Parameters<FunctionCompleteFn>[0] = {}) =>
+      client.functions.completeSuccess({
+        token,
+        outputs: params.outputs || {},
+        function_execution_id: functionExecutionId,
+      });
+  }
+
+  /**
+   * Factory for `fail()` utility
+   */
+  public static createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
+    const token = selectToken(context);
+    const { functionExecutionId } = context;
+
+    if (!functionExecutionId) {
+      const errorMsg = 'No function_execution_id found';
+      throw new CustomFunctionCompleteFailError(errorMsg);
+    }
+
+    return (params: Parameters<FunctionFailFn>[0]) => {
+      const { error } = params ?? {};
+
+      return client.functions.completeError({
+        token,
+        error,
+        function_execution_id: functionExecutionId,
+      });
+    };
   }
 }
 
 /** Helper Functions */
-export function validate<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
-  callbackId: string,
-  middleware: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[],
-): void {
+export function validate(callbackId: string, middleware: CustomFunctionExecuteMiddleware): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'CustomFunction expects a callback_id as the first argument';
@@ -119,40 +161,55 @@ export function validate<Options extends SlackEventMiddlewareArgsOptions = { aut
 }
 
 /**
- * Factory for `complete()` utility
+ * `processFunctionMiddleware()` invokes each listener middleware
  */
-export function createFunctionComplete(context: Context, client: WebClient): FunctionCompleteFn {
-  const { functionExecutionId } = context;
+export async function processFunctionMiddleware(
+  args: AllCustomFunctionMiddlewareArgs,
+  middleware: CustomFunctionMiddleware,
+): Promise<void> {
+  const { context, client, logger } = args;
+  const callbacks = [...middleware] as Middleware<AnyMiddlewareArgs>[];
+  const lastCallback = callbacks.pop();
 
-  if (!functionExecutionId) {
-    const errorMsg = 'No function_execution_id found';
-    throw new CustomFunctionCompleteSuccessError(errorMsg);
+  if (lastCallback !== undefined) {
+    await processMiddleware(callbacks, args, context, client, logger, async () =>
+      lastCallback({ ...args, context, client, logger }),
+    );
   }
+}
 
-  return (params: Parameters<FunctionCompleteFn>[0] = {}) =>
-    client.functions.completeSuccess({
-      outputs: params.outputs || {},
-      function_execution_id: functionExecutionId,
-    });
+export function isFunctionEvent(args: AnyMiddlewareArgs): args is AllCustomFunctionMiddlewareArgs {
+  return VALID_PAYLOAD_TYPES.has(args.payload.type);
+}
+
+function selectToken(context: Context): string | undefined {
+  // If attachFunctionToken = false, fallback to botToken or userToken
+  return context.functionBotAccessToken ? context.functionBotAccessToken : context.botToken || context.userToken;
 }
 
 /**
- * Factory for `fail()` utility
- */
-export function createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
-  const { functionExecutionId } = context;
+ * `enrichFunctionArgs()` takes in a function's args and:
+ *  1. removes the next() passed in from App-level middleware processing
+ *    - events will *not* continue down global middleware chain to subsequent listeners
+ *  2. augments args with step lifecycle-specific properties/utilities
+ * */
+export function enrichFunctionArgs(
+  args: AllCustomFunctionMiddlewareArgs,
+  webClientOptions: WebClientOptions,
+): AllCustomFunctionMiddlewareArgs {
+  const { next: _next, ...functionArgs } = args;
+  const enrichedArgs = { ...functionArgs };
+  const token = selectToken(functionArgs.context);
 
-  if (!functionExecutionId) {
-    const errorMsg = 'No function_execution_id found';
-    throw new CustomFunctionCompleteFailError(errorMsg);
-  }
+  // Making calls with a functionBotAccessToken establishes continuity between
+  // a function_executed event and subsequent interactive events (actions)
+  const client = new WebClient(token, webClientOptions);
+  enrichedArgs.client = client;
 
-  return (params: Parameters<FunctionFailFn>[0]) => {
-    const { error } = params ?? {};
+  // Utility args
+  enrichedArgs.inputs = enrichedArgs.event.inputs;
+  enrichedArgs.complete = CustomFunction.createFunctionComplete(enrichedArgs.context, client);
+  enrichedArgs.fail = CustomFunction.createFunctionFail(enrichedArgs.context, client);
 
-    return client.functions.completeError({
-      error,
-      function_execution_id: functionExecutionId,
-    });
-  };
+  return enrichedArgs as AllCustomFunctionMiddlewareArgs; // TODO: dangerous casting as it obfuscates missing `next()`
 }

@@ -10,7 +10,6 @@ import {
   type Override,
   createDummyAppMentionEventMiddlewareArgs,
   createDummyBlockActionEventMiddlewareArgs,
-  createDummyCustomFunctionMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
   createDummyReceiverEvent,
   createDummyViewSubmissionMiddlewareArgs,
@@ -763,43 +762,6 @@ describe('App middleware processing', () => {
 
         assert.equal(globalClient, clientArg);
       });
-
-      it('should use the xwfp token if the request contains one', async () => {
-        const MockApp = await importApp();
-        const app = new MockApp({
-          receiver: fakeReceiver,
-          authorize: noop,
-        });
-
-        let clientArg: WebClient | undefined;
-        app.use(async ({ client }) => {
-          clientArg = client;
-        });
-        const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
-        await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
-
-        assert.notTypeOf(clientArg, 'undefined');
-        assert.equal(clientArg?.token, 'xwfp-valid');
-      });
-
-      it('should not use xwfp token if the request contains one and attachFunctionToken is false', async () => {
-        const MockApp = await importApp();
-        const app = new MockApp({
-          receiver: fakeReceiver,
-          authorize: noop,
-          attachFunctionToken: false,
-        });
-
-        let clientArg: WebClient | undefined;
-        app.use(async ({ client }) => {
-          clientArg = client;
-        });
-        const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
-        await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
-
-        assert.notTypeOf(clientArg, 'undefined');
-        assert.equal(clientArg?.token, undefined);
-      });
     });
 
     describe('say()', () => {
@@ -1024,7 +986,7 @@ describe('App middleware processing', () => {
           authorize: sinon.fake.resolves(dummyAuthorizationResult),
         });
         app.use(async ({ ack, next }) => {
-          if (ack !== noopVoid) {
+          if (ack) {
             // this should be called even if app.view listeners do not exist
             await ack();
             return;

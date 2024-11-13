@@ -1,5 +1,4 @@
 import type { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
-
 // TODO: breaking change: remove, unnecessary abstraction, just use Record directly
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.

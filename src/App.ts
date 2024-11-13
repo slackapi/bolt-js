@@ -7,11 +7,9 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
+  type CustomFunctionMiddleware,
   type FunctionCompleteFn,
   type FunctionFailFn,
-  type SlackCustomFunctionMiddlewareArgs,
-  createFunctionComplete,
-  createFunctionFail,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
@@ -31,9 +29,7 @@ import {
   isEventTypeToSkipAuthorize,
 } from './helpers';
 import {
-  autoAcknowledge,
   ignoreSelf as ignoreSelfMiddleware,
-  isSlackEventMiddlewareArgsOptions,
   matchCommandName,
   matchConstraints,
   matchEventType,
@@ -51,6 +47,7 @@ import SocketModeReceiver from './receivers/SocketModeReceiver';
 import type {
   AckFn,
   ActionConstraints,
+  AllMiddlewareArgs,
   AnyMiddlewareArgs,
   BlockAction,
   BlockElementAction,
@@ -75,7 +72,6 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
-  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcut,
   SlackShortcutMiddlewareArgs,
@@ -86,7 +82,7 @@ import type {
   ViewOutput,
   WorkflowStepEdit,
 } from './types';
-import { type AllMiddlewareArgs, contextBuiltinKeys } from './types/middleware';
+import { contextBuiltinKeys } from './types';
 import { type StringIndexed, isRejected } from './types/utilities';
 const packageJson = require('../package.json');
 
@@ -500,7 +496,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param m global middleware function
    */
   public use<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    m: Middleware<AnyMiddlewareArgs<{ autoAcknowledge: false }>, AppCustomContext & MiddlewareCustomContext>,
+    m: Middleware<AnyMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>,
   ): this {
     this.middleware.push(m as Middleware<AnyMiddlewareArgs>);
     return this;
@@ -533,31 +529,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
-    callbackId: string,
-    options: Options,
-    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[]
-  ): this;
-  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
-    callbackId: string,
-    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[]
-  ): this;
-  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
-    callbackId: string,
-    ...optionOrListeners: (Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>)[]
-  ): this {
-    // TODO: fix this casting; edge case is if dev specifically sets AutoAck generic as false, this true assignment is invalid according to TS.
-    const options = isSlackEventMiddlewareArgsOptions(optionOrListeners[0])
-      ? optionOrListeners[0]
-      : ({ autoAcknowledge: true } as Options);
-    const listeners = optionOrListeners.filter(
-      (optionOrListener): optionOrListener is Middleware<SlackCustomFunctionMiddlewareArgs<Options>> => {
-        return !isSlackEventMiddlewareArgsOptions(optionOrListener);
-      },
-    );
-
-    const fn = new CustomFunction<Options>(callbackId, listeners, options);
-    this.listeners.push(fn.getListeners());
+  public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
+    const fn = new CustomFunction(callbackId, listeners, this.webClientOptions);
+    const m = fn.getMiddleware();
+    this.middleware.push(m);
     return this;
   }
 
@@ -619,7 +594,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.listeners.push([
       onlyEvents,
       matchEventType(eventNameOrPattern),
-      autoAcknowledge,
       ..._listeners,
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
@@ -688,7 +662,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     this.listeners.push([
       onlyEvents,
       matchEventType('message'),
-      autoAcknowledge,
       ...messageMiddleware,
     ] as Middleware<AnyMiddlewareArgs>[]);
   }
@@ -1006,7 +979,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Factory for say() utility
     const createSay = (channelId: string): SayFn => {
-      const token = selectToken(context, this.attachFunctionToken);
+      const token = selectToken(context);
       return (message) => {
         let postMessageArguments: ChatPostMessageArguments;
         if (typeof message === 'string') {
@@ -1067,66 +1040,27 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       respond?: RespondFn;
       /** Ack function might be set below */
       // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
-      ack: AckFn<any>;
+      ack?: AckFn<any>;
       complete?: FunctionCompleteFn;
       fail?: FunctionFailFn;
       inputs?: FunctionInputs;
     } = {
       body: bodyArg,
-      ack,
       payload,
     };
-
-    // Get the client arg
-    let { client } = this;
-
-    const token = selectToken(context, this.attachFunctionToken);
-
-    if (token !== undefined) {
-      let pool: WebClientPool | undefined = undefined;
-      const clientOptionsCopy = { ...this.clientOptions };
-      if (authorizeResult.teamId !== undefined) {
-        pool = this.clients[authorizeResult.teamId];
-        if (pool === undefined) {
-          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
-        }
-        // Add teamId to clientOptions so it can be automatically added to web-api calls
-        clientOptionsCopy.teamId = authorizeResult.teamId;
-      } else if (authorizeResult.enterpriseId !== undefined) {
-        pool = this.clients[authorizeResult.enterpriseId];
-        if (pool === undefined) {
-          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
-        }
-      }
-      if (pool !== undefined) {
-        client = pool.getOrCreate(token, clientOptionsCopy);
-      }
-    }
 
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
-      // TODO: assigning eventListenerArgs by reference to set properties of listenerArgs is error prone, there should be a better way to do this!
-      const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
+      const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs;
       eventListenerArgs.event = eventListenerArgs.payload;
       if (eventListenerArgs.event.type === 'message') {
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
         messageEventListenerArgs.message = messageEventListenerArgs.payload;
       }
-      if (eventListenerArgs.event.type === 'function_executed') {
-        listenerArgs.complete = createFunctionComplete(context, client);
-        listenerArgs.fail = createFunctionFail(context, client);
-        listenerArgs.inputs = eventListenerArgs.event.inputs;
-      }
     } else if (type === IncomingEventType.Action) {
       const actionListenerArgs = listenerArgs as SlackActionMiddlewareArgs;
       actionListenerArgs.action = actionListenerArgs.payload;
-      // Add complete() and fail() utilities for function-related interactivity
-      if (context.functionExecutionId !== undefined) {
-        listenerArgs.complete = createFunctionComplete(context, client);
-        listenerArgs.fail = createFunctionFail(context, client);
-        listenerArgs.inputs = context.functionInputs;
-      }
     } else if (type === IncomingEventType.Command) {
       const commandListenerArgs = listenerArgs as SlackCommandMiddlewareArgs;
       commandListenerArgs.command = commandListenerArgs.payload;
@@ -1152,6 +1086,50 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
       // This can exist only when view_submission payloads - response_url_enabled: true
       listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
+    }
+
+    // Set ack() utility
+    if (type !== IncomingEventType.Event) {
+      listenerArgs.ack = ack;
+    } else {
+      // Events API requests are acknowledged right away, since there's no data expected
+      await ack();
+    }
+
+    // Get the client arg
+    let { client } = this;
+
+    // If functionBotAccessToken exists on context, the incoming event is function-related *and* the
+    // user has `attachFunctionToken` enabled. In that case, subsequent calls with the client should
+    // use the function-related/JIT token in lieu of the botToken or userToken.
+    const token = context.functionBotAccessToken ? context.functionBotAccessToken : selectToken(context);
+
+    // Add complete() and fail() utilities for function-related interactivity
+    if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
+      listenerArgs.complete = CustomFunction.createFunctionComplete(context, client);
+      listenerArgs.fail = CustomFunction.createFunctionFail(context, client);
+      listenerArgs.inputs = context.functionInputs;
+    }
+
+    if (token !== undefined) {
+      let pool: WebClientPool | undefined = undefined;
+      const clientOptionsCopy = { ...this.clientOptions };
+      if (authorizeResult.teamId !== undefined) {
+        pool = this.clients[authorizeResult.teamId];
+        if (pool === undefined) {
+          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
+        }
+        // Add teamId to clientOptions so it can be automatically added to web-api calls
+        clientOptionsCopy.teamId = authorizeResult.teamId;
+      } else if (authorizeResult.enterpriseId !== undefined) {
+        pool = this.clients[authorizeResult.enterpriseId];
+        if (pool === undefined) {
+          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
+        }
+      }
+      if (pool !== undefined) {
+        client = pool.getOrCreate(token, clientOptionsCopy);
+      }
     }
 
     // Dispatch event through the global middleware chain
@@ -1597,15 +1575,7 @@ function isBlockActionOrInteractiveMessageBody(
 }
 
 // Returns either a bot token or a user token for client, say()
-function selectToken(context: Context, attachFunctionToken: boolean): string | undefined {
-  if (attachFunctionToken) {
-    // If functionBotAccessToken exists on context, the incoming event is function-related *and* the
-    // user has `attachFunctionToken` enabled. In that case, subsequent calls with the client should
-    // use the function-related/JIT token in lieu of the botToken or userToken.
-    if (context.functionBotAccessToken) {
-      return context.functionBotAccessToken;
-    }
-  }
+function selectToken(context: Context): string | undefined {
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
