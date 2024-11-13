@@ -1,15 +1,18 @@
 import type { SlackEvent } from '@slack/types';
-import type { SayFn, StringIndexed } from '../utilities';
+import type { AckFn, SayFn, StringIndexed } from '../utilities';
+
+export type SlackEventMiddlewareArgsOptions = { autoAcknowledge: boolean };
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
  */
-export type SlackEventMiddlewareArgs<EventType extends string = string> = {
+export type SlackEventMiddlewareArgs<
+  EventType extends string = string,
+  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
+> = {
   payload: EventFromType<EventType>;
   event: EventFromType<EventType>;
   body: EnvelopedEvent<EventFromType<EventType>>;
-  // Add `ack` as undefined for global middleware in TypeScript TODO: but why? spend some time digging into this
-  ack?: undefined;
 } & (EventType extends 'message'
   ? // If this is a message event, add a `message` property
     { message: EventFromType<EventType> }
@@ -17,7 +20,8 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
     ? // If this event contains a channel, add a `say` utility function
       { say: SayFn }
-    : unknown);
+    : unknown) &
+  (Options['autoAcknowledge'] extends true ? unknown : { ack: AckFn<void> });
 
 export interface BaseSlackEvent<T extends string = string> {
   type: T;
