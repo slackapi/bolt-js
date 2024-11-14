@@ -14,7 +14,7 @@ Before getting started, you will need the following:
 
 **Skip to the code**
 
-If you'd rather skip the tutorial and just head straight to the code, you can use our [Bolt for JavaScript App Agent & Assistant Template](https://github.com/slack-samples/bolt-js-assistant-template) as a template.
+If you'd rather skip the tutorial and just head straight to the code, you can use our [Bolt for JavaScript App Agent & Assistant Template](https://github.com/slack-samples/bolt-js-assistant-template).
 
 ## Creating your app {#create-app}
 
@@ -78,7 +78,7 @@ If your app is up and running, you'll see a message that says `⚡️ Bolt app i
 
 ## Exploring assistant functionality {#assistant-functionality}
 
-Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the agents & assistants feature (found on the **Agents & Assistants** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's assistant functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
+Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the agents & assistants feature (found on the **Agents & Assistants** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's assistant functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
 
 ## App code {#app-code}
 
@@ -123,7 +123,7 @@ When a prompt has Slack's special syntax like <@USER_ID> or <#CHANNEL_ID>, you m
 
 ### ThreadContextStore {#thread-context-store}
 
-In this sample app, we've opted to rely on the thread context information provided by the `assistant_thread_started` and `assistant_thread_context_changed` events, however, it's important to know that the `message.im` event does not provide this information. You may therefore opt to use a custom `ThreadContextStore`, as shown in the comments of `app.js`:
+In this sample app, we've opted to rely on the thread context information provided by the `assistant_thread_started` and `assistant_thread_context_changed` events; however, it's important to know that the `message.im` event does not provide this information. You may therefore opt to use a custom `ThreadContextStore`, as shown in the comments of `app.js`:
 
 ```js
     threadContextStore: {
@@ -181,7 +181,7 @@ The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_s
   },
   ```
 
-  In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & Assistants**.
+In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & Assistants**.
 
 
 ### Reacting to `assistant_thread_context_changed` event
@@ -236,7 +236,7 @@ When a user sends a message to the app, there are a couple of things we do befor
 
 The `setTitle` method calls the [`assistant.threads.setTitle`](https://api.slack.com/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
 
-The `setStatus` method calls the [`assistant.threads.setStatus`](https://api.slack.com/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending at empty string, like this:
+The `setStatus` method calls the [`assistant.threads.setStatus`](https://api.slack.com/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
 
 ```js
 await setStatus('');
@@ -368,7 +368,7 @@ After getting the thread replies, we map them to the appropriate object structur
 });
 ```
 
-The entirety of the user message processing in this example is wrapped in a try-catch to provide the user an error message when something goes wrong, which is a best practice. If successful, the final action we take is to call the `say` method with the LLM response.
+The entirety of the user message processing in this example is wrapped in a try-catch block to provide the user an error message when something goes wrong, which is a best practice. If successful, the final action we take is to call the `say` method with the LLM response.
 
 ## Next steps {#next-steps}
 
@@ -378,10 +378,10 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for app assistants in the Agents & Assistants documentation [here](http://localhost:3000/bolt-js/concepts/assistant).
+➡️ Read more about Bolt support for app assistants in the Agents & Assistants documentation [here](https://tools.slack.dev/bolt-js/concepts/assistant).
 
 ➡️ Level up your agent game after reading through the [Agents & Assistants usage guide](https://api.slack.com/docs/apps/ai) and [Best practices for developing app agents](https://api.slack.com/docs/apps/ai-best-practices).
 
 ### Explore pre-built agents & assistants {#marketplace}
 
-Check out pre-built agents and assistants ready for use in the [Slack marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
+Check out pre-built agents and assistants ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
