@@ -19,8 +19,7 @@ table tr:nth-child(even) {
 }
 
 /* changing the links to blue for accessibility  */
-p a,
-.markdown a {
+p a, .markdown a {
   color: var(--slack-cloud-blue);
 }
 
@@ -54,7 +53,7 @@ a:hover {
 /* removing ToC line */
 .table-of-contents__left-border {
   border-left: none !important;
-}
+} 
 
 /* increasing name of SDK in sidebar */
 .sidebar-title {
@@ -65,8 +64,8 @@ a:hover {
 
 /* removing sidebar line and adding space to match ToC */
 .theme-doc-sidebar-container {
-  border-right: none !important;
-  margin-right: 2rem;
+    border-right: none !important;
+    margin-right: 2rem;
 }
 
 /* announcement bar up top */
@@ -113,17 +112,17 @@ html[data-theme="dark"] .navbar-github-link::before {
 
 /* Docs code bubbles */
 [data-theme="light"] {
-  --code-link-background: #cfe9fe;
-  --code-link-text: rgb(21, 50, 59);
+  --code-link-background: #CFE9FE; 
+  --code-link-text:  rgb(21, 50, 59);
 
-  --method-link-background: #cdefc4;
+  --method-link-background: #CDEFC4;
   --method-link-text: rgb(0, 41, 0);
 
-  --scope-link-background: #fbf3e0;
+  --scope-link-background: #FBF3E0; 
   --scope-link-text: rgb(63, 46, 0);
 
-  --event-link-background: #fddde3;
-  --event-link-text: rgb(74, 21, 75);
+  --event-link-background: #FDDDE3;
+  --event-link-text:  rgb(74, 21, 75);
 }
 
 [data-theme="dark"] {
@@ -131,28 +130,28 @@ html[data-theme="dark"] .navbar-github-link::before {
   --method-link-text: white;
   --scope-link-text: white;
   --event-link-text: white;
-  --code-link-background: #1ab9ff50;
-  --method-link-background: #41b65850;
-  --scope-link-background: #fcc00350;
-  --event-link-background: #e3066a50;
+  --code-link-background: #1AB9FF50;
+  --method-link-background: #41B65850;
+  --scope-link-background: #FCC00350;
+  --event-link-background: #E3066A50;
 }
 
 a code {
   background-color: var(--code-link-background);
-  color: var(--code-link-text);
+  color:  var(--code-link-text);
 }
 
 a[href^="https://api.slack.com/methods"] > code {
   background-color: var(--method-link-background);
-  color: var(--method-link-text);
+  color:  var(--method-link-text);
 }
 
 a[href^="https://api.slack.com/scopes"] > code {
   background-color: var(--scope-link-background);
-  color: var(--scope-link-text);
+  color:  var(--scope-link-text);
 }
 
 a[href^="https://api.slack.com/events"] > code {
   background-color: var(--event-link-background);
-  color: var(--event-link-text);
+  color:  var(--event-link-text);
 }
