@@ -1,6 +1,12 @@
 import type { SlackEvent } from '@slack/types';
 import type { AckFn, SayFn, StringIndexed } from '../utilities';
 
+/**
+ * Event options type that dictates the TypeScript behavior of middleware arguments
+ *
+ * @export
+ * @typedef {SlackEventMiddlewareArgsOptions}
+ */
 export type SlackEventMiddlewareArgsOptions = { autoAcknowledge: boolean };
 
 /**
