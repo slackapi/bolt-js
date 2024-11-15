@@ -415,7 +415,7 @@ export function createDummyCustomFunctionMiddlewareArgs<
     } as SlackCustomFunctionMiddlewareArgs<Options>;
   }
   return {
-    ack: () => Promise.resolve(),
+    ack: sinon.fake(),
     body,
     complete: () => Promise.resolve({ ok: true }),
     event,

@@ -28,6 +28,7 @@ function buildOverrides(secondOverrides: Override[]): Override {
 describe('App function() routing', () => {
   let fakeReceiver: FakeReceiver;
   let fakeHandler: SinonSpy;
+  let fakeAck: SinonSpy;
   const fakeLogger = createFakeLogger();
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
@@ -37,6 +38,7 @@ describe('App function() routing', () => {
     fakeLogger.error.reset();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
+    fakeAck = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = await importApp(buildOverrides([]));
     app = new MockApp({
@@ -45,6 +47,7 @@ describe('App function() routing', () => {
       authorize: sinon.fake.resolves(dummyAuthorizationResult),
     });
   });
+
   describe('for function executed events', () => {
     it('should route a function executed event to a handler registered with `function(string)` that matches the callback ID', async () => {
       app.function('my_id', fakeHandler);
@@ -53,10 +56,11 @@ describe('App function() routing', () => {
         options: { autoAcknowledge: false },
       });
       await fakeReceiver.sendEvent({
-        ack: args.ack,
+        ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.called(fakeHandler);
+      sinon.assert.calledOnce(fakeHandler);
+      sinon.assert.calledOnce(fakeAck);
     });
 
     it('should route a function executed event to a handler with the proper arguments', async () => {
@@ -74,38 +78,43 @@ describe('App function() routing', () => {
         options: { autoAcknowledge: false },
       });
       await fakeReceiver.sendEvent({
-        ack: args.ack,
+        ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.called(testHandler);
+      sinon.assert.calledOnce(testHandler);
+      sinon.assert.calledOnce(fakeAck);
     });
 
     it('should route a function executed event to a handler and auto ack by default', async () => {
       app.function('my_id', fakeHandler);
       const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
-      let isAck = false;
       await fakeReceiver.sendEvent({
-        ack: async () => {
-          isAck = true;
-        },
+        ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.called(fakeHandler);
-      assert.isTrue(isAck);
+      sinon.assert.calledOnce(fakeHandler);
+      sinon.assert.calledOnce(fakeAck);
     });
 
     it('should route a function executed event to a handler and NOT auto ack if autoAcknowledge is false', async () => {
       app.function('my_id', { autoAcknowledge: false }, fakeHandler);
       const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
-      let isAck = false;
       await fakeReceiver.sendEvent({
-        ack: async () => {
-          isAck = true;
-        },
+        ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.called(fakeHandler);
-      assert.isFalse(isAck);
+      sinon.assert.calledOnce(fakeHandler);
+      sinon.assert.notCalled(fakeAck);
+    });
+
+    it('should fail routing and not acknowledge if the handler is not defined', async () => {
+      const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
+      await fakeReceiver.sendEvent({
+        ack: fakeAck,
+        body: args.body,
+      });
+      sinon.assert.notCalled(fakeHandler);
+      sinon.assert.notCalled(fakeAck);
     });
   });
 });
