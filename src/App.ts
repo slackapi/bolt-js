@@ -1116,7 +1116,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         listenerArgs.inputs = eventListenerArgs.event.inputs;
       } else {
         // Events API requests are acknowledged right away, since there's no data expected
-        // Except function_executed events
+        // Except function_executed events, they will get acknowledged as part of middleware processing
         await listenerArgs.ack();
       }
     } else if (type === IncomingEventType.Action) {
