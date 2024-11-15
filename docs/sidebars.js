@@ -73,6 +73,12 @@ const sidebars = {
       items: ['legacy/hubot-migration', 'legacy/steps-from-apps', 'legacy/conversation-store'],
     },
     { type: 'html', value: '<hr>' },
+    {
+      type: 'category',
+      label: 'Tutorials',
+      items: ['tutorials/ai-assistant'],
+    },
+    { type: 'html', value: '<hr>' },
     'reference',
     { type: 'html', value: '<hr>' },
     {
