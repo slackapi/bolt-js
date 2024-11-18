@@ -52,7 +52,6 @@ describe('App middleware processing', () => {
       },
     ];
   }
-  // TODO: tests for ignoreSelf option
 
   it('should warn and skip when processing a receiver event with unknown type (never crash)', async () => {
     const fakeLogger = createFakeLogger();
