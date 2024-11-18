@@ -17,7 +17,6 @@ import {
   withNoopWebClient,
 } from '../helpers';
 
-
 function buildOverrides(secondOverrides: Override[]): Override {
   return mergeOverrides(
     withNoopAppMetadata(),

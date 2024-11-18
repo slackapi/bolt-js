@@ -16,7 +16,6 @@ import {
   mergeOverrides,
   noop,
   noopMiddleware,
-  noopVoid,
   withAxiosPost,
   withConversationContext,
   withMemoryStore,
@@ -29,6 +28,7 @@ import {
 describe('App middleware and listener arguments', () => {
   let fakeReceiver: FakeReceiver;
   let fakeErrorHandler: SinonSpy;
+  let fakeAck: SinonSpy;
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let overrides: Override;
 
@@ -48,6 +48,7 @@ describe('App middleware and listener arguments', () => {
   beforeEach(() => {
     fakeReceiver = new FakeReceiver();
     fakeErrorHandler = sinon.fake();
+    fakeAck = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
   });
 
@@ -56,8 +57,8 @@ describe('App middleware and listener arguments', () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
       const MockApp = await importApp(overrides);
+      const fakeHandler = sinon.fake();
 
-      let workedAsExpected = false;
       const app = new MockApp({
         receiver: fakeReceiver,
         authorize: async ({ enterpriseId }) => {
@@ -67,11 +68,8 @@ describe('App middleware and listener arguments', () => {
           return dummyAuthorizationResult;
         },
       });
-      app.event('message', async () => {
-        workedAsExpected = true;
-      });
+      app.event('message', fakeHandler);
       await fakeReceiver.sendEvent({
-        ack: noopVoid,
         ...createDummyMessageEventMiddlewareArgs(
           {},
           {
@@ -86,37 +84,35 @@ describe('App middleware and listener arguments', () => {
             ],
           },
         ),
+        ack: fakeAck,
       });
 
-      assert.isTrue(workedAsExpected);
+      sinon.assert.calledOnce(fakeAck);
+      sinon.assert.calledOnce(fakeHandler);
     });
     it('should be skipped for tokens_revoked events #674', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
       const MockApp = await importApp(overrides);
+      const fakeAuthorize = sinon.fake.resolves({});
+      const fakeHandler = sinon.fake();
 
-      let workedAsExpected = false;
-      let authorizeCallCount = 0;
       const app = new MockApp({
         receiver: fakeReceiver,
-        authorize: async () => {
-          authorizeCallCount += 1;
-          return {};
-        },
+        authorize: fakeAuthorize,
       });
-      app.event('tokens_revoked', async () => {
-        workedAsExpected = true;
-      });
+      app.event('tokens_revoked', fakeHandler);
 
       // The authorize must be called for other events
       await fakeReceiver.sendEvent({
-        ack: noopVoid,
         ...createDummyAppMentionEventMiddlewareArgs(),
+        ack: fakeAck,
       });
-      assert.equal(authorizeCallCount, 1);
+      sinon.assert.calledOnce(fakeAck);
+      sinon.assert.calledOnce(fakeAuthorize);
 
       await fakeReceiver.sendEvent({
-        ack: noopVoid,
+        ack: fakeAck,
         body: {
           enterprise_id: 'E_org_id',
           api_app_id: 'A111',
@@ -131,36 +127,33 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      assert.equal(authorizeCallCount, 1); // still 1
-      assert.isTrue(workedAsExpected);
+      sinon.assert.calledTwice(fakeAck);
+      sinon.assert.calledOnce(fakeAuthorize); // still 1
+      sinon.assert.calledOnce(fakeHandler);
     });
     it('should be skipped for app_uninstalled events #674', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
       const MockApp = await importApp(overrides);
+      const fakeAuthorize = sinon.fake.resolves({});
+      const fakeHandler = sinon.fake();
 
-      let workedAsExpected = false;
-      let authorizeCallCount = 0;
       const app = new MockApp({
         receiver: fakeReceiver,
-        authorize: async () => {
-          authorizeCallCount += 1;
-          return {};
-        },
+        authorize: fakeAuthorize,
       });
-      app.event('app_uninstalled', async () => {
-        workedAsExpected = true;
-      });
+      app.event('app_uninstalled', fakeHandler);
 
       // The authorize must be called for other events
       await fakeReceiver.sendEvent({
-        ack: noopVoid,
         ...createDummyAppMentionEventMiddlewareArgs(),
+        ack: fakeAck,
       });
-      assert.equal(authorizeCallCount, 1);
+      sinon.assert.calledOnce(fakeAck);
+      sinon.assert.calledOnce(fakeAuthorize);
 
       await fakeReceiver.sendEvent({
-        ack: noopVoid,
+        ack: fakeAck,
         body: {
           enterprise_id: 'E_org_id',
           api_app_id: 'A111',
@@ -171,8 +164,9 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      assert.equal(authorizeCallCount, 1); // still 1
-      assert.isTrue(workedAsExpected);
+      sinon.assert.calledTwice(fakeAck);
+      sinon.assert.calledOnce(fakeAuthorize); // still 1
+      sinon.assert.calledOnce(fakeHandler);
     });
   });
 
@@ -207,10 +201,9 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      assert(fakeErrorHandler.notCalled);
-      assert.equal(fakeAxiosPost.callCount, 1);
+      sinon.assert.notCalled(fakeErrorHandler);
       // Assert that each call to fakeAxiosPost had the right arguments
-      sinon.assert.calledWith(fakeAxiosPost, response_url, { text: responseText });
+      sinon.assert.calledOnceWithExactly(fakeAxiosPost, response_url, { text: responseText });
     });
 
     it('should respond with a response object', async () => {
@@ -243,9 +236,8 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      assert.equal(fakeAxiosPost.callCount, 1);
       // Assert that each call to fakeAxiosPost had the right arguments
-      sinon.assert.calledWith(fakeAxiosPost, response_url, responseObject);
+      sinon.assert.calledOnceWithExactly(fakeAxiosPost, response_url, responseObject);
     });
     it('should be able to use respond for view_submission payloads', async () => {
       const responseObject = { text: 'response' };
@@ -279,9 +271,8 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      assert.equal(fakeAxiosPost.callCount, 1);
       // Assert that each call to fakeAxiosPost had the right arguments
-      assert(fakeAxiosPost.calledWith(responseUrl, responseObject));
+      sinon.assert.calledOnceWithExactly(fakeAxiosPost, responseUrl, responseObject);
     });
   });
 
@@ -320,14 +311,15 @@ describe('App middleware and listener arguments', () => {
             },
           },
           respond: noop,
-          ack: noopVoid,
+          ack: fakeAck,
         },
       ];
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      assert.isTrue(fakeLogger.info.called);
-      assert.isTrue(fakeLogger.debug.called);
+      sinon.assert.calledOnce(fakeAck);
+      sinon.assert.calledOnce(fakeLogger.info);
+      sinon.assert.calledOnce(fakeLogger.debug);
     });
 
     it('should work in the case both logger and logLevel are given', async () => {
@@ -365,15 +357,16 @@ describe('App middleware and listener arguments', () => {
             },
           },
           respond: noop,
-          ack: noopVoid,
+          ack: fakeAck,
         },
       ];
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      assert.isTrue(fakeLogger.info.called);
-      assert.isTrue(fakeLogger.debug.called);
-      assert.isTrue(fakeLogger.setLevel.called);
+      sinon.assert.calledOnce(fakeAck);
+      sinon.assert.calledOnce(fakeLogger.info);
+      sinon.assert.calledOnce(fakeLogger.debug);
+      sinon.assert.calledOnce(fakeLogger.setLevel);
     });
   });
 
@@ -422,11 +415,13 @@ describe('App middleware and listener arguments', () => {
           },
         },
         respond: noop,
-        ack: noopVoid,
+        ack: fakeAck,
       };
       const receiverEvents = [event, event, event];
 
       await Promise.all(receiverEvents.map((evt) => fakeReceiver.sendEvent(evt)));
+
+      sinon.assert.calledThrice(fakeAck);
 
       assert.isUndefined(app.client.token);
       assert.equal(clients[0].token, 'xoxb-123');
@@ -541,14 +536,14 @@ describe('App middleware and listener arguments', () => {
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        assert.equal(fakePostMessage.callCount, dummyReceiverEvents.length);
+        sinon.assert.callCount(fakePostMessage, dummyReceiverEvents.length);
         // Assert that each call to fakePostMessage had the right arguments
         for (const call of fakePostMessage.getCalls()) {
           const firstArg = call.args[0];
           assert.propertyVal(firstArg, 'text', dummyMessage);
           assert.propertyVal(firstArg, 'channel', dummyChannelId);
         }
-        assert(fakeErrorHandler.notCalled);
+        sinon.assert.notCalled(fakeErrorHandler);
       });
 
       it('should send a complex message to a channel where the incoming event originates', async () => {
@@ -568,14 +563,14 @@ describe('App middleware and listener arguments', () => {
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        assert.equal(fakePostMessage.callCount, dummyReceiverEvents.length);
+        sinon.assert.callCount(fakePostMessage, dummyReceiverEvents.length);
         // Assert that each call to fakePostMessage had the right arguments
         for (const call of fakePostMessage.getCalls()) {
           const firstArg = call.args[0];
           assert.propertyVal(firstArg, 'channel', dummyChannelId);
           assert.propertyVal(firstArg, 'text', dummyMessage.text);
         }
-        assert(fakeErrorHandler.notCalled);
+        sinon.assert.notCalled(fakeErrorHandler);
       });
     });
 
@@ -642,7 +637,7 @@ describe('App middleware and listener arguments', () => {
 
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        assert.equal(assertionAggregator.callCount, dummyReceiverEvents.length);
+        sinon.assert.callCount(assertionAggregator, dummyReceiverEvents.length);
       });
 
       it("should handle failures through the App's global error handler", async () => {
@@ -662,7 +657,7 @@ describe('App middleware and listener arguments', () => {
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        assert.equal(fakeErrorHandler.callCount, dummyReceiverEvents.length);
+        sinon.assert.callCount(fakeErrorHandler, dummyReceiverEvents.length);
       });
     });
   });
@@ -690,8 +685,6 @@ describe('App middleware and listener arguments', () => {
         logger.debug(event);
       });
 
-      let ackInMiddlewareCalled = false;
-
       const receiverEvents = [
         {
           body: {
@@ -709,7 +702,7 @@ describe('App middleware and listener arguments', () => {
             },
           },
           respond: noop,
-          ack: noopVoid,
+          ack: fakeAck,
         },
         {
           body: {
@@ -727,16 +720,14 @@ describe('App middleware and listener arguments', () => {
             },
           },
           respond: noop,
-          ack: async () => {
-            ackInMiddlewareCalled = true;
-          },
+          ack: fakeAck,
         },
       ];
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      assert.isTrue(fakeLogger.info.called);
-      assert.isTrue(ackInMiddlewareCalled);
+      sinon.assert.calledOnceWithExactly(fakeLogger.info, 'Events API');
+      sinon.assert.calledTwice(fakeAck);
     });
   });
 
@@ -753,23 +744,22 @@ describe('App middleware and listener arguments', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
 
-      let ackCalled = false;
       app.view(callback_id, async ({ ack, context, view }) => {
         assert.equal(context.teamId, app_installed_team_id);
         assert.notEqual(view.team_id, app_installed_team_id);
         await ack();
-        ackCalled = true;
       });
       app.error(fakeErrorHandler);
 
-      await fakeReceiver.sendEvent(
-        createDummyViewSubmissionMiddlewareArgs({
+      await fakeReceiver.sendEvent({
+        ...createDummyViewSubmissionMiddlewareArgs({
           callback_id,
           app_installed_team_id,
         }),
-      );
+        ack: fakeAck,
+      });
 
-      assert.isTrue(ackCalled);
+      sinon.assert.calledOnce(fakeAck);
     });
   });
 });
