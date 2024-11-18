@@ -1,14 +1,20 @@
 import { InstallationStore, InstallationQuery } from "@slack/oauth";
-import { Logger } from '@slack/logger';
+import { ConsoleLogger, Logger, LogLevel } from '@slack/logger';
 import { Context } from "../types";
 
 export class TokenRevocationListeners {
   private installationStore: InstallationStore;
   private logger: Logger;
 
-  public constructor(installationStore: InstallationStore, logger: Logger) {
+  public constructor(installationStore: InstallationStore, logger: Logger, logLevel = LogLevel.INFO,) {
     this.installationStore = installationStore;
-    this.logger = logger;
+    this.logger =
+      logger ??
+      (() => {
+        const defaultLogger = new ConsoleLogger();
+        defaultLogger.setLevel(logLevel);
+        return defaultLogger;
+      })();
   }
 
   public handleTokensRevokedEvents(context: Context) {
@@ -16,8 +22,8 @@ export class TokenRevocationListeners {
   
     const installQuery: InstallationQuery<typeof isEnterpriseInstall> = {
       isEnterpriseInstall: isEnterpriseInstall,
-      teamId: isEnterpriseInstall ? context.teamId : undefined,
-      enterpriseId: isEnterpriseInstall ? context.enterpriseId : undefined
+      teamId: context.teamId,
+      enterpriseId: context.enterpriseId,
     };
 
     this.installationStore.deleteInstallation(installQuery, this.logger);
