@@ -1,10 +1,10 @@
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
-import type App from '../../../src/App';
-import { type ExtendedErrorHandlerArgs, LogLevel } from '../../../src/App';
-import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedError } from '../../../src/errors';
-import type { NextFn, ReceiverEvent, SayFn } from '../../../src/types';
+import type App from '../../../../src/App';
+import { type ExtendedErrorHandlerArgs, LogLevel } from '../../../../src/App';
+import { AuthorizationError, type CodedError, ErrorCode, UnknownError, isCodedError } from '../../../../src/errors';
+import type { NextFn, ReceiverEvent, SayFn } from '../../../../src/types';
 import {
   FakeReceiver,
   type Override,
@@ -27,7 +27,7 @@ import {
   withNoopWebClient,
   withPostMessage,
   withSuccessfulBotUserFetchingWebClient,
-} from '../helpers';
+} from '../../helpers';
 
 describe('App middleware processing', () => {
   let fakeReceiver: FakeReceiver;
