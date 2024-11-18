@@ -36,8 +36,8 @@ export class TokenRevocationListeners {
   
     const installQuery: InstallationQuery<typeof isEnterpriseInstall> = {
       isEnterpriseInstall: isEnterpriseInstall,
-      teamId: isEnterpriseInstall ? context.teamId : undefined,
-      enterpriseId: isEnterpriseInstall ? context.enterpriseId : undefined
+      teamId: context.teamId,
+      enterpriseId: context.enterpriseId,
     };
     
     this.installationStore.deleteInstallation(installQuery, this.logger);
