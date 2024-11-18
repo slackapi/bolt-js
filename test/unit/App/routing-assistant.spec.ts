@@ -17,11 +17,6 @@ import {
   withNoopWebClient,
 } from '../helpers';
 
-type singleFakeConfig = {
-  threadStarted: SinonSpy;
-  threadContextChanged: SinonSpy;
-  userMessage: SinonSpy;
-};
 
 function buildOverrides(secondOverrides: Override[]): Override {
   return mergeOverrides(
@@ -33,13 +28,17 @@ function buildOverrides(secondOverrides: Override[]): Override {
   );
 }
 
-describe('App event() routing', () => {
+describe('App assistant routing', () => {
   let fakeReceiver: FakeReceiver;
   let fakeAck: SinonSpy;
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
   let app: App;
-  let singleFakeConfig: singleFakeConfig;
+  let fakeConfig: {
+    threadStarted: SinonSpy;
+    threadContextChanged: SinonSpy;
+    userMessage: SinonSpy;
+  };
 
   beforeEach(async () => {
     fakeReceiver = new FakeReceiver();
@@ -52,15 +51,15 @@ describe('App event() routing', () => {
       authorize: sinon.fake.resolves(dummyAuthorizationResult),
     });
 
-    singleFakeConfig = {
+    fakeConfig = {
       threadStarted: sinon.fake(),
       threadContextChanged: sinon.fake(),
       userMessage: sinon.fake(),
     };
   });
 
-  it('should route `assistant_thread_started` event to a registered handler registered', async () => {
-    const assistant = new Assistant(singleFakeConfig);
+  it('should route `assistant_thread_started` event to a registered handler', async () => {
+    const assistant = new Assistant(fakeConfig);
     app.assistant(assistant);
     await fakeReceiver.sendEvent({
       ...createDummyAssistantThreadStartedEventMiddlewareArgs(),
@@ -68,13 +67,13 @@ describe('App event() routing', () => {
     });
 
     sinon.assert.calledOnce(fakeAck);
-    sinon.assert.calledOnce(singleFakeConfig.threadStarted);
-    sinon.assert.notCalled(singleFakeConfig.threadContextChanged);
-    sinon.assert.notCalled(singleFakeConfig.userMessage);
+    sinon.assert.calledOnce(fakeConfig.threadStarted);
+    sinon.assert.notCalled(fakeConfig.threadContextChanged);
+    sinon.assert.notCalled(fakeConfig.userMessage);
   });
 
-  it('should route `assistant_thread_context_changed` event to a registered handler registered', async () => {
-    const assistant = new Assistant(singleFakeConfig);
+  it('should route `assistant_thread_context_changed` event to a registered handler', async () => {
+    const assistant = new Assistant(fakeConfig);
     app.assistant(assistant);
     await fakeReceiver.sendEvent({
       ...createDummyAssistantThreadContextChangedEventMiddlewareArgs(),
@@ -82,13 +81,13 @@ describe('App event() routing', () => {
     });
 
     sinon.assert.calledOnce(fakeAck);
-    sinon.assert.notCalled(singleFakeConfig.threadStarted);
-    sinon.assert.calledOnce(singleFakeConfig.threadContextChanged);
-    sinon.assert.notCalled(singleFakeConfig.userMessage);
+    sinon.assert.notCalled(fakeConfig.threadStarted);
+    sinon.assert.calledOnce(fakeConfig.threadContextChanged);
+    sinon.assert.notCalled(fakeConfig.userMessage);
   });
 
-  it('should route `message` event to a registered handler registered', async () => {
-    const assistant = new Assistant(singleFakeConfig);
+  it('should route a message assistant scoped event to a registered handler', async () => {
+    const assistant = new Assistant(fakeConfig);
     app.assistant(assistant);
     await fakeReceiver.sendEvent({
       ...createDummyAssistantUserMessageEventMiddlewareArgs(),
@@ -96,9 +95,9 @@ describe('App event() routing', () => {
     });
 
     sinon.assert.calledOnce(fakeAck);
-    sinon.assert.notCalled(singleFakeConfig.threadStarted);
-    sinon.assert.notCalled(singleFakeConfig.threadContextChanged);
-    sinon.assert.calledOnce(singleFakeConfig.userMessage);
+    sinon.assert.notCalled(fakeConfig.threadStarted);
+    sinon.assert.notCalled(fakeConfig.threadContextChanged);
+    sinon.assert.calledOnce(fakeConfig.userMessage);
   });
 
   it('should not execute handler if no routing found, but acknowledge event', async () => {
@@ -108,8 +107,8 @@ describe('App event() routing', () => {
     });
 
     sinon.assert.calledOnce(fakeAck);
-    sinon.assert.notCalled(singleFakeConfig.threadStarted);
-    sinon.assert.notCalled(singleFakeConfig.threadContextChanged);
-    sinon.assert.notCalled(singleFakeConfig.userMessage);
+    sinon.assert.notCalled(fakeConfig.threadStarted);
+    sinon.assert.notCalled(fakeConfig.threadContextChanged);
+    sinon.assert.notCalled(fakeConfig.userMessage);
   });
 });
