@@ -36,7 +36,7 @@ export class TokenRevocationListeners {
       */
     } else {
       throw new Error(
-        `Custom InstallationStore must have deleteInstallation method implemented`,
+        'Custom InstallationStore must have deleteInstallation method implemented',
       );
     }
   }
@@ -60,7 +60,7 @@ export class TokenRevocationListeners {
       */
     } else {
       throw new Error(
-        `Custom InstallationStore must have deleteInstallation method implemented`,
+        'Custom InstallationStore must have deleteInstallation method implemented',
       );
     }
   }
