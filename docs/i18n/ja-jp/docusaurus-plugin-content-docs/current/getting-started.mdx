@@ -188,6 +188,35 @@ import TabItem from '@theme/TabItem';
 
 もしボットに参加しているすべての場所で全てのメッセージイベントをリッスンさせたいなら、これら４つ全てのイベントを選んでください。選択したら、緑の **Save Changes** ボタンをクリックします。
 
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
+
+プロジェクトに戻り、先ほど保存した `xapp` トークンを環境変数に保存してください。
+
+```shell
+export SLACK_APP_TOKEN=xapp-<your-app-token>
+```
+
+Bolt の初期化部分のコードを変更し、アプリを再起動してください。
+
+```javascript
+// ソケットモードでトークンおよび signing secret で初期化します。
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: true, // 追加
+  appToken: process.env.SLACK_APP_TOKEN // 追加
+});
+```
+
+</TabItem>
+<TabItem value="http" label="HTTP">
+
+作業中です！
+
+</TabItem>
+</Tabs>
+
 ---
 
 ## メッセージのリスニングと応答 {#listening-and-responding-to-a-message}
