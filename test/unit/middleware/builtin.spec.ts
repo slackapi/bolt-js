@@ -46,7 +46,7 @@ describe('Built-in global middleware', () => {
         const args = wrapMiddleware(event, ctx);
         await middleware(args);
 
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
         // The following assertion(s) check behavior that is only targeted at RegExp patterns
         if (typeof pattern !== 'string') {
           if (ctx.matches !== undefined) {
@@ -172,7 +172,7 @@ describe('Built-in global middleware', () => {
 
         await builtins.directMention(args);
 
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should not match message events that do not mention the bot user ID', async () => {
@@ -225,7 +225,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext, botUserId: fakeBotUserId, botId: fakeBotUserId };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs(), ctx);
         await builtins.ignoreSelf(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should ignore message events identified as a bot message from the same bot ID as this app', async () => {
@@ -273,7 +273,7 @@ describe('Built-in global middleware', () => {
 
         await Promise.all(listOfFakeArgs.map(builtins.ignoreSelf));
         for (const args of listOfFakeArgs) {
-          sinon.assert.called(args.next);
+          sinon.assert.calledOnce(args.next);
         }
       });
     });
@@ -283,7 +283,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs(), ctx);
         await builtins.onlyCommands(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should ignore non-command payloads', async () => {
@@ -299,14 +299,14 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), ctx);
         await builtins.matchCommandName('/hi')(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should continue middleware processing for requests that match a pattern', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), ctx);
         await builtins.matchCommandName(/h/)(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should skip other requests', async () => {
@@ -322,7 +322,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
         await builtins.onlyEvents(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should skip other requests', async () => {
@@ -338,7 +338,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
         await builtins.matchEventType('app_mention')(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should continue middleware processing for if RegExp match occurs on event type', async () => {
@@ -347,9 +347,9 @@ describe('Built-in global middleware', () => {
         const appHomeArgs = wrapMiddleware(createDummyAppHomeOpenedEventMiddlewareArgs(), ctx);
         const middleware = builtins.matchEventType(/app_mention|app_home_opened/);
         await middleware(appMentionArgs);
-        sinon.assert.called(appMentionArgs.next);
+        sinon.assert.calledOnce(appMentionArgs.next);
         await middleware(appHomeArgs);
-        sinon.assert.called(appHomeArgs.next);
+        sinon.assert.calledOnce(appHomeArgs.next);
       });
 
       it('should skip non-matching event types', async () => {
@@ -386,7 +386,7 @@ describe('Built-in global middleware', () => {
           ctx,
         );
         await builtins.subtype('bot_message')(args);
-        sinon.assert.called(args.next);
+        sinon.assert.calledOnce(args.next);
       });
 
       it('should skip non-matching message subtypes', async () => {
