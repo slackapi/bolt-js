@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "4.1.1",
+  "version": "4.1.2-rc.1",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -43,7 +43,7 @@
   "dependencies": {
     "@slack/logger": "^4.0.0",
     "@slack/oauth": "^3",
-    "@slack/socket-mode": "^2.0.2",
+    "@slack/socket-mode": "^2.0.3-rc.1",
     "@slack/types": "^2.13.0",
     "@slack/web-api": "^7",
     "@types/express": "^4.17.21",
