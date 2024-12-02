@@ -28,7 +28,7 @@ jobs:
       - run: npm test
       - name: Upload coverage to Codecov
         if: matrix.node-version == '22.x'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: coverage
