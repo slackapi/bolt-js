@@ -137,7 +137,7 @@ In this sample app, we've opted to rely on the thread context information provid
 The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event is sent when a user opens the assistant container, either with a DM or from the top nav bar entry point. Responding to this event starts the conversation with the user. Here we will greet the user then set some suggested prompts. The `message` field of each prompt is what is sent to the assistant when the user clicks on the prompt.
 
 ```js
-  threadStarted: async ({ event, say, setSuggestedPrompts, saveThreadContext }) => {
+  threadStarted: async ({ event, logger, say, setSuggestedPrompts, saveThreadContext }) => {
     const { context } = event.assistant_thread;
 
     try {
@@ -176,7 +176,7 @@ The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_s
        */
       await setSuggestedPrompts({ prompts, title: 'Here are some suggested options:' });
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   },
   ```
@@ -196,12 +196,12 @@ The [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_
   * method (either the DefaultAssistantContextStore or custom, if provided).
   * https://api.slack.com/events/assistant_thread_context_changed
   */
-  threadContextChanged: async ({ saveThreadContext }) => {
+  threadContextChanged: async ({ logger, saveThreadContext }) => {
     // const { channel_id, thread_ts, context: assistantContext } = event.assistant_thread;
     try {
       await saveThreadContext();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   },
 ```
@@ -272,7 +272,7 @@ For this scenario, the user is in a channel and the app has access to that chann
               limit: 50,
             });
           } else {
-            console.error(e);
+            logger.error(e);
           }
         }
 ```
@@ -359,7 +359,7 @@ After getting the thread replies, we map them to the appropriate object structur
       // Provide a response to the user
       await say({ text: llmResponse.choices[0].message.content });
     } catch (e) {
-      console.error(e);
+      logger.error(e);
 
       // Send message to advise user and clear processing status if a failure occurs
       await say({ text: 'Sorry, something went wrong!' });
