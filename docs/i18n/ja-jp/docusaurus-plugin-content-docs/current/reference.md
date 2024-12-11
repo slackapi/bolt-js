@@ -37,15 +37,15 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 ### リスナー関数の引数 {#listener-function-arguments}
 リスナー関数がアクセスできる引数は、リスナー関数が渡されるメソッドによって決まります。以下の表は、これらの引数の説明です。この表は、それぞれの引数とそれにアクセスできるメソッドの詳細をカバーします。
 
-| 引数  | 説明  |
-| :--- | :--- |
+| 引数  | メソッド | 説明  |
+| :--- | :--- | :--- |
 | `payload` | すべてのリスナー | 受信したイベントペイロードから装飾部分などが取り除かれた本質的な内容部分。この内容や構造はイベントの種別によって異なります。このペイロード情報は下記の `body`のサブセットです。また、`payload` には、リスナーが渡されたメソッド名と同じ名前のエイリアスを使ってアクセスすることもできます（`message`、`event`、`action`、`shortcut`、`view`、`command`、`options`）。**payload の内容を簡単に確認する方法は、それを実際にログに出力してみることです**。または、[TypeScript](/tutorial/using-typescript) を使うのもよいでしょう。 |
-| `say` | `message`, `event`, `action`, `command` | 受信したイベントが紐づいているチャンネルにメッセージを送信する関数。この引数が使用できるのは、リスナーをトリガーしたイベントにチャンネル ID が含まれる場合のみです（`message` イベントが最も一般的です）。`say` は、シンプルな文字列（プレーンテキストのメッセージ）またはオブジェクト（ブロックを含むメッセージ）を受け付けます。`say` は Promise を返します。この Promise は [`chat.postMessage` の応答でresolveされます](https://api.slack.com/methods/chat.postMessage)。もし`action` メソッドや、`message` 以外のイベントを使用する場合は、[イベントの payload にチャンネル ID が含まれているかを確認するようにしてください](https://api.slack.com/events)。
-| `ack` | `action`, `shortcut`, `view`, `command`, `options` | アプリが受信イベントを受け取ったことを確認するために呼び出す**必要のある関数**。`ack` は応答の完了時にresolveする Promise を返します。詳しくは、[イベントの確認](#acknowledging-events)を参照してください。
-| `client` | すべてのリスナー | イベントに関連づけられたトークンを使用する Web API クライアント。単一のワークスペースへのインストールでは、トークンは Appのコンストラクターに提供されます。複数のワークスペースへのインストールでは、トークンは `authorize` 関数から返されます。
-| `respond` | `action`, `shortcut`, `view`, `command` | 受信イベントに `response_url` が**含まれる場合**に、受信イベントに応答を返す関数。`respond` は Promise を返します。この Promise は、`response_url` の応答結果に resolveされます。ショートカットに関しては、`respond` はメッセージショートカットで**のみ**動作します（グローバルショートカットでは動作しません）。ビューでの `respond` は モーダル内の input ブロックの [conversations list](https://api.slack.com/reference/block-kit/block-elements#conversation_select) や [channels list](https://api.slack.com/reference/block-kit/block-elements#channel_select) のセレクトメニューで `response_url_enabled: true` というオプションが指定されている場合**のみ**動作します。
-| `context` | すべてのリスナー | イベントのコンテキスト。このオブジェクトは、`botId` など、イベントやアプリに関するデータを保持します。イベントがリスナーに渡される前に、ミドルウェアで他のコンテキスト情報を追加することもできます。
-| `body` | すべてのリスナー | リクエストの `body` 全体を保持するオブジェクト（`payload` のスーパーセット）。`trigger_id` や `authorizations` など、一部の付帯的なデータは payload の外側でのみ利用できます。
+| `say` | `message`, `event`, `action`, `command` | 受信したイベントが紐づいているチャンネルにメッセージを送信する関数。この引数が使用できるのは、リスナーをトリガーしたイベントにチャンネル ID が含まれる場合のみです（`message` イベントが最も一般的です）。`say` は、シンプルな文字列（プレーンテキストのメッセージ）またはオブジェクト（ブロックを含むメッセージ）を受け付けます。`say` は Promise を返します。この Promise は [`chat.postMessage` の応答でresolveされます](https://api.slack.com/methods/chat.postMessage)。もし`action` メソッドや、`message` 以外のイベントを使用する場合は、[イベントの payload にチャンネル ID が含まれているかを確認するようにしてください](https://api.slack.com/events)。 |
+| `ack` | `action`, `shortcut`, `view`, `command`, `options` | アプリが受信イベントを受け取ったことを確認するために呼び出す**必要のある関数**。`ack` は応答の完了時にresolveする Promise を返します。詳しくは、[イベントの確認](#acknowledging-events)を参照してください。 |
+| `client` | すべてのリスナー | イベントに関連づけられたトークンを使用する Web API クライアント。単一のワークスペースへのインストールでは、トークンは Appのコンストラクターに提供されます。複数のワークスペースへのインストールでは、トークンは `authorize` 関数から返されます。|
+| `respond` | `action`, `shortcut`, `view`, `command` | 受信イベントに `response_url` が**含まれる場合**に、受信イベントに応答を返す関数。`respond` は Promise を返します。この Promise は、`response_url` の応答結果に resolveされます。ショートカットに関しては、`respond` はメッセージショートカットで**のみ**動作します（グローバルショートカットでは動作しません）。ビューでの `respond` は モーダル内の input ブロックの [conversations list](https://api.slack.com/reference/block-kit/block-elements#conversation_select) や [channels list](https://api.slack.com/reference/block-kit/block-elements#channel_select) のセレクトメニューで `response_url_enabled: true` というオプションが指定されている場合**のみ**動作します。 |
+| `context` | すべてのリスナー | イベントのコンテキスト。このオブジェクトは、`botId` など、イベントやアプリに関するデータを保持します。イベントがリスナーに渡される前に、ミドルウェアで他のコンテキスト情報を追加することもできます。 |
+| `body` | すべてのリスナー | リクエストの `body` 全体を保持するオブジェクト（`payload` のスーパーセット）。`trigger_id` や `authorizations` など、一部の付帯的なデータは payload の外側でのみ利用できます。 |
 
 #### body と payload について
 
