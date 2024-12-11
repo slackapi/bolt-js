@@ -48,6 +48,7 @@ Listener functions have access to a set of arguments that may change based on th
 | `respond` | `action`, `shortcut`, `view`, `command` | Function that responds to an incoming event **if** it contains a `response_url`. `respond` returns a promise that resolves with the results of responding using the `response_url`. For shortcuts, `respond` will **only** work for message shortcuts (not global shortcuts). For views, `respond` will **only** work when using `response_url_enabled: true` for [conversations list](https://api.slack.com/reference/block-kit/block-elements#conversation_select) and [channels list](https://api.slack.com/reference/block-kit/block-elements#channel_select) select menus in input blocks in modals. |
 | `context` | All listeners | Event context. This object contains data about the event and the app, such as the `botId`. Middleware can add additional context before the event is passed to listeners. |
 | `body` | All listeners | Object that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`). |
+| `logger` | All listeners | The application logger with all of [the logging functions](/concepts/logging) for output. |
 
 #### Body and payload references
 The structure of the `payload` and `body` is detailed on the API site:

@@ -112,7 +112,7 @@ const app = new App({
   // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -250,7 +250,7 @@ app.message('hello', async ({ message, say }) => {
   // アプリを起動します
   await app.start();
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -275,7 +275,7 @@ app.message('hello', async ({ message, say }) => {
   // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -366,7 +366,7 @@ app.message('hello', async ({ message, say }) => {
   // アプリを起動します
   await app.start();
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -410,7 +410,7 @@ app.message('hello', async ({ message, say }) => {
   // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -482,7 +482,7 @@ app.action('button_click', async ({ body, ack, say }) => {
   // アプリを起動します
   await app.start();
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -533,7 +533,7 @@ app.action('button_click', async ({ body, ack, say }) => {
   // アプリを起動します
   await app.start(process.env.PORT || 3000);
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 

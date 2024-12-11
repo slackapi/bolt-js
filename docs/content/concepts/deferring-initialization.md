@@ -29,7 +29,7 @@ const app = new App({
     // Now safe to call start()
     await app.start(process.env.PORT || 3000);
   } catch (e) {
-    console.log(e);
+    app.logger.error(e);
     process.exit(1);
   }
 })()

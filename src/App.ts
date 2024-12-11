@@ -222,7 +222,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   private receiver: Receiver;
 
   /** Logger */
-  private logger: Logger;
+  public logger: Logger;
 
   /** Log Level */
   private logLevel: LogLevel;
