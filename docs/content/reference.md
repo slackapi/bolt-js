@@ -39,7 +39,7 @@ There are a collection of constraint objects that some methods have access to. T
 ### Listener function arguments
 Listener functions have access to a set of arguments that may change based on the method which the function is passed to. Below is an explanation of the different arguments. The below table details the different arguments and the methods they'll be accessible in.
 
-| Argument  | Method | Description  |
+| Argument  | Listener | Description  |
 | :--- | :--- | :--- |
 | `payload` | All listeners | The unwrapped contents of the incoming event, which varies based on event. This is a subset of the information included in `body` which is detailed below. `payload` is also accessible via the alias corresponding to the method name that the listener is passed to (`message`, `event`, `action`, `shortcut`, `view`, `command`, `options`) **An easy way to understand what's in a payload is to log it**, or [use TypeScript](/tutorial/using-typescript). |
 | `say` | `message`, `event`, `action` `command` | Function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a channel ID (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and objects (for messages containing blocks). `say` returns a promise that will resolve with a [`chat.postMessage` response](https://api.slack.com/methods/chat.postMessage). If you're using an the `action` method, or an event other than `message`, you should [ensure that the event payload contains a channel ID](https://api.slack.com/events). |
