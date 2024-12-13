@@ -89,7 +89,7 @@ You're now set up with the Serverless tools! Let's move on to preparing your Bol
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Getting Started guide](/getting-started or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Getting Started guide](/getting-started) or clone the template app below:
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
