@@ -57,7 +57,7 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
 :::tip
-Be sure to give the [assistants reference docs](/reference#assistants) a look!
+Be sure to give the [assistants reference docs](/reference#agents--assistants) a look!
 :::
 
 ## Handling a new thread {#handling-new-thread}
