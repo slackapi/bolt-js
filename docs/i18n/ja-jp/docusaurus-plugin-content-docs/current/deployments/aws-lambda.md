@@ -241,7 +241,7 @@ ngrok http 3000
 
 :::tip 
 
-パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](https://tools.slack.dev/bolt-js/getting-started#setting-up-events)を参照してください。
+パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](https://tools.slack.dev/bolt-js/ja-jp/getting-started#setting-up-events)を参照してください。
 
 :::
 
