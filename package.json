@@ -37,7 +37,7 @@
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": "slackapi/bolt",
-  "homepage": "https://slack.dev/bolt-js",
+  "homepage": "https://tools.slack.dev/bolt-js",
   "bugs": {
     "url": "https://github.com/slackapi/bolt-js/issues"
   },
