@@ -36,7 +36,7 @@
     "test:types": "tsd --files test/types",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
-  "repository": "slackapi/bolt",
+  "repository": "slackapi/bolt-js",
   "homepage": "https://tools.slack.dev/bolt-js",
   "bugs": {
     "url": "https://github.com/slackapi/bolt-js/issues"
