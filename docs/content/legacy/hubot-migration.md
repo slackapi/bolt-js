@@ -50,7 +50,7 @@ The [Events API](https://api.slack.com/bot-users#app-mentions-response) is a bot
 
 :::info
 
-Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/getting-started) and [setting up events](https://tools.slack.dev/getting-started#setting-up-events) in the Getting Started guide.
+Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/getting-started) and [setting up events](/getting-started#setting-up-events) in the Getting Started guide.
 
 :::
 

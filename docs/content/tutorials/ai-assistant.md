@@ -378,7 +378,7 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for app assistants in the Agents & Assistants documentation [here](https://tools.slack.dev/bolt-js/concepts/assistant).
+➡️ Read more about Bolt support for app assistants in the Agents & Assistants documentation [here](/concepts/assistant).
 
 ➡️ Level up your agent game after reading through the [Agents & Assistants usage guide](https://api.slack.com/docs/apps/ai) and [Best practices for developing app agents](https://api.slack.com/docs/apps/ai-best-practices).
 
