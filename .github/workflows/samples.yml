@@ -15,6 +15,7 @@ jobs:
         example:
           - examples/getting-started-typescript
           - examples/custom-receiver
+          - examples/oauth-express-receiver
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
