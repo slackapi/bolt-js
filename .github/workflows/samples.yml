@@ -25,7 +25,7 @@ jobs:
         run: npm i && npm pack .
       - name: Install example dependencies and current bolt-js
         working-directory: ${{ matrix.example }}
-        run: npm i && npm i ../slack-bolt-*.tgz
+        run: npm i && npm i ../../slack-bolt-*.tgz
       - name: Compile sample
         working-directory: ${{ matrix.example }}
         run: npm run build
