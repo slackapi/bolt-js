@@ -22,7 +22,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - uses: actions/checkout@v4
       - name: Install dependencies and link bolt-js
-        run: npm i && npm link .
+        run: npm i --omit=dev --ignore-scripts && npm link .
       - name: Install example dependencies and link bolt-js
         working-directory: ${{ matrix.example }}
         run: npm i && npm link @slack/bolt
@@ -48,7 +48,7 @@ jobs:
           path: ./bolt-js
       - name: Install and link bolt-js
         working-directory: ./bolt-js
-        run: npm i && npm link .
+        run: npm i --omit=dev --ignore-scripts && npm link .
       - name: Checkout ${{ matrix.sample }}
         uses: actions/checkout@v4
         with:
@@ -60,4 +60,3 @@ jobs:
       - name: Compile sample
         working-directory: ./sample
         run: npx tsc
-
