@@ -22,9 +22,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - uses: actions/checkout@v4
-      - name: Install dependencies and package bolt-js
-        run: npm i && npm pack .
-      - name: Install example dependencies and current bolt-js
+      - name: Package the latest changes to bolt-js
+        run: npm i && npm pack . && rm -rf node_modules
+      - name: Install example dependencies for testing
         working-directory: ${{ matrix.example }}
         run: npm i && npm i ../../slack-bolt-*.tgz
       - name: Compile sample
@@ -47,15 +47,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: ./bolt-js
-      - name: Install and package bolt-js
+      - name: Package the latest changes to bolt-js
         working-directory: ./bolt-js
-        run: npm i && npm pack .
+        run: npm i && npm pack . && rm -rf node_modules
       - name: Checkout ${{ matrix.sample }}
         uses: actions/checkout@v4
         with:
           repository: ${{ matrix.sample }}
           path: ./sample
-      - name: Install sample dependencies and current bolt-js
+      - name: Install sample dependencies for testing
         working-directory: ./sample
         run: npm i && npm i ../bolt-js/slack-bolt-*.tgz
       - name: Compile sample
