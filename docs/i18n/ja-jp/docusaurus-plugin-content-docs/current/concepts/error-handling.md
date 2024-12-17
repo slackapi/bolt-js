@@ -50,7 +50,7 @@ const app = new App({
 // より一般的なグローバルのエラーハンドラー
 app.error(async (error) => {
   // メッセージ送信をリトライすべきか、アプリを停止すべきか判断するためにエラーの詳細を確認
-  console.error(error);
+  app.logger.error(error);
 });
 ```
 

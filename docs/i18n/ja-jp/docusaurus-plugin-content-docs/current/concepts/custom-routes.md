@@ -44,7 +44,7 @@ const app = new App({
 
 (async () => {
   await app.start();
-  console.log('⚡️ Bolt app started');
+  app.logger.info('⚡️ Bolt app started');
 })();
 ```
 
@@ -71,7 +71,7 @@ app.event('message', async ({ event, client }) => {
 });
 
 receiver.router.use((req, res, next) => {
-  console.log(`Request time: ${Date.now()}`);
+  app.logger.info(`Request time: ${Date.now()}`);
   next();
 });
 
@@ -83,6 +83,6 @@ receiver.router.post('/secret-page', (req, res) => {
 
 (async () => {
   await app.start();
-  console.log('⚡️ Bolt app started');
+  app.logger.info('⚡️ Bolt app started');
 })();
 ```
