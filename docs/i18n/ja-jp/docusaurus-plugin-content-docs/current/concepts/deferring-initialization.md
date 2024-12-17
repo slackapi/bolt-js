@@ -25,7 +25,7 @@ const app = new App({
     // init() メソッドを呼び出したので、`start()` メソッドを安全に呼び出すことができる
     await app.start(process.env.PORT || 3000);
   } catch (e) {
-    console.log(e);
+    app.logger.error(e);
     process.exit(1);
   }
 })()

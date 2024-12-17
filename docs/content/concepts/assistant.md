@@ -117,7 +117,7 @@ The following example uses the [OpenAI API client](https://platform.openai.com/d
 
  ```js
  ...
-  userMessage: async ({ client, message, say, setTitle, setStatus }) => {
+  userMessage: async ({ client, logger, message, say, setTitle, setStatus }) => {
     const { channel, thread_ts } = message;
 
     try {
@@ -155,7 +155,7 @@ The following example uses the [OpenAI API client](https://platform.openai.com/d
       await say(llmResponse.choices[0].message.content);
       
     } catch (e) {
-      console.error(e);
+      logger.error(e);
 
       // Send message to advise user and clear processing status if a failure occurs
       await say('Sorry, something went wrong!');

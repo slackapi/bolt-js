@@ -18,7 +18,36 @@ const app = new App({
 });
 ```
 
-## Sending log output somewhere besides the console
+## Writing logs
+
+The logger included with the constructed `App` can be used to log writings throughout your application code:
+
+```javascript
+(async () => {
+  app.logger.debug("Starting the app now!");
+  await app.start();
+  app.logger.info("⚡️ Bolt app started");
+})();
+```
+
+Different app listeners can use the same `logger` that's provided as an argument to output additional details:
+
+```javascript
+app.event("team_join", async ({ client, event, logger }) => {
+  logger.info("Someone new just joined the team.");
+  try {
+    const result = await client.chat.postMessage({
+      channel: "C0123456789",
+      text: `Welcome to the team, <@${event.user.id}>!`,
+    });
+    logger.debug(result);
+  } catch (error) {
+    logger.error(error);
+  }
+});
+```
+
+## Redirecting outputs
 
 If you want to send logs to somewhere besides the console or want more control over the logger, you can implement a custom logger. A custom logger must implement specific methods (known as the `Logger` interface):
 
