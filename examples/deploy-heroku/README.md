@@ -59,7 +59,7 @@ heroku ps:scale web=1
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/slackapi/bolt-js)
 
-[1]: https://slack.dev/bolt-js/deployments/heroku
-[2]: https://slack.dev/bolt-js/
+[1]: https://tools.slack.dev/bolt-js/deployments/heroku/
+[2]: https://tools.slack.dev/bolt-js/
 [3]: https://heroku.com/
-[4]: https://slack.dev/bolt-js/tutorial/getting-started
+[4]: https://tools.slack.dev/bolt-js/getting-started

@@ -1301,7 +1301,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://slack.dev/bolt-js/concepts/authenticating-oauth for these required fields.\n`,
+        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://tools.slack.dev/bolt-js/concepts/authenticating-oauth/ for these required fields.\n`,
       );
       // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && usingOauth) {

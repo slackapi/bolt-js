@@ -324,7 +324,7 @@ stored for later lookup. This happens in the terms of installation objects and
 an installation store.
 
 The following outlines installations to individual workspaces with more
-[information on org-wide installations](#org-wide-installation) below.
+[information on org-wide installations](#org-wide-installations) below.
 
 #### Installation objects
 
