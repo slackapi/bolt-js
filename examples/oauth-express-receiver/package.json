@@ -5,11 +5,14 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx tsc --allowJs --noEmit --esModuleInterop app.js"
   },
   "author": "Slack Technologies, Inc.",
   "license": "MIT",
   "dependencies": {
     "@slack/bolt": "^3.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
   }
 }
