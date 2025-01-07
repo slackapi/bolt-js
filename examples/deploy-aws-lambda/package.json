@@ -4,15 +4,15 @@
   "description": "Deploying to AWS Lambda ⚡️ Bolt for JavaScript using the AwsLambdaReceiver",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "serverless offline --noPrependStageInUrl",
+    "deploy": "serverless deploy"
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^3"
+    "@slack/bolt": "^4.2.0"
   },
   "devDependencies": {
-    "serverless": "^2.13.0",
-    "serverless-offline": "^6.8.0"
+    "serverless": "^4.4.18",
+    "serverless-offline": "^14.4.0"
   }
 }

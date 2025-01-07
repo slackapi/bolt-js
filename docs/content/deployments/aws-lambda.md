@@ -153,7 +153,7 @@ const app = new App({
     // the acknowledgement until after your handler has run to ensure your handler
     // isn't terminated early by responding to the HTTP request that triggered it.
 
-    // processBeforeResponse: true
+    // receiver.processBeforeResponse: true
 
 });
 ```
@@ -178,10 +178,10 @@ Create a new file called `serverless.yml` in your app's root directory and paste
 
 ```yaml
 service: serverless-bolt-js
-frameworkVersion: '3'
+frameworkVersion: "4"
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs22.x
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
