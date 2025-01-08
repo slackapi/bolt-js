@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "ngrok": "ngrok http 3000",
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "license": "MIT",
   "dependencies": {
