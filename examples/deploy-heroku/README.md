@@ -57,7 +57,7 @@ heroku ps:scale web=1
 
 ### 6. Bonus: Deploy to Heroku with one click
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/slackapi/bolt-js)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/zimeg/bolt-js/tree/main/examples/deploy-heroku)
 
 [1]: https://tools.slack.dev/bolt-js/deployments/heroku/
 [2]: https://tools.slack.dev/bolt-js/
