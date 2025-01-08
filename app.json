@@ -9,12 +9,12 @@
   "success_url": "/",
   "env": {
     "SLACK_SIGNING_SECRET": {
-      "description": "Slack creates a unique string for your app and shares it with you. Verify requests from Slack with confidence by verifying signatures using your signing secret. (begins with xoxb-)",
+      "description": "Slack creates a unique string for your app and shares it with you. Verify requests from Slack with confidence by verifying signatures using your signing secret.",
       "value": "",
       "required": true
     },
     "SLACK_BOT_TOKEN": {
-      "description": "Bot tokens represent a bot associated with the app installed in a workspace. Unlike user tokens, they're not tied to a user's identity; they're just tied to your app.",
+      "description": "Bot tokens represent a bot associated with the app installed in a workspace. Unlike user tokens, they're not tied to a user's identity; they're just tied to your app. Begins with 'xoxb-'.",
       "value": "",
       "required": true
     },
