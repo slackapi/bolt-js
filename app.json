@@ -2,7 +2,7 @@
   "name": "Deploying to Heroku ⚡️ Bolt for JavaScript",
   "description": "This is a Slack app built with the Bolt for JavaScript framework that showcases deploying to the Heroku platform.",
   "keywords": ["slack", "heroku", "nodejs", "bolt", "bolt-js", "javascript"],
-  "logo": "https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/assets/bolt-logo.svg",
+  "logo": "https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/static/img/bolt-logo.svg",
   "image": "heroku/nodejs",
   "website": "https://tools.slack.dev/bolt-js/",
   "repository": "https://github.com/slackapi/bolt-js",
