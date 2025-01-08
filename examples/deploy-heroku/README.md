@@ -57,7 +57,7 @@ heroku ps:scale web=1
 
 ### 6. Bonus: Deploy to Heroku with one click
 
-<a href="https://heroku.com/deploy?template=https://github.com/slackapi/bolt-js" rel="noreferrer">
+<a href="https://dashboard.heroku.com/new?template=https://github.com/slackapi/bolt-js">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
 
