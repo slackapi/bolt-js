@@ -10,24 +10,13 @@
   },
   "oauth_config": {
     "scopes": {
-      "bot": [
-        "channels:history",
-        "chat:write",
-        "groups:history",
-        "im:history",
-        "mpim:history"
-      ]
+      "bot": ["channels:history", "chat:write", "groups:history", "im:history", "mpim:history"]
     }
   },
   "settings": {
     "event_subscriptions": {
       "request_url": "https://example-app-101.herokuapp.com/slack/events",
-      "bot_events": [
-        "message.channels",
-        "message.groups",
-        "message.im",
-        "message.mpim"
-      ]
+      "bot_events": ["message.channels", "message.groups", "message.im", "message.mpim"]
     },
     "interactivity": {
       "is_enabled": true,
