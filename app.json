@@ -2,19 +2,19 @@
   "name": "Deploying to Heroku ⚡️ Bolt for JavaScript",
   "description": "This is a Slack app built with the Bolt for JavaScript framework that showcases deploying to the Heroku platform.",
   "keywords": ["slack", "heroku", "nodejs", "bolt", "bolt-js", "javascript"],
-  "logo": "https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/assets/bolt-logo.svg",
+  "logo": "https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/static/img/bolt-logo.svg",
   "image": "heroku/nodejs",
   "website": "https://tools.slack.dev/bolt-js/",
   "repository": "https://github.com/slackapi/bolt-js",
   "success_url": "/",
   "env": {
     "SLACK_SIGNING_SECRET": {
-      "description": "Slack creates a unique string for your app and shares it with you. Verify requests from Slack with confidence by verifying signatures using your signing secret. (begins with xoxb-)",
+      "description": "Slack creates a unique string for your app and shares it with you. Verify requests from Slack with confidence by verifying signatures using your signing secret.",
       "value": "",
       "required": true
     },
     "SLACK_BOT_TOKEN": {
-      "description": "Bot tokens represent a bot associated with the app installed in a workspace. Unlike user tokens, they're not tied to a user's identity; they're just tied to your app.",
+      "description": "Bot tokens represent a bot associated with the app installed in a workspace. Unlike user tokens, they're not tied to a user's identity; they're just tied to your app. Begins with 'xoxb-'.",
       "value": "",
       "required": true
     },
@@ -27,7 +27,7 @@
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "free"
+      "size": "eco"
     }
   },
   "buildpacks": [

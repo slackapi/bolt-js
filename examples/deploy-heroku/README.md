@@ -49,15 +49,15 @@ heroku ps:scale web=1
 ### 5. Create Slack App
 
 1. Follow the [Getting Started with Bolt for JavaScript][4] guide to:
-    - Create a Slack app
-    - Add required scopes
-    - Subscribe to required events 
+   - Create a Slack app
+   - Add required scopes
+   - Subscribe to required events
 2. Follow the [Deploying to Heroku with Bolt for JavaScript][1] guide to:
-    - Update your **Request URL** for actions and events
+   - Update your **Request URL** for actions and events
 
 ### 6. Bonus: Deploy to Heroku with one click
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/slackapi/bolt-js)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https://github.com/slackapi/bolt-js)
 
 [1]: https://tools.slack.dev/bolt-js/deployments/heroku/
 [2]: https://tools.slack.dev/bolt-js/
