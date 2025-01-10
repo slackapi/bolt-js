@@ -36,5 +36,5 @@ receiver.router.get('/secret-page', (req, res) => {
 
 (async () => {
   await app.start(3000);
-  console.log('Express app is running');
+  app.logger.info('Express app is running');
 })();
