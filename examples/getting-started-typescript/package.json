@@ -17,6 +17,6 @@
     "@tsconfig/node18": "^18.2.4",
     "@types/node": "^18",
     "ts-node": "^10",
-    "typescript": "5.3.3"
+    "typescript": "5.7.3"
   }
 }
