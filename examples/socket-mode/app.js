@@ -25,7 +25,6 @@ const clientOptions = {
 const app = new App({
   // receiver: socketModeReceiver,
   token: process.env.SLACK_BOT_TOKEN, //disable this if enabling OAuth in socketModeReceiver
-  // logLevel: LogLevel.DEBUG,
   clientOptions,
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
