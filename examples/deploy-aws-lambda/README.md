@@ -98,6 +98,10 @@ Now that your Slack app is deployed, you can register your AWS Lambda endpoint w
         - `message.im`
         - `message.mpim`
     1. Select **Save Changes**
+1. Select **Interactivity & Shortcuts**
+    1. Enable **Interactivity**
+    1. Set the **Request URL** to `https://{your-domain}.amazonaws.com/dev/slack/events`
+    1. Select **Save Changes**
 
 ## 6. Test your Slack app
 
@@ -137,9 +141,9 @@ Follow the steps to [test your app](#6-test-your-slack-app).
 [aws-cli-configure-user]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds
 [aws-lambda]: https://aws.amazon.com/lambda/
 [bolt-app]: https://github.com/slackapi/bolt-js-getting-started-app
-[bolt-guide]: https://slack.dev/bolt-js/tutorial/getting-started
-[bolt-guide-aws-lambda]: https://slack.dev/bolt-js/deployments/aws-lambda
-[bolt-website]: https://slack.dev/bolt-js/
+[bolt-guide]: https://tools.slack.dev/bolt-js/getting-started/
+[bolt-guide-aws-lambda]: https://tools.slack.dev/bolt-js/deployments/aws-lambda/
+[bolt-website]: https://tools.slack.dev/bolt-js/
 [ngrok-install]: https://api.slack.com/tutorials/tunneling-with-ngrok
 [serverless-framework]: https://serverless.com/
 [serverless-install]: https://www.serverless.com/framework/docs/getting-started/

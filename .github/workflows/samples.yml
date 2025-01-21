@@ -10,6 +10,7 @@ jobs:
   examples:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node-version: [18.x, 20.x, 22.x]
         example:
@@ -32,6 +33,7 @@ jobs:
   samples:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node-version: [18.x, 20.x, 22.x]
         sample:
@@ -60,4 +62,3 @@ jobs:
       - name: Compile sample
         working-directory: ./sample
         run: npx tsc
-

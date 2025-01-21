@@ -19,7 +19,7 @@ const app = new App({
 
 (async () => {
   await app.start();
-  console.log('⚡️ Bolt app started');
+  app.logger.info('⚡️ Bolt app started');
 })();
 ```
 
@@ -48,6 +48,6 @@ const app = new App({
 
 (async () => {
   await app.start();
-  console.log('⚡️ Bolt app started');
+  app.logger.info('⚡️ Bolt app started');
 })();
 ```

@@ -68,5 +68,5 @@ const app = new App({
 
 (async () => {
   await app.start(process.env.PORT || 3000);
-  console.log('⚡️ Bolt app started');
+  app.logger.info('⚡️ Bolt app started');
 })();

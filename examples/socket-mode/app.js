@@ -25,7 +25,6 @@ const clientOptions = {
 const app = new App({
   // receiver: socketModeReceiver,
   token: process.env.SLACK_BOT_TOKEN, //disable this if enabling OAuth in socketModeReceiver
-  // logLevel: LogLevel.DEBUG,
   clientOptions,
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
@@ -34,7 +33,7 @@ const app = new App({
 
 (async () => {
   await app.start();
-  console.log('⚡️ Bolt app started');
+  app.logger.info('⚡️ Bolt app started');
 })();
 
 // Publish a App Home
@@ -58,15 +57,15 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 // Message Shortcut example
-app.shortcut('launch_msg_shortcut', async ({ shortcut, body, ack, context, client }) => {
+app.shortcut('launch_msg_shortcut', async ({ shortcut, body, ack, context, client, logger }) => {
   await ack();
-  console.log(shortcut);
+  logger.info(shortcut);
 });
 
 // Global Shortcut example
 // setup global shortcut in App config with `launch_shortcut` as callback id
 // add `commands` scope
-app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client }) => {
+app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client, logger }) => {
   try {
     // Acknowledge shortcut request
     await ack();
@@ -105,13 +104,13 @@ app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client })
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 
 // subscribe to 'app_mention' event in your App config
 // need app_mentions:read and chat:write scopes
-app.event('app_mention', async ({ event, context, client, say }) => {
+app.event('app_mention', async ({ event, context, client, logger, say }) => {
   try {
     await say({
       blocks: [
@@ -135,7 +134,7 @@ app.event('app_mention', async ({ event, context, client, say }) => {
       ],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 });
 
@@ -168,9 +167,9 @@ app.message('hello', async ({ message, say }) => {
 });
 
 // Listen and respond to button click
-app.action('first_button', async ({ action, ack, say, context }) => {
-  console.log('button clicked');
-  console.log(action);
+app.action('first_button', async ({ action, ack, say, context, logger }) => {
+  logger.info('button clicked');
+  logger.info(action);
   // acknowledge the request right away
   await ack();
   await say('Thanks for clicking the fancy button');

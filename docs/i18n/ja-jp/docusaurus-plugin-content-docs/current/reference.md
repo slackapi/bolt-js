@@ -20,7 +20,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 | `app.action(actionId, fn);`     | Block Kit エレメントから送信される `action` イベントをリッスンします。このイベントにはユーザーのボタン操作、メニュー選択、日付ピッカーの操作などがあります。`actionId` は文字列型で、アプリがビュー内に含めたブロックエレメントに指定した一意の `action_id` の値と一致する必要があります。ここでいう「ビュー」とは、メッセージ、モーダル、アプリのホームタブのことを指します。アクションエレメントを `input` ブロックに配置した場合はイベントがトリガーされないことに注意してください。
 | `app.shortcut(callbackId, fn);` | グローバルショートカットまたはメッセージショートカットの呼び出しをリッスンします。`callbackId` は文字列または正規表現で、アプリの設定で指定したショートカットの `callback_id` にマッチする必要があります。
 | `app.view(callbackId, fn);`     | `view_submission` イベントと `view_closed` イベントをリッスンします。`view_submission` イベントは、アプリが開いたモーダルでユーザーがデータ送信の操作をしたときに発生します。`view_closed` イベントは、ユーザーがデータ送信を実行せずにモーダルを閉じたときに発生します。
-| `app.step(workflowStep)` | `WorkflowStep` のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには `edit`、`save`、`execute` の 3 種類があります。ワークフローステップについて詳しくは、[ドキュメント](/concepts/steps-from-apps)を参照してください。
+| `app.step(workflowStep)` | `WorkflowStep` のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには `edit`、`save`、`execute` の 3 種類があります。ワークフローステップについて詳しくは、[ドキュメント](/legacy/steps-from-apps)を参照してください。
 | `app.command(commandName, fn);` | Slash コマンドの呼び出しをリッスンします。`commandName` は文字列型で、アプリの設定で指定したスラッシュコマンドと一致する必要があります。スラッシュコマンドの名前では `/` を最初に配置します（例 : `/helpdesk`）。
 | `app.options(actionId, fn);`    | 外部データソースを使用するセレクトメニューなどから送られる選択肢読み込みのリクエストをリッスンします。使う機会は多くありませんが、`app.action` と混同しないようにしましょう。`actionId` は文字列型で、アプリがビュー内に[外部データソースを使用するセレクトメニュー](https://api.slack.com/reference/block-kit/block-elements#external_select)を含めるときに指定した`action_id` と一致する必要があります。
 
@@ -37,15 +37,15 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 ### リスナー関数の引数 {#listener-function-arguments}
 リスナー関数がアクセスできる引数は、リスナー関数が渡されるメソッドによって決まります。以下の表は、これらの引数の説明です。この表は、それぞれの引数とそれにアクセスできるメソッドの詳細をカバーします。
 
-| 引数  | 説明  |
-| :--- | :--- |
-| `payload` | すべてのリスナー | 受信したイベントペイロードから装飾部分などが取り除かれた本質的な内容部分。この内容や構造はイベントの種別によって異なります。このペイロード情報は下記の `body`のサブセットです。また、`payload` には、リスナーが渡されたメソッド名と同じ名前のエイリアスを使ってアクセスすることもできます（`message`、`event`、`action`、`shortcut`、`view`、`command`、`options`）。**payload の内容を簡単に確認する方法は、それを実際にログに出力してみることです**。または、[TypeScript](/tutorial/using-typescript) を使うのもよいでしょう。 |
-| `say` | `message`, `event`, `action`, `command` | 受信したイベントが紐づいているチャンネルにメッセージを送信する関数。この引数が使用できるのは、リスナーをトリガーしたイベントにチャンネル ID が含まれる場合のみです（`message` イベントが最も一般的です）。`say` は、シンプルな文字列（プレーンテキストのメッセージ）またはオブジェクト（ブロックを含むメッセージ）を受け付けます。`say` は Promise を返します。この Promise は [`chat.postMessage` の応答でresolveされます](https://api.slack.com/methods/chat.postMessage)。もし`action` メソッドや、`message` 以外のイベントを使用する場合は、[イベントの payload にチャンネル ID が含まれているかを確認するようにしてください](https://api.slack.com/events)。
-| `ack` | `action`, `shortcut`, `view`, `command`, `options` | アプリが受信イベントを受け取ったことを確認するために呼び出す**必要のある関数**。`ack` は応答の完了時にresolveする Promise を返します。詳しくは、[イベントの確認](#acknowledging-events)を参照してください。
-| `client` | すべてのリスナー | イベントに関連づけられたトークンを使用する Web API クライアント。単一のワークスペースへのインストールでは、トークンは Appのコンストラクターに提供されます。複数のワークスペースへのインストールでは、トークンは `authorize` 関数から返されます。
-| `respond` | `action`, `shortcut`, `view`, `command` | 受信イベントに `response_url` が**含まれる場合**に、受信イベントに応答を返す関数。`respond` は Promise を返します。この Promise は、`response_url` の応答結果に resolveされます。ショートカットに関しては、`respond` はメッセージショートカットで**のみ**動作します（グローバルショートカットでは動作しません）。ビューでの `respond` は モーダル内の input ブロックの [conversations list](https://api.slack.com/reference/block-kit/block-elements#conversation_select) や [channels list](https://api.slack.com/reference/block-kit/block-elements#channel_select) のセレクトメニューで `response_url_enabled: true` というオプションが指定されている場合**のみ**動作します。
-| `context` | すべてのリスナー | イベントのコンテキスト。このオブジェクトは、`botId` など、イベントやアプリに関するデータを保持します。イベントがリスナーに渡される前に、ミドルウェアで他のコンテキスト情報を追加することもできます。
-| `body` | すべてのリスナー | リクエストの `body` 全体を保持するオブジェクト（`payload` のスーパーセット）。`trigger_id` や `authorizations` など、一部の付帯的なデータは payload の外側でのみ利用できます。
+| 引数  | リスナー | 説明  |
+| :--- | :--- | :--- |
+| `payload` | すべてのリスナー | 受信したイベントペイロードから装飾部分などが取り除かれた本質的な内容部分。この内容や構造はイベントの種別によって異なります。このペイロード情報は下記の `body`のサブセットです。また、`payload` には、リスナーが渡されたメソッド名と同じ名前のエイリアスを使ってアクセスすることもできます（`message`、`event`、`action`、`shortcut`、`view`、`command`、`options`）。**payload の内容を簡単に確認する方法は、それを実際にログに出力してみることです**。または、[TypeScript](https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-typescript) を使うのもよいでしょう。 |
+| `say` | `message`, `event`, `action`, `command` | 受信したイベントが紐づいているチャンネルにメッセージを送信する関数。この引数が使用できるのは、リスナーをトリガーしたイベントにチャンネル ID が含まれる場合のみです（`message` イベントが最も一般的です）。`say` は、シンプルな文字列（プレーンテキストのメッセージ）またはオブジェクト（ブロックを含むメッセージ）を受け付けます。`say` は Promise を返します。この Promise は [`chat.postMessage` の応答でresolveされます](https://api.slack.com/methods/chat.postMessage)。もし`action` メソッドや、`message` 以外のイベントを使用する場合は、[イベントの payload にチャンネル ID が含まれているかを確認するようにしてください](https://api.slack.com/events)。 |
+| `ack` | `action`, `shortcut`, `view`, `command`, `options` | アプリが受信イベントを受け取ったことを確認するために呼び出す**必要のある関数**。`ack` は応答の完了時にresolveする Promise を返します。詳しくは、[イベントの確認](/concepts/acknowledge)を参照してください。 |
+| `client` | すべてのリスナー | イベントに関連づけられたトークンを使用する Web API クライアント。単一のワークスペースへのインストールでは、トークンは Appのコンストラクターに提供されます。複数のワークスペースへのインストールでは、トークンは `authorize` 関数から返されます。|
+| `respond` | `action`, `shortcut`, `view`, `command` | 受信イベントに `response_url` が**含まれる場合**に、受信イベントに応答を返す関数。`respond` は Promise を返します。この Promise は、`response_url` の応答結果に resolveされます。ショートカットに関しては、`respond` はメッセージショートカットで**のみ**動作します（グローバルショートカットでは動作しません）。ビューでの `respond` は モーダル内の input ブロックの [conversations list](https://api.slack.com/reference/block-kit/block-elements#conversation_select) や [channels list](https://api.slack.com/reference/block-kit/block-elements#channel_select) のセレクトメニューで `response_url_enabled: true` というオプションが指定されている場合**のみ**動作します。 |
+| `context` | すべてのリスナー | イベントのコンテキスト。このオブジェクトは、`botId` など、イベントやアプリに関するデータを保持します。イベントがリスナーに渡される前に、ミドルウェアで他のコンテキスト情報を追加することもできます。 |
+| `body` | すべてのリスナー | リクエストの `body` 全体を保持するオブジェクト（`payload` のスーパーセット）。`trigger_id` や `authorizations` など、一部の付帯的なデータは payload の外側でのみ利用できます。 |
 
 #### body と payload について
 
@@ -125,7 +125,7 @@ Bolt では、さまざまなエラーが定義されています。これらに
 | `ReceiverMultipleAckError` | Receiver 内で、すでに確認が済んでいるリクエストに対してアプリがさらに `ack()` を呼んだ場合にスローされるエラーです。現在、デフォルトの `HTTPReceiver` でのみ使用されます。 |
 | `ReceiverAuthenticityError` | アプリのリクエストの署名が検証できないときにスローされるエラーです。このエラーには、失敗した理由を示す情報が含まれます（例 : タイムスタンプが有効でない、ヘッダーに抜けがある、署名シークレットが有効でない）。
 | `MultipleListenerError` | 単一のイベントに対して複数のリスナーでの処理中に複数のエラーが発生した場合にスローされるエラーです。個々のエラーを配列に収めた `originals` プロパティを持ちます。 |
-| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/concepts/steps-from-apps)を参照してください。  |
+| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/legacy/steps-from-apps)を参照してください。  |
 | `UnknownError` | フレームワーク内でスローされる、特定のエラーコードを持たないエラーです。`original` プロパティで詳細を確認できます。 |
 
 > [errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts) のコードで、エラー定義の部分とコンストラクターの部分を読み、参考にしてみてください。

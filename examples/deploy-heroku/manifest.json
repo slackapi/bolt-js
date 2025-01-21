@@ -1,0 +1,29 @@
+{
+  "display_information": {
+    "name": "Bolt on Heroku Example"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Bolt on Heroku Example",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": ["channels:history", "chat:write", "groups:history", "im:history", "mpim:history"]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://example-app-101.herokuapp.com/slack/events",
+      "bot_events": ["message.channels", "message.groups", "message.im", "message.mpim"]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://example-app-101.herokuapp.com/slack/events"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

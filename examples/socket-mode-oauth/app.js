@@ -15,9 +15,9 @@ const app = new App({
 (async () => {
   try {
     await app.start(process.env.PORT);
-    console.log('⚡️ Bolt app is running! ⚡️');
+    app.logger.info('⚡️ Bolt app is running! ⚡️');
   } catch (error) {
-    console.error('Unable to start App', error);
+    app.logger.error('Unable to start App', error);
     process.exit(1);
   }
 })();

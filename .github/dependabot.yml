@@ -24,3 +24,17 @@ updates:
       docusaurus:
         patterns:
           - "@docusaurus/*"
+  - package-ecosystem: "npm"
+    directories:
+      - "/examples/custom-properties"
+      - "/examples/custom-receiver"
+      - "/examples/deploy-aws-lambda"
+      - "/examples/deploy-heroku"
+      - "/examples/getting-started-typescript"
+      - "/examples/message-metadata"
+      - "/examples/oauth-express-receiver"
+      - "/examples/oauth"
+      - "/examples/socket-mode-oauth"
+      - "/examples/socket-mode"
+    schedule:
+      interval: "weekly"

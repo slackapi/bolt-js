@@ -8,7 +8,6 @@ import {
   importApp,
   mergeOverrides,
   noopMiddleware,
-  noopVoid,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,
@@ -28,6 +27,7 @@ function buildOverrides(secondOverrides: Override[]): Override {
 describe('App message() routing', () => {
   let fakeReceiver: FakeReceiver;
   let fakeHandler: SinonSpy;
+  let fakeAck: SinonSpy;
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
   let app: App;
@@ -35,6 +35,7 @@ describe('App message() routing', () => {
   beforeEach(async () => {
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
+    fakeAck = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = await importApp(buildOverrides([]));
     app = new MockApp({
@@ -48,16 +49,28 @@ describe('App message() routing', () => {
     app.message('yo', fakeHandler);
     await fakeReceiver.sendEvent({
       ...createDummyMessageEventMiddlewareArgs({ text: 'yo' }),
-      ack: noopVoid,
+      ack: fakeAck,
     });
-    sinon.assert.called(fakeHandler);
+    sinon.assert.calledOnce(fakeHandler);
+    sinon.assert.calledOnce(fakeAck);
   });
+
   it('should route a message event to a handler registered with `message(RegExp)` if message contents match', async () => {
     app.message(/hi/, fakeHandler);
     await fakeReceiver.sendEvent({
       ...createDummyMessageEventMiddlewareArgs({ text: 'hiya' }),
-      ack: noopVoid,
+      ack: fakeAck,
     });
-    sinon.assert.called(fakeHandler);
+    sinon.assert.calledOnce(fakeHandler);
+    sinon.assert.calledOnce(fakeAck);
+  });
+
+  it('should not execute handler if no routing found, but acknowledge message event', async () => {
+    await fakeReceiver.sendEvent({
+      ...createDummyMessageEventMiddlewareArgs({ text: 'yo' }),
+      ack: fakeAck,
+    });
+    sinon.assert.notCalled(fakeHandler);
+    sinon.assert.calledOnce(fakeAck);
   });
 });
