@@ -16,7 +16,6 @@ import {
   mergeOverrides,
   noop,
   noopMiddleware,
-  noopVoid,
   withAxiosPost,
   withConversationContext,
   withMemoryStore,
@@ -673,7 +672,7 @@ describe('App middleware and listener arguments', () => {
         authorize: sinon.fake.resolves(dummyAuthorizationResult),
       });
       app.use(async ({ ack, next }) => {
-        if (ack !== noopVoid) {
+        if (ack) {
           // this should be called even if app.view listeners do not exist
           await ack();
           return;

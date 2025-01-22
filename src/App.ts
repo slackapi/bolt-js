@@ -1065,13 +1065,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       respond?: RespondFn;
       /** Ack function might be set below */
       // biome-ignore lint/suspicious/noExplicitAny: different kinds of acks accept different arguments, TODO: revisit this to see if we can type better
-      ack: AckFn<any>;
+      ack?: AckFn<any>;
       complete?: FunctionCompleteFn;
       fail?: FunctionFailFn;
       inputs?: FunctionInputs;
     } = {
       body: bodyArg,
-      ack,
       payload,
     };
 
@@ -1153,9 +1152,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
     }
 
-    if (type === IncomingEventType.Event) {
+    // Set ack() utility
+    if (type !== IncomingEventType.Event) {
+      listenerArgs.ack = ack;
+    } else {
       const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
-      if (eventListenerArgs.event?.type !== 'function_executed') {
+      if (eventListenerArgs.event?.type === 'function_executed') {
+        listenerArgs.ack = ack;
+      }else{
         // Events API requests are acknowledged right away, since there's no data expected
         // Except function_executed events since ack can be handled by the user
         await ack();
