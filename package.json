@@ -47,10 +47,7 @@
     "@slack/socket-mode": "^2.0.3",
     "@slack/types": "^2.13.0",
     "@slack/web-api": "^7.8.0",
-    "@types/express": "^5.0.0",
-    "@types/express-serve-static-core": "^5.0.0",
     "axios": "^1.7.8",
-    "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",
     "tsscmp": "^1.0.6"
@@ -73,5 +70,21 @@
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
     "typescript": "5.3.3"
+  },
+  "peerDependencies": {
+    "express": "^5.0.0",
+    "@types/express": "^5.0.0",
+    "@types/express-serve-static-core": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    },
+    "@types/express": {
+      "optional": true
+    },
+    "@types/express-serve-static-core": {
+      "optional": true
+    }
   }
 }
