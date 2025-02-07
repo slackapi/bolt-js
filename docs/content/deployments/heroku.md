@@ -153,7 +153,7 @@ or, have some fun with a random name:
 
 ```shell
 heroku create
-# Creating sharp-rain-871... done, stack is heroku-18
+# Creating sharp-rain-871... done, stack is heroku-24
 # https://sharp-rain-871.herokuapp.com/ | https://git.heroku.com/sharp-rain-871.git
 ```
 
