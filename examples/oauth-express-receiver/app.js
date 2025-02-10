@@ -1,10 +1,5 @@
 const { App, ExpressReceiver, LogLevel, FileInstallationStore } = require('@slack/bolt');
 
-/**
- * @type {import("@slack/bolt/dist/receivers/ParamsIncomingMessage").ParamsIncomingMessage};
- */
-const _example = null;
-
 // Create an ExpressReceiver
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
