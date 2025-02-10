@@ -74,10 +74,5 @@
   },
   "peerDependencies": {
     "@types/express": "^5.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@types/express": {
-      "optional": true
-    }
   }
 }
