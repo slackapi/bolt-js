@@ -1,8 +1,8 @@
 service: serverless-aws-lambda-receiver-bolt-js
-frameworkVersion: '2'
+frameworkVersion: "4"
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs22.x
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}

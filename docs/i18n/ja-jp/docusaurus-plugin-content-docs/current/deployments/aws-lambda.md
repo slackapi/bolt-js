@@ -153,7 +153,7 @@ const app = new App({
     // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
     // これによってハンドラーがトリガーとなった HTTP リクエストに応答を返すことでただちに終了されることを防ぐことができます。
     
-    //processBeforeResponse: true
+    // receiver.processBeforeResponse: true
 });
 ```
 
@@ -177,10 +177,10 @@ Serverless Framework のプロジェクトでは、アプリの設定とデプ�
 
 ```yaml
 service: serverless-bolt-js
-frameworkVersion: '3'
+frameworkVersion: "4"
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs22.x
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}

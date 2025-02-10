@@ -57,9 +57,8 @@
     "@biomejs/biome": "^1.9.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.1.7",
-    "@types/express": "^5.0.0",
     "@types/mocha": "^10.0.1",
-    "@types/node": "22.10.2",
+    "@types/node": "22.13.1",
     "@types/sinon": "^7.0.11",
     "@types/tsscmp": "^1.0.0",
     "c8": "^10.1.2",
@@ -72,5 +71,8 @@
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
     "typescript": "5.3.3"
+  },
+  "peerDependencies": {
+    "@types/express": "^5.0.0"
   }
 }

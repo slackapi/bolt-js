@@ -98,6 +98,10 @@ Now that your Slack app is deployed, you can register your AWS Lambda endpoint w
         - `message.im`
         - `message.mpim`
     1. Select **Save Changes**
+1. Select **Interactivity & Shortcuts**
+    1. Enable **Interactivity**
+    1. Set the **Request URL** to `https://{your-domain}.amazonaws.com/dev/slack/events`
+    1. Select **Save Changes**
 
 ## 6. Test your Slack app
 

@@ -10,7 +10,7 @@
   "author": "Slack Technologies, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^3.6.0"
+    "@slack/bolt": "^4.2.0"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

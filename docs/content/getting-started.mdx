@@ -131,7 +131,7 @@ To listen for events happening in a Slack workspace (like when a message is post
 
 For those just starting, we recommend using [Socket Mode](https://api.slack.com/apis/connections/socket). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall. 
 
-That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku) to stably respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Martketplace.
+That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku) to stably respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Marketplace.
 
 We've provided instructions for both ways in this guide.
 
@@ -475,7 +475,7 @@ app.action('button_click', async ({ body, ack, say }) => {
   </TabItem>
 </Tabs>
 
-You can see that we used `app.action()` to listen for the `action_id` that we named `sample_button`. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
+You can see that we used `app.action()` to listen for the `action_id` that we named `button_click`. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
 
 ---
 
