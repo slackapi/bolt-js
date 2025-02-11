@@ -13,11 +13,21 @@ All you need to work with this project is a supported version of [Node.js](https
 
 ### Testing
 
+#### Unit Tests
+
 This package has unit tests for most files in the same directory the code is in with the suffix `.spec` (i.e. `exampleFile.spec.ts`). You can run the entire test suite using the npm script `npm test`. This command is also executed by GitHub Actions, the continuous integration service, for every Pull Request and branch. The coverage is computed with the `codecov` package. The tests themselves are run using the `mocha` test runner.
 
 Test code should be written in syntax that runs on the oldest supported Node.js version. This ensures that backwards compatibility is tested and the APIs look reasonable in versions of Node.js that do not support the most modern syntax.
 
+#### Debugging
+
 A useful trick for debugging inside tests is to use the Chrome Debugging Protocol feature of Node.js to set breakpoints and interactively debug. In order to do this you must run mocha directly. This means that you should have already linted the source (`npm run lint`), manually. You then run the tests using the following command: `./node_modules/.bin/mocha test/{test-name}.js --debug-brk --inspect` (replace {test-name} with an actual test file).
+
+#### Local Development
+
+Using in progress changes made to this package in another app is sometimes useful in experiments. A packaged build of Bolt for JavaScript can be created with `npm pack` and installed in a project with `npm install ../slack-bolt-*.tgz`. The packaged build includes dependencies published with Bolt for JavaScript, including required peer dependencies but not devDependencies, to imitate actual installations.
+
+Remove cached project dependencies with `rm -rf node_modules` between those steps to keep the cache clean.
 
 ### Managing Documentation
 
