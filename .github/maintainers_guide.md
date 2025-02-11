@@ -34,7 +34,7 @@ npm pack
 
 Install the `slack-bolt-*.tgz` to an app to use your changes:
 
-```zsh
+```sh
 npm install path/to/bolt-js/slack-bolt-*.tgz
 ```
 
