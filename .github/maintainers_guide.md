@@ -25,9 +25,22 @@ A useful trick for debugging inside tests is to use the Chrome Debugging Protoco
 
 #### Local Development
 
-Using in progress changes made to this package in another app is sometimes useful in experiments. A packaged build of Bolt for JavaScript can be created with `npm pack` and installed in a project with `npm install ../slack-bolt-*.tgz`. The packaged build includes dependencies published with Bolt for JavaScript, including required peer dependencies but not devDependencies, to imitate actual installations.
+Using in progress changes made to this package in an app can be useful for development.
+Use the pack command to package the Bolt for Javascript project:
 
-Remove cached project dependencies with `rm -rf node_modules` between those steps to keep the cache clean.
+```sh
+npm pack
+```
+
+Install the `slack-bolt-*.tgz` to an app to use your changes:
+
+```sh
+npm install path/to/bolt-js/slack-bolt-*.tgz
+```
+
+The packaged build includes dependencies published with Bolt for JavaScript, including required peer dependencies but not devDependencies, to imitate actual installations.
+
+Remove cached project dependencies with `rm -r node_modules package-lock.json` between those steps to keep the cache clean.
 
 ### Managing Documentation
 
