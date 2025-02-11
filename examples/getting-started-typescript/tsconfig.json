@@ -4,6 +4,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
+    "skipLibCheck": false,
     "sourceMap": true,
     "rootDir": "src",
     "outDir": "dist"
