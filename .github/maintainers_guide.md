@@ -32,7 +32,7 @@ Use the pack command to package the project
 npm pack
 ```
 
-Install the `slack-bolt-*.tgz` to use your changes
+Install the `slack-bolt-*.tgz` to an app to use your changes:
 
 ```zsh
 npm install path/to/bolt-js/slack-bolt-*.tgz
