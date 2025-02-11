@@ -28,7 +28,7 @@ A useful trick for debugging inside tests is to use the Chrome Debugging Protoco
 Using in progress changes made to this package in an app can be useful for development.
 Use the pack command to package the Bolt for Javascript project:
 
-```zsh
+```sh
 npm pack
 ```
 
