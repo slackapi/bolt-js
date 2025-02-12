@@ -280,8 +280,8 @@ describe('App global middleware Processing', () => {
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
 
-    assert.notTypeOf(clientArg, 'undefined');
-    assert.equal(clientArg?.token, 'xwfp-valid');
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, 'xwfp-valid');
   });
 
   it('should not use xwfp token if the request contains one and attachFunctionToken is false', async () => {
@@ -299,7 +299,29 @@ describe('App global middleware Processing', () => {
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
 
-    assert.notTypeOf(clientArg, 'undefined');
-    assert.equal(clientArg?.token, undefined);
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, undefined);
+  });
+
+  it('should use the xwfp token if the request contains one and not reuse it in following requests', async () => {
+    const MockApp = await importApp();
+    const app = new MockApp({
+      receiver: fakeReceiver,
+      authorize: sinon.fake.resolves({ botToken: 'xoxb-valid' }),
+    });
+
+    let clientArg: WebClient | undefined;
+    app.use(async ({ client }) => {
+      clientArg = client;
+    });
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
+    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, 'xwfp-valid');
+
+    await fakeReceiver.sendEvent(dummyReceiverEvent);
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, 'xoxb-valid');
   });
 });
