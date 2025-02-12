@@ -1159,7 +1159,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
       if (eventListenerArgs.event?.type === 'function_executed') {
         listenerArgs.ack = ack;
-      }else{
+      } else {
         // Events API requests are acknowledged right away, since there's no data expected
         // Except function_executed events since ack can be handled by the user
         await ack();
