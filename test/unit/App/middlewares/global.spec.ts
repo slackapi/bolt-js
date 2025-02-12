@@ -13,7 +13,6 @@ import {
   delay,
   importApp,
   mergeOverrides,
-  noop,
   noopMiddleware,
   withConversationContext,
   withMemoryStore,
@@ -271,7 +270,7 @@ describe('App global middleware Processing', () => {
     const MockApp = await importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
-      authorize: noop,
+      authorize: sinon.fake.resolves({}),
     });
 
     let clientArg: WebClient | undefined;
@@ -289,7 +288,7 @@ describe('App global middleware Processing', () => {
     const MockApp = await importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
-      authorize: noop,
+      authorize: sinon.fake.resolves({}),
       attachFunctionToken: false,
     });
 

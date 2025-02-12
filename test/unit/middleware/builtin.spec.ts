@@ -6,11 +6,7 @@ import { expectType } from 'tsd';
 import { ErrorCode } from '../../../src/errors';
 import { isSlackEventMiddlewareArgsOptions } from '../../../src/middleware/builtin';
 // import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from '../../../src/middleware/builtin';
-import type {
-  Context,
-  /* NextFn, */ SlackEventMiddlewareArgs,
-  SlackEventMiddlewareArgsOptions,
-} from '../../../src/types';
+import type { Context, SlackEventMiddlewareArgs, SlackEventMiddlewareArgsOptions } from '../../../src/types';
 import {
   type Override,
   createDummyAppHomeOpenedEventMiddlewareArgs,
