@@ -17,6 +17,7 @@ import type {
   AssistantThreadStartedMiddlewareArgs,
   AssistantUserMessageMiddlewareArgs,
 } from '../../../src/Assistant';
+import type { SlackCustomFunctionMiddlewareArgs } from '../../../src/CustomFunction';
 import type {
   AckFn,
   AllMiddlewareArgs,
@@ -298,6 +299,74 @@ export function createDummyCommandMiddlewareArgs(commandOverrides?: DummyCommand
     respond,
     say,
     ack: () => Promise.resolve(),
+  };
+}
+
+export function createDummyCustomFunctionMiddlewareArgs(
+  data: {
+    callbackId?: string;
+    inputs?: Record<string, string | number | boolean>;
+  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' } },
+): SlackCustomFunctionMiddlewareArgs {
+  data.callbackId = data.callbackId || 'reverse';
+  data.inputs = data.inputs ? data.inputs : { stringToReverse: 'hello' };
+  const testFunction = {
+    id: 'Fn111',
+    callback_id: data.callbackId,
+    title: data.callbackId,
+    description: 'Takes a string and reverses it',
+    type: 'app',
+    input_parameters: [
+      {
+        type: 'string',
+        name: 'stringToReverse',
+        description: 'The string to reverse',
+        title: 'String To Reverse',
+        is_required: true,
+      },
+    ],
+    output_parameters: [
+      {
+        type: 'string',
+        name: 'reverseString',
+        description: 'The string in reverse',
+        title: 'Reverse String',
+        is_required: true,
+      },
+    ],
+    app_id: 'A111',
+    date_updated: 1659054991,
+    date_deleted: 0,
+    date_created: 1725987754,
+  };
+
+  const event = {
+    type: 'function_executed',
+    function: testFunction,
+    inputs: data.inputs,
+    function_execution_id: 'Fx111',
+    workflow_execution_id: 'Wf111',
+    event_ts: '1659055013.509853',
+    bot_access_token: 'xwfp-valid',
+  } as const;
+
+  const body = {
+    token: 'verification_token',
+    team_id: 'T111',
+    api_app_id: 'A111',
+    event,
+    event_id: 'Ev111',
+    event_time: 1659055013,
+    type: 'event_callback',
+  } as const;
+
+  return {
+    body,
+    complete: () => Promise.resolve({ ok: true }),
+    event,
+    fail: () => Promise.resolve({ ok: true }),
+    inputs: data.inputs,
+    payload: event,
   };
 }
 
