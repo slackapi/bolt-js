@@ -1,3 +1,4 @@
+import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
@@ -6,6 +7,7 @@ import { AuthorizationError, type CodedError, ErrorCode, UnknownError } from '..
 import type { NextFn, ReceiverEvent } from '../../../../src/types';
 import {
   FakeReceiver,
+  createDummyCustomFunctionMiddlewareArgs,
   createDummyReceiverEvent,
   createFakeLogger,
   delay,
@@ -262,5 +264,64 @@ describe('App global middleware Processing', () => {
 
     assert.instanceOf(actualError, UnknownError);
     assert.equal(actualError.message, error.message);
+  });
+
+  it('should use the xwfp token if the request contains one', async () => {
+    const MockApp = await importApp();
+    const app = new MockApp({
+      receiver: fakeReceiver,
+      authorize: sinon.fake.resolves({}),
+    });
+
+    let clientArg: WebClient | undefined;
+    app.use(async ({ client }) => {
+      clientArg = client;
+    });
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
+    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, 'xwfp-valid');
+  });
+
+  it('should not use xwfp token if the request contains one and attachFunctionToken is false', async () => {
+    const MockApp = await importApp();
+    const app = new MockApp({
+      receiver: fakeReceiver,
+      authorize: sinon.fake.resolves({}),
+      attachFunctionToken: false,
+    });
+
+    let clientArg: WebClient | undefined;
+    app.use(async ({ client }) => {
+      clientArg = client;
+    });
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
+    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, undefined);
+  });
+
+  it('should use the xwfp token if the request contains one and not reuse it in following requests', async () => {
+    const MockApp = await importApp();
+    const app = new MockApp({
+      receiver: fakeReceiver,
+      authorize: sinon.fake.resolves({ botToken: 'xoxb-valid' }),
+    });
+
+    let clientArg: WebClient | undefined;
+    app.use(async ({ client }) => {
+      clientArg = client;
+    });
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
+    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, 'xwfp-valid');
+
+    await fakeReceiver.sendEvent(dummyReceiverEvent);
+    assert.isDefined(clientArg);
+    assert.equal(clientArg.token, 'xoxb-valid');
   });
 });
