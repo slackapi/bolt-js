@@ -1,4 +1,5 @@
 import type { Confirmation, Option, PlainTextElement, RichTextBlock } from '@slack/types';
+import type { FunctionInputs } from '../events';
 import type { StringIndexed } from '../utilities';
 import type { ViewOutput, ViewStateValue } from '../view';
 
@@ -281,6 +282,16 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   enterprise?: {
     id: string;
     name: string;
+  };
+
+  // function scoped properties
+  bot_access_token?: string;
+  function_data?: {
+    execution_id: string;
+    function: {
+      callback_id: string;
+    };
+    inputs: FunctionInputs;
   };
 }
 

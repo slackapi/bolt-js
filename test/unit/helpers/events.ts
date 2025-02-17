@@ -28,6 +28,7 @@ import type {
   BlockSuggestion,
   Context,
   EnvelopedEvent,
+  FunctionInputs,
   GlobalShortcut,
   MessageShortcut,
   ReceiverEvent,
@@ -303,17 +304,17 @@ export function createDummyCommandMiddlewareArgs(commandOverrides?: DummyCommand
 }
 
 export function createDummyCustomFunctionMiddlewareArgs(
-  data: {
+  functionOverrides: {
     callbackId?: string;
     inputs?: Record<string, string | number | boolean>;
   } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' } },
 ): SlackCustomFunctionMiddlewareArgs {
-  data.callbackId = data.callbackId || 'reverse';
-  data.inputs = data.inputs ? data.inputs : { stringToReverse: 'hello' };
+  functionOverrides.callbackId = functionOverrides.callbackId || 'reverse';
+  functionOverrides.inputs = functionOverrides.inputs ? functionOverrides.inputs : { stringToReverse: 'hello' };
   const testFunction = {
     id: 'Fn111',
-    callback_id: data.callbackId,
-    title: data.callbackId,
+    callback_id: functionOverrides.callbackId,
+    title: functionOverrides.callbackId,
     description: 'Takes a string and reverses it',
     type: 'app',
     input_parameters: [
@@ -343,7 +344,7 @@ export function createDummyCustomFunctionMiddlewareArgs(
   const event = {
     type: 'function_executed',
     function: testFunction,
-    inputs: data.inputs,
+    inputs: functionOverrides.inputs,
     function_execution_id: 'Fx111',
     workflow_execution_id: 'Wf111',
     event_ts: '1659055013.509853',
@@ -365,7 +366,7 @@ export function createDummyCustomFunctionMiddlewareArgs(
     complete: () => Promise.resolve({ ok: true }),
     event,
     fail: () => Promise.resolve({ ok: true }),
-    inputs: data.inputs,
+    inputs: functionOverrides.inputs,
     payload: event,
   };
 }
@@ -407,6 +408,29 @@ export function createDummyBlockActionEventMiddlewareArgs(
     say,
     ack,
   };
+}
+
+export function createDummyFunctionScopedBlockActionEventMiddlewareArgs(
+  actionOverrides?: DummyBlockActionOverride,
+  functionOverrides: {
+    callbackId: string;
+    inputs: FunctionInputs;
+  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' } },
+  // biome-ignore lint/suspicious/noExplicitAny: allow mocking tools to provide any override
+  bodyOverrides?: Record<string, any>,
+): SlackActionMiddlewareArgs<BlockAction> {
+  const functionBodyOverrides = {
+    bot_access_token: 'xwfp-valid',
+    function_data: {
+      execution_id: 'Fx111',
+      function: {
+        callback_id: functionOverrides.callbackId,
+      },
+      inputs: functionOverrides.inputs,
+    },
+    ...bodyOverrides,
+  };
+  return createDummyBlockActionEventMiddlewareArgs(actionOverrides, functionBodyOverrides);
 }
 
 interface DummyBlockSuggestionOverride {
