@@ -84,6 +84,12 @@ const sidebars = {
     'reference',
     { type: 'html', value: '<hr>' },
     {
+			type: "category",
+			label: "Tutorials",
+			items: ["tutorials/ai-assistant", "tutorials/custom-steps", "tutorials/custom-steps-workflow-builder-new", "tutorials/custom-steps-workflow-builder-existing"],
+		},
+    { type: 'html', value: '<hr>' },
+    {
       type: 'link',
       label: 'Release notes',
       href: 'https://github.com/slackapi/bolt-js/releases',
