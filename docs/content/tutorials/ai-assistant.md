@@ -1,5 +1,5 @@
 ---
-title: Getting started with an AI Assistant
+title: AI Assistant
 slug: /tutorials/ai-assistant
 lang: en
 ---
