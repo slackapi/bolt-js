@@ -64,7 +64,7 @@ Releasing can feel intimidating at first, but rest assured: if you make a mistak
 
 3. Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`. (see [Versioning and Tags](https://github.com/slackapi/node-slack-sdk/blob/main/.github/maintainers_guide.md#versioning-and-tags))
     - The version must be in the format of `Major.Minor.Patch-BetaNamespace.BetaVersion` (ex: `5.10.0-workflowStepsBeta.1`, `2.5.0-rc.1`)
-    -  Update any dependency versions in `package.json` and install locally `rm -rf node_modules && npm install`
+    -  Update any dependency versions in `package.json` and install locally `rm -r node_modules package-lock.json && npm install`
     -  Confirm tests pass and code is free of linting errors by running `npm test`.
     -  Make a single commit with a message for the version bump ([Example](https://github.com/slackapi/bolt-js/pull/1133/commits/bcc421cd05b50ddcdeb806fcb27a38d7d9f8ede8)).
     - Create a pull request for the version change ([Example](https://github.com/slackapi/bolt-js/pull/1133))
