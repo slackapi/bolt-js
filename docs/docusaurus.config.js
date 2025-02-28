@@ -71,8 +71,8 @@ const config = {
           },
           {
             to: '/concepts/ai-apps',
-            from: '/concepts/assistant'
-          }
+            from: '/concepts/assistant',
+          },
         ],
       },
     ],
