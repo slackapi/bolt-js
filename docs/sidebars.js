@@ -39,7 +39,7 @@ const sidebars = {
             'concepts/publishing-views',
           ],
         },
-        'concepts/assistant',
+        'concepts/ai-apps',
         'concepts/custom-steps',
         {
           type: 'category',
