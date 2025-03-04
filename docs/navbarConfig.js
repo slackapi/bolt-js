@@ -71,14 +71,14 @@ const navbar = {
       position: 'right',
       to: 'https://api.slack.com/developer-program',
       target: '_blank',
-      rel: 'noopener noreferrer',
+      rel: "noopener noreferrer"
     },
     {
       label: 'Your apps',
       to: 'https://api.slack.com/apps',
       position: 'right',
       target: '_blank',
-      rel: 'noopener noreferrer',
+      rel: "noopener noreferrer"
     },
     {
       type: 'localeDropdown',
