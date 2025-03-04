@@ -64,8 +64,6 @@
   /* --ifm-heading-font-family: 'AvantGardeForSalesforce', sans-serif; */
   /* --ifm-font-family-base: 'Salesforce_Sans', sans-serif; */
   --ifm-navbar-height: 83px;
-
-
 }
 
 .navbar__logo img {
@@ -84,9 +82,8 @@
   --ifm-footer-color: white !important;
 }
 
-.theme-admonition div{
+.theme-admonition div {
   text-transform: none !important; /* Disables uppercase transformation */
-
 }
 
 /* resets striped tables that hurt me eyes */
@@ -99,14 +96,12 @@ h1 {
 }
 
 /* Reduce title size in blog list */
-.blog-list-page h2[class*="title"]
-{
+.blog-list-page h2[class*="title"] {
   font-size: 2rem;
 }
 
 /* Reduce title size in blog page */
-.blog-post-page h1[class*="title"]
-{
+.blog-post-page h1[class*="title"] {
   font-size: 2rem;
 }
 
@@ -201,9 +196,8 @@ a:hover {
   border-left: none !important;
 }
 
-
 .dropdown-hr {
-  margin: 0
+  margin: 0;
 }
 
 /* increasing name of site in sidebar */
@@ -281,8 +275,8 @@ summary {
 }
 
 details {
-  border: 1px solid var(--ifm-color-primary)!important;
-  background-color: var(--ifm-background-color)!important;
+  border: 1px solid var(--ifm-color-primary) !important;
+  background-color: var(--ifm-background-color) !important;
   --docusaurus-details-decoration-color: var(--ifm-color-primary);
 }
 
@@ -290,7 +284,6 @@ details[open] {
   border: 1px solid var(--ifm-color-primary);
   background-color: var(--ifm-background-color);
   --docusaurus-details-decoration-color: var(--ifm-color-primary);
-
 }
 
 /* Docs code bubbles */
@@ -305,7 +298,7 @@ details[open] {
   --scope-link-background: var(--slack-yellow-30-on-white);
   --scope-link-text: rgb(63, 46, 0);
 
-  --event-link-background:#fad4e5;
+  --event-link-background: #fad4e5;
   /* --event-link-text: rgb(63, 0, 24); */
   --event-link-text: rgb(0, 0, 0);
 
@@ -338,38 +331,32 @@ a code {
   color: var(--code-link-text);
 }
 
-a[href^="https://api.slack.com/methods"] > code
-{
+a[href^="https://api.slack.com/methods"] > code {
   background-color: var(--method-link-background);
   color: var(--method-link-text);
 }
 
-a[href^="/reference/methods"] > code
-{
+a[href^="/reference/methods"] > code {
   background-color: var(--method-link-background);
   color: var(--method-link-text);
 }
 
-a[href^="https://api.slack.com/scopes"] > code
-{
+a[href^="https://api.slack.com/scopes"] > code {
   background-color: var(--scope-link-background);
   color: var(--scope-link-text);
 }
 
-a[href^="/reference/scopes"] > code
-{
+a[href^="/reference/scopes"] > code {
   background-color: var(--scope-link-background);
   color: var(--scope-link-text);
 }
 
-a[href^="https://api.slack.com/events"] > code
-{
+a[href^="https://api.slack.com/events"] > code {
   background-color: var(--event-link-background);
   color: var(--event-link-text);
 }
 
-a[href^="/reference/events"] > code
-{
+a[href^="/reference/events"] > code {
   background-color: var(--event-link-background);
   color: var(--event-link-text);
 }
@@ -394,13 +381,11 @@ a[href^="/slack-cli/reference/commands"] > code {
   background-color: var(--slack-green-20) !important;
 }
 
-
 .facts-section .tabs-container {
   border: none;
   border-radius: 0px;
   padding: 0em;
-  --ifm-leading: 0rem
-
+  --ifm-leading: 0rem;
 }
 
 .facts-section .tabs__item {
@@ -409,13 +394,12 @@ a[href^="/slack-cli/reference/commands"] > code {
 }
 
 .facts-section .tabs__item--active {
-  border-bottom-color: inherit
+  border-bottom-color: inherit;
 }
 
 .errors-section {
   background-color: var(--slack-red-20) !important;
 }
-
 
 .inputs-section {
   background-color: var(--slack-blue-20) !important;
@@ -438,7 +422,6 @@ a[href^="/slack-cli/reference/commands"] > code {
 .facts-row-list-item {
   display: inline-block;
 }
-
 
 .inline-icon {
   height: 1.9em; /* Matches the height of the text */
@@ -542,7 +525,7 @@ a[href^="/slack-cli/reference/commands"] > code {
   /* align-items: center; */
   padding-top: 1rem;
   padding-bottom: 1rem;
-  border-top: 1px solid  var(--ifm-color-emphasis-400);
+  border-top: 1px solid var(--ifm-color-emphasis-400);
 }
 
 .info-key {
@@ -577,7 +560,7 @@ html[data-theme="light"] .button:hover {
 }
 
 .footer-spaced {
-  display: flex; 
-  gap: 20px; 
-  padding-bottom: 1rem
+  display: flex;
+  gap: 20px;
+  padding-bottom: 1rem;
 }
