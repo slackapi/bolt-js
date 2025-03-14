@@ -47,7 +47,7 @@
     "@slack/socket-mode": "^2.0.3",
     "@slack/types": "^2.13.0",
     "@slack/web-api": "^7.8.0",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",
