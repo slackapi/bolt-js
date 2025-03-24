@@ -373,7 +373,7 @@ app.function("code_assist", async ({ client, inputs, complete, fail }) => {
 ```
 
 This is the meat of our app! Here's a breakdown of what we've added:
-* `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model; think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
+* `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model. Think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
 * `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) to achieve the same result.
 * `assistant` is an instance of the [`Assistant` class](/bolt-js/concepts/ai-apps#the-assistant-class-instance); this sets up the suggested prompts that the user sees in the split-view container upon opening your app. 
 * `userMessage` is the handler that takes care of the fiddly bits around getting the thread history, preparing the structure of the messages for processing in a way that the model is expecting, interacting with the model, and responding to the user. 
@@ -396,7 +396,7 @@ With your app running, head over to the Slack client and open your app from the 
 You should now see it and be able to open it from the icon in the upper right of the Slack client window. This opens the split-view. Upon opening your app's split-view, you should see the suggested prompts we set up in `app.js` file. Click on one of the suggested prompts or formulate a question of your own to see your AI app in action!
 
 ## Side quest: Use your function as a custom step in Workflow Builder {#custom-step}
-Let's explore how to use the functionality you've created in your app inside of a workflow. In case you're unfamiliar, Workflow Builder is the no-code solution for executing tasks in Slack. Once your app is installed on your org, you can grant anyone access to use its function as a custom step in their workflow. Here's how that's done.
+Let's explore how to use the functionality you've created in your app inside of a workflow. In case you're unfamiliar, [Workflow Builder](https://slack.com/help/articles/360035692513-Guide-to-Slack-Workflow-Builder) is the no-code solution for executing tasks in Slack. Once your app is installed on your org, you can grant anyone access to use its function as a custom step in their workflow. Here's how that's done.
 
 1. Open Workflow Builder by clicking on your workspace name in Slack, then hovering over **Tools** and clicking on **Workflow Builder**.
 2. Click the button to create a **New Workflow**, then **Build Workflow**.
