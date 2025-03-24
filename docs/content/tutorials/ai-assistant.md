@@ -4,7 +4,7 @@ slug: /tutorials/ai-assistant
 lang: en
 ---
 
-In this tutorial, you will create an app, enable the features to make it an assistant app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
+In this tutorial, you will create an app, enable the features to make it an AI app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
 
 ## Prerequisites {#prereqs}
 
@@ -28,7 +28,7 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
 1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://api.slack.com/scopes/connections:write) scope, name the token, and click **Generate**. (For more details, refer to [understanding OAuth scopes for bots](https://api.slack.com/tutorials/tracks/understanding-oauth-scopes-bot)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 
 Save these for the moment; we first need to clone the project, then we'll set these variables.
 
@@ -76,9 +76,9 @@ npm run
 
 If your app is up and running, you'll see a message that says `⚡️ Bolt app is running!`.
 
-## Exploring assistant functionality {#assistant-functionality}
+## Exploring AI app functionality {#assistant-functionality}
 
-Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the agents & assistants feature (found on the **Agents & Assistants** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's assistant functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
+Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the AI apps feature (found on the **Agents & AI Apps** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's AI functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
 
 ## App code {#app-code}
 
@@ -134,7 +134,7 @@ In this sample app, we've opted to rely on the thread context information provid
 
 ### Responding to `assistant_thread_started` event
 
-The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event is sent when a user opens the assistant container, either with a DM or from the top nav bar entry point. Responding to this event starts the conversation with the user. Here we will greet the user then set some suggested prompts. The `message` field of each prompt is what is sent to the assistant when the user clicks on the prompt.
+The [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event is sent when a user opens the assistant container, either with a DM or from the top nav bar entry point. Responding to this event starts the conversation with the user. Here we will greet the user then set some suggested prompts. The `message` field of each prompt is what is sent to the assistant when the user clicks on the prompt.
 
 ```js
   threadStarted: async ({ event, logger, say, setSuggestedPrompts, saveThreadContext }) => {
@@ -181,12 +181,12 @@ The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_s
   },
   ```
 
-In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & Assistants**.
+In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & AI Apps**.
 
 
 ### Reacting to `assistant_thread_context_changed` event
 
-The [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event is sent when the user switches channels while the assistant container is open. Listening to this event, and subsequently saving the new context, is important because it gives you timely information about what your user is looking at, and therefore, asking about. This updated context allows you to respond more appropriately.
+The [`assistant_thread_context_changed`](https://docs.slack.dev/reference/events/assistant_thread_context_changed) event is sent when the user switches channels while the assistant container is open. Listening to this event, and subsequently saving the new context, is important because it gives you timely information about what your user is looking at, and therefore, asking about. This updated context allows you to respond more appropriately.
 
 ```js
   /**
@@ -234,9 +234,9 @@ When a user sends a message to the app, there are a couple of things we do befor
       await setStatus('is typing..');
 ```
 
-The `setTitle` method calls the [`assistant.threads.setTitle`](https://api.slack.com/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
+The `setTitle` method calls the [`assistant.threads.setTitle`](https://docs.slack.dev/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
 
-The `setStatus` method calls the [`assistant.threads.setStatus`](https://api.slack.com/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
+The `setStatus` method calls the [`assistant.threads.setStatus`](https://docs.slack.dev/reference/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
 
 ```js
 await setStatus('');
@@ -374,14 +374,14 @@ The entirety of the user message processing in this example is wrapped in a try-
 
 ### Consider HTTP {#http}
 
-This sample app uses Socket Mode to receive events. This is great for developing and testing out your app, but we recommend using HTTP to receive events for a production-ready app. Read more about the differences between Socket Mode and HTTP [here](https://api.slack.com/apis/event-delivery).
+This sample app uses Socket Mode to receive events. This is great for developing and testing out your app, but we recommend using HTTP to receive events for a production-ready app. Read more about the differences between Socket Mode and HTTP [here](https://docs.slack.dev/apis/events-api/comparing-http-socket-mode).
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for app assistants in the Agents & Assistants documentation [here](/concepts/assistant).
+➡️ Read more about Bolt support for AI apps in the documentation [here](/concepts/ai-apps).
 
-➡️ Level up your agent game after reading through the [Agents & Assistants usage guide](https://api.slack.com/docs/apps/ai) and [Best practices for developing app agents](https://api.slack.com/docs/apps/ai-best-practices).
+➡️ Level up your AI app game after reading through the [AI apps usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for developing AI apps](https://docs.slack.dev/ai/ai-apps-best-practices).
 
-### Explore pre-built agents & assistants {#marketplace}
+### Explore pre-built AI apps {#marketplace}
 
-Check out pre-built agents and assistants ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
+Check out pre-built AI apps ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
