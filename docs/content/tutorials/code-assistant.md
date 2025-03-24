@@ -4,7 +4,7 @@ slug: /tutorials/code-assistant
 lang: en
 ---
 
-In this tutorial, we will create an [AI app](/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. 
+In this tutorial, we will create an [AI app](https://docs.slack.dev/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
 
 Hugging Face is an open-source community best known for its transformers library and platform for machine learning models. Hugging Face's model hub is an online repository where you can find thousands of pre-trained models for natural language processing, computer vision, speech recognition, and more. The platform is open-source, so anyone can contribute to the models and browse the models others have started. Here, we will be using the [Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) model to create an app that can answer coding questions.
 
@@ -17,11 +17,10 @@ Before getting started, you will need the following:
 ## Creating your app {#create-app}
 
 1. Navigate to the [app creation page](https://api.slack.com/apps/new) and select **From a manifest**.
-2. Select the workspace you want to install the application in.
-3. Copy the contents below into the text box that says **Paste your manifest code here** (within the **JSON** tab) and click **Next**.
+2. Select the workspace you want to install the application in and click **Next**.
+3. Copy the contents below and paste it into the text box that says **Paste your manifest code here** (within the **JSON** tab), replacing the placeholder text, and click **Next**.
 
 ```json
-// manifest.json
 {
   "display_information": {
     "name": "Code Assistant"
@@ -101,19 +100,24 @@ Before getting started, you will need the following:
 }
 ```
 
-4. Review the configuration and click **Create**.
-----INSERT WORDS ABOUT WHAT YOU CREATED, INCLUDING CUSTOM STEP------
-5. You're now in your app configuration's **Basic Information** page. Navigate to the **Install App** link in the left nav and click **Install to Workspace**, then **Allow** on the screen that follows.
+4. Review the configuration and click **Create**. Clicking around in these settings, you can see what the manifest has created for us. Some highlights:
+* Within **App Home**, we've enabled the **Chat Tab**. This will allow users to access your app both in the split-view container as well as within a chat tab of the app.
+* **Agents & AI Apps** is enabled. With this toggled on, the split-view container is available for your app.
+* A custom step has been added to **Workflow Steps**. A workflow step is a custom step that can be used in Workflow Builder. Setting up information about that step here (its name, input parameters, and output parameters) lets Slack know what data to collect from the workflow to send to the function. We'll implement the logic step for this in code.
+* **Org Level Apps** has been enabled. This means that your app will be installed at the organization level. Upon installation, it is not added to any workspaces, but the workspace admin can choose which workspaces in the org to add the app to.
+* Within **OAuth & Permissions**, you will find several bot tokens have been added.
+*  Within **Event Subscriptions**, you will find several events this app subscribes to, which allow it to respond to user requests appropriately.
+5. Navigate to the **Install App** page in the left nav and click **Install to Workspace**, then **Allow** on the screen that follows.
 
 ### Obtaining your environment variables {#env-variables}
 
-Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
+In order to connect this configuration with the app we are about to code, you'll need to first obtain and set some environment variables.
 1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
 2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](https://docs.slack.dev/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 
-Save these for the moment; we first need to clone the project, then we'll set these variables.
+Save these for the moment; we first need to set up our project locally, then we'll set these variables.
 
-### Clone the sample project {#clone}
+### Clone the starter template {#clone}
 
 Create a new directory for your app:
 
@@ -308,7 +312,7 @@ app.function("code_assist", async ({ client, inputs, complete, fail }) => {
     try {
       const result = await client.conversations.history({
         channel: channel_id,
-        latest: message_id,
+        oldest: message_id,
         limit: 1,
         inclusive: true,
       });
@@ -324,7 +328,7 @@ app.function("code_assist", async ({ client, inputs, complete, fail }) => {
         await client.conversations.join({ channel: channel_id });
         const result = await client.conversations.history({
           channel: channel_id,
-          latest: message_id,
+          oldest: message_id,
           limit: 1,
           inclusive: true,
         });
@@ -370,14 +374,14 @@ app.function("code_assist", async ({ client, inputs, complete, fail }) => {
 
 This is the meat of our app! Here's a breakdown of what we've added:
 * `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model; think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
-* `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](/reference/block-kit/blocks/markdown-block) to achieve the same result.
+* `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) to achieve the same result.
 * `assistant` is an instance of the [`Assistant` class](/bolt-js/concepts/ai-apps#the-assistant-class-instance); this sets up the suggested prompts that the user sees in the split-view container upon opening your app. 
 * `userMessage` is the handler that takes care of the fiddly bits around getting the thread history, preparing the structure of the messages for processing in a way that the model is expecting, interacting with the model, and responding to the user. 
-* `app.function` sets up a custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 
+* `app.function` sets up the custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 This is the implementation logic of the custom workflow step we saw created by the manifest in the app settings. We use the [`conversations.history`](https://docs.slack.dev/reference/methods/conversations.history) method to find the message where the emoji reaction was placed, then send that to the model as the question.
 
 ### Run the app {#run}
 
-We are almost ready to run the app. Navigate to your terminal window and run the following command:
+We are ready to run the app. Navigate to your terminal window and run the following command:
 
 ```bash
 npm start
@@ -389,16 +393,16 @@ If your app is up and running, you'll see a message that says `⚡️ Code Assis
 
 With your app running, head over to the Slack client and open your app from the icon in the upper right of the window. If you don't see it there, open your Preferences by clicking on your workspace name, then **Preferences**, then **Navigation**. Under a section that says **App agents & assistants**, check the box next to your app. Note: if you do not see the **App agents & assistants** section, check that your app is installed both to your organization and your workspace. 
 
-You should now see it and be able to open it from the icon in the upper right of the Slack client window. This opens the split-view. Upon opening your app's split-view, you should see the suggested prompts we set up in `app.js` file.
+You should now see it and be able to open it from the icon in the upper right of the Slack client window. This opens the split-view. Upon opening your app's split-view, you should see the suggested prompts we set up in `app.js` file. Click on one of the suggested prompts or formulate a question of your own to see your AI app in action!
 
-## Optional side quest: Use your function as a custom step {#custom-step}
+## Side quest: Use your function as a custom step in Workflow Builder {#custom-step}
 Let's explore how to use the functionality you've created in your app inside of a workflow. In case you're unfamiliar, Workflow Builder is the no-code solution for executing tasks in Slack. Once your app is installed on your org, you can grant anyone access to use its function as a custom step in their workflow. Here's how that's done.
 
 1. Open Workflow Builder by clicking on your workspace name in Slack, then hovering over **Tools** and clicking on **Workflow Builder**.
 2. Click the button to create a **New Workflow**, then **Build Workflow**.
 3. Select an event for how you will start your workflow. For this example, choose **When an emoji reaction is used**, then add the robot emoji 🤖, as well as which channels you'd like the workflow to work in. Confirm your selection by clicking **Continue**.
 4. Select **Add steps**, then in the search bar, search for your app `Code Assist` and select it. This is your function as a custom step!
-5. Click the `{}` next to **Message ID** and select **Link to the message that was reacted to**. Under **Channel ID**, select **The channel where the reacted message is in**, then **Save**.
+5. Click the `{}` next to **Message ID** and select **Time when the reacted message was sent**. Once it populates the box, click on the down arrow next to it and select **Timestamp**. Then, under **Channel ID**, select **The channel where the reacted message is in**, then **Save**.
 6. Now that we have the app concocting a reply to the question in the message that was reacted to with the robot emoji, we need to do something with it. Let's post it in the channel where the question originated so that all interested parties know the answer.
 7. Click **Add Step** once more, then **Messages**. Select **Send a message to a channel** and choose **The channel where the reacted message is in**. Below the message composer box, click **Insert a variable**, and under `Code Assist`, select **Answer**. This is the output of our custom function, as we defined it back in the [manifest](#create-app) from which the app was created. Click **Save**.
 6. Now it's time to publish our workflow. Click **Finish Up** in the upper right, give your workflow a name, then **Publish**.
