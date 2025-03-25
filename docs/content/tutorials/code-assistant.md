@@ -137,7 +137,7 @@ Then navigate to its directory:
 
 ```bash
 # Change into this project directory
-cd bolt-js-assistant-template
+cd bolt-js-starter-template
 ```
 
 For this project, we will need to install [Axios](https://www.npmjs.com/package/axios), [Hugging Face Inference](https://www.npmjs.com/package/@huggingface/inference), and [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch). Run this command in your terminal window to install the dependencies we need:
