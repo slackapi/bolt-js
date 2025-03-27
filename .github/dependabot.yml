@@ -12,6 +12,7 @@ updates:
       - dependency-name: "@types/node"
       # allow updates for slack official libraries
       - dependency-name: "@slack/*"
+    versioning-strategy: increase
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -42,3 +43,4 @@ updates:
       - "/examples/socket-mode"
     schedule:
       interval: "weekly"
+    versioning-strategy: increase
