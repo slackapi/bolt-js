@@ -41,6 +41,10 @@ updates:
       - "/examples/oauth"
       - "/examples/socket-mode-oauth"
       - "/examples/socket-mode"
+    labels:
+      - "area:examples"
+      - "dependencies"
+      - "javascript"
     schedule:
       interval: "weekly"
     versioning-strategy: increase
