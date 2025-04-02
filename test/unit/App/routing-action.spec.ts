@@ -1,9 +1,11 @@
+import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import {
   FakeReceiver,
   type Override,
   createDummyBlockActionEventMiddlewareArgs,
+  createDummyFunctionScopedBlockActionEventMiddlewareArgs,
   createFakeLogger,
   importApp,
   mergeOverrides,
@@ -109,6 +111,30 @@ describe('App action() routing', () => {
       ack: fakeAck,
     });
     sinon.assert.notCalled(fakeHandler);
+    sinon.assert.notCalled(fakeAck);
+  });
+
+  it('should route a function scoped action to a handler with the proper arguments', async () => {
+    const testInputs = { test: true };
+    const testHandler = sinon.spy(async ({ inputs, complete, fail, client }) => {
+      assert.equal(inputs, testInputs);
+      assert.typeOf(complete, 'function');
+      assert.typeOf(fail, 'function');
+      assert.equal(client.token, 'xwfp-valid');
+    });
+    app.action('my_id', testHandler);
+    const args = createDummyFunctionScopedBlockActionEventMiddlewareArgs(
+      { action_id: 'my_id' },
+      {
+        callbackId: 'function_callback_id',
+        inputs: testInputs,
+      },
+    );
+    await fakeReceiver.sendEvent({
+      ack: fakeAck,
+      body: args.body,
+    });
+    sinon.assert.calledOnce(testHandler);
     sinon.assert.notCalled(fakeAck);
   });
 });
