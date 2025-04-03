@@ -372,7 +372,7 @@ The entirety of the user message processing in this example is wrapped in a try-
 
 #### Using the markdown block in `say` {#markdown-block}
 
-To safeguard against any markdown translation errors, we can return our text response inside of a [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) in the `say` block, instead of relying on providing precise enough instructions to the LLM. Here's how that would look:
+To safeguard against any markdown translation errors, we can return our text response inside of a [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) in the `say` section of code, instead of relying on providing precise enough instructions to the LLM. Here's how that would look:
 
 ```js
 ...
