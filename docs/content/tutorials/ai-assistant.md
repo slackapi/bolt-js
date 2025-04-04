@@ -370,6 +370,27 @@ After getting the thread replies, we map them to the appropriate object structur
 
 The entirety of the user message processing in this example is wrapped in a try-catch block to provide the user an error message when something goes wrong, which is a best practice. If successful, the final action we take is to call the `say` method with the LLM response.
 
+#### Using the markdown block in `say` {#markdown-block}
+
+To safeguard against any markdown translation errors, we can return our text response inside of a [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) in the `say` section of code, instead of relying on providing precise enough instructions to the LLM. Here's how that would look:
+
+```js
+...
+      await say(
+        {
+          blocks: [
+          {
+            "type": "markdown",
+            "text": llmResponse.choices[0].message.content,
+          }
+        ]
+      }
+    )
+...
+```
+
+This ensures that if the LLM's response included, for example, a code block, it would be formatted appropriately when sent to the user as a response.
+
 ## Next steps {#next-steps}
 
 ### Consider HTTP {#http}
