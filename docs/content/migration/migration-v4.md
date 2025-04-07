@@ -68,7 +68,7 @@ For those building bolt-js apps using the `ExpressReceiver`, the packaged `expre
 
 ## 🍽️ `@slack/types` exported as a named `types` export {#types-named-export}
 
-We are slowly moving more core Slack domain object types and interfaces into [the utility package `@slack/types`][types]. For example, recently we shuffled [Slack Events API payloads](https://api.slack.com/events) from bolt-js over to `@slack/types`. Similar moves will continue as we improve bolt-js. Ideally, we'd like for everyone - ourselves as Slack employees but of course you as well, dear developer - to leverage these types when modeling Slack domain objects.
+We are slowly moving more core Slack domain object types and interfaces into [the utility package `@slack/types`][types]. For example, recently we shuffled [Slack Events API payloads](https://docs.slack.dev/reference/events) from bolt-js over to `@slack/types`. Similar moves will continue as we improve bolt-js. Ideally, we'd like for everyone - ourselves as Slack employees but of course you as well, dear developer - to leverage these types when modeling Slack domain objects.
 
 Anyways, previously we simply `export * from '@slack/types';` in bolt-js. We've tweaked this somewhat, it is now: `export * as types from '@slack/types';`. So if you are using `@slack/types` when packaged within bolt-js, please update your references to something like:
 
@@ -150,6 +150,6 @@ import { webApi } from '@slack/bolt';
 // now can use e.g. webApi.WebClient, etc.
 ```
 
-[methods]: https://api.slack.com/methods
+[methods]: https://docs.slack.dev/reference/methods
 [web-api]: https://www.npmjs.com/package/@slack/web-api
 [types]: https://www.npmjs.com/package/@slack/types

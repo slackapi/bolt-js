@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/message-listening
 ---
 
-To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message` .A `message()` listener is equivalent to `event('message')`
+To listen to messages that [your app has access to receive](https:///messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message` .A `message()` listener is equivalent to `event('message')`
 
 The `message()` listener accepts an optional `pattern` parameter of type `string` or `RegExp` object which filters out any messages that don’t match the pattern.
 
@@ -38,7 +38,7 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
 
 ## Filtering on event subtypes {#filtering-event-subtypes}
 
-You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
+You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://docs.slack.dev/reference/events/message#subtypes).
 
 ```javascript
 // Import subtype from the package

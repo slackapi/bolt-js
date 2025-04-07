@@ -6,14 +6,14 @@ lang: ja-jp
 
 Bolt は、Slack アプリを構築する時間と手間を減らすために作成されたフレームワークで、Slack 開発者のみなさんに最新機能とベストプラクティスを使用してアプリを構築できる単一のインターフェイスを提供します。このガイドでは、[Hubot で作成されたアプリを Bolt アプリに](https://hubot.github.com/docs/)移行するプロセスを順を追って説明します。
 
-すでに [ボットユーザーがいるアプリ](https://api.slack.com/bot-users#getting-started) を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに[Bolt リポジトリのサンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) を読むとよいでしょう。
+すでに [ボットユーザーがいるアプリ](https://docs.slack.dev/legacy/legacy-bot-users) を持っている方、または Hubot コードを Bolt コードに変換するコードサンプルをお探しの方は、はじめに[Bolt リポジトリのサンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) を読むとよいでしょう。
  
 ---
 
 ## まずはじめに {#setting-the-stage}
-Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握しているとさらに理解を深めることができるでしょう。Slack の Hubot アダプターは、　WebSocket をベースとした [RTM API](https://api.slack.com/rtm) と接続するように実装されているので、Hubot アプリには一連のワークスペースイベントが一気にストリーミングされます。そして、RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでおすすめできません。
+Hubot アプリを Bolt に変換するとき、それぞれが内部的にどのように機能しているかを把握しているとさらに理解を深めることができるでしょう。Slack の Hubot アダプターは、　WebSocket をベースとした [RTM API](https://docs.slack.dev/legacy/legacy-rtm-api) と接続するように実装されているので、Hubot アプリには一連のワークスペースイベントが一気にストリーミングされます。そして、RTM API は、新しいプラットフォーム機能をサポートしておらず、特にアプリが複数のまたは大規模な Slack チームにインストールされる場合には、膨大なリソースを消費する可能性があるため、ほとんどのユースケースでおすすめできません。
 
-デフォルトの Bolt レシーバーは、[Events API](https://api.slack.com/events-api) をサポートするように構築されています。これは、HTTP ベースのイベントサブスクリプションを使用して Bolt アプリに JSON ペイロードを送信します。Events API には、RTM にはない新機能のイベントも含まれており、より細かい制御が可能でスケーラブルですのでほとんどのユースケースで推奨されています。しかし例外として、RTM API を使用し続けなければならない理由の 1 つに、アプリをホストしているサーバーにファイアウォールがあり、HTTP 送信リクエストのみを許可して、受信リクエストを許可しないというようなケースが挙げられます。
+デフォルトの Bolt レシーバーは、[Events API](https://docs.slack.dev/apis/events-api/) をサポートするように構築されています。これは、HTTP ベースのイベントサブスクリプションを使用して Bolt アプリに JSON ペイロードを送信します。Events API には、RTM にはない新機能のイベントも含まれており、より細かい制御が可能でスケーラブルですのでほとんどのユースケースで推奨されています。しかし例外として、RTM API を使用し続けなければならない理由の 1 つに、アプリをホストしているサーバーにファイアウォールがあり、HTTP 送信リクエストのみを許可して、受信リクエストを許可しないというようなケースが挙げられます。
 
 Bolt アプリを作成する前に考慮に入れた方がよい違いがほかにもあります。
 - Bolt は Node v10.0.0 以上で動作します。アプリをホストしているサーバーが、v10 をサポートできない場合は、現時点でアプリを Bolt に移行することはできません。
@@ -43,10 +43,10 @@ Bolt アプリを作成する前に考慮に入れた方がよい違いがほか
 ### ボットユーザーを追加する
 Slack では、Hubot アプリはユーザーとの対話型のボットユーザーを採用しています。
 
-新しいアプリにボットユーザーを追加するには、左側のサイドバーの **Bot Users** をクリックしてから、**Add A Bot User** をクリックします。表示名とユーザー名を指定して、**Add Bot User** をクリックします。その他のフィールドの詳しい情報は、[API サイト](https://api.slack.com/bot-users#creating-bot-user) をご覧ください。
+新しいアプリにボットユーザーを追加するには、左側のサイドバーの **Bot Users** をクリックしてから、**Add A Bot User** をクリックします。表示名とユーザー名を指定して、**Add Bot User** をクリックします。その他のフィールドの詳しい情報は、[API サイト](https://docs.slack.dev/legacy/legacy-bot-users#creating) をご覧ください。
 
 ## ボットの設定 {#configure-what-your-bot-will-hear}
-[Events API](https://api.slack.com/bot-users#app-mentions-response) は、ボットの目と耳に相当します。これによりボットは、投稿されたメッセージ、チャンネルの変更、Slack で発生するその他のアクティビティに反応することができます。
+[Events API](https://docs.slack.dev/legacy/legacy-bot-users#handling-events) は、ボットの目と耳に相当します。これによりボットは、投稿されたメッセージ、チャンネルの変更、Slack で発生するその他のアクティビティに反応することができます。
 
 :::warning 
 
@@ -71,7 +71,7 @@ Slack では、Hubot アプリはユーザーとの対話型のボットユー�
 
 :::tip
 
-Bolt に追加された利点として、どの [Events API イベント](https://api.slack.com/events) でもリッスンできることが挙げられます。移行が完了すれば、[ユーザーがワークスペースに参加したとき](https://api.slack.com/events/team_join) や [ユーザーがアプリで DM を開いたとき](https://api.slack.com/events/app_home_opened) など、より多くのイベントをリッスンできます。
+Bolt に追加された利点として、どの [Events API イベント](https://docs.slack.dev/reference/events) でもリッスンできることが挙げられます。移行が完了すれば、[ユーザーがワークスペースに参加したとき](https://docs.slack.dev/reference/events/team_join) や [ユーザーがアプリで DM を開いたとき](https://docs.slack.dev/reference/events/app_home_opened) など、より多くのイベントをリッスンできます。
 
 :::
 
@@ -104,7 +104,7 @@ Hubot スクリプトは、`send()` を使用してメッセージを同じ会�
 
 Bolt は、`send()` の代わりに `say()` を使用し、`respond()` を使用して `response_url` で返信を送信します。返信の冒頭にメンションを追加するには、`context` オブジェクトにあるユーザー ID を使用できます。たとえば、メッセージイベントの場合は次のようにできます: `say('<@${message.user}>Hello :wave:')`
 
-Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()` を使用すると [ボタン、メニューの選択、デートピッカー](https://api.slack.com/messaging/interactivity#interaction) といったインタラクティブなコンポーネントを付けてメッセージを送信できます。
+Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()` を使用すると [ボタン、メニューの選択、デートピッカー](https://docs.slack.dev/messaging/creating-interactive-messages) といったインタラクティブなコンポーネントを付けてメッセージを送信できます。
 
 :::tip 
 
@@ -117,7 +117,7 @@ Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()`
 ### `respond` と `react`
 前のセクションで、Hubot スクリプトで `respond()` が使用されている場合は `app_mention` イベントを、`react()` が使用されている場合は `reaction_added` をサブスクライブするようにアプリを設定しました。
 
-Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://api.slack.com/events) をリッスンできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
+Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Events API イベント](https://docs.slack.dev/reference/events) をリッスンできます。コードを変更するには、`respond()` を app.event(‘app_mention’) に、`react()` を `app.event(‘reaction_added’)` に変更するだけです。この点は、[サンプルスクリプト](https://github.com/slackapi/bolt-js/blob/master/examples/hubot-example/script.js) で詳しく説明されています。
 
 :::tip
 
@@ -184,7 +184,7 @@ Hubot には、brain と呼ばれるメモリ内ストレージがあります�
 ここまで来れば、きっと Hubot アプリを Bolt アプリに変換できているはずです！✨⚡
 
 新しくなってよりクールになった Bolt アプリを、さらにパワーアップしていくこともできます。
-- [ボタンやメニュー選択](https://api.slack.com/messaging/interactivity#interaction) などの双方向のインタラクションを追加することを検討してください。これらの機能は、Hubot ではサポートされていませんでしたが、アプリが Slack にメッセージを送信するときにコンテキストアクションを含めることができるようになります。
+- [ボタンやメニュー選択](https://docs.slack.dev/messaging/creating-interactive-messages) などの双方向のインタラクションを追加することを検討してください。これらの機能は、Hubot ではサポートされていませんでしたが、アプリが Slack にメッセージを送信するときにコンテキストアクションを含めることができるようになります。
 - こちらの ドキュメント を読んで、Bolt でほかに何ができるか探してみてください。
 - イベントやインタラクティブコンポーネントの使用方法を示す [サンプルアプリ](https://glitch.com/~slack-bolt) をチェックしてみてください。
 
