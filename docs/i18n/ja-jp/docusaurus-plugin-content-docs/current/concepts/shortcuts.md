@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/shortcuts
 ---
 
-`shortcut()` メソッドは、[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)と[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)の両方をサポートします。
+`shortcut()` メソッドは、[グローバルショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#global)と[メッセージショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#messages)の両方をサポートします。
 
 ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのリクエストをリッスンすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
 
@@ -14,7 +14,7 @@ slug: /concepts/shortcuts
 
 グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](/concepts/creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
 
-⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを使用できます。
+⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) エレメントを使用できます。
 メッセージショートカットのペイロードはチャンネル ID を含みます。
 
 ```javascript
@@ -44,7 +44,7 @@ app.shortcut('open_modal', async ({ shortcut, ack, context, logger }) => {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
+              "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://docs.slack.dev/block-kit/#making-things-interactive|*make the modal interactive*> or <https://docs.slack.dev/surfaces/modals#composing_views|*learn more advanced modal use cases*>."
             }
           },
           {
@@ -99,7 +99,7 @@ app.shortcut({ callback_id: 'open_modal', type: 'message_action' }, async ({ sho
             type: "section",
             text: {
               type: "mrkdwn",
-              text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
+              text: "About the simplest modal you could conceive of :smile:\n\nMaybe <https://docs.slack.dev/block-kit/#making-things-interactive|*make the modal interactive*> or <https://docs.slack.dev/surfaces/modals#composing_views|*learn more advanced modal use cases*>."
             }
           },
           {

@@ -12,7 +12,7 @@ lang: ja-jp
 
 ## InstallationStore と orgAuthorize での OrG レベルでのインストール対応に関する変更 {#org-wide-app-installation-changes-to-installationstore--orgauthorize}
 
-[Bolt for JavaScript 2.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0) で、私たちは [OrG レベルでのインストール](https://api.slack.com/enterprise/apps)のサポートを追加しました。このサポートをあなたのアプリケーションに追加するには、OAuth フローの中で使用される `fetchOrgInstallation`、`storeOrgInstallation` という二つの新しいメソッドを導入する必要がありました。 3.x では、よりシンプルなインタフェースの実現と Bolt for Python、Bolt for Java との互換性を考慮して、これらの二つの新しいメソッドのサポートを廃止しました。マイグレーションに必要となる変更については以下のコード例を参考にしてください。
+[Bolt for JavaScript 2.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.5.0) で、私たちは [OrG レベルでのインストール](https://docs.slack.dev/enterprise-grid/)のサポートを追加しました。このサポートをあなたのアプリケーションに追加するには、OAuth フローの中で使用される `fetchOrgInstallation`、`storeOrgInstallation` という二つの新しいメソッドを導入する必要がありました。 3.x では、よりシンプルなインタフェースの実現と Bolt for Python、Bolt for Java との互換性を考慮して、これらの二つの新しいメソッドのサポートを廃止しました。マイグレーションに必要となる変更については以下のコード例を参考にしてください。
 
 これまで:
 

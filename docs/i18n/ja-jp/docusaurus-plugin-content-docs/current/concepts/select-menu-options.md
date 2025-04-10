@@ -8,7 +8,7 @@ slug: /concepts/options
 
 `external_select` メニューには `action_id` を使用することをおすすめしますが、ダイアログはまだ Block Kit をサポートしていないため、制約オブジェクトを用いて `callback_id` でフィルタリングする必要があります。
 
-オプションのリクエストへの応答には、適切なオプションを指定して `ack()` を実行する必要があります。API サイトに掲載されている[external_select の応答の例](https://api.slack.com/reference/messaging/block-elements#external_select)や[ダイアログ応答の例](https://api.slack.com/legacy/dialogs#dynamic_select_elements_external)を参考にしてください。
+オプションのリクエストへの応答には、適切なオプションを指定して `ack()` を実行する必要があります。API サイトに掲載されている[external_select の応答の例](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select)や[ダイアログ応答の例](https://docs.slack.dev/legacy/legacy-dialogs)を参考にしてください。
 
 ```javascript
 // external_select オプションリクエストに応答する例

@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/updating-pushing-views
 ---
 
-モーダルでは、複数のモーダルをスタックのように積み重ねて表示できます。[`views.open`](https://api.slack.com/methods/views.open) という API を呼び出すと、まず親の（最初の）モーダルが表示されます。この最初の呼び出しの後、[`views.update`](https://api.slack.com/methods/views.update) を実行することでそのビューを書き換えることもできますし、最初に述べたように [`views.push`](https://api.slack.com/methods/views.push) で新しいモーダルを積み重ねて表示することもできます。
+モーダルでは、複数のモーダルをスタックのように積み重ねて表示できます。[`views.open`](https://docs.slack.dev/reference/methods/views.open/) という API を呼び出すと、まず親の（最初の）モーダルが表示されます。この最初の呼び出しの後、[`views.update`](https://docs.slack.dev/reference/methods/views.update) を実行することでそのビューを書き換えることもできますし、最初に述べたように [`views.push`](https://docs.slack.dev/reference/methods/views.push/) で新しいモーダルを積み重ねて表示することもできます。
 
 ## `views.update`
 
@@ -12,7 +12,7 @@ slug: /concepts/updating-pushing-views
 
 ## `views.push`
 
-モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて `views.push` を呼び出します。この API 呼び出しには、有効な `trigger_id` と、新しく生成する [ビュー部分のペイロード](https://api.slack.com/reference/block-kit/views)を渡します。`views.push` の引数は [モーダルを開始するとき](/concepts/creating-modals)と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
+モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて `views.push` を呼び出します。この API 呼び出しには、有効な `trigger_id` と、新しく生成する [ビュー部分のペイロード](https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload)を渡します。`views.push` の引数は [モーダルを開始するとき](/concepts/creating-modals)と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
 
 より詳細な情報は [API ドキュメント](/concepts/view-submissions)を参照してください。
 

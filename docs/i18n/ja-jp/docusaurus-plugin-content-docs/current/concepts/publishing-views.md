@@ -4,9 +4,9 @@ lang: ja-jp
 slug: /concepts/publishing-views
 ---
 
-[ホームタブ](https://api.slack.com/surfaces/tabs/using)は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、[`views.publish`](https://api.slack.com/methods/views.publish) API メソッドの呼び出しで `user_id` と[ビューのペイロード](https://api.slack.com/reference/block-kit/views)を指定して、ホームタブを公開・更新することができるようになります。
+[ホームタブ](https://docs.slack.dev/surfaces/app-home)は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、[`views.publish`](https://docs.slack.dev/reference/methods/views.publish/) API メソッドの呼び出しで `user_id` と[ビューのペイロード](https://docs.slack.dev/reference/views)を指定して、ホームタブを公開・更新することができるようになります。
 
-エンドユーザーが App Home（ホームタブやアプリとの DM など）にアクセスしたことを知るために、[`app_home_opened`](https://api.slack.com/events/app_home_opened) イベントをサブスクライブすることができます。
+エンドユーザーが App Home（ホームタブやアプリとの DM など）にアクセスしたことを知るために、[`app_home_opened`](https://docs.slack.dev/reference/events/app_home_opened) イベントをサブスクライブすることができます。
 
 ```javascript
 // ユーザーが App Home にアクセスしたことを伝えるイベントをリッスン
@@ -31,7 +31,7 @@ app.event('app_home_opened', async ({ event, client, logger }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>."
+              text: "Learn how home tabs can be more useful and interactive <https://docs.slack.dev/surfaces/app-home|*in the documentation*>."
             }
           }
         ]

@@ -19,7 +19,7 @@ app.message('knock knock', async ({ message, say }) => {
 
 `say()` は、より複雑なメッセージペイロードを受け付けるので、メッセージに機能やリッチな構造を与えることが容易です。
 
-リッチなメッセージレイアウトをアプリに追加する方法については、[API サイトのガイド](https://api.slack.com/messaging/composing/layouts)を参照し、[Block Kit ビルダー](https://api.slack.com/tools/block-kit-builder?template=1)の一般的なアプリフローのテンプレートを確認してください。
+リッチなメッセージレイアウトをアプリに追加する方法については、[API サイトのガイド](https://docs.slack.dev/messaging/#structure)を参照し、[Block Kit ビルダー](https://api.slack.com/tools/block-kit-builder?template=1)の一般的なアプリフローのテンプレートを確認してください。
 
 ```javascript
 // 誰かが 📅 絵文字でリアクションした時に、日付ピッカー block を送信

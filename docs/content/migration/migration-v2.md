@@ -68,7 +68,7 @@ Other error related changes include:
 
 ## Message shortcuts {#message-shortcuts}
 
-[Message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts) (previously referred to as message actions) now use the `shortcut()` method instead of the `action()` method.
+[Message shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts) (previously referred to as message actions) now use the `shortcut()` method instead of the `action()` method.
 
 Before:
 

@@ -7,14 +7,14 @@ lang: en
 
 Bolt was created to reduce the time and complexity it takes to build Slack apps. It provides Slack developers a single interface to build using modern features and best practices. This guide is meant to step you through the process of migrating your app from using [Hubot](https://hubot.github.com/docs/) to Bolt for JavaScript.
 
-If you already have an [app with a bot user](https://api.slack.com/bot-users#getting-started) or if you’re looking for code samples that translate Hubot code to Bolt for JavaScript code, you may find it valuable to start by reading through the [example script in the Bolt for JavaScript repository](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.0.0/examples/hubot-example/script.js).
+If you already have an [app with a bot user](https://docs.slack.dev/legacy/legacy-bot-users) or if you’re looking for code samples that translate Hubot code to Bolt for JavaScript code, you may find it valuable to start by reading through the [example script in the Bolt for JavaScript repository](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.0.0/examples/hubot-example/script.js).
  
 ---
 
 ## Setting the stage {#setting-the-stage}
-When translating a Hubot app to Bolt for JavaScript, it’s good to know how each are working behind the scenes. Slack’s Hubot adapter is built to interface with the [RTM API](https://api.slack.com/rtm), which uses a WebSocket-based connection that sends a stream of workspace events to your Hubot app. The RTM API is not recommended for most use cases since it doesn’t include support for newer platform features and it can become very resource-intensive, particularly if the app is installed on multiple or large Slack teams.
+When translating a Hubot app to Bolt for JavaScript, it’s good to know how each are working behind the scenes. Slack’s Hubot adapter is built to interface with the [RTM API](https://docs.slack.dev/legacy/legacy-rtm-api), which uses a WebSocket-based connection that sends a stream of workspace events to your Hubot app. The RTM API is not recommended for most use cases since it doesn’t include support for newer platform features and it can become very resource-intensive, particularly if the app is installed on multiple or large Slack teams.
 
-The default Bolt for JavaScript receiver is built to support the [Events API](https://api.slack.com/events-api), which uses HTTP-based event subscriptions to send JSON payloads to your Bolt app. The Events API includes newer events that aren’t on RTM and is more granular and scalable. It’s recommended for most use cases, though one reason your app may be stuck using the RTM API could be that the server you’re hosting your app from has a firewall that only allows outgoing requests and not incoming ones.
+The default Bolt for JavaScript receiver is built to support the [Events API](https://docs.slack.dev/apis/events-api/), which uses HTTP-based event subscriptions to send JSON payloads to your Bolt app. The Events API includes newer events that aren’t on RTM and is more granular and scalable. It’s recommended for most use cases, though one reason your app may be stuck using the RTM API could be that the server you’re hosting your app from has a firewall that only allows outgoing requests and not incoming ones.
 
 There are a few other differences you may want to consider before creating a Bolt for JavaScript app:
 - The minimum version of Node for Bolt for JavaScript is `v10.0.0`. If the server you’re hosting your app from cannot support `v10`, it’s not possible to migrate your app to Bolt for JavaScript at the moment.
@@ -43,10 +43,10 @@ Look around, add an app icon and description, and then let’s start configuring
 ### Add a bot user
 On Slack, Hubot apps employ bot users which are designed to interact with users in conversation.
 
-To add a bot user to your new app, click **Bot Users** on the left sidebar and then **Add A Bot User**. Give it a display name and username, then click **Add Bot User**. There’s more information about what the different fields are [on our API site](https://api.slack.com/bot-users#creating-bot-user).
+To add a bot user to your new app, click **Bot Users** on the left sidebar and then **Add A Bot User**. Give it a display name and username, then click **Add Bot User**. There’s more information about what the different fields are [on our API site](https://docs.slack.dev/legacy/legacy-bot-users#creating).
 
 ## Configure what your bot will hear {#configure-what-your-bot-will-hear}
-The [Events API](https://api.slack.com/bot-users#app-mentions-response) is a bot's equivalent of eyes and ears. It gives a bot a way to react to posted messages, changes to channels, and other activities that happen in Slack.
+The [Events API](https://docs.slack.dev/legacy/legacy-bot-users#handling-events) is a bot's equivalent of eyes and ears. It gives a bot a way to react to posted messages, changes to channels, and other activities that happen in Slack.
 
 :::info
 
@@ -71,7 +71,7 @@ Your Hubot app may have responded to other events depending on what functionalit
 
 :::info
 
-An added benefit to Bolt is you can listen to any [Events API event](https://api.slack.com/events). So after you’re done migrating, you can listen to more events like [when a user joins the workspace](https://api.slack.com/events/team_join) or [when a user opens a DM with your app](https://api.slack.com/events/app_home_opened).
+An added benefit to Bolt is you can listen to any [Events API event](https://docs.slack.dev/reference/events). So after you’re done migrating, you can listen to more events like [when a user joins the workspace](https://docs.slack.dev/reference/events/team_join) or [when a user opens a DM with your app](https://docs.slack.dev/reference/events/app_home_opened).
 
 :::
 
@@ -100,7 +100,7 @@ Hubot scripts use `send()` to send a message to the same conversation and `reply
 
 Bolt for JavaScript uses `await say()` in place of `send()`, or `await respond()` to use the `response_url` to send a reply. To add an @-mention to the beginning of your reply, you can use the user ID found in the `context` object. For example, for a message event you could use `await say('<@${message.user}> Hello :wave:')`
 
-The arguments for Hubot’s `send()` and Bolt for JavaScript's `say()` are mostly the same, although `say()` allows you to send messages with [interactive components like buttons, select menus, and datepickers](https://api.slack.com/messaging/interactivity#interaction).
+The arguments for Hubot’s `send()` and Bolt for JavaScript's `say()` are mostly the same, although `say()` allows you to send messages with [interactive components like buttons, select menus, and datepickers](https://docs.slack.dev/messaging/creating-interactive-messages).
 
 👨‍💻👩‍💻 Anywhere where you use `send()` in your code, change it to use `await say()`
 
@@ -110,7 +110,7 @@ The arguments for Hubot’s `send()` and Bolt for JavaScript's `say()` are mostl
 
 In the previous section, you should have subscribed your app to the `app_mention` event if your Hubot script uses `respond()`, and `reaction_added` if you uses `react()`.
 
-Bolt for JavaScript uses a method called `event()` that allows you to listen to any [Events API event](https://api.slack.com/events). To change your code, you’ll just change any `respond()` to `app.event(‘app_mention’)` and any `react()` to `app.event(‘reaction_added’)`. This is detailed more [in the example script](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.0.0/examples/hubot-example/script.js).
+Bolt for JavaScript uses a method called `event()` that allows you to listen to any [Events API event](https://docs.slack.dev/reference/events). To change your code, you’ll just change any `respond()` to `app.event(‘app_mention’)` and any `react()` to `app.event(‘reaction_added’)`. This is detailed more [in the example script](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.0.0/examples/hubot-example/script.js).
 
 👨‍💻👩‍💻 Anywhere where you use `respond()` in your code, change it to use `app.event(‘app_mention’)`. Anywhere you use `react`, change it to `app.event(‘reaction_added’)`.
 
@@ -169,7 +169,7 @@ If there is more than one instance of your app running, the built-in conversatio
 If you’ve made it this far, it means you’ve likely converted your Hubot app into a Bolt for JavaScript app! ✨⚡
 
 Now that you have your flashy new Bolt for JavaScript app, you can explore how to power it up:
-- Consider adding interactivity [like buttons and select menus](https://api.slack.com/messaging/interactivity#interaction). These weren’t supported by Hubot and will allow your app to include contextual actions when sending messages to Slack.
+- Consider adding interactivity [like buttons and select menus](https://docs.slack.dev/messaging/creating-interactive-messages). These weren’t supported by Hubot and will allow your app to include contextual actions when sending messages to Slack.
 - Read the rest of the documentation to explore what else is possible with Bolt for JavaScript.
 - Check out our [sample app](https://glitch.com/~slack-bolt) that shows you how to use events and interactive components.
 

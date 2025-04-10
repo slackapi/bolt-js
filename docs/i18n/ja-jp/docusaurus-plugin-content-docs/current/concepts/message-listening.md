@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/message-listening
 ---
 
-[アプリが受信可能な](https://api.slack.com/messaging/retrieving#permissions)メッセージをリッスンするには、`message` 型でないイベントを除外する `message()` メソッドを使用します。`message()` リスナーは `event('message')` と等価の機能を提供します。
+[アプリが受信可能な](https://docs.slack.dev/messaging/retrieving-messages#permissions)メッセージをリッスンするには、`message` 型でないイベントを除外する `message()` メソッドを使用します。`message()` リスナーは `event('message')` と等価の機能を提供します。
 
 `message()` は、`string` 型か `RegExp` 型の、指定パターンに一致しないメッセージを除外する `pattern` パラメーター（指定は必須ではありません）を受け付けます。
 
@@ -38,7 +38,7 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
 
 ## メッセージのサブタイプのフィルタリング
 
-イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `message_changed` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://api.slack.com/events/message#message_subtypes)を参照してください。
+イベントのサブタイプをフィルタリングしたい場合、組み込みの `subtype()` ミドルウェアを使用できます。 `message_changed` や `message_replied` のような一般的なメッセージサブタイプの情報は、[メッセージイベントのドキュメント](https://docs.slack.dev/reference/events/message#subtypes)を参照してください。
 
 ```javascript
 // パッケージから subtype をインポート

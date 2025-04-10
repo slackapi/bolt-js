@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /legacy/steps-from-apps
 ---
 
-（アプリによる）ワークフローステップ（Workflow Steps from Apps) は、[ワークフロービルダー](https://api.slack.com/workflows)におけるワークフローに組み込み可能なカスタムのワークフローステップを任意の Slack アプリが提供することを可能とします。
+（アプリによる）ワークフローステップ（Workflow Steps from Apps) は、[ワークフロービルダー](https://docs.slack.dev/legacy/legacy-steps-from-apps/)におけるワークフローに組み込み可能なカスタムのワークフローステップを任意の Slack アプリが提供することを可能とします。
 
 ワークフローステップは、三つの異なるユーザーイベントから構成されます:
 
@@ -14,7 +14,7 @@ slug: /legacy/steps-from-apps
 
 ワークフローステップを機能させるためには、これら三つのイベント全てを適切にハンドリングする必要があります。
 
-ワークフローステップのさらなる詳細については [API ドキュメント](https://api.slack.com/workflows/steps)を参考にしてください。
+ワークフローステップのさらなる詳細については [API ドキュメント](https://docs.slack.dev/legacy/legacy-steps-from-apps/)を参考にしてください。
 
 ---
 
@@ -52,13 +52,13 @@ app.step(ws);
 
 ##  ステップの追加・編集
 
-ワークフローの作成者が、アプリが提供するステップをワークフローに追加（またはその設定を変更）するタイミングで、アプリは [`workflow_step_edit`](https://api.slack.com/reference/workflows/workflow_step_edit) というイベントを受信します。このイベントの受信時に `WorkflowStep` 設定オブジェクト内の `edit` コールバック関数が実行されます。
+ワークフローの作成者が、アプリが提供するステップをワークフローに追加（またはその設定を変更）するタイミングで、アプリは [`workflow_step_edit`](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step_edit-payload) というイベントを受信します。このイベントの受信時に `WorkflowStep` 設定オブジェクト内の `edit` コールバック関数が実行されます。
 
-このとき、ワークフロー作成・変更のどちらの場合でも、アプリは[ワークフローステップ設定のためのモーダル](https://api.slack.com/reference/workflows/configuration-view)を応答する必要があります。このモーダルは、ワークフローステップに固有の設定である必要があり、通常のモーダルにはない制約があります。最もわかりやすいものとしては、`title​`、`submit​`、`close` プロパティを設定することができません。また、デフォルトの設定では、この設定モーダルの `callback_id` はワークフローステップのものと同じものが使用されます。
+このとき、ワークフロー作成・変更のどちらの場合でも、アプリは[ワークフローステップ設定のためのモーダル](https://docs.slack.dev/legacy/legacy-steps-from-apps/)を応答する必要があります。このモーダルは、ワークフローステップに固有の設定である必要があり、通常のモーダルにはない制約があります。最もわかりやすいものとしては、`title​`、`submit​`、`close` プロパティを設定することができません。また、デフォルトの設定では、この設定モーダルの `callback_id` はワークフローステップのものと同じものが使用されます。
 
 `edit` コールバック関数の中では モーダルの view のうち `blocks` だけを渡すだけで簡単にステップ設定モーダルをオープンすることができる `configure()` というユーティリティ関数が利用できます。これは、必要な入力内容が揃うまで設定の保存を無効にする `submit_disabled` というオプションを `true` に設定します。
 
-設定モーダルを開く処理に関するさらなる詳細は、[ドキュメント](https://api.slack.com/workflows/steps#handle_config_view)を参考にしてください。
+設定モーダルを開く処理に関するさらなる詳細は、[ドキュメント](https://docs.slack.dev/legacy/legacy-steps-from-apps/)を参考にしてください。
 
 ```javascript
 const ws = new WorkflowStep('add_task', {
@@ -120,7 +120,7 @@ const ws = new WorkflowStep('add_task', {
 - `step_name` は、デフォルトのステップ名を上書きするために使用します
 - `step_image_url` は、デフォルトのステップのイメージ画像を上書きするために使用します
 
-これら引数をどのように構成するかの詳細は、[ドキュメント](https://api.slack.com/reference/workflows/workflow_step)を参考にしてください。
+これら引数をどのように構成するかの詳細は、[ドキュメント](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object)を参考にしてください。
 
 ```javascript
 const ws = new WorkflowStep('add_task', {
@@ -161,7 +161,7 @@ const ws = new WorkflowStep('add_task', {
 
 ## ステップの実行
 
-ワークフローの利用者によって、アプリが提供するカスタムのワークフローステップが実行されるとき、アプリは[`workflow_step_execute`](https://api.slack.com/events/workflow_step_execute) というイベントを受信します。このイベントの受信時に `WorkflowStep` 設定オブジェクト内の `execute` コールバック関数が実行されます。
+ワークフローの利用者によって、アプリが提供するカスタムのワークフローステップが実行されるとき、アプリは[`workflow_step_execute`](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object) というイベントを受信します。このイベントの受信時に `WorkflowStep` 設定オブジェクト内の `execute` コールバック関数が実行されます。
 
 `save` コールバック関数で予め規定された `inputs` の情報を使って、ここでの処理は、サードパーティの API を呼び出したり、データベースに情報を保存したり、そのユーザーのホームタブを更新したり、`outputs` オブジェクトを構築することで後続のワークフローステップが利用できる情報を設定したりします。
 

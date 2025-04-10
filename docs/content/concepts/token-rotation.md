@@ -10,5 +10,5 @@ Instead of an access token representing an existing installation of your Slack a
 
 Bolt for JavaScript supports and will handle token rotation automatically so long as the [built-in OAuth](/concepts/authenticating-oauth) functionality is used.
 
-For more information about token rotation, please see the [documentation](https://api.slack.com/authentication/rotation).
+For more information about token rotation, please see the [documentation](https://docs.slack.dev/authentication/using-token-rotation).
 

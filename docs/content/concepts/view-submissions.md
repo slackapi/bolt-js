@@ -6,7 +6,7 @@ slug: /concepts/view-submissions
 
 You may listen for user interactions with views using the `view` method. 
 
-Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in [view](https://api.slack.com/reference/interaction-payloads/views) input blocks, you can access the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
+Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in view input blocks, you can access the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 If the `notify_on_close` field of a view has been set to `true`, Slack will also send a `view_closed` request if a user clicks the close button. See the section on **Handling views on close** for more detail.
 To listen to either a `view_submission` request or `view_closed` request, you can use the built-in `view()` method.
 
@@ -27,9 +27,9 @@ app.view('modal-callback-id', async ({ ack, body }) => {
   });
 });
 ```
-Similarly, there are options for [displaying errors](https://api.slack.com/surfaces/modals/using#displaying_errors) in response to view submissions.
+Similarly, there are options for [displaying errors](https://docs.slack.dev/surfaces/modals#displaying_errors) in response to view submissions.
 
-Read more about view submissions in our [API documentation](https://api.slack.com/surfaces/modals/using#handling_submissions).
+Read more about view submissions in our [API documentation](https://docs.slack.dev/surfaces/modals#interactions).
 
 ---
 
@@ -38,7 +38,7 @@ Read more about view submissions in our [API documentation](https://api.slack.co
 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this.
 
 :::tip 
-See the [API documentation](https://api.slack.com/surfaces/modals/using#modal_cancellations) for more information about `view_closed`.
+See the [API documentation](https://docs.slack.dev/surfaces/modals#interactions) for more information about `view_closed`.
 :::
 
 #### Handle a `view_closed` request
