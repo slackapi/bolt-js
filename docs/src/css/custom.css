@@ -331,6 +331,11 @@ a code {
   color: var(--code-link-text);
 }
 
+a[href^="https://api.slack.com/methods"] > code {
+  background-color: var(--method-link-background);
+  color: var(--method-link-text);
+}
+
 a[href^="https://docs.slack.dev/reference/methods"] > code {
   background-color: var(--method-link-background);
   color: var(--method-link-text);
