@@ -4,11 +4,11 @@ lang: en
 slug: /concepts/creating-modals
 ---
 
-[Modals](https://api.slack.com/block-kit/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](https://api.slack.com/reference/block-kit/views) to the built-in client's [`views.open`](https://api.slack.com/methods/views.open) method. 
+[Modals](https://docs.slack.dev/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](https://docs.slack.dev/reference/views/modal-views) to the built-in client's [`views.open`](https://docs.slack.dev/reference/methods/views.open/) method. 
 
 Your app receives `trigger_id` parameters in payloads sent to your Request URL triggered user invocation like a slash command, button press, or interaction with a select menu.
 
-Read more about modal composition in the [API documentation](https://api.slack.com/surfaces/modals/using#composing_views)
+Read more about modal composition in the [API documentation](https://docs.slack.dev/surfaces/modals#composing_views)
 
 ```javascript
 // Listen for a slash command invocation
