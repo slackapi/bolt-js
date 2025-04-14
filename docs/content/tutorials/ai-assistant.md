@@ -172,7 +172,7 @@ The [`assistant_thread_started`](https://docs.slack.dev/reference/events/assista
        * Provide the user up to 4 optional, preset prompts to choose from.
        * The optional `title` prop serves as a label above the prompts. If
        * not, provided, 'Try these prompts:' will be displayed.
-       * https://api.slack.com/methods/assistant.threads.setSuggestedPrompts
+       * https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts
        */
       await setSuggestedPrompts({ prompts, title: 'Here are some suggested options:' });
     } catch (e) {
@@ -194,7 +194,7 @@ The [`assistant_thread_context_changed`](https://docs.slack.dev/reference/events
   * while the Assistant container is open. If `threadContextChanged` is not
   * provided, context will be saved using the AssistantContextStore's `save`
   * method (either the DefaultAssistantContextStore or custom, if provided).
-  * https://api.slack.com/events/assistant_thread_context_changed
+  * https://docs.slack.dev/reference/events/assistant_thread_context_changed
   */
   threadContextChanged: async ({ logger, saveThreadContext }) => {
     // const { channel_id, thread_ts, context: assistantContext } = event.assistant_thread;
@@ -214,7 +214,7 @@ When a user sends a message to the app, there are a couple of things we do befor
   /**
   * Messages sent to the Assistant do not contain a subtype and must
   * be deduced based on their shape and metadata (if provided).
-  * https://api.slack.com/events/message
+  * https://docs.slack.dev/reference/events/message
   */
   userMessage: async ({ client, message, getThreadContext, say, setTitle, setStatus }) => {
     const { channel, thread_ts } = message;
@@ -223,13 +223,13 @@ When a user sends a message to the app, there are a couple of things we do befor
       /**
        * Set the title of the Assistant thread to capture the initial topic/question
        * as a way to facilitate future reference by the user.
-       * https://api.slack.com/methods/assistant.threads.setTitle
+       * https://docs.slack.dev/reference/methods/assistant.threads.setTitle
        */
       await setTitle(message.text);
 
       /**
        * Set the status of the Assistant to give the appearance of active processing.
-       * https://api.slack.com/methods/assistant.threads.setStatus
+       * https://docs.slack.dev/reference/methods/assistant.threads.setStatus
        */
       await setStatus('is typing..');
 ```

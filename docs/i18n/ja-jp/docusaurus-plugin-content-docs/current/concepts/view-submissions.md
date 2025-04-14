@@ -27,9 +27,9 @@ app.view('modal-callback-id', async ({ ack, body }) => {
   });
 });
 ```
-この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://api.slack.com/surfaces/modals/using#displaying_errors) ためのオプションもあります。
+この例と同様に、モーダルでの送信リクエストに対して、[エラーを表示する](https://docs.slack.dev/surfaces/modals#displaying_errors) ためのオプションもあります。
 
-より詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#handling_submissions)を参照してください。
+より詳細な情報は [API ドキュメント](https://docs.slack.dev/surfaces/modals#interactions)を参照してください。
 
 ---
 
@@ -37,7 +37,7 @@ app.view('modal-callback-id', async ({ ack, body }) => {
 
 💡 `view_closed` リクエストをリッスンするとき、`callback_id` と `type: 'view_closed'` を含むオブジェクトの指定が必要です。以下の例を参照してください。
 
-`view_closed` に関するより詳細な情報は [API ドキュメント](https://api.slack.com/surfaces/modals/using#modal_cancellations)を参照してください。
+`view_closed` に関するより詳細な情報は [API ドキュメント](https://docs.slack.dev/surfaces/modals#interactions)を参照してください。
 
 ```javascript
 // view_closed リクエストの処理
