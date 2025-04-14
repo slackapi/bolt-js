@@ -10,4 +10,4 @@ Bolt for JavaScript [v3.5.0](https://github.com/slackapi/bolt-js/releases/tag/%4
 
 [Bolt for JavaScript の組み込みの OAuth 機能](/concepts/authenticating-oauth) を使用していれば、Bolt for JavaScript が自動的にトークンローテーションの処理をハンドリングします。
 
-トークンローテーションに関する詳細は [API ドキュメント](https://api.slack.com/authentication/rotation)を参照してください。
+トークンローテーションに関する詳細は [API ドキュメント](https://docs.slack.dev/authentication/using-token-rotation)を参照してください。

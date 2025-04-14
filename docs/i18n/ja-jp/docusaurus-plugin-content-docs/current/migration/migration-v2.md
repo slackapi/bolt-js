@@ -66,7 +66,7 @@ app.error(async (error) => {
 
 ## メッセージショートカット {#message-shortcuts}
 
-[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts) (以前はメッセージアクションと呼ばれていました)は、これまで `action()` メソッドでハンドリングしていましたが `shortcut()` メソッドを使うようになりました。
+[メッセージショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#messages) (以前はメッセージアクションと呼ばれていました)は、これまで `action()` メソッドでハンドリングしていましたが `shortcut()` メソッドを使うようになりました。
 
 これまで:
 

@@ -19,7 +19,7 @@ app.message('knock knock', async ({ message, say }) => {
 
 `say()` accepts more complex message payloads to make it easy to add functionality and structure to your messages.
 
-To explore adding rich message layouts to your app, read through [the guide on our API site](https://api.slack.com/messaging/composing/layouts) and look through templates of common app flows [in the Block Kit Builder](https://api.slack.com/tools/block-kit-builder?template=1).
+To explore adding rich message layouts to your app, read through [the guide on our API site](https://docs.slack.dev/messaging/#structure) and look through templates of common app flows [in the Block Kit Builder](https://api.slack.com/tools/block-kit-builder?template=1).
 
 ```javascript
 // Sends a section block with datepicker when someone reacts with a 📅 emoji
