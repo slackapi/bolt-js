@@ -113,7 +113,7 @@ There are three [utilities](/reference#the-assistantconfig-configuration-object)
 * `setTitle`
 * `setStatus`
 
-The following example uses the [OpenAI API client](https://platform.openai.com/docs/api-reference/introduction), but you can substitute it with the AI client of your choice.
+The following example uses a [Hugging Face inference provider](https://huggingface.co/docs/inference-providers/en/index), but you can substitute it with the AI client of your choice.
 
  ```js
  ...
@@ -145,10 +145,10 @@ The following example uses the [OpenAI API client](https://platform.openai.com/d
       ];
 
       // Send message history and newest question to LLM
-      const llmResponse = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        n: 1,
+      const llmResponse = await hfClient.chatCompletion({
+        model: 'Qwen/QwQ-32B',
         messages,
+        max_tokens: 2000,
       });
 
       // Provide a response to the user
