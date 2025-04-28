@@ -69,6 +69,10 @@ const config = {
             to: '/',
             from: ['/concepts', '/concepts/advanced', '/concepts/basic'],
           },
+          {
+            to: '/concepts/ai-apps',
+            from: '/concepts/assistant',
+          },
         ],
       },
     ],

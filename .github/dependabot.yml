@@ -12,6 +12,7 @@ updates:
       - dependency-name: "@types/node"
       # allow updates for slack official libraries
       - dependency-name: "@slack/*"
+    versioning-strategy: increase
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -24,6 +25,10 @@ updates:
       docusaurus:
         patterns:
           - "@docusaurus/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
   - package-ecosystem: "npm"
     directories:
       - "/examples/custom-properties"
@@ -36,5 +41,10 @@ updates:
       - "/examples/oauth"
       - "/examples/socket-mode-oauth"
       - "/examples/socket-mode"
+    labels:
+      - "area:examples"
+      - "dependencies"
+      - "javascript"
     schedule:
       interval: "weekly"
+    versioning-strategy: increase

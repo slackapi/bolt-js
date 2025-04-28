@@ -1,16 +1,16 @@
 ---
-title: Getting started with an AI Assistant
+title: AI Assistant
 slug: /tutorials/ai-assistant
 lang: en
 ---
 
-In this tutorial, you will create an app, enable the features to make it an assistant app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
+In this tutorial, you will create an app, enable the features to make it an AI app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
 
 ## Prerequisites {#prereqs}
 
 Before getting started, you will need the following:
 * a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* an OpenAI account with sufficient credits, and in which you have generated a secret key.
+* a [Hugging Face](https://huggingface.co/) account with sufficient credits, and in which you have generated a secret key.
 
 **Skip to the code**
 
@@ -28,7 +28,7 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
 1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://api.slack.com/scopes/connections:write) scope, name the token, and click **Generate**. (For more details, refer to [understanding OAuth scopes for bots](https://api.slack.com/tutorials/tracks/understanding-oauth-scopes-bot)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 
 Save these for the moment; we first need to clone the project, then we'll set these variables.
 
@@ -58,7 +58,7 @@ code .
 
 Now, we are ready to store those environment variables.
 1. Rename the `.env.sample` file to `.env`
-2. Open the file and replace `YOUR_SLACK_APP_TOKEN` with the value of the token you generated on the **Basic Information** page. Replace `YOUR_SLACK_BOT_TOKEN` with the value of the token generated when you installed the app. Replace `YOUR_OPEN_API_KEY` with the key you generated with OpenAI.
+2. Open the file and replace `YOUR_SLACK_APP_TOKEN` with the value of the token you generated on the **Basic Information** page. Replace `YOUR_SLACK_BOT_TOKEN` with the value of the token generated when you installed the app. Replace `YOUR_HUGGINGFACE_API_KEY` with the key you generated with Hugging Face.
 
 ### Run the app {#run}
 
@@ -76,9 +76,9 @@ npm run
 
 If your app is up and running, you'll see a message that says `⚡️ Bolt app is running!`.
 
-## Exploring assistant functionality {#assistant-functionality}
+## Exploring AI app functionality {#assistant-functionality}
 
-Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the agents & assistants feature (found on the **Agents & Assistants** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's assistant functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
+Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the AI apps feature (found on the **Agents & AI Apps** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's AI functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
 
 ## App code {#app-code}
 
@@ -89,12 +89,12 @@ Starting at the very top of the `app.js` file, we see that we import a few relev
 ```js
 const { App, LogLevel, Assistant } = require('@slack/bolt');
 const { config } = require('dotenv');
-const { OpenAI } = require('openai');
+const { HfInference } = require('@huggingface/inference');
 ```
 
-Most notably are the `openai` module to be able to communicate with OpenAI and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant. 
+Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant. 
 
-Next, we initialize the app and our `openai` variable with the tokens we previously saved as environment variables in the `.env` file.
+Next, we initialize the app and our `hfClient` variable with the tokens we previously saved as environment variables in the `.env` file.
 
 ```js
 /** Initialization */
@@ -105,13 +105,11 @@ const app = new App({
   logLevel: LogLevel.DEBUG,
 });
 
-/** OpenAI Setup */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// HuggingFace configuration
+const hfClient = new HfInference(process.env.HUGGINGFACE_API_KEY);
 ```
 
-After this, we see some text saved to the `DEFAULT_SYSTEM_CONTENT` variable. This is used later when constructing the message to send to OpenAI; we'll get to why this is necessary later.
+After this, we see some text saved to the `DEFAULT_SYSTEM_CONTENT` variable. This is used later when constructing the message to send to Hugging Face; we'll get to why this is necessary later.
 
 ```js
 const DEFAULT_SYSTEM_CONTENT = `You're an assistant in a Slack workspace.
@@ -134,7 +132,7 @@ In this sample app, we've opted to rely on the thread context information provid
 
 ### Responding to `assistant_thread_started` event
 
-The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_started) event is sent when a user opens the assistant container, either with a DM or from the top nav bar entry point. Responding to this event starts the conversation with the user. Here we will greet the user then set some suggested prompts. The `message` field of each prompt is what is sent to the assistant when the user clicks on the prompt.
+The [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event is sent when a user opens the assistant container, either with a DM or from the top nav bar entry point. Responding to this event starts the conversation with the user. Here we will greet the user then set some suggested prompts. The `message` field of each prompt is what is sent to the assistant when the user clicks on the prompt.
 
 ```js
   threadStarted: async ({ event, logger, say, setSuggestedPrompts, saveThreadContext }) => {
@@ -172,7 +170,7 @@ The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_s
        * Provide the user up to 4 optional, preset prompts to choose from.
        * The optional `title` prop serves as a label above the prompts. If
        * not, provided, 'Try these prompts:' will be displayed.
-       * https://api.slack.com/methods/assistant.threads.setSuggestedPrompts
+       * https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts
        */
       await setSuggestedPrompts({ prompts, title: 'Here are some suggested options:' });
     } catch (e) {
@@ -181,12 +179,12 @@ The [`assistant_thread_started`](https://api.slack.com/events/assistant_thread_s
   },
   ```
 
-In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & Assistants**.
+In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & AI Apps**.
 
 
 ### Reacting to `assistant_thread_context_changed` event
 
-The [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_thread_context_changed) event is sent when the user switches channels while the assistant container is open. Listening to this event, and subsequently saving the new context, is important because it gives you timely information about what your user is looking at, and therefore, asking about. This updated context allows you to respond more appropriately.
+The [`assistant_thread_context_changed`](https://docs.slack.dev/reference/events/assistant_thread_context_changed) event is sent when the user switches channels while the assistant container is open. Listening to this event, and subsequently saving the new context, is important because it gives you timely information about what your user is looking at, and therefore, asking about. This updated context allows you to respond more appropriately.
 
 ```js
   /**
@@ -194,7 +192,7 @@ The [`assistant_thread_context_changed`](https://api.slack.com/events/assistant_
   * while the Assistant container is open. If `threadContextChanged` is not
   * provided, context will be saved using the AssistantContextStore's `save`
   * method (either the DefaultAssistantContextStore or custom, if provided).
-  * https://api.slack.com/events/assistant_thread_context_changed
+  * https://docs.slack.dev/reference/events/assistant_thread_context_changed
   */
   threadContextChanged: async ({ logger, saveThreadContext }) => {
     // const { channel_id, thread_ts, context: assistantContext } = event.assistant_thread;
@@ -214,7 +212,7 @@ When a user sends a message to the app, there are a couple of things we do befor
   /**
   * Messages sent to the Assistant do not contain a subtype and must
   * be deduced based on their shape and metadata (if provided).
-  * https://api.slack.com/events/message
+  * https://docs.slack.dev/reference/events/message
   */
   userMessage: async ({ client, message, getThreadContext, say, setTitle, setStatus }) => {
     const { channel, thread_ts } = message;
@@ -223,26 +221,26 @@ When a user sends a message to the app, there are a couple of things we do befor
       /**
        * Set the title of the Assistant thread to capture the initial topic/question
        * as a way to facilitate future reference by the user.
-       * https://api.slack.com/methods/assistant.threads.setTitle
+       * https://docs.slack.dev/reference/methods/assistant.threads.setTitle
        */
       await setTitle(message.text);
 
       /**
        * Set the status of the Assistant to give the appearance of active processing.
-       * https://api.slack.com/methods/assistant.threads.setStatus
+       * https://docs.slack.dev/reference/methods/assistant.threads.setStatus
        */
       await setStatus('is typing..');
 ```
 
-The `setTitle` method calls the [`assistant.threads.setTitle`](https://api.slack.com/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
+The `setTitle` method calls the [`assistant.threads.setTitle`](https://docs.slack.dev/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
 
-The `setStatus` method calls the [`assistant.threads.setStatus`](https://api.slack.com/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
+The `setStatus` method calls the [`assistant.threads.setStatus`](https://docs.slack.dev/reference/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
 
 ```js
 await setStatus('');
 ```
 
-We show a couple of examples in this sample app of how to handle user message processing: use channel history to give context to the user's message, and use thread history to give context to the user's message. Here is how to do each and prepare the information for sending to OpenAI.
+We show a couple of examples in this sample app of how to handle user message processing: use channel history to give context to the user's message, and use thread history to give context to the user's message. Here is how to do each and prepare the information for sending to Hugging Face.
 
 #### Using channel history for context {#channel-history}
 
@@ -277,7 +275,7 @@ For this scenario, the user is in a channel and the app has access to that chann
         }
 ```
 
-After getting the channel history, it's time to construct the prompt to send to OpenAI. OpenAI prompts contain an array of `messages` in which each message object has a `role` and `content`.
+After getting the channel history, it's time to construct the prompt to send to Hugging Face. Hugging Face prompts contain an array of `messages` in which each message object has a `role` and `content`.
 
 The `role` represents the perspective from which you'd like model to respond to the provided input and influences how the model might interpret the input. The three possible role values are `system`, `assistant`, and `user`.
 * The `system` role provides high-level instructions; it sets the scene.
@@ -300,10 +298,10 @@ Refer back to the top of the `app.js` file to where we defined the `DEFAULT_SYST
         ];
 
         // Send channel history and prepared request to LLM
-        const llmResponse = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          n: 1,
+        const llmResponse = await hfClient.chatCompletion({
+          model: 'Qwen/QwQ-32B',
           messages,
+          max_tokens: 2000,
         });
 
         // Provide a response to the user
@@ -339,7 +337,7 @@ In the code that follows, we provide the thread history to the LLM for interpret
       });
 ```
 
-After getting the thread replies, we map them to the appropriate object structure to send to OpenAI, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response. 
+After getting the thread replies, we map them to the appropriate object structure to send to Hugging Face, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response. 
 
 ```js
 
@@ -350,10 +348,10 @@ After getting the thread replies, we map them to the appropriate object structur
       ];
 
       // Send message history and newest question to LLM
-      const llmResponse = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        n: 1,
+      const llmResponse = await hfClient.chatCompletion({
+        model: 'Qwen/QwQ-32B',
         messages,
+        max_tokens: 2000,
       });
 
       // Provide a response to the user
@@ -370,18 +368,39 @@ After getting the thread replies, we map them to the appropriate object structur
 
 The entirety of the user message processing in this example is wrapped in a try-catch block to provide the user an error message when something goes wrong, which is a best practice. If successful, the final action we take is to call the `say` method with the LLM response.
 
+#### Using the markdown block in `say` {#markdown-block}
+
+To safeguard against any markdown translation errors, we can return our text response inside of a [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) in the `say` section of code, instead of relying on providing precise enough instructions to the LLM. Here's how that would look:
+
+```js
+...
+      await say(
+        {
+          blocks: [
+          {
+            "type": "markdown",
+            "text": llmResponse.choices[0].message.content,
+          }
+        ]
+      }
+    )
+...
+```
+
+This ensures that if the LLM's response included, for example, a code block, it would be formatted appropriately when sent to the user as a response.
+
 ## Next steps {#next-steps}
 
 ### Consider HTTP {#http}
 
-This sample app uses Socket Mode to receive events. This is great for developing and testing out your app, but we recommend using HTTP to receive events for a production-ready app. Read more about the differences between Socket Mode and HTTP [here](https://api.slack.com/apis/event-delivery).
+This sample app uses Socket Mode to receive events. This is great for developing and testing out your app, but we recommend using HTTP to receive events for a production-ready app. Read more about the differences between Socket Mode and HTTP [here](https://docs.slack.dev/apis/events-api/comparing-http-socket-mode).
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for app assistants in the Agents & Assistants documentation [here](/concepts/assistant).
+➡️ Read more about Bolt support for AI apps in the documentation [here](/concepts/ai-apps).
 
-➡️ Level up your agent game after reading through the [Agents & Assistants usage guide](https://api.slack.com/docs/apps/ai) and [Best practices for developing app agents](https://api.slack.com/docs/apps/ai-best-practices).
+➡️ Level up your AI app game after reading through the [AI apps usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for developing AI apps](https://docs.slack.dev/ai/ai-apps-best-practices).
 
-### Explore pre-built agents & assistants {#marketplace}
+### Explore pre-built AI apps {#marketplace}
 
-Check out pre-built agents and assistants ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
+Check out pre-built AI apps ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
