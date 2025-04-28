@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/updating-pushing-views
 ---
 
-Modals contain a stack of views. When you call the [`views.open`](https://api.slack.com/methods/views.open) method, you add the root view to the modal. After the initial call, you can dynamically update a view by calling the [`views.update`](https://api.slack.com/methods/views.update) method, or stack a new view on top of the root view by calling the [`views.push`](https://api.slack.com/methods/views.push) method.
+Modals contain a stack of views. When you call the [`views.open`](https://docs.slack.dev/reference/methods/views.open/) method, you add the root view to the modal. After the initial call, you can dynamically update a view by calling the [`views.update`](https://docs.slack.dev/reference/methods/views.update) method, or stack a new view on top of the root view by calling the [`views.push`](https://docs.slack.dev/reference/methods/views.push) method.
 
 ## The `views.update` method
 
@@ -12,9 +12,9 @@ To update a view, you can use the built-in client to call the `views.update` met
 
 ## The `views.push` method
 
-To push a new view onto the view stack, you can use the built-in client to call the `views.push` method by passing a valid `trigger_id` parameter and a new [view payload](https://api.slack.com/reference/block-kit/views). The arguments for the `views.push` method is the same as [`views.open`](/concepts/creating-modals). After you open a modal, you may only push two additional views onto the view stack.
+To push a new view onto the view stack, you can use the built-in client to call the `views.push` method by passing a valid `trigger_id` parameter and a new [view payload](https://docs.slack.dev/reference/views). The arguments for the `views.push` method is the same as [`views.open`](/concepts/creating-modals). After you open a modal, you may only push two additional views onto the view stack.
 
-Learn more about updating and pushing views in our [API documentation](https://api.slack.com/surfaces/modals/using#modifying)
+Learn more about updating and pushing views in our [API documentation](https://docs.slack.dev/surfaces/modals)
 
 ```javascript
 // Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)

@@ -39,7 +39,7 @@ const sidebars = {
             'concepts/publishing-views',
           ],
         },
-        'concepts/assistant',
+        'concepts/ai-apps',
         'concepts/custom-steps',
         {
           type: 'category',
@@ -82,6 +82,18 @@ const sidebars = {
     },
     { type: 'html', value: '<hr>' },
     'reference',
+    { type: 'html', value: '<hr>' },
+    {
+      type: 'category',
+      label: 'Tutorials',
+      items: [
+        'tutorials/ai-assistant',
+        'tutorials/code-assistant',
+        'tutorials/custom-steps',
+        'tutorials/custom-steps-workflow-builder-new',
+        'tutorials/custom-steps-workflow-builder-existing',
+      ],
+    },
     { type: 'html', value: '<hr>' },
     {
       type: 'link',

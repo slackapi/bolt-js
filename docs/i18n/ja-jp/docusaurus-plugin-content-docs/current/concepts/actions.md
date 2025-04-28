@@ -18,7 +18,7 @@ Bolt 2.x からメッセージショートカット（以前はメッセージ�
 
 :::
 
-`block_actions` ペイロードの詳細については、[こちら](https://api.slack.com/reference/interaction-payloads) をご覧ください。リスナー内からビューの完全なペイロードにアクセスするには、コールバック関数内で `body` 引数を参照します。
+`block_actions` ペイロードの詳細については、[こちら](https://docs.slack.dev/reference/interaction-payloads) をご覧ください。リスナー内からビューの完全なペイロードにアクセスするには、コールバック関数内で `body` 引数を参照します。
 
 ```javascript
 // action_id が "approve_button" のインタラクティブコンポーネントがトリガーされる毎にミドルウェアが呼び出される

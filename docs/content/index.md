@@ -2,7 +2,7 @@
 
 Bolt for JavaScript is a JavaScript framework to build Slack apps with the latest Slack platform features. Read the [Getting Started Guide](/getting-started) to set up and run your first Bolt app.
 
-Then, head over to the Concepts guides. They'll help you build a Bolt app for whatever use case you may have.
+Then, explore the rest of the pages within the Guides section. The documentation there will help you build a Bolt app for whatever use case you may have.
 
 ## Getting help
 
