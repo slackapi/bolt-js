@@ -7,8 +7,8 @@ import type {
   SayFn,
   SlackAction,
 } from '../../';
-import type { FunctionCompleteFn, FunctionFailFn } from '../../src/CustomFunction';
 import App from '../../src/App';
+import type { FunctionCompleteFn, FunctionFailFn } from '../../src/CustomFunction';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
