@@ -123,10 +123,8 @@ export function createFunctionFail(context: Context, client: WebClient): Functio
   }
 
   return (params: FunctionFailArguments) => {
-    const { error } = params ?? {};
-
     return client.functions.completeError({
-      error,
+      error: params.error,
       function_execution_id: functionExecutionId,
     });
   };
