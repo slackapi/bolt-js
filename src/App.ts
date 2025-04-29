@@ -969,10 +969,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       if (functionInputs) {
         context.functionInputs = functionInputs;
       }
-    }
-
-    // Attach and make available the JIT/function-related token on context
-    if (this.attachFunctionToken) {
       if (functionBotAccessToken) {
         context.functionBotAccessToken = functionBotAccessToken;
       }
