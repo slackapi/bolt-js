@@ -979,6 +979,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     // Factory for say() utility
+    // TODO: could this be move out of processEvent, use the same token from below or perhaps even a client from the pool
     const createSay = (channelId: string): SayFn => {
       const token = selectToken(context, this.attachFunctionToken);
       return (message) => {
