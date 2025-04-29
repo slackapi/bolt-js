@@ -6,17 +6,11 @@ import {
   CustomFunctionInitializationError,
 } from './errors';
 import { matchEventType, onlyEvents } from './middleware/builtin';
-import type { AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
-
-/** Interfaces */
-
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
 interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
 }
-
-/** Types */
-
 export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
 
 interface FunctionFailArguments {
@@ -31,8 +25,16 @@ export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'functi
   fail: FunctionFailFn;
 };
 
+/** @deprecated use Middleware<SlackCustomFunctionMiddlewareArgs>[] instead - this may be removed in a minor release */
+export type CustomFunctionMiddleware = Middleware<SlackCustomFunctionMiddlewareArgs>[];
+
+/** @deprecated use SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs instead - this may be removed in a minor release */
+export type AllCustomFunctionMiddlewareArgs<
+  T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
+> = T & AllMiddlewareArgs;
+
 /*
- * Middleware that filters out function scoped events that do not match the provided callback ID
+ * Middleware that matches a function callback ID
  */
 export function matchCallbackId(callbackId: string): Middleware<SlackCustomFunctionMiddlewareArgs> {
   return async ({ payload, next }) => {
@@ -62,7 +64,7 @@ export class CustomFunction {
       matchEventType('function_executed'),
       matchCallbackId(this.callbackId),
       ...this.listeners,
-    ] as Middleware<AnyMiddlewareArgs>[];
+    ] as Middleware<AnyMiddlewareArgs>[]; // FIXME: workaround for TypeScript 4.7 breaking changes
   }
 }
 
@@ -102,7 +104,7 @@ export function createFunctionComplete(context: Context, client: WebClient): Fun
     throw new CustomFunctionCompleteSuccessError(errorMsg);
   }
 
-  return (params: Parameters<FunctionCompleteFn>[0] = {}) =>
+  return (params: FunctionCompleteArguments = {}) =>
     client.functions.completeSuccess({
       outputs: params.outputs || {},
       function_execution_id: functionExecutionId,
@@ -120,11 +122,9 @@ export function createFunctionFail(context: Context, client: WebClient): Functio
     throw new CustomFunctionCompleteFailError(errorMsg);
   }
 
-  return (params: Parameters<FunctionFailFn>[0]) => {
-    const { error } = params ?? {};
-
+  return (params: FunctionFailArguments) => {
     return client.functions.completeError({
-      error,
+      error: params.error,
       function_execution_id: functionExecutionId,
     });
   };
