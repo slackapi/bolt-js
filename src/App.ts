@@ -1072,7 +1072,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
         }
       }
-      if (pool !== undefined) {
+      if (this.attachFunctionToken && context.functionBotAccessToken) {
+        client = new WebClient(token, clientOptions);
+      } else if (pool !== undefined) {
         client = pool.getOrCreate(token, clientOptionsCopy);
       }
     }
