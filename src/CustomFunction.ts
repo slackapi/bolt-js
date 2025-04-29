@@ -96,7 +96,7 @@ export function createFunctionComplete(context: Context, client: WebClient): Fun
     throw new CustomFunctionCompleteSuccessError(errorMsg);
   }
 
-  return (params: Parameters<FunctionCompleteFn>[0] = {}) =>
+  return (params: FunctionCompleteArguments = {}) =>
     client.functions.completeSuccess({
       outputs: params.outputs || {},
       function_execution_id: functionExecutionId,
