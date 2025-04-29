@@ -1580,13 +1580,8 @@ function isBlockActionOrInteractiveMessageBody(
 
 // Returns either a bot token, a user token or a workflow token for client, say()
 function selectToken(context: Context, attachFunctionToken: boolean): string | undefined {
-  if (attachFunctionToken) {
-    // If functionBotAccessToken exists on context, the incoming event is function-related *and* the
-    // user has `attachFunctionToken` enabled. In that case, subsequent calls with the client should
-    // use the function-related/JIT token in lieu of the botToken or userToken.
-    if (context.functionBotAccessToken) {
-      return context.functionBotAccessToken;
-    }
+  if (attachFunctionToken && context.functionBotAccessToken) {
+    return context.functionBotAccessToken;
   }
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
