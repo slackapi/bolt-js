@@ -62,7 +62,7 @@ export class CustomFunction {
       matchEventType('function_executed'),
       matchCallbackId(this.callbackId),
       ...this.listeners,
-    ] as Middleware<AnyMiddlewareArgs>[];
+    ] as Middleware<AnyMiddlewareArgs>[]; // FIXME: workaround for TypeScript 4.7 breaking changes
   }
 }
 
