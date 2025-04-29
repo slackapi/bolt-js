@@ -6,7 +6,7 @@ import {
   CustomFunctionInitializationError,
 } from './errors';
 import { matchEventType, onlyEvents } from './middleware/builtin';
-import type { AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
 interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
@@ -24,6 +24,14 @@ export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'functi
   complete: FunctionCompleteFn;
   fail: FunctionFailFn;
 };
+
+/** @deprecated use Middleware<SlackCustomFunctionMiddlewareArgs>[] instead - this may be removed in a minor release */
+export type CustomFunctionMiddleware = Middleware<SlackCustomFunctionMiddlewareArgs>[];
+
+/** @deprecated use SlackCustomFunctionMiddlewareArgs & AllMiddlewareArgs instead - this may be removed in a minor release */
+export type AllCustomFunctionMiddlewareArgs<
+  T extends SlackCustomFunctionMiddlewareArgs = SlackCustomFunctionMiddlewareArgs,
+> = T & AllMiddlewareArgs;
 
 /*
  * Middleware that matches a function callback ID
