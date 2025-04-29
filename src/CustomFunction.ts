@@ -114,7 +114,7 @@ export function createFunctionFail(context: Context, client: WebClient): Functio
     throw new CustomFunctionCompleteFailError(errorMsg);
   }
 
-  return (params: Parameters<FunctionFailFn>[0]) => {
+  return (params: FunctionFailArguments) => {
     const { error } = params ?? {};
 
     return client.functions.completeError({
