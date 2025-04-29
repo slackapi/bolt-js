@@ -1056,6 +1056,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     const token = selectToken(context, this.attachFunctionToken);
 
+    // TODO: this logic should be isolated and tested according to the expected behavior
     if (token !== undefined) {
       let pool: WebClientPool | undefined = undefined;
       const clientOptionsCopy = { ...this.clientOptions };
@@ -1072,8 +1073,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
         }
       }
+
       if (this.attachFunctionToken && context.functionBotAccessToken) {
-        client = new WebClient(token, clientOptions);
+        // workflow tokens are always unique, they should not be added to the pool
+        client = new WebClient(token, clientOptionsCopy);
       } else if (pool !== undefined) {
         client = pool.getOrCreate(token, clientOptionsCopy);
       }
