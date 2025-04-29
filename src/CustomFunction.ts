@@ -11,9 +11,6 @@ interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
 }
-
-/** Types */
-
 export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
 
 interface FunctionFailArguments {
