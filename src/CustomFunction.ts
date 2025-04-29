@@ -7,9 +7,6 @@ import {
 } from './errors';
 import { matchEventType, onlyEvents } from './middleware/builtin';
 import type { AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
-
-/** Interfaces */
-
 interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
