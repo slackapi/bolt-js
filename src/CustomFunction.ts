@@ -32,7 +32,7 @@ export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'functi
 };
 
 /*
- * Middleware that filters out function scoped events that do not match the provided callback ID
+ * Middleware that matches a function callback ID
  */
 export function matchCallbackId(callbackId: string): Middleware<SlackCustomFunctionMiddlewareArgs> {
   return async ({ payload, next }) => {
