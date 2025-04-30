@@ -1003,6 +1003,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     }
 
     // Factory for say() utility
+    // TODO: could this be move out of processEvent, use the same token from below or perhaps even a client from the pool
     const createSay = (channelId: string): SayFn => {
       const token = selectToken(context, this.attachFunctionToken);
       return (message) => {
@@ -1079,6 +1080,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     const token = selectToken(context, this.attachFunctionToken);
 
+    // TODO: this logic should be isolated and tested according to the expected behavior
     if (token !== undefined) {
       let pool: WebClientPool | undefined = undefined;
       const clientOptionsCopy = { ...this.clientOptions };
@@ -1095,7 +1097,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
         }
       }
-      if (pool !== undefined) {
+
+      if (this.attachFunctionToken && context.functionBotAccessToken) {
+        // workflow tokens are always unique, they should not be added to the pool
+        client = new WebClient(token, clientOptionsCopy);
+      } else if (pool !== undefined) {
         client = pool.getOrCreate(token, clientOptionsCopy);
       }
     }
@@ -1608,15 +1614,10 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-// Returns either a bot token or a user token for client, say()
+// Returns either a bot token, a user token or a workflow token for client, say()
 function selectToken(context: Context, attachFunctionToken: boolean): string | undefined {
-  if (attachFunctionToken) {
-    // If functionBotAccessToken exists on context, the incoming event is function-related *and* the
-    // user has `attachFunctionToken` enabled. In that case, subsequent calls with the client should
-    // use the function-related/JIT token in lieu of the botToken or userToken.
-    if (context.functionBotAccessToken) {
-      return context.functionBotAccessToken;
-    }
+  if (attachFunctionToken && context.functionBotAccessToken) {
+    return context.functionBotAccessToken;
   }
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }

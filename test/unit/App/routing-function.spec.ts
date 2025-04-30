@@ -55,7 +55,7 @@ describe('App function() routing', () => {
         options: { autoAcknowledge: false },
       });
       await fakeReceiver.sendEvent({
-        ack: args.ack,
+        ack: fakeAck,
         body: args.body,
       });
       sinon.assert.calledOnce(fakeHandler);
@@ -76,7 +76,7 @@ describe('App function() routing', () => {
         options: { autoAcknowledge: false },
       });
       await fakeReceiver.sendEvent({
-        ack: args.ack,
+        ack: fakeAck,
         body: args.body,
       });
       sinon.assert.calledOnce(testHandler);

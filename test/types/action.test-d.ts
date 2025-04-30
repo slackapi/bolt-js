@@ -1,6 +1,14 @@
 import { expectAssignable, expectError, expectType } from 'tsd';
-import type { BlockElementAction, DialogSubmitAction, InteractiveAction, SayFn, SlackAction } from '../../';
+import type {
+  BlockElementAction,
+  DialogSubmitAction,
+  FunctionInputs,
+  InteractiveAction,
+  SayFn,
+  SlackAction,
+} from '../../';
 import App from '../../src/App';
+import type { FunctionCompleteFn, FunctionFailFn } from '../../src/CustomFunction';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
@@ -39,4 +47,11 @@ app.action<SlackAction, MyContext>('action_id', async ({ context }) => {
 const typedContextApp = new App<MyContext>();
 typedContextApp.action('action_id', async ({ context }) => {
   expectAssignable<MyContext>(context);
+});
+
+// // If an action is `function` scoped the handlers a provide/define
+app.action('callback', async ({ inputs, complete, fail }) => {
+  expectType<FunctionInputs | undefined>(inputs);
+  expectType<FunctionCompleteFn | undefined>(complete);
+  expectType<FunctionFailFn | undefined>(fail);
 });

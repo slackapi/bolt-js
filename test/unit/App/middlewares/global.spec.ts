@@ -26,6 +26,7 @@ describe('App global middleware Processing', () => {
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let fakeFirstMiddleware: SinonSpy;
   let fakeSecondMiddleware: SinonSpy;
+  const fakeAck = sinon.fake.resolves({});
   let app: App;
   let dummyReceiverEvent: ReceiverEvent;
 
@@ -33,6 +34,7 @@ describe('App global middleware Processing', () => {
     fakeReceiver = new FakeReceiver();
     fakeErrorHandler = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
+    fakeAck.resetHistory();
 
     const fakeConversationContext = sinon.fake.returns(noopMiddleware);
     const overrides = mergeOverrides(
