@@ -85,6 +85,10 @@ describe('CustomFunction', () => {
         const complete = createFunctionComplete({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
         await complete();
         assert(completeMock.called, 'client.functions.completeSuccess not called!');
+        assert(
+          completeMock.calledWith({ function_execution_id: 'Fx1234', outputs: {} }),
+          'client.functions.completeSuccess called with unexpected arguments!',
+        );
       });
       it('should throw if no functionExecutionId present on context', () => {
         const client = new WebClient('sometoken');
