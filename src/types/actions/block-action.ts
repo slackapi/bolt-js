@@ -285,12 +285,42 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
   };
 
   // function scoped properties
+  /**
+   * An expiring token generated for the context of a workflow step.
+   * @see {@link https://docs.slack.dev/authentication/tokens/#wfb}
+   */
   bot_access_token?: string;
+  /**
+   * Information about the executed step.
+   * @see {@link https://docs.slack.dev/workflows/workflow-steps/}
+   * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps/}
+   */
   function_data?: {
+    /**
+     * A unique ID for the step being executed.
+     * @see {@link https://docs.slack.dev/workflows/workflow-steps/}
+     * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps/}
+     */
     execution_id: string;
+    /**
+     * Details about the step.
+     * @see {@link https://docs.slack.dev/workflows/workflow-steps/}
+     * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps/}
+     */
     function: {
+      /**
+       * The unique callback ID of the step.
+       * @see {@link https://docs.slack.dev/workflows/workflow-steps/#create}
+       * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps/}
+       */
       callback_id: string;
     };
+    /**
+     * Values of input parameters for the executed step.
+     * @see {@link https://docs.slack.dev/workflows/workflow-steps/}
+     * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps/}
+     * @see {@link https://tools.slack.dev/bolt-js/tutorials/custom-steps#inputs-outputs}
+     */
     inputs: FunctionInputs;
   };
 }
