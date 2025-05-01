@@ -500,7 +500,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param m global middleware function
    */
   public use<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    m: Middleware<AnyMiddlewareArgs<{ autoAcknowledge: false }>, AppCustomContext & MiddlewareCustomContext>,
+    m: Middleware<AnyMiddlewareArgs, AppCustomContext & MiddlewareCustomContext>,
   ): this {
     this.middleware.push(m as Middleware<AnyMiddlewareArgs>);
     return this;
@@ -533,30 +533,26 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
+  public function(
     callbackId: string,
-    options: Options,
-    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[]
+    options: SlackEventMiddlewareArgsOptions,
+    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]
   ): this;
-  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
+  public function(callbackId: string, ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]): this;
+  public function(
     callbackId: string,
-    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[]
-  ): this;
-  public function<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
-    callbackId: string,
-    ...optionOrListeners: (Options | Middleware<SlackCustomFunctionMiddlewareArgs<Options>>)[]
+    ...optionOrListeners: (SlackEventMiddlewareArgsOptions | Middleware<SlackCustomFunctionMiddlewareArgs>)[]
   ): this {
-    // TODO: fix this casting; edge case is if dev specifically sets AutoAck generic as false, this true assignment is invalid according to TS.
     const options = isSlackEventMiddlewareArgsOptions(optionOrListeners[0])
       ? optionOrListeners[0]
-      : ({ autoAcknowledge: true } as Options);
+      : { autoAcknowledge: true };
     const listeners = optionOrListeners.filter(
-      (optionOrListener): optionOrListener is Middleware<SlackCustomFunctionMiddlewareArgs<Options>> => {
+      (optionOrListener): optionOrListener is Middleware<SlackCustomFunctionMiddlewareArgs> => {
         return !isSlackEventMiddlewareArgsOptions(optionOrListener);
       },
     );
 
-    const fn = new CustomFunction<Options>(callbackId, listeners, options);
+    const fn = new CustomFunction(callbackId, listeners, options);
     this.listeners.push(fn.getListeners());
     return this;
   }

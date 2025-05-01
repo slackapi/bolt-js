@@ -304,20 +304,16 @@ export function createDummyCommandMiddlewareArgs(commandOverrides?: DummyCommand
   };
 }
 
-export function createDummyCustomFunctionMiddlewareArgs<
-  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
->(
+export function createDummyCustomFunctionMiddlewareArgs(
   functionOverrides: {
     callbackId?: string;
     inputs?: Record<string, string | number | boolean>;
-    options?: Options;
-  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' }, options: { autoAcknowledge: true } as Options },
-): SlackCustomFunctionMiddlewareArgs<Options> {
+    options?: SlackEventMiddlewareArgsOptions;
+  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' }, options: { autoAcknowledge: true } },
+): SlackCustomFunctionMiddlewareArgs {
   functionOverrides.callbackId = functionOverrides.callbackId || 'reverse';
   functionOverrides.inputs = functionOverrides.inputs ? functionOverrides.inputs : { stringToReverse: 'hello' };
-  functionOverrides.options = functionOverrides.options
-    ? functionOverrides.options
-    : ({ autoAcknowledge: true } as Options);
+  functionOverrides.options = functionOverrides.options ? functionOverrides.options : { autoAcknowledge: true };
   const testFunction = {
     id: 'Fn111',
     callback_id: functionOverrides.callbackId,
@@ -376,7 +372,7 @@ export function createDummyCustomFunctionMiddlewareArgs<
       fail: () => Promise.resolve({ ok: true }),
       inputs: functionOverrides.inputs,
       payload: event,
-    } as SlackCustomFunctionMiddlewareArgs<Options>;
+    };
   }
   return {
     ack: () => Promise.resolve(),

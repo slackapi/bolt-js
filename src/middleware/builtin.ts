@@ -64,10 +64,9 @@ function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewa
   return isEventArgs(args) && 'message' in args;
 }
 
-export function isSlackEventMiddlewareArgsOptions<
-  Options extends SlackEventMiddlewareArgsOptions,
-  EventMiddlewareArgs extends SlackEventMiddlewareArgs,
->(optionOrListener: Options | Middleware<EventMiddlewareArgs>): optionOrListener is Options {
+export function isSlackEventMiddlewareArgsOptions<EventType extends string = string>(
+  optionOrListener: SlackEventMiddlewareArgsOptions | Middleware<SlackEventMiddlewareArgs<EventType>>,
+): optionOrListener is SlackEventMiddlewareArgsOptions {
   return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
 }
 

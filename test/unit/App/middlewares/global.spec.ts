@@ -64,7 +64,7 @@ describe('App global middleware Processing', () => {
     return [
       {
         body: {},
-        ack: sinon.fake(),
+        ack: fakeAck,
       },
     ];
   }
@@ -280,7 +280,7 @@ describe('App global middleware Processing', () => {
       clientArg = client;
     });
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
-    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+    await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
     assert.isDefined(clientArg);
     assert.equal(clientArg.token, 'xwfp-valid');
@@ -299,7 +299,7 @@ describe('App global middleware Processing', () => {
       clientArg = client;
     });
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
-    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+    await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
     assert.isDefined(clientArg);
     assert.equal(clientArg.token, undefined);
@@ -317,7 +317,7 @@ describe('App global middleware Processing', () => {
       clientArg = client;
     });
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
-    await fakeReceiver.sendEvent({ ack: testData.ack, body: testData.body });
+    await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
     assert.isDefined(clientArg);
     assert.equal(clientArg.token, 'xwfp-valid');

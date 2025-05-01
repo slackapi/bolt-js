@@ -1,4 +1,3 @@
-import type { FunctionExecutedEvent } from '@slack/types';
 import type { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse, WebClient } from '@slack/web-api';
 import {
   CustomFunctionCompleteFailError,
@@ -27,13 +26,7 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
-export type SlackCustomFunctionMiddlewareArgs<
-  Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true },
-> = SlackEventMiddlewareArgs<'function_executed', Options> & {
-  inputs: FunctionExecutedEvent['inputs'];
-  complete: FunctionCompleteFn;
-  fail: FunctionFailFn;
-};
+export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'function_executed'>;
 
 /** @deprecated use Middleware<SlackCustomFunctionMiddlewareArgs>[] instead - this may be removed in a minor release */
 export type CustomFunctionMiddleware = Middleware<SlackCustomFunctionMiddlewareArgs>[];
@@ -55,18 +48,18 @@ export function matchCallbackId(callbackId: string): Middleware<SlackCustomFunct
 }
 
 /** Class */
-export class CustomFunction<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }> {
+export class CustomFunction {
   /** Function callback_id */
   public callbackId: string;
 
-  private listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[];
+  private listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[];
 
-  private options: Options;
+  private options: SlackEventMiddlewareArgsOptions;
 
   public constructor(
     callbackId: string,
-    listeners: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[],
-    options: Options,
+    listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[],
+    options: SlackEventMiddlewareArgsOptions,
   ) {
     validate(callbackId, listeners);
 
@@ -95,10 +88,7 @@ export class CustomFunction<Options extends SlackEventMiddlewareArgsOptions = { 
 }
 
 /** Helper Functions */
-export function validate<Options extends SlackEventMiddlewareArgsOptions = { autoAcknowledge: true }>(
-  callbackId: string,
-  middleware: Middleware<SlackCustomFunctionMiddlewareArgs<Options>>[],
-): void {
+export function validate(callbackId: string, middleware: Middleware<SlackCustomFunctionMiddlewareArgs>[]): void {
   // Ensure callbackId is valid
   if (typeof callbackId !== 'string') {
     const errorMsg = 'CustomFunction expects a callback_id as the first argument';
