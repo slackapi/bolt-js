@@ -364,16 +364,6 @@ export function createDummyCustomFunctionMiddlewareArgs(
     type: 'event_callback',
   } as const;
 
-  if (functionOverrides.options.autoAcknowledge) {
-    return {
-      body,
-      complete: () => Promise.resolve({ ok: true }),
-      event,
-      fail: () => Promise.resolve({ ok: true }),
-      inputs: functionOverrides.inputs,
-      payload: event,
-    };
-  }
   return {
     ack: () => Promise.resolve(),
     body,

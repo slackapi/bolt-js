@@ -24,7 +24,7 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
         inputs: FunctionExecutedEvent['inputs'];
         complete: FunctionCompleteFn;
         fail: FunctionFailFn;
-        ack?: AckFn<void>;
+        ack: AckFn<void>;
       }
     : {
         // Add `ack` as undefined for global middleware in TypeScript TODO: but why? spend some time digging into this
