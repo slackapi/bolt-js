@@ -10,7 +10,7 @@ In this tutorial, you will create an app, enable the features to make it an AI a
 
 Before getting started, you will need the following:
 * a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* an OpenAI account with sufficient credits, and in which you have generated a secret key.
+* a [Hugging Face](https://huggingface.co/) account with sufficient credits, and in which you have generated a secret key.
 
 **Skip to the code**
 
@@ -58,7 +58,7 @@ code .
 
 Now, we are ready to store those environment variables.
 1. Rename the `.env.sample` file to `.env`
-2. Open the file and replace `YOUR_SLACK_APP_TOKEN` with the value of the token you generated on the **Basic Information** page. Replace `YOUR_SLACK_BOT_TOKEN` with the value of the token generated when you installed the app. Replace `YOUR_OPEN_API_KEY` with the key you generated with OpenAI.
+2. Open the file and replace `YOUR_SLACK_APP_TOKEN` with the value of the token you generated on the **Basic Information** page. Replace `YOUR_SLACK_BOT_TOKEN` with the value of the token generated when you installed the app. Replace `YOUR_HUGGINGFACE_API_KEY` with the key you generated with Hugging Face.
 
 ### Run the app {#run}
 
@@ -89,12 +89,12 @@ Starting at the very top of the `app.js` file, we see that we import a few relev
 ```js
 const { App, LogLevel, Assistant } = require('@slack/bolt');
 const { config } = require('dotenv');
-const { OpenAI } = require('openai');
+const { HfInference } = require('@huggingface/inference');
 ```
 
-Most notably are the `openai` module to be able to communicate with OpenAI and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant. 
+Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant. 
 
-Next, we initialize the app and our `openai` variable with the tokens we previously saved as environment variables in the `.env` file.
+Next, we initialize the app and our `hfClient` variable with the tokens we previously saved as environment variables in the `.env` file.
 
 ```js
 /** Initialization */
@@ -105,13 +105,11 @@ const app = new App({
   logLevel: LogLevel.DEBUG,
 });
 
-/** OpenAI Setup */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// HuggingFace configuration
+const hfClient = new HfInference(process.env.HUGGINGFACE_API_KEY);
 ```
 
-After this, we see some text saved to the `DEFAULT_SYSTEM_CONTENT` variable. This is used later when constructing the message to send to OpenAI; we'll get to why this is necessary later.
+After this, we see some text saved to the `DEFAULT_SYSTEM_CONTENT` variable. This is used later when constructing the message to send to Hugging Face; we'll get to why this is necessary later.
 
 ```js
 const DEFAULT_SYSTEM_CONTENT = `You're an assistant in a Slack workspace.
@@ -242,7 +240,7 @@ The `setStatus` method calls the [`assistant.threads.setStatus`](https://docs.sl
 await setStatus('');
 ```
 
-We show a couple of examples in this sample app of how to handle user message processing: use channel history to give context to the user's message, and use thread history to give context to the user's message. Here is how to do each and prepare the information for sending to OpenAI.
+We show a couple of examples in this sample app of how to handle user message processing: use channel history to give context to the user's message, and use thread history to give context to the user's message. Here is how to do each and prepare the information for sending to Hugging Face.
 
 #### Using channel history for context {#channel-history}
 
@@ -277,7 +275,7 @@ For this scenario, the user is in a channel and the app has access to that chann
         }
 ```
 
-After getting the channel history, it's time to construct the prompt to send to OpenAI. OpenAI prompts contain an array of `messages` in which each message object has a `role` and `content`.
+After getting the channel history, it's time to construct the prompt to send to Hugging Face. Hugging Face prompts contain an array of `messages` in which each message object has a `role` and `content`.
 
 The `role` represents the perspective from which you'd like model to respond to the provided input and influences how the model might interpret the input. The three possible role values are `system`, `assistant`, and `user`.
 * The `system` role provides high-level instructions; it sets the scene.
@@ -300,10 +298,10 @@ Refer back to the top of the `app.js` file to where we defined the `DEFAULT_SYST
         ];
 
         // Send channel history and prepared request to LLM
-        const llmResponse = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          n: 1,
+        const llmResponse = await hfClient.chatCompletion({
+          model: 'Qwen/QwQ-32B',
           messages,
+          max_tokens: 2000,
         });
 
         // Provide a response to the user
@@ -339,7 +337,7 @@ In the code that follows, we provide the thread history to the LLM for interpret
       });
 ```
 
-After getting the thread replies, we map them to the appropriate object structure to send to OpenAI, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response. 
+After getting the thread replies, we map them to the appropriate object structure to send to Hugging Face, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response. 
 
 ```js
 
@@ -350,10 +348,10 @@ After getting the thread replies, we map them to the appropriate object structur
       ];
 
       // Send message history and newest question to LLM
-      const llmResponse = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        n: 1,
+      const llmResponse = await hfClient.chatCompletion({
+        model: 'Qwen/QwQ-32B',
         messages,
+        max_tokens: 2000,
       });
 
       // Provide a response to the user

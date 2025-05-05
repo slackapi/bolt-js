@@ -7,9 +7,11 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
-  type CustomFunctionMiddleware,
   type FunctionCompleteFn,
   type FunctionFailFn,
+  type SlackCustomFunctionMiddlewareArgs,
+  createFunctionComplete,
+  createFunctionFail,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
@@ -534,10 +536,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function(callbackId: string, ...listeners: CustomFunctionMiddleware): this {
-    const fn = new CustomFunction(callbackId, listeners, this.webClientOptions);
-    const m = fn.getMiddleware();
-    this.middleware.push(m);
+  public function(callbackId: string, ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]): this {
+    const fn = new CustomFunction(callbackId, listeners);
+    this.listeners.push(fn.getListeners());
     return this;
   }
 
@@ -973,18 +974,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       if (functionInputs) {
         context.functionInputs = functionInputs;
       }
-    }
-
-    // Attach and make available the JIT/function-related token on context
-    if (this.attachFunctionToken) {
       if (functionBotAccessToken) {
         context.functionBotAccessToken = functionBotAccessToken;
       }
     }
 
     // Factory for say() utility
+    // TODO: could this be move out of processEvent, use the same token from below or perhaps even a client from the pool
     const createSay = (channelId: string): SayFn => {
-      const token = selectToken(context);
+      const token = selectToken(context, this.attachFunctionToken);
       return (message) => {
         let postMessageArguments: ChatPostMessageArguments;
         if (typeof message === 'string') {
@@ -1054,6 +1052,37 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       payload,
     };
 
+    // Get the client arg
+    let { client } = this;
+
+    const token = selectToken(context, this.attachFunctionToken);
+
+    // TODO: this logic should be isolated and tested according to the expected behavior
+    if (token !== undefined) {
+      let pool: WebClientPool | undefined = undefined;
+      const clientOptionsCopy = { ...this.clientOptions };
+      if (authorizeResult.teamId !== undefined) {
+        pool = this.clients[authorizeResult.teamId];
+        if (pool === undefined) {
+          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
+        }
+        // Add teamId to clientOptions so it can be automatically added to web-api calls
+        clientOptionsCopy.teamId = authorizeResult.teamId;
+      } else if (authorizeResult.enterpriseId !== undefined) {
+        pool = this.clients[authorizeResult.enterpriseId];
+        if (pool === undefined) {
+          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
+        }
+      }
+
+      if (this.attachFunctionToken && context.functionBotAccessToken) {
+        // workflow tokens are always unique, they should not be added to the pool
+        client = new WebClient(token, clientOptionsCopy);
+      } else if (pool !== undefined) {
+        client = pool.getOrCreate(token, clientOptionsCopy);
+      }
+    }
+
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
@@ -1063,9 +1092,21 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
         messageEventListenerArgs.message = messageEventListenerArgs.payload;
       }
+      // Add complete() and fail() utilities for function-related interactivity
+      if (eventListenerArgs.event.type === 'function_executed') {
+        listenerArgs.complete = createFunctionComplete(context, client);
+        listenerArgs.fail = createFunctionFail(context, client);
+        listenerArgs.inputs = eventListenerArgs.event.inputs;
+      }
     } else if (type === IncomingEventType.Action) {
       const actionListenerArgs = listenerArgs as SlackActionMiddlewareArgs;
       actionListenerArgs.action = actionListenerArgs.payload;
+      // Add complete() and fail() utilities for function-related interactivity
+      if (context.functionExecutionId !== undefined) {
+        listenerArgs.complete = createFunctionComplete(context, client);
+        listenerArgs.fail = createFunctionFail(context, client);
+        listenerArgs.inputs = context.functionInputs;
+      }
     } else if (type === IncomingEventType.Command) {
       const commandListenerArgs = listenerArgs as SlackCommandMiddlewareArgs;
       commandListenerArgs.command = commandListenerArgs.payload;
@@ -1099,42 +1140,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     } else {
       // Events API requests are acknowledged right away, since there's no data expected
       await ack();
-    }
-
-    // Get the client arg
-    let { client } = this;
-
-    // If functionBotAccessToken exists on context, the incoming event is function-related *and* the
-    // user has `attachFunctionToken` enabled. In that case, subsequent calls with the client should
-    // use the function-related/JIT token in lieu of the botToken or userToken.
-    const token = context.functionBotAccessToken ? context.functionBotAccessToken : selectToken(context);
-
-    // Add complete() and fail() utilities for function-related interactivity
-    if (type === IncomingEventType.Action && context.functionExecutionId !== undefined) {
-      listenerArgs.complete = CustomFunction.createFunctionComplete(context, client);
-      listenerArgs.fail = CustomFunction.createFunctionFail(context, client);
-      listenerArgs.inputs = context.functionInputs;
-    }
-
-    if (token !== undefined) {
-      let pool: WebClientPool | undefined = undefined;
-      const clientOptionsCopy = { ...this.clientOptions };
-      if (authorizeResult.teamId !== undefined) {
-        pool = this.clients[authorizeResult.teamId];
-        if (pool === undefined) {
-          pool = this.clients[authorizeResult.teamId] = new WebClientPool();
-        }
-        // Add teamId to clientOptions so it can be automatically added to web-api calls
-        clientOptionsCopy.teamId = authorizeResult.teamId;
-      } else if (authorizeResult.enterpriseId !== undefined) {
-        pool = this.clients[authorizeResult.enterpriseId];
-        if (pool === undefined) {
-          pool = this.clients[authorizeResult.enterpriseId] = new WebClientPool();
-        }
-      }
-      if (pool !== undefined) {
-        client = pool.getOrCreate(token, clientOptionsCopy);
-      }
     }
 
     // Dispatch event through the global middleware chain
@@ -1579,8 +1584,11 @@ function isBlockActionOrInteractiveMessageBody(
   return (body as SlackActionMiddlewareArgs<BlockAction | InteractiveMessage>['body']).actions !== undefined;
 }
 
-// Returns either a bot token or a user token for client, say()
-function selectToken(context: Context): string | undefined {
+// Returns either a bot token, a user token or a workflow token for client, say()
+function selectToken(context: Context, attachFunctionToken: boolean): string | undefined {
+  if (attachFunctionToken && context.functionBotAccessToken) {
+    return context.functionBotAccessToken;
+  }
   return context.botToken !== undefined ? context.botToken : context.userToken;
 }
 
