@@ -129,7 +129,12 @@ export interface AppOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
-  clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
+  /**
+   * Configurations for the web client used to send Slack API method requests.
+   *
+   * See {@link https://tools.slack.dev/node-slack-sdk/reference/web-api/interfaces/WebClientOptions} for more information.
+   */
+  clientOptions?: WebClientOptions;
   socketMode?: boolean;
   developerMode?: boolean;
   tokenVerificationEnabled?: boolean;
