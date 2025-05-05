@@ -786,6 +786,7 @@ describe('App middleware and listener arguments', () => {
       app.function(callbackId, async ({ context }) => {
         assert.strictEqual(context.functionExecutionId, functionExecutionId);
         assert.strictEqual(context.functionBotAccessToken, functionBotAccessToken);
+        assert.deepStrictEqual(context.functionInputs, inputs);
         called = true;
       });
       app.error(fakeErrorHandler);

@@ -1623,6 +1623,7 @@ function extractFunctionContext(body: StringIndexed) {
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
     functionExecutionId = body.event.function_execution_id;
     functionBotAccessToken = body.event.bot_access_token;
+    functionInputs = body.event.inputs;
   }
 
   // interactivity (block_actions)
