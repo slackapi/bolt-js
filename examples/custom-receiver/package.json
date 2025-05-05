@@ -17,7 +17,7 @@
     "@slack/oauth": "^3",
     "dotenv": "^16",
     "fastify": "^5",
-    "koa": "^2"
+    "koa": "^3"
   },
   "devDependencies": {
     "@types/koa__router": "^12",
