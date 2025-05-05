@@ -8,6 +8,7 @@ import {
   type Override,
   createDummyAppMentionEventMiddlewareArgs,
   createDummyBlockActionEventMiddlewareArgs,
+  createDummyCustomFunctionMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
   createDummyReceiverEvent,
   createDummyViewSubmissionMiddlewareArgs,
@@ -756,6 +757,93 @@ describe('App middleware and listener arguments', () => {
           callback_id,
           app_installed_team_id,
         }),
+        ack: fakeAck,
+      });
+
+      sinon.assert.calledOnce(fakeAck);
+    });
+
+    it('should have function executed event details from a custom step payload', async () => {
+      const fakeAxiosPost = sinon.fake.resolves({});
+      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      const MockApp = await importApp(overrides);
+      const callbackId = 'reverse_string';
+      const functionBotAccessToken = 'xwfp-example';
+      const functionExecutionId = 'Fx1234567890';
+      const inputs = {
+        numerics: 12,
+        stringToReverse: 'palindrome',
+        trimmedSpaces: false,
+      };
+
+      const app = new MockApp({
+        attachFunctionToken: false, // https://github.com/slackapi/bolt-js/pull/2513
+        receiver: fakeReceiver,
+        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      });
+
+      let called = false;
+      app.function(callbackId, async ({ context }) => {
+        assert.strictEqual(context.functionExecutionId, functionExecutionId);
+        assert.strictEqual(context.functionBotAccessToken, functionBotAccessToken);
+        called = true;
+      });
+      app.error(fakeErrorHandler);
+
+      await fakeReceiver.sendEvent({
+        ...createDummyCustomFunctionMiddlewareArgs({
+          callbackId,
+          functionBotAccessToken,
+          functionExecutionId,
+          inputs,
+        }),
+        ack: fakeAck,
+      });
+
+      assert.isTrue(called);
+      sinon.assert.calledOnce(fakeAck);
+    });
+
+    it('should have function executed event details from a block actions payload', async () => {
+      const fakeAxiosPost = sinon.fake.resolves({});
+      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      const MockApp = await importApp(overrides);
+      const callbackId = 'reverse_string_button';
+      const functionBotAccessToken = 'xwfp-example';
+      const functionExecutionId = 'Fx1234567890';
+      const inputs = {
+        numerics: 12,
+        stringToReverse: 'palindrome',
+        trimmedSpaces: false,
+      };
+
+      const app = new MockApp({
+        attachFunctionToken: false, // https://github.com/slackapi/bolt-js/pull/2513
+        receiver: fakeReceiver,
+        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      });
+
+      app.action(callbackId, async ({ ack, context }) => {
+        assert.strictEqual(context.functionExecutionId, functionExecutionId);
+        assert.strictEqual(context.functionBotAccessToken, functionBotAccessToken);
+        assert.deepStrictEqual(context.functionInputs, inputs);
+        await ack();
+      });
+      app.error(fakeErrorHandler);
+
+      await fakeReceiver.sendEvent({
+        ...createDummyBlockActionEventMiddlewareArgs(
+          {
+            action_id: callbackId,
+          },
+          {
+            bot_access_token: functionBotAccessToken,
+            function_data: {
+              execution_id: functionExecutionId,
+              inputs,
+            },
+          },
+        ),
         ack: fakeAck,
       });
 
