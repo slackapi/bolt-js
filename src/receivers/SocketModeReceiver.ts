@@ -21,6 +21,7 @@ import {
   type SocketModeReceiverProcessEventErrorHandlerArgs,
   defaultProcessEventErrorHandler,
 } from './SocketModeFunctions';
+import { SocketModeResponseAck } from './SocketModeResponseAck';
 import { type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
@@ -224,10 +225,11 @@ export default class SocketModeReceiver implements Receiver {
     }
 
     this.client.on('slack_event', async (args) => {
-      const { ack, body, retry_num, retry_reason } = args;
+      const { body, retry_num, retry_reason } = args;
+      const ack = new SocketModeResponseAck({ logger: this.logger, socketModeClientAck: args.ack });
       const event: ReceiverEvent = {
         body,
-        ack,
+        ack: ack.bind(),
         retryNum: retry_num,
         retryReason: retry_reason,
         customProperties: customPropertiesExtractor(args),
@@ -241,7 +243,7 @@ export default class SocketModeReceiver implements Receiver {
           event,
         });
         if (shouldBeAcked) {
-          await ack();
+          await ack.ack();
         }
       }
     });
