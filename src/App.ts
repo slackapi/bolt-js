@@ -131,7 +131,12 @@ export interface AppOptions {
   logger?: Logger;
   logLevel?: LogLevel;
   ignoreSelf?: boolean;
-  clientOptions?: Pick<WebClientOptions, 'slackApiUrl'>;
+  /**
+   * Configurations for the web client used to send Slack API method requests.
+   *
+   * See {@link https://tools.slack.dev/node-slack-sdk/reference/web-api/interfaces/WebClientOptions} for more information.
+   */
+  clientOptions?: WebClientOptions;
   socketMode?: boolean;
   developerMode?: boolean;
   tokenVerificationEnabled?: boolean;
@@ -989,10 +994,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       if (functionInputs) {
         context.functionInputs = functionInputs;
       }
-    }
-
-    // Attach and make available the JIT/function-related token on context
-    if (this.attachFunctionToken) {
       if (functionBotAccessToken) {
         context.functionBotAccessToken = functionBotAccessToken;
       }
@@ -1649,6 +1650,7 @@ function extractFunctionContext(body: StringIndexed) {
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
     functionExecutionId = body.event.function_execution_id;
     functionBotAccessToken = body.event.bot_access_token;
+    functionInputs = body.event.inputs;
   }
 
   // interactivity (block_actions)
