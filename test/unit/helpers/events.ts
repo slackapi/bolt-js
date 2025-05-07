@@ -303,13 +303,23 @@ export function createDummyCommandMiddlewareArgs(commandOverrides?: DummyCommand
   };
 }
 
+interface DummyCustomFunctionOverride {
+  callbackId?: string;
+  functionBotAccessToken?: string;
+  functionExecutionId?: string;
+  inputs?: Record<string, string | number | boolean>;
+}
 export function createDummyCustomFunctionMiddlewareArgs(
-  functionOverrides: {
-    callbackId?: string;
-    inputs?: Record<string, string | number | boolean>;
-  } = { callbackId: 'reverse', inputs: { stringToReverse: 'hello' } },
+  functionOverrides: DummyCustomFunctionOverride = {
+    callbackId: 'reverse',
+    functionBotAccessToken: 'xwfp-valid',
+    functionExecutionId: 'Fx111',
+    inputs: { stringToReverse: 'hello' },
+  },
 ): SlackCustomFunctionMiddlewareArgs {
   functionOverrides.callbackId = functionOverrides.callbackId || 'reverse';
+  functionOverrides.functionBotAccessToken = functionOverrides.functionBotAccessToken || 'xwfp-valid';
+  functionOverrides.functionExecutionId = functionOverrides.functionExecutionId || 'Fx111';
   functionOverrides.inputs = functionOverrides.inputs ? functionOverrides.inputs : { stringToReverse: 'hello' };
   const testFunction = {
     id: 'Fn111',
@@ -345,10 +355,10 @@ export function createDummyCustomFunctionMiddlewareArgs(
     type: 'function_executed',
     function: testFunction,
     inputs: functionOverrides.inputs,
-    function_execution_id: 'Fx111',
+    function_execution_id: functionOverrides.functionExecutionId,
     workflow_execution_id: 'Wf111',
     event_ts: '1659055013.509853',
-    bot_access_token: 'xwfp-valid',
+    bot_access_token: functionOverrides.functionBotAccessToken,
   } as const;
 
   const body = {
