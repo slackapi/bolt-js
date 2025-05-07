@@ -8,9 +8,7 @@ describe('SocketModeResponseAck', async () => {
   const fakeLogger = createFakeLogger();
 
   beforeEach(() => {
-    fakeSocketModeClientAck.resetHistory();
-    fakeLogger.debug.reset();
-    fakeLogger.error.reset();
+    sinon.reset();
   });
 
   it('should work', async () => {
@@ -20,7 +18,17 @@ describe('SocketModeResponseAck', async () => {
     });
     assert.isDefined(ack);
     assert.isDefined(ack.bind());
-    ack.ack(); // no exception
+    await ack.ack(); // no exception
+    sinon.assert.calledOnce(fakeSocketModeClientAck);
+  });
+
+  it('bound Ack invocation should work', async () => {
+    const ack = new SocketModeResponseAck({
+      logger: fakeLogger,
+      socketModeClientAck: fakeSocketModeClientAck,
+    });
+    const bound = ack.bind();
+    await bound(); // no exception
     sinon.assert.calledOnce(fakeSocketModeClientAck);
   });
 
@@ -30,8 +38,31 @@ describe('SocketModeResponseAck', async () => {
       socketModeClientAck: fakeSocketModeClientAck,
     });
     const bound = ack.bind();
-    ack.ack();
+    await ack.ack();
     await bound();
-    sinon.assert.calledWith(fakeLogger.debug, 'ack() has already been called; subsequent calls have no effect');
+    sinon.assert.calledWith(fakeLogger.warn, 'ack() has already been invoked; subsequent calls have no effect');
+  });
+
+  it('should log a debug message when there are more then 1 bound Ack invocation', async () => {
+    const ack = new SocketModeResponseAck({
+      logger: fakeLogger,
+      socketModeClientAck: fakeSocketModeClientAck,
+    });
+    const bound = ack.bind();
+    await bound();
+    sinon.assert.neverCalledWith(fakeLogger.warn, 'ack() has already been invoked; subsequent calls have no effect');
+    await bound();
+    sinon.assert.calledWith(fakeLogger.warn, 'ack() has already been invoked; subsequent calls have no effect');
+  });
+
+  it('should allow more then 1 direct ack() invocation', async () => {
+    const ack = new SocketModeResponseAck({
+      logger: fakeLogger,
+      socketModeClientAck: fakeSocketModeClientAck,
+    });
+    await ack.ack({});
+    sinon.assert.calledWith(fakeLogger.debug, 'ack() response sent (body: {})');
+    await ack.ack();
+    sinon.assert.calledWith(fakeLogger.debug, 'ack() response sent (body: undefined)');
   });
 });

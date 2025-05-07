@@ -1,5 +1,5 @@
 import type { Logger } from '@slack/logger';
-import type { AckFn } from '../types';
+import type { AckFn, ResponseAck } from '../types';
 
 // biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
 export type SocketModeResponseBody = any;
@@ -10,7 +10,7 @@ export interface AckArgs {
   socketModeClientAck: SocketModeClientAck;
 }
 
-export class SocketModeResponseAck {
+export class SocketModeResponseAck implements ResponseAck {
   private logger: Logger;
 
   private isAcknowledged: boolean;
@@ -30,7 +30,7 @@ export class SocketModeResponseAck {
       this.logger.debug(`ack() call begins (body: ${JSON.stringify(responseBody)})`);
       if (this.isAcknowledged) {
         // TODO: this should throw a ReceiverMultipleAckError error instead of printing a debug message
-        this.logger.debug('ack() has already been called; subsequent calls have no effect');
+        this.logger.warn('ack() has already been invoked; subsequent calls have no effect');
         return;
       }
       await this.ack(responseBody);
