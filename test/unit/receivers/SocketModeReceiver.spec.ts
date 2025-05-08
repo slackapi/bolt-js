@@ -6,7 +6,9 @@ import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import rewiremock from 'rewiremock';
 import sinon from 'sinon';
-import { AppInitializationError, CustomRouteInitializationError } from '../../../src/errors';
+import App from '../../../src/App';
+import { AppInitializationError, AuthorizationError, CustomRouteInitializationError } from '../../../src/errors';
+import type { ReceiverEvent } from '../../../src/types';
 import {
   FakeServer,
   type Override,
@@ -627,6 +629,7 @@ describe('SocketModeReceiver', () => {
       assert(clientStub.start.called);
     });
   });
+
   describe('#stop()', () => {
     it('should invoke the SocketModeClient disconnect method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
@@ -648,6 +651,56 @@ describe('SocketModeReceiver', () => {
       receiver.client = clientStub as unknown as SocketModeClient;
       await receiver.stop();
       assert(clientStub.disconnect.called);
+    });
+  });
+
+  describe('event', () => {
+    it('acknowledges processed events', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().resolves();
+      processStub.callsFake(async (event: ReceiverEvent) => {
+        await event.ack();
+      });
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
+      receiver.init(app);
+
+      // Stub ack with an awaited promise for tests
+      let resolve: () => void;
+      const called = new Promise<void>((r) => {
+        resolve = r;
+      });
+      const ack = sinon.stub().callsFake(async () => {
+        resolve();
+      });
+
+      receiver.client.emit('slack_event', { ack });
+      await called;
+      assert.isTrue(ack.called);
+    });
+
+    it('acknowledges erroring events', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().resolves();
+      processStub.callsFake(async (_) => {
+        throw new AuthorizationError('brokentoken', new Error());
+      });
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
+      receiver.init(app);
+
+      // Stub ack with an awaited promise for tests
+      let resolve: () => void;
+      const called = new Promise<void>((r) => {
+        resolve = r;
+      });
+      const ack = sinon.stub().callsFake(async () => {
+        resolve();
+      });
+
+      receiver.client.emit('slack_event', { ack });
+      await called;
+      assert.isTrue(ack.called);
     });
   });
 });
