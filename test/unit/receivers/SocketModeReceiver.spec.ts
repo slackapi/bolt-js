@@ -8,11 +8,13 @@ import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import App from '../../../src/App';
 import { AppInitializationError, AuthorizationError, CustomRouteInitializationError } from '../../../src/errors';
+import { defaultProcessEventErrorHandler } from '../../../src/receivers/SocketModeFunctions';
 import type { ReceiverEvent } from '../../../src/types';
 import {
   FakeServer,
   type Override,
   createFakeLogger,
+  delay,
   mergeOverrides,
   type noopVoid,
   withHttpCreateServer,
@@ -679,11 +681,8 @@ describe('SocketModeReceiver', () => {
       assert.isTrue(ack.called);
     });
 
-    it('acknowledges erroring events', async () => {
-      const processStub = sinon.stub<[ReceiverEvent]>().resolves();
-      processStub.callsFake(async (_) => {
-        throw new AuthorizationError('brokentoken', new Error());
-      });
+    it('acknowledges events that throw AuthorizationError', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().throws(new AuthorizationError('brokentoken', new Error()));
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       const SocketModeReceiver = await importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
@@ -701,6 +700,27 @@ describe('SocketModeReceiver', () => {
       receiver.client.emit('slack_event', { ack });
       await called;
       assert.isTrue(ack.called);
+    });
+
+    it('does not acknowledge events that know unknown errors', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().throws(new Error('internal error'));
+      const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'xapp-example',
+        processEventErrorHandler: defaultProcessEventErrorHandlerSpy,
+      });
+      receiver.init(app);
+
+      const slackRequestArgs = { body: {}, ack: sinon.fake() };
+
+      receiver.client.emit('slack_event', slackRequestArgs);
+      while (!defaultProcessEventErrorHandlerSpy.called) {
+        await delay(50);
+      }
+
+      sinon.assert.notCalled(slackRequestArgs.ack);
     });
   });
 });
