@@ -702,7 +702,7 @@ describe('SocketModeReceiver', () => {
       assert.isTrue(ack.called);
     });
 
-    it('does not acknowledge events that know unknown errors', async () => {
+    it('does not acknowledge events that throw unknown errors', async () => {
       const processStub = sinon.stub<[ReceiverEvent]>().throws(new Error('internal error'));
       const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
