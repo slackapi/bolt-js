@@ -30,7 +30,7 @@ export class SocketModeResponseAck implements ResponseAck {
       this.logger.debug(`ack() call begins (body: ${JSON.stringify(responseBody)})`);
       if (this.isAcknowledged) {
         // TODO: (semver:major) this should throw a ReceiverMultipleAckError error instead of printing a debug message
-        this.logger.error(
+        this.logger.warn(
           'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
         );
         return;
