@@ -42,12 +42,12 @@ describe('SocketModeResponseAck', async () => {
       const ack = responseAck.bind();
       await ack();
       sinon.assert.neverCalledWith(
-        fakeLogger.error,
+        fakeLogger.warn,
         'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
       );
       await ack();
       sinon.assert.calledWith(
-        fakeLogger.error,
+        fakeLogger.warn,
         'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
       );
     });
