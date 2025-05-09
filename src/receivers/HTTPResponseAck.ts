@@ -13,7 +13,7 @@ export interface AckArgs {
   httpResponse: ServerResponse;
 }
 
-// TODO(semver:major): change this to "HTTPResponseBody"
+// TODO: (semver:major) change this to "HTTPResponseBody"
 // biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
 export type HTTResponseBody = any;
 

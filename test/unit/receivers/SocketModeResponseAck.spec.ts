@@ -12,39 +12,41 @@ describe('SocketModeResponseAck', async () => {
   });
 
   it('should define bind', async () => {
-    const ack = new SocketModeResponseAck({
+    const responseAck = new SocketModeResponseAck({
       logger: fakeLogger,
       socketModeClientAck: fakeSocketModeClientAck,
     });
-    assert.isDefined(ack);
-    assert.isDefined(ack.bind());
+    assert.isDefined(responseAck);
+    assert.isDefined(responseAck.bind());
   });
 
-  it('bound Ack invocation should work', async () => {
-    const ack = new SocketModeResponseAck({
-      logger: fakeLogger,
-      socketModeClientAck: fakeSocketModeClientAck,
+  describe('bind', async () => {
+    it('should create bound Ack that invoke the response to the request', async () => {
+      const responseAck = new SocketModeResponseAck({
+        logger: fakeLogger,
+        socketModeClientAck: fakeSocketModeClientAck,
+      });
+      const ack = responseAck.bind();
+      await ack(); // no exception
+      sinon.assert.calledOnce(fakeSocketModeClientAck);
     });
-    const bound = ack.bind();
-    await bound(); // no exception
-    sinon.assert.calledOnce(fakeSocketModeClientAck);
-  });
 
-  it('should log an error message when there are more then 1 bound Ack invocation', async () => {
-    const ack = new SocketModeResponseAck({
-      logger: fakeLogger,
-      socketModeClientAck: fakeSocketModeClientAck,
+    it('should log an error message when there are more then 1 bound Ack invocation', async () => {
+      const responseAck = new SocketModeResponseAck({
+        logger: fakeLogger,
+        socketModeClientAck: fakeSocketModeClientAck,
+      });
+      const ack = responseAck.bind();
+      await ack();
+      sinon.assert.neverCalledWith(
+        fakeLogger.error,
+        'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
+      );
+      await ack();
+      sinon.assert.calledWith(
+        fakeLogger.error,
+        'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
+      );
     });
-    const bound = ack.bind();
-    await bound();
-    sinon.assert.neverCalledWith(
-      fakeLogger.error,
-      'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
-    );
-    await bound();
-    sinon.assert.calledWith(
-      fakeLogger.error,
-      'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
-    );
   });
 });

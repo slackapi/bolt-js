@@ -10,15 +10,15 @@ describe('HTTPResponseAck', async () => {
   it('should work', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const ack = new HTTPResponseAck({
+    const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
       httpRequest,
       httpResponse,
     });
-    assert.isDefined(ack);
-    assert.isDefined(ack.bind());
-    ack.ack(); // no exception
+    assert.isDefined(responseAck);
+    assert.isDefined(responseAck.bind());
+    responseAck.ack(); // no exception
   });
   it('should trigger unhandledRequestHandler if unacknowledged', (done) => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -58,14 +58,14 @@ describe('HTTPResponseAck', async () => {
   it('should throw an error if a bound Ack invocation was already acknowledged', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const ack = new HTTPResponseAck({
+    const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
       httpRequest,
       httpResponse,
     });
-    const bound = ack.bind();
-    ack.ack();
+    const bound = responseAck.bind();
+    responseAck.ack();
     try {
       await bound();
       assert.fail('No exception raised');
@@ -76,31 +76,31 @@ describe('HTTPResponseAck', async () => {
   it('should store response body if processBeforeResponse=true', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const ack = new HTTPResponseAck({
+    const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: true,
       httpRequest,
       httpResponse,
     });
-    const bound = ack.bind();
+    const bound = responseAck.bind();
     const body = { some: 'thing' };
     await bound(body);
-    assert.equal(ack.storedResponse, body, 'Body passed to bound handler not stored in Ack instance.');
+    assert.equal(responseAck.storedResponse, body, 'Body passed to bound handler not stored in Ack instance.');
   });
   it('should store an empty string if response body is falsy and processBeforeResponse=true', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const ack = new HTTPResponseAck({
+    const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: true,
       httpRequest,
       httpResponse,
     });
-    const bound = ack.bind();
+    const bound = responseAck.bind();
     const body = false;
     await bound(body);
     assert.equal(
-      ack.storedResponse,
+      responseAck.storedResponse,
       '',
       'Falsy body passed to bound handler not stored as empty string in Ack instance.',
     );
@@ -109,13 +109,13 @@ describe('HTTPResponseAck', async () => {
     const stub = sinon.stub(HTTPModuleFunctions, 'buildContentResponse');
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const ack = new HTTPResponseAck({
+    const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
       httpRequest,
       httpResponse,
     });
-    const bound = ack.bind();
+    const bound = responseAck.bind();
     const body = { some: 'thing' };
     await bound(body);
     assert(
