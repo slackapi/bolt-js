@@ -6,11 +6,15 @@ import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import rewiremock from 'rewiremock';
 import sinon from 'sinon';
-import { AppInitializationError, CustomRouteInitializationError } from '../../../src/errors';
+import App from '../../../src/App';
+import { AppInitializationError, AuthorizationError, CustomRouteInitializationError } from '../../../src/errors';
+import { defaultProcessEventErrorHandler } from '../../../src/receivers/SocketModeFunctions';
+import type { ReceiverEvent } from '../../../src/types';
 import {
   FakeServer,
   type Override,
   createFakeLogger,
+  delay,
   mergeOverrides,
   type noopVoid,
   withHttpCreateServer,
@@ -627,6 +631,7 @@ describe('SocketModeReceiver', () => {
       assert(clientStub.start.called);
     });
   });
+
   describe('#stop()', () => {
     it('should invoke the SocketModeClient disconnect method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
@@ -648,6 +653,97 @@ describe('SocketModeReceiver', () => {
       receiver.client = clientStub as unknown as SocketModeClient;
       await receiver.stop();
       assert(clientStub.disconnect.called);
+    });
+  });
+
+  describe('event', () => {
+    it('should allow events processed to be acknowledged', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().callsFake(async (event: ReceiverEvent) => {
+        await event.ack();
+      });
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
+      receiver.init(app);
+
+      // Stub ack with an awaited promise for tests
+      let notifyAckCalled: () => void;
+      const ackCalled = new Promise<void>((resolve) => {
+        notifyAckCalled = resolve;
+      });
+      const ack = sinon.stub().callsFake(async () => {
+        notifyAckCalled();
+      });
+
+      receiver.client.emit('slack_event', { ack });
+      await ackCalled;
+      sinon.assert.calledOnce(ack);
+    });
+
+    it('acknowledges events that throw AuthorizationError', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().throws(new AuthorizationError('brokentoken', new Error()));
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
+      receiver.init(app);
+
+      // Stub ack with an awaited promise for tests
+      let notifyAckCalled: () => void;
+      const ackCalled = new Promise<void>((resolve) => {
+        notifyAckCalled = resolve;
+      });
+      const ack = sinon.stub().callsFake(async () => {
+        notifyAckCalled();
+      });
+
+      receiver.client.emit('slack_event', { ack });
+      await ackCalled;
+      sinon.assert.calledOnce(ack);
+    });
+
+    it('does not acknowledge events that throw unknown errors', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().throws(new Error('internal error'));
+      const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'xapp-example',
+        processEventErrorHandler: defaultProcessEventErrorHandlerSpy,
+      });
+      receiver.init(app);
+
+      const slackRequestArgs = { body: {}, ack: sinon.fake() };
+      receiver.client.emit('slack_event', slackRequestArgs);
+
+      while (!defaultProcessEventErrorHandlerSpy.called) {
+        await delay(50);
+      }
+      sinon.assert.calledOnce(defaultProcessEventErrorHandlerSpy);
+      sinon.assert.notCalled(slackRequestArgs.ack);
+    });
+
+    it('does not re-acknowledge events that handle acknowledge and then throw unknown errors', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().callsFake(async (event: ReceiverEvent) => {
+        await event.ack();
+        throw new Error('internal error');
+      });
+      const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'xapp-example',
+        processEventErrorHandler: defaultProcessEventErrorHandlerSpy,
+      });
+      receiver.init(app);
+
+      const slackRequestArgs = { body: {}, ack: sinon.fake() };
+      receiver.client.emit('slack_event', slackRequestArgs);
+
+      while (!defaultProcessEventErrorHandlerSpy.called) {
+        await delay(50);
+      }
+      sinon.assert.calledOnce(defaultProcessEventErrorHandlerSpy);
+      sinon.assert.calledOnce(slackRequestArgs.ack);
     });
   });
 });
