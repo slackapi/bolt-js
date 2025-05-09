@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Logger } from '@slack/logger';
 import { ReceiverMultipleAckError } from '../errors';
-import type { AckFn } from '../types';
+import type { AckFn, ResponseAck } from '../types';
 import * as httpFunc from './HTTPModuleFunctions';
 
 export interface AckArgs {
@@ -13,10 +13,11 @@ export interface AckArgs {
   httpResponse: ServerResponse;
 }
 
+// TODO: (semver:major) change this to "HTTPResponseBody"
 // biome-ignore lint/suspicious/noExplicitAny: response bodies can be anything
 export type HTTResponseBody = any;
 
-export class HTTPResponseAck {
+export class HTTPResponseAck implements ResponseAck {
   private logger: Logger;
 
   private isAcknowledged: boolean;
