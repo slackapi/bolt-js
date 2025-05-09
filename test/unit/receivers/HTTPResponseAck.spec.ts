@@ -1,13 +1,15 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import { expectType } from 'tsd';
 import { ReceiverMultipleAckError } from '../../../src/errors';
 import * as HTTPModuleFunctions from '../../../src/receivers/HTTPModuleFunctions';
 import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
+import type { ResponseAck } from '../../../src/types';
 import { createFakeLogger } from '../helpers';
 
 describe('HTTPResponseAck', async () => {
-  it('should work', async () => {
+  it('should implement ResponseAck and work', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
@@ -18,6 +20,7 @@ describe('HTTPResponseAck', async () => {
     });
     assert.isDefined(responseAck);
     assert.isDefined(responseAck.bind());
+    expectType<ResponseAck>(responseAck);
     responseAck.ack(); // no exception
   });
   it('should trigger unhandledRequestHandler if unacknowledged', (done) => {

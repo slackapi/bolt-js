@@ -1,6 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
+import { expectType } from 'tsd';
 import { SocketModeResponseAck } from '../../../src/receivers/SocketModeResponseAck';
+import type { ResponseAck } from '../../../src/types';
 import { createFakeLogger } from '../helpers';
 
 describe('SocketModeResponseAck', async () => {
@@ -11,13 +13,14 @@ describe('SocketModeResponseAck', async () => {
     sinon.reset();
   });
 
-  it('should define bind', async () => {
+  it('should implement ResponseAck', async () => {
     const responseAck = new SocketModeResponseAck({
       logger: fakeLogger,
       socketModeClientAck: fakeSocketModeClientAck,
     });
     assert.isDefined(responseAck);
     assert.isDefined(responseAck.bind());
+    expectType<ResponseAck>(responseAck);
   });
 
   describe('bind', async () => {
