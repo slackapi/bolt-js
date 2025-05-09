@@ -49,7 +49,7 @@ We're going to use bot and app tokens for this guide.
 ![OAuth Tokens](/img//bot-token.png "Bot OAuth Token")
 
 :::tip
- 
+
 Treat your token like a password and [keep it safe](https://docs.slack.dev/authentication/best-practices-for-security). Your app uses it to post and retrieve information from Slack workspaces.
 
 :::
@@ -127,9 +127,9 @@ Your app should let you know that it's up and running. 🎉
 ## Setting up events {#setting-up-events}
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.
 
-To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://docs.slack.dev/apis/events-api/). 
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://docs.slack.dev/apis/events-api/).
 
-For those just starting, we recommend using [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall. 
+For those just starting, we recommend using [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall.
 
 That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku)) to stably respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Marketplace.
 
@@ -156,7 +156,7 @@ When an event occurs, Slack will send your app information about the event, like
 
 2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://docs.slack.dev/apis/events-api/#subscribing) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡
 
-:::info 
+:::info
 
 For local development, you can use a proxy service like [ngrok](https://ngrok.com/) to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel.
 
