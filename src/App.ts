@@ -32,6 +32,7 @@ import {
 } from './helpers';
 import {
   ignoreSelf as ignoreSelfMiddleware,
+  isSlackEventMiddlewareArgsOptions,
   matchCommandName,
   matchConstraints,
   matchEventType,
@@ -74,6 +75,7 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcut,
   SlackShortcutMiddlewareArgs,
@@ -536,8 +538,26 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   /**
    * Register CustomFunction middleware
    */
-  public function(callbackId: string, ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]): this {
-    const fn = new CustomFunction(callbackId, listeners);
+  public function(
+    callbackId: string,
+    options: SlackEventMiddlewareArgsOptions,
+    ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]
+  ): this;
+  public function(callbackId: string, ...listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]): this;
+  public function(
+    callbackId: string,
+    ...optionOrListeners: (SlackEventMiddlewareArgsOptions | Middleware<SlackCustomFunctionMiddlewareArgs>)[]
+  ): this {
+    const options = isSlackEventMiddlewareArgsOptions(optionOrListeners[0])
+      ? optionOrListeners[0]
+      : { autoAcknowledge: true };
+    const listeners = optionOrListeners.filter(
+      (optionOrListener): optionOrListener is Middleware<SlackCustomFunctionMiddlewareArgs> => {
+        return !isSlackEventMiddlewareArgsOptions(optionOrListener);
+      },
+    );
+
+    const fn = new CustomFunction(callbackId, listeners, options);
     this.listeners.push(fn.getListeners());
     return this;
   }
@@ -1086,7 +1106,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     // Set aliases
     if (type === IncomingEventType.Event) {
-      const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs;
+      // TODO: assigning eventListenerArgs by reference to set properties of listenerArgs is error prone, there should be a better way to do this!
+      const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
       eventListenerArgs.event = eventListenerArgs.payload;
       if (eventListenerArgs.event.type === 'message') {
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
@@ -1138,8 +1159,14 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     if (type !== IncomingEventType.Event) {
       listenerArgs.ack = ack;
     } else {
-      // Events API requests are acknowledged right away, since there's no data expected
-      await ack();
+      const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
+      if (eventListenerArgs.event?.type === 'function_executed') {
+        listenerArgs.ack = ack;
+      } else {
+        // Events API requests are acknowledged right away, since there's no data expected
+        // Except function_executed events since ack can be handled by the user
+        await ack();
+      }
     }
 
     // Dispatch event through the global middleware chain

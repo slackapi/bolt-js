@@ -52,6 +52,7 @@ describe('App function() routing', () => {
       app.function('my_id', fakeHandler);
       const args = createDummyCustomFunctionMiddlewareArgs({
         callbackId: 'my_id',
+        options: { autoAcknowledge: false },
       });
       await fakeReceiver.sendEvent({
         ack: fakeAck,
@@ -72,6 +73,7 @@ describe('App function() routing', () => {
       const args = createDummyCustomFunctionMiddlewareArgs({
         callbackId: 'my_id',
         inputs: testInputs,
+        options: { autoAcknowledge: false },
       });
       await fakeReceiver.sendEvent({
         ack: fakeAck,
@@ -89,6 +91,18 @@ describe('App function() routing', () => {
       });
       sinon.assert.calledOnce(fakeHandler);
       sinon.assert.calledOnce(fakeAck);
+    });
+
+    it('should route a function executed event to a handler and NOT auto ack if autoAcknowledge is false', async () => {
+      app.function('my_id', { autoAcknowledge: false }, fakeHandler);
+      const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
+      const fakeAck = sinon.fake.resolves({});
+      await fakeReceiver.sendEvent({
+        ack: fakeAck,
+        body: args.body,
+      });
+      sinon.assert.calledOnce(fakeHandler);
+      sinon.assert.notCalled(fakeAck);
     });
   });
 });
