@@ -11,15 +11,13 @@ describe('SocketModeResponseAck', async () => {
     sinon.reset();
   });
 
-  it('should work', async () => {
+  it('should define bind', async () => {
     const ack = new SocketModeResponseAck({
       logger: fakeLogger,
       socketModeClientAck: fakeSocketModeClientAck,
     });
     assert.isDefined(ack);
     assert.isDefined(ack.bind());
-    await ack.ack(); // no exception
-    sinon.assert.calledOnce(fakeSocketModeClientAck);
   });
 
   it('bound Ack invocation should work', async () => {
@@ -32,37 +30,21 @@ describe('SocketModeResponseAck', async () => {
     sinon.assert.calledOnce(fakeSocketModeClientAck);
   });
 
-  it('should log a debug message if a bound Ack invocation was already acknowledged', async () => {
-    const ack = new SocketModeResponseAck({
-      logger: fakeLogger,
-      socketModeClientAck: fakeSocketModeClientAck,
-    });
-    const bound = ack.bind();
-    await ack.ack();
-    await bound();
-    sinon.assert.calledWith(fakeLogger.warn, 'ack() has already been invoked; subsequent calls have no effect');
-  });
-
-  it('should log a debug message when there are more then 1 bound Ack invocation', async () => {
+  it('should log an error message when there are more then 1 bound Ack invocation', async () => {
     const ack = new SocketModeResponseAck({
       logger: fakeLogger,
       socketModeClientAck: fakeSocketModeClientAck,
     });
     const bound = ack.bind();
     await bound();
-    sinon.assert.neverCalledWith(fakeLogger.warn, 'ack() has already been invoked; subsequent calls have no effect');
+    sinon.assert.neverCalledWith(
+      fakeLogger.error,
+      'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
+    );
     await bound();
-    sinon.assert.calledWith(fakeLogger.warn, 'ack() has already been invoked; subsequent calls have no effect');
-  });
-
-  it('should allow more then 1 direct ack() invocation', async () => {
-    const ack = new SocketModeResponseAck({
-      logger: fakeLogger,
-      socketModeClientAck: fakeSocketModeClientAck,
-    });
-    await ack.ack({});
-    sinon.assert.calledWith(fakeLogger.debug, 'ack() response sent (body: {})');
-    await ack.ack();
-    sinon.assert.calledWith(fakeLogger.debug, 'ack() response sent (body: undefined)');
+    sinon.assert.calledWith(
+      fakeLogger.error,
+      'ack() has already been called. Additional calls will be ignored and may lead to errors in other receivers.',
+    );
   });
 });

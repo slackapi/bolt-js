@@ -243,7 +243,7 @@ export default class SocketModeReceiver implements Receiver {
           event,
         });
         if (shouldBeAcked) {
-          await ack.ack();
+          event.ack();
         }
       }
     });

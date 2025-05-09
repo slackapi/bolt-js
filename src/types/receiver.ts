@@ -35,7 +35,4 @@ export interface ResponseAck {
   // Returns the function to acknowledge incoming requests
   // biome-ignore lint/suspicious/noExplicitAny: TODO: Make the argument type more specific
   bind(): AckFn<any>;
-  // The function to acknowledge incoming requests
-  // biome-ignore lint/suspicious/noExplicitAny: TODO: Make the argument type more specific
-  ack(response?: any): void | Promise<void>;
 }
