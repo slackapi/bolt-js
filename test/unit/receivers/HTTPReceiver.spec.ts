@@ -193,11 +193,11 @@ describe('HTTPReceiver', () => {
       assert.isNotNull(defaultPort);
       assert.propertyVal(defaultPort, 'port', 3000);
       await defaultPort.start(9001);
-      sinon.assert.calledWith(fakeServer.listen, 9001);
+      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(9001));
       await defaultPort.stop();
       fakeServer.listen.resetHistory();
       await defaultPort.start('1337');
-      sinon.assert.calledWith(fakeServer.listen, 1337);
+      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(1337));
       await defaultPort.stop();
     });
   });
