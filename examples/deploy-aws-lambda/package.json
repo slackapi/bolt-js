@@ -12,7 +12,7 @@
     "@slack/bolt": "^4.3.0"
   },
   "devDependencies": {
-    "serverless": "^4.14.2",
+    "serverless": "^4.14.3",
     "serverless-offline": "^14.4.0"
   }
 }
