@@ -536,7 +536,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   }
 
   /**
-   * Register CustomFunction middleware
+   * Register middleware for a workflow step.
+   * @param callbackId Unique callback ID of a step.
+   * @param [options] Configurations for the listener.
+   * @param listeners Middleware handlers to call.
+   * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps}
+   * @see {@link https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options}
    */
   public function(
     callbackId: string,
