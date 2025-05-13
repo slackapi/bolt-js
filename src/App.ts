@@ -1107,7 +1107,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Set aliases
     if (type === IncomingEventType.Event) {
       // TODO: assigning eventListenerArgs by reference to set properties of listenerArgs is error prone, there should be a better way to do this!
-      const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
+      const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs;
       eventListenerArgs.event = eventListenerArgs.payload;
       if (eventListenerArgs.event.type === 'message') {
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
