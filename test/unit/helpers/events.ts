@@ -37,6 +37,7 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewMiddlewareArgs,
@@ -308,19 +309,23 @@ interface DummyCustomFunctionOverride {
   functionBotAccessToken?: string;
   functionExecutionId?: string;
   inputs?: Record<string, string | number | boolean>;
+  options?: SlackEventMiddlewareArgsOptions;
 }
+
 export function createDummyCustomFunctionMiddlewareArgs(
   functionOverrides: DummyCustomFunctionOverride = {
     callbackId: 'reverse',
     functionBotAccessToken: 'xwfp-valid',
     functionExecutionId: 'Fx111',
     inputs: { stringToReverse: 'hello' },
+    options: { autoAcknowledge: true },
   },
 ): SlackCustomFunctionMiddlewareArgs {
   functionOverrides.callbackId = functionOverrides.callbackId || 'reverse';
   functionOverrides.functionBotAccessToken = functionOverrides.functionBotAccessToken || 'xwfp-valid';
   functionOverrides.functionExecutionId = functionOverrides.functionExecutionId || 'Fx111';
   functionOverrides.inputs = functionOverrides.inputs ? functionOverrides.inputs : { stringToReverse: 'hello' };
+  functionOverrides.options = functionOverrides.options ? functionOverrides.options : { autoAcknowledge: true };
   const testFunction = {
     id: 'Fn111',
     callback_id: functionOverrides.callbackId,
@@ -372,6 +377,7 @@ export function createDummyCustomFunctionMiddlewareArgs(
   } as const;
 
   return {
+    ack: () => Promise.resolve(),
     body,
     complete: () => Promise.resolve({ ok: true }),
     event,

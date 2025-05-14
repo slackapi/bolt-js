@@ -1,12 +1,19 @@
-import type { FunctionExecutedEvent } from '@slack/types';
 import type { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse, WebClient } from '@slack/web-api';
 import {
   CustomFunctionCompleteFailError,
   CustomFunctionCompleteSuccessError,
   CustomFunctionInitializationError,
 } from './errors';
-import { matchEventType, onlyEvents } from './middleware/builtin';
-import type { AllMiddlewareArgs, AnyMiddlewareArgs, Context, Middleware, SlackEventMiddlewareArgs } from './types';
+import { autoAcknowledge, matchEventType, onlyEvents } from './middleware/builtin';
+import type {
+  AllMiddlewareArgs,
+  AnyMiddlewareArgs,
+  Context,
+  Middleware,
+  SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
+} from './types';
+
 interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
@@ -19,11 +26,7 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
 
-export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'function_executed'> & {
-  inputs: FunctionExecutedEvent['inputs'];
-  complete: FunctionCompleteFn;
-  fail: FunctionFailFn;
-};
+export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'function_executed'>;
 
 /** @deprecated use Middleware<SlackCustomFunctionMiddlewareArgs>[] instead - this may be removed in a minor release */
 export type CustomFunctionMiddleware = Middleware<SlackCustomFunctionMiddlewareArgs>[];
@@ -51,14 +54,30 @@ export class CustomFunction {
 
   private listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[];
 
-  public constructor(callbackId: string, listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[]) {
+  private options: SlackEventMiddlewareArgsOptions;
+
+  public constructor(
+    callbackId: string,
+    listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[],
+    options: SlackEventMiddlewareArgsOptions,
+  ) {
     validate(callbackId, listeners);
 
     this.callbackId = callbackId;
     this.listeners = listeners;
+    this.options = options;
   }
 
   public getListeners(): Middleware<AnyMiddlewareArgs>[] {
+    if (this.options.autoAcknowledge) {
+      return [
+        onlyEvents,
+        matchEventType('function_executed'),
+        matchCallbackId(this.callbackId),
+        autoAcknowledge,
+        ...this.listeners,
+      ] as Middleware<AnyMiddlewareArgs>[];
+    }
     return [
       onlyEvents,
       matchEventType('function_executed'),

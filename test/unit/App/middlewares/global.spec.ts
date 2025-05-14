@@ -64,7 +64,7 @@ describe('App global middleware Processing', () => {
     return [
       {
         body: {},
-        ack: sinon.fake(),
+        ack: fakeAck,
       },
     ];
   }
@@ -279,7 +279,7 @@ describe('App global middleware Processing', () => {
     app.use(async ({ client }) => {
       clientArg = client;
     });
-    const testData = createDummyCustomFunctionMiddlewareArgs({});
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
     assert.isDefined(clientArg);
@@ -298,7 +298,7 @@ describe('App global middleware Processing', () => {
     app.use(async ({ client }) => {
       clientArg = client;
     });
-    const testData = createDummyCustomFunctionMiddlewareArgs({});
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
     assert.isDefined(clientArg);
@@ -316,7 +316,7 @@ describe('App global middleware Processing', () => {
     app.use(async ({ client }) => {
       clientArg = client;
     });
-    const testData = createDummyCustomFunctionMiddlewareArgs({});
+    const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
     assert.isDefined(clientArg);
