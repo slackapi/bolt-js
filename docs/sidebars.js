@@ -13,7 +13,11 @@ const sidebars = {
       label: 'Guides',
       collapsed: false,
       items: [
-        'getting-started',
+        {
+          type: 'category',
+          label: 'Getting Started',
+          items: ['getting-started', 'building-an-app'],
+        },
         {
           type: 'category',
           label: 'Slack API calls',
