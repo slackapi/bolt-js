@@ -95,7 +95,7 @@ const config = {
         // switch to alucard when available in prism?
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-        additionalLanguages: ['bash']
+        additionalLanguages: ['bash'],
       },
       codeblock: {
         showGithubLink: true,
