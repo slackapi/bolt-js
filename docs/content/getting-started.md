@@ -190,7 +190,7 @@ $ slack run
 ```
 
 </TabItem>
-<TabItem value="terminal" label="Browser">
+<TabItem value="terminal" label="Terminal">
 
 ```script
 $ npm run start
