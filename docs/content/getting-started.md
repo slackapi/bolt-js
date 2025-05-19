@@ -209,7 +209,7 @@ With the app running, add your app's bot to a channel or send your app a direct 
 
 ## Updating the app
 
-At this point, you're successfully running the getting started Bolt for JavaScript [app](https://github.com/slackapi/bolt-js-getting-started-app)!
+At this point, you're successfully running the getting started Bolt for JavaScript [app](https://github.com/slack-samples/bolt-js-getting-started-app)!
 
 The defaults included leave opportunities abound, so to personalize this app let's now update the app name then respond with a kind farewell.
 

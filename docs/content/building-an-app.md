@@ -422,7 +422,7 @@ Let's add a handler to send a followup message when someone clicks the button:
   <TabItem value="socket-mode" label="Socket Mode">
 
 ```js reference
-https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js
+https://github.com/slack-samples/bolt-js-getting-started-app/blob/main/app.js
 ```
 
   </TabItem>
@@ -484,7 +484,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 
 ## Next steps {#next-steps}
 
-You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app)! 🎉
+You just built your first [Bolt for JavaScript app](https://github.com/slack-samples/bolt-js-getting-started-app)! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
