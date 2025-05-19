@@ -5,7 +5,7 @@ sidebar_label: Building an app
 
 This guide is meant to walk you through getting up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 
-When you’re finished, you’ll have created the [Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own. ⚡️
+When you’re finished, you’ll have created the [Getting started app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own. ⚡️
 
 ---
 
@@ -270,7 +270,7 @@ app.message('hello', async ({ message, say }) => {
   </TabItem>
 </Tabs>
 
-If you restart your app, so long as your bot user has been added to the channel/DM, when you send any message that contains "hello", it will respond.
+If you restart your app, so long as your bot user has been added to the channel or DM conversation, when you send any message that contains "hello", it will respond.
 
 This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
 
@@ -407,7 +407,7 @@ You'll notice in the button `accessory` object, there is an `action_id`. This wi
 
 :::tip
 
-The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mock up messages and generates the corresponding JSON that you can paste directly in your app.
 
 :::
 

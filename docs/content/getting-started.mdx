@@ -3,7 +3,7 @@ title: Quick start with Bolt for JavaScript
 sidebar_label: Quick start
 ---
 
-This quick start guide aims to help you get a Slack app using Bolt for JavaScript up and running as soon as possible!
+This quickstart guide aims to help you get a Slack app using Bolt for JavaScript up and running as soon as possible!
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -97,7 +97,7 @@ $ cd first-bolt-app
 $ npm install
 ```
 
-Outlines of a project are taking shape, so we can move on the creating an app!
+Outlines of a project are taking shape, so we can move on to creating an app!
 
 </TabItem>
 </Tabs>
@@ -138,7 +138,7 @@ Naviage to your list of apps and [create a new Slack app](https://api.slack.com/
 2. Use copied values from the `manifest.json` file to create your app.
 3. Confirm the app features and click "Create".
 
-You'll then land on your app's **Basic Information** page which is an overview of your app and contains important credentials.
+You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials.
 
 On these pages you're free to make changes, such as updating your app icon:
 
@@ -169,7 +169,7 @@ A bot token is also needed to interact with the Web API methods as your app's bo
 
 ![OAuth Tokens](/img//bot-token.png "Bot OAuth Token")
 
-3. Copy the bot token `xoxb` from the **OAuth & Permissions page** and then store it in a new environment variable:
+3. Copy the bot token beginning with `xoxb` from the **OAuth & Permissions page** and then store it in a new environment variable:
 
 ```sh
 $ export SLACK_BOT_TOKEN=xoxb-example
@@ -206,17 +206,17 @@ Logs in the console will let you know that the app is up and running:
 [INFO]  bolt-app ⚡️ Bolt app is running!
 ```
 
-With the app running, add your app's bot to a channel or send it a direct message saying "hello" and wait for a response. Clicking the attached button will post another message to channel.
+With the app running, add your app's bot to a channel or send your app a direct message saying "hello" and wait for a response. Clicking the attached button will post another message to channel.
 
 ## Updating the app
 
-At this point, you're running the getting started Bolt for JavaScript [app](https://github.com/slackapi/bolt-js-getting-started-app)!
+At this point, you're successfully running the getting started Bolt for JavaScript [app](https://github.com/slackapi/bolt-js-getting-started-app)!
 
 The defaults included leave opportunities abound, so to personalize this app let's now update the app name then respond with a kind farewell.
 
 #### Changing the app name
 
-With intentions of the app's purpose known, return back to app settings and make changes that seem right.
+With intentions of the app's purpose known, return back to app settings and make changes that feel right to you.
 
 - **App name**: The label describing your app. Found on the "Basic Information" page.
 - **Bot name**: A title appearing in conversations. Found on the "App Home" page.
@@ -235,7 +235,7 @@ app.message('goodbye', async ({ say }) => {
 });
 ```
 
-Once the file is saved, restart your app to make sure the latest changes are being used then go back to channel and say "goodbye".
+Once the file is saved, restart your app to make sure the latest changes are being used, then go back to channel and say "goodbye".
 
 ## Next steps {#next-steps}
 
@@ -252,5 +252,5 @@ You can now continue customizing your app with various features to make it right
 * Explore the different events your bot can listen to with the [`event`](/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the documentation site.
 * Bolt allows you to call [Web API](/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on our API site.
 * Learn more about the different [token](https://docs.slack.dev/authentication/tokens) types and [authentication](/concepts/authenticating-oauth) setups. Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
-* Receive events using HTTP for various deployment methods, such as to the [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda) providers.
+* Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda).
 * Compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
