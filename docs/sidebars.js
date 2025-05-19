@@ -7,17 +7,17 @@ const sidebars = {
       label: 'Bolt for JavaScript',
       className: 'sidebar-title',
     },
+    {
+      type: 'doc',
+      id: 'getting-started',
+    },
     { type: 'html', value: '<hr>' },
     {
       type: 'category',
       label: 'Guides',
       collapsed: false,
       items: [
-        {
-          type: 'category',
-          label: 'Getting Started',
-          items: ['getting-started', 'building-an-app'],
-        },
+        'building-an-app',
         {
           type: 'category',
           label: 'Slack API calls',

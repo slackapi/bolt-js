@@ -1,6 +1,6 @@
 ---
-title: Quick start with Bolt for JavaScript
-sidebar_label: Quick start
+title: Quickstart with Bolt for JavaScript
+sidebar_label: Quickstart
 ---
 
 This quickstart guide aims to help you get a Slack app using Bolt for JavaScript up and running as soon as possible!
