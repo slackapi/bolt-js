@@ -178,7 +178,6 @@ $ export SLACK_BOT_TOKEN=xoxb-example
 </TabItem>
 </Tabs>
 
-
 ## Running the app
 
 After the app has been created, it is time to run it:
@@ -249,8 +248,8 @@ Follow along with the steps that went into making this app on the [building an a
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-* Explore the different events your bot can listen to with the [`event`](/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the API docs site.
-* Bolt allows you to call [Web API](/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
-* Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
-* Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda).
-* Compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
+- Explore the different events your bot can listen to with the [`event`](/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the API docs site.
+- Bolt allows you to call [Web API](/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
+- Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
+- Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda).
+- Compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
