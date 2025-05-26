@@ -30,21 +30,15 @@ updates:
           - "react"
           - "react-dom"
   - package-ecosystem: "npm"
-    directories:
-      - "/examples/custom-properties"
-      - "/examples/custom-receiver"
-      - "/examples/deploy-aws-lambda"
-      - "/examples/deploy-heroku"
-      - "/examples/getting-started-typescript"
-      - "/examples/message-metadata"
-      - "/examples/oauth-express-receiver"
-      - "/examples/oauth"
-      - "/examples/socket-mode-oauth"
-      - "/examples/socket-mode"
+    directory: "/examples"
+    schedule:
+      interval: "weekly"
     labels:
       - "area:examples"
       - "dependencies"
       - "javascript"
-    schedule:
-      interval: "weekly"
     versioning-strategy: increase
+    groups:
+      slack:
+        patterns:
+          - "@slack/*"
