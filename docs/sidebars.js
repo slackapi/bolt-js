@@ -90,7 +90,7 @@ const sidebars = {
       items: [
         'tutorials/ai-assistant',
         'tutorials/code-assistant',
-        'tutorials/custom-steps',       
+        'tutorials/custom-steps',
         'tutorials/custom-steps-workflow-builder-new',
         'tutorials/custom-steps-workflow-builder-existing',
       ],
