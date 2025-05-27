@@ -41,6 +41,7 @@ const sidebars = {
         },
         'concepts/ai-apps',
         'concepts/custom-steps',
+        'concepts/custom-steps-dynamic-options',
         {
           type: 'category',
           label: 'App Configuration',
@@ -89,7 +90,7 @@ const sidebars = {
       items: [
         'tutorials/ai-assistant',
         'tutorials/code-assistant',
-        'tutorials/custom-steps',
+        'tutorials/custom-steps',       
         'tutorials/custom-steps-workflow-builder-new',
         'tutorials/custom-steps-workflow-builder-existing',
       ],
