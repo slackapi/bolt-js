@@ -40,8 +40,15 @@ const sidebars = {
           ],
         },
         'concepts/ai-apps',
-        'concepts/custom-steps',
-        'concepts/custom-steps-dynamic-options',
+        {
+          type: 'category',
+          label: 'Custom Steps',
+          items: [
+
+            'concepts/custom-steps',
+            'concepts/custom-steps-dynamic-options',
+          ]
+        },
         {
           type: 'category',
           label: 'App Configuration',
