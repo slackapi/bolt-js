@@ -45,8 +45,8 @@ $ slack login
 
 Tooling for the terminal can also be used to follow along:
 
-- **Git**: https://git-scm.com/downloads
-- **Node.js**: https://nodejs.org/en/download
+- [Git](https://git-scm.com/downloads)
+- [Node.js](https://nodejs.org/en/download)
 
 Once installed, make sure recent versions are being used:
 
