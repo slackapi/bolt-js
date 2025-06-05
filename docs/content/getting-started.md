@@ -82,7 +82,7 @@ $ slack create first-bolt-app --template slack-samples/bolt-js-getting-started-a
 $ cd first-bolt-app
 ```
 
-After a project is created you'll have a `package.json` file with project details and a `.slack` directory for application use.
+After a project is created you'll have a `package.json` file for app dependencies and a `.slack` directory for Slack CLI configuration.
 
 A few other files exist too, but we'll visit these later.
 
@@ -131,7 +131,7 @@ After confirming the app responds, celebrate, then interrupt the process by pres
 Navigate to your list of apps and [create a new Slack app](https://api.slack.com/apps/new) using the "from a manifest" option:
 
 1. Select the workspace to develop your app in.
-2. Use copied values from the `manifest.json` file to create your app.
+2. Copy and paste the `manifest.json` file to create your app.
 3. Confirm the app features and click "Create".
 
 You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials:
@@ -140,8 +140,8 @@ You'll then land on your app's **Basic Information** page, which is an overview 
 
 To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/concepts/socket-mode). This connection requires a specific app token:
 
-1. On the **Basic Information** page, scroll to the "App-Level Tokens" section and click **Generate Token and Scopes**.
-2. Name the token "Development" or something similar and add the `connections:write` scope, then click "Generate".
+1. On the **Basic Information** page, scroll to the **App-Level Tokens** section and click **Generate Token and Scopes**.
+2. Name the token "Development" or something similar and add the `connections:write` scope, then click **Generate**.
 3. Save the generated `xapp` token as an environment variable within your project:
 
 ```sh
@@ -190,7 +190,7 @@ After confirming the app responds, celebrate, then interrupt the process by pres
 
 ## Updating the app
 
-At this point, you're successfully running the getting started Bolt for JavaScript [app](https://github.com/slack-samples/bolt-js-getting-started-app)!
+At this point, you've successfully run the getting started Bolt for JavaScript [app](https://github.com/slack-samples/bolt-js-getting-started-app)!
 
 The defaults included leave opportunities abound, so to personalize this app let's now edit the code to respond with a kind farewell.
 
@@ -217,7 +217,7 @@ The created app will have some placeholder values and a small set of [scopes](ht
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
-Visit app settings for your app with the following command:
+Open app settings for your app with the following command:
 
 ```sh
 $ slack app settings
@@ -230,11 +230,11 @@ This will open the following page in a web browser:
 </TabItem>
 <TabItem value="terminal" label="Browser">
 
-Return back to the pages of customization for your app at a similar URL:
+Browse to https://api.slack.com/apps and select your app from the list.
 
-```
-https://api.slack.com/apps/A0123456789
-```
+This will open the following page:
+
+![Basic Information page](/img//basic-information-page.png "Basic Information page")
 
 </TabItem>
 </Tabs>
