@@ -25,8 +25,8 @@ A few tools are needed for the following steps. We recommend using the [**Slack 
 
 Install the latest version of the Slack CLI to get started:
 
-- **Mac / Linux**: https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux
-- **Windows**: https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-windows
+- [Slack CLI for macOS & Linux](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
+- [Slack CLI for Windows](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-windows)
 
 Then confirm a successful installation with the following command:
 
