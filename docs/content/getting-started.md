@@ -211,14 +211,7 @@ With the app running, add your app's bot to a channel or send your app a direct 
 
 At this point, you're successfully running the getting started Bolt for JavaScript [app](https://github.com/slack-samples/bolt-js-getting-started-app)!
 
-The defaults included leave opportunities abound, so to personalize this app let's now update the app name then respond with a kind farewell.
-
-#### Changing the app name
-
-With intentions of the app's purpose known, return back to app settings and make changes that feel right to you.
-
-- **App name**: The label describing your app. Found on the "Basic Information" page.
-- **Bot name**: A title appearing in conversations. Found on the "App Home" page.
+The defaults included leave opportunities abound, so to personalize this app let's now edit the code to respond with a kind farewell.
 
 #### Responding to a farewell
 
