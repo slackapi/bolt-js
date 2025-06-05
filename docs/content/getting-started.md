@@ -66,7 +66,7 @@ We recommend using [developer sandboxes](https://docs.slack.dev/tools/developer-
 
 :::
 
-## Initializing a project {#initializing-a-project}
+## Creating a project {#creating-a-project}
 
 With the toolchain configured, it's time to set up a new Bolt project. This contains the code that handles logic for your app.
 
@@ -102,9 +102,9 @@ Outlines of a project are taking shape, so we can move on to creating an app!
 </TabItem>
 </Tabs>
 
-## Creating an app {#creating-an-app}
+## Running the app {#running-the-app}
 
-Before you can start developing with Bolt, you will want to create a Slack app.
+Before you can start developing with Bolt, you will want a running Slack app.
 
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
@@ -117,17 +117,13 @@ $ slack run
 [INFO]  bolt-app ⚡️ Bolt app is running!
 ```
 
-After the app has started, celebrate, then interrupt the process with `^C` to stop it for now.
+With the app running, you can test it out with the following steps:
 
-The created app will have some placeholder values and a small set of [scopes](https://docs.slack.dev/reference/scopes) to start, but we recommend exploring the customizations possible on app settings:
+1. Open a direct message with your app or invite the bot to a public channel.
+2. Send "hello" to the current conversation and wait for a response.
+3. Click the attached button labelled "Click me" to post another reply.
 
-```sh
-$ slack app settings
-```
-
-On these pages you're free to make changes, such as updating your app icon, or inspect various credentials:
-
-![Basic Information page](/img//basic-information-page.png "Basic Information page")
+After confirming the app responds, celebrate, then interrupt the process by pressing `CTRL+C` in the terminal to stop your app from running.
 
 </TabItem>
 <TabItem value="terminal" label="Browser">
@@ -138,9 +134,7 @@ Navigate to your list of apps and [create a new Slack app](https://api.slack.com
 2. Use copied values from the `manifest.json` file to create your app.
 3. Confirm the app features and click "Create".
 
-You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials.
-
-On these pages you're free to make changes, such as updating your app icon:
+You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials:
 
 ![Basic Information page](/img//basic-information-page.png "Basic Information page")
 
@@ -175,37 +169,24 @@ A bot token is also needed to interact with the Web API methods as your app's bo
 $ export SLACK_BOT_TOKEN=xoxb-example
 ```
 
-</TabItem>
-</Tabs>
-
-## Running the app
-
 After the app has been created, it is time to run it:
 
-<Tabs groupId="cli-or-terminal">
-<TabItem value="cli" label="Slack CLI">
-
 ```sh
-$ slack run
-```
-
-</TabItem>
-<TabItem value="terminal" label="Terminal">
-
-```script
 $ npm run start
-```
-
-</TabItem>
-</Tabs>
-
-Logs in the console will let you know that the app is up and running:
-
-```sh
+...
 [INFO]  bolt-app ⚡️ Bolt app is running!
 ```
 
-With the app running, add your app's bot to a channel or send your app a direct message saying "hello" and wait for a response. Clicking the attached button will post another message to channel.
+With the app running, you can test it out with the following steps:
+
+1. Open a direct message with your app or invite the bot to a public channel.
+2. Send "hello" to the current conversation and wait for a response.
+3. Click the attached button labelled "Click me" to post another reply.
+
+After confirming the app responds, celebrate, then interrupt the process by pressing `CTRL+C` in the terminal to stop your app from running.
+
+</TabItem>
+</Tabs>
 
 ## Updating the app
 
@@ -229,6 +210,37 @@ app.message('goodbye', async ({ say }) => {
 
 Once the file is saved, restart your app to make sure the latest changes are being used, then go back to channel and say "goodbye".
 
+#### Customizing app settings
+
+The created app will have some placeholder values and a small set of [scopes](https://docs.slack.dev/reference/scopes) to start, but we recommend exploring the customizations possible on app settings.
+
+<Tabs groupId="cli-or-terminal">
+<TabItem value="cli" label="Slack CLI">
+
+Visit app settings for your app with the following command:
+
+```sh
+$ slack app settings
+```
+
+This will open the following page in a web browser:
+
+![Basic Information page](/img//basic-information-page.png "Basic Information page")
+
+</TabItem>
+<TabItem value="terminal" label="Browser">
+
+Return back to the pages of customization for your app at a similar URL:
+
+```
+https://api.slack.com/apps/A0123456789
+```
+
+</TabItem>
+</Tabs>
+
+On these pages you're free to make changes such as updating your app icon, configuring app features, and perhaps even distributing your app!
+
 ## Next steps {#next-steps}
 
 Congrats once more on getting up and running with this quick start.
@@ -245,4 +257,4 @@ You can now continue customizing your app with various features to make it right
 - Bolt allows you to call [Web API](/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
 - Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
 - Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda).
-- Compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
+- Read on [app design](https://docs.slack.dev/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
