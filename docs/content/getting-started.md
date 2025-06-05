@@ -136,7 +136,7 @@ Navigate to your list of apps and [create a new Slack app](https://api.slack.com
 
 You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials:
 
-![Basic Information page](/img//basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/concepts/socket-mode). This connection requires a specific app token:
 
@@ -161,7 +161,7 @@ A bot token is also needed to interact with the Web API methods as your app's bo
 1. Navigate to the **OAuth & Permissions** on the left sidebar and install your app to your workspace to generate a token.
 2. After authorizing the installation, you'll return to the **OAuth & Permissions** page and find a **Bot User OAuth Access Token**:
 
-![OAuth Tokens](/img//bot-token.png "Bot OAuth Token")
+![OAuth Tokens](/img/bot-token.png "Bot OAuth Token")
 
 3. Copy the bot token beginning with `xoxb` from the **OAuth & Permissions page** and then store it in a new environment variable:
 
@@ -225,7 +225,7 @@ $ slack app settings
 
 This will open the following page in a web browser:
 
-![Basic Information page](/img//basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 </TabItem>
 <TabItem value="terminal" label="Browser">
@@ -234,7 +234,7 @@ Browse to https://api.slack.com/apps and select your app from the list.
 
 This will open the following page:
 
-![Basic Information page](/img//basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 </TabItem>
 </Tabs>

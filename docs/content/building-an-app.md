@@ -23,7 +23,7 @@ After you fill out an app name (_you can change it later_) and pick a workspace 
 
 This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header.
 
-![Basic Information page](/img//basic-information-page.png "Basic Information page")
+![Basic Information page](/img/basic-information-page.png "Basic Information page")
 
 Look around, add an app icon and description, and then let's start configuring your app. 🔩
 
@@ -49,7 +49,7 @@ We're going to use bot and app tokens for this guide.
 
 4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
-![OAuth Tokens](/img//bot-token.png "Bot OAuth Token")
+![OAuth Tokens](/img/bot-token.png "Bot OAuth Token")
 
 :::tip[Not sharing is sometimes caring]
 
