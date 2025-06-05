@@ -132,7 +132,7 @@ On these pages you're free to make changes, such as updating your app icon, or i
 </TabItem>
 <TabItem value="terminal" label="Browser">
 
-Naviage to your list of apps and [create a new Slack app](https://api.slack.com/apps/new) using the "from a manifest" option:
+Navigate to your list of apps and [create a new Slack app](https://api.slack.com/apps/new) using the "from a manifest" option:
 
 1. Select the workspace to develop your app in.
 2. Use copied values from the `manifest.json` file to create your app.
