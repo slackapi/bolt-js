@@ -117,7 +117,7 @@ $ slack run
 [INFO]  bolt-app ⚡️ Bolt app is running!
 ```
 
-With the app running, you can test it out with the following steps:
+With the app running, you can test it out with the following steps in Slack:
 
 1. Open a direct message with your app or invite the bot to a public channel.
 2. Send "hello" to the current conversation and wait for a response.
@@ -177,7 +177,7 @@ $ npm run start
 [INFO]  bolt-app ⚡️ Bolt app is running!
 ```
 
-With the app running, you can test it out with the following steps:
+With the app running, you can test it out with the following steps in Slack:
 
 1. Open a direct message with your app or invite the bot to a public channel.
 2. Send "hello" to the current conversation and wait for a response.
@@ -208,7 +208,48 @@ app.message('goodbye', async ({ say }) => {
 });
 ```
 
-Once the file is saved, restart your app to make sure the latest changes are being used, then go back to channel and say "goodbye".
+Once the file is updated, save the changes and then we'll make sure those changes are being used.
+
+<Tabs groupId="cli-or-terminal">
+<TabItem value="cli" label="Slack CLI">
+
+Run the following command and select the app created earlier to start, or restart, your app with the latest changes:
+
+```sh
+$ slack run
+...
+[INFO]  bolt-app ⚡️ Bolt app is running!
+```
+
+After finding the above output appears, open Slack to perform these steps:
+
+1. Return to the direct message or public channel with your bot.
+2. Send "goodbye" to the conversation.
+3. Receive a parting response from before and repeat "goodbye" to find another one.
+
+Your app can be stopped again by pressing `CTRL+C` in the terminal to end these chats.
+
+</TabItem>
+<TabItem value="terminal" label="Terminal">
+
+Run the following command to start, or restart, your app with the latest changes:
+
+```sh
+$ npm run start
+...
+[INFO]  bolt-app ⚡️ Bolt app is running!
+```
+
+After finding the above output appears, open Slack to perform these steps:
+
+1. Return to the direct message or public channel with your bot.
+2. Send "goodbye" to the conversation.
+3. Receive a parting response from before and repeat "goodbye" to find another one.
+
+Your app can be stopped again by pressing `CTRL+C` in the terminal to end these chats.
+
+</TabItem>
+</Tabs>
 
 #### Customizing app settings
 
