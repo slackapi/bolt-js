@@ -169,7 +169,7 @@ A bot token is also needed to interact with the Web API methods as your app's bo
 $ export SLACK_BOT_TOKEN=xoxb-example
 ```
 
-After the app has been created, it is time to run it:
+After saving tokens for the app you created, it is time to run it:
 
 ```sh
 $ npm run start
