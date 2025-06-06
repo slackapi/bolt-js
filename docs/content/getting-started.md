@@ -131,7 +131,7 @@ After confirming the app responds, celebrate, then interrupt the process by pres
 Navigate to your list of apps and [create a new Slack app](https://api.slack.com/apps/new) using the "from a manifest" option:
 
 1. Select the workspace to develop your app in.
-2. Copy and paste the `manifest.json` file to create your app.
+2. Copy and paste the `manifest.json` file contents to create your app.
 3. Confirm the app features and click "Create".
 
 You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials:
