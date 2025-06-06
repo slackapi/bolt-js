@@ -75,7 +75,7 @@ If you don’t already have a project, let’s create a new one!
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
-A blank template can be used to start with project scaffolding:
+A starter template can be used to start with project scaffolding:
 
 ```sh
 $ slack create first-bolt-app --template slack-samples/bolt-js-getting-started-app
@@ -89,7 +89,7 @@ A few other files exist too, but we'll visit these later.
 </TabItem>
 <TabItem value="terminal" label="Terminal">
 
-A blank template can be cloned to start with project scaffolding:
+A starter template can be cloned to start with project scaffolding:
 
 ```sh
 $ git clone https://github.com/slack-samples/bolt-js-getting-started-app first-bolt-app
