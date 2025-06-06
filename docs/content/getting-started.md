@@ -121,7 +121,7 @@ With the app running, you can test it out with the following steps in Slack:
 
 1. Open a direct message with your app or invite the bot to a public channel.
 2. Send "hello" to the current conversation and wait for a response.
-3. Click the attached button labelled "Click me" to post another reply.
+3. Click the attached button labelled "Click Me" to post another reply.
 
 After confirming the app responds, celebrate, then interrupt the process by pressing `CTRL+C` in the terminal to stop your app from running.
 
@@ -181,7 +181,7 @@ With the app running, you can test it out with the following steps in Slack:
 
 1. Open a direct message with your app or invite the bot to a public channel.
 2. Send "hello" to the current conversation and wait for a response.
-3. Click the attached button labelled "Click me" to post another reply.
+3. Click the attached button labelled "Click Me" to post another reply.
 
 After confirming the app responds, celebrate, then interrupt the process by pressing `CTRL+C` in the terminal to stop your app from running.
 
