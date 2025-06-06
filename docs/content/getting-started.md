@@ -159,7 +159,7 @@ Treat your tokens like a password and [keep it safe](https://docs.slack.dev/auth
 A bot token is also needed to interact with the Web API methods as your app's bot user. We can gather this as follows:
 
 1. Navigate to the **OAuth & Permissions** on the left sidebar and install your app to your workspace to generate a token.
-2. After authorizing the installation, you'll return to the **OAuth & Permissions** page and find a **Bot User OAuth Access Token**:
+2. After authorizing the installation, you'll return to the **OAuth & Permissions** page and find a **Bot User OAuth Token**:
 
 ![OAuth Tokens](/img/bot-token.png "Bot OAuth Token")
 
