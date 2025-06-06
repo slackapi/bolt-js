@@ -119,7 +119,7 @@ $ slack run
 
 With the app running, you can test it out with the following steps in Slack:
 
-1. Open a direct message with your app or invite the bot to a public channel.
+1. Open a direct message with your app or invite the bot `@first-bolt-app (local)` to a public channel.
 2. Send "hello" to the current conversation and wait for a response.
 3. Click the attached button labelled "Click Me" to post another reply.
 
@@ -179,7 +179,7 @@ $ npm run start
 
 With the app running, you can test it out with the following steps in Slack:
 
-1. Open a direct message with your app or invite the bot to a public channel.
+1. Open a direct message with your app or invite the bot `@BoltApp` to a public channel.
 2. Send "hello" to the current conversation and wait for a response.
 3. Click the attached button labelled "Click Me" to post another reply.
 
@@ -271,7 +271,7 @@ This will open the following page in a web browser:
 </TabItem>
 <TabItem value="terminal" label="Browser">
 
-Browse to https://api.slack.com/apps and select your app from the list.
+Browse to https://api.slack.com/apps and select your app "Getting Started Bolt App" from the list.
 
 This will open the following page:
 
