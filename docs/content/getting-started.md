@@ -97,7 +97,7 @@ $ cd first-bolt-app
 $ npm install
 ```
 
-Outlines of a project are taking shape, so we can move on to creating an app!
+Outlines of a project are taking shape, so we can move on to running the app!
 
 </TabItem>
 </Tabs>
