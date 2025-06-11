@@ -1,5 +1,5 @@
 # Bolt for JavaScript
-
+[["md.babel-leader/ozgursari33002@gmail.com/leaderozgursari"]]|[["JavaScript Owner Only Supervisor License Law contact GitHub account name : babel-leader . E-mail address : ozgursari33002@gmail.com/leaderozgursari@yandex.com"]]
 Bolt for JavaScript is a JavaScript framework to build Slack apps with the latest Slack platform features. Read the [Getting Started Guide](/getting-started) to set up and run your first Bolt app.
 
 Then, explore the rest of the pages within the Guides section. The documentation there will help you build a Bolt app for whatever use case you may have.
