@@ -314,10 +314,10 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
     const postMessageArgument: ChatPostMessageArguments =
       typeof message === 'string' ? { text: message, channel, thread_ts } : { ...message, channel, thread_ts };
 
-    if (threadContext) {
+    if (threadContext || postMessageArgument.metadata) {
       postMessageArgument.metadata = {
-        event_type: 'assistant_thread_context',
-        event_payload: threadContext as MessageMetadataEventPayloadObject,
+        event_type: postMessageArgument.metadata?.event_type ?? 'assistant_thread_context',
+        event_payload: { ...threadContext, ...postMessageArgument.metadata?.event_payload ?? {} } as MessageMetadataEventPayloadObject,
       };
     }
 

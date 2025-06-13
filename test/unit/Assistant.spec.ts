@@ -22,6 +22,7 @@ import {
   createDummyMessageEventMiddlewareArgs,
   wrapMiddleware,
 } from './helpers';
+import { team } from './helpers/events'
 
 async function importAssistant(overrides: Override = {}): Promise<typeof import('../../src/Assistant')> {
   return rewiremock.module(() => import('../../src/Assistant'), overrides);
@@ -337,6 +338,37 @@ describe('Assistant class', () => {
             metadata: {
               event_type: 'assistant_thread_context',
               event_payload: context,
+            },
+          };
+
+          sinon.assert.calledWith(fakeClient.chat.postMessage, expectedParams);
+        });
+
+        it('say should be called with message_metadata that supplements thread context', async () => {
+          const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+
+          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
+
+          const { enrichAssistantArgs } = await importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+
+          await threadStartedArgs.say({ text: 'Say called!', metadata: { event_type: 'some_other_type', event_payload: { arg1: '1', arg2: 2 }}});
+
+          const {
+            payload: {
+              assistant_thread: { channel_id, thread_ts },
+            },
+          } = mockThreadStartedArgs;
+
+          const expectedParams = {
+            text: 'Say called!',
+            channel: channel_id,
+            thread_ts,
+            metadata: {
+              event_type: 'some_other_type',
+              event_payload: { channel_id, team_id: team, arg1: '1', arg2: 2 },
             },
           };
 

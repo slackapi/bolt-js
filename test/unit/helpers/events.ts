@@ -49,7 +49,7 @@ import type {
 
 const ts = '1234.56';
 const user = 'U1234';
-const team = 'T1234';
+export const team = 'T1234';
 const channel = 'C1234';
 const token = 'xoxb-1234';
 const app_id = 'A1234';
