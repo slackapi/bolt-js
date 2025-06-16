@@ -3,9 +3,9 @@ title: Deploying to Heroku
 lang: en
 ---
 
-This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
+This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the [Heroku platform](https://heroku.com/). Along the way, we'll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 
-When you’re finished, you’ll have this ⚡️[Deploying to Heroku app](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-heroku) to run, modify, and make your own.
+When you're finished, you'll have this ⚡️[Deploying to Heroku app](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-heroku) to run, modify, and make your own.
 
 :::warning
 
@@ -131,7 +131,7 @@ You should now be set up with the Heroku tools! Let's move on to the exciting st
 
 ## Create an app on Heroku {#create-an-app-on-heroku}
 
-It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
+It's time to [create a Heroku app](https://devcenter.heroku.com/articles/creating-apps) using the tools that you just installed. When you create an app, you can choose a unique name or have it randomly generated.
 
 Creating new Heroku apps will use your existing Heroku plan subscription. When getting started or deploying many small apps, we recommend starting with [Heroku's low-cost Eco Dyno plan](https://blog.heroku.com/new-low-cost-plans).
 
@@ -295,6 +295,91 @@ git push heroku main
 ```
 
 When the deploy is complete, you can open a Slack channel that your app has joined and say "goodbye" (lower-case). You should see a friendly farewell from your Slack app.
+
+---
+
+## Automating deploys with deploy hooks {#automating-deploys}
+
+You can automate your Slack app deployments using `deploy hooks` and GitHub Actions. This allows you to automatically deploy changes to your application code and app manifest whenever a PR is merged to your main branch.
+
+### 1. Set up the deploy hook
+
+In your project's `.slack/hooks.json` file, add a deploy hook:
+
+```json
+{
+  "hooks": {
+    "get-hooks": "npx -q --no-install -p @slack/cli-hooks slack-cli-get-hooks",
+    "deploy": "git push heroku main"
+  }
+}
+```
+
+This hook tells Slack's CLI to execute the Heroku deployment command whenever the deploy process is triggered. The `slack deploy` command will:
+- Update your app settings based on any app manifest changes
+- Reinstall the app if needed
+- Run this deploy hook to push your code to Heroku
+
+This ensures a consistent deploy process for your Slack app. With the deploy command in place, you can set up a GitHub action to manage automatic deployments on merges to your main branch.
+
+### 2. Create a GitHub Action
+
+Create a new file at `.github/workflows/deploy.yml` with the following content:
+
+```yaml
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+    - uses: actions/checkout@v4
+      
+      - name: Install Slack CLI
+        run: |
+          curl -fsSL https://downloads.slack-edge.com/slack-cli/install.sh | bash
+      
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+      
+      - name: Deploy to Slack and Heroku
+        env:
+          SLACK_SERVICE_TOKEN: ${{ secrets.SLACK_SERVICE_TOKEN }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: slack deploy -s --token $SLACK_SERVICE_TOKEN
+
+```
+
+### 3. Set up GitHub Secrets
+
+You'll need to add two secrets to your GitHub repository:
+
+1. `SLACK_SERVICE_TOKEN`: A token with permissions to deploy your Slack app. If you don't have a token, you can [obtain one with `slack auth`](https://tools.slack.dev/slack-cli/guides/authorizing-the-slack-cli/#obtain-token)
+2. `HEROKU_API_KEY`: Your Heroku API key for deployment authentication
+
+You can add these under your repository's Settings → Secrets and variables → Actions section.
+
+### 4. How it works
+
+With this setup in place:
+
+1. When a PR is merged to the `main` branch, the GitHub Action is triggered
+2. The action installs the Slack CLI
+3. The action installs the Heroku CLI
+4. The `slack deploy` command is executed, which:
+   - Updates your app settings in Slack
+   - Reinstalls the app if needed
+   - Runs your deploy hook to push code to Heroku
+
+This automation ensures that both your application code and Slack app configuration stay in sync with each deployment.
 
 ---
 
