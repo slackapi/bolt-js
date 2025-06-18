@@ -22,7 +22,7 @@ import {
   createDummyMessageEventMiddlewareArgs,
   wrapMiddleware,
 } from './helpers';
-import { team } from './helpers/events'
+import { team } from './helpers/events';
 
 async function importAssistant(overrides: Override = {}): Promise<typeof import('../../src/Assistant')> {
   return rewiremock.module(() => import('../../src/Assistant'), overrides);
@@ -354,7 +354,10 @@ describe('Assistant class', () => {
           const { enrichAssistantArgs } = await importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
-          await threadStartedArgs.say({ text: 'Say called!', metadata: { event_type: 'some_other_type', event_payload: { arg1: '1', arg2: 2 }}});
+          await threadStartedArgs.say({
+            text: 'Say called!',
+            metadata: { event_type: 'some_other_type', event_payload: { arg1: '1', arg2: 2 } },
+          });
 
           const {
             payload: {

@@ -317,7 +317,10 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
     if (threadContext || postMessageArgument.metadata) {
       postMessageArgument.metadata = {
         event_type: postMessageArgument.metadata?.event_type ?? 'assistant_thread_context',
-        event_payload: { ...threadContext, ...postMessageArgument.metadata?.event_payload ?? {} } as MessageMetadataEventPayloadObject,
+        event_payload: {
+          ...threadContext,
+          ...(postMessageArgument.metadata?.event_payload ?? {}),
+        } as MessageMetadataEventPayloadObject,
       };
     }
 
