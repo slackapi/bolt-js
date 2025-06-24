@@ -141,6 +141,7 @@ Look around, add an app icon and description, and then let's start configuring y
 Slack apps use [OAuth to manage access to Slack's APIs](https://docs.slack.dev/authentication/installing-with-oauth). When an app is installed, you'll receive a token that the app can use to call API methods.
 
 There are three main token types available to a Slack app: user (`xoxp`), bot (`xoxb`), and app (`xapp`) tokens.
+
 - [User tokens](https://docs.slack.dev/authentication/tokens#user) allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace.
 - [Bot tokens](https://docs.slack.dev/authentication/tokens#bot) are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
 - [App-level tokens](https://docs.slack.dev/authentication/tokens#app-level) represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.
@@ -235,7 +236,7 @@ Create a new entrypoint file called `app.js` in this directory and add the follo
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your app and bot token
 const app = new App({
@@ -248,7 +249,7 @@ const app = new App({
   // Start your app
   await app.start();
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -256,19 +257,19 @@ const app = new App({
 <TabItem value="http" label="HTTP">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 (async () => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -299,6 +300,7 @@ Your app should let you know that it's up and running. 🎉
 ---
 
 ## Setting up events {#setting-up-events}
+
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.
 
 To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://docs.slack.dev/apis/events-api/).
@@ -315,6 +317,7 @@ If you want your bot to listen to messages from everywhere it is added to, choos
 ---
 
 ## Listening and responding to a message {#listening-and-responding-to-a-message}
+
 Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
 
 The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello":
@@ -323,7 +326,7 @@ The following example listens and responds to all messages in channels/DMs where
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your app and bot token
 const app = new App({
@@ -333,7 +336,7 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message("hello", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say(`Hey there <@${message.user}>!`);
 });
@@ -342,7 +345,7 @@ app.message('hello', async ({ message, say }) => {
   // Start your app
   await app.start();
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -350,7 +353,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -359,7 +362,7 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message("hello", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say(`Hey there <@${message.user}>!`);
 });
@@ -368,7 +371,7 @@ app.message('hello', async ({ message, say }) => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -385,7 +388,6 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration.
 
-
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
 
@@ -394,7 +396,7 @@ With Socket Mode on, basic interactivity is enabled for us by default, so no fur
 </TabItem>
 <TabItem value="http" label="HTTP">
 
-Similar to events, you'll need to specify a Request URL for Slack to send the action (such as *user clicked a button*).
+Similar to events, you'll need to specify a Request URL for Slack to send the action (such as _user clicked a button_).
 
 By default, Bolt uses the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
 
@@ -404,6 +406,7 @@ By default, Bolt uses the same endpoint for interactive components that it uses 
 When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events.
 
 Now, let’s go back to your app’s code and add logic to handle those events:
+
 - First, we'll send a message that contains an interactive component (in this case a button).
 - Next, we'll listen for the action of a user clicking the button before responding
 
@@ -413,7 +416,7 @@ Below, the code from the last section is modified to send a message containing a
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your app and bot token
 const app = new App({
@@ -423,27 +426,27 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message("hello", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Click Me",
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: "button_click",
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
@@ -451,7 +454,7 @@ app.message('hello', async ({ message, say }) => {
   // Start your app
   await app.start();
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -459,36 +462,36 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message("hello", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Click Me",
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: "button_click",
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
@@ -496,7 +499,7 @@ app.message('hello', async ({ message, say }) => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -513,7 +516,7 @@ The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way
 
 :::
 
-Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (*yet!*).
+Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (_yet!_).
 
 Let's add a handler to send a followup message when someone clicks the button:
 
@@ -528,40 +531,40 @@ https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js
 <TabItem value="http" label="HTTP">
 
 ```javascript
-const { App } = require('@slack/bolt');
+const { App } = require("@slack/bolt");
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message("hello", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Click Me",
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: "button_click",
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
-app.action('button_click', async ({ body, ack, say }) => {
+app.action("button_click", async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
   await say(`<@${body.user.id}> clicked the button`);
@@ -571,7 +574,7 @@ app.action('button_click', async ({ body, ack, say }) => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info('⚡️ Bolt app is running!');
+  app.logger.info("⚡️ Bolt app is running!");
 })();
 ```
 
@@ -583,14 +586,15 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 ---
 
 ## Next steps {#next-steps}
+
 You just built your first [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-getting-started-app)! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
-* Read through the concepts pages to learn about the different methods and features your Bolt app has access to.
+- Read through the concepts pages to learn about the different methods and features your Bolt app has access to.
 
-* Explore the different events your bot can listen to with the [`events()`](/concepts/event-listening) method. All of the events are listed [on the API site](https://docs.slack.dev/reference/events).
+- Explore the different events your bot can listen to with the [`events()`](/concepts/event-listening) method. All of the events are listed [on the API site](https://docs.slack.dev/reference/events).
 
-* Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on our API site.
+- Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://docs.slack.dev/authentication/tokens). Your app may need different tokens depending on the actions you want it to perform.
+- Learn more about the different token types [on our API site](https://docs.slack.dev/authentication/tokens). Your app may need different tokens depending on the actions you want it to perform.

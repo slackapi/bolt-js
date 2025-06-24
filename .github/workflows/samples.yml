@@ -3,7 +3,8 @@ name: Samples Integration Type-checking
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -16,12 +17,16 @@ jobs:
         example:
           - examples/getting-started-typescript
           - examples/custom-receiver
+    permissions:
+      contents: read
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - name: Package the latest changes to bolt-js
         run: npm i && npm pack . && rm -rf node_modules
       - name: Install example dependencies for testing
@@ -39,23 +44,27 @@ jobs:
         sample:
           - slack-samples/bolt-ts-starter-template
           - slack-samples/bolt-ts-custom-function-template
+    permissions:
+      contents: read
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
       - name: Checkout bolt-js
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           path: ./bolt-js
+          persist-credentials: false
       - name: Package the latest changes to bolt-js
         working-directory: ./bolt-js
         run: npm i && npm pack . && rm -rf node_modules
       - name: Checkout ${{ matrix.sample }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: ${{ matrix.sample }}
           path: ./sample
+          persist-credentials: false
       - name: Install sample dependencies for testing
         working-directory: ./sample
         run: npm i && npm i ../bolt-js/slack-bolt-*.tgz

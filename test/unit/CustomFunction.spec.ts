@@ -10,7 +10,7 @@ import {
   validate,
 } from '../../src/CustomFunction';
 import { CustomFunctionInitializationError } from '../../src/errors';
-import { matchEventType, onlyEvents } from '../../src/middleware/builtin';
+import { autoAcknowledge, matchEventType, onlyEvents } from '../../src/middleware/builtin';
 import type { Middleware } from '../../src/types';
 
 const MOCK_FN = async () => {};
@@ -22,12 +22,12 @@ const MOCK_MIDDLEWARE_MULTIPLE = [MOCK_FN, MOCK_FN_2];
 describe('CustomFunction', () => {
   describe('constructor', () => {
     it('should accept single function as middleware', async () => {
-      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE);
+      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
       assert.isNotNull(fn);
     });
 
     it('should accept multiple functions as middleware', async () => {
-      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE);
+      const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE, { autoAcknowledge: true });
       assert.isNotNull(fn);
     });
   });
@@ -35,13 +35,21 @@ describe('CustomFunction', () => {
   describe('getListeners', () => {
     it('should return an ordered array of listeners used to map function events to handlers', async () => {
       const cbId = 'test_executed_callback_id';
-      const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE);
+      const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
       const listeners = fn.getListeners();
-      assert.equal(listeners.length, 4);
+      assert.equal(listeners.length, 5);
       assert.equal(listeners[0], onlyEvents);
       assert.equal(listeners[1].toString(), matchEventType('function_executed').toString());
       assert.equal(listeners[2].toString(), matchCallbackId(cbId).toString());
-      assert.equal(listeners[3], MOCK_FN);
+      assert.equal(listeners[3], autoAcknowledge);
+      assert.equal(listeners[4], MOCK_FN);
+    });
+
+    it('should return a array of listeners without the autoAcknowledge middleware when auto acknowledge is disabled', async () => {
+      const cbId = 'test_executed_callback_id';
+      const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: false });
+      const listeners = fn.getListeners();
+      assert.isFalse(listeners.includes(autoAcknowledge));
     });
   });
 

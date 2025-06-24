@@ -657,9 +657,8 @@ describe('SocketModeReceiver', () => {
   });
 
   describe('event', () => {
-    it('acknowledges processed events', async () => {
-      const processStub = sinon.stub<[ReceiverEvent]>().resolves();
-      processStub.callsFake(async (event: ReceiverEvent) => {
+    it('should allow events processed to be acknowledged', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().callsFake(async (event: ReceiverEvent) => {
         await event.ack();
       });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
@@ -668,17 +667,17 @@ describe('SocketModeReceiver', () => {
       receiver.init(app);
 
       // Stub ack with an awaited promise for tests
-      let resolve: () => void;
-      const called = new Promise<void>((r) => {
-        resolve = r;
+      let notifyAckCalled: () => void;
+      const ackCalled = new Promise<void>((resolve) => {
+        notifyAckCalled = resolve;
       });
       const ack = sinon.stub().callsFake(async () => {
-        resolve();
+        notifyAckCalled();
       });
 
       receiver.client.emit('slack_event', { ack });
-      await called;
-      assert.isTrue(ack.called);
+      await ackCalled;
+      sinon.assert.calledOnce(ack);
     });
 
     it('acknowledges events that throw AuthorizationError', async () => {
@@ -689,17 +688,17 @@ describe('SocketModeReceiver', () => {
       receiver.init(app);
 
       // Stub ack with an awaited promise for tests
-      let resolve: () => void;
-      const called = new Promise<void>((r) => {
-        resolve = r;
+      let notifyAckCalled: () => void;
+      const ackCalled = new Promise<void>((resolve) => {
+        notifyAckCalled = resolve;
       });
       const ack = sinon.stub().callsFake(async () => {
-        resolve();
+        notifyAckCalled();
       });
 
       receiver.client.emit('slack_event', { ack });
-      await called;
-      assert.isTrue(ack.called);
+      await ackCalled;
+      sinon.assert.calledOnce(ack);
     });
 
     it('does not acknowledge events that throw unknown errors', async () => {
@@ -714,13 +713,37 @@ describe('SocketModeReceiver', () => {
       receiver.init(app);
 
       const slackRequestArgs = { body: {}, ack: sinon.fake() };
-
       receiver.client.emit('slack_event', slackRequestArgs);
+
       while (!defaultProcessEventErrorHandlerSpy.called) {
         await delay(50);
       }
-
+      sinon.assert.calledOnce(defaultProcessEventErrorHandlerSpy);
       sinon.assert.notCalled(slackRequestArgs.ack);
+    });
+
+    it('does not re-acknowledge events that handle acknowledge and then throw unknown errors', async () => {
+      const processStub = sinon.stub<[ReceiverEvent]>().callsFake(async (event: ReceiverEvent) => {
+        await event.ack();
+        throw new Error('internal error');
+      });
+      const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
+      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'xapp-example',
+        processEventErrorHandler: defaultProcessEventErrorHandlerSpy,
+      });
+      receiver.init(app);
+
+      const slackRequestArgs = { body: {}, ack: sinon.fake() };
+      receiver.client.emit('slack_event', slackRequestArgs);
+
+      while (!defaultProcessEventErrorHandlerSpy.called) {
+        await delay(50);
+      }
+      sinon.assert.calledOnce(defaultProcessEventErrorHandlerSpy);
+      sinon.assert.calledOnce(slackRequestArgs.ack);
     });
   });
 });

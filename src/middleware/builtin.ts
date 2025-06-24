@@ -15,6 +15,7 @@ import type {
   SlackActionMiddlewareArgs,
   SlackCommandMiddlewareArgs,
   SlackEventMiddlewareArgs,
+  SlackEventMiddlewareArgsOptions,
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
   SlackViewAction,
@@ -61,6 +62,12 @@ function isEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs 
 
 function isMessageEventArgs(args: AnyMiddlewareArgs): args is SlackEventMiddlewareArgs<'message'> {
   return isEventArgs(args) && 'message' in args;
+}
+
+export function isSlackEventMiddlewareArgsOptions<EventType extends string = string>(
+  optionOrListener: SlackEventMiddlewareArgsOptions | Middleware<SlackEventMiddlewareArgs<EventType>>,
+): optionOrListener is SlackEventMiddlewareArgsOptions {
+  return typeof optionOrListener !== 'function' && 'autoAcknowledge' in optionOrListener;
 }
 
 /**
@@ -117,6 +124,16 @@ export const onlyViewActions: Middleware<AnyMiddlewareArgs> = async (args) => {
   if ('view' in args) {
     await args.next();
   }
+};
+
+/**
+ * Middleware that auto acknowledges the request received
+ */
+export const autoAcknowledge: Middleware<AnyMiddlewareArgs> = async (args) => {
+  if ('ack' in args && args.ack !== undefined) {
+    await args.ack();
+  }
+  await args.next();
 };
 
 /**

@@ -192,7 +192,7 @@ describe('ExpressReceiver', () => {
 
       sinon.assert.calledOnce(fakeCreateServer);
       assert.strictEqual(server, fakeServer as unknown as Server);
-      sinon.assert.calledWith(fakeServer.listen, port);
+      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(port));
     });
     it('should start listening for requests using the built-in HTTPS (TLS) server when given TLS server options', async () => {
       overrides = mergeOverrides(
@@ -208,7 +208,7 @@ describe('ExpressReceiver', () => {
 
       sinon.assert.calledWith(fakeCreateServer, tlsOptions);
       assert.strictEqual(server, fakeServer as unknown as HTTPSServer);
-      sinon.assert.calledWith(fakeServer.listen, port);
+      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(port));
     });
     it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async () => {
       const fakeCreateFailingServer = sinon.fake.returns(new FakeServer(new Error('fake listening error')));
@@ -541,7 +541,10 @@ describe('ExpressReceiver', () => {
 
     beforeEach(() => {
       // requestTimestamp = 1531420618 means this timestamp
-      clock = sinon.useFakeTimers(new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime());
+      clock = sinon.useFakeTimers({
+        now: new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime(),
+        shouldAdvanceTime: true,
+      });
     });
 
     afterEach(() => {
