@@ -256,11 +256,11 @@ Your **Request URL** ends with `/slack/events`, such as `https://abc123.ngrok.io
 
 First, select **Interactivity & Shortcuts** from the side and update the **Request URL**:
 
-![Interactivity & Shortcuts page](../../img/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
+![Interactivity & Shortcuts page](..//img/bolt-js/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
 
 Second, select **Event Subscriptions** from the side and update the **Request URL**:
 
-![Event Subscriptions page](../../img/event-subscriptions-page.png "Event Subscriptions page")
+![Event Subscriptions page](..//img/bolt-js/event-subscriptions-page.png "Event Subscriptions page")
 
 ### 3. Test your Slack app
 
@@ -312,11 +312,11 @@ With your endpoint copied, navigate to your [Slack app's configuration](https://
 
 First, select **Interactivity & Shortcuts** from the side and update the **Request URL**:
 
-![Interactivity & Shortcuts page](../../img/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
+![Interactivity & Shortcuts page](..//img/bolt-js/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts page")
 
 Second, select **Event Subscriptions** from the side and update the **Request URL**:
 
-![Event Subscriptions page](../../img/event-subscriptions-page.png "Event Subscriptions page")
+![Event Subscriptions page](..//img/bolt-js/event-subscriptions-page.png "Event Subscriptions page")
 
 ### 3. Test your Slack app
 
