@@ -257,11 +257,11 @@ ngrok http 3000
 
 まず、サイドバーの「**Interactivity & Shortcuts**」を選択し、**リクエスト URL** を更新します。
 
-![「Interactivity & Shortcuts」ページ](/img/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
+![「Interactivity & Shortcuts」ページ](/img/bolt-js/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
 
 次に、サイドバーの「**Event Subscriptions**」を選択し、**リクエスト URL** を更新します。
 
-![「Event Subscriptions」ページ](/img/event-subscriptions-page.png "「Event Subscriptions」ページ")
+![「Event Subscriptions」ページ](/img/bolt-js/event-subscriptions-page.png "「Event Subscriptions」ページ")
 
 ### 3. Slack アプリをテストする
 
@@ -313,11 +313,11 @@ Slack からのイベントやアクションの送信先となる**リクエス
 
 まず、サイドバーの「**Interactivity & Shortcuts**」を選択し、**リクエスト URL** を更新します。
 
-![「Interactivity & Shortcuts」ページ](/img/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
+![「Interactivity & Shortcuts」ページ](/img/bolt-js/interactivity-and-shortcuts-page.png "「Interactivity & Shortcuts」ページ")
 
 次に、サイドバーの「**Event Subscriptions**」を選択し、**リクエスト URL** を更新します。
 
-![「Event Subscriptions」ページ](/img/event-subscriptions-page.png "「Event Subscriptions」ページ")
+![「Event Subscriptions」ページ](/img/bolt-js/event-subscriptions-page.png "「Event Subscriptions」ページ")
 
 ### 3. Slack アプリをテストする
 

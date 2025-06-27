@@ -235,11 +235,11 @@ heroku info
 
 つ目の場所は、サイドパネルの「**Interactivity & Shortcuts**」です。これを選択し、リクエスト**URLを**更新します。
 
-![Interactivity & Shortcuts page](/img/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts")
+![Interactivity & Shortcuts page](/img/bolt-js/interactivity-and-shortcuts-page.png "Interactivity & Shortcuts")
 
 2 つ目の場所は、サイドパネルの「**Event Subscriptions**」です。これを選択し、リクエスト**URLを**更新します。
 
-![Event Subscriptions page](/img/event-subscriptions-page.png "Event Subscriptions")
+![Event Subscriptions page](/img/bolt-js/event-subscriptions-page.png "Event Subscriptions")
 
 :::tip 
 
