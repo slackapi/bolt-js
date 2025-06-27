@@ -1,7 +1,7 @@
 ---
 title: Migrating apps from Hubot to Bolt for JavaScript
 sidebar_label: Hubot app migration
-slug: /bolt-js/tutorial/hubot-migration
+slug: /bolt-js/migration/hubot-migration
 lang: en
 ---
 

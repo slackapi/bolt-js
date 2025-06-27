@@ -705,7 +705,7 @@ for additional details for common error codes.
 [callback-options]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
 [callback-options-default]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L162
 [callbacks]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
-[custom-routes]: /concepts/custom-routes
+[custom-routes]: /bolt-js/concepts/custom-routes
 [direct-install]: https://github.com/slackapi/bolt-js/blob/5b4d9ceb65e6bf5cf29dfa58268ea248e5466bfb/examples/oauth/app.js#L58-L64
 [errors]: https://docs.slack.dev/authentication/installing-with-oauth#errors
 [examples]: https://github.com/slackapi/bolt-js/tree/main/examples/oauth

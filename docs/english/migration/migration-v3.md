@@ -1,6 +1,6 @@
 ---
 title: Migrating to V3
-slug: /bolt-js/tutorial/migration-v3
+slug: /bolt-js/migration/migration-v3
 lang: en
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Bolt for JavaScript interface and configuration reference
 sidebar_label: Reference
-slug: /bolt-js reference
+slug: /bolt-js/reference
 lang: en
 ---
 

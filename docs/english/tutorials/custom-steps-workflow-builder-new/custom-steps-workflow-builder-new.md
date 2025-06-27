@@ -58,7 +58,7 @@ We now have a Bolt app ready for development! Open the `manifest.json` file and 
 
 Open a browser and navigate to [your apps page](https://api.slack.com/apps). This is where we will create a new app with our previously copied manifest details. Click the **Create New App** button, then select **From an app manifest** when prompted to choose how you'd like to configure your app's settings.
 
-![Create app from manifest](custom-steps-wfb-new/manifest.png)
+![Create app from manifest](manifest.png)
 
 Next, select a workspace where you have permissions to install apps, and click **Next**. Select the **JSON** tab and clear the existing contents. Paste the contents of the `manifest.json` file you previously copied.
 
@@ -74,7 +74,7 @@ Another configuration setting to note is **Socket Mode**. We have turned this on
 
 Clicking on **Workflow Steps** in the left nav will show you that one workflow step has been added! This reflects the `function` defined in our manifest: functions are workflow steps. We will get to this step's implementation later.
 
-![Workflow step](custom-steps-wfb-new/workflow-step.png)
+![Workflow step](workflow-step.png)
 
 ### Tokens {#tokens}
 
@@ -85,17 +85,17 @@ In order to connect our app here with the logic of our sample code set up locall
 
 To generate an app token, navigate to **Basic Information** and scroll down to **App-Level Token**. 
 
-![App token](custom-steps-wfb-new/app-token.png)
+![App token](app-token.png)
 
 Click **Generate Token and Scopes**, then **Add Scope** and choose `connections:write`. Choose a name for your token and click **Generate**. Copy that value, save it somewhere accessible, and click **Done** to close out of the modal.
 
 Next up is the bot token. We can only get this token by installing the app into the workspace. Navigate to **Install App** and click the button to install, choosing **Allow** at the next screen. 
 
-![Install app](custom-steps-wfb-new/install.png)
+![Install app](install.png)
 
 You will then have a bot token. Again, copy that value and save it somewhere accessible.
 
-![Bot token](custom-steps-wfb-new/bot-token.png)
+![Bot token](bot-token.png)
 
 💡 Treat your tokens like passwords and keep them safe. Your app uses them to post and retrieve information from Slack workspaces. Minimally, do NOT commit them to version control.
 
@@ -130,15 +130,15 @@ The starter project you cloned contains a sample custom step lovingly titled “
 
 In the Slack Client of your development workspace, open Workflow Builder by clicking on the workspace name, **Tools**, then **Workflow Builder**. Create a new workflow, then select **Build Workflow**:
 
-![Creating a new workflow](custom-steps-wfb-new/wfb-1.png)
+![Creating a new workflow](wfb-1.png)
 
 Select **Choose an event** under **Start the workflow...**, then **From a link in Slack** to configure this workflow to start when someone clicks its shortcut link:
 
-![Starting a new workflow from a shortcut link](custom-steps-wfb-new/wfb-2.png)
+![Starting a new workflow from a shortcut link](wfb-2.png)
 
 Click the **Continue** button to confirm that this is workflow should start with a shortcut link:
 
-![Confirming a new shortcut workflow setup](custom-steps-wfb-new/wfb-3.png)
+![Confirming a new shortcut workflow setup](wfb-3.png)
 
 Find the sample step provided in the template by either searching for the name of your app (e.g., `Bolt Custom Step`) or the name of your step (e.g. `Sample step`) in the Steps search bar.
 
@@ -146,43 +146,43 @@ If you search by app name, any custom step that your app has defined will be lis
 
 Add the “Sample step" in the search results to the workflow:
 
-![Adding the sample step to the workflow](custom-steps-wfb-new/wfb-4.png)
+![Adding the sample step to the workflow](wfb-4.png)
 
 As soon as you add the “Sample step" to the workflow, a modal will appear to configure the step's input&mdash;in this case, a user variable:
 
-![Configuring the sample step's inputs](custom-steps-wfb-new/wfb-5.png)
+![Configuring the sample step's inputs](wfb-5.png)
 
 Configure the user input to be “Person who used this workflow”, then click the **Save** button:
 
-![Saving the sample step after configuring the user input](custom-steps-wfb-new/wfb-6.png)
+![Saving the sample step after configuring the user input](wfb-6.png)
 
 Click the **Finish Up** button, then provide a name and description for your workflow.
 
 Finally, click the **Publish** button:
 
-![Publishing a workflow](custom-steps-wfb-new/wfb-7.png)
+![Publishing a workflow](wfb-7.png)
 
 Copy the shortcut link, then exit Workflow Builder and paste the link to a message in any channel you’re in:
 
-![Copying a workflow link](custom-steps-wfb-new/wfb-8.png)
+![Copying a workflow link](wfb-8.png)
 
 After you send a message containing the shortcut link, the link will unfurl and you’ll see a **Start Workflow** button.
 
 Click the **Start Workflow** button:
 
-![Starting your new workflow](custom-steps-wfb-new/wfb-9.png)
+![Starting your new workflow](wfb-9.png)
 
 You should see a new direct message from your app:
 
-![A new direct message from your app](custom-steps-wfb-new/wfb-10.png)
+![A new direct message from your app](wfb-10.png)
 
 The message from your app asks you to click the **Complete step** button:
 
-![A new direct message from your app](custom-steps-wfb-new/wfb-11.png)
+![A new direct message from your app](wfb-11.png)
 
 Once you click the button, the direct message to you will be updated to let you know that the step interaction was successfully completed:
 
-![Sample step finished successfully](custom-steps-wfb-new/wfb-12.png)
+![Sample step finished successfully](wfb-12.png)
 
 Now that we’ve gotten a feel for how we will use the custom step, let’s learn more about how function listeners work.
 

@@ -12,7 +12,7 @@ slug: /bolt-js/concepts/global-middleware
 
 :::info
 
-Bolt 2.x からグローバルミドルウェアが `async` 関数をサポートしました！この変更については [2.x マイグレーションガイド](/tutorial/migration-v2)を参照してください。
+Bolt 2.x からグローバルミドルウェアが `async` 関数をサポートしました！この変更については [2.x マイグレーションガイド](/migration/migration-v2)を参照してください。
 
 :::
 
