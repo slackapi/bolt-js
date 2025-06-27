@@ -261,7 +261,7 @@ Not sure where to host your app? We recommend following the [Heroku Deployment G
 
 ### Control step access {#access}
 
-You can choose who has access to your custom steps. To define this, refer to the [custom function access](/automation/functions/access) page.
+You can choose who has access to your custom steps. To define this, refer to the [custom function access](/deno-slack-sdk/guides/controlling-access-to-custom-functions) page.
 
 ### Distribution {#distribution}
 
