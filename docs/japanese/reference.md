@@ -1,7 +1,7 @@
 ---
 title: リファレンス（Appインターフェイスと設定）
 sidebar_label: リファレンス
-slug: /bolt-js reference
+slug: /bolt-js/reference
 permalink: /reference
 ---
 
