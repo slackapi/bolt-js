@@ -8,7 +8,7 @@ You can listen to any [Events API event](https://docs.slack.dev/reference/events
 
 The `event()` method requires an `eventType` of type string.
 
-*Notice:* When configuring your request URL on the Event Subscriptions page of your Slack app, the path of the URL must be `slack/events`.
+Please note that when configuring your request URL on the Event Subscriptions page of your Slack app, the path of the URL must be `/slack/events`.
 For example, if your app is hosted at `https://example.com`, the request URL should be `https://example.com/slack/events`.
 
 ```javascript
