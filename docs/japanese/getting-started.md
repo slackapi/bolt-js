@@ -1,7 +1,7 @@
 ---
 title: Bolt 入門ガイド
 sidebar_label: 入門ガイド
-slug: /bolt-js getting-started
+slug: /bolt-js/getting-started
 lang: ja-jp
 ---
 
@@ -24,7 +24,7 @@ lang: ja-jp
 
 このページには、後で必要になる重要な認証情報 (**App Credentials**  ヘッダーの下の  `Signing Secret`  など) に加えて、アプリケーションの概要が表示されます。
 
-![Basic Information page](img/bolt-js/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/bolt-js/basic-information-page.png "Basic Information page")
 
 ひと通り確認し、アプリのアイコンと説明を追加してから、アプリの設定 🔩 を始めましょう。
 
