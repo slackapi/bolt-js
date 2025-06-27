@@ -22,18 +22,12 @@
       {
         "type": "category",
         "label": "Slack API calls",
-        "items": [
-          "bolt-js/concepts/message-sending",
-          "bolt-js/concepts/web-api"
-        ]
+        "items": ["bolt-js/concepts/message-sending", "bolt-js/concepts/web-api"]
       },
       {
         "type": "category",
         "label": "Events",
-        "items": [
-          "bolt-js/concepts/message-listening",
-          "bolt-js/concepts/event-listening"
-        ]
+        "items": ["bolt-js/concepts/message-listening", "bolt-js/concepts/event-listening"]
       },
       {
         "type": "category",
@@ -54,10 +48,7 @@
       {
         "type": "category",
         "label": "Custom Steps",
-        "items": [
-          "bolt-js/concepts/custom-steps",
-          "bolt-js/concepts/custom-steps-dynamic-options"
-        ]
+        "items": ["bolt-js/concepts/custom-steps", "bolt-js/concepts/custom-steps-dynamic-options"]
       },
       {
         "type": "category",
@@ -92,19 +83,12 @@
       {
         "type": "category",
         "label": "Deployments",
-        "items": [
-          "bolt-js/deployments/aws-lambda",
-          "bolt-js/deployments/heroku"
-        ]
+        "items": ["bolt-js/deployments/aws-lambda", "bolt-js/deployments/heroku"]
       },
       {
         "type": "category",
         "label": "Migration Guides",
-        "items": [
-          "bolt-js/migration/migration-v2",
-          "bolt-js/migration/migration-v3",
-          "bolt-js/migration/migration-v4"
-        ]
+        "items": ["bolt-js/migration/migration-v2", "bolt-js/migration/migration-v3", "bolt-js/migration/migration-v4"]
       },
       {
         "type": "category",
