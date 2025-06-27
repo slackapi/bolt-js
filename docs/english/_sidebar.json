@@ -124,8 +124,8 @@
       "bolt-js/tutorials/ai-assistant",
       "bolt-js/tutorials/code-assistant",
       "bolt-js/tutorials/custom-steps",
-      "bolt-js/tutorials/custom-steps-workflow-builder-new",
-      "bolt-js/tutorials/custom-steps-workflow-builder-existing"
+      "bolt-js/tutorials/custom-steps-workflow-builder-new/custom-steps-workflow-builder-new",
+      "bolt-js/tutorials/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing"
     ]
   },
   { "type": "html", "value": "<hr>" },
