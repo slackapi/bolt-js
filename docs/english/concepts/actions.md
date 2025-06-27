@@ -10,7 +10,7 @@ Your app can listen and respond to user actions like button clicks, and menu sel
 
 Actions can be filtered on an `action_id` of type string or RegExp object. `action_id`s act as unique identifiers for interactive components on the Slack platform. 
 
-You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/concepts/acknowledge).
+You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/bolt-js/concepts/acknowledge).
 
 View more information about the `block_actions` payload within the [relevant API documentation page](https://docs.slack.dev/reference/interaction-payloads). To access the full payload of a view from within a listener, reference the `body` argument within your callback function.
 

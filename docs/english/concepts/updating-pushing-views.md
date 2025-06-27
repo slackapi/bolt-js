@@ -12,7 +12,7 @@ To update a view, you can use the built-in client to call the `views.update` met
 
 ## The `views.push` method
 
-To push a new view onto the view stack, you can use the built-in client to call the `views.push` method by passing a valid `trigger_id` parameter and a new [view payload](https://docs.slack.dev/reference/views). The arguments for the `views.push` method is the same as [`views.open`](/concepts/creating-modals). After you open a modal, you may only push two additional views onto the view stack.
+To push a new view onto the view stack, you can use the built-in client to call the `views.push` method by passing a valid `trigger_id` parameter and a new [view payload](https://docs.slack.dev/reference/views). The arguments for the `views.push` method is the same as [`views.open`](/bolt-js/concepts/creating-modals). After you open a modal, you may only push two additional views onto the view stack.
 
 Learn more about updating and pushing views in our [API documentation](https://docs.slack.dev/surfaces/modals)
 

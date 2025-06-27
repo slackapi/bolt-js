@@ -136,7 +136,7 @@ To listen for events happening in a Slack workspace (like when a message is post
 
 For those just starting, we recommend using [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall.
 
-That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku)) to stably respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Marketplace.
+That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)) to stably respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Marketplace.
 
 We've provided instructions for both ways in this guide.
 
@@ -490,8 +490,8 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 - Read through the concepts pages to learn about the different methods and features your Bolt app has access to.
 
-- Explore the different events your bot can listen to with the [`events()`](/concepts/event-listening) method. All of the events are listed on the [API docs site](https://docs.slack.dev/reference/events).
+- Explore the different events your bot can listen to with the [`events()`](/bolt-js/concepts/event-listening) method. All of the events are listed on the [API docs site](https://docs.slack.dev/reference/events).
 
-- Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
+- Bolt allows you to [call Web API methods](/bolt-js/concepts/web-api) with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
 
 - Learn more about the different token types [on the API docs site](https://docs.slack.dev/authentication/tokens). Your app may need different tokens depending on the actions you want it to perform.

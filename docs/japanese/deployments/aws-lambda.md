@@ -89,7 +89,7 @@ Serverless のツールのセットアップが完了しました。次に、AWS
 
 ## Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
-まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド](/getting-started)を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
+まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド](/bolt-js/getting-started)を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -120,7 +120,7 @@ const app = new App({
 });
 ```
 
-次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](/concepts/receiver) をカスタマイズします。
+次に Lambda 関数のイベントに応答するよう、Bolt アプリの [`receiver`](/bolt-js/concepts/receiver) をカスタマイズします。
 
 `app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
@@ -197,7 +197,7 @@ plugins:
 
 :::tip 
 
-`SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/getting-started#setting-up-your-project)を入門ガイドで参照してください。
+`SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/bolt-js/getting-started#setting-up-your-project)を入門ガイドで参照してください。
 
 :::
 
@@ -241,7 +241,7 @@ ngrok http 3000
 
 :::tip 
 
-パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](/getting-started#setting-up-events)を参照してください。
+パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](/bolt-js/getting-started#setting-up-events)を参照してください。
 
 :::
 
@@ -265,7 +265,7 @@ ngrok http 3000
 
 ### 3. Slack アプリをテストする
 
-Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド](/getting-started)のとおり、アプリから応答があるはずです。
+Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド](/bolt-js/getting-started)のとおり、アプリから応答があるはずです。
 
 > 👩‍💻 hello<br/>
 > 🤖 Hey there @Jane!
@@ -366,5 +366,5 @@ serverless deploy
 
 - [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) と [Serverless Framework](https://www.serverless.com/framework/docs/providers/aws/guide/intro/) の理解を深める。
 - Bolt の基本的な概念と [Serverless のプラグイン](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/)を活用してアプリを拡張する。
-- [Bolt の応用コンセプト](/concepts/logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
+- [Bolt の応用コンセプト](/bolt-js/concepts/logging)でログの記録についての知識を深めたり、[Serverless でのログメッセージの表示方法](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)について確認したりする。
 - Serverless の [AWS Lambda のテスト環境](https://www.serverless.com/framework/docs/providers/aws/guide/testing/)や[デプロイ環境](https://www.serverless.com/framework/docs/providers/aws/guide/deploying/)を本格的に活用する。

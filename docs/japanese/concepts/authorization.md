@@ -10,7 +10,7 @@ slug: /bolt-js/concepts/authorization
 
 `authorize` オプションには、イベントソースを入力値として受け取り、許可された認可されたクレデンシャルを含むオブジェクトを Promise の値として返す関数を指定します。このイベントソースの情報には、 `teamId` (常に存在します)、 `userId`、`conversationId`、`enterpriseId` のような、リクエストが誰によって発生させられたか、どこで発生したかに関する情報が含まれます。
 
-許可されたクレデンシャルには、`botToken`、`userToken`、`botId` (アプリがボット自体からのメッセージを無視するために必要です)、 `botUserId` が含まれます。[`context`](/concepts/context) オブジェクトに、これ以外の他のプロパティを自由に設定することもできます。
+許可されたクレデンシャルには、`botToken`、`userToken`、`botId` (アプリがボット自体からのメッセージを無視するために必要です)、 `botUserId` が含まれます。[`context`](/bolt-js/concepts/context) オブジェクトに、これ以外の他のプロパティを自由に設定することもできます。
 
 `botToken` と `userToken` は、どちらか、またはその両方を必ず設定してください。`say()` のようなユーティリティを動作させるには、どちらか一方が存在している必要があります。両方指定した場合、`say()` では `botToken` が優先されます。
 

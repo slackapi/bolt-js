@@ -16,7 +16,7 @@ If you use `shortcut()` multiple times with overlapping RegExp matches, _all_ ma
 
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the request.
 
-Shortcuts include a `trigger_id` which an app can use to [open a modal](/concepts/creating-modals) that confirms the action the user is taking. 
+Shortcuts include a `trigger_id` which an app can use to [open a modal](/bolt-js/concepts/creating-modals) that confirms the action the user is taking. 
 
 When configuring shortcuts within your app configuration, you'll continue to append `/slack/events` to your request URL.
 

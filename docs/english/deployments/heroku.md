@@ -17,7 +17,7 @@ When you’re finished, you’ll have this ⚡️[Deploying to Heroku app](https
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Getting Started guide](/getting-started) or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Getting Started guide](/bolt-js/getting-started) or clone the template app below:
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -190,7 +190,7 @@ heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 
 :::info 
 
-If you don't know where to find your credentials, please read about [exporting your signing secret and token](/getting-started#tokens-and-installing-apps) in the Getting Started guide.
+If you don't know where to find your credentials, please read about [exporting your signing secret and token](/bolt-js/getting-started#tokens-and-installing-apps) in the Getting Started guide.
 
 :::
 
@@ -264,7 +264,7 @@ Heroku Eco Dyno apps sleep when inactive. 💤 If your verification fails, pleas
 
 Your app is now deployed and Slack is updated, so let's try it out!
 
-Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](/getting-started#sending-and-responding-to-actions), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
+Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](/bolt-js/getting-started#sending-and-responding-to-actions), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
 
 ---
 
@@ -306,5 +306,5 @@ Now that you've deployed a basic app, you can start exploring how to customize a
 
 - Brush up on [how Heroku works](https://devcenter.heroku.com/articles/how-heroku-works) and understand the [limitations of a Heroku Eco Dyno app](https://devcenter.heroku.com/articles/eco-dyno-hours).
 - Extend your app with with other Bolt capabilities and and [Heroku's Add-ons](https://elements.heroku.com/addons).
-- Learn about [logging](/concepts/logging) and how to [view log messages in Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
+- Learn about [logging](/bolt-js/concepts/logging) and how to [view log messages in Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs).
 - Get ready for primetime with [how to scale your Heroku app](https://devcenter.heroku.com/articles/getting-started-with-nodejs#scale-the-app).

@@ -89,7 +89,7 @@ You're now set up with the Serverless tools! Let's move on to preparing your Bol
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Getting Started guide](/getting-started) or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Getting Started guide](/bolt-js/getting-started) or clone the template app below:
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -120,7 +120,7 @@ const app = new App({
 });
 ```
 
-Next, we'll customize your Bolt app's [`receiver`](/concepts/receiver) to respond to Lambda function events.
+Next, we'll customize your Bolt app's [`receiver`](/bolt-js/concepts/receiver) to respond to Lambda function events.
 
 Update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
@@ -200,7 +200,7 @@ plugins:
 
 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be environment variables on your local machine.
 
-You can [learn how to export Slack environment variables](/getting-started#setting-up-your-project) in our Getting Started guide.
+You can [learn how to export Slack environment variables](/bolt-js/getting-started#setting-up-your-project) in our Getting Started guide.
 
 :::
 
@@ -244,7 +244,7 @@ ngrok http 3000
 
 :::info 
 
-[Learn how to use ngrok](/getting-started#setting-up-events) to create a public URL and forward requests to your local machine.
+[Learn how to use ngrok](/bolt-js/getting-started#setting-up-events) to create a public URL and forward requests to your local machine.
 
 :::
 
@@ -264,7 +264,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 ### 3. Test your Slack app
 
-Now you can test your Slack app by inviting your app to a channel then saying “hello” (lower-case). Just like in the [Getting Started guide](/getting-started), your app should respond back:
+Now you can test your Slack app by inviting your app to a channel then saying “hello” (lower-case). Just like in the [Getting Started guide](/bolt-js/getting-started), your app should respond back:
 
 ```
 > 👩‍💻 hello
@@ -370,5 +370,5 @@ Now that you've built and deployed a basic app, here are some ideas you can expl
 
 - Brush up on [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) and the [Serverless Framework](https://www.serverless.com/framework/docs/providers/aws/guide/intro/).
 - Extend your app with other Bolt capabilities and [Serverless plugins](https://www.serverless.com/framework/docs/providers/aws/guide/plugins/).
-- Learn about [logging](/concepts/logging) and how to [view log messages with Serverless](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/).
+- Learn about [logging](/bolt-js/concepts/logging) and how to [view log messages with Serverless](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/).
 - Get ready for primetime with AWS Lambda [testing](https://www.serverless.com/framework/docs/providers/aws/guide/testing/) and [deployment environments](https://www.serverless.com/framework/docs/providers/aws/guide/deploying/).

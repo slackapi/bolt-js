@@ -25,7 +25,7 @@ For a more in-depth look at a receiver, [read the source code for the built-in `
 
 ## Customizing built-in receivers
 
-The built-in `HTTPReceiver`, `ExpressReceiver`, `AwsLambdaReceiver` and `SocketModeReceiver` accept several configuration options. For a full list of options, see the [Receiver options reference](/reference#receiver-options).
+The built-in `HTTPReceiver`, `ExpressReceiver`, `AwsLambdaReceiver` and `SocketModeReceiver` accept several configuration options. For a full list of options, see the [Receiver options reference](/bolt-js/reference#receiver-options).
 
 ### Extracting custom properties
 

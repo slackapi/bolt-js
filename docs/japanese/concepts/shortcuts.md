@@ -12,7 +12,7 @@ slug: /bolt-js/concepts/shortcuts
 
 グローバルショートカットのリクエストは Slack へリクエストを受信したことを知らせるために `ack()` メソッドで確認する必要があります。
 
-グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](/concepts/creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
+グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](/bolt-js/concepts/creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
 
 ⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) エレメントを使用できます。
 メッセージショートカットのペイロードはチャンネル ID を含みます。

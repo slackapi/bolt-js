@@ -397,7 +397,7 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for AI apps in the documentation [here](/concepts/ai-apps).
+➡️ Read more about Bolt support for AI apps in the documentation [here](/bolt-js/concepts/ai-apps).
 
 ➡️ Level up your AI app game after reading through the [AI apps usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for developing AI apps](https://docs.slack.dev/ai/ai-apps-best-practices).
 

@@ -12,7 +12,7 @@ When complete, you'll have a local environment configured with a customized [app
 
 :::tip[Reference for readers]
 
-In search of the complete guide to building an app from scratch? Check out the [building an app](/building-an-app) guide.
+In search of the complete guide to building an app from scratch? Check out the [building an app](/bolt-js/building-an-app) guide.
 
 :::
 
@@ -138,7 +138,7 @@ You'll then land on your app's **Basic Information** page, which is an overview 
 
 ![Basic Information page](/img/bolt-js/basic-information-page.png "Basic Information page")
 
-To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/concepts/socket-mode). This connection requires a specific app token:
+To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/bolt-js/concepts/socket-mode). This connection requires a specific app token:
 
 1. On the **Basic Information** page, scroll to the **App-Level Tokens** section and click **Generate Token and Scopes**.
 2. Name the token "Development" or something similar and add the `connections:write` scope, then click **Generate**.
@@ -288,14 +288,14 @@ Congrats once more on getting up and running with this quick start.
 
 :::info[Dive deeper]
 
-Follow along with the steps that went into making this app on the [building an app](/building-an-app) guide for an educational overview.
+Follow along with the steps that went into making this app on the [building an app](/bolt-js/building-an-app) guide for an educational overview.
 
 :::
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-- Explore the different events your bot can listen to with the [`event`](/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the API docs site.
-- Bolt allows you to call [Web API](/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
-- Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
-- Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda).
+- Explore the different events your bot can listen to with the [`event`](/bolt-js/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the API docs site.
+- Bolt allows you to call [Web API](/bolt-js/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
+- Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/bolt-js/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
+- Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/bolt-js/deployments/heroku) or [AWS Lambda](/bolt-js/deployments/aws-lambda).
 - Read on [app design](https://docs.slack.dev/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.

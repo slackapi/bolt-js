@@ -11,7 +11,7 @@ lang: ja-jp
 
 ## Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
-Bolt アプリを作るのが初めてという場合は、まず[Bolt 入門ガイド](/getting-started)に沿って進めてみましょう。または、以下のテンプレートアプリをクローンしてもよいでしょう。
+Bolt アプリを作るのが初めてという場合は、まず[Bolt 入門ガイド](/bolt-js/getting-started)に沿って進めてみましょう。または、以下のテンプレートアプリをクローンしてもよいでしょう。
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -176,7 +176,7 @@ heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 
 :::tip 
 
-認証情報の入手場所がわからない場合、Bolt 入門ガイドで[署名シークレットとトークンのエクスポート](/getting-started)について参照してください。
+認証情報の入手場所がわからない場合、Bolt 入門ガイドで[署名シークレットとトークンのエクスポート](/bolt-js/getting-started)について参照してください。
 
 :::
 
@@ -251,7 +251,7 @@ heroku info
 
 アプリのデプロイが完了し、Slack の設定変更も行いました。アプリを試してみましょう。
 
-アプリが参加しているSlack チャンネルを開き、半角の小文字で"hello" と書き込みます。[Bolt 入門ガイド](/getting-started)のとおり、アプリから応答があるはずです。応答がない場合、リクエスト**URLを**確認し、もう一度試してください。
+アプリが参加しているSlack チャンネルを開き、半角の小文字で"hello" と書き込みます。[Bolt 入門ガイド](/bolt-js/getting-started)のとおり、アプリから応答があるはずです。応答がない場合、リクエスト**URLを**確認し、もう一度試してください。
 
 ---
 

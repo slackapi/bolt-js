@@ -40,7 +40,7 @@ const app = new App({
 
 * アプリがすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳しくは [OAuth ライブラリのドキュメント](https://tools.slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
-* 💡 Bolt for JavaScript は [カスタムのレシーバー](/concepts/receiver)での OAuth をサポートしていません。カスタムのレシーバーで OAuth フローを実装したい場合は、私たちが提供している [OAuth ライブラリ](https://tools.slack.dev/node-slack-sdk/oauth#slack-oauth) を使うことができます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
+* 💡 Bolt for JavaScript は [カスタムのレシーバー](/bolt-js/concepts/receiver)での OAuth をサポートしていません。カスタムのレシーバーで OAuth フローを実装したい場合は、私たちが提供している [OAuth ライブラリ](https://tools.slack.dev/node-slack-sdk/oauth#slack-oauth) を使うことができます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
 
 ##### Redirect URI
 
