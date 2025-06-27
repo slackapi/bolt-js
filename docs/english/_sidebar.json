@@ -9,7 +9,10 @@
     "type": "doc",
     "id": "bolt-js/getting-started"
   },
-  { "type": "html", "value": "<hr>" },
+  {
+    "type": "html",
+    "value": "<hr>"
+  },
   {
     "type": "category",
     "label": "Guides",
@@ -114,9 +117,15 @@
       }
     ]
   },
-  { "type": "html", "value": "<hr>" },
+  {
+    "type": "html",
+    "value": "<hr>"
+  },
   "bolt-js/reference",
-  { "type": "html", "value": "<hr>" },
+  {
+    "type": "html",
+    "value": "<hr>"
+  },
   {
     "type": "category",
     "label": "Tutorials",
@@ -128,7 +137,10 @@
       "bolt-js/tutorials/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing"
     ]
   },
-  { "type": "html", "value": "<hr>" },
+  {
+    "type": "html",
+    "value": "<hr>"
+  },
   {
     "type": "link",
     "label": "Release notes",
