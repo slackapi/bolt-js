@@ -234,7 +234,7 @@ The second argument is the callback function, or the logic that will run when yo
 
 Field | Description
 ------|------------
-`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](/methods). Read more about the `WebClient` for Bolt JS [here](https://slack.dev/bolt-js/concepts/web-api/).
+`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](https://docs.slack.dev/reference/methods). Read more about the `WebClient` for Bolt JS [here](https://slack.dev/bolt-js/concepts/web-api/).
 `complete` | A utility method that invokes `functions.completeSuccess`. This method indicates to Slack that a step has completed successfully without issue. When called, `complete` requires you include an `outputs` object that matches your step definition in [`output_parameters`](#inputs-outputs).
 `fail` | A utility method that invokes `functions.completeError`. True to its name, this method signals to Slack that a step has failed to complete. The `fail` method requires an argument of `error` to be sent along with it, which is used to help users understand what went wrong.
 `inputs` | An alias for the `input_parameters` that were provided to the step upon execution.

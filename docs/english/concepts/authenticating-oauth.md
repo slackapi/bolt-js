@@ -699,7 +699,7 @@ for additional details for common error codes.
 
 [add-to-slack]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/default-render-html-for-install-path.ts
 [app-settings]: https://api.slack.com/apps
-[authorization]: /concepts/authorization
+[authorization]: /bolt-js/concepts/authorization
 [callback-default-failure]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L127-L162
 [callback-default-success]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L125
 [callback-options]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/CallbackOptions

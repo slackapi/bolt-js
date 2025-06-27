@@ -28,7 +28,7 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
 1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](https://docs.slack.dev/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 
 Save these for the moment; we first need to clone the project, then we'll set these variables.
 
@@ -92,7 +92,7 @@ const { config } = require('dotenv');
 const { HfInference } = require('@huggingface/inference');
 ```
 
-Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant. 
+Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/ai-apps) that simplifies handling incoming events related to the app assistant. 
 
 Next, we initialize the app and our `hfClient` variable with the tokens we previously saved as environment variables in the `.env` file.
 

@@ -62,7 +62,7 @@ The structure of the `payload` and `body` is detailed on the API site:
 ### Difference from listener middleware
 Listener middleware is used to implement logic across many listener functions (though usually not all of them). Listener middleware has the same arguments as the above listener functions, with one distinction: they also have a `next()` function that **must** be called in order to pass the chain of execution. Learn more about listener middleware [in the documentation](/bolt-js/concepts/listener-middleware).
 
-## Built-in middleware functions
+## Built-in middleware functions {#built-in-middleware-functions}
 
 Bolt offers a variety of built-in middleware functions to help simplify development of your Slack applications. These middleware functions implement common patterns to help filter out or focus your own listener function implementations.
 
@@ -87,7 +87,7 @@ These middleware functions are divided into two groups: [global middleware funct
 - `onlyShortcuts`: Filters out any event that isn't a shortcut.
 - `onlyViewActions`: Filters out any event that isn't a `view_submission` or `view_closed` event.
 
-### Built-in listener middleware functions
+### Built-in listener middleware functions {#built-in-listener-middleware-functions}
 
 - `directMention()`: Filters out any `message` event whose text does not start with an @-mention of the handling app.
 - `matchCommandName(pattern)`: Filters out any shortcut command whose name does not match the provided `pattern`; `pattern` can be a string or regular expression.
@@ -102,7 +102,8 @@ These middleware functions are divided into two groups: [global middleware funct
 ## Initialization options
 Bolt includes a collection of initialization options to customize apps. There are two primary kinds of options: Bolt app options and receiver options. The receiver options may change based on the receiver your app uses. The following receiver options are for the default `HTTPReceiver` (so they'll work as long as you aren't using a custom receiver).
 
-### Receiver options
+### Receiver options {#receiver-options}
+
 `HTTPReceiver` options can be passed into the `App` constructor, just like the Bolt app options. They'll be passed to the `HTTPReceiver` instance upon initialization.
 
 | Option  | Description  |
@@ -152,9 +153,9 @@ Bolt's client is an instance of `WebClient` from the [Node Slack SDK](https://to
 
 :::
 
-## Agents & Assistants
+## Agents & Assistants {#agents-assistants}
 
-### The `AssistantConfig` configuration object
+### The `AssistantConfig` configuration object {#the-assistantconfig-configuration-object}
 
 | Property | Required? | Description | 
 |---|---|---|

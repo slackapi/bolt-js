@@ -6,7 +6,7 @@ slug: /bolt-js/concepts/error-handling
 
 :::info
 
-Since v2, error handling has improved! View the [migration guide for V2](/tutorial/migration-v2) to learn about the changes.
+Since v2, error handling has improved! View the [migration guide for V2](/bolt-js/migration/migration-v2) to learn about the changes.
 
 :::
 
