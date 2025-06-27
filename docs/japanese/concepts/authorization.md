@@ -1,7 +1,7 @@
 ---
 title: 認可（Authorization）
 lang: ja-jp
-slug: /concepts/authorization
+slug: /bolt-js/concepts/authorization
 ---
 
 認可（Authorization）は、Slack からのリクエストを処理するにあたって、どの Slack クレデンシャル (ボットトークンなど) を使用可能にするかを決定するプロセスです。

@@ -1,7 +1,7 @@
 ---
 title: Custom Steps
 lang: en
-slug: /concepts/custom-steps
+slug: /bolt-js/concepts/custom-steps
 ---
 
 Your app can use the `function()` method to listen to incoming [custom step requests](https://docs.slack.dev/workflows/workflow-steps). Custom steps are used in Workflow Builder to build workflows. The method requires a step `callback_id` of type string. This `callback_id` must also be defined in your [Function](https://docs.slack.dev/reference/app-manifest#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.

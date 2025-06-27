@@ -1,6 +1,6 @@
 ---
 title: Migrating to V2
-slug: /tutorial/migration-v2
+slug: /bolt-js/tutorial/migration-v2
 lang: en
 ---
 

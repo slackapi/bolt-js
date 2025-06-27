@@ -1,7 +1,7 @@
 ---
 title: Authenticating with OAuth
 lang: en
-slug: /concepts/authenticating-oauth
+slug: /bolt-js/concepts/authenticating-oauth
 ---
 
 OAuth allows installation of your app to any workspace and is an important step in distributing your app. This is because each app installation issues unique [access tokens with related installation information](#the-installation-object) that can be retrieved for incoming events and used to make scoped API requests.

@@ -1,7 +1,7 @@
 ---
 title: Global middleware
 lang: en
-slug: /concepts/global-middleware
+slug: /bolt-js/concepts/global-middleware
 ---
 
 Global middleware is run for all incoming requests before any [listener middleware](/concepts/listener-middleware). You can add any number of global middleware to your app by utilizing `app.use(fn)`. The middleware function `fn` is called with the same arguments as listeners and an additional `next` function.

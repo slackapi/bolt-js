@@ -1,7 +1,7 @@
 ---
 title: Using the Web API
 lang: en
-slug: /concepts/web-api
+slug: /bolt-js/concepts/web-api
 ---
 
 You can call any [Web API method](https://docs.slack.dev/reference/methods) using the [`WebClient`](https://tools.slack.dev/node-slack-sdk/web-api) provided to your app's listeners as `client`. This uses either the token that initialized your app **or** the token that is returned from the [`authorize`](/concepts/authorization) function for the incoming event. The built-in [OAuth support](/concepts/authenticating-oauth) handles the second case by default.

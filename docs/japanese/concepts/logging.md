@@ -1,7 +1,7 @@
 ---
 title: ログの表示
 lang: ja-jp
-slug: /concepts/logging
+slug: /bolt-js/concepts/logging
 ---
 
 Bolt はデフォルトの設定では、標準出力のコンソールにログを出力します。どれくらいのログが出力されるかは、コンストラクターの引数の `logLevel` を指定して、カスタマイズできます。使用可能なログレベルは、頻度の高い方から順に、`DEBUG`、`INFO`、`WARN`、`ERROR` です。

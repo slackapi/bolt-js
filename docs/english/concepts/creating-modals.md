@@ -1,7 +1,7 @@
 ---
 title: Opening modals
 lang: en
-slug: /concepts/creating-modals
+slug: /bolt-js/concepts/creating-modals
 ---
 
 [Modals](https://docs.slack.dev/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](https://docs.slack.dev/reference/views/modal-views) to the built-in client's [`views.open`](https://docs.slack.dev/reference/methods/views.open/) method. 

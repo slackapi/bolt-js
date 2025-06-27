@@ -1,7 +1,7 @@
 ---
 title: ソケットモードの使用
 lang: ja-jp
-slug: /concepts/socket-mode
+slug: /bolt-js/concepts/socket-mode
 ---
 
 [ソケットモード](https://docs.slack.dev/apis/events-api/using-socket-mode) は、アプリに WebSocket での接続と、そのコネクション経由でのデータ受信を可能とします。コネクションをハンドリングするために `@slack/bolt@3.0.0` 以上では `SokcetModeReceiver` というレシーバーが提供されています。ソケットモードを使う前に、アプリの管理画面でソケットモードの機能が有効になっていることを確認しておいてください。

@@ -1,7 +1,7 @@
 ---
 title: Adding custom HTTP routes 
 lang: en
-slug: /concepts/custom-routes
+slug: /bolt-js/concepts/custom-routes
 ---
 
 As of `v3.7.0`, custom HTTP routes can be easily added by passing in an array of routes as `customRoutes` when initializing `App`. 

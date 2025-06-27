@@ -1,7 +1,7 @@
 ---
 title: ホームタブの更新
 lang: ja-jp
-slug: /concepts/publishing-views
+slug: /bolt-js/concepts/publishing-views
 ---
 
 [ホームタブ](https://docs.slack.dev/surfaces/app-home)は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、[`views.publish`](https://docs.slack.dev/reference/methods/views.publish/) API メソッドの呼び出しで `user_id` と[ビューのペイロード](https://docs.slack.dev/reference/views)を指定して、ホームタブを公開・更新することができるようになります。

@@ -1,7 +1,7 @@
 ---
 title: モーダルの更新と多重表示
 lang: ja-jp
-slug: /concepts/updating-pushing-views
+slug: /bolt-js/concepts/updating-pushing-views
 ---
 
 モーダルでは、複数のモーダルをスタックのように積み重ねて表示できます。[`views.open`](https://docs.slack.dev/reference/methods/views.open/) という API を呼び出すと、まず親の（最初の）モーダルが表示されます。この最初の呼び出しの後、[`views.update`](https://docs.slack.dev/reference/methods/views.update) を実行することでそのビューを書き換えることもできますし、最初に述べたように [`views.push`](https://docs.slack.dev/reference/methods/views.push/) で新しいモーダルを積み重ねて表示することもできます。

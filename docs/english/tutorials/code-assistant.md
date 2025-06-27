@@ -1,6 +1,6 @@
 ---
 title: AI Code Assistant with Hugging Face
-slug: /tutorials/code-assistant
+slug: /bolt-js/tutorials/code-assistant
 lang: en
 ---
 

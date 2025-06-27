@@ -1,7 +1,7 @@
 ---
 title: AI Apps
 lang: en
-slug: /concepts/ai-apps
+slug: /bolt-js/concepts/ai-apps
 ---
 
 :::info[This feature requires a paid plan]

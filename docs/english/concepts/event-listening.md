@@ -1,7 +1,7 @@
 ---
 title: Listening to events
 lang: en
-slug: /concepts/event-listening
+slug: /bolt-js/concepts/event-listening
 ---
 
 You can listen to any [Events API event](https://docs.slack.dev/reference/events) using the `event()` method after subscribing to it in your app configuration. This allows your app to take action when something happens in Slack, like a user reacting to a message or joining a channel.

@@ -1,7 +1,7 @@
 ---
 title: Deferring app initialization
 lang: en
-slug: /concepts/deferring-initialization
+slug: /bolt-js/concepts/deferring-initialization
 ---
 
 Bolt offers a way to defer full initialization via the `deferInitialization` option and to call the equivalent `App#init()` in your code, putting more control over asynchronous execution required for initialization into your hands as the developer.

@@ -1,7 +1,7 @@
 ---
 title: モーダルでの送信のリスニング
 lang: ja-jp
-slug: /concepts/view-submissions
+slug: /bolt-js/concepts/view-submissions
 ---
 
 `view` メソッドを使うと、ユーザーのビューとのインタラクションをリッスンすることができます。

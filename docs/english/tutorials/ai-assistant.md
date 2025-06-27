@@ -1,6 +1,6 @@
 ---
 title: AI Assistant
-slug: /tutorials/ai-assistant
+slug: /bolt-js/tutorials/ai-assistant
 lang: en
 ---
 

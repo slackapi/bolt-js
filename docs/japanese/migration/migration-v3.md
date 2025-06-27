@@ -1,6 +1,6 @@
 ---
 title: 3.x マイグレーションガイド
-slug: /tutorial/migration-v3
+slug: /bolt-js/tutorial/migration-v3
 lang: ja-jp
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Sending messages
 lang: en
-slug: /concepts/message-sending
+slug: /bolt-js/concepts/message-sending
 ---
 
 Within your listener function, `say()` is available whenever there is an associated conversation (for example, a conversation where the event or action which triggered the listener occurred). `say()` accepts a string to post simple messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated conversation.

@@ -1,7 +1,7 @@
 ---
 title: Listening & responding to shortcuts
 lang: en
-slug: /concepts/shortcuts
+slug: /bolt-js/concepts/shortcuts
 ---
 
 The `shortcut()` method supports both [global shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts#shortcut-types) and [message shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts#messages).

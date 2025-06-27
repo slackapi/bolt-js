@@ -1,7 +1,7 @@
 ---
 title: Token rotation
 lang: en
-slug: /concepts/token-rotation
+slug: /bolt-js/concepts/token-rotation
 ---
 
 Supported in Bolt for JavaScript as of v3.5.0, token rotation provides an extra layer of security for your access tokens and is defined by the [OAuth V2 RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4).

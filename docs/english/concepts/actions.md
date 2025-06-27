@@ -1,7 +1,7 @@
 ---
 title: Listening & responding to actions
 lang: en
-slug: /concepts/actions
+slug: /bolt-js/concepts/actions
 ---
 
 Your app can listen and respond to user actions like button clicks, and menu selects, using the `action` method.

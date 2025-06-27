@@ -1,7 +1,7 @@
 ---
 title: モーダルの開始
 lang: ja-jp
-slug: /concepts/creating-modals
+slug: /bolt-js/concepts/creating-modals
 ---
 
 [モーダル](https://docs.slack.dev/surfaces/modals)は、ユーザー情報を収集したり、動的な表示を実現するためのインターフェースです。モーダルは、有効な `trigger_id` と [ビュー部分のペイロード](https://docs.slack.dev/block-kit/) を組み込みの API クライアントによる [`views.open`](https://docs.slack.dev/reference/methods/views.open/) メソッドの呼び出しに渡すことで開始することができます。

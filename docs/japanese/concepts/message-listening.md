@@ -1,7 +1,7 @@
 ---
 title: メッセージ・イベントのリスニング
 lang: ja-jp
-slug: /concepts/message-listening
+slug: /bolt-js/concepts/message-listening
 ---
 
 [アプリが受信可能な](https://docs.slack.dev/messaging/retrieving-messages#permissions)メッセージをリッスンするには、`message` 型でないイベントを除外する `message()` メソッドを使用します。`message()` リスナーは `event('message')` と等価の機能を提供します。

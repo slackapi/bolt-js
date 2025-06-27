@@ -1,7 +1,7 @@
 ---
 title: ショートカットのリスニング
 lang: ja-jp
-slug: /concepts/shortcuts
+slug: /bolt-js/concepts/shortcuts
 ---
 
 `shortcut()` メソッドは、[グローバルショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#global)と[メッセージショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#messages)の両方をサポートします。
