@@ -1,5 +1,6 @@
 ---
 title: Custom Steps for Workflow Builder (existing app)
+slug: bolt-js/tutorials/custom-steps-workflow-builder-existing
 ---
 
 :::info[This feature requires a paid plan]
