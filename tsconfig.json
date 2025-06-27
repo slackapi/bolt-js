@@ -13,10 +13,6 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "test/**/*"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["test/**/*"]
 }

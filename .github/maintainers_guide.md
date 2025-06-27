@@ -44,9 +44,38 @@ Remove cached project dependencies with `rm -r node_modules package-lock.json` b
 
 ### Managing Documentation
 
-See the [`/docs/README.md`](../docs/README.md) file for documentation instructions.
-
 If you're not touching the `/docs` folder, you don't need to worry about the docs setup affecting your PR.
+
+The `/docs` folder contains two types of docs files:
+
+* markdown files
+* sidebar.json
+
+The private repo containing the tools.slack.dev site pulls these in at build time.
+
+Maintainers need to use the `run workflow` button associated with the `deploy` workflow in that private repo to update the docs with changes from here. 
+
+#### Markdown Files
+
+The markdown files here are secretly mdx files in disguise.
+
+If you'd like to add images to pages, add the image files to the same folder the md file is in.
+
+We appreciate markdown edits from anyone!!! 
+
+#### Sidebar
+
+`_sidebar.json` sets the Bolt JS docs sidebar 
+
+Sidebar values take the form of `bolt-js/path-within-docs/`.
+
+or, in other words - full path but remove "docs":
+path: `bolt-js/docs/concepts/sending-variables.md`
+value: `bolt-js/concepts/sending-variables`
+
+For info on syntax see https://docusaurus.io/docs/sidebar.
+
+This file is copied to slackapi.github.io/bolt-js/_sidebar.json, then called in slackapi.github.io/sidebars.js
 
 ### Releases
 _For beta releases, see Beta Releases section below:_

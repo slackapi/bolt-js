@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["docs/.docusaurus", "examples/**/dist"]
+    "ignore": ["examples/**/dist"]
   },
   "formatter": {
     "enabled": true,
