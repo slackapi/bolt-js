@@ -11,7 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "@slack/bolt": "^4.4.0",
-    "dotenv": "^16"
+    "dotenv": "^17"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.4",
