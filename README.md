@@ -1,4 +1,4 @@
-# Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/static/img/bolt.svg" alt="Bolt logo" width="32"/> for JavaScript
+# Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/img/bolt.svg" alt="Bolt logo" width="32"/> for JavaScript
 
 [![codecov](https://codecov.io/gh/slackapi/bolt-js/branch/main/graph/badge.svg?token=x4oCgiexvp)](https://codecov.io/gh/slackapi/bolt-js)
 [![Node.js CI](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml/badge.svg)](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml)
