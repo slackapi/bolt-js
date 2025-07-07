@@ -92,11 +92,10 @@ const config = {
       navbar,
       footer,
       prism: {
-        additionalLanguages: ['bash', 'powershell'],
         // switch to alucard when available in prism?
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-        additionalLanguages: ['bash'],
+        additionalLanguages: ['bash', 'powershell'],
       },
       codeblock: {
         showGithubLink: true,
