@@ -392,15 +392,21 @@ export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']
   let threadTs = '';
   let context: AssistantThreadContext = {};
 
-  // assistant_thread_started, asssistant_thread_context_changed
-  if (payload.type === 'assistant_thread_started' || payload.type === 'assistant_thread_context_changed') {
-    channelId = payload.assistant_thread?.channel_id;
-    threadTs = payload.assistant_thread?.thread_ts;
-    context = payload.assistant_thread?.context;
+  if (
+    'assistant_thread' in payload &&
+    payload.assistant_thread &&
+    typeof payload.assistant_thread.channel_id === 'string' &&
+    typeof payload.assistant_thread.thread_ts === 'string'
+  ) {
+    channelId = payload.assistant_thread.channel_id;
+    threadTs = payload.assistant_thread.thread_ts;
+    if (typeof payload.assistant_thread.context === 'object' && payload.assistant_thread.context !== null) {
+      context = payload.assistant_thread.context;
+    }
   }
 
   // user message in thread
-  if (payload.type === 'message' && 'thread_ts' in payload && payload.thread_ts !== undefined) {
+  if ('channel' in payload && 'thread_ts' in payload && payload.thread_ts !== undefined) {
     channelId = payload.channel;
     threadTs = payload.thread_ts;
   }
