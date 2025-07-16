@@ -35,8 +35,6 @@ describe('App basic features', () => {
         const app = new MockApp({ token: '', signingSecret: '', port: 9999 });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
         assert.propertyVal(app['receiver'], 'port', 9999);
-
-        assert.isTrue(false);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = await importApp(overrides);
