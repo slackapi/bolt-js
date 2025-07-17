@@ -1,5 +1,5 @@
 ---
-title: AI in Apps
+title: Using AI in Apps
 lang: en
 slug: /concepts/ai-apps
 ---
@@ -62,7 +62,7 @@ Be sure to give the [reference docs](/reference#agents--assistants) a look!
 
 ## Handling a new thread {#handling-new-thread}
 
-When the user opens a new thread with your AI feature-enabled app, the [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
+When the user opens a new thread with your AI-enabled app, the [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
 
 In the example below, the app is sending a message — containing thread context [message metadata](https://docs.slack.dev/messaging/message-metadata/) behind the scenes — to the user, along with a single [prompt](https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts).
 
