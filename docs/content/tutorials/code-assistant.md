@@ -4,7 +4,7 @@ slug: /tutorials/code-assistant
 lang: en
 ---
 
-In this tutorial, we will create an [AI app](https://docs.slack.dev/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
+In this tutorial, we will create an [app that has platform AI features enabled](https://docs.slack.dev/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
 
 Hugging Face is an open-source community best known for its transformers library and platform for machine learning models. Hugging Face's model hub is an online repository where you can find thousands of pre-trained models for natural language processing, computer vision, speech recognition, and more. The platform is open-source, so anyone can contribute to the models and browse the models others have started. Here, we will be using the [Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) model to create an app that can answer coding questions.
 
@@ -393,7 +393,7 @@ If your app is up and running, you'll see a message that says `⚡️ Code Assis
 
 With your app running, head over to the Slack client and open your app from the icon in the upper right of the window. If you don't see it there, open your Preferences by clicking on your workspace name, then **Preferences**, then **Navigation**. Under a section that says **App agents & assistants**, check the box next to your app. Note: if you do not see the **App agents & assistants** section, check that your app is installed both to your organization and your workspace. 
 
-You should now see it and be able to open it from the icon in the upper right of the Slack client window. This opens the split-view. Upon opening your app's split-view, you should see the suggested prompts we set up in `app.js` file. Click on one of the suggested prompts or formulate a question of your own to see your AI app in action!
+You should now see it and be able to open it from the icon in the upper right of the Slack client window. This opens the split-view. Upon opening your app's split-view, you should see the suggested prompts we set up in `app.js` file. Click on one of the suggested prompts or formulate a question of your own to see your AI-enabled app in action!
 
 ## Side quest: Use your function as a custom step in Workflow Builder {#custom-step}
 Let's explore how to use the functionality you've created in your app inside of a workflow. In case you're unfamiliar, [Workflow Builder](https://slack.com/help/articles/360035692513-Guide-to-Slack-Workflow-Builder) is the no-code solution for executing tasks in Slack. Once your app is installed on your org, you can grant anyone access to use its function as a custom step in their workflow. Here's how that's done.
