@@ -4,7 +4,7 @@ slug: /bolt-js/tutorials/code-assistant
 lang: en
 ---
 
-In this tutorial, we will create an [AI app](https://docs.slack.dev/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
+In this tutorial, we will create an [AI app](/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
 
 Hugging Face is an open-source community best known for its transformers library and platform for machine learning models. Hugging Face's model hub is an online repository where you can find thousands of pre-trained models for natural language processing, computer vision, speech recognition, and more. The platform is open-source, so anyone can contribute to the models and browse the models others have started. Here, we will be using the [Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) model to create an app that can answer coding questions.
 
@@ -113,7 +113,7 @@ Before getting started, you will need the following:
 
 In order to connect this configuration with the app we are about to code, you'll need to first obtain and set some environment variables.
 1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](https://docs.slack.dev/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 
 Save these for the moment; we first need to set up our project locally, then we'll set these variables.
 
@@ -374,10 +374,10 @@ app.function("code_assist", async ({ client, inputs, complete, fail }) => {
 
 This is the meat of our app! Here's a breakdown of what we've added:
 * `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model. Think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
-* `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block) to achieve the same result.
+* `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](/reference/block-kit/blocks/markdown-block) to achieve the same result.
 * `assistant` is an instance of the [`Assistant` class](/bolt-js/concepts/ai-apps#the-assistant-class-instance); this sets up the suggested prompts that the user sees in the split-view container upon opening your app. 
 * `userMessage` is the handler that takes care of the fiddly bits around getting the thread history, preparing the structure of the messages for processing in a way that the model is expecting, interacting with the model, and responding to the user. 
-* `app.function` sets up the custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 This is the implementation logic of the custom workflow step we saw created by the manifest in the app settings. We use the [`conversations.history`](https://docs.slack.dev/reference/methods/conversations.history) method to find the message where the emoji reaction was placed, then send that to the model as the question.
+* `app.function` sets up the custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 This is the implementation logic of the custom workflow step we saw created by the manifest in the app settings. We use the [`conversations.history`](/reference/methods/conversations.history) method to find the message where the emoji reaction was placed, then send that to the model as the question.
 
 ### Run the app {#run}
 

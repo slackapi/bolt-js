@@ -38,9 +38,9 @@ const app = new App({
 
 * **Slack で開く**: ユーザーが **Slack で開く** を選択した後、アプリが Slack からのイベントをするときに `installationStore` の `fetchInstallation` や `storeInstallation` ハンドラーが実行されます。ハンドラーに渡す引数に関するより詳しい情報は  **Installation Object** セクションを参照してください。
 
-* アプリがすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳しくは [OAuth ライブラリのドキュメント](https://tools.slack.dev/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
+* アプリがすでにインストールされていて、さらにユーザーから追加の認可情報（例：ユーザートークンの発行）な場合や、何らかの理由で動的にインストール用の URL を生成したい場合は、`ExpressReceiver` を自前でインスタンス化し、それを `receiver` という変数に代入した上で `receiver.installer.generateInstallUrl()` を呼び出してください。詳しくは [OAuth ライブラリのドキュメント]/node-slack-sdk/oauth#generating-an-installation-url)の `generateInstallUrl()` を参照してください。
 
-* 💡 Bolt for JavaScript は [カスタムのレシーバー](/bolt-js/concepts/receiver)での OAuth をサポートしていません。カスタムのレシーバーで OAuth フローを実装したい場合は、私たちが提供している [OAuth ライブラリ](https://tools.slack.dev/node-slack-sdk/oauth#slack-oauth) を使うことができます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
+* 💡 Bolt for JavaScript は [カスタムのレシーバー](/bolt-js/concepts/receiver)での OAuth をサポートしていません。カスタムのレシーバーで OAuth フローを実装したい場合は、私たちが提供している [OAuth ライブラリ]/node-slack-sdk/oauth#slack-oauth) を使うことができます。Bolt for JavaScript の組み込みのモジュールもこれを内部的に利用しています。
 
 ##### Redirect URI
 
@@ -102,9 +102,9 @@ Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `instal
 
 ##### OrG 全体へのインストール
 
-[Enterprise Grid の OrG 全体へのインストール](https://docs.slack.dev/enterprise-grid/)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
+[Enterprise Grid の OrG 全体へのインストール](/enterprise-grid/)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
 
-管理者画面からの [Enterprise Grid の OrG 全体へのインストール](https://docs.slack.dev/enterprise-grid/) の場合、 Bolt で動作させるために追加の設定が必要です。この利用シナリオでは、推奨の `state` パラメータが提供されず、Bolt アプリでは `state` を検証しようとするため、インストールを継続することができません。
+管理者画面からの [Enterprise Grid の OrG 全体へのインストール](/enterprise-grid/) の場合、 Bolt で動作させるために追加の設定が必要です。この利用シナリオでは、推奨の `state` パラメータが提供されず、Bolt アプリでは `state` を検証しようとするため、インストールを継続することができません。
 
 Bolt アプリ側で `stateVerification` オプションを false に設定することで、 `state` パラメーターの検証を無効することができます。以下の例を参考にしてください。
 
@@ -120,7 +120,7 @@ const app = new App({
 });
 ```
 
-Slack の OAuth インストールフローについてのより詳細な情報は [API ドキュメント](https://docs.slack.dev/authentication/installing-with-oauth)を参照してください。
+Slack の OAuth インストールフローについてのより詳細な情報は [API ドキュメント](/authentication/installing-with-oauth)を参照してください。
 
 ```javascript
 const app = new App({

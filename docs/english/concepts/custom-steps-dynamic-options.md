@@ -2,7 +2,7 @@
 
 ## Background {#background}
 
-[Legacy steps from apps](https://docs.slack.dev/changelog/2023-08-workflow-steps-from-apps-step-back) previously enabled Slack apps to create and process custom workflow steps, which could then be shared and used by anyone in Workflow Builder. To support your transition away from them, custom steps used as dynamic options are available. These allow you to use data defined when referencing the step in Workflow Builder as inputs to the step.
+[Legacy steps from apps](/changelog/2023-08-workflow-steps-from-apps-step-back) previously enabled Slack apps to create and process custom workflow steps, which could then be shared and used by anyone in Workflow Builder. To support your transition away from them, custom steps used as dynamic options are available. These allow you to use data defined when referencing the step in Workflow Builder as inputs to the step.
 
 ## Example use case {#use-case}
 
@@ -88,13 +88,13 @@ The `inputs` attribute defines the parameters to be passed as inputs to the step
 
 The following format can be used to reference any input parameter defined by the step: `{{input_parameters.<PARAMETER_NAME>}}`.
 
-In addition, the `{{client.query}}` parameter can be used as a placeholder for an input value. The `{{client.builder_context}}` parameter will inject the [`slack#/types/user_context`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types/#usercontext) of the user building the workflow as the value to the input parameter.
+In addition, the `{{client.query}}` parameter can be used as a placeholder for an input value. The `{{client.builder_context}}` parameter will inject the [`slack#/types/user_context`]/deno-slack-sdk/reference/slack-types/#usercontext) of the user building the workflow as the value to the input parameter.
 
 ### Types of dynamic options UIs {#dynamic-option-UIs}
 
 The above example demonstrates one possible UI to be rendered for builders: a single-select drop-down menu of dynamic options. However, dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields.
 
-The type is dictated by the output parameter of the custom step used as a dynamic option. In order to use a custom step in a dynamic option context, its output must adhere to a defined interface, that is, it must have an `options` parameter of type [`options_select`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_select) or [`options_field`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_field), as shown in the following code snippet.
+The type is dictated by the output parameter of the custom step used as a dynamic option. In order to use a custom step in a dynamic option context, its output must adhere to a defined interface, that is, it must have an `options` parameter of type [`options_select`]/deno-slack-sdk/reference/slack-types#options_select) or [`options_field`]/deno-slack-sdk/reference/slack-types#options_field), as shown in the following code snippet.
 
 ```js
 "output_parameters": {
@@ -109,9 +109,9 @@ The type is dictated by the output parameter of the custom step used as a dynami
 
 #### Drop-down menus {#drop-down}
 
-Your dynamic input parameter can be rendered as a drop-down menu, which will use the options obtained from a custom step with an `options` output parameter of the type [`options_select`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_select).
+Your dynamic input parameter can be rendered as a drop-down menu, which will use the options obtained from a custom step with an `options` output parameter of the type [`options_select`]/deno-slack-sdk/reference/slack-types#options_select).
 
-The drop-down menu UI component can be rendered in two ways: single-select, or multi-select. To render the dynamic input as a single-select menu, the input parameter defining the dynamic option must be of the type [`string`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#string).
+The drop-down menu UI component can be rendered in two ways: single-select, or multi-select. To render the dynamic input as a single-select menu, the input parameter defining the dynamic option must be of the type [`string`]/deno-slack-sdk/reference/slack-types#string).
 
 ```js
 "step-with-dynamic-input": {
@@ -133,7 +133,7 @@ The drop-down menu UI component can be rendered in two ways: single-select, or m
 }
 ```
 
-To render the dynamic input as a multi-select menu, the input parameter defining the dynamic option must be of the type [`array`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#array), and its `items` must be of type [`string`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#string).
+To render the dynamic input as a multi-select menu, the input parameter defining the dynamic option must be of the type [`array`]/deno-slack-sdk/reference/slack-types#array), and its `items` must be of type [`string`]/deno-slack-sdk/reference/slack-types#string).
 
 ```js
 "step-with-dynamic-input": {
@@ -159,9 +159,9 @@ To render the dynamic input as a multi-select menu, the input parameter defining
 
 #### Fields {#fields}
 
-In the code snippet below, the input parameter is rendered as a set of fields with keys and values. The option fields are obtained from a custom step with an `options` output parameter of type [`options_field`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_field).
+In the code snippet below, the input parameter is rendered as a set of fields with keys and values. The option fields are obtained from a custom step with an `options` output parameter of type [`options_field`]/deno-slack-sdk/reference/slack-types#options_field).
 
-The input parameter that defines the dynamic option must be of type [`object`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#object), as the completed set of fields in Workflow Builder will be passed to the custom step as an [untyped object](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#untyped-object) during workflow execution.
+The input parameter that defines the dynamic option must be of type [`object`]/deno-slack-sdk/reference/slack-types#object), as the completed set of fields in Workflow Builder will be passed to the custom step as an [untyped object]/deno-slack-sdk/reference/slack-types#untyped-object) during workflow execution.
 
 ```js
 "test-field-dynamic-options": {
@@ -185,20 +185,20 @@ The input parameter that defines the dynamic option must be of type [`object`](h
 
 ### Dynamic option types {#dynamic-option-types}
 
-As mentioned earlier, in order to use a custom step as a dynamic option, its output must adhere to a defined interface: it must have an `options` output parameter of the type either [`options_select`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_select) or [`options_field`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_field). 
+As mentioned earlier, in order to use a custom step as a dynamic option, its output must adhere to a defined interface: it must have an `options` output parameter of the type either [`options_select`]/deno-slack-sdk/reference/slack-types#options_select) or [`options_field`]/deno-slack-sdk/reference/slack-types#options_field). 
 
-To take a look at these in more detail, refer to our [Options Slack type](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options) documentation.
+To take a look at these in more detail, refer to our [Options Slack type]/deno-slack-sdk/reference/slack-types#options) documentation.
 
 ## Dynamic options handler {#dynamic-option-handler}
 
 Each custom step defined in the manifest needs a corresponding handler in your Slack app. Although implemented similarly to existing function execution event handlers, there are two key differences between regular custom step invocations and those used for dynamic options:
 
-* The custom step must have an `options` output parameter that is of type [`options_select`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_select) or [`options_field`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#options_field).
-* The [`function_executed`](https://docs.slack.dev/reference/events/function_executed) event must be handled synchronously. This optimizes the response time of returned dynamic options and provides a crisp builder experience.
+* The custom step must have an `options` output parameter that is of type [`options_select`]/deno-slack-sdk/reference/slack-types#options_select) or [`options_field`]/deno-slack-sdk/reference/slack-types#options_field).
+* The [`function_executed`](/reference/events/function_executed) event must be handled synchronously. This optimizes the response time of returned dynamic options and provides a crisp builder experience.
 
 ### Asynchronous event handling {#async}
 
-By default, the [Bolt family of frameworks](https://tools.slack.dev/) handles `function_executed` events asynchronously. 
+By default, the [Bolt family of frameworks](/tools) handles `function_executed` events asynchronously. 
 
 For example, the various modal-related API methods provide two ways to update a view: synchronously using a `response_action` HTTP response, or asynchronously using a separate HTTP API call. Using the asynchronous approach allows developers to handle events free of timeouts, but this isn't desired for dynamic options as it introduces delays and violates our stated goal of providing a crisp builder experience.
 
@@ -208,13 +208,13 @@ Dynamic options support synchronous handling of `function_executed` events. By e
 
 ### Implementation {#implementation}
 
-To optimize the response time of dynamic options, you must acknowledge the incoming event after calling the [`function.completeSuccess`](https://docs.slack.dev/reference/methods/functions.completeSuccess) or [`function.completeError`](https://docs.slack.dev/reference/methods/functions.completeError) API methods, minimizing asynchronous latency. The `function.completeSuccess` and `function.completeError` API methods are invoked in the complete and fail helper functions.
+To optimize the response time of dynamic options, you must acknowledge the incoming event after calling the [`function.completeSuccess`](/reference/methods/functions.completeSuccess) or [`function.completeError`](/reference/methods/functions.completeError) API methods, minimizing asynchronous latency. The `function.completeSuccess` and `function.completeError` API methods are invoked in the complete and fail helper functions.
 
 A new `auto_acknowledge` flag allows you more granular control over whether specific event handlers should operate in synchronous or asynchronous response modes in order to enable a smooth dynamic options experience.
 
 #### Example {#bolt-js}
 
-In [Bolt for JavaScript](https://tools.slack.dev/bolt-js/), you can pass an `{ autoAcknowledge: false }` options object to a function listener. This allows you to manually control when the `await ack()` helper function is executed and implement synchronous `function_executed` event handling.
+In [Bolt for JavaScript]/bolt-js/), you can pass an `{ autoAcknowledge: false }` options object to a function listener. This allows you to manually control when the `await ack()` helper function is executed and implement synchronous `function_executed` event handling.
 
 ```js
 app.function('get-projects', { autoAcknowledge: false }, async ({ ack, complete }) => {
@@ -245,4 +245,4 @@ app.function('get-projects', { autoAcknowledge: false }, async ({ ack, complete 
 });
 ```
 
-✨  **To learn more about the Bolt family of frameworks and tools**, check out our [Slack Developer Tools](https://tools.slack.dev/).
+✨  **To learn more about the Bolt family of frameworks and tools**, check out our [Slack Developer Tools](/tools).

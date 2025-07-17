@@ -4,7 +4,7 @@ lang: en
 slug: /bolt-js/concepts/shortcuts
 ---
 
-The `shortcut()` method supports both [global shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts#shortcut-types) and [message shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts#messages).
+The `shortcut()` method supports both [global shortcuts](/interactivity/implementing-shortcuts#shortcut-types) and [message shortcuts](/interactivity/implementing-shortcuts#messages).
 
 Shortcuts are invocable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut requests. The method requires a `callback_id` parameter of type `string` or `RegExp`.
 
@@ -22,7 +22,7 @@ When configuring shortcuts within your app configuration, you'll continue to app
 
 :::warning
 
-Global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) element within a modal. Message shortcuts do include channel ID.
+Global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) element within a modal. Message shortcuts do include channel ID.
 
 :::
 

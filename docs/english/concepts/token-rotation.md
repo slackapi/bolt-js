@@ -10,7 +10,7 @@ Instead of an access token representing an existing installation of your Slack a
 
 Bolt for JavaScript will rotate tokens automatically in response to incoming events so long as the [built-in OAuth](/bolt-js/concepts/authenticating-oauth) functionality is used.
 
-To rotate tokens on a separate schedule, consider implementing the `InstallProvider` from the [`@slack/oauth`](https://tools.slack.dev/node-slack-sdk/oauth) package for use of the provided `authorize` method:
+To rotate tokens on a separate schedule, consider implementing the `InstallProvider` from the [`@slack/oauth`]/node-slack-sdk/oauth) package for use of the provided `authorize` method:
 
 ```js
 const { InstallProvider } = require("@slack/oauth");
@@ -31,6 +31,6 @@ async function rotateTokenBeforeUsing(query) {
 }
 ```
 
-The above implementation also requires an installation [store](https://tools.slack.dev/node-slack-sdk/oauth/#storing-installations-in-a-database) to fetch and store installation information according to the incoming installation query.
+The above implementation also requires an installation [store]/node-slack-sdk/oauth/#storing-installations-in-a-database) to fetch and store installation information according to the incoming installation query.
 
-For more information about token rotation, please see the [documentation](https://docs.slack.dev/authentication/using-token-rotation).
+For more information about token rotation, please see the [documentation](/authentication/using-token-rotation).

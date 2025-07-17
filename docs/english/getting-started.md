@@ -18,15 +18,15 @@ In search of the complete guide to building an app from scratch? Check out the [
 
 #### Prerequisites
 
-A few tools are needed for the following steps. We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but other options remain available.
+A few tools are needed for the following steps. We recommend using the [**Slack CLI**]/slack-cli/) for the smoothest experience, but other options remain available.
 
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
 Install the latest version of the Slack CLI to get started:
 
-- [Slack CLI for macOS & Linux](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
-- [Slack CLI for Windows](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-windows)
+- [Slack CLI for macOS & Linux]/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
+- [Slack CLI for Windows]/slack-cli/guides/installing-the-slack-cli-for-windows)
 
 Then confirm a successful installation with the following command:
 
@@ -62,7 +62,7 @@ $ node --version
 
 A workspace where development can happen is also needed.
 
-We recommend using [developer sandboxes](https://docs.slack.dev/tools/developer-sandboxes) to avoid disruptions where real work gets done.
+We recommend using [developer sandboxes](/tools/developer-sandboxes) to avoid disruptions where real work gets done.
 
 :::
 
@@ -152,7 +152,7 @@ The above command works on Linux and macOS but [similar commands are available o
 
 :::warning[Keep it secret. Keep it safe]
 
-Treat your tokens like a password and [keep it safe](https://docs.slack.dev/authentication/best-practices-for-security). Your app uses these to retrieve and send information to Slack.
+Treat your tokens like a password and [keep it safe](/authentication/best-practices-for-security). Your app uses these to retrieve and send information to Slack.
 
 :::
 
@@ -253,7 +253,7 @@ Your app can be stopped again by pressing `CTRL+C` in the terminal to end these 
 
 #### Customizing app settings
 
-The created app will have some placeholder values and a small set of [scopes](https://docs.slack.dev/reference/scopes) to start, but we recommend exploring the customizations possible on app settings.
+The created app will have some placeholder values and a small set of [scopes](/reference/scopes) to start, but we recommend exploring the customizations possible on app settings.
 
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
@@ -294,8 +294,8 @@ Follow along with the steps that went into making this app on the [building an a
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-- Explore the different events your bot can listen to with the [`event`](/bolt-js/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the API docs site.
-- Bolt allows you to call [Web API](/bolt-js/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
-- Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/bolt-js/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
+- Explore the different events your bot can listen to with the [`event`](/bolt-js/concepts/event-listening) method. All of the [events](/reference/events) are listed on the API docs site.
+- Bolt allows you to call [Web API](/bolt-js/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) on the API docs site.
+- Learn more about the different [token types](/authentication/tokens) and [authentication setups](/bolt-js/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
 - Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/bolt-js/deployments/heroku) or [AWS Lambda](/bolt-js/deployments/aws-lambda).
-- Read on [app design](https://docs.slack.dev/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
+- Read on [app design](/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.

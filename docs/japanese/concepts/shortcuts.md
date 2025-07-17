@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /bolt-js/concepts/shortcuts
 ---
 
-`shortcut()` メソッドは、[グローバルショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#global)と[メッセージショートカット](https://docs.slack.dev/interactivity/implementing-shortcuts#messages)の両方をサポートします。
+`shortcut()` メソッドは、[グローバルショートカット](/interactivity/implementing-shortcuts#global)と[メッセージショートカット](/interactivity/implementing-shortcuts#messages)の両方をサポートします。
 
 ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのリクエストをリッスンすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
 
@@ -14,7 +14,7 @@ slug: /bolt-js/concepts/shortcuts
 
 グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](/bolt-js/concepts/creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
 
-⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) エレメントを使用できます。
+⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) エレメントを使用できます。
 メッセージショートカットのペイロードはチャンネル ID を含みます。
 
 ```javascript

@@ -27,9 +27,9 @@ app.view('modal-callback-id', async ({ ack, body }) => {
   });
 });
 ```
-Similarly, there are options for [displaying errors](https://docs.slack.dev/surfaces/modals#displaying_errors) in response to view submissions.
+Similarly, there are options for [displaying errors](/surfaces/modals#displaying_errors) in response to view submissions.
 
-Read more about view submissions in our [API documentation](https://docs.slack.dev/surfaces/modals#interactions).
+Read more about view submissions in our [API documentation](/surfaces/modals#interactions).
 
 ---
 
@@ -38,7 +38,7 @@ Read more about view submissions in our [API documentation](https://docs.slack.d
 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this.
 
 :::tip 
-See the [API documentation](https://docs.slack.dev/surfaces/modals#interactions) for more information about `view_closed`.
+See the [API documentation](/surfaces/modals#interactions) for more information about `view_closed`.
 :::
 
 #### Handle a `view_closed` request

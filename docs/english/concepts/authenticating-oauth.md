@@ -499,7 +499,7 @@ installation in your app configuration settings under **Org Level Apps**.
 
 #### Admin installation state verficiation
 
-Installing an [org-wide](https://docs.slack.dev/enterprise-grid/) app from admin
+Installing an [org-wide](/enterprise-grid/) app from admin
 pages requires additional configuration to work with Bolt. In that scenario, the
 recommended `state` parameter is not supplied. Bolt will try to verify `state`
 and stop the installation from progressing.
@@ -702,30 +702,30 @@ for additional details for common error codes.
 [authorization]: /bolt-js/concepts/authorization
 [callback-default-failure]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L127-L162
 [callback-default-success]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L125
-[callback-options]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
+[callback-options]: /node-slack-sdk/reference/oauth/interfaces/CallbackOptions
 [callback-options-default]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L162
-[callbacks]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
+[callbacks]: /node-slack-sdk/reference/oauth/interfaces/CallbackOptions
 [custom-routes]: /bolt-js/concepts/custom-routes
 [direct-install]: https://github.com/slackapi/bolt-js/blob/5b4d9ceb65e6bf5cf29dfa58268ea248e5466bfb/examples/oauth/app.js#L58-L64
-[errors]: https://docs.slack.dev/authentication/installing-with-oauth#errors
+[errors]: /authentication/installing-with-oauth#errors
 [examples]: https://github.com/slackapi/bolt-js/tree/main/examples/oauth
-[generate-install-url]: https://tools.slack.dev/node-slack-sdk/oauth/#using-handleinstallpath
+[generate-install-url]: /node-slack-sdk/oauth/#using-handleinstallpath
 [install-provider-options]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/install-provider-options.ts
-[installation-page]: https://tools.slack.dev/node-slack-sdk/oauth/#showing-an-installation-page
-[installation-store]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/InstallationStore
+[installation-page]: /node-slack-sdk/oauth/#showing-an-installation-page
+[installation-store]: /node-slack-sdk/reference/oauth/interfaces/InstallationStore
 [installation-store-file]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/installation-stores/file-store.ts
-[oauth-node]: https://tools.slack.dev/node-slack-sdk/oauth
-[oauth-v2]: https://docs.slack.dev/authentication/installing-with-oauth
-[oidc]: https://tools.slack.dev/node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
-[org-ready]: https://docs.slack.dev/enterprise-grid/developing-for-enterprise-grid#opt
-[org-ready-oauth]: https://docs.slack.dev/enterprise-grid/developing-for-enterprise-grid#oauth
-[scopes]: https://docs.slack.dev/reference/scopes
+[oauth-node]: /node-slack-sdk/oauth
+[oauth-v2]: /authentication/installing-with-oauth
+[oidc]: /node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
+[org-ready]: /enterprise-grid/developing-for-enterprise-grid#opt
+[org-ready-oauth]: /enterprise-grid/developing-for-enterprise-grid#oauth
+[scopes]: /reference/scopes
 [settings]: https://api.slack.com/apps
-[siws]: https://docs.slack.dev/authentication/sign-in-with-slack/
-[state]: https://tools.slack.dev/node-slack-sdk/oauth#using-a-custom-state-store
-[state-store]: https://tools.slack.dev/node-slack-sdk/reference/oauth/interfaces/StateStore
+[siws]: /authentication/sign-in-with-slack/
+[state]: /node-slack-sdk/oauth#using-a-custom-state-store
+[state-store]: /node-slack-sdk/reference/oauth/interfaces/StateStore
 [state-store-clear]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/state-stores/clear-state-store.ts
-[store]: https://tools.slack.dev/node-slack-sdk/oauth#storing-installations-in-a-database
-[user-tokens]: https://docs.slack.dev/authentication/tokens#user
-[verification]: https://tools.slack.dev/node-slack-sdk/oauth#state-verification
-[web-api]: https://tools.slack.dev/node-slack-sdk/web-api
+[store]: /node-slack-sdk/oauth#storing-installations-in-a-database
+[user-tokens]: /authentication/tokens#user
+[verification]: /node-slack-sdk/oauth#state-verification
+[web-api]: /node-slack-sdk/web-api

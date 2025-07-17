@@ -9,7 +9,7 @@ If you don't have a paid workspace for development, you can join the [Developer 
 
 With custom steps for Bolt apps, your app can create and process workflow steps that users later add in Workflow Builder. This guide goes through how to build a custom step for your app using the [app settings](https://api.slack.com/apps). 
 
-If you're looking to build a custom step using the Deno Slack SDK, check out our guide on [creating a custom step for Workflow Builder with the Deno Slack SDK](https://tools.slack.dev/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
+If you're looking to build a custom step using the Deno Slack SDK, check out our guide on [creating a custom step for Workflow Builder with the Deno Slack SDK]/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
 
 You can also take a look at the template for the [Bolt for JavaScript custom workflow step](https://github.com/slack-samples/bolt-js-custom-step-template) on GitHub.
 
@@ -69,7 +69,7 @@ Field | Type | Description
 `type` | String | Defines the data type and can fall into one of two categories: primitives or Slack-specific. 
 `title` | String | The label that appears in Workflow Builder when a user sets up this step in their workflow.
 `description` | String | The description that accompanies the input when a user sets up this step in their workflow.
-`dynamic_options` | Object | For custom steps dynamic options in Workflow Builder, define this property and point to a custom step designed to return the set of dynamic elements once the step is added to a workflow within Workflow Builder. Dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields. Refer to custom steps dynamic options for Workflow Builder using [Bolt for JavaScript](https://tools.slack.dev/bolt-js/concepts/custom-steps-dynamic-options) or [Bolt for Python](https://tools.slack.dev/bolt-python/concepts/custom-steps-dynamic-options) for more details.
+`dynamic_options` | Object | For custom steps dynamic options in Workflow Builder, define this property and point to a custom step designed to return the set of dynamic elements once the step is added to a workflow within Workflow Builder. Dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields. Refer to custom steps dynamic options for Workflow Builder using [Bolt for JavaScript]/bolt-js/concepts/custom-steps-dynamic-options) or [Bolt for Python]/bolt-python/concepts/custom-steps-dynamic-options) for more details.
 `is_required` | Boolean | Indicates whether or not the input is required by the step in order to run. If it’s required and not provided, the user will not be able to save the configuration nor use the step in their workflow. This property is available only in v1 of the manifest. We recommend v2, using the `required` array as noted in the example above.
 `hint` | String | Helper text that appears below the input when a user sets up this step in their workflow.
 
@@ -234,7 +234,7 @@ The second argument is the callback function, or the logic that will run when yo
 
 Field | Description
 ------|------------
-`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](https://docs.slack.dev/reference/methods). Read more about the `WebClient` for Bolt JS [here](https://slack.dev/bolt-js/concepts/web-api/).
+`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](/reference/methods). Read more about the `WebClient` for Bolt JS [here](https://slack.dev/bolt-js/concepts/web-api/).
 `complete` | A utility method that invokes `functions.completeSuccess`. This method indicates to Slack that a step has completed successfully without issue. When called, `complete` requires you include an `outputs` object that matches your step definition in [`output_parameters`](#inputs-outputs).
 `fail` | A utility method that invokes `functions.completeError`. True to its name, this method signals to Slack that a step has failed to complete. The `fail` method requires an argument of `error` to be sent along with it, which is used to help users understand what went wrong.
 `inputs` | An alias for the `input_parameters` that were provided to the step upon execution.

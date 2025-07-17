@@ -360,4 +360,4 @@ That's it — we hope you learned a lot!
 
 In this tutorial, we added custom steps via the manifest, but if you'd like to see how to add custom steps in the [app settings](https://api.slack.com/apps) to an existing app, follow along with the [Create a custom step for Workflow Builder: existing Bolt app](/bolt-js/tutorials/custom-steps-workflow-builder-existing) tutorial.
 
-If you're interested in exploring how to create custom steps to use in Workflow Builder as steps with our Deno Slack SDK, too, that tutorial can be found [here](https://tools.slack.dev/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
+If you're interested in exploring how to create custom steps to use in Workflow Builder as steps with our Deno Slack SDK, too, that tutorial can be found [here]/deno-slack-sdk/tutorials/workflow-builder-custom-step/).

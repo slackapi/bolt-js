@@ -3,9 +3,9 @@
 [![codecov](https://codecov.io/gh/slackapi/bolt-js/branch/main/graph/badge.svg?token=x4oCgiexvp)](https://codecov.io/gh/slackapi/bolt-js)
 [![Node.js CI](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml/badge.svg)](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml)
 
-A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://tools.slack.dev/bolt-js/getting-started) to set-up and run your first Bolt app.
+A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide]/bolt-js/getting-started) to set-up and run your first Bolt app.
 
-Read [the documentation](https://tools.slack.dev/bolt-js) to explore the basic and advanced concepts of Bolt for JavaScript.
+Read [the documentation]/bolt-js) to explore the basic and advanced concepts of Bolt for JavaScript.
 
 ## Setup
 
@@ -107,7 +107,7 @@ app.message(async ({ message, say }) => {
 
 ### Calling the Web API
 
-In addition to the [`client` property passed to listeners](#making-things-happen), each app has a top-level `client` that can be used to call methods. Unlike the `client` passed to listeners, the top-level client must be passed a `token`. [Read the documentation](https://tools.slack.dev/bolt-js/concepts#web-api) for more details.
+In addition to the [`client` property passed to listeners](#making-things-happen), each app has a top-level `client` that can be used to call methods. Unlike the `client` passed to listeners, the top-level client must be passed a `token`. [Read the documentation]/bolt-js/concepts#web-api) for more details.
 
 ### Acknowledging events
 
@@ -129,7 +129,7 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 
 ## Getting Help
 
-[The documentation](https://tools.slack.dev/bolt-js) has more information on basic and advanced concepts for Bolt for JavaScript.
+[The documentation]/bolt-js) has more information on basic and advanced concepts for Bolt for JavaScript.
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 

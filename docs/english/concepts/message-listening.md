@@ -38,7 +38,7 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
 
 ## Filtering on event subtypes {#filtering-event-subtypes}
 
-You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](https://docs.slack.dev/reference/events/message#subtypes).
+You can filter on subtypes of events by using the built-in `subtype()` middleware. Common message subtypes like `message_changed` and `message_replied` can be found [on the message event page](/reference/events/message#subtypes).
 
 ```javascript
 // Import subtype from the package

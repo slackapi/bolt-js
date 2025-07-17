@@ -56,11 +56,11 @@ With the above, now when a message payload is wrapped in middleware arguments, i
 
 All bolt handlers are [provided a convenience `client` argument](../concepts/web-api) that developers can use to make API requests to [Slack's public HTTP APIs][methods]. This `client` is powered by [the `@slack/web-api` package][web-api]. In bolt v4, `web-api` has been upgraded from v6 to v7.
 
-More APIs! Better argument type safety! And a whole slew of other changes, too. Many of these changes won't affect JavaScript application builders, but if you are building a bolt app using TypeScript, you may see some compilation issues. Head over to [the `@slack/web-api` v6 -> v7 migration guide](https://tools.slack.dev/node-slack-sdk/migration/migrating-web-api-package-to-v7) to get the details on what changed and how to migrate to v7.
+More APIs! Better argument type safety! And a whole slew of other changes, too. Many of these changes won't affect JavaScript application builders, but if you are building a bolt app using TypeScript, you may see some compilation issues. Head over to [the `@slack/web-api` v6 -> v7 migration guide]/node-slack-sdk/migration/migrating-web-api-package-to-v7) to get the details on what changed and how to migrate to v7.
 
 ## 🔌 `@slack/socket-mode` v2 upgrade {#socket-mode-v2}
 
-While the breaking changes from this upgrade should be shielded from most bolt-js users, if you are using [the `SocketModeReceiver` or setting `socketMode: true`](../concepts/socket-mode) _and_ attach custom code to how the `SocketModeReceiver` operates, we suggest you read through [the `@slack/socket-mode` v1 -> v2 migration guide](https://tools.slack.dev/node-slack-sdk/migration/migrating-socket-mode-package-to-v2/), just in case.
+While the breaking changes from this upgrade should be shielded from most bolt-js users, if you are using [the `SocketModeReceiver` or setting `socketMode: true`](../concepts/socket-mode) _and_ attach custom code to how the `SocketModeReceiver` operates, we suggest you read through [the `@slack/socket-mode` v1 -> v2 migration guide]/node-slack-sdk/migration/migrating-socket-mode-package-to-v2/), just in case.
 
 ## 🚅 `express` v5 upgrade {#express-v5}
 
@@ -68,7 +68,7 @@ For those building bolt-js apps using the `ExpressReceiver`, the packaged `expre
 
 ## 🍽️ `@slack/types` exported as a named `types` export {#types-named-export}
 
-We are slowly moving more core Slack domain object types and interfaces into [the utility package `@slack/types`][types]. For example, recently we shuffled [Slack Events API payloads](https://docs.slack.dev/reference/events) from bolt-js over to `@slack/types`. Similar moves will continue as we improve bolt-js. Ideally, we'd like for everyone - ourselves as Slack employees but of course you as well, dear developer - to leverage these types when modeling Slack domain objects.
+We are slowly moving more core Slack domain object types and interfaces into [the utility package `@slack/types`][types]. For example, recently we shuffled [Slack Events API payloads](/reference/events) from bolt-js over to `@slack/types`. Similar moves will continue as we improve bolt-js. Ideally, we'd like for everyone - ourselves as Slack employees but of course you as well, dear developer - to leverage these types when modeling Slack domain objects.
 
 Anyways, previously we simply `export * from '@slack/types';` in bolt-js. We've tweaked this somewhat, it is now: `export * as types from '@slack/types';`. So if you are using `@slack/types` when packaged within bolt-js, please update your references to something like:
 
@@ -150,6 +150,6 @@ import { webApi } from '@slack/bolt';
 // now can use e.g. webApi.WebClient, etc.
 ```
 
-[methods]: https://docs.slack.dev/reference/methods
+[methods]: /reference/methods
 [web-api]: https://www.npmjs.com/package/@slack/web-api
 [types]: https://www.npmjs.com/package/@slack/types
