@@ -5,19 +5,11 @@
     "label": "Bolt for JavaScript",
     "className": "sidebar-title"
   },
-  {
-    "type": "doc",
-    "id": "bolt-js/getting-started"
-  },
+  "bolt-js/getting-started",
   {
     "type": "html",
     "value": "<hr>"
   },
-  {
-    "type": "category",
-    "label": "Guides",
-    "collapsed": false,
-    "items": [
       "bolt-js/building-an-app",
       {
         "type": "category",
@@ -98,9 +90,7 @@
           "bolt-js/legacy/steps-from-apps",
           "bolt-js/legacy/conversation-store"
         ]
-      }
-    ]
-  },
+      },
   {
     "type": "html",
     "value": "<hr>"
