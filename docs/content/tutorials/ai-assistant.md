@@ -4,7 +4,7 @@ slug: /tutorials/ai-assistant
 lang: en
 ---
 
-In this tutorial, you will create an app, enable the features to make it an AI app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
+In this tutorial, you will create an app, enable the features to take advantage of platform AI capabilities, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
 
 ## Prerequisites {#prereqs}
 
@@ -76,9 +76,9 @@ npm run
 
 If your app is up and running, you'll see a message that says `⚡️ Bolt app is running!`.
 
-## Exploring AI app functionality {#assistant-functionality}
+## Exploring app functionality {#assistant-functionality}
 
-Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the AI apps feature (found on the **Agents & AI Apps** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's AI functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
+Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the feature for AI capabilities (found on the **Agents & AI Apps** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's AI functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
 
 ## App code {#app-code}
 
@@ -397,10 +397,10 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for AI apps in the documentation [here](/concepts/ai-apps).
+➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/concepts/ai-apps).
 
-➡️ Level up your AI app game after reading through the [AI apps usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for developing AI apps](https://docs.slack.dev/ai/ai-apps-best-practices).
+➡️ Level up your AI game after reading through the [usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for AI feature-enabled apps](https://docs.slack.dev/ai/ai-apps-best-practices).
 
-### Explore pre-built AI apps {#marketplace}
+### Explore pre-built apps using AI features {#marketplace}
 
-Check out pre-built AI apps ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
+Check out pre-built apps ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
