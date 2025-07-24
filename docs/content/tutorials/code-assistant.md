@@ -6,7 +6,7 @@ lang: en
 
 In this tutorial, we will create an [app that has platform AI features enabled](https://docs.slack.dev/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
 
-Hugging Face is an open-source community best known for its transformers library and platform for machine learning models. Hugging Face's model hub is an online repository where you can find thousands of pre-trained models for natural language processing, computer vision, speech recognition, and more. The platform is open-source, so anyone can contribute to the models and browse the models others have started. Here, we will be using the [Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) model to create an app that can answer coding questions.
+Hugging Face is an open-source community best known for its transformers library and platform for machine learning models. Hugging Face's model hub is an online repository where you can find thousands of pre-trained models for natural language processing, computer vision, speech recognition, and more. The platform is open-source, so anyone can contribute to the models and browse the models others have started. Here, we will be using the [SmolLM3-3B](https://huggingface.co/HuggingFaceTB/SmolLM3-3B) model to create an app that can answer coding questions.
 
 ## Prerequisites {#prereqs}
 
@@ -343,7 +343,7 @@ app.function("code_assist", async ({ client, inputs, complete, fail }) => {
     }
 
     const modelResponse = await hfClient.chatCompletion({
-      model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+      model: "HuggingFaceTB/SmolLM3-3B",
       messages,
       max_tokens: 2000,
     });
