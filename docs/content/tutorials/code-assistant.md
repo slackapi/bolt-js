@@ -116,9 +116,9 @@ Before getting started, you will need the following:
 
 In order to connect this configuration with the app we are about to code, you'll need to first obtain and set some environment variables.
 
-1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](https://docs.slack.dev/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
-3. A fine grained [access token](https://huggingface.co/settings/tokens) from Hugging Face with the "Make calls to Inference Providers" permission is also needed. Keep this for `HUGGINGFACE_API_KEY`.
+1. **Bot token**: On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
+2. **App token**: Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](https://docs.slack.dev/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+3. **Hugging Face token**: Obtain a fine grained [access token](https://huggingface.co/settings/tokens) from Hugging Face with the "Make calls to Inference Providers" permission is also needed. Keep this for `HUGGINGFACE_API_KEY`.
 
 Save these for the moment; we first need to set up our project locally, then we'll set these variables.
 
