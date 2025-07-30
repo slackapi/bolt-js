@@ -32,7 +32,6 @@ import TabItem from '@theme/TabItem';
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
-
 Install the latest version of the Slack CLI for your operating system of choice by following the corresponding guide:
 
 - [Slack CLI for macOS & Linux](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
@@ -76,7 +75,6 @@ If you don’t already have a project, let’s create a new one!
 <TabItem value="cli" label="Slack CLI">
 
 In this guide, we'll be scaffolding this project with the [`bolt-js-blank-template`](example) template.
-
 
 ```sh
 $ slack create first-bolt-app --template slack-samples/bolt-js-blank-template
@@ -214,7 +212,7 @@ Create a new entrypoint file called `app.js` in this directory and add the follo
 ```javascript title="app.js"
 const { App } = require("@slack/bolt");
 
-// Initializes your app with your app and bot token
+// Initializes your app with your Slack app and bot token
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
@@ -341,7 +339,7 @@ The following example listens and responds to all messages in channels/DMs where
 ```javascript title="app.js"
 const { App } = require("@slack/bolt");
 
-// Initializes your app with your app and bot token
+// Initializes your app with your Slack app and bot token
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
@@ -435,7 +433,7 @@ Below, the `app.js` file from the last section is modified to send a message con
 ```javascript title="app.js"
 const { App } = require("@slack/bolt");
 
-// Initializes your app with your app and bot token
+// Initializes your app with your Slack app and bot token
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
