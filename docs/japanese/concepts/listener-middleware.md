@@ -12,28 +12,29 @@ slug: /bolt-js/concepts/listener-middleware
 
 例として、リスナーが人（ボットではないユーザー）からのメッセージのみを扱うケースを考えてみましょう。このためには、全てのボットメッセージを除外するリスナーミドルウェアを実装します。
 
-:::info 
+:::info
 
 Bolt 2.x からミドルウェアが `async` 関数をサポートしました！この変更については [2.x マイグレーションガイド](/bolt-js/migration/migration-v2)を参照してください。
 
 :::
 
 ```javascript
-// 'bot_message' サブタイプを持つメッセージをフィルタリングするリスナーミドルウェア
+// ボットからのメッセージをフィルタリングするリスナーミドルウェア
 async function noBotMessages({ message, next }) {
-  if (!message.subtype || message.subtype !== 'bot_message') {
+  if (!message.bot_id) {
     await next();
   }
 }
 
 // ボットではなく人間からのメッセージのみを受信するリスナー
-app.message(noBotMessages, async ({ message, logger }) => logger.info(
+app.message(noBotMessages, async ({ message, logger }) => {
   // 新規で投稿されたメッセージのみを処理
-  if (message.subtype === undefined
-    // || message.subtype === 'bot_message'
-    || message.subtype === 'file_share'
-    || message.subtype === 'thread_broadcast') {
-    logger.info(`(MSG) User: ${message.user} Message: ${message.text}`)
+  if (
+    message.subtype === undefined ||
+    message.subtype === 'file_share' ||
+    message.subtype === 'thread_broadcast'
+  ) {
+    logger.info(`(MSG) User: ${message.user} Message: ${message.text}`);
   }
-));
+});
 ```

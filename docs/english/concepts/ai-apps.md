@@ -1,5 +1,5 @@
 ---
-title: AI Apps
+title: Using AI in Apps
 lang: en
 slug: /bolt-js/concepts/ai-apps
 ---
@@ -8,7 +8,11 @@ slug: /bolt-js/concepts/ai-apps
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
+<<<<<<< HEAD:docs/english/concepts/ai-apps.md
 AI apps comprise a new messaging experience for Slack. If you're unfamiliar with using AI apps within Slack, you'll want to read the [API documentation on the subject](/ai/). Then come back here to implement them with Bolt!
+=======
+The Agents & AI Apps feature comprises a unique messaging experience for Slack. If you're unfamiliar with using the Agents & AI Apps feature within Slack, you'll want to read the [API documentation on the subject](https://docs.slack.dev/ai/). Then come back here to implement them with Bolt!
+>>>>>>> origin:docs/content/concepts/ai-apps.md
 
 ## Configuring your app to support AI features
 
@@ -25,12 +29,20 @@ AI apps comprise a new messaging experience for Slack. If you're unfamiliar with
   * [`message.im`](/reference/events/message.im)
 
 :::info
+<<<<<<< HEAD:docs/english/concepts/ai-apps.md
 You _could_ implement your own AI app by [listening](/bolt-js/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
+=======
+You _could_ go it alone and [listen](/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
+>>>>>>> origin:docs/content/concepts/ai-apps.md
 :::
 
 ## The `Assistant` class instance
 
+<<<<<<< HEAD:docs/english/concepts/ai-apps.md
 The [`Assistant`](/bolt-js/reference#the-assistantconfig-configuration-object) can be used to handle the incoming events expected from a user interacting with an AI app in Slack. A typical flow would look like:
+=======
+The [`Assistant`](/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
+>>>>>>> origin:docs/content/concepts/ai-apps.md
 
 1. [The user starts a thread](#handling-new-thread). The `Assistant` class handles the incoming [`assistant_thread_started`](/reference/events/assistant_thread_started) event.
 2. [The thread context may change at any point](#handling-thread-context-changes). The `Assistant` class can handle any incoming [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed) events. The class also provides a default `context` store to keep track of thread context changes as the user moves through Slack.
@@ -57,12 +69,20 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
 :::tip
+<<<<<<< HEAD:docs/english/concepts/ai-apps.md
 Be sure to give the [AI apps reference docs](/bolt-js/reference#agents-assistants) a look!
+=======
+Be sure to give the [reference docs](/reference#agents--assistants) a look!
+>>>>>>> origin:docs/content/concepts/ai-apps.md
 :::
 
 ## Handling a new thread {#handling-new-thread}
 
+<<<<<<< HEAD:docs/english/concepts/ai-apps.md
 When the user opens a new thread with your AI app, the [`assistant_thread_started`](/reference/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
+=======
+When the user opens a new thread with your AI-enabled app, the [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
+>>>>>>> origin:docs/content/concepts/ai-apps.md
 
 In the example below, the app is sending a message — containing thread context [message metadata](/messaging/message-metadata/) behind the scenes — to the user, along with a single [prompt](/reference/methods/assistant.threads.setSuggestedPrompts).
 
@@ -85,7 +105,7 @@ In the example below, the app is sending a message — containing thread context
 ```
 
 :::tip
-When a user opens an AI app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
+When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
 :::
 
 ## Handling thread context changes {#handling-thread-context-changes}
@@ -104,7 +124,11 @@ If you use the built-in `AssistantThreadContextStore` without any custom configu
 
 ## Handling the user response {#handling-user-response}
 
+<<<<<<< HEAD:docs/english/concepts/ai-apps.md
 When the user messages your AI app, the [`message.im`](/reference/events/message.im) event will be sent to your app. Capture this with the `userMessage` handler. 
+=======
+When the user messages your app, the [`message.im`](https://docs.slack.dev/reference/events/message.im) event will be sent to your app. Capture this with the `userMessage` handler. 
+>>>>>>> origin:docs/content/concepts/ai-apps.md
 
 Messages sent to the app do not contain a [subtype](/reference/events/message/#subtypes) and must be deduced based on their shape and any provided [message metadata](/messaging/message-metadata/).
 
