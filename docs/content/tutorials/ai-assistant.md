@@ -4,13 +4,14 @@ slug: /tutorials/ai-assistant
 lang: en
 ---
 
-In this tutorial, you will create an app, enable the features to make it an AI app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
+In this tutorial, you will create an app, enable the features to take advantage of platform AI capabilities, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
 
 ## Prerequisites {#prereqs}
 
 Before getting started, you will need the following:
+
 * a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* a [Hugging Face](https://huggingface.co/) account with sufficient credits, and in which you have generated a secret key.
+* a [Hugging Face](https://huggingface.co/) account with sufficient credits, and in which you can generate a secret key.
 
 **Skip to the code**
 
@@ -27,14 +28,16 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 ### Obtaining your environment variables {#env-variables}
 
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
-1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+
+1. **Bot token**: On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
+2. **App token**: Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+3. **Hugging Face token**: Obtain a fine grained [access token](https://huggingface.co/settings/tokens) from Hugging Face with the "Make calls to Inference Providers" permission. Keep this for `HUGGINGFACE_API_KEY`.
 
 Save these for the moment; we first need to clone the project, then we'll set these variables.
 
 ### Clone the sample project {#clone}
 
-In your terminal window, run the following command to clone the project repository locally: 
+In your terminal window, run the following command to clone the project repository locally:
 
 ```bash
 # Clone this project onto your machine
@@ -57,8 +60,15 @@ code .
 ### Set your environment variables {#set-vars}
 
 Now, we are ready to store those environment variables.
+
 1. Rename the `.env.sample` file to `.env`
 2. Open the file and replace `YOUR_SLACK_APP_TOKEN` with the value of the token you generated on the **Basic Information** page. Replace `YOUR_SLACK_BOT_TOKEN` with the value of the token generated when you installed the app. Replace `YOUR_HUGGINGFACE_API_KEY` with the key you generated with Hugging Face.
+
+```bash title=".env"
+SLACK_APP_TOKEN=xapp-1-example-token
+SLACK_BOT_TOKEN=xoxb-example-token
+HUGGINGFACE_API_KEY=hf_exampletoken
+```
 
 ### Run the app {#run}
 
@@ -76,9 +86,9 @@ npm run
 
 If your app is up and running, you'll see a message that says `⚡️ Bolt app is running!`.
 
-## Exploring AI app functionality {#assistant-functionality}
+## Exploring app functionality {#assistant-functionality}
 
-Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the AI apps feature (found on the **Agents & AI Apps** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's AI functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file. 
+Creating this app from the manifest of a sample app added several features you can explore in the [app settings](https://api.slack.com/apps). These include setting several scopes (found on the **OAuth & Permissions** page), enabling the chat tab (found on the **App Home** page), enabling the feature for AI capabilities (found on the **Agents & AI Apps** page), and listening for a few events (found under **Subscribe to bot events** on the **Event Subscriptions** page). We'll see how these all come together to support the app's AI functionality in the app logic. Navigate back to Visual Studio Code and open the `app.js` file.
 
 ## App code {#app-code}
 
@@ -89,10 +99,10 @@ Starting at the very top of the `app.js` file, we see that we import a few relev
 ```js
 const { App, LogLevel, Assistant } = require('@slack/bolt');
 const { config } = require('dotenv');
-const { HfInference } = require('@huggingface/inference');
+const { InferenceClient } = require('@huggingface/inference');
 ```
 
-Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant. 
+Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant.
 
 Next, we initialize the app and our `hfClient` variable with the tokens we previously saved as environment variables in the `.env` file.
 
@@ -106,7 +116,7 @@ const app = new App({
 });
 
 // HuggingFace configuration
-const hfClient = new HfInference(process.env.HUGGINGFACE_API_KEY);
+const hfClient = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
 ```
 
 After this, we see some text saved to the `DEFAULT_SYSTEM_CONTENT` variable. This is used later when constructing the message to send to Hugging Face; we'll get to why this is necessary later.
@@ -177,10 +187,9 @@ The [`assistant_thread_started`](https://docs.slack.dev/reference/events/assista
       logger.error(e);
     }
   },
-  ```
+```
 
 In this sample app, we only set suggested prompts at the initial interaction with the user, but you can set these dynamically at any time during your interaction. Alternatively, if you'd like to set fixed, hardcoded prompts, you can do so in the [app settings](https://api.slack.com/apps) under **Agents & AI Apps**.
-
 
 ### Reacting to `assistant_thread_context_changed` event
 
@@ -214,7 +223,7 @@ When a user sends a message to the app, there are a couple of things we do befor
   * be deduced based on their shape and metadata (if provided).
   * https://docs.slack.dev/reference/events/message
   */
-  userMessage: async ({ client, message, getThreadContext, say, setTitle, setStatus }) => {
+  userMessage: async ({ client, logger, message, getThreadContext, say, setTitle, setStatus }) => {
     const { channel, thread_ts } = message;
 
     try {
@@ -232,7 +241,7 @@ When a user sends a message to the app, there are a couple of things we do befor
       await setStatus('is typing..');
 ```
 
-The `setTitle` method calls the [`assistant.threads.setTitle`](https://docs.slack.dev/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
+The `setTitle` method calls the [`assistant.threads.setTitle`](https://docs.slack.dev/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app.
 
 The `setStatus` method calls the [`assistant.threads.setStatus`](https://docs.slack.dev/reference/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
 
@@ -278,6 +287,7 @@ For this scenario, the user is in a channel and the app has access to that chann
 After getting the channel history, it's time to construct the prompt to send to Hugging Face. Hugging Face prompts contain an array of `messages` in which each message object has a `role` and `content`.
 
 The `role` represents the perspective from which you'd like model to respond to the provided input and influences how the model might interpret the input. The three possible role values are `system`, `assistant`, and `user`.
+
 * The `system` role provides high-level instructions; it sets the scene.
 * The `assistant` role denotes the model's response. We'll see this further down in the code when we provided a thread history to the model for context.
 * The `user` role is the user talking to the assistant or other users.
@@ -315,7 +325,7 @@ In this scenario, we've provided the channel history within the user message. Le
 
 #### Using thread history for context {#thread-history}
 
-In the code that follows, we provide the thread history to the LLM for interpreting, rather than the channel history. This is for simplification in the sample, but you could combine the two concepts in your own app. 
+In the code that follows, we provide the thread history to the LLM for interpreting, rather than the channel history. This is for simplification in the sample, but you could combine the two concepts in your own app.
 
 ```js
       /**
@@ -337,7 +347,7 @@ In the code that follows, we provide the thread history to the LLM for interpret
       });
 ```
 
-After getting the thread replies, we map them to the appropriate object structure to send to Hugging Face, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response. 
+After getting the thread replies, we map them to the appropriate object structure to send to Hugging Face, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response.
 
 ```js
 
@@ -397,10 +407,10 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for AI apps in the documentation [here](/concepts/ai-apps).
+➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/concepts/ai-apps).
 
-➡️ Level up your AI app game after reading through the [AI apps usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for developing AI apps](https://docs.slack.dev/ai/ai-apps-best-practices).
+➡️ Level up your AI game after reading through the [usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for AI feature-enabled apps](https://docs.slack.dev/ai/ai-apps-best-practices).
 
-### Explore pre-built AI apps {#marketplace}
+### Explore pre-built apps using AI features {#marketplace}
 
-Check out pre-built AI apps ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
+Check out pre-built apps ready for use in the [Slack Marketplace](https://community.slack.com/marketplace/category/At07HZAKCSAC-agents-assistants).
