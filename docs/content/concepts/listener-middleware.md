@@ -13,21 +13,22 @@ But of course, you can write your own middleware for more custom functionality. 
 As an example, let’s say your listener should only deal with messages from humans. You can write a listener middleware that excludes any bot messages.
 
 ```javascript
-// Listener middleware that filters out messages with 'bot_message' subtype
+// Listener middleware that filters out messages from a bot
 async function noBotMessages({ message, next }) {
-  if (!message.subtype || message.subtype !== 'bot_message') {
+  if (!message.bot_id) {
     await next();
   }
 }
 
 // The listener only receives messages from humans
-app.message(noBotMessages, async ({ message, logger }) => logger.info(
+app.message(noBotMessages, async ({ message, logger }) => {
   // Handle only newly posted messages
-  if (message.subtype === undefined
-    // || message.subtype === 'bot_message'
-    || message.subtype === 'file_share'
-    || message.subtype === 'thread_broadcast') {
-    logger.info(`(MSG) User: ${message.user} Message: ${message.text}`)
+  if (
+    message.subtype === undefined ||
+    message.subtype === 'file_share' ||
+    message.subtype === 'thread_broadcast'
+  ) {
+    logger.info(`(MSG) User: ${message.user} Message: ${message.text}`);
   }
-));
+});
 ```
