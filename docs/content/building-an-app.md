@@ -394,7 +394,7 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ## Sending and responding to actions {#sending-and-responding-to-actions}
 
-To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in app settings.
+To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity.
 
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
@@ -405,6 +405,8 @@ With Socket Mode on, basic interactivity is enabled for us by default, so no fur
 <TabItem value="http" label="HTTP">
 
 Similar to events, you'll need to specify a Request URL for Slack to send the action (such as _user clicked a button_).
+
+Head over to **Interactivity & Shortcuts** in app settings.
 
 By default, Bolt uses the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://example.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
 
