@@ -75,7 +75,7 @@ If you don’t already have a project, let’s create a new one!
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
-In this guide, we'll be scaffolding this project with the [`bolt-js-blank-template`](example) template.
+In this guide, we'll be scaffolding this project with the [`bolt-js-blank-template`](https://github.com/slack-samples/bolt-js-blank-template) template.
 
 ```sh
 $ slack create first-bolt-app --template slack-samples/bolt-js-blank-template
