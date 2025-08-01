@@ -4,9 +4,10 @@ sidebar_label: Building an app
 ---
 
 This guide will walk you through creating and using a Slack app built with Bolt for JavaScript. On this journey, you'll:
-* set up your local environment, 
-* create a new Slack app, 
-* and enable it to listen for and respond to messages within a Slack workspace.
+
+- set up your local environment,
+- create a new Slack app,
+- and enable it to listen for and respond to messages within a Slack workspace.
 
 When you’re finished, you’ll have created the [Getting Started app](https://github.com/slackapi/bolt-js-getting-started-app) to run, modify, and make your own. ⚡️
 
@@ -24,7 +25,7 @@ You'll need a workspace where development can happen. We recommend using [develo
 
 :::
 
-We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but you can also choose to follow along in the terminal as long as you have Node.js. 
+We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but you can also choose to follow along in the terminal as long as you have Node.js.
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -230,7 +231,7 @@ const app = new App({
 </TabItem>
 <TabItem value="http" label="HTTP">
 
-:::info[For local development, you can use a proxy service like [ngrok](https://ngrok.com/) to create a public URL and tunnel requests to your development environment.] 
+:::info[For local development, you can use a proxy service like [ngrok](https://ngrok.com/) to create a public URL and tunnel requests to your development environment.]
 
 Refer to [ngrok's getting started guide](https://ngrok.com/docs/getting-started/) on how to create this tunnel.
 
@@ -283,8 +284,6 @@ const app = new App({
 
 Now let's actually run your app!
 
----
-
 ## Running the app {#running-the-app}
 
 Save your `app.js` file, then from the command line run the following:
@@ -306,9 +305,7 @@ $ node app.js
 </TabItem>
 </Tabs>
 
-Your app should let you know that it's up and running. It's not actually listening for anything though. Let's change that. 
-
----
+Your app should let you know that it's up and running. It's not actually listening for anything though. Let's change that.
 
 ## Subscribing to events {#subscribing-to-events}
 
@@ -325,13 +322,11 @@ Scroll down to **Subscribe to Bot Events**. There are four events related to mes
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
----
-
 ## Listening and responding to messages {#listening-and-responding-to-messages}
 
 Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
 
-The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello". Insert the highlighted lines into `app.js`. 
+The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello". Insert the highlighted lines into `app.js`.
 
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
@@ -397,8 +392,6 @@ Then restart your app. So long as your bot user has been added to the conversati
 
 This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
 
----
-
 ## Sending and responding to actions {#sending-and-responding-to-actions}
 
 To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in app settings.
@@ -406,7 +399,7 @@ To use features like buttons, select menus, datepickers, modals, and shortcuts, 
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
 
-With Socket Mode on, basic interactivity is enabled for us by default, so no further action here is needed
+With Socket Mode on, basic interactivity is enabled for us by default, so no further action here is needed.
 
 </TabItem>
 <TabItem value="http" label="HTTP">
@@ -425,7 +418,7 @@ Now, let’s go back to your app’s code and add logic to handle those events:
 - First, we'll send a message that contains an interactive component (in this case a button).
 - Next, we'll listen for the action of a user clicking the button before responding.
 
-Below, the `app.js` file from the last section is modified to send a message containing a button rather than just a string. Update the highlighted lines as shown: 
+Below, the `app.js` file from the last section is modified to send a message containing a button rather than just a string. Update the highlighted lines as shown:
 
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
@@ -529,7 +522,7 @@ The value inside of `say()` is now an object that contains an array of `blocks`.
 
 You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
-:::tip[Use [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype your interactive messages.] 
+:::tip[Use [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype your interactive messages.]
 
 Block Kit Builder lets you (or anyone on your team) mock up messages and generates the corresponding JSON that you can paste directly in your app.
 
@@ -603,8 +596,6 @@ app.action("button_click", async ({ body, ack, say }) => {
 </Tabs>
 
 We used `app.action()` to listen for the `action_id` that we named `button_click`. Restart your app, and then click the button; you'll see a new message from your app that says you clicked the button.
-
----
 
 ## Next steps {#next-steps}
 
