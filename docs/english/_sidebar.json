@@ -10,87 +10,79 @@
     "type": "html",
     "value": "<hr>"
   },
-      "bolt-js/building-an-app",
-      {
-        "type": "category",
-        "label": "Slack API calls",
-        "items": ["bolt-js/concepts/message-sending", "bolt-js/concepts/web-api"]
-      },
-      {
-        "type": "category",
-        "label": "Events",
-        "items": ["bolt-js/concepts/message-listening", "bolt-js/concepts/event-listening"]
-      },
-      {
-        "type": "category",
-        "label": "App UI & Interactivity",
-        "items": [
-          "bolt-js/concepts/acknowledge",
-          "bolt-js/concepts/shortcuts",
-          "bolt-js/concepts/commands",
-          "bolt-js/concepts/actions",
-          "bolt-js/concepts/creating-modals",
-          "bolt-js/concepts/updating-pushing-views",
-          "bolt-js/concepts/view-submissions",
-          "bolt-js/concepts/select-menu-options",
-          "bolt-js/concepts/publishing-views"
-        ]
-      },
-      "bolt-js/concepts/ai-apps",
-      {
-        "type": "category",
-        "label": "Custom Steps",
-        "items": ["bolt-js/concepts/custom-steps", "bolt-js/concepts/custom-steps-dynamic-options"]
-      },
-      {
-        "type": "category",
-        "label": "App Configuration",
-        "items": [
-          "bolt-js/concepts/socket-mode",
-          "bolt-js/concepts/error-handling",
-          "bolt-js/concepts/logging",
-          "bolt-js/concepts/custom-routes",
-          "bolt-js/concepts/deferring-initialization",
-          "bolt-js/concepts/receiver"
-        ]
-      },
-      {
-        "type": "category",
-        "label": "Middleware & Context",
-        "items": [
-          "bolt-js/concepts/global-middleware",
-          "bolt-js/concepts/listener-middleware",
-          "bolt-js/concepts/context"
-        ]
-      },
-      {
-        "type": "category",
-        "label": "Authorization & Security",
-        "items": [
-          "bolt-js/concepts/authenticating-oauth",
-          "bolt-js/concepts/authorization",
-          "bolt-js/concepts/token-rotation"
-        ]
-      },
-      {
-        "type": "category",
-        "label": "Deployments",
-        "items": ["bolt-js/deployments/aws-lambda", "bolt-js/deployments/heroku"]
-      },
-      {
-        "type": "category",
-        "label": "Migration Guides",
-        "items": ["bolt-js/migration/migration-v2", "bolt-js/migration/migration-v3", "bolt-js/migration/migration-v4"]
-      },
-      {
-        "type": "category",
-        "label": "Legacy",
-        "items": [
-          "bolt-js/legacy/hubot-migration",
-          "bolt-js/legacy/steps-from-apps",
-          "bolt-js/legacy/conversation-store"
-        ]
-      },
+  "bolt-js/building-an-app",
+  {
+    "type": "category",
+    "label": "Slack API calls",
+    "items": ["bolt-js/concepts/message-sending", "bolt-js/concepts/web-api"]
+  },
+  {
+    "type": "category",
+    "label": "Events",
+    "items": ["bolt-js/concepts/message-listening", "bolt-js/concepts/event-listening"]
+  },
+  {
+    "type": "category",
+    "label": "App UI & Interactivity",
+    "items": [
+      "bolt-js/concepts/acknowledge",
+      "bolt-js/concepts/shortcuts",
+      "bolt-js/concepts/commands",
+      "bolt-js/concepts/actions",
+      "bolt-js/concepts/creating-modals",
+      "bolt-js/concepts/updating-pushing-views",
+      "bolt-js/concepts/view-submissions",
+      "bolt-js/concepts/select-menu-options",
+      "bolt-js/concepts/publishing-views"
+    ]
+  },
+  "bolt-js/concepts/ai-apps",
+  {
+    "type": "category",
+    "label": "Custom Steps",
+    "items": ["bolt-js/concepts/custom-steps", "bolt-js/concepts/custom-steps-dynamic-options"]
+  },
+  {
+    "type": "category",
+    "label": "App Configuration",
+    "items": [
+      "bolt-js/concepts/socket-mode",
+      "bolt-js/concepts/error-handling",
+      "bolt-js/concepts/logging",
+      "bolt-js/concepts/custom-routes",
+      "bolt-js/concepts/deferring-initialization",
+      "bolt-js/concepts/receiver"
+    ]
+  },
+  {
+    "type": "category",
+    "label": "Middleware & Context",
+    "items": ["bolt-js/concepts/global-middleware", "bolt-js/concepts/listener-middleware", "bolt-js/concepts/context"]
+  },
+  {
+    "type": "category",
+    "label": "Authorization & Security",
+    "items": [
+      "bolt-js/concepts/authenticating-oauth",
+      "bolt-js/concepts/authorization",
+      "bolt-js/concepts/token-rotation"
+    ]
+  },
+  {
+    "type": "category",
+    "label": "Deployments",
+    "items": ["bolt-js/deployments/aws-lambda", "bolt-js/deployments/heroku"]
+  },
+  {
+    "type": "category",
+    "label": "Migration Guides",
+    "items": ["bolt-js/migration/migration-v2", "bolt-js/migration/migration-v3", "bolt-js/migration/migration-v4"]
+  },
+  {
+    "type": "category",
+    "label": "Legacy",
+    "items": ["bolt-js/legacy/hubot-migration", "bolt-js/legacy/steps-from-apps", "bolt-js/legacy/conversation-store"]
+  },
   {
     "type": "html",
     "value": "<hr>"
