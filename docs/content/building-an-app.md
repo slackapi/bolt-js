@@ -190,7 +190,7 @@ We've provided instructions for both ways in this guide, choose your flavor and 
 
 :::tip[The Slack CLI template does not require Socket Mode configurations]
 
-The template we used to start with the Slack CLI is configured to use Socket Mode out of the box! [Skip to the _Setting up events_ section](#setting-up-events).
+The template we used to start with the Slack CLI is configured to use Socket Mode out of the box! [Skip to the _Running the app_ section](#running-the-app).
 
 :::
 
