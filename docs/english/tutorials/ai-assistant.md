@@ -28,15 +28,10 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 ### Obtaining your environment variables {#env-variables}
 
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
-<<<<<<< HEAD:docs/english/tutorials/ai-assistant.md
-1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
-=======
 
 1. **Bot token**: On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. **App token**: Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. **App token**: Navigate to **Basic Information** and in the **App-Level Tokens** section, click **Generate Token and Scopes**. Add the [`connections:write`](/reference/scopes/connections.write) scope, name the token, and click **Generate**. (More on tokens [here](/authentication/tokens)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 3. **Hugging Face token**: Obtain a fine grained [access token](https://huggingface.co/settings/tokens) from Hugging Face with the "Make calls to Inference Providers" permission. Keep this for `HUGGINGFACE_API_KEY`.
->>>>>>> origin:docs/content/tutorials/ai-assistant.md
 
 Save these for the moment; we first need to clone the project, then we'll set these variables.
 
@@ -107,11 +102,7 @@ const { config } = require('dotenv');
 const { InferenceClient } = require('@huggingface/inference');
 ```
 
-<<<<<<< HEAD:docs/english/tutorials/ai-assistant.md
-Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/ai-apps) that simplifies handling incoming events related to the app assistant. 
-=======
 Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant.
->>>>>>> origin:docs/content/tutorials/ai-assistant.md
 
 Next, we initialize the app and our `hfClient` variable with the tokens we previously saved as environment variables in the `.env` file.
 
@@ -250,11 +241,7 @@ When a user sends a message to the app, there are a couple of things we do befor
       await setStatus('is typing..');
 ```
 
-<<<<<<< HEAD:docs/english/tutorials/ai-assistant.md
-The `setTitle` method calls the [`assistant.threads.setTitle`](/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app. 
-=======
-The `setTitle` method calls the [`assistant.threads.setTitle`](https://docs.slack.dev/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app.
->>>>>>> origin:docs/content/tutorials/ai-assistant.md
+The `setTitle` method calls the [`assistant.threads.setTitle`](/reference/methods/assistant.threads.setTitle) method. Setting this title helps organize the conversations to the app, as they appear in a referential list in the history tab of the app.
 
 The `setStatus` method calls the [`assistant.threads.setStatus`](/reference/methods/assistant.threads.setStatus) method. This status shows like a typing indicator underneath the message composer. This status automatically clears when the app sends a reply. You can also clear it by sending an empty string, like this:
 
@@ -420,15 +407,9 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-<<<<<<< HEAD:docs/english/tutorials/ai-assistant.md
-➡️ Read more about Bolt support for AI apps in the documentation [here](/bolt-js/concepts/ai-apps).
+➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/bolt-js/concepts/ai-apps).
 
-➡️ Level up your AI app game after reading through the [AI apps usage guide](/ai/developing-ai-apps) and [Best practices for developing AI apps](/ai/ai-apps-best-practices).
-=======
-➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/concepts/ai-apps).
-
-➡️ Level up your AI game after reading through the [usage guide](https://docs.slack.dev/ai/developing-ai-apps) and [Best practices for AI feature-enabled apps](https://docs.slack.dev/ai/ai-apps-best-practices).
->>>>>>> origin:docs/content/tutorials/ai-assistant.md
+➡️ Level up your AI game after reading through the [usage guide](/ai/developing-ai-apps) and [Best practices for AI feature-enabled apps](/ai/ai-apps-best-practices).
 
 ### Explore pre-built apps using AI features {#marketplace}
 
