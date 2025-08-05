@@ -1,7 +1,7 @@
 ---
 title: アクション
 lang: ja-jp
-slug: /bolt-js/concepts/actions
+slug: /ja-jp/bolt-js/concepts/actions
 ---
 
 Bolt アプリは `action` メソッドを用いて、ボタンのクリック、メニューの選択、メッセージショートカットなどのユーザーのアクションをリッスンすることができます。

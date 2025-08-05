@@ -1,7 +1,7 @@
 ---
 title: Bolt 入門ガイド
 sidebar_label: 入門ガイド
-slug: /bolt-js/getting-started
+slug: /ja-jp/bolt-js/getting-started
 lang: ja-jp
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: グローバルミドルウェア
 lang: ja-jp
-slug: /bolt-js/concepts/global-middleware
+slug: /ja-jp/bolt-js/concepts/global-middleware
 ---
 
 グローバルミドルウェアは、すべての受信リクエストに対して、リスナーミドルウェアより前に実行されます。`app.use(fn({payload,...,next}))` を使用すると、グローバルミドルウェアをいくつでもアプリに追加できます。

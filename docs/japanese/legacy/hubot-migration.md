@@ -1,6 +1,6 @@
 ---
 title: Hubot から Bolt に移行する方法
-slug: /bolt-js/legacy/hubot-migration
+slug: /ja-jp/bolt-js/legacy/hubot-migration
 lang: ja-jp
 ---
 

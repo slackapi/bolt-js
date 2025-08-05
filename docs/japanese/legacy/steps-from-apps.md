@@ -1,7 +1,7 @@
 ---
 title: ワークフローステップの概要
 lang: ja-jp
-slug: /bolt-js/legacy/steps-from-apps
+slug: /ja-jp/bolt-js/legacy/steps-from-apps
 ---
 
 （アプリによる）ワークフローステップ（Workflow Steps from Apps) は、[ワークフロービルダー](/legacy/legacy-steps-from-apps/)におけるワークフローに組み込み可能なカスタムのワークフローステップを任意の Slack アプリが提供することを可能とします。

@@ -1,7 +1,7 @@
 ---
 title: レシーバーのカスタマイズ
 lang: ja-jp
-slug: /bolt-js/concepts/receiver
+slug: /ja-jp/bolt-js/concepts/receiver
 ---
 
 レシーバーは、Slack からのイベントを受け付けてパースした後、それを Bolt アプリに伝える責務を担っています。Bolt アプリは、`context` 情報やリスナーへのイベントの引き渡しを行います。レシーバーの実装は `Receiver` インターフェイスに準拠している必要があります。

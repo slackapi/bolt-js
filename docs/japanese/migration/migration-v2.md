@@ -1,6 +1,6 @@
 ---
 title: 2.x マイグレーションガイド
-slug: /bolt-js/migration/migration-v2
+slug: /ja-jp/bolt-js/migration/migration-v2
 lang: ja-jp
 ---
 

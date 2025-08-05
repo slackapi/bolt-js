@@ -1,7 +1,7 @@
 ---
 title: 会話ストア
 lang: ja-jp
-slug: /bolt-js/concepts/conversation-store
+slug: /ja-jp/bolt-js/concepts/conversation-store
 ---
 
 Bolt は、会話 (conversation) に関連する state を設定および取得する store をサポートしています。conversation store には以下の 2 つのメソッドがあります。

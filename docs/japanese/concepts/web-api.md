@@ -1,7 +1,7 @@
 ---
 title: Web API の使用
 lang: ja-jp
-slug: /bolt-js/concepts/web-api
+slug: /ja-jp/bolt-js/concepts/web-api
 ---
 
 [Web API メソッド](/reference/methods)を呼び出すには、リスナー関数の引数に `client` として提供されている [`WebClient`]/node-slack-sdk/web-api) を使用します。このインスタンスが使用するトークンは、Bolt アプリの初期化時に指定されたもの **もしくは** Slack からのリクエストに対して [`authorize` 関数](/bolt-js/concepts/authorization)から返されたものが設定されます。組み込みの [OAuth サポート](/bolt-js/concepts/authenticating-oauth)は、この後者のケースをデフォルトでハンドリングします。

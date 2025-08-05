@@ -1,7 +1,7 @@
 ---
 title: ショートカットのリスニング
 lang: ja-jp
-slug: /bolt-js/concepts/shortcuts
+slug: /ja-jp/bolt-js/concepts/shortcuts
 ---
 
 `shortcut()` メソッドは、[グローバルショートカット](/interactivity/implementing-shortcuts#global)と[メッセージショートカット](/interactivity/implementing-shortcuts#messages)の両方をサポートします。

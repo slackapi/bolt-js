@@ -1,7 +1,7 @@
 ---
 title: イベントのリスニング
 lang: ja-jp
-slug: /bolt-js/concepts/event-listening
+slug: /ja-jp/bolt-js/concepts/event-listening
 ---
 
 [Events API イベント](/apis/events-api/)のリスニングは、Slack アプリの設定画面でサブスクリプション設定を行った上で `event()` メソッドを使用します。これにより、Slack で何かが発生した (例：ユーザーがメッセージにリアクションした、チャンネルに参加した) ときに Bolt アプリ側で処理を実行できます。

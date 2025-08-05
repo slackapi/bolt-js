@@ -1,7 +1,7 @@
 ---
 title: context の追加
 lang: ja-jp
-slug: /bolt-js/concepts/context
+slug: /ja-jp/bolt-js/concepts/context
 ---
 
 `context` オブジェクトは、受信リクエストに付加情報を提供するために使用されるもので、全てのリスナーがこれを使用できます。例えば、3rd party のシステムからユーザー情報を追加したり、ミドルウェアのチェインの中で次のミドルウェアが必要とする一時的な状態を追加したりといった用途に利用できます。
