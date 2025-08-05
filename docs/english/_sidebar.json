@@ -109,82 +109,82 @@
     "label": "日本語 (日本)",
     "link": {
       "type": "doc",
-      "id": "ja-jp/bolt-js/getting-started"
+      "id": "bolt-js/ja-jp/getting-started"
     },
     "items": [
-      "ja-jp/bolt-js/getting-started",
+      "bolt-js/ja-jp/getting-started",
       {
         "type": "category",
         "label": "Slack API コール",
-        "items": ["ja-jp/bolt-js/concepts/message-sending", "ja-jp/bolt-js/concepts/web-api"]
+        "items": ["bolt-js/ja-jp/concepts/message-sending", "bolt-js/ja-jp/concepts/web-api"]
       },
       {
         "type": "category",
         "label": "イベント API",
-        "items": ["ja-jp/bolt-js/concepts/message-listening", "ja-jp/bolt-js/concepts/event-listening"]
+        "items": ["bolt-js/ja-jp/concepts/message-listening", "bolt-js/ja-jp/concepts/event-listening"]
       },
       {
         "type": "category",
         "label": "インタラクティビティ & ショートカット",
         "items": [
-          "ja-jp/bolt-js/concepts/acknowledge",
-          "ja-jp/bolt-js/concepts/shortcuts",
-          "ja-jp/bolt-js/concepts/commands",
-          "ja-jp/bolt-js/concepts/actions",
-          "ja-jp/bolt-js/concepts/creating-modals",
-          "ja-jp/bolt-js/concepts/updating-pushing-views",
-          "ja-jp/bolt-js/concepts/view-submissions",
-          "ja-jp/bolt-js/concepts/select-menu-options",
-          "ja-jp/bolt-js/concepts/publishing-views"
+          "bolt-js/ja-jp/concepts/acknowledge",
+          "bolt-js/ja-jp/concepts/shortcuts",
+          "bolt-js/ja-jp/concepts/commands",
+          "bolt-js/ja-jp/concepts/actions",
+          "bolt-js/ja-jp/concepts/creating-modals",
+          "bolt-js/ja-jp/concepts/updating-pushing-views",
+          "bolt-js/ja-jp/concepts/view-submissions",
+          "bolt-js/ja-jp/concepts/select-menu-options",
+          "bolt-js/ja-jp/concepts/publishing-views"
         ]
       },
       {
         "type": "category",
         "label": "App の設定",
         "items": [
-          "ja-jp/bolt-js/concepts/socket-mode",
-          "ja-jp/bolt-js/concepts/error-handling",
-          "ja-jp/bolt-js/concepts/logging",
-          "ja-jp/bolt-js/concepts/custom-routes",
-          "ja-jp/bolt-js/concepts/deferring-initialization",
-          "ja-jp/bolt-js/concepts/receiver"
+          "bolt-js/ja-jp/concepts/socket-mode",
+          "bolt-js/ja-jp/concepts/error-handling",
+          "bolt-js/ja-jp/concepts/logging",
+          "bolt-js/ja-jp/concepts/custom-routes",
+          "bolt-js/ja-jp/concepts/deferring-initialization",
+          "bolt-js/ja-jp/concepts/receiver"
         ]
       },
       {
         "type": "category",
         "label": "ミドルウェア & コンテキスト",
         "items": [
-          "ja-jp/bolt-js/concepts/global-middleware",
-          "ja-jp/bolt-js/concepts/listener-middleware",
-          "ja-jp/bolt-js/concepts/context"
+          "bolt-js/ja-jp/concepts/global-middleware",
+          "bolt-js/ja-jp/concepts/listener-middleware",
+          "bolt-js/ja-jp/concepts/context"
         ]
       },
       {
         "type": "category",
         "label": "認可 & セキュリティ",
         "items": [
-          "ja-jp/bolt-js/concepts/authenticating-oauth",
-          "ja-jp/bolt-js/concepts/authorization",
-          "ja-jp/bolt-js/concepts/token-rotation"
+          "bolt-js/ja-jp/concepts/authenticating-oauth",
+          "bolt-js/ja-jp/concepts/authorization",
+          "bolt-js/ja-jp/concepts/token-rotation"
         ]
       },
       {
         "type": "category",
         "label": "Deployments",
-        "items": ["ja-jp/bolt-js/deployments/aws-lambda", "ja-jp/bolt-js/deployments/heroku"]
+        "items": ["bolt-js/ja-jp/deployments/aws-lambda", "bolt-js/ja-jp/deployments/heroku"]
       },
       {
         "type": "category",
         "label": "マイグレーションガイド",
-        "items": ["ja-jp/bolt-js/migration/migration-v2", "ja-jp/bolt-js/migration/migration-v3"]
+        "items": ["bolt-js/ja-jp/migration/migration-v2", "bolt-js/ja-jp/migration/migration-v3"]
       },
       {
         "type": "category",
         "label": "レガシー（非推奨）",
         "items": [
-          "ja-jp/bolt-js/legacy/hubot-migration",
-          "ja-jp/bolt-js/legacy/steps-from-apps",
-          "ja-jp/bolt-js/legacy/conversation-store"
+          "bolt-js/ja-jp/legacy/hubot-migration",
+          "bolt-js/ja-jp/legacy/steps-from-apps",
+          "bolt-js/ja-jp/legacy/conversation-store"
         ]
       }
     ]
