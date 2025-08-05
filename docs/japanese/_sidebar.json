@@ -31,11 +31,6 @@
       },
       {
         "type": "category",
-        "label": "Custom Steps",
-        "items": ["ja-jp/bolt-js/concepts/custom-steps", "ja-jp/bolt-js/concepts/custom-steps-dynamic-options"]
-      },
-      {
-        "type": "category",
         "label": "App の設定",
         "items": [
           "ja-jp/bolt-js/concepts/socket-mode",
@@ -72,7 +67,7 @@
       {
         "type": "category",
         "label": "マイグレーションガイド",
-        "items": ["ja-jp/bolt-js/migration/migration-v2", "ja-jp/bolt-js/migration/migration-v3", "ja-jp/bolt-js/migration/migration-v4"]
+        "items": ["ja-jp/bolt-js/migration/migration-v2", "ja-jp/bolt-js/migration/migration-v3"]
       },
       {
         "type": "category",
