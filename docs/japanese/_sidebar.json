@@ -1,7 +1,7 @@
 [
   {
     "type": "category",
-    "label": "Bolt for Python",
+    "label": "Bolt for JavaScript",
     "items": [
       "ja-jp/bolt-js/getting-started",
       {
