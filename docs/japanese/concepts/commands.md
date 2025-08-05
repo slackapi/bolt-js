@@ -1,8 +1,4 @@
----
-title: コマンドのリスニングと応答
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/commands
----
+# コマンドのリスニングと応答
 
 スラッシュコマンドが実行されたリクエストをリッスンするには、アプリで `command()` メソッドを使用します。メソッドの使用には文字列か正規表現の `commandName` の指定が必要です。
 

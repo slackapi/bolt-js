@@ -1,7 +1,4 @@
----
-title: AWS Lambda へのデプロイ
-lang: ja-jp
----
+# AWS Lambda へのデプロイ
 
 このガイドでは、Bolt for JavaScript、[Serverless Framework](https://serverless.com/)、[AWS Lambda](https://aws.amazon.com/lambda/) を使った Slack アプリの準備とデプロイの方法について説明します。
 

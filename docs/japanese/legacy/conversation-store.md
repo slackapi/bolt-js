@@ -1,8 +1,4 @@
----
-title: 会話ストア
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/conversation-store
----
+# 会話ストア
 
 Bolt は、会話 (conversation) に関連する state を設定および取得する store をサポートしています。conversation store には以下の 2 つのメソッドがあります。
 * `set()` は会話の state を変更します。`set()` は、文字列型の `conversationId`、任意の型の `value`、およびオプションの数値型の `expiresAt` を必要とします。`set()` は `Promise` を返します。

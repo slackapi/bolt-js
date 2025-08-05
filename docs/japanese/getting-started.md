@@ -1,9 +1,8 @@
 ---
-title: Bolt 入門ガイド
 sidebar_label: 入門ガイド
-slug: /ja-jp/bolt-js/getting-started
-lang: ja-jp
 ---
+
+# Bolt 入門ガイド
 
 このガイドでは、Bolt を使用して Slack アプリを起動し実行する方法について説明します。その過程で、新しい Slack アプリを作成し、ローカル環境を設定し、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発します。
 

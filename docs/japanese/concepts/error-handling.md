@@ -1,8 +1,4 @@
----
-title: エラーの処理
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/error-handling
----
+# エラーの処理
 
 *注: Bolt 2.x からエラーハンドリングが改善されました！この変更については [2.x マイグレーションガイド](/bolt-js/migration/migration-v2)を参照してください。*
 

@@ -1,8 +1,4 @@
----
-title: OAuth フローの実装
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/authenticating-oauth
----
+# OAuth フローの実装
 
 Slack アプリの配布を行うには Bolt による OAuth フローを実装し、インストール時に取得した情報をセキュアな方法で保存しておく必要があります。
 Bolt は OAuth フローそのものに加えて OAuth のためのルーティング、 state パラメーターの検証、保存するためのインストール情報をアプリに受け渡す、などの処理をハンドリングします。

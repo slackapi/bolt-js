@@ -1,8 +1,4 @@
----
-title: トークンのローテーション
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/token-rotation
----
+# トークンのローテーション
 
 Bolt for JavaScript [v3.5.0](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.5.0) から、アクセストークンのさらなるセキュリティ強化のレイヤーであるトークンローテーションの機能に対応しています。トークンローテーションは [OAuth V2 の RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4) で規定されているものです。
 

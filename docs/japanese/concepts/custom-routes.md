@@ -1,8 +1,4 @@
----
-title: カスタム HTTP ルートの追加
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/custom-routes
----
+# カスタム HTTP ルートの追加
 
 `v3.7.0` から `App` を初期化する際に `customRoutes` というルートの配列を渡すことでカスタムの HTTP ルートを簡単に追加できるようになりました。
 

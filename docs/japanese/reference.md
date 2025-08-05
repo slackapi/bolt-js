@@ -1,9 +1,8 @@
 ---
-title: リファレンス（Appインターフェイスと設定）
 sidebar_label: リファレンス
-slug: /ja-jp/bolt-js/reference
-permalink: /reference
 ---
+
+# リファレンス（Appインターフェイスと設定）
 
 このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/bolt-js/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
 

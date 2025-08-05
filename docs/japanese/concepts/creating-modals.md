@@ -1,8 +1,4 @@
----
-title: モーダルの開始
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/creating-modals
----
+# モーダルの開始
 
 [モーダル](/surfaces/modals)は、ユーザー情報を収集したり、動的な表示を実現するためのインターフェースです。モーダルは、有効な `trigger_id` と [ビュー部分のペイロード](/block-kit/) を組み込みの API クライアントによる [`views.open`](/reference/methods/views.open/) メソッドの呼び出しに渡すことで開始することができます。
 

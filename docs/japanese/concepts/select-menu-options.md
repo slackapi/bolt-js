@@ -1,8 +1,4 @@
----
-title: オプションのリスニングと応答
-lang: ja-jp
-slug: /ja-jp/bolt-js/concepts/options
----
+# オプションのリスニングと応答
 
 `options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様](/bolt-js/concepts/actions)に、文字列型の `action_id` または制約付きオブジェクトが必要です。
 

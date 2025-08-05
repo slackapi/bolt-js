@@ -1,7 +1,4 @@
----
-title: Heroku へのデプロイ
-lang: ja-jp
----
+# Heroku へのデプロイ
 
 このガイドでは、Bolt for JavaScriptと[Heroku プラットフォーム](https://heroku.com/)を使ってSlack アプリを用意して、デプロイするまでの手順を説明します。全体の流れとしては、Bolt Slack アプリをダウンロードし、Heroku 用の準備を済ませ、デプロイする流れになります。
 

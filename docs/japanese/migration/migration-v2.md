@@ -1,8 +1,4 @@
----
-title: 2.x マイグレーションガイド
-slug: /ja-jp/bolt-js/migration/migration-v2
-lang: ja-jp
----
+# 2.x マイグレーションガイド
 
 `@slack/bolt@1.x` End of life は **2021 年 4 月 30 日** の予定です。この日からは `@slack/bolt@1.x` の開発は完全に終了となり、残っている open issue や pull request もクローズされます。
 
