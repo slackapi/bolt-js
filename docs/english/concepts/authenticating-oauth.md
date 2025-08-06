@@ -693,23 +693,23 @@ Occasional mishaps in various places throughout the OAuth process can cause
 errors, but these often have meaning! Explore [the API documentation][errors]
 for additional details for common error codes.
 
-[add-to-slack]: https://github.com/slackapi/tools/node-slack-sdk/blob/main/packages/oauth/src/default-render-html-for-install-path.ts
+[add-to-slack]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/default-render-html-for-install-path.ts
 [app-settings]: https://api.slack.com/apps
 [authorization]: /tools/bolt-js/concepts/authorization
-[callback-default-failure]: https://github.com/slackapi/tools/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L127-L162
-[callback-default-success]: https://github.com/slackapi/tools/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L125
+[callback-default-failure]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L127-L162
+[callback-default-success]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L125
 [callback-options]: /tools/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
-[callback-options-default]: https://github.com/slackapi/tools/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L162
+[callback-options-default]: https://github.com/slackapi/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L162
 [callbacks]: /tools/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
 [custom-routes]: /tools/bolt-js/concepts/custom-routes
 [direct-install]: https://github.com/slackapi/bolt-js/blob/5b4d9ceb65e6bf5cf29dfa58268ea248e5466bfb/examples/oauth/app.js#L58-L64
 [errors]: /authentication/installing-with-oauth#errors
 [examples]: https://github.com/slackapi/bolt-js/tree/main/examples/oauth
 [generate-install-url]: /tools/node-slack-sdk/oauth/#using-handleinstallpath
-[install-provider-options]: https://github.com/slackapi/tools/node-slack-sdk/blob/main/packages/oauth/src/install-provider-options.ts
+[install-provider-options]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/install-provider-options.ts
 [installation-page]: /tools/node-slack-sdk/oauth/#showing-an-installation-page
 [installation-store]: /tools/node-slack-sdk/reference/oauth/interfaces/InstallationStore
-[installation-store-file]: https://github.com/slackapi/tools/node-slack-sdk/blob/main/packages/oauth/src/installation-stores/file-store.ts
+[installation-store-file]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/installation-stores/file-store.ts
 [oauth-node]: /tools/node-slack-sdk/oauth
 [oauth-v2]: /authentication/installing-with-oauth
 [oidc]: /tools/node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
@@ -720,7 +720,7 @@ for additional details for common error codes.
 [siws]: /authentication/sign-in-with-slack/
 [state]: /tools/node-slack-sdk/oauth#using-a-custom-state-store
 [state-store]: /tools/node-slack-sdk/reference/oauth/interfaces/StateStore
-[state-store-clear]: https://github.com/slackapi/tools/node-slack-sdk/blob/main/packages/oauth/src/state-stores/clear-state-store.ts
+[state-store-clear]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/state-stores/clear-state-store.ts
 [store]: /tools/node-slack-sdk/oauth#storing-installations-in-a-database
 [user-tokens]: /authentication/tokens#user
 [verification]: /tools/node-slack-sdk/oauth#state-verification
