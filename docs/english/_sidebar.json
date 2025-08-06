@@ -57,7 +57,11 @@
   {
     "type": "category",
     "label": "Middleware & Context",
-    "items": ["tools/bolt-js/concepts/global-middleware", "tools/bolt-js/concepts/listener-middleware", "tools/bolt-js/concepts/context"]
+    "items": [
+      "tools/bolt-js/concepts/global-middleware",
+      "tools/bolt-js/concepts/listener-middleware",
+      "tools/bolt-js/concepts/context"
+    ]
   },
   {
     "type": "category",
@@ -76,12 +80,20 @@
   {
     "type": "category",
     "label": "Migration Guides",
-    "items": ["tools/bolt-js/migration/migration-v2", "tools/bolt-js/migration/migration-v3", "tools/bolt-js/migration/migration-v4"]
+    "items": [
+      "tools/bolt-js/migration/migration-v2",
+      "tools/bolt-js/migration/migration-v3",
+      "tools/bolt-js/migration/migration-v4"
+    ]
   },
   {
     "type": "category",
     "label": "Legacy",
-    "items": ["tools/bolt-js/legacy/hubot-migration", "tools/bolt-js/legacy/steps-from-apps", "tools/bolt-js/legacy/conversation-store"]
+    "items": [
+      "tools/bolt-js/legacy/hubot-migration",
+      "tools/bolt-js/legacy/steps-from-apps",
+      "tools/bolt-js/legacy/conversation-store"
+    ]
   },
   {
     "type": "html",
