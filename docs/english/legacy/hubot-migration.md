@@ -27,9 +27,7 @@ If you have access to an existing Slack app with a bot user, you can [jump ahead
 
 The first thing you’ll want to do is [create a Slack app](https://api.slack.com/apps/new).
 
-:::tip
-
-We recommend using a workspace where you won’t disrupt real work getting done — you can create a new one for free.
+:::tip[We recommend using a workspace where you won’t disrupt real work getting done — you can create a new one for free.]
 
 :::
 

@@ -95,9 +95,7 @@ Once the install is complete, we can test the Heroku CLI by displaying all of th
 heroku help
 ```
 
-:::tip 
-
-If the `heroku` command is not found, refresh your path by opening a new terminal session/tab.
+:::tip[If the `heroku` command is not found, refresh your path by opening a new terminal session/tab.]
 
 :::
 
@@ -132,9 +130,7 @@ It’s time to [create a Heroku app](https://devcenter.heroku.com/articles/creat
 
 Creating new Heroku apps will use your existing Heroku plan subscription. When getting started or deploying many small apps, we recommend starting with [Heroku's low-cost Eco Dyno plan](https://blog.heroku.com/new-low-cost-plans).
 
-:::tip 
-
-Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).
+:::tip[Eligible students can apply for platform credits through the [Heroku for GitHub Student program](https://blog.heroku.com/github-student-developer-program).]
 
 :::
 
@@ -237,9 +233,7 @@ In our example, the web address is `https://sharp-rain-871.herokuapp.com/`.
 
 Head over to the [Slack App page](https://api.slack.com/apps) and select your app name. Next, we'll update your **Request URL** in two locations to be your web address.
 
-:::tip 
-
-Your **Request URL** ends with `/slack/events`, such as `https://sharp-rain-871.herokuapp.com/slack/events`.
+:::tip[Your **Request URL** ends with `/slack/events`, such as `https://sharp-rain-871.herokuapp.com/slack/events`.]
 
 :::
 
@@ -251,9 +245,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 ![Event Subscriptions page](/img/bolt-js/event-subscriptions-page.png "Event Subscriptions page")
 
-:::tip 
-
-Heroku Eco Dyno apps sleep when inactive. 💤 If your verification fails, please try it again immediately.
+:::tip[Heroku Eco Dyno apps sleep when inactive. 💤 If your verification fails, please try it again immediately.]
 
 :::
 

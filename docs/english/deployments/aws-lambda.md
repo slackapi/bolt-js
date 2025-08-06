@@ -10,9 +10,7 @@ When you’re finished, you’ll have this ⚡️[Deploying to AWS Lambda app](h
 
 [AWS Lambda](https://aws.amazon.com/lambda/) is a serverless, Function-as-a-Service (FaaS) platform that allows you to run code without managing servers. In this section, we'll configure your local machine to access AWS Lambda.
 
-:::tip 
-
-Skip this section if you have already [configured a profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles) on your local machine to access AWS Lambda.
+:::tip[Skip this section if you have already [configured a profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-profiles) on your local machine to access AWS Lambda.]
 
 :::
 
@@ -58,9 +56,7 @@ aws configure
 # Default output format [None]: json
 ```
 
-:::tip 
-
-Customize the [region](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region) and [output format](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format) best for you.
+:::tip[Customize the [region](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region) and [output format](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format) best for you.]
 
 :::
 
@@ -227,9 +223,7 @@ First, use the `serverless offline` command to start your app and listen to AWS 
 serverless offline --noPrependStageInUrl
 ```
 
-:::tip 
-
-You can make code changes to your app in one terminal while running the above command in another terminal, and as you save code changes your app will reload automatically.
+:::tip[You can make code changes to your app in one terminal while running the above command in another terminal, and as you save code changes your app will reload automatically.]
 
 :::
 
@@ -351,9 +345,7 @@ serverless deploy
 
 When the deploy is complete, you can open a Slack channel that your app has joined and say "goodbye" (lower-case). You should see a friendly farewell from your Slack app.
 
-:::tip 
-
-If you are making small changes to single functions, you can deploy only a single function using `serverless deploy function -f my-function` which is much faster. Run `serverless help deploy function` for more detailed help.
+:::tip[If you are making small changes to single functions, you can deploy only a single function using `serverless deploy function -f my-function` which is much faster. Run `serverless help deploy function` for more detailed help.]
 
 :::
 

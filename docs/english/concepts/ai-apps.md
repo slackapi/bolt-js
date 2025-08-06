@@ -52,8 +52,7 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
-:::tip
-Be sure to give the [reference docs](/tools/bolt-js/reference#agents--assistants) a look!
+:::tip[Be sure to give the [reference docs](/tools/bolt-js/reference#agents--assistants) a look!]
 :::
 
 ## Handling a new thread {#handling-new-thread}
@@ -80,8 +79,9 @@ In the example below, the app is sending a message — containing thread context
 ...
 ```
 
-:::tip
-When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
+:::tip[When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data.] 
+
+You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
 :::
 
 ## Handling thread context changes {#handling-thread-context-changes}

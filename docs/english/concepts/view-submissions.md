@@ -33,8 +33,7 @@ Read more about view submissions in our [API documentation](/surfaces/modals#int
 
 When listening for `view_closed` requests, you must pass an object containing `type: 'view_closed'` and the view `callback_id`. See below for an example of this.
 
-:::tip 
-See the [API documentation](/surfaces/modals#interactions) for more information about `view_closed`.
+:::tip[See the [API documentation](/surfaces/modals#interactions) for more information about `view_closed`.]
 :::
 
 #### Handle a `view_closed` request
