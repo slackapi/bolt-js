@@ -19,15 +19,15 @@ In search of the complete guide to building an app from scratch? Check out the [
 
 #### Prerequisites
 
-A few tools are needed for the following steps. We recommend using the [**Slack CLI**]/slack-cli/) for the smoothest experience, but other options remain available.
+A few tools are needed for the following steps. We recommend using the [**Slack CLI**](https://docs.slack.dev/tools/slack-cli/) for the smoothest experience, but other options remain available.
 
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
 Install the latest version of the Slack CLI to get started:
 
-- [Slack CLI for macOS & Linux]/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
-- [Slack CLI for Windows]/slack-cli/guides/installing-the-slack-cli-for-windows)
+- [Slack CLI for macOS & Linux](tools/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
+- [Slack CLI for Windows](tools/slack-cli/guides/installing-the-slack-cli-for-windows)
 
 Then confirm a successful installation with the following command:
 

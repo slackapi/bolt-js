@@ -262,4 +262,4 @@ Nice work! Now that you've added a workflow step to your Bolt app, a world of po
 
 If you're looking to create a brand new Bolt app with custom workflow steps, check out [the tutorial here](/tools/bolt-js/tutorials/custom-steps-workflow-builder-new).
 
-If you're interested in exploring how to create custom steps to use in Workflow Builder as steps with our Deno Slack SDK, too, that tutorial can be found [here]/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
+If you're interested in exploring how to create custom steps to use in Workflow Builder as steps with our Deno Slack SDK, too, that tutorial can be found [here](/tools/deno-slack-sdk/tutorials/workflow-builder-custom-step/).

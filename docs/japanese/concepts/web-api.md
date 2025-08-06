@@ -1,10 +1,10 @@
 # Web API の使用
 
-[Web API メソッド](/reference/methods)を呼び出すには、リスナー関数の引数に `client` として提供されている [`WebClient`]/node-slack-sdk/web-api) を使用します。このインスタンスが使用するトークンは、Bolt アプリの初期化時に指定されたもの **もしくは** Slack からのリクエストに対して [`authorize` 関数](/tools/bolt-js/concepts/authorization)から返されたものが設定されます。組み込みの [OAuth サポート](/tools/bolt-js/concepts/authenticating-oauth)は、この後者のケースをデフォルトでハンドリングします。
+[Web API メソッド](/reference/methods)を呼び出すには、リスナー関数の引数に `client` として提供されている [`WebClient`](/tools/node-slack-sdk/web-api) を使用します。このインスタンスが使用するトークンは、Bolt アプリの初期化時に指定されたもの **もしくは** Slack からのリクエストに対して [`authorize` 関数](/tools/bolt-js/concepts/authorization)から返されたものが設定されます。組み込みの [OAuth サポート](/tools/bolt-js/concepts/authenticating-oauth)は、この後者のケースをデフォルトでハンドリングします。
 
 Bolt アプリケーションは、トップレベルに `app.client` も持っています。このインスタンスには、トークンをメソッド呼び出しのパラメーターとして都度指定します。Slack からのリクエストが authorize されないユースケースや、リスナー関数の外で Web API を呼び出したい場合は、このトップレベルの `app.client` を使用します。
 
-トップレベルのクライアントを使ってもリスナー関数でのクライアントを使っても、[`WebClient`]/node-slack-sdk/web-api) が提供するメソッドを呼び出すと、それへの Slack からのレスポンスを含む Promise の値が返されます。
+トップレベルのクライアントを使ってもリスナー関数でのクライアントを使っても、[`WebClient`](/tools/node-slack-sdk/web-api) が提供するメソッドを呼び出すと、それへの Slack からのレスポンスを含む Promise の値が返されます。
 
 [OrG 全体へのインストール機能](/enterprise-grid/)の導入により、[いくつかの Web API](/enterprise-grid/developing-for-enterprise-grid#using-apis) は、動作しているワークスペースを伝えるために `team_id` パラメーターを必要とします。Bolt for JavaScript は、この `team_id` を Slack から受け取ったペイロードを元に判定し、`client` インスタンスに設定します。これは、既存のアプリケーションにとっても OrG 全体へのインストールに対応する上で有用です。既存の Web API 呼び出しの処理をアップデートする必要はありません。
 
