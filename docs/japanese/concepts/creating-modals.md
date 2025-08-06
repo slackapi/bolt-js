@@ -4,7 +4,7 @@
 
 `trigger_id` はスラッシュコマンド、ボタンの押下、メニューの選択などによって Request URL に送信されたペイロードの項目として入手することができます。
 
-モーダルの生成についてのより詳細な情報は [API ドキュメント](/surfaces/modals#composing_views)を参照してください。
+モーダルの生成についてのより詳細な情報は [API ドキュメント](/surfaces/modals#composing_views)を参照してください。
 
 ```javascript
 // コマンド起動をリッスン
