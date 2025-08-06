@@ -46,14 +46,14 @@ Slack では、Hubot アプリはユーザーとの対話型のボットユー�
 
 :::warning 
 
-ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](/bolt-js/getting-started) と [イベントの設定](/bolt-js/getting-started#setting-up-events) を参考にしてください。
+ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](/tools/bolt-js/getting-started) と [イベントの設定](/tools/bolt-js/getting-started#setting-up-events) を参考にしてください。
 
 :::
 
 ### メッセージのリスニング
 すべての Hubot アプリは、デフォルトでメッセージをリッスンできるので、ボットユーザーがそうするように設定する必要があります。
 
-[イベントの設定](/bolt-js/getting-started#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリッスン)、`message group` (プライベートチャンネルのメッセージをリッスン)、`message.im` (アプリのホーム/DM スペースのメッセージをリッスン)、`message.mpim` (マルチパーソン DM のメッセージをリッスン）。
+[イベントの設定](/tools/bolt-js/getting-started#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリッスン)、`message group` (プライベートチャンネルのメッセージをリッスン)、`message.im` (アプリのホーム/DM スペースのメッセージをリッスン)、`message.mpim` (マルチパーソン DM のメッセージをリッスン）。
 
 ボットがチャンネルのメッセージをリッスンするだけでよい場合は、`message.channels` と`message.groups` をリッスンできます。または、ボットがすべての場所のメッセージをリッスンするようにするには、4 つのメッセージイベントすべてを選択します。
 
@@ -93,7 +93,7 @@ Hubot スクリプトは、`hear()` を使用して、一致するパターン�
 
 :::
 
-[メッセージのリスニングについてもっと詳しく読む](/bolt-js/concepts/message-listening).
+[メッセージのリスニングについてもっと詳しく読む](/tools/bolt-js/concepts/message-listening).
 
 ### `say()` および `respond()` を使用したメッセージで応答する
 Hubot スクリプトは、`send()` を使用してメッセージを同じ会話に送信し、`reply()` を使用して、元のメッセージを送信したユーザー宛の@メンションを付けて、メッセージを同じ会話上に送信します。
@@ -108,7 +108,7 @@ Hubot の `send()` と Bolt の `say()` はほとんど同じですが、`say()`
 
 :::
 
-[メッセージへの応答についてもっと詳しく読む](/bolt-js/concepts/message-sending).
+[メッセージへの応答についてもっと詳しく読む](/tools/bolt-js/concepts/message-sending).
 
 ### `respond` と `react`
 前のセクションで、Hubot スクリプトで `respond()` が使用されている場合は `app_mention` イベントを、`react()` が使用されている場合は `reaction_added` をサブスクライブするようにアプリを設定しました。
@@ -121,7 +121,7 @@ Bolt は、`event()` と呼ばれるメソッドを使用して、任意の [Eve
 
 :::
 
-[イベントのリッスンについてもっと詳しく読む](/bolt-js/concepts/event-listening).
+[イベントのリッスンについてもっと詳しく読む](/tools/bolt-js/concepts/event-listening).
 
 ## Bolt で Web API メソッドを使用する {#using-web-api-methods-with-bolt-for-javascript}
 Hubot では、`@slack/client` から `WebClient` パッケージをインポートする必要がありました。Bolt では、`app.client` からアクセスできる `WebClient` インスタンスがデフォルトでインポートされます。
@@ -150,14 +150,14 @@ app.message('react', async ({ message, context, logger }) => {
 
 :::
 
-[Bolt での Web API の使用についてもっと詳しく読む。](/bolt-js/concepts/web-api)
+[Bolt での Web API の使用についてもっと詳しく読む。](/tools/bolt-js/concepts/web-api)
 
 ## Bolt でのミドルウェアの使用 {#using-middleware-with-bolt-for-javascript}
 Hubot には、受信 (リスナーが呼び出される前に実行される)、リスナー (一致するすべてのリスナーに対して実行される)、応答 (送信されるすべての応答に対して実行される) という 3 種類のミドルウェアがあります。
 
 Bolt には、グローバルとリスナーという 2 種類のミドルウェアしかありません。
-- グローバルミドルウェアは、リスナーミドルウェアが呼び出される前に実行されます。Bolt アプリ自体に付属しています。[Bolt のグローバルミドルウェアについてもっと詳しく読む。](/bolt-js/concepts/global-middleware).
-- リスナーミドルウェアは、付属するリスナー関数に対してのみ実行されます。[Bolt のリスナーミドルウェアについてもっと詳しく読む。](/bolt-js/concepts/listener-middleware)
+- グローバルミドルウェアは、リスナーミドルウェアが呼び出される前に実行されます。Bolt アプリ自体に付属しています。[Bolt のグローバルミドルウェアについてもっと詳しく読む。](/tools/bolt-js/concepts/global-middleware).
+- リスナーミドルウェアは、付属するリスナー関数に対してのみ実行されます。[Bolt のリスナーミドルウェアについてもっと詳しく読む。](/tools/bolt-js/concepts/listener-middleware)
 
 Bolt では、グローバルとリスナーというミドルウェアはいずれも、`await next()` を呼び出して実行の制御を次のミドルウェアに渡す必要があります。ミドルウェアが実行中にエラーを検出した場合、`Error` を `next()` に渡すことができ、エラーはその前に実行されたミドルウェアチェーンにバブルアップされます。
 
@@ -174,7 +174,7 @@ Hubot には、brain と呼ばれるメモリ内ストレージがあります�
 
 アプリのインスタンスが複数実行されている場合、組み込みの conversation store はプロセス間で共有されないため、データベースから conversation の状態を取得する conversation store を実装することをおすすめします。
 
-[会話ストアについてもっと詳しく読む](/bolt-js/concepts/conversation-store).
+[会話ストアについてもっと詳しく読む](/tools/bolt-js/concepts/conversation-store).
 
 ## 次のステップ {#next-steps}
 ここまで来れば、きっと Hubot アプリを Bolt アプリに変換できているはずです！✨⚡

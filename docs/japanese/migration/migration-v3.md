@@ -90,7 +90,7 @@ const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => {
 
 ## デフォルトのレシーバーを HTTPReceiver に変更 {#http-receiver-as-default}
 
-3.x から新しい [`HTTPReceiver`](https://github.com/slackapi/bolt-js/issues/670) というレシーバーを導入し、デフォルトのレシーバー実装を、これまでの `ExpressReceiver` からこのレシーバーに変更します。この変更は、Bolt for JavaScript を Express.js 以外の人気のある Web フレームワーク（Hapi.js や Koa など）とともに動作させることを容易にします。`ExpressReceiver` は引き続き Bolt for JavaScript のリリースに含まれます。また、`HTTPReceiver` は `ExpressReceiver` が提供する全ての機能を提供するわけではありません。例えば、一つのユースケースとしては、`HTTPReceiver` ではカスタムの HTTP ルート（例: ヘルスチェックのための URL を追加する）を追加する機能はサポートされていません。このようなユースケースに対応するためには、引き続き `ExpressReceiver` を利用することを推奨します。その場合はクラスを import して、インスタンス化したものを `App` のコンストラクタに渡してください。詳細は[カスタム HTTP ルートの追加](/bolt-js/concepts/custom-routes)を参考にしてください。
+3.x から新しい [`HTTPReceiver`](https://github.com/slackapi/bolt-js/issues/670) というレシーバーを導入し、デフォルトのレシーバー実装を、これまでの `ExpressReceiver` からこのレシーバーに変更します。この変更は、Bolt for JavaScript を Express.js 以外の人気のある Web フレームワーク（Hapi.js や Koa など）とともに動作させることを容易にします。`ExpressReceiver` は引き続き Bolt for JavaScript のリリースに含まれます。また、`HTTPReceiver` は `ExpressReceiver` が提供する全ての機能を提供するわけではありません。例えば、一つのユースケースとしては、`HTTPReceiver` ではカスタムの HTTP ルート（例: ヘルスチェックのための URL を追加する）を追加する機能はサポートされていません。このようなユースケースに対応するためには、引き続き `ExpressReceiver` を利用することを推奨します。その場合はクラスを import して、インスタンス化したものを `App` のコンストラクタに渡してください。詳細は[カスタム HTTP ルートの追加](/tools/bolt-js/concepts/custom-routes)を参考にしてください。
 
 ## Node の最低必須バージョン {#minimum-node-version}
 

@@ -141,7 +141,7 @@ import TabItem from '@theme/TabItem';
 
 :::tip 
 
-ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)など）にデプロイするアプリや Slack App Directory で配布されるアプリに適しています。 HTTP での情報については[こちらのドキュメント](#setting-up-events)を参照してください。
+ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/tools/bolt-js/deployments/aws-lambda) or [Heroku](/tools/bolt-js/deployments/heroku)など）にデプロイするアプリや Slack App Directory で配布されるアプリに適しています。 HTTP での情報については[こちらのドキュメント](#setting-up-events)を参照してください。
 
 :::
 
@@ -550,6 +550,6 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 * 基本的な概念 をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
 
-* ボットが[`events()` メソッド](/bolt-js/concepts/event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](/reference/events)にリストされています。
+* ボットが[`events()` メソッド](/tools/bolt-js/concepts/event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](/reference/events)にリストされています。
 
-* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/bolt-js/concepts/web-api)ことができます。API サイトに [200 を超えるメソッド](/reference/methods)を用意してあります。
+* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/tools/bolt-js/concepts/web-api)ことができます。API サイトに [200 を超えるメソッド](/reference/methods)を用意してあります。

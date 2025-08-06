@@ -7,7 +7,7 @@ slug: /bolt-js/tutorials/custom-steps-workflow-builder-new
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-Adding a workflow step to your app and implementing a corresponding function listener is how you define a custom Workflow Builder step. In this tutorial, you'll use [Bolt for JavaScript](/bolt-js/) to add your workflow step, then wire it up in [Workflow Builder](https://slack.com/help/articles/360035692513-Guide-to-Workflow-Builder).
+Adding a workflow step to your app and implementing a corresponding function listener is how you define a custom Workflow Builder step. In this tutorial, you'll use [Bolt for JavaScript](/tools/bolt-js/) to add your workflow step, then wire it up in [Workflow Builder](https://slack.com/help/articles/360035692513-Guide-to-Workflow-Builder).
 
 When finished, you'll be ready to build scalable and innovative workflow steps for anyone using Workflow Builder in your workspace.
 
@@ -71,7 +71,7 @@ All of your app's settings can be configured within these screens. By creating a
 
 Navigate to **Event Subscriptions** and expand **Subscribe to bot events** to see that we have subscribed to the `function_executed` event. This is also a requirement for adding workflow steps to our app, as it lets our app know when a step has been triggered, allowing our app to respond to it. 
 
-Another configuration setting to note is **Socket Mode**. We have turned this on for our local development, but socket mode is not intended for use in a production environment. When you are satisfied with your app and ready to deploy it to a production environment, you should switch to using public HTTP request URLs. Read more about getting started with HTTP in [Bolt for JavaScript here](/bolt-js/getting-started).
+Another configuration setting to note is **Socket Mode**. We have turned this on for our local development, but socket mode is not intended for use in a production environment. When you are satisfied with your app and ready to deploy it to a production environment, you should switch to using public HTTP request URLs. Read more about getting started with HTTP in [Bolt for JavaScript here](/tools/bolt-js/getting-started).
 
 Clicking on **Workflow Steps** in the left nav will show you that one workflow step has been added! This reflects the `function` defined in our manifest: functions are workflow steps. We will get to this step's implementation later.
 
@@ -358,6 +358,6 @@ Slack will send an action event payload to your app when the button is clicked o
 
 That's it — we hope you learned a lot!
 
-In this tutorial, we added custom steps via the manifest, but if you'd like to see how to add custom steps in the [app settings](https://api.slack.com/apps) to an existing app, follow along with the [Create a custom step for Workflow Builder: existing Bolt app](/bolt-js/tutorials/custom-steps-workflow-builder-existing) tutorial.
+In this tutorial, we added custom steps via the manifest, but if you'd like to see how to add custom steps in the [app settings](https://api.slack.com/apps) to an existing app, follow along with the [Create a custom step for Workflow Builder: existing Bolt app](/tools/bolt-js/tutorials/custom-steps-workflow-builder-existing) tutorial.
 
 If you're interested in exploring how to create custom steps to use in Workflow Builder as steps with our Deno Slack SDK, too, that tutorial can be found [here]/deno-slack-sdk/tutorials/workflow-builder-custom-step/).

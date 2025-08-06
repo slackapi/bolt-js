@@ -8,7 +8,7 @@ End of life for `@slack/bolt@1.x` was  **April 30th, 2021**. Development has bee
 
 This guide will walk you through the process of updating your app from using `@slack/bolt@1.x` to `@slack/bolt@2.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes.
 
-That being said, End of life for `@slack/bolt@2.x` was **May 31st, 2021**. After following this guide, you'll then want to follow the guide for [Migrating to V3](/bolt-js/migration/migration-v3).
+That being said, End of life for `@slack/bolt@2.x` was **May 31st, 2021**. After following this guide, you'll then want to follow the guide for [Migrating to V3](/tools/bolt-js/migration/migration-v3).
 
 ---
 

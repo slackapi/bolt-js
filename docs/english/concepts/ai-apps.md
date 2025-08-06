@@ -25,12 +25,12 @@ The Agents & AI Apps feature comprises a unique messaging experience for Slack. 
   * [`message.im`](/reference/events/message.im)
 
 :::info
-You _could_ go it alone and [listen](/bolt-js/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
+You _could_ go it alone and [listen](/tools/bolt-js/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 :::
 
 ## The `Assistant` class instance
 
-The [`Assistant`](/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
+The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
 
 1. [The user starts a thread](#handling-new-thread). The `Assistant` class handles the incoming [`assistant_thread_started`](/reference/events/assistant_thread_started) event.
 2. [The thread context may change at any point](#handling-thread-context-changes). The `Assistant` class can handle any incoming [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed) events. The class also provides a default `context` store to keep track of thread context changes as the user moves through Slack.
@@ -57,7 +57,7 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
 :::tip
-Be sure to give the [reference docs](/bolt-js/reference#agents--assistants) a look!
+Be sure to give the [reference docs](/tools/bolt-js/reference#agents--assistants) a look!
 :::
 
 ## Handling a new thread {#handling-new-thread}
@@ -108,7 +108,7 @@ When the user messages your app, the [`message.im`](/reference/events/message.im
 
 Messages sent to the app do not contain a [subtype](/reference/events/message/#subtypes) and must be deduced based on their shape and any provided [message metadata](/messaging/message-metadata/).
 
-There are three [utilities](/bolt-js/reference#the-assistantconfig-configuration-object) that are particularly useful in curating the user experience:
+There are three [utilities](/tools/bolt-js/reference#the-assistantconfig-configuration-object) that are particularly useful in curating the user experience:
 * `say`
 * `setTitle`
 * `setStatus`

@@ -8,9 +8,9 @@
 
 ## `views.push`
 
-モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて `views.push` を呼び出します。この API 呼び出しには、有効な `trigger_id` と、新しく生成する [ビュー部分のペイロード](/reference/interaction-payloads/view-interactions-payload)を渡します。`views.push` の引数は [モーダルを開始するとき](/bolt-js/concepts/creating-modals)と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
+モーダルのスタックに新しいモーダルを積み重ねるためには、組み込みの API クライアントを用いて `views.push` を呼び出します。この API 呼び出しには、有効な `trigger_id` と、新しく生成する [ビュー部分のペイロード](/reference/interaction-payloads/view-interactions-payload)を渡します。`views.push` の引数は [モーダルを開始するとき](/tools/bolt-js/concepts/creating-modals)と同様です。最初のモーダルを開いた後、その上にさらに二つまで追加のモーダルをスタックに積み重ねることができます。
 
-より詳細な情報は [API ドキュメント](/bolt-js/concepts/view-submissions)を参照してください。
+より詳細な情報は [API ドキュメント](/tools/bolt-js/concepts/view-submissions)を参照してください。
 
 ```javascript
 // action_id: button_abc のボタンを押すイベントをリッスン

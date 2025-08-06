@@ -4,6 +4,6 @@ Bolt for JavaScript [v3.5.0](https://github.com/slackapi/bolt-js/releases/tag/%4
 
 既存の Slack アプリではアクセストークンが無期限に存在し続けるのに対して、トークンローテーションを有効にしたアプリではアクセストークンが失効するようになります。リフレッシュトークンを利用して、アクセストークンを長期間にわたって更新し続けることができます。
 
-[Bolt for JavaScript の組み込みの OAuth 機能](/bolt-js/concepts/authenticating-oauth) を使用していれば、Bolt for JavaScript が自動的にトークンローテーションの処理をハンドリングします。
+[Bolt for JavaScript の組み込みの OAuth 機能](/tools/bolt-js/concepts/authenticating-oauth) を使用していれば、Bolt for JavaScript が自動的にトークンローテーションの処理をハンドリングします。
 
 トークンローテーションに関する詳細は [API ドキュメント](/authentication/using-token-rotation)を参照してください。

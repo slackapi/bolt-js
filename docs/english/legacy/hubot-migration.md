@@ -50,14 +50,14 @@ The [Events API](/legacy/legacy-bot-users#handling-events) is a bot's equivalent
 
 :::info
 
-Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/bolt-js/getting-started) and [setting up events](/bolt-js/getting-started#setting-up-events) in the Getting Started guide.
+Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/tools/bolt-js/getting-started) and [setting up events](/tools/bolt-js/getting-started#setting-up-events) in the Getting Started guide.
 
 :::
 
 ### Listening for messages
 All Hubot apps can listen to messages by default, so we need to configure your bot user to do the same.
 
-After walking through [setting up events](/bolt-js/getting-started#setting-up-events), your Request URL should be verified. Scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
+After walking through [setting up events](/tools/bolt-js/getting-started#setting-up-events), your Request URL should be verified. Scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
 
 If you only want your bot to listen to messages in channels, you can listen to `message.channels` and `message.groups`. Or if you want your bot to listen to messages from everywhere it is, choose all four message events.
 
@@ -93,7 +93,7 @@ Hubot scripts use `hear()` listen to messages with a matching pattern. Bolt for 
 
 👨‍💻👩‍💻 Anywhere where you use `hear()` in your code, change it to use `message()`
 
-[Read more about listening to messages](/bolt-js/concepts/message-listening).
+[Read more about listening to messages](/tools/bolt-js/concepts/message-listening).
 
 ### Responding with a message using `say()` and `respond()`
 Hubot scripts use `send()` to send a message to the same conversation and `reply()` to send a message to the same conversation with an @-mention to the user that sent the original message.
@@ -104,7 +104,7 @@ The arguments for Hubot’s `send()` and Bolt for JavaScript's `say()` are mostl
 
 👨‍💻👩‍💻 Anywhere where you use `send()` in your code, change it to use `await say()`
 
-[Read more about responding to messages](/bolt-js/concepts/message-sending).
+[Read more about responding to messages](/tools/bolt-js/concepts/message-sending).
 
 ### `respond` and `react`
 
@@ -114,7 +114,7 @@ Bolt for JavaScript uses a method called `event()` that allows you to listen to 
 
 👨‍💻👩‍💻 Anywhere where you use `respond()` in your code, change it to use `app.event(‘app_mention’)`. Anywhere you use `react`, change it to `app.event(‘reaction_added’)`.
 
-[Read more about listening to events](/bolt-js/concepts/event-listening).
+[Read more about listening to events](/tools/bolt-js/concepts/event-listening).
 
 ## Using Web API methods with Bolt for JavaScript {#using-web-api-methods-with-bolt-for-javascript}
 In Hubot, you needed to import the `WebClient` package from `@slack/client`. Bolt for JavaScript imports a `WebClient` instance for you by default, and exposes it as the `client` argument available on all listeners.
@@ -139,14 +139,14 @@ app.message('react', async ({ message, context, client, logger }) => {
 
 👨‍💻👩‍💻 Change your Web API calls to use one the `client` argument.
 
-[Read more about using the Web API with Bolt](/bolt-js/concepts/web-api).
+[Read more about using the Web API with Bolt](/tools/bolt-js/concepts/web-api).
 
 ## Using middleware with Bolt for JavaScript {#using-middleware-with-bolt-for-javascript}
 Hubot has three kinds of middleware: receive (runs before any listeners are called), listener (runs for every matching listener), and response (runs for every response sent).
 
 Bolt for JavaScript only has two kinds of middleware — global and listener:
-- Global middleware runs before any listener middleware is called. It’s attached to the Bolt for JavaScript app itself. [Read more about Bolt for JavaScript's global middleware](/bolt-js/concepts/global-middleware).
-- Listener middleware only runs for listener functions it’s attached to. [Read more about Bolt for JavaScript's listener middleware](/bolt-js/concepts/listener-middleware).
+- Global middleware runs before any listener middleware is called. It’s attached to the Bolt for JavaScript app itself. [Read more about Bolt for JavaScript's global middleware](/tools/bolt-js/concepts/global-middleware).
+- Listener middleware only runs for listener functions it’s attached to. [Read more about Bolt for JavaScript's listener middleware](/tools/bolt-js/concepts/listener-middleware).
 
 In Bolt for JavaScript, both kinds of middleware must call `await next()` to pass control of execution from one middleware to the next. If your middleware encounters an error during execution, you can `throw` it and the error will be bubbled up through the previously-executed middleware chain.
 
@@ -163,7 +163,7 @@ The default, built-in conversation store uses an in-memory store similar to Hubo
 
 If there is more than one instance of your app running, the built-in conversation store will not be shared among the processes so you’ll want to implement a conversation store that fetches conversation state from a database.
 
-[Read more about conversation stores](/bolt-js/concepts/conversation-store).
+[Read more about conversation stores](/tools/bolt-js/concepts/conversation-store).
 
 ## Next steps {#next-steps}
 If you’ve made it this far, it means you’ve likely converted your Hubot app into a Bolt for JavaScript app! ✨⚡

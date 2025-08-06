@@ -7,7 +7,7 @@ slug: /bolt-js/tutorials/custom-steps-workflow-builder-existing
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-If you followed along with our [create a custom step for Workflow Builder: new app](/bolt-js/tutorials/custom-steps-workflow-builder-new) tutorial, you have seen how to add custom steps to a brand new app. But what if you have an app up and running currently to which you'd like to add custom steps? You've come to the right place!
+If you followed along with our [create a custom step for Workflow Builder: new app](/tools/bolt-js/tutorials/custom-steps-workflow-builder-new) tutorial, you have seen how to add custom steps to a brand new app. But what if you have an app up and running currently to which you'd like to add custom steps? You've come to the right place!
 
 In this tutorial we will:
 - Start with an existing Bolt app
@@ -263,6 +263,6 @@ In any channel where your app is installed, paste the link you copied and send i
 
 Nice work! Now that you've added a workflow step to your Bolt app, a world of possibilities is open to you! Create and share workflow steps across your organization to optimize Slack users' time and make their working lives more productive.
 
-If you're looking to create a brand new Bolt app with custom workflow steps, check out [the tutorial here](/bolt-js/tutorials/custom-steps-workflow-builder-new).
+If you're looking to create a brand new Bolt app with custom workflow steps, check out [the tutorial here](/tools/bolt-js/tutorials/custom-steps-workflow-builder-new).
 
 If you're interested in exploring how to create custom steps to use in Workflow Builder as steps with our Deno Slack SDK, too, that tutorial can be found [here]/deno-slack-sdk/tutorials/workflow-builder-custom-step/).

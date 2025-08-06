@@ -4,7 +4,7 @@ sidebar_label: リファレンス
 
 # リファレンス（Appインターフェイスと設定）
 
-このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/bolt-js/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
+このガイドでは、Bolt インターフェイスのリスナー関数、リスナー関数の引数、初期化オプション、エラーについて詳しく説明します。⚡[入門ガイド](/tools/bolt-js/getting-started)をまだ完了していない場合は、先にそちらで Bolt for JavaScript アプリ開発の基本を確認しておきましょう。
 
 ## リスナー関数 {#listener-functions}
 Slack アプリは通常、Slack からのイベント情報を受け取ったり、それに応答を返したりします。受信するイベントは 1 つの場合もあれば、多数の場合もあります。例えば、Events API のイベント（アプリに関連するリンクが共有されたときなど）や、ユーザーがアプリのショートカットを実行するイベントを受け取ったりします。Slack からのリクエストの種類に応じて、それぞれ異なるメソッドが用意されています。これらのメソッドに、それらのイベントを処理したり応答を返したりするための**リスナー関数**を渡します。
@@ -19,7 +19,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 | `app.action(actionId, fn);`     | Block Kit エレメントから送信される `action` イベントをリッスンします。このイベントにはユーザーのボタン操作、メニュー選択、日付ピッカーの操作などがあります。`actionId` は文字列型で、アプリがビュー内に含めたブロックエレメントに指定した一意の `action_id` の値と一致する必要があります。ここでいう「ビュー」とは、メッセージ、モーダル、アプリのホームタブのことを指します。アクションエレメントを `input` ブロックに配置した場合はイベントがトリガーされないことに注意してください。
 | `app.shortcut(callbackId, fn);` | グローバルショートカットまたはメッセージショートカットの呼び出しをリッスンします。`callbackId` は文字列または正規表現で、アプリの設定で指定したショートカットの `callback_id` にマッチする必要があります。
 | `app.view(callbackId, fn);`     | `view_submission` イベントと `view_closed` イベントをリッスンします。`view_submission` イベントは、アプリが開いたモーダルでユーザーがデータ送信の操作をしたときに発生します。`view_closed` イベントは、ユーザーがデータ送信を実行せずにモーダルを閉じたときに発生します。
-| `app.step(workflowStep)` | `WorkflowStep` のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには `edit`、`save`、`execute` の 3 種類があります。ワークフローステップについて詳しくは、[ドキュメント](/bolt-js/legacy/steps-from-apps)を参照してください。
+| `app.step(workflowStep)` | `WorkflowStep` のインスタンスに渡されたコールバックを使用して、ワークフローステップイベントのリッスンと応答を行います。コールバックには `edit`、`save`、`execute` の 3 種類があります。ワークフローステップについて詳しくは、[ドキュメント](/tools/bolt-js/legacy/steps-from-apps)を参照してください。
 | `app.command(commandName, fn);` | Slash コマンドの呼び出しをリッスンします。`commandName` は文字列型で、アプリの設定で指定したスラッシュコマンドと一致する必要があります。スラッシュコマンドの名前では `/` を最初に配置します（例 : `/helpdesk`）。
 | `app.options(actionId, fn);`    | 外部データソースを使用するセレクトメニューなどから送られる選択肢読み込みのリクエストをリッスンします。使う機会は多くありませんが、`app.action` と混同しないようにしましょう。`actionId` は文字列型で、アプリがビュー内に[外部データソースを使用するセレクトメニュー](/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select)を含めるときに指定した`action_id` と一致する必要があります。
 
@@ -40,7 +40,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 | :--- | :--- | :--- |
 | `payload` | すべてのリスナー | 受信したイベントペイロードから装飾部分などが取り除かれた本質的な内容部分。この内容や構造はイベントの種別によって異なります。このペイロード情報は下記の `body`のサブセットです。また、`payload` には、リスナーが渡されたメソッド名と同じ名前のエイリアスを使ってアクセスすることもできます（`message`、`event`、`action`、`shortcut`、`view`、`command`、`options`）。**payload の内容を簡単に確認する方法は、それを実際にログに出力してみることです**。または、[TypeScript](https://github.com/slackapi/bolt-js/tree/main/examples/getting-started-typescript) を使うのもよいでしょう。 |
 | `say` | `message`, `event`, `action`, `command` | 受信したイベントが紐づいているチャンネルにメッセージを送信する関数。この引数が使用できるのは、リスナーをトリガーしたイベントにチャンネル ID が含まれる場合のみです（`message` イベントが最も一般的です）。`say` は、シンプルな文字列（プレーンテキストのメッセージ）またはオブジェクト（ブロックを含むメッセージ）を受け付けます。`say` は Promise を返します。この Promise は [`chat.postMessage` の応答でresolveされます](/reference/methods/chat.postMessage)。もし`action` メソッドや、`message` 以外のイベントを使用する場合は、[イベントの payload にチャンネル ID が含まれているかを確認するようにしてください](/reference/events)。 |
-| `ack` | `action`, `shortcut`, `view`, `command`, `options` | アプリが受信イベントを受け取ったことを確認するために呼び出す**必要のある関数**。`ack` は応答の完了時にresolveする Promise を返します。詳しくは、[イベントの確認](/bolt-js/concepts/acknowledge)を参照してください。 |
+| `ack` | `action`, `shortcut`, `view`, `command`, `options` | アプリが受信イベントを受け取ったことを確認するために呼び出す**必要のある関数**。`ack` は応答の完了時にresolveする Promise を返します。詳しくは、[イベントの確認](/tools/bolt-js/concepts/acknowledge)を参照してください。 |
 | `client` | すべてのリスナー | イベントに関連づけられたトークンを使用する Web API クライアント。単一のワークスペースへのインストールでは、トークンは Appのコンストラクターに提供されます。複数のワークスペースへのインストールでは、トークンは `authorize` 関数から返されます。|
 | `respond` | `action`, `shortcut`, `view`, `command` | 受信イベントに `response_url` が**含まれる場合**に、受信イベントに応答を返す関数。`respond` は Promise を返します。この Promise は、`response_url` の応答結果に resolveされます。ショートカットに関しては、`respond` はメッセージショートカットで**のみ**動作します（グローバルショートカットでは動作しません）。ビューでの `respond` は モーダル内の input ブロックの [conversations list](/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) や [channels list](/reference/block-kit/block-elements/multi-select-menu-element#channel_multi_select) のセレクトメニューで `response_url_enabled: true` というオプションが指定されている場合**のみ**動作します。 |
 | `context` | すべてのリスナー | イベントのコンテキスト。このオブジェクトは、`botId` など、イベントやアプリに関するデータを保持します。イベントがリスナーに渡される前に、ミドルウェアで他のコンテキスト情報を追加することもできます。 |
@@ -58,7 +58,7 @@ Slack アプリは通常、Slack からのイベント情報を受け取った�
 - `options` : [`body` と `payload`](/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select)
 
 ### リスナーミドルウェアとの違い {#difference-from-listener-middleware}
-リスナーミドルウェアは、多くのリスナー関数で利用するロジックを実装したい場合に使用します（全てのリスナーでは使わないようなケースで）。リスナーミドルウェアは、上で説明したリスナー関数と同じ引数を持ちますが、唯一異なるのは `next()` 関数を持っている点です。この関数は、実行のチェインを切らないために、**必ず呼び出される必要があります**。リスナーミドルウェアについて詳しくは、[ドキュメント](/bolt-js/concepts/listener-middleware)を参照してください。
+リスナーミドルウェアは、多くのリスナー関数で利用するロジックを実装したい場合に使用します（全てのリスナーでは使わないようなケースで）。リスナーミドルウェアは、上で説明したリスナー関数と同じ引数を持ちますが、唯一異なるのは `next()` 関数を持っている点です。この関数は、実行のチェインを切らないために、**必ず呼び出される必要があります**。リスナーミドルウェアについて詳しくは、[ドキュメント](/tools/bolt-js/concepts/listener-middleware)を参照してください。
 
 ## 初期化オプション {#initialization-options}
 Bolt には、アプリをカスタマイズするためのさまざまな初期化オプションが用意されています。主なオプションには、Bolt アプリのオプションとレシーバーのオプションの 2 種類があります。レシーバーのオプションは、アプリで使用するレシーバーによって異なります。デフォルトの `HTTPReceiver` では以下のレシーバーオプションが利用できます（カスタムのレシーバーを使わない限りはこれらが利用できます）。
@@ -71,16 +71,16 @@ Bolt には、アプリをカスタマイズするためのさまざまな初期
 | `signingSecret` | アプリの設定の「Basic Information」から取得した 文字列。受信イベントが Slack から送信されたものであることを検証するために使用されます。 |
 | `endpoints` | レシーバーが Slack からの受信リクエストをリッスンするエンドポイントを指定する文字列または `オブジェクト`。現在、オブジェクトに指定できるキーはラベルとしての任意の文字列のみで、値にはカスタムのエンドポイントを指定します（例 : `/myapp/events`）。**デフォルトでは `/slack/events` というエンドポイントにすべてのイベントが送信されます。** |
 | `processBeforeResponse` | イベントに対して即座に確認の応答を返すかどうかを指定する真偽値。リクエストへの応答が完了するとリスナーはただちに終了してしまうため、FaaS プラットフォームでアプリを実行する場合に有用な設定です。 `true` に設定すると早期終了を防ぐためにハンドラーが実行されるまで応答を返すのを遅らせます。デフォルトは `false` です。  |
-| `clientId` | アプリの設定で指定した、クライアントの ID を示す文字列。[OAuth の設定を行うために必要です](/bolt-js/concepts/authenticating-oauth)。 |
-| `clientSecret` | アプリの設定で指定した、クライアントのシークレットキーを示す 文字列。[OAuth の設定を行うために必要です](/bolt-js/concepts/authenticating-oauth)。 |
-| `stateSecret` | CSRF 攻撃を防ぐために [OAuth の設定時](/bolt-js/concepts/authenticating-oauth)に渡すことができる、推奨のパラメーター（文字列）。 |
-| `installationStore` | [OAuth の設定時](/bolt-js/concepts/authenticating-oauth)に、インストールデータの保存・取得・削除の手段を定義します。`fetchInstallation` 、`storeInstallation`、`deleteInstallation` という 3 つのメソッドが含まれます。デフォルトの `installationStore` はインメモリストアです。 |
-| `scopes` | アプリが [OAuth のプロセスの中で](/bolt-js/concepts/authenticating-oauth)アクセス許可を求めるスコープのリスト。 |
-| `installerOptions` | [デフォルトの OAuth サポート](/bolt-js/concepts/authenticating-oauth)をカスタマイズする場合に指定するオブジェクト（必須ではない）。詳しくは、OAuth のドキュメントを参照してください。 |
-| `dispatchErrorHandler` | 受信リクエストが想定しないパスへのリクエストを受信したときに実行されるエラーハンドラー。 詳細は[エラー処理のドキュメント](/bolt-js/concepts/error-handling)を参照してください。 |
-| `processEventErrorHandler` | イベントの処理中に例外がスローされたときに実行されるエラーハンドラー。  詳細は[ドキュメント](/bolt-js/concepts/error-handling)を参照してください。|
-| `unhandledRequestHandler` | Slack からのリクエストが Bolt アプリによって確認（`ack()`）されなかったときに実行されるエラーハンドラー。 詳細は[ドキュメント](/bolt-js/concepts/error-handling)を参照してください。 |
-| `unhandledRequestTimeoutMillis` | リクエストが受信されてから `unhandledRequestHandler` が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは `3001` です。 詳細は[ドキュメント](/bolt-js/concepts/error-handling)を参照してください。 |
+| `clientId` | アプリの設定で指定した、クライアントの ID を示す文字列。[OAuth の設定を行うために必要です](/tools/bolt-js/concepts/authenticating-oauth)。 |
+| `clientSecret` | アプリの設定で指定した、クライアントのシークレットキーを示す 文字列。[OAuth の設定を行うために必要です](/tools/bolt-js/concepts/authenticating-oauth)。 |
+| `stateSecret` | CSRF 攻撃を防ぐために [OAuth の設定時](/tools/bolt-js/concepts/authenticating-oauth)に渡すことができる、推奨のパラメーター（文字列）。 |
+| `installationStore` | [OAuth の設定時](/tools/bolt-js/concepts/authenticating-oauth)に、インストールデータの保存・取得・削除の手段を定義します。`fetchInstallation` 、`storeInstallation`、`deleteInstallation` という 3 つのメソッドが含まれます。デフォルトの `installationStore` はインメモリストアです。 |
+| `scopes` | アプリが [OAuth のプロセスの中で](/tools/bolt-js/concepts/authenticating-oauth)アクセス許可を求めるスコープのリスト。 |
+| `installerOptions` | [デフォルトの OAuth サポート](/tools/bolt-js/concepts/authenticating-oauth)をカスタマイズする場合に指定するオブジェクト（必須ではない）。詳しくは、OAuth のドキュメントを参照してください。 |
+| `dispatchErrorHandler` | 受信リクエストが想定しないパスへのリクエストを受信したときに実行されるエラーハンドラー。 詳細は[エラー処理のドキュメント](/tools/bolt-js/concepts/error-handling)を参照してください。 |
+| `processEventErrorHandler` | イベントの処理中に例外がスローされたときに実行されるエラーハンドラー。  詳細は[ドキュメント](/tools/bolt-js/concepts/error-handling)を参照してください。|
+| `unhandledRequestHandler` | Slack からのリクエストが Bolt アプリによって確認（`ack()`）されなかったときに実行されるエラーハンドラー。 詳細は[ドキュメント](/tools/bolt-js/concepts/error-handling)を参照してください。 |
+| `unhandledRequestTimeoutMillis` | リクエストが受信されてから `unhandledRequestHandler` が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは `3001` です。 詳細は[ドキュメント](/tools/bolt-js/concepts/error-handling)を参照してください。 |
 | `signatureVerification` | Bolt が Slack からの受信リクエストの署名を検証するかどうかを指定する真偽値。 デフォルトは `true` です。 |
 
 ### App オプション {#app-options}
@@ -88,20 +88,20 @@ App オプションは、`App` のコンストラクターに渡します。`rec
 
 | オプション  | 説明  |
 | :--- | :--- |
-| `receiver` | `Receiver` のインスタンス。受信イベントのパースとその処理を行います。[`Receiver` インターフェイス](/bolt-js/concepts/receiver)に準拠して、`init(app)`、`start()`、`stop()`を持つ必要があります。receiver について詳しくは、[ドキュメント](/bolt-js/concepts/receiver)を参照してください。 |
+| `receiver` | `Receiver` のインスタンス。受信イベントのパースとその処理を行います。[`Receiver` インターフェイス](/tools/bolt-js/concepts/receiver)に準拠して、`init(app)`、`start()`、`stop()`を持つ必要があります。receiver について詳しくは、[ドキュメント](/tools/bolt-js/concepts/receiver)を参照してください。 |
 | `agent` | オプションの HTTP `エージェント`。プロキシのサポートを設定する場合に使用します。カスタムの agent について詳しくは、[Node Slack SDK のドキュメント]/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent)を参照してください。 |
 | `clientTls` |  設定必須ではない文字列。HTTP クライアントリクエストにカスタムの TLS を設定する場合に指定します。`"pfx"`、`"key"`、`"passphrase"`、`"cert"`、`"ca"` のいずれかを指定します。 |
-| `convoStore` | ステートに関連する会話のデータを設定・取得するためのデータストア実装。`set()` で会話のステートを設定し、`get()` で取得します。デフォルトでは、アプリはインメモリのストアを利用できます。詳細とサンプルについては、[ドキュメント](/bolt-js/concepts/conversation-store)を参照してください。 |
+| `convoStore` | ステートに関連する会話のデータを設定・取得するためのデータストア実装。`set()` で会話のステートを設定し、`get()` で取得します。デフォルトでは、アプリはインメモリのストアを利用できます。詳細とサンプルについては、[ドキュメント](/tools/bolt-js/concepts/conversation-store)を参照してください。 |
 | `token` | アプリの設定（「Settings」>「Install App」）で指定した 文字列。Web API の呼び出しに必要です。`authorize`、`orgAuthorize`やOAuth 設定を使用する場合には指定しないでください。 |
 | `botId` | `authorize` が定義されていない場合に限り指定できる、設定必須ではない`botId`（例 :`B12345`）。ボットトークンの ID で、アプリ自身によって送信されたメッセージを無視するために使用されます。`xoxb` トークンがアプリに渡されている場合、アプリは [`auth.test` メソッド](/reference/methods/auth.test)を呼び出して、この値を自動的に取得します。 |
 | `botUserId` | `authorize` が定義されていない場合に限り指定できる、設定必須ではない`botUserId`。`botId` とは異なり、ボットユーザーに関連づけられたユーザー ID を指します。ダイレクトメンションを識別するために使用します。`xoxb` トークンがアプリに渡されている場合、アプリは [`auth.test` メソッド](/reference/methods/auth.test)を呼び出して、この値を自動的に取得します。 |
-| `authorize` | 複数のチームでのインストールをサポートする場合に使用する関数。どのトークンが受信イベントに関連づけられているかを判断するのに使用します。`authorize` 関数に渡される元データには、場合によって `userId`、`conversationId`、`enterpriseId`、`teamId`、`isEnterpriseInstall` が含まれます（受信イベントによって異なります）。`authorize` 関数は、`botToken`、`botId`、`botUserId`、または `userToken`を返します。[ビルトインの OAuth サポート](/bolt-js/concepts/authenticating-oauth)を使用する場合、`authorize` 関数は自動的に作成されるため、自分で渡す必要はありません。`authorize` 関数について詳しくは、こちらを参照してください。   |
-| `logger` | ビルトインのロガーの代わりにカスタムのロガーを渡すためのオプション。ロガーには特定のメソッドが実装されている必要があります。これには [`Logger` インターフェイス](https://github.com/slackapi/node-slack-sdk/blob/main/packages/logger/src/index.ts)で定義されている `setLevel(level:LogLevel)`、`getLevel()`、`setName(name: string)`、`debug(...msgs: any\[])`、`info(...msgs: any\[])`、`warn(...msgs: any\[])`、`error(...msgs: any\[])` があります。ログ出力の詳細については、[ドキュメント](/bolt-js/concepts/logging)を参照してください。  |
-| `logLevel` | 出力するログのレベルを指定するオプション。`LogLevel` の出力に含まれる情報のレベルには、重要度の低い順から高い順に `DEBUG`、`INFO`、`WARN`、`ERROR` があります。デフォルトの `logLevel` は `INFO` に設定されています。ログ出力の詳細については、[ドキュメント](/bolt-js/concepts/logging)を参照してください。 |
-| `extendedErrorHandler` | 真偽値を指定するオプションで、 `true` に設定するとさらなるリクエストのコンテキスト情報を含んだオブジェクトがグローバルエラーハンドラーに渡されます。 バージョン 3.8.0 から利用することができます。 デフォルトは `false` です。 より高度なエラーの処理に関する詳細は [API ドキュメント](/bolt-js/concepts/error-handling)を参照してください。 |
+| `authorize` | 複数のチームでのインストールをサポートする場合に使用する関数。どのトークンが受信イベントに関連づけられているかを判断するのに使用します。`authorize` 関数に渡される元データには、場合によって `userId`、`conversationId`、`enterpriseId`、`teamId`、`isEnterpriseInstall` が含まれます（受信イベントによって異なります）。`authorize` 関数は、`botToken`、`botId`、`botUserId`、または `userToken`を返します。[ビルトインの OAuth サポート](/tools/bolt-js/concepts/authenticating-oauth)を使用する場合、`authorize` 関数は自動的に作成されるため、自分で渡す必要はありません。`authorize` 関数について詳しくは、こちらを参照してください。   |
+| `logger` | ビルトインのロガーの代わりにカスタムのロガーを渡すためのオプション。ロガーには特定のメソッドが実装されている必要があります。これには [`Logger` インターフェイス](https://github.com/slackapi/node-slack-sdk/blob/main/packages/logger/src/index.ts)で定義されている `setLevel(level:LogLevel)`、`getLevel()`、`setName(name: string)`、`debug(...msgs: any\[])`、`info(...msgs: any\[])`、`warn(...msgs: any\[])`、`error(...msgs: any\[])` があります。ログ出力の詳細については、[ドキュメント](/tools/bolt-js/concepts/logging)を参照してください。  |
+| `logLevel` | 出力するログのレベルを指定するオプション。`LogLevel` の出力に含まれる情報のレベルには、重要度の低い順から高い順に `DEBUG`、`INFO`、`WARN`、`ERROR` があります。デフォルトの `logLevel` は `INFO` に設定されています。ログ出力の詳細については、[ドキュメント](/tools/bolt-js/concepts/logging)を参照してください。 |
+| `extendedErrorHandler` | 真偽値を指定するオプションで、 `true` に設定するとさらなるリクエストのコンテキスト情報を含んだオブジェクトがグローバルエラーハンドラーに渡されます。 バージョン 3.8.0 から利用することができます。 デフォルトは `false` です。 より高度なエラーの処理に関する詳細は [API ドキュメント](/tools/bolt-js/concepts/error-handling)を参照してください。 |
 | `ignoreSelf` | アプリ自身から発信されたメッセージをミドルウェアの関数で無視するかどうかを指定する真偽値。`botId` が必要です。デフォルトは `true` です。  |
 | `clientOptions.slackApiUrl` | Slack Web API で使用するエンドポイントをカスタマイズできます。これが使用されるのはほとんどがテスト用途です。 |
-| `socketMode` | 真偽値を指定するオプションで、`true` に設定するとアプリは[ソケットモード](/bolt-js/concepts/socket-mode)で起動します。ソケットモードは WebSocket のコネクションを通して Slack からのデータを受信する機能です。デフォルトは `false` です。
+| `socketMode` | 真偽値を指定するオプションで、`true` に設定するとアプリは[ソケットモード](/tools/bolt-js/concepts/socket-mode)で起動します。ソケットモードは WebSocket のコネクションを通して Slack からのデータを受信する機能です。デフォルトは `false` です。
 | `developerMode` | デベロッパーモードを有効にする真偽値です。 `true` に設定したとき、`logLevel` は `DEBUG`、 `socketMode` は `true` に自動的に設定されます。しかし、 これらの二つのプロパティを明示的に設定した場合、それらの設定が `developerMode` による設定よりも優先されます。さらに、デバッグをしやすくするためのカスタムの OAuth エラーハンドラーも提供されます。また、全ての Slack からのリクエストのボディがログ出力されるため、トークンのようなセンシティブな情報がログに含まれる可能性があります。デフォルトは `false` です。|
 | `deferInitialization` | アプリの初期化を遅延させる真偽値です。有効にすると非同期の `App#init()` メソッドを手動で呼び出す必要があります。 また `init()` メソッドは `App#start()` を実行する前に呼び出さなければなりません。 デフォルトは `false` です。 |
 | `signatureVerification` | Boltが着信リクエストでSlackの署名を検証する必要があるかどうかを決定するブール値。 デフォルトは`true`です。 |
@@ -124,7 +124,7 @@ Bolt では、さまざまなエラーが定義されています。これらに
 | `ReceiverMultipleAckError` | Receiver 内で、すでに確認が済んでいるリクエストに対してアプリがさらに `ack()` を呼んだ場合にスローされるエラーです。現在、デフォルトの `HTTPReceiver` でのみ使用されます。 |
 | `ReceiverAuthenticityError` | アプリのリクエストの署名が検証できないときにスローされるエラーです。このエラーには、失敗した理由を示す情報が含まれます（例 : タイムスタンプが有効でない、ヘッダーに抜けがある、署名シークレットが有効でない）。
 | `MultipleListenerError` | 単一のイベントに対して複数のリスナーでの処理中に複数のエラーが発生した場合にスローされるエラーです。個々のエラーを配列に収めた `originals` プロパティを持ちます。 |
-| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/bolt-js/legacy/steps-from-apps)を参照してください。  |
+| `WorkflowStepInitializationError` | 新しい `WorkflowStep` をインスタンス化する際に、設定オプションが無効な場合、または不足している場合にスローされるエラーです。原因として、`callback_id` が指定されていない、または設定オブジェクトが指定されていないことが考えられます。ワークフローステップについて詳しくは、[ドキュメント](/tools/bolt-js/legacy/steps-from-apps)を参照してください。  |
 | `UnknownError` | フレームワーク内でスローされる、特定のエラーコードを持たないエラーです。`original` プロパティで詳細を確認できます。 |
 
 > [errors.ts](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts) のコードで、エラー定義の部分とコンストラクターの部分を読み、参考にしてみてください。

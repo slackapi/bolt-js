@@ -10,7 +10,7 @@
 
 :::info
 
-Bolt 2.x からミドルウェアが `async` 関数をサポートしました！この変更については [2.x マイグレーションガイド](/bolt-js/migration/migration-v2)を参照してください。
+Bolt 2.x からミドルウェアが `async` 関数をサポートしました！この変更については [2.x マイグレーションガイド](/tools/bolt-js/migration/migration-v2)を参照してください。
 
 :::
 

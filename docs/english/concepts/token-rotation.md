@@ -8,7 +8,7 @@ Supported in Bolt for JavaScript as of v3.5.0, token rotation provides an extra 
 
 Instead of an access token representing an existing installation of your Slack app indefinitely, with token rotation enabled, access tokens expire. A refresh token acts as a long-lived way to refresh your access tokens.
 
-Bolt for JavaScript will rotate tokens automatically in response to incoming events so long as the [built-in OAuth](/bolt-js/concepts/authenticating-oauth) functionality is used.
+Bolt for JavaScript will rotate tokens automatically in response to incoming events so long as the [built-in OAuth](/tools/bolt-js/concepts/authenticating-oauth) functionality is used.
 
 To rotate tokens on a separate schedule, consider implementing the `InstallProvider` from the [`@slack/oauth`]/node-slack-sdk/oauth) package for use of the provided `authorize` method:
 

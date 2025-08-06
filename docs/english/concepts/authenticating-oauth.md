@@ -194,7 +194,7 @@ the app settings are needed and changes to these routes might be desired.
 :::info
 
 Bolt for JavaScript does not support OAuth for
-[custom receivers](/bolt-js/concepts/receiver). If you're implementing a custom
+[custom receivers](/tools/bolt-js/concepts/receiver). If you're implementing a custom
 receiver, you can instead use our [`@slack/oauth`][oauth-node] package, which is
 what Bolt for JavaScript uses under the hood.
 

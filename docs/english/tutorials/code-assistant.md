@@ -380,7 +380,7 @@ This is the meat of our app! Here's a breakdown of what we've added:
 
 * `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model. Think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
 * `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](/reference/block-kit/blocks/markdown-block) to achieve the same result.
-* `assistant` is an instance of the [`Assistant` class](/bolt-js/concepts/ai-apps#the-assistant-class-instance); this sets up the suggested prompts that the user sees in the split-view container upon opening your app.
+* `assistant` is an instance of the [`Assistant` class](/tools/bolt-js/concepts/ai-apps#the-assistant-class-instance); this sets up the suggested prompts that the user sees in the split-view container upon opening your app.
 * `userMessage` is the handler that takes care of the fiddly bits around getting the thread history, preparing the structure of the messages for processing in a way that the model is expecting, interacting with the model, and responding to the user.
 * `app.function` sets up the custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 This is the implementation logic of the custom workflow step we saw created by the manifest in the app settings. We use the [`conversations.history`](/reference/methods/conversations.history) method to find the message where the emoji reaction was placed, then send that to the model as the question.
 

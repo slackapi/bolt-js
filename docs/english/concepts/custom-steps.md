@@ -63,13 +63,13 @@ app.function('sample_custom_step', async ({ inputs, complete, fail, logger }) =>
 
 Your app's custom steps may create interactivity points for users, for example: Post a message with a button
 
-If such interaction points originate from a custom step execution, the events sent to your app representing the end-user interaction with these points are considered to be _function-scoped interactivity events_. These interactivity events can be handled by your app using the same concepts we covered earlier, such as [Listening to actions](/bolt-js/concepts/actions).
+If such interaction points originate from a custom step execution, the events sent to your app representing the end-user interaction with these points are considered to be _function-scoped interactivity events_. These interactivity events can be handled by your app using the same concepts we covered earlier, such as [Listening to actions](/tools/bolt-js/concepts/actions).
 
 _function-scoped interactivity events_ will contain data related to the custom step (`function_executed` event) they were spawned from, such as custom step `inputs` and access to `complete()` and `fail()` listener arguments.
 
 Your app can skip calling `complete()` or `fail()` in the `function()` handler method if the custom step creates an interaction point that requires user interaction before the step can end. However, in the relevant interactivity handler method, your app must invoke `complete()` or `fail()` to notify Slack that the custom step has been processed.
 
-You’ll notice in all interactivity handler examples, `ack()` is used. It is required to call the `ack()` function within an interactivity listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/bolt-js/concepts/acknowledge).
+You’ll notice in all interactivity handler examples, `ack()` is used. It is required to call the `ack()` function within an interactivity listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/tools/bolt-js/concepts/acknowledge).
 
 ```js
 /** This sample custom step posts a message with a button */
@@ -154,4 +154,4 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
 }
 ```
 
-Learn more about responding to interactivity, see the [Slack API documentation](/bolt-js/concepts/custom-steps#listening-to-custom-step-interactivity-events).
+Learn more about responding to interactivity, see the [Slack API documentation](/tools/bolt-js/concepts/custom-steps#listening-to-custom-step-interactivity-events).

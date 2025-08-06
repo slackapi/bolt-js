@@ -14,7 +14,7 @@ If you use `command()` multiple times with overlapping RegExp matches, _all_ mat
 
 Commands must be acknowledged with `ack()` to inform Slack your app has received the request.
 
-There are two ways to respond to slash commands. The first way is to use `say()`, which accepts a string or JSON payload. The second is `respond()` which is a utility for the `response_url`. These are explained in more depth in the [responding to actions](/bolt-js/concepts/actions) section.
+There are two ways to respond to slash commands. The first way is to use `say()`, which accepts a string or JSON payload. The second is `respond()` which is a utility for the `response_url`. These are explained in more depth in the [responding to actions](/tools/bolt-js/concepts/actions) section.
 
 When configuring commands within your app configuration, you'll continue to append `/slack/events` to your request URL.
 

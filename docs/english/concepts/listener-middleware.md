@@ -6,7 +6,7 @@ slug: /bolt-js/concepts/listener-middleware
 
 Listener middleware is used for logic across many listener functions (but usually not all of them). They are added as arguments before the listener function in one of the built-in methods. You can add any number of listener middleware before the listener function.
 
-There’s a collection of [built-in listener middleware](/bolt-js/reference#built-in-listener-middleware-functions) that you can use like `directMention` which filters out any message that doesn’t directly @-mention your bot at the start of a message.
+There’s a collection of [built-in listener middleware](/tools/bolt-js/reference#built-in-listener-middleware-functions) that you can use like `directMention` which filters out any message that doesn’t directly @-mention your bot at the start of a message.
 
 But of course, you can write your own middleware for more custom functionality. While writing your own middleware, your function must call `await next()` to pass control to the next middleware, or `throw` to pass an error back up the previously-executed middleware chain.
 
