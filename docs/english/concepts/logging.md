@@ -1,8 +1,4 @@
----
-title: Logging
-lang: en
-slug: /bolt-js/concepts/logging
----
+# Logging
 
 By default, Bolt for JavaScript will log information from your app to the console. You can customize how much logging occurs by passing a `logLevel` in the constructor. The available log levels in order of most to least logs are `DEBUG`, `INFO`, `WARN`, and `ERROR`.
 

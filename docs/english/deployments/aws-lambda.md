@@ -1,7 +1,4 @@
----
-title: Deploying to AWS Lambda
-lang: en
----
+# Deploying to AWS Lambda
 
 This guide walks you through preparing and deploying a Slack app using Bolt for JavaScript, the [Serverless Framework](https://serverless.com/), and [AWS Lambda](https://aws.amazon.com/lambda/).
 

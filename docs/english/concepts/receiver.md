@@ -1,8 +1,4 @@
----
-title: Customizing a receiver
-lang: en
-slug: /bolt-js/concepts/receiver
----
+# Customizing a receiver
 
 ## Writing a custom receiver
 

@@ -1,8 +1,4 @@
----
-title: Listener middleware
-lang: en
-slug: /bolt-js/concepts/listener-middleware
----
+# Listener middleware
 
 Listener middleware is used for logic across many listener functions (but usually not all of them). They are added as arguments before the listener function in one of the built-in methods. You can add any number of listener middleware before the listener function.
 

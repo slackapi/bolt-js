@@ -1,8 +1,4 @@
----
-title: Adding context
-lang: en
-slug: /bolt-js/concepts/context
----
+# Adding context
 
 All listeners have access to a `context` object, which can be used to enrich requests with additional information. For example, perhaps you want to add user information from a third party system or add temporary state for the next middleware in the chain.
 

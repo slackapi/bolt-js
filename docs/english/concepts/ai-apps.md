@@ -1,8 +1,4 @@
----
-title: Using AI in Apps
-lang: en
-slug: /bolt-js/concepts/ai-apps
----
+# Using AI in Apps
 
 :::info[This feature requires a paid plan]
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.

@@ -1,7 +1,4 @@
----
-title: Deploying to Heroku
-lang: en
----
+# Deploying to Heroku
 
 This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the [Heroku platform](https://heroku.com/). Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.
 

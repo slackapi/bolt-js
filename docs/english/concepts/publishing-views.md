@@ -1,8 +1,4 @@
----
-title: Publishing views to App Home
-lang: en
-slug: /bolt-js/concepts/publishing-views
----
+# Publishing views to App Home
 
 [Home tabs](/surfaces/app-home) are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and [view payload](/reference/views/home-tab-views) to the [`views.publish`](/reference/methods/views.publish/) method.
 

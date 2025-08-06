@@ -1,8 +1,4 @@
----
-title: Listening to messages
-lang: en
-slug: /bolt-js/concepts/message-listening
----
+# Listening to messages
 
 To listen to messages that [your app has access to receive](https:///messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message` .A `message()` listener is equivalent to `event('message')`
 

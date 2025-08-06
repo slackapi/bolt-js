@@ -1,8 +1,4 @@
----
-title: Migrating to V4
-slug: /bolt-js/migration/migration-v4
-lang: en
----
+# Migrating to V4
 
 This guide will walk you through the process of updating your app from using `@slack/bolt@3.x` to `@slack/bolt@4.x`. There may be a few changes you'll need to make depending on which features you use, but for most apps, these changes can be applied in a few minutes. Some apps may need no changes at all.
 

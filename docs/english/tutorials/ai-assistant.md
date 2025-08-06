@@ -1,8 +1,4 @@
----
-title: AI Assistant
-slug: /bolt-js/tutorials/ai-assistant
-lang: en
----
+# AI Assistant
 
 In this tutorial, you will create an app, enable the features to take advantage of platform AI capabilities, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.
 

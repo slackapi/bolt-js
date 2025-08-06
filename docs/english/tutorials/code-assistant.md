@@ -1,8 +1,4 @@
----
-title: AI Code Assistant with Hugging Face
-slug: /bolt-js/tutorials/code-assistant
-lang: en
----
+# AI Code Assistant with Hugging Face
 
 In this tutorial, we will create an [app that has platform AI features enabled](/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
 

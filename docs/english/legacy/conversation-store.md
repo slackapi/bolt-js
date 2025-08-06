@@ -1,8 +1,4 @@
----
-title: Conversation stores
-lang: en
-slug: /bolt-js/concepts/conversation-store
----
+# Conversation stores
 
 Bolt for JavaScript includes support for a store, which sets and retrieves state related to a conversation. 
 

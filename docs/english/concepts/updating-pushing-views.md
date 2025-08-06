@@ -1,8 +1,4 @@
----
-title: Updating & pushing views
-lang: en
-slug: /bolt-js/concepts/updating-pushing-views
----
+# Updating & pushing views
 
 Modals contain a stack of views. When you call the [`views.open`](/reference/methods/views.open/) method, you add the root view to the modal. After the initial call, you can dynamically update a view by calling the [`views.update`](/reference/methods/views.update) method, or stack a new view on top of the root view by calling the [`views.push`](/reference/methods/views.push) method.
 

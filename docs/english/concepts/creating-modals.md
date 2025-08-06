@@ -1,8 +1,4 @@
----
-title: Opening modals
-lang: en
-slug: /bolt-js/concepts/creating-modals
----
+# Opening modals
 
 [Modals](/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](/reference/views/modal-views) to the built-in client's [`views.open`](/reference/methods/views.open/) method. 
 

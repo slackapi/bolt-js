@@ -1,7 +1,4 @@
----
-title: Custom Steps for Workflow Builder (existing app)
-slug: /bolt-js/tutorials/custom-steps-workflow-builder-existing
----
+# Custom Steps for Workflow Builder (existing app)
 
 :::info[This feature requires a paid plan]
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.

@@ -1,8 +1,4 @@
----
-title: Listening to views
-lang: en
-slug: /bolt-js/concepts/view-submissions
----
+# Listening to views
 
 You may listen for user interactions with views using the `view` method. 
 

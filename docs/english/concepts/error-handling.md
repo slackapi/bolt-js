@@ -1,8 +1,4 @@
----
-title: Handling errors
-lang: en
-slug: /bolt-js/concepts/error-handling
----
+# Handling errors
 
 :::info
 

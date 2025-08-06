@@ -1,8 +1,4 @@
----
-title: Listening & responding to select menu options
-lang: en
-slug: /bolt-js/concepts/options
----
+# Listening & responding to select menu options
 
 The `options()` method listens for incoming option request payloads from Slack. Similar to the [`action()`](/tools/bolt-js/concepts/actions) method,
 an `action_id` or constraints object is required.

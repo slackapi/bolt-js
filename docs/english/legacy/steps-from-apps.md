@@ -1,8 +1,4 @@
----
-title: Steps from Apps
-lang: en
-slug: /bolt-js/legacy/steps-from-apps
----
+# Steps from Apps
 
 :::danger
 

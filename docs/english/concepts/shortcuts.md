@@ -1,8 +1,4 @@
----
-title: Listening & responding to shortcuts
-lang: en
-slug: /bolt-js/concepts/shortcuts
----
+# Listening & responding to shortcuts
 
 The `shortcut()` method supports both [global shortcuts](/interactivity/implementing-shortcuts#shortcut-types) and [message shortcuts](/interactivity/implementing-shortcuts#messages).
 

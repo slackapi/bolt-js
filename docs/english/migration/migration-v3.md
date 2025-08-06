@@ -1,8 +1,4 @@
----
-title: Migrating to V3
-slug: /bolt-js/migration/migration-v3
-lang: en
----
+# Migrating to V3
 
 End of life for `@slack/bolt@2.x` was **May 31st, 2021**. Development has been fully stopped for `@slack/bolt@2.x` and all remaining open issues and pull requests have been closed. 
 

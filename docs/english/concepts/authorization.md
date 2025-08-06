@@ -1,8 +1,4 @@
----
-title: Authorization
-lang: en
-slug: /bolt-js/concepts/authorization
----
+# Authorization
 
 Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming request.
 
