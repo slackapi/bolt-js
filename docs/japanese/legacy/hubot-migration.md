@@ -174,7 +174,7 @@ Hubot には、brain と呼ばれるメモリ内ストレージがあります�
 
 アプリのインスタンスが複数実行されている場合、組み込みの conversation store はプロセス間で共有されないため、データベースから conversation の状態を取得する conversation store を実装することをおすすめします。
 
-[会話ストアについてもっと詳しく読む](/tools/bolt-js/concepts/conversation-store).
+[会話ストアについてもっと詳しく読む](/tools/bolt-js/legacy/conversation-store).
 
 ## 次のステップ {#next-steps}
 ここまで来れば、きっと Hubot アプリを Bolt アプリに変換できているはずです！✨⚡

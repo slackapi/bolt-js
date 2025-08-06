@@ -214,7 +214,7 @@ A new `auto_acknowledge` flag allows you more granular control over whether spec
 
 #### Example {#bolt-js}
 
-In [Bolt for JavaScript](tools/bolt-js/), you can pass an `{ autoAcknowledge: false }` options object to a function listener. This allows you to manually control when the `await ack()` helper function is executed and implement synchronous `function_executed` event handling.
+In [Bolt for JavaScript](/tools/bolt-js/), you can pass an `{ autoAcknowledge: false }` options object to a function listener. This allows you to manually control when the `await ack()` helper function is executed and implement synchronous `function_executed` event handling.
 
 ```js
 app.function('get-projects', { autoAcknowledge: false }, async ({ ack, complete }) => {

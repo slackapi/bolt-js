@@ -91,7 +91,7 @@ App オプションは、`App` のコンストラクターに渡します。`rec
 | `receiver` | `Receiver` のインスタンス。受信イベントのパースとその処理を行います。[`Receiver` インターフェイス](/tools/bolt-js/concepts/receiver)に準拠して、`init(app)`、`start()`、`stop()`を持つ必要があります。receiver について詳しくは、[ドキュメント](/tools/bolt-js/concepts/receiver)を参照してください。 |
 | `agent` | オプションの HTTP `エージェント`。プロキシのサポートを設定する場合に使用します。カスタムの agent について詳しくは、[Node Slack SDK のドキュメント](/tools/node-slack-sdk/web-api#proxy-requests-with-a-custom-agent)を参照してください。 |
 | `clientTls` |  設定必須ではない文字列。HTTP クライアントリクエストにカスタムの TLS を設定する場合に指定します。`"pfx"`、`"key"`、`"passphrase"`、`"cert"`、`"ca"` のいずれかを指定します。 |
-| `convoStore` | ステートに関連する会話のデータを設定・取得するためのデータストア実装。`set()` で会話のステートを設定し、`get()` で取得します。デフォルトでは、アプリはインメモリのストアを利用できます。詳細とサンプルについては、[ドキュメント](/tools/bolt-js/concepts/conversation-store)を参照してください。 |
+| `convoStore` | ステートに関連する会話のデータを設定・取得するためのデータストア実装。`set()` で会話のステートを設定し、`get()` で取得します。デフォルトでは、アプリはインメモリのストアを利用できます。詳細とサンプルについては、[ドキュメント](/tools/bolt-js/legacy/conversation-store)を参照してください。 |
 | `token` | アプリの設定（「Settings」>「Install App」）で指定した 文字列。Web API の呼び出しに必要です。`authorize`、`orgAuthorize`やOAuth 設定を使用する場合には指定しないでください。 |
 | `botId` | `authorize` が定義されていない場合に限り指定できる、設定必須ではない`botId`（例 :`B12345`）。ボットトークンの ID で、アプリ自身によって送信されたメッセージを無視するために使用されます。`xoxb` トークンがアプリに渡されている場合、アプリは [`auth.test` メソッド](/reference/methods/auth.test)を呼び出して、この値を自動的に取得します。 |
 | `botUserId` | `authorize` が定義されていない場合に限り指定できる、設定必須ではない`botUserId`。`botId` とは異なり、ボットユーザーに関連づけられたユーザー ID を指します。ダイレクトメンションを識別するために使用します。`xoxb` トークンがアプリに渡されている場合、アプリは [`auth.test` メソッド](/reference/methods/auth.test)を呼び出して、この値を自動的に取得します。 |

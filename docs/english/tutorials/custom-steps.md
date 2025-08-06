@@ -67,7 +67,7 @@ Field | Type | Description
 `type` | String | Defines the data type and can fall into one of two categories: primitives or Slack-specific. 
 `title` | String | The label that appears in Workflow Builder when a user sets up this step in their workflow.
 `description` | String | The description that accompanies the input when a user sets up this step in their workflow.
-`dynamic_options` | Object | For custom steps dynamic options in Workflow Builder, define this property and point to a custom step designed to return the set of dynamic elements once the step is added to a workflow within Workflow Builder. Dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields. Refer to custom steps dynamic options for Workflow Builder using [Bolt for JavaScript](tools/bolt-js/concepts/custom-steps-dynamic-options) or [Bolt for Python](tools/bolt-python/concepts/custom-steps-dynamic-options) for more details.
+`dynamic_options` | Object | For custom steps dynamic options in Workflow Builder, define this property and point to a custom step designed to return the set of dynamic elements once the step is added to a workflow within Workflow Builder. Dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields. Refer to custom steps dynamic options for Workflow Builder using [Bolt for JavaScript](/tools/bolt-js/concepts/custom-steps-dynamic-options) or [Bolt for Python](/tools/bolt-python/concepts/custom-steps-dynamic-options) for more details.
 `is_required` | Boolean | Indicates whether or not the input is required by the step in order to run. If it’s required and not provided, the user will not be able to save the configuration nor use the step in their workflow. This property is available only in v1 of the manifest. We recommend v2, using the `required` array as noted in the example above.
 `hint` | String | Helper text that appears below the input when a user sets up this step in their workflow.
 
@@ -259,7 +259,7 @@ Not sure where to host your app? We recommend following the [Heroku Deployment G
 
 ### Control step access {#access}
 
-You can choose who has access to your custom steps. To define this, refer to the [custom function access](/deno-slack-sdk/guides/controlling-access-to-custom-functions) page.
+You can choose who has access to your custom steps. To define this, refer to the [custom function access](/tools/deno-slack-sdk/guides/controlling-access-to-custom-functions) page.
 
 ### Distribution {#distribution}
 

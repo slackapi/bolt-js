@@ -695,13 +695,13 @@ for additional details for common error codes.
 
 [add-to-slack]: https://github.com/slackapi/tools/node-slack-sdk/blob/main/packages/oauth/src/default-render-html-for-install-path.ts
 [app-settings]: https://api.slack.com/apps
-[authorization]: /bolt-js/concepts/authorization
+[authorization]: /tools/bolt-js/concepts/authorization
 [callback-default-failure]: https://github.com/slackapi/tools/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L127-L162
 [callback-default-success]: https://github.com/slackapi/tools/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L125
 [callback-options]: /tools/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
 [callback-options-default]: https://github.com/slackapi/tools/node-slack-sdk/blob/e5a4f3fbbd4f6aad9fdd415976f80668b01fd442/packages/oauth/src/callback-options.ts#L81-L162
 [callbacks]: /tools/node-slack-sdk/reference/oauth/interfaces/CallbackOptions
-[custom-routes]: /bolt-js/concepts/custom-routes
+[custom-routes]: /tools/bolt-js/concepts/custom-routes
 [direct-install]: https://github.com/slackapi/bolt-js/blob/5b4d9ceb65e6bf5cf29dfa58268ea248e5466bfb/examples/oauth/app.js#L58-L64
 [errors]: /authentication/installing-with-oauth#errors
 [examples]: https://github.com/slackapi/bolt-js/tree/main/examples/oauth

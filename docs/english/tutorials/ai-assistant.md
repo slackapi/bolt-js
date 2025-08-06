@@ -98,7 +98,7 @@ const { config } = require('dotenv');
 const { InferenceClient } = require('@huggingface/inference');
 ```
 
-Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/tools/bolt-js/concepts/assistant) that simplifies handling incoming events related to the app assistant.
+Most notably are the `@huggingface/inference` module to be able to communicate with Hugging Face and the Bolt Assistant class. The Assistant class is a [Bolt feature](/tools/bolt-js/concepts/ai-apps) that simplifies handling incoming events related to the app assistant.
 
 Next, we initialize the app and our `hfClient` variable with the tokens we previously saved as environment variables in the `.env` file.
 
