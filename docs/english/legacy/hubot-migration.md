@@ -162,7 +162,7 @@ The default, built-in conversation store uses an in-memory store similar to Hubo
 
 If there is more than one instance of your app running, the built-in conversation store will not be shared among the processes so you’ll want to implement a conversation store that fetches conversation state from a database.
 
-[Read more about conversation stores](/tools/bolt-js/concepts/conversation-store).
+[Read more about conversation stores](/tools/bolt-js/legacy/conversation-store).
 
 ## Next steps {#next-steps}
 If you’ve made it this far, it means you’ve likely converted your Hubot app into a Bolt for JavaScript app! ✨⚡
