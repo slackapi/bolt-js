@@ -28,6 +28,7 @@
     "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
+    "docs": "npx typedoc --plugin typedoc-plugin-markdown",
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
@@ -70,6 +71,8 @@
     "source-map-support": "^0.5.12",
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
+    "typedoc": "^0.28.7",
+    "typedoc-plugin-markdown": "^4.7.0",
     "typescript": "5.3.3"
   },
   "peerDependencies": {
