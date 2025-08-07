@@ -19,7 +19,7 @@ export * from './workflow-step-edit';
  * TODO: BlockAction's default generic parameter (ElementAction) might be too specific to allow for this type to be used
  * as a constraint on SlackActionMiddlewareArgs' Action generic parameter.
  *
- * If someone were to instantiate `SlackActionMiddlewareArgs<BlockAction<SomeNewAction>>`, would it work? We need it to
+ * If someone were to instantiate , would it work? We need it to
  * work as long as SomeNewAction implements BasicElementAction.
  *
  * We don't want to substitute BlockAction with `BlockAction<BasicElementAction>` here because that means the completions
