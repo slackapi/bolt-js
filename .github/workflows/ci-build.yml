@@ -19,7 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version:
+          - 18.x
+          - 20.x
+          - 22.17.1
+          - 22.18.0
     permissions:
       contents: read
     steps:
