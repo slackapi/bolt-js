@@ -1,6 +1,6 @@
+import path from 'node:path';
 // import type { SlackEvent } from '@slack/types';
 import { assert } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ErrorCode } from '../../../src/errors';
@@ -15,6 +15,7 @@ import {
   createDummyMemberChannelEventMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
   createDummyReactionAddedEventMiddlewareArgs,
+  proxyquire,
   wrapMiddleware,
 } from '../helpers';
 
@@ -28,7 +29,8 @@ const ts = '1234.56';
 const channel = 'C1234';
 
 async function importBuiltin(overrides: Override = {}): Promise<typeof import('../../../src/middleware/builtin')> {
-  return rewiremock.module(() => import('../../../src/middleware/builtin'), overrides);
+  const absolutePath = path.resolve(__dirname, '../../../src/middleware/builtin');
+  return proxyquire(absolutePath, overrides);
 }
 
 describe('Built-in global middleware', () => {

@@ -1,10 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
+import path from 'node:path';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import App from '../../../src/App';
 import { AppInitializationError, AuthorizationError, CustomRouteInitializationError } from '../../../src/errors';
@@ -17,6 +17,7 @@ import {
   delay,
   mergeOverrides,
   type noopVoid,
+  proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
@@ -25,7 +26,8 @@ import {
 async function importSocketModeReceiver(
   overrides: Override = {},
 ): Promise<typeof import('../../../src/receivers/SocketModeReceiver').default> {
-  return (await rewiremock.module(() => import('../../../src/receivers/SocketModeReceiver'), overrides)).default;
+  const absolutePath = path.resolve(__dirname, '../../../src/receivers/SocketModeReceiver');
+  return proxyquire(absolutePath, overrides).default;
 }
 
 describe('SocketModeReceiver', () => {

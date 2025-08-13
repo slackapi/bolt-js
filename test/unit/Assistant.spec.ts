@@ -1,7 +1,7 @@
+import path from 'node:path';
 import type { AssistantThreadStartedEvent } from '@slack/types';
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import {
   type AllAssistantMiddlewareArgs,
@@ -20,12 +20,14 @@ import {
   createDummyAssistantThreadStartedEventMiddlewareArgs,
   createDummyAssistantUserMessageEventMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
+  proxyquire,
   wrapMiddleware,
 } from './helpers';
 import { team } from './helpers/events';
 
 async function importAssistant(overrides: Override = {}): Promise<typeof import('../../src/Assistant')> {
-  return rewiremock.module(() => import('../../src/Assistant'), overrides);
+  const absolutePath = path.resolve(__dirname, '../../src/Assistant');
+  return proxyquire(absolutePath, overrides);
 }
 
 const MOCK_FN = async () => {};

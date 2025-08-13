@@ -1,6 +1,6 @@
+import path from 'node:path';
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import {
   type AllWorkflowStepMiddlewareArgs,
@@ -14,10 +14,11 @@ import {
 } from '../../src/WorkflowStep';
 import { WorkflowStepInitializationError } from '../../src/errors';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
-import { type Override, noopVoid } from './helpers';
+import { type Override, noopVoid, proxyquire } from './helpers';
 
 async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('../../src/WorkflowStep')> {
-  return rewiremock.module(() => import('../../src/WorkflowStep'), overrides);
+  const absolutePath = path.resolve(__dirname, '../../src/WorkflowStep');
+  return proxyquire(absolutePath, overrides);
 }
 
 const MOCK_CONFIG_SINGLE = {

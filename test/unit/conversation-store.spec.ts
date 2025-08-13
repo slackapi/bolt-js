@@ -1,10 +1,10 @@
+import path from 'node:path';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
 import { assert, AssertionError } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
-import { type Override, createFakeLogger, delay } from './helpers';
+import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
 
 /* Testing Harness */
 
@@ -24,7 +24,8 @@ interface DummyContext<ConversationState> {
 async function importConversationStore(
   overrides: Override = {},
 ): Promise<typeof import('../../src/conversation-store')> {
-  return rewiremock.module(() => import('../../src/conversation-store'), overrides);
+  const absolutePath = path.resolve(__dirname, '../../src/conversation-store');
+  return proxyquire(absolutePath, overrides);
 }
 
 // Composable overrides

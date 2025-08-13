@@ -1,6 +1,7 @@
+import path from 'node:path';
 import type { AuthTestResponse, WebClientOptions } from '@slack/web-api';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
+import { proxyquire } from './index';
 
 /*
  * Contains test helpers related to importing, mocking and overriding parts of the App class
@@ -39,7 +40,8 @@ function mergeObjProperties(first: Override, second: Override): Override {
 export async function importApp(
   overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
 ): Promise<typeof import('../../../src/App').default> {
-  return (await rewiremock.module(() => import('../../../src/App'), overrides)).default;
+  const absolutePath = path.resolve(__dirname, '../../../src/App');
+  return proxyquire(absolutePath, overrides).default;
 }
 
 // Composable overrides

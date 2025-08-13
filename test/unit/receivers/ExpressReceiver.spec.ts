@@ -1,10 +1,10 @@
 import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
+import path from 'node:path';
 import { Readable } from 'node:stream';
 import type { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { Application, IRouter, Request, Response } from 'express';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';
 import {
@@ -26,6 +26,7 @@ import {
   type Override,
   createFakeLogger,
   mergeOverrides,
+  proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
@@ -34,7 +35,8 @@ import {
 async function importExpressReceiver(
   overrides: Override = {},
 ): Promise<typeof import('../../../src/receivers/ExpressReceiver').default> {
-  return (await rewiremock.module(() => import('../../../src/receivers/ExpressReceiver'), overrides)).default;
+  const absolutePath = path.resolve(__dirname, '../../../src/receivers/ExpressReceiver');
+  return proxyquire(absolutePath, overrides).default;
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: accept any kind of mock response
@@ -56,6 +58,7 @@ describe('ExpressReceiver', () => {
   let fakeServer: FakeServer;
   let fakeCreateServer: sinon.SinonSpy;
   let overrides: Override;
+
   beforeEach(() => {
     fakeServer = new FakeServer();
     fakeCreateServer = sinon.fake.returns(fakeServer);

@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
+import path from 'node:path';
 import { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import {
   AppInitializationError,
@@ -17,6 +17,7 @@ import {
   createFakeLogger,
   mergeOverrides,
   type noopVoid,
+  proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
@@ -25,7 +26,8 @@ import {
 async function importHTTPReceiver(
   overrides: Override = {},
 ): Promise<typeof import('../../../src/receivers/HTTPReceiver').default> {
-  return (await rewiremock.module(() => import('../../../src/receivers/HTTPReceiver'), overrides)).default;
+  const absolutePath = path.resolve(__dirname, '../../../src/receivers/HTTPReceiver');
+  return proxyquire(absolutePath, overrides).default;
 }
 
 describe('HTTPReceiver', () => {

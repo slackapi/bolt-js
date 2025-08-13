@@ -3,6 +3,9 @@ import sinon from 'sinon';
 import type { ConversationStore } from '../../../src/conversation-store';
 import type { NextFn } from '../../../src/types';
 
+import proxyquire from 'proxyquire';
+export { proxyquire };
+
 export * from './app';
 export * from './events';
 export * from './receivers';
