@@ -22,8 +22,7 @@ jobs:
         node-version:
           - 18.x
           - 20.x
-          - 22.17.1
-          - 22.18.0
+          - 22.17.1 # https://github.com/slackapi/bolt-js/pull/2628
     permissions:
       contents: read
     steps:
