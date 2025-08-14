@@ -1,10 +1,10 @@
+import path from 'node:path';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
 import { assert, AssertionError } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
-import { type Override, createFakeLogger, delay } from './helpers';
+import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
 
 /* Testing Harness */
 
@@ -21,10 +21,9 @@ interface DummyContext<ConversationState> {
 }
 
 // Loading the system under test using overrides
-async function importConversationStore(
-  overrides: Override = {},
-): Promise<typeof import('../../src/conversation-store')> {
-  return rewiremock.module(() => import('../../src/conversation-store'), overrides);
+function importConversationStore(overrides: Override = {}): typeof import('../../src/conversation-store') {
+  const absolutePath = path.resolve(__dirname, '../../src/conversation-store');
+  return proxyquire(absolutePath, overrides);
 }
 
 // Composable overrides
@@ -55,9 +54,7 @@ describe('conversationContext middleware', () => {
     const fakeLogger = createFakeLogger();
     const fakeNext = sinon.fake();
     const dummyContext: DummyContext<void> = {};
-    const { conversationContext } = await importConversationStore(
-      withGetTypeAndConversation(fakeGetTypeAndConversation),
-    );
+    const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
       body: {},
       context: dummyContext,
@@ -90,9 +87,7 @@ describe('conversationContext middleware', () => {
     const fakeLogger = createFakeLogger();
     const fakeNext = sinon.fake();
     const dummyContext: DummyContext<symbol> = {};
-    const { conversationContext } = await importConversationStore(
-      withGetTypeAndConversation(fakeGetTypeAndConversation),
-    );
+    const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
       body: {},
       context: dummyContext,
@@ -127,9 +122,7 @@ describe('conversationContext middleware', () => {
     const fakeLogger = createFakeLogger();
     const fakeNext = sinon.fake();
     const dummyContext: DummyContext<symbol> = {};
-    const { conversationContext } = await importConversationStore(
-      withGetTypeAndConversation(fakeGetTypeAndConversation),
-    );
+    const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
       body: {},
       context: dummyContext,
@@ -166,9 +159,7 @@ describe('conversationContext middleware', () => {
     const fakeLogger = createFakeLogger();
     const fakeNext = sinon.fake();
     const dummyContext: DummyContext<symbol> = {};
-    const { conversationContext } = await importConversationStore(
-      withGetTypeAndConversation(fakeGetTypeAndConversation),
-    );
+    const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
       body: {},
       context: dummyContext,
@@ -198,7 +189,7 @@ describe('MemoryStore', () => {
   describe('constructor', () => {
     it('should initialize successfully', async () => {
       // Arrange
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = importConversationStore();
 
       // Act
       const store = new MemoryStore();
@@ -216,7 +207,7 @@ describe('MemoryStore', () => {
       // Arrange
       const dummyConversationState = Symbol();
       const dummyConversationId = 'CONVERSATION_ID';
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = importConversationStore();
 
       // Act
       const store = new MemoryStore();
@@ -229,7 +220,7 @@ describe('MemoryStore', () => {
 
     it('should reject lookup of conversation state when the conversation is not stored', async () => {
       // Arrange
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = importConversationStore();
 
       // Act
       const store = new MemoryStore();
@@ -248,7 +239,7 @@ describe('MemoryStore', () => {
       const dummyConversationId = 'CONVERSATION_ID';
       const dummyConversationState = Symbol();
       const expiresInMs = 5;
-      const { MemoryStore } = await importConversationStore();
+      const { MemoryStore } = importConversationStore();
 
       // Act
       const store = new MemoryStore();

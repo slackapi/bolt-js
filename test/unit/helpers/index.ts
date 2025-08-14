@@ -1,7 +1,12 @@
 import { ConsoleLogger } from '@slack/logger';
+import proxyquire from 'proxyquire';
 import sinon from 'sinon';
 import type { ConversationStore } from '../../../src/conversation-store';
 import type { NextFn } from '../../../src/types';
+
+// Ensure that the module gets loaded fresh every time
+proxyquire.noPreserveCache();
+export { proxyquire };
 
 export * from './app';
 export * from './events';

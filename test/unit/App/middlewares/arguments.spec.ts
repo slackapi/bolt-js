@@ -57,7 +57,7 @@ describe('App middleware and listener arguments', () => {
     it('should extract valid enterprise_id in a shared channel #935', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const fakeHandler = sinon.fake();
 
       const app = new MockApp({
@@ -94,7 +94,7 @@ describe('App middleware and listener arguments', () => {
     it('should be skipped for tokens_revoked events #674', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const fakeAuthorize = sinon.fake.resolves({});
       const fakeHandler = sinon.fake();
 
@@ -135,7 +135,7 @@ describe('App middleware and listener arguments', () => {
     it('should be skipped for app_uninstalled events #674', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const fakeAuthorize = sinon.fake.resolves({});
       const fakeHandler = sinon.fake();
 
@@ -178,7 +178,7 @@ describe('App middleware and listener arguments', () => {
       const action_id = 'block_action_id';
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
 
       const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       app.action(action_id, async ({ respond }) => {
@@ -213,7 +213,7 @@ describe('App middleware and listener arguments', () => {
       const action_id = 'block_action_id';
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
 
       const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       app.action(action_id, async ({ respond }) => {
@@ -245,7 +245,7 @@ describe('App middleware and listener arguments', () => {
       const responseUrl = 'https://fake.slack/response_url';
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
 
       const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       app.view('view-id', async ({ respond }) => {
@@ -279,7 +279,7 @@ describe('App middleware and listener arguments', () => {
 
   describe('logger', () => {
     it('should be available in middleware/listener args', async () => {
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const fakeLogger = createFakeLogger();
       const app = new MockApp({
         logger: fakeLogger,
@@ -324,7 +324,7 @@ describe('App middleware and listener arguments', () => {
     });
 
     it('should work in the case both logger and logLevel are given', async () => {
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const fakeLogger = createFakeLogger();
       const app = new MockApp({
         logger: fakeLogger,
@@ -373,7 +373,7 @@ describe('App middleware and listener arguments', () => {
 
   describe('client', () => {
     it('should be available in middleware/listener args', async () => {
-      const MockApp = await importApp(
+      const MockApp = importApp(
         mergeOverrides(withNoopAppMetadata(), withSuccessfulBotUserFetchingWebClient('B123', 'U123')),
       );
       const tokens = ['xoxb-123', 'xoxp-456', 'xoxb-123'];
@@ -433,7 +433,7 @@ describe('App middleware and listener arguments', () => {
     });
 
     it("should be set to the global app client when authorization doesn't produce a token", async () => {
-      const MockApp = await importApp();
+      const MockApp = importApp();
       const app = new MockApp({
         receiver: fakeReceiver,
         authorize: noop,
@@ -523,7 +523,7 @@ describe('App middleware and listener arguments', () => {
       it('should send a simple message to a channel where the incoming event originates', async () => {
         const fakePostMessage = sinon.fake.resolves({});
         overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
 
         const dummyMessage = 'test';
         const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -550,7 +550,7 @@ describe('App middleware and listener arguments', () => {
       it('should send a complex message to a channel where the incoming event originates', async () => {
         const fakePostMessage = sinon.fake.resolves({});
         overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
 
         const dummyMessage = { text: 'test' };
         const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -623,7 +623,7 @@ describe('App middleware and listener arguments', () => {
 
       it("should not exist in the arguments on incoming events that don't support say", async () => {
         overrides = buildOverrides([withNoopWebClient()]);
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
 
         const assertionAggregator = sinon.fake();
         const dummyReceiverEvents = createReceiverEventsWithoutSay(dummyChannelId);
@@ -644,7 +644,7 @@ describe('App middleware and listener arguments', () => {
       it("should handle failures through the App's global error handler", async () => {
         const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
         overrides = buildOverrides([withPostMessage(fakePostMessage)]);
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
 
         const dummyMessage = { text: 'test' };
         const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
@@ -665,7 +665,7 @@ describe('App middleware and listener arguments', () => {
 
   describe('ack()', () => {
     it('should be available in middleware/listener args', async () => {
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const fakeLogger = createFakeLogger();
       const app = new MockApp({
         logger: fakeLogger,
@@ -736,7 +736,7 @@ describe('App middleware and listener arguments', () => {
     it('should be able to use the app_installed_team_id when provided by the payload', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const callback_id = 'view-id';
       const app_installed_team_id = 'T-installed-workspace';
 
@@ -766,7 +766,7 @@ describe('App middleware and listener arguments', () => {
     it('should have function executed event details from a custom step payload', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const callbackId = 'reverse_string';
       const functionBotAccessToken = 'xwfp-example';
       const functionExecutionId = 'Fx1234567890';
@@ -808,7 +808,7 @@ describe('App middleware and listener arguments', () => {
     it('should have function executed event details from a block actions payload', async () => {
       const fakeAxiosPost = sinon.fake.resolves({});
       overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const callbackId = 'reverse_string_button';
       const functionBotAccessToken = 'xwfp-example';
       const functionExecutionId = 'Fx1234567890';

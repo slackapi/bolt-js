@@ -47,7 +47,7 @@ describe('App ignore self middleware processing', () => {
 
   describe('with ignoreSelf true (default)', () => {
     beforeEach(async () => {
-      MockApp = await importApp(buildOverrides([]));
+      MockApp = importApp(buildOverrides([]));
       app = new MockApp({
         logger: fakeLogger,
         receiver: fakeReceiver,
@@ -104,7 +104,7 @@ describe('App ignore self middleware processing', () => {
 
   describe('with ignoreSelf false', () => {
     beforeEach(async () => {
-      MockApp = await importApp(buildOverrides([]));
+      MockApp = importApp(buildOverrides([]));
       app = new MockApp({
         logger: fakeLogger,
         receiver: fakeReceiver,

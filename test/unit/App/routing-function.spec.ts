@@ -40,7 +40,7 @@ describe('App function() routing', () => {
     fakeHandler.resetHistory();
     fakeAck.resetHistory();
     dummyAuthorizationResult = { botToken: '', botId: '' };
-    MockApp = await importApp(buildOverrides([]));
+    MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
