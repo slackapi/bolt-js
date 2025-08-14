@@ -1,11 +1,9 @@
 import path from 'node:path';
-// import type { SlackEvent } from '@slack/types';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ErrorCode } from '../../../src/errors';
 import { isSlackEventMiddlewareArgsOptions } from '../../../src/middleware/builtin';
-// import { matchCommandName, matchEventType, onlyCommands, onlyEvents, subtype } from '../../../src/middleware/builtin';
 import type { Context, SlackEventMiddlewareArgs, SlackEventMiddlewareArgsOptions } from '../../../src/types';
 import {
   type Override,
@@ -28,7 +26,7 @@ const dummyContext: DummyContext = { isEnterpriseInstall: false };
 const ts = '1234.56';
 const channel = 'C1234';
 
-async function importBuiltin(overrides: Override = {}): Promise<typeof import('../../../src/middleware/builtin')> {
+function importBuiltin(overrides: Override = {}): typeof import('../../../src/middleware/builtin') {
   const absolutePath = path.resolve(__dirname, '../../../src/middleware/builtin');
   return proxyquire(absolutePath, overrides);
 }
@@ -36,7 +34,7 @@ async function importBuiltin(overrides: Override = {}): Promise<typeof import('.
 describe('Built-in global middleware', () => {
   let builtins: Awaited<ReturnType<typeof importBuiltin>>;
   beforeEach(async () => {
-    builtins = await importBuiltin();
+    builtins = importBuiltin();
   });
   describe('matchMessage()', () => {
     function matchesPatternTestCase(

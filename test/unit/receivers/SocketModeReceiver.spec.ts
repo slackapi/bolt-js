@@ -23,9 +23,9 @@ import {
 } from '../helpers';
 
 // Loading the system under test using overrides
-async function importSocketModeReceiver(
+function importSocketModeReceiver(
   overrides: Override = {},
-): Promise<typeof import('../../../src/receivers/SocketModeReceiver').default> {
+): typeof import('../../../src/receivers/SocketModeReceiver').default {
   const absolutePath = path.resolve(__dirname, '../../../src/receivers/SocketModeReceiver');
   return proxyquire(absolutePath, overrides).default;
 }
@@ -51,7 +51,7 @@ describe('SocketModeReceiver', () => {
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments and use default arguments when not provided', async () => {
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
@@ -68,7 +68,7 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should allow for customizing port the socket listens on', async () => {
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const customPort = 1337;
       const receiver = new SocketModeReceiver({
@@ -87,7 +87,7 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should allow for extracting additional values from Socket Mode messages', async () => {
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
@@ -97,7 +97,7 @@ describe('SocketModeReceiver', () => {
       assert.isNotNull(receiver);
     });
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
       const clientId = 'my-clientId';
       const clientSecret = 'my-clientSecret';
       const stateSecret = 'my-stateSecret';
@@ -166,7 +166,7 @@ describe('SocketModeReceiver', () => {
   describe('request handling', () => {
     it('should return a 404 if a request flows through the install path, redirect URI path and custom routes without being handled', async () => {
       const installProviderStub = sinon.createStubInstance(InstallProvider);
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];
@@ -202,7 +202,7 @@ describe('SocketModeReceiver', () => {
     describe('handleInstallPathRequest()', () => {
       it('should invoke installer handleInstallPath if a request comes into the install path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -236,7 +236,7 @@ describe('SocketModeReceiver', () => {
       });
       it('should use a custom HTML renderer for the install path webpage', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -271,7 +271,7 @@ describe('SocketModeReceiver', () => {
       });
       it('should redirect installers if directInstall is true', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -308,7 +308,7 @@ describe('SocketModeReceiver', () => {
     describe('handleInstallRedirectRequest()', () => {
       it('should invoke installer handleCallback if a request comes into the redirect URI path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const callbackOptions = {
           failure: () => {},
@@ -348,7 +348,7 @@ describe('SocketModeReceiver', () => {
       });
       it('should invoke handleCallback with installURLoptions as params if state verification is off', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
         const redirectUri = 'http://example.com/heyo';
@@ -400,7 +400,7 @@ describe('SocketModeReceiver', () => {
     describe('custom route handling', () => {
       it('should call custom route handler only if request matches route path and method', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
@@ -438,7 +438,7 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler when request matches path, ignoring query params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
@@ -476,7 +476,7 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler only if request matches route path and method including params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
@@ -514,7 +514,7 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler only if request matches multiple route paths and method including params', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [
           { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
           { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
@@ -557,7 +557,7 @@ describe('SocketModeReceiver', () => {
 
       it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [
           { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
           { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
@@ -598,7 +598,7 @@ describe('SocketModeReceiver', () => {
       });
 
       it("should throw an error if customRoutes don't have the required keys", async () => {
-        const SocketModeReceiver = await importSocketModeReceiver(overrides);
+        const SocketModeReceiver = importSocketModeReceiver(overrides);
         // biome-ignore lint/suspicious/noExplicitAny: typing as any to intentionally have missing required keys
         const customRoutes = [{ handler: sinon.fake() }] as any;
 
@@ -613,7 +613,7 @@ describe('SocketModeReceiver', () => {
   describe('#start()', () => {
     it('should invoke the SocketModeClient start method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
@@ -637,7 +637,7 @@ describe('SocketModeReceiver', () => {
   describe('#stop()', () => {
     it('should invoke the SocketModeClient disconnect method', async () => {
       const clientStub = sinon.createStubInstance(SocketModeClient);
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
@@ -664,7 +664,7 @@ describe('SocketModeReceiver', () => {
         await event.ack();
       });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
       receiver.init(app);
 
@@ -685,7 +685,7 @@ describe('SocketModeReceiver', () => {
     it('acknowledges events that throw AuthorizationError', async () => {
       const processStub = sinon.stub<[ReceiverEvent]>().throws(new AuthorizationError('brokentoken', new Error()));
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
       receiver.init(app);
 
@@ -707,7 +707,7 @@ describe('SocketModeReceiver', () => {
       const processStub = sinon.stub<[ReceiverEvent]>().throws(new Error('internal error'));
       const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({
         appToken: 'xapp-example',
         processEventErrorHandler: defaultProcessEventErrorHandlerSpy,
@@ -731,7 +731,7 @@ describe('SocketModeReceiver', () => {
       });
       const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
-      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({
         appToken: 'xapp-example',
         processEventErrorHandler: defaultProcessEventErrorHandlerSpy,

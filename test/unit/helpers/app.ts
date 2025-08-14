@@ -37,9 +37,9 @@ function mergeObjProperties(first: Override, second: Override): Override {
 /**
  * Helps with importing the App class and overriding certain aspects of it, like its setting of request metadata and ensuring the API client within doesnt issue network requests.
  */
-export async function importApp(
+export function importApp(
   overrides: Override = mergeOverrides(withNoopAppMetadata(), withNoopWebClient()),
-): Promise<typeof import('../../../src/App').default> {
+): typeof import('../../../src/App').default {
   const absolutePath = path.resolve(__dirname, '../../../src/App');
   return proxyquire(absolutePath, overrides).default;
 }

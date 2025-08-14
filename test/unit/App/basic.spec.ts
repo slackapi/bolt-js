@@ -31,13 +31,13 @@ describe('App basic features', () => {
   describe('constructor', () => {
     describe('with a custom port value in HTTP Mode', () => {
       it('should accept a port value at the top-level', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '', port: 9999 });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
         assert.propertyVal(app['receiver'], 'port', 9999);
       });
       it('should accept a port value under installerOptions', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '', port: 7777, installerOptions: { port: 9999 } });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
         assert.propertyVal(app['receiver'], 'port', 9999);
@@ -53,7 +53,7 @@ describe('App basic features', () => {
         deleteInstallation: async () => {},
       };
       it('should accept a port value at the top-level', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({
           socketMode: true,
           appToken: fakeAppToken,
@@ -68,7 +68,7 @@ describe('App basic features', () => {
         assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
       });
       it('should accept a port value under installerOptions', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({
           socketMode: true,
           appToken: fakeAppToken,
@@ -90,13 +90,13 @@ describe('App basic features', () => {
     // that the `ignoreSelf` middleware will fail (or maybe just warn) a bunch.
     describe('with successful single team authorization results', () => {
       it('should succeed with a token for single team authorization', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '' });
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
         assert.instanceOf(app, MockApp);
       });
       it('should pass the given token to app.client', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({ token: 'xoxb-foo-bar', signingSecret: '' });
         assert.isDefined(app.client);
         assert.equal(app.client.token, 'xoxb-foo-bar');
@@ -104,12 +104,12 @@ describe('App basic features', () => {
     });
     it('should succeed with an authorize callback', async () => {
       const authorizeCallback = sinon.fake();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       new MockApp({ authorize: authorizeCallback, signingSecret: '' });
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
     });
     it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
-      const MockApp = await importApp();
+      const MockApp = importApp();
       try {
         new MockApp({ signingSecret: '' });
         assert.fail();
@@ -119,7 +119,7 @@ describe('App basic features', () => {
     });
     it('should fail when both a token and authorize callback are specified', async () => {
       const authorizeCallback = sinon.fake();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       try {
         new MockApp({ token: '', authorize: authorizeCallback, signingSecret: '' });
         assert.fail();
@@ -130,7 +130,7 @@ describe('App basic features', () => {
     });
     it('should fail when both a token is specified and OAuthInstaller is initialized', async () => {
       const authorizeCallback = sinon.fake();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       try {
         new MockApp({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
         assert.fail();
@@ -141,7 +141,7 @@ describe('App basic features', () => {
     });
     it('should fail when both a authorize callback is specified and OAuthInstaller is initialized', async () => {
       const authorizeCallback = sinon.fake();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       try {
         new MockApp({
           authorize: authorizeCallback,
@@ -158,7 +158,7 @@ describe('App basic features', () => {
     });
     describe('with a custom receiver', () => {
       it('should succeed with no signing secret', async () => {
-        const MockApp = await importApp();
+        const MockApp = importApp();
         new MockApp({
           receiver: new FakeReceiver(),
           authorize: noop,
@@ -166,7 +166,7 @@ describe('App basic features', () => {
       });
     });
     it('should fail when no signing secret for the default receiver is specified', async () => {
-      const MockApp = await importApp();
+      const MockApp = importApp();
       try {
         new MockApp({ authorize: noop });
         assert.fail();
@@ -176,7 +176,7 @@ describe('App basic features', () => {
     });
     it('should fail when both socketMode and a custom receiver are specified', async () => {
       const fakeReceiver = new FakeReceiver();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       try {
         new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver });
         assert.fail();
@@ -185,7 +185,7 @@ describe('App basic features', () => {
       }
     });
     it('should succeed when both socketMode and SocketModeReceiver are specified', async () => {
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const socketModeReceiver = new SocketModeReceiver({ appToken: fakeAppToken });
       new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
     });
@@ -198,7 +198,7 @@ describe('App basic features', () => {
         withMemoryStore(fakeMemoryStore),
         withConversationContext(fakeConversationContext),
       );
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
 
       new MockApp({ authorize: noop, signingSecret: '' });
       assert(fakeMemoryStore.calledWithNew);
@@ -212,13 +212,13 @@ describe('App basic features', () => {
         withConversationContext(fakeConversationContext),
       );
       it('should initialize without a conversation store when option is false', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         new MockApp({ convoStore: false, authorize: noop, signingSecret: '' });
         assert(fakeConversationContext.notCalled);
       });
       it('should initialize the conversation store', async () => {
         const dummyConvoStore = createFakeConversationStore();
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({ convoStore: dummyConvoStore, authorize: noop, signingSecret: '' });
         assert.instanceOf(app, MockApp);
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
@@ -226,7 +226,7 @@ describe('App basic features', () => {
     });
     describe('with custom redirectUri supplied', () => {
       it('should fail when missing installerOptions', async () => {
-        const MockApp = await importApp();
+        const MockApp = importApp();
         try {
           new MockApp({ token: '', signingSecret: '', redirectUri: 'http://example.com/redirect' }); // eslint-disable-line no-new
           assert.fail();
@@ -235,7 +235,7 @@ describe('App basic features', () => {
         }
       });
       it('should fail when missing installerOptions.redirectUriPath', async () => {
-        const MockApp = await importApp();
+        const MockApp = importApp();
         try {
           new MockApp({
             token: '',
@@ -262,7 +262,7 @@ describe('App basic features', () => {
         },
       });
 
-      const MockApp = await importApp(overrides);
+      const MockApp = importApp(overrides);
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
       new MockApp({ clientOptions, authorize: noop, signingSecret: '', logLevel: LogLevel.ERROR });
       assert.ok(fakeConstructor.called);
@@ -291,7 +291,7 @@ describe('App basic features', () => {
         },
       });
       it('should not perform auth.test API call if tokenVerificationEnabled is false', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         new MockApp({
           token: 'xoxb-completely-invalid-token',
           signingSecret: 'invalid-one',
@@ -300,7 +300,7 @@ describe('App basic features', () => {
       });
 
       it('should fail in await App#init()', async () => {
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({
           token: 'xoxb-completely-invalid-token',
           signingSecret: 'invalid-one',
@@ -334,7 +334,7 @@ describe('App basic features', () => {
           withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
         );
         const fakeLogger = createFakeLogger();
-        const MockApp = await importApp(overrides);
+        const MockApp = importApp(overrides);
         const app = new MockApp({ logger: fakeLogger, token: '', appToken: fakeAppToken, developerMode: true });
         assert.propertyVal(app, 'logLevel', LogLevel.DEBUG);
         assert.propertyVal(app, 'socketMode', true);
@@ -351,7 +351,7 @@ describe('App basic features', () => {
       // Arrange
       const dummyReturn = Symbol();
       const fakeReceiver = new FakeReceiver();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       const app = new MockApp({ receiver: fakeReceiver, authorize: noop });
       fakeReceiver.start = sinon.fake.returns(sinon.promise().resolve(dummyReturn));
       await app.start(1337);
@@ -364,7 +364,7 @@ describe('App basic features', () => {
       const dummyReturn = Symbol();
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
-      const MockApp = await importApp();
+      const MockApp = importApp();
       fakeReceiver.stop = sinon.fake.returns(sinon.promise().resolve(dummyReturn));
 
       const app = new MockApp({ receiver: fakeReceiver, authorize: noop });

@@ -43,7 +43,7 @@ describe('App assistant routing', () => {
     fakeReceiver = new FakeReceiver();
     fakeAck = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
-    MockApp = await importApp(buildOverrides([]));
+    MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: createFakeLogger(),
       receiver: fakeReceiver,

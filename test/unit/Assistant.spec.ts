@@ -25,7 +25,7 @@ import {
 } from './helpers';
 import { team } from './helpers/events';
 
-async function importAssistant(overrides: Override = {}): Promise<typeof import('../../src/Assistant')> {
+function importAssistant(overrides: Override = {}): typeof import('../../src/Assistant') {
   const absolutePath = path.resolve(__dirname, '../../src/Assistant');
   return proxyquire(absolutePath, overrides);
 }
@@ -58,7 +58,7 @@ describe('Assistant class', () => {
 
     describe('validate', () => {
       it('should throw an error if config is not an object', async () => {
-        const { validate } = await importAssistant();
+        const { validate } = importAssistant();
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = '' as unknown as AssistantConfig;
@@ -69,7 +69,7 @@ describe('Assistant class', () => {
       });
 
       it('should throw an error if required keys are missing', async () => {
-        const { validate } = await importAssistant();
+        const { validate } = importAssistant();
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = {
@@ -82,7 +82,7 @@ describe('Assistant class', () => {
       });
 
       it('should throw an error if props are not a single callback or an array of callbacks', async () => {
-        const { validate } = await importAssistant();
+        const { validate } = importAssistant();
 
         // intentionally casting to AssistantConfig to trigger failure
         const badConfig = {
@@ -123,7 +123,7 @@ describe('Assistant class', () => {
         );
         const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
 
-        const { isAssistantEvent } = await importAssistant();
+        const { isAssistantEvent } = importAssistant();
 
         assert(isAssistantEvent(mockThreadStartedArgs));
         assert(isAssistantEvent(mockThreadContextChangedArgs));
@@ -132,7 +132,7 @@ describe('Assistant class', () => {
 
       it('should return false if not a recognized assistant event', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs());
-        const { isAssistantEvent } = await importAssistant();
+        const { isAssistantEvent } = importAssistant();
         assert.isFalse(isAssistantEvent(fakeMessageArgs));
       });
     });
@@ -140,20 +140,20 @@ describe('Assistant class', () => {
     describe('matchesConstraints', () => {
       it('should return true if recognized assistant message', async () => {
         const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
-        const { matchesConstraints } = await importAssistant();
+        const { matchesConstraints } = importAssistant();
         assert.ok(matchesConstraints(mockUserMessageArgs));
       });
 
       it('should return false if not supported message subtype', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
-        const { matchesConstraints } = await importAssistant();
+        const { matchesConstraints } = importAssistant();
         // casting here as we intentionally are providing type-mismatched argument as a runtime test
         assert.isFalse(matchesConstraints(fakeMessageArgs as unknown as AssistantMiddlewareArgs));
       });
 
       it('should return true if not message event', async () => {
         const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
-        const { matchesConstraints } = await importAssistant();
+        const { matchesConstraints } = importAssistant();
         assert(matchesConstraints(mockThreadStartedArgs));
       });
     });
@@ -161,25 +161,25 @@ describe('Assistant class', () => {
     describe('isAssistantMessage', () => {
       it('should return true if assistant message event', async () => {
         const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
-        const { isAssistantMessage } = await importAssistant();
+        const { isAssistantMessage } = importAssistant();
         assert(isAssistantMessage(mockUserMessageArgs.payload));
       });
 
       it('should return false if not correct subtype', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ thread_ts: '1234.56' }));
-        const { isAssistantMessage } = await importAssistant();
+        const { isAssistantMessage } = importAssistant();
         assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
       });
 
       it('should return false if thread_ts is missing', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
-        const { isAssistantMessage } = await importAssistant();
+        const { isAssistantMessage } = importAssistant();
         assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
       });
 
       it('should return false if channel_type is incorrect', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ channel_type: 'mpim' }));
-        const { isAssistantMessage } = await importAssistant();
+        const { isAssistantMessage } = importAssistant();
         assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
       });
     });
@@ -195,7 +195,7 @@ describe('Assistant class', () => {
         const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
         const mockThreadContextStore = createMockThreadContextStore();
 
-        const { enrichAssistantArgs } = await importAssistant();
+        const { enrichAssistantArgs } = importAssistant();
 
         const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
         const threadContextChangedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadContextChangedArgs);
@@ -209,7 +209,7 @@ describe('Assistant class', () => {
       it('should augment assistant_thread_started args with utilities', async () => {
         const { payload } = createDummyAssistantThreadStartedEventMiddlewareArgs();
         const mockThreadContextStore = createMockThreadContextStore();
-        const { enrichAssistantArgs } = await importAssistant();
+        const { enrichAssistantArgs } = importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
         const assistantArgs = enrichAssistantArgs(mockThreadContextStore, {
           payload,
@@ -224,7 +224,7 @@ describe('Assistant class', () => {
       it('should augment assistant_thread_context_changed args with utilities', async () => {
         const { payload } = createDummyAssistantThreadContextChangedEventMiddlewareArgs();
         const mockThreadContextStore = createMockThreadContextStore();
-        const { enrichAssistantArgs } = await importAssistant();
+        const { enrichAssistantArgs } = importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
         const assistantArgs = enrichAssistantArgs(mockThreadContextStore, {
           payload,
@@ -239,7 +239,7 @@ describe('Assistant class', () => {
       it('should augment message args with utilities', async () => {
         const { payload } = createDummyAssistantUserMessageEventMiddlewareArgs();
         const mockThreadContextStore = createMockThreadContextStore();
-        const { enrichAssistantArgs } = await importAssistant();
+        const { enrichAssistantArgs } = importAssistant();
         // TODO: enrichAssistantArgs likely needs a different argument type, as AssistantMiddlewareArgs type already has the assistant utility enrichments present.
         const assistantArgs = enrichAssistantArgs(mockThreadContextStore, {
           payload,
@@ -255,7 +255,7 @@ describe('Assistant class', () => {
         it('should return expected channelId, threadTs, and context for `assistant_thread_started` event', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
           const { payload } = mockThreadStartedArgs;
-          const { extractThreadInfo } = await importAssistant();
+          const { extractThreadInfo } = importAssistant();
           const { channelId, threadTs, context } = extractThreadInfo(payload);
 
           assert.equal(payload.assistant_thread.channel_id, channelId);
@@ -268,7 +268,7 @@ describe('Assistant class', () => {
             createDummyAssistantThreadContextChangedEventMiddlewareArgs(),
           );
           const { payload } = mockThreadContextChangedArgs;
-          const { extractThreadInfo } = await importAssistant();
+          const { extractThreadInfo } = importAssistant();
           const { channelId, threadTs, context } = extractThreadInfo(payload);
 
           assert.equal(payload.assistant_thread.channel_id, channelId);
@@ -279,7 +279,7 @@ describe('Assistant class', () => {
         it('should return expected channelId and threadTs for `message` event', async () => {
           const mockUserMessageArgs = wrapMiddleware(createDummyAssistantUserMessageEventMiddlewareArgs());
           const { payload } = mockUserMessageArgs;
-          const { extractThreadInfo } = await importAssistant();
+          const { extractThreadInfo } = importAssistant();
           const { channelId, threadTs, context } = extractThreadInfo(payload);
 
           assert.equal(payload.channel, channelId);
@@ -291,7 +291,7 @@ describe('Assistant class', () => {
         it('should throw error if `channel_id` or `thread_ts` are missing', async () => {
           const { payload } = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
           payload.assistant_thread.channel_id = '';
-          const { extractThreadInfo } = await importAssistant();
+          const { extractThreadInfo } = importAssistant();
 
           const extractThreadInfoFn = () => extractThreadInfo(payload);
           const expectedMsg = 'Assistant message event is missing required properties: channel_id';
@@ -307,7 +307,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.say('Say called!');
@@ -322,7 +322,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.say('Say called!');
@@ -353,7 +353,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.say({
@@ -388,7 +388,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = { save: sinon.spy(), get: sinon.spy() };
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           // Verify that get is not called prior to say being used
@@ -406,7 +406,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setStatus('Status set!');
@@ -421,7 +421,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }], title: '' });
@@ -436,7 +436,7 @@ describe('Assistant class', () => {
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
-          const { enrichAssistantArgs } = await importAssistant();
+          const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           await threadStartedArgs.setTitle('Title set!');
@@ -451,7 +451,7 @@ describe('Assistant class', () => {
         const mockThreadContextChangedArgs = wrapMiddleware(
           createDummyAssistantThreadContextChangedEventMiddlewareArgs(),
         );
-        const { processAssistantMiddleware } = await importAssistant();
+        const { processAssistantMiddleware } = importAssistant();
 
         const fn1 = sinon.spy((async ({ next: continuation }) => {
           await continuation();
