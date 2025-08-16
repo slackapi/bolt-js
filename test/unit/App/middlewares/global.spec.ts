@@ -43,7 +43,7 @@ describe('App global middleware Processing', () => {
       withMemoryStore(sinon.fake()),
       withConversationContext(fakeConversationContext),
     );
-    const MockApp = await importApp(overrides);
+    const MockApp = importApp(overrides);
 
     dummyReceiverEvent = createDummyReceiverEvent();
     fakeFirstMiddleware = sinon.fake(noopMiddleware);
@@ -73,7 +73,7 @@ describe('App global middleware Processing', () => {
     const fakeLogger = createFakeLogger();
     const fakeMiddleware = sinon.fake(noopMiddleware);
     const invalidReceiverEvents = createInvalidReceiverEvents();
-    const MockApp = await importApp();
+    const MockApp = importApp();
 
     const app = new MockApp({ receiver: fakeReceiver, logger: fakeLogger, authorize: sinon.fake() });
     app.use(fakeMiddleware);
@@ -90,7 +90,7 @@ describe('App global middleware Processing', () => {
     const dummyOrigError = new Error('auth failed');
     const dummyAuthorizationError = new AuthorizationError('auth failed', dummyOrigError);
     const dummyReceiverEvent = createDummyReceiverEvent();
-    const MockApp = await importApp();
+    const MockApp = importApp();
 
     const app = new MockApp({
       receiver: fakeReceiver,
@@ -269,7 +269,7 @@ describe('App global middleware Processing', () => {
   });
 
   it('should use the xwfp token if the request contains one', async () => {
-    const MockApp = await importApp();
+    const MockApp = importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
       authorize: sinon.fake.resolves({}),
@@ -287,7 +287,7 @@ describe('App global middleware Processing', () => {
   });
 
   it('should not use xwfp token if the request contains one and attachFunctionToken is false', async () => {
-    const MockApp = await importApp();
+    const MockApp = importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
       authorize: sinon.fake.resolves({}),
@@ -306,7 +306,7 @@ describe('App global middleware Processing', () => {
   });
 
   it('should use the xwfp token if the request contains one and not reuse it in following requests', async () => {
-    const MockApp = await importApp();
+    const MockApp = importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
       authorize: sinon.fake.resolves({ botToken: 'xoxb-valid' }),

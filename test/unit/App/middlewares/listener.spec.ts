@@ -18,7 +18,7 @@ describe('App listener middleware processing', () => {
     fakeErrorHandler = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
 
-    const MockAppNoOverrides = await importApp();
+    const MockAppNoOverrides = importApp();
     app = new MockAppNoOverrides({
       receiver: fakeReceiver,
       authorize: sinon.fake.resolves(dummyAuthorizationResult),

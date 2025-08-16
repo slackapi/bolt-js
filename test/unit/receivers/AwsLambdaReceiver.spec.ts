@@ -63,7 +63,7 @@ describe('AwsLambdaReceiver', () => {
     const awsEvent = createDummyAWSPayload(body, timestamp);
     const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
-    const App = await importApp(appOverrides);
+    const App = importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
@@ -93,7 +93,7 @@ describe('AwsLambdaReceiver', () => {
     });
     const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
-    const App = await importApp(appOverrides);
+    const App = importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
@@ -123,7 +123,7 @@ describe('AwsLambdaReceiver', () => {
     });
     const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
-    const App = await importApp(appOverrides);
+    const App = importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,
@@ -155,7 +155,7 @@ describe('AwsLambdaReceiver', () => {
     });
     const response1 = await handler(awsEvent, {}, (_error, _result) => {});
     assert.equal(response1.statusCode, 404);
-    const App = await importApp(appOverrides);
+    const App = importApp(appOverrides);
     const app = new App({
       token: 'xoxb-',
       receiver: awsReceiver,

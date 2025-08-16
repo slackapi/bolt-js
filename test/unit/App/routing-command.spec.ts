@@ -37,7 +37,7 @@ describe('App command() routing', () => {
     fakeHandler = sinon.fake();
     fakeAck = sinon.fake();
     dummyAuthorizationResult = { botToken: '', botId: '' };
-    MockApp = await importApp(buildOverrides([]));
+    MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: createFakeLogger(),
       receiver: fakeReceiver,

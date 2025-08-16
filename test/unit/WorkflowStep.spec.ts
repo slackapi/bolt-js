@@ -1,6 +1,6 @@
+import path from 'node:path';
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import {
   type AllWorkflowStepMiddlewareArgs,
@@ -14,10 +14,11 @@ import {
 } from '../../src/WorkflowStep';
 import { WorkflowStepInitializationError } from '../../src/errors';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
-import { type Override, noopVoid } from './helpers';
+import { type Override, noopVoid, proxyquire } from './helpers';
 
-async function importWorkflowStep(overrides: Override = {}): Promise<typeof import('../../src/WorkflowStep')> {
-  return rewiremock.module(() => import('../../src/WorkflowStep'), overrides);
+function importWorkflowStep(overrides: Override = {}): typeof import('../../src/WorkflowStep') {
+  const absolutePath = path.resolve(__dirname, '../../src/WorkflowStep');
+  return proxyquire(absolutePath, overrides);
 }
 
 const MOCK_CONFIG_SINGLE = {
@@ -88,7 +89,7 @@ describe('WorkflowStep class', () => {
 
   describe('validate', () => {
     it('should throw an error if callback_id is not valid', async () => {
-      const { validate } = await importWorkflowStep();
+      const { validate } = importWorkflowStep();
 
       // intentionally casting to string to trigger failure
       const badId = {} as string;
@@ -99,7 +100,7 @@ describe('WorkflowStep class', () => {
     });
 
     it('should throw an error if config is not an object', async () => {
-      const { validate } = await importWorkflowStep();
+      const { validate } = importWorkflowStep();
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = '' as unknown as WorkflowStepConfig;
@@ -110,7 +111,7 @@ describe('WorkflowStep class', () => {
     });
 
     it('should throw an error if required keys are missing', async () => {
-      const { validate } = await importWorkflowStep();
+      const { validate } = importWorkflowStep();
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = {
@@ -123,7 +124,7 @@ describe('WorkflowStep class', () => {
     });
 
     it('should throw an error if lifecycle props are not a single callback or an array of callbacks', async () => {
-      const { validate } = await importWorkflowStep();
+      const { validate } = importWorkflowStep();
 
       // intentionally casting to WorkflowStepConfig to trigger failure
       const badConfig = {
@@ -145,7 +146,7 @@ describe('WorkflowStep class', () => {
       const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
         AllMiddlewareArgs;
 
-      const { isStepEvent } = await importWorkflowStep();
+      const { isStepEvent } = importWorkflowStep();
 
       const editIsStepEvent = isStepEvent(fakeEditArgs);
       const viewIsStepEvent = isStepEvent(fakeSaveArgs);
@@ -160,7 +161,7 @@ describe('WorkflowStep class', () => {
       const fakeEditArgs = createFakeStepEditAction() as unknown as AnyMiddlewareArgs;
       fakeEditArgs.payload.type = 'invalid_type';
 
-      const { isStepEvent } = await importWorkflowStep();
+      const { isStepEvent } = importWorkflowStep();
       const actionIsStepEvent = isStepEvent(fakeEditArgs);
 
       assert.isFalse(actionIsStepEvent);
@@ -174,7 +175,7 @@ describe('WorkflowStep class', () => {
       const fakeExecuteArgs = createFakeStepExecuteEvent() as unknown as SlackWorkflowStepMiddlewareArgs &
         AllMiddlewareArgs;
 
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
 
       const editStepArgs = prepareStepArgs(fakeEditArgs);
       const viewStepArgs = prepareStepArgs(fakeSaveArgs);
@@ -187,7 +188,7 @@ describe('WorkflowStep class', () => {
 
     it('should augment workflow_step_edit args with step and configure()', async () => {
       const fakeArgs = createFakeStepEditAction();
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const stepArgs = prepareStepArgs(fakeArgs as AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>);
 
@@ -197,7 +198,7 @@ describe('WorkflowStep class', () => {
 
     it('should augment view_submission with step and update()', async () => {
       const fakeArgs = createFakeStepSaveEvent();
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const stepArgs = prepareStepArgs(
         fakeArgs as unknown as AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>,
@@ -209,7 +210,7 @@ describe('WorkflowStep class', () => {
 
     it('should augment workflow_step_execute with step, complete() and fail()', async () => {
       const fakeArgs = createFakeStepExecuteEvent();
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const stepArgs = prepareStepArgs(
         fakeArgs as unknown as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>,
@@ -228,7 +229,7 @@ describe('WorkflowStep class', () => {
       const fakeClient = { views: { open: sinon.spy() } };
       fakeEditArgs.client = fakeClient as unknown as WebClient;
 
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const editStepArgs = prepareStepArgs(
         fakeEditArgs,
@@ -245,7 +246,7 @@ describe('WorkflowStep class', () => {
       const fakeClient = { workflows: { updateStep: sinon.spy() } };
       fakeSaveArgs.client = fakeClient as unknown as WebClient;
 
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const saveStepArgs = prepareStepArgs(
         fakeSaveArgs,
@@ -263,7 +264,7 @@ describe('WorkflowStep class', () => {
       const fakeClient = { workflows: { stepCompleted: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
 
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const executeStepArgs = prepareStepArgs(
         fakeExecuteArgs,
@@ -281,7 +282,7 @@ describe('WorkflowStep class', () => {
       const fakeClient = { workflows: { stepFailed: sinon.spy() } };
       fakeExecuteArgs.client = fakeClient as unknown as WebClient;
 
-      const { prepareStepArgs } = await importWorkflowStep();
+      const { prepareStepArgs } = importWorkflowStep();
       // casting to returned type because prepareStepArgs isn't built to do so
       const executeStepArgs = prepareStepArgs(
         fakeExecuteArgs,
@@ -296,7 +297,7 @@ describe('WorkflowStep class', () => {
   describe('processStepMiddleware', () => {
     it('should call each callback in user-provided middleware', async () => {
       const { ...fakeArgs } = createFakeStepEditAction() as unknown as AllWorkflowStepMiddlewareArgs;
-      const { processStepMiddleware } = await importWorkflowStep();
+      const { processStepMiddleware } = importWorkflowStep();
 
       const fn1 = sinon.spy((async ({ next: continuation }) => {
         await continuation();

@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
+import path from 'node:path';
 import { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import rewiremock from 'rewiremock';
 import sinon from 'sinon';
 import {
   AppInitializationError,
@@ -17,15 +17,15 @@ import {
   createFakeLogger,
   mergeOverrides,
   type noopVoid,
+  proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
 
 // Loading the system under test using overrides
-async function importHTTPReceiver(
-  overrides: Override = {},
-): Promise<typeof import('../../../src/receivers/HTTPReceiver').default> {
-  return (await rewiremock.module(() => import('../../../src/receivers/HTTPReceiver'), overrides)).default;
+function importHTTPReceiver(overrides: Override = {}): typeof import('../../../src/receivers/HTTPReceiver').default {
+  const absolutePath = path.resolve(__dirname, '../../../src/receivers/HTTPReceiver');
+  return proxyquire(absolutePath, overrides).default;
 }
 
 describe('HTTPReceiver', () => {
@@ -51,7 +51,7 @@ describe('HTTPReceiver', () => {
   describe('constructor', () => {
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments and use default arguments when not provided', async () => {
-      const HTTPReceiver = await importHTTPReceiver(overrides);
+      const HTTPReceiver = importHTTPReceiver(overrides);
 
       const receiver = new HTTPReceiver({
         logger: noopLogger,
@@ -90,7 +90,7 @@ describe('HTTPReceiver', () => {
     });
 
     it('should accept a custom port', async () => {
-      const HTTPReceiver = await importHTTPReceiver(overrides);
+      const HTTPReceiver = importHTTPReceiver(overrides);
 
       const defaultPort = new HTTPReceiver({
         signingSecret: 'secret',
@@ -117,7 +117,7 @@ describe('HTTPReceiver', () => {
     });
 
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
-      const HTTPReceiver = await importHTTPReceiver();
+      const HTTPReceiver = importHTTPReceiver();
       const clientId = 'my-clientId';
       const clientSecret = 'my-clientSecret';
       const signingSecret = 'secret';
@@ -185,7 +185,7 @@ describe('HTTPReceiver', () => {
   });
   describe('start() method', () => {
     it('should accept both numeric and string port arguments and correctly pass as number into server.listen method', async () => {
-      const HTTPReceiver = await importHTTPReceiver(overrides);
+      const HTTPReceiver = importHTTPReceiver(overrides);
 
       const defaultPort = new HTTPReceiver({
         signingSecret: 'secret',
@@ -205,7 +205,7 @@ describe('HTTPReceiver', () => {
     describe('handleInstallPathRequest()', () => {
       it('should invoke installer handleInstallPath if a request comes into the install path', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const HTTPReceiver = await importHTTPReceiver(overrides);
+        const HTTPReceiver = importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -236,7 +236,7 @@ describe('HTTPReceiver', () => {
 
       it('should use a custom HTML renderer for the install path webpage', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const HTTPReceiver = await importHTTPReceiver(overrides);
+        const HTTPReceiver = importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -268,7 +268,7 @@ describe('HTTPReceiver', () => {
 
       it('should redirect installers if directInstall is true', async () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider);
-        const HTTPReceiver = await importHTTPReceiver(overrides);
+        const HTTPReceiver = importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -304,7 +304,7 @@ describe('HTTPReceiver', () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
           handleCallback: sinon.stub().resolves() as unknown as Promise<void>,
         });
-        const HTTPReceiver = await importHTTPReceiver(overrides);
+        const HTTPReceiver = importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -340,7 +340,7 @@ describe('HTTPReceiver', () => {
         const installProviderStub = sinon.createStubInstance(InstallProvider, {
           handleCallback: sinon.stub().resolves() as unknown as Promise<void>,
         });
-        const HTTPReceiver = await importHTTPReceiver(overrides);
+        const HTTPReceiver = importHTTPReceiver(overrides);
 
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -388,7 +388,7 @@ describe('HTTPReceiver', () => {
     });
     describe('custom route handling', async () => {
       it('should call custom route handler only if request matches route path and method', async () => {
-        const HTTPReceiver = await importHTTPReceiver();
+        const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
         const receiver = new HTTPReceiver({
@@ -420,7 +420,7 @@ describe('HTTPReceiver', () => {
       });
 
       it('should call custom route handler only if request matches route path and method, ignoring query params', async () => {
-        const HTTPReceiver = await importHTTPReceiver();
+        const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
         const receiver = new HTTPReceiver({
@@ -452,7 +452,7 @@ describe('HTTPReceiver', () => {
       });
 
       it('should call custom route handler only if request matches route path and method including params', async () => {
-        const HTTPReceiver = await importHTTPReceiver();
+        const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
         const receiver = new HTTPReceiver({
@@ -484,7 +484,7 @@ describe('HTTPReceiver', () => {
       });
 
       it('should call custom route handler only if request matches multiple route paths and method including params', async () => {
-        const HTTPReceiver = await importHTTPReceiver();
+        const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [
           { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
           { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
@@ -520,7 +520,7 @@ describe('HTTPReceiver', () => {
       });
 
       it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async () => {
-        const HTTPReceiver = await importHTTPReceiver();
+        const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [
           { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
           { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
@@ -556,7 +556,7 @@ describe('HTTPReceiver', () => {
       });
 
       it("should throw an error if customRoutes don't have the required keys", async () => {
-        const HTTPReceiver = await importHTTPReceiver();
+        const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [{ path: '/test' }] as CustomRoute[];
 
         assert.throws(
@@ -573,7 +573,7 @@ describe('HTTPReceiver', () => {
 
     it("should throw if request doesn't match install path, redirect URI path, or custom routes", async () => {
       const installProviderStub = sinon.createStubInstance(InstallProvider);
-      const HTTPReceiver = await importHTTPReceiver(overrides);
+      const HTTPReceiver = importHTTPReceiver(overrides);
 
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];

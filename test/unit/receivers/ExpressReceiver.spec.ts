@@ -1,10 +1,10 @@
 import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
+import path from 'node:path';
 import { Readable } from 'node:stream';
 import type { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { Application, IRouter, Request, Response } from 'express';
-import rewiremock from 'rewiremock';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';
 import {
@@ -26,15 +26,17 @@ import {
   type Override,
   createFakeLogger,
   mergeOverrides,
+  proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
 
 // Loading the system under test using overrides
-async function importExpressReceiver(
+function importExpressReceiver(
   overrides: Override = {},
-): Promise<typeof import('../../../src/receivers/ExpressReceiver').default> {
-  return (await rewiremock.module(() => import('../../../src/receivers/ExpressReceiver'), overrides)).default;
+): typeof import('../../../src/receivers/ExpressReceiver').default {
+  const absolutePath = path.resolve(__dirname, '../../../src/receivers/ExpressReceiver');
+  return proxyquire(absolutePath, overrides).default;
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: accept any kind of mock response
@@ -56,6 +58,7 @@ describe('ExpressReceiver', () => {
   let fakeServer: FakeServer;
   let fakeCreateServer: sinon.SinonSpy;
   let overrides: Override;
+
   beforeEach(() => {
     fakeServer = new FakeServer();
     fakeCreateServer = sinon.fake.returns(fakeServer);
@@ -184,7 +187,7 @@ describe('ExpressReceiver', () => {
 
   describe('#start()', () => {
     it('should start listening for requests using the built-in HTTP server', async () => {
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
@@ -199,7 +202,7 @@ describe('ExpressReceiver', () => {
         withHttpCreateServer(sinon.fake.throws('Should not be used.')),
         withHttpsCreateServer(fakeCreateServer),
       );
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       const tlsOptions = { key: '', cert: '' };
@@ -216,7 +219,7 @@ describe('ExpressReceiver', () => {
         withHttpCreateServer(fakeCreateFailingServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
@@ -235,7 +238,7 @@ describe('ExpressReceiver', () => {
         withHttpCreateServer(fakeCreateUndefinedServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
@@ -250,7 +253,7 @@ describe('ExpressReceiver', () => {
       assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
 
@@ -269,7 +272,7 @@ describe('ExpressReceiver', () => {
 
   describe('#stop()', () => {
     it('should stop listening for requests when a built-in HTTP server is already started', async () => {
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       await receiver.start(port);
@@ -277,7 +280,7 @@ describe('ExpressReceiver', () => {
       await receiver.stop();
     });
     it('should reject when a built-in HTTP server is not started', async () => {
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
 
       let caughtError: Error | undefined;
@@ -300,7 +303,7 @@ describe('ExpressReceiver', () => {
         withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       await receiver.start(12345);
 
@@ -344,7 +347,7 @@ describe('ExpressReceiver', () => {
       buildContentResponseStub.restore();
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
@@ -361,7 +364,7 @@ describe('ExpressReceiver', () => {
         event.ack.storedResponse = 'something';
         return Promise.resolve({});
       });
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
@@ -373,7 +376,7 @@ describe('ExpressReceiver', () => {
     });
     it('should throw and build an HTTP 500 response with no body if processEvent raises an uncoded Error or a coded, non-Authorization Error', async () => {
       processStub.callsFake(() => Promise.reject(new Error('uh oh')));
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
@@ -389,7 +392,7 @@ describe('ExpressReceiver', () => {
     });
     it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async () => {
       processStub.callsFake(() => Promise.reject(new AuthorizationError('uh oh', new Error())));
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
@@ -408,7 +411,7 @@ describe('ExpressReceiver', () => {
   describe('oauth support', () => {
     describe('install path route', () => {
       it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async () => {
-        const ER = await importExpressReceiver(overrides);
+        const ER = importExpressReceiver(overrides);
         const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '' });
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleInstallPath').resolves();
 
@@ -423,7 +426,7 @@ describe('ExpressReceiver', () => {
     });
     describe('redirect path route', () => {
       it('should call installer.handleCallback with callbackOptions when HTTP request hits the redirect URI path and stateVerification=true', async () => {
-        const ER = await importExpressReceiver(overrides);
+        const ER = importExpressReceiver(overrides);
         const callbackOptions = {};
         const scopes = ['some'];
         const installerOptions = {
@@ -448,7 +451,7 @@ describe('ExpressReceiver', () => {
         sinon.assert.calledWith(handleStub, req, resp, callbackOptions);
       });
       it('should call installer.handleCallback with callbackOptions and installUrlOptions when HTTP request hits the redirect URI path and stateVerification=false', async () => {
-        const ER = await importExpressReceiver(overrides);
+        const ER = importExpressReceiver(overrides);
         const callbackOptions = {};
         const scopes = ['some'];
         const installerOptions = {
@@ -477,7 +480,7 @@ describe('ExpressReceiver', () => {
 
   describe('state management for built-in server', () => {
     it('should be able to start after it was stopped', async () => {
-      const ER = await importExpressReceiver(overrides);
+      const ER = importExpressReceiver(overrides);
       const receiver = new ER({ signingSecret: '' });
       const port = 12345;
       await receiver.start(port);
