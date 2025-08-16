@@ -10,7 +10,7 @@ When you’re finished, you’ll have created the [Getting Started app](https://
 
 :::tip[Less reading, more doing]
 
-Follow the [quickstart](/getting-started) guide to run an app as soon as possible. This guide will more thoroughly explore building your first app using Bolt for JavaScript.
+Follow the [quickstart](/tools/bolt-js/getting-started) guide to run an app as soon as possible. This guide will more thoroughly explore building your first app using Bolt for JavaScript.
 
 :::
 
@@ -178,7 +178,7 @@ Let's now start your app to receive events from the [Events API](/apis/events-ap
 There are two paths for connecting your app to receive events:
 
 - **Socket Mode**: For those just starting, we recommend using [Socket Mode](/apis/events-api/using-socket-mode/). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall.
-- **Request URL**: Alternatively, you're welcome to set up an app with public HTTP [Request URLs](/apis/events-api/using-http-request-urls). HTTP is more useful for apps being deployed to hosting environments (like [AWS](/deployments/aws-lambda) or [Heroku](/deployments/heroku)) to stably respond within large Slack organizations, or apps intended for distribution via the Slack Marketplace.
+- **Request URL**: Alternatively, you're welcome to set up an app with public HTTP [Request URLs](/apis/events-api/using-http-request-urls). HTTP is more useful for apps being deployed to hosting environments (like [AWS](/tools/bolt-js/deployments/aws-lambda) or [Heroku](/tools/bolt-js/deployments/heroku)) to stably respond within large Slack organizations, or apps intended for distribution via the Slack Marketplace.
 
 We've provided instructions for both ways in this guide, choose your flavor and let's carry on.
 
@@ -603,5 +603,5 @@ You just built a [Bolt for JavaScript app](https://github.com/slackapi/bolt-js-g
 Now that you have an app up and running, you can start exploring how to make your Bolt app truly yours. Here are some ideas about what to explore next:
 
 - Read through the various concepts pages to learn about the different methods and features accessible to your Bolt app.
-- Explore the different events your bot can listen to with the [`events()`](tools/bolt-js/concepts/event-listening) method. [View all of the events within the API docs](/reference/events).
+- Explore the different events your bot can listen to with the [`events()`](/tools/bolt-js/concepts/event-listening) method. [View all of the events within the API docs](/reference/events).
 - The Bolt framework allows you to [call Web API methods](/tools/bolt-js/concepts/web-api) with the client attached to your app. [View the over 200 methods within the API docs](/reference/methods).
