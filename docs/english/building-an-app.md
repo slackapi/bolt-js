@@ -116,7 +116,7 @@ Before you can begin developing with Bolt for JavaScript, you'll want to create 
 
 The scaffolded blank template contains a `manifest.json` file with the app details for the app we are creating and installing.
 
-Run the following command to create a new app and choose a Slack team for development:
+Run the following command to create a new "local" app and choose a Slack team for development:
 
 ```sh
 $ slack install
@@ -205,7 +205,7 @@ Back in your project, store the `xapp` token you created earlier in your environ
 $ export SLACK_APP_TOKEN=xapp-<your-app-token>
 ```
 
-Create a new entrypoint file called `app.js` in this directory and add the following code:
+Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
 const { App } = require("@slack/bolt");
@@ -234,30 +234,15 @@ Refer to [ngrok's getting started guide](https://ngrok.com/docs/getting-started/
 
 :::
 
-First you'll need to enable events from [app settings](https://api.slack.com/apps):
+First you'll need a signing secret to verify that the requests sent to your app are from Slack.
 
-1. Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
-2. Add your [Request URL](/apis/events-api/#subscribing). Slack will send HTTP POST requests corresponding to events to this Request URL endpoint.
-
-:::warning[Can you hear me now?]
-
-Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads).
-
-When configuring your Request URL within your app configuration, you'll append `/slack/events`:
-
-```text
-https://example.ngrok.io/slack/events
-```
-
-:::
-
-3. Return to the **Basic Information** page and copy your Signing Secret to store in a new environment variable:
+1. Go to the **Basic Information** page on [app settings](https://api.slack.com/apps) and copy your Signing Secret to store in a new environment variable:
 
 ```sh
 $ export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
-Create a new entrypoint file called `app.js` in this directory and add the following code:
+2. Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
 const { App } = require("@slack/bolt");
@@ -276,14 +261,39 @@ const app = new App({
 })();
 ```
 
+3. Next let's start your app to receive events. Run the following command in the terminal:
+
+```sh
+$ node app.js
+```
+
+Then enable events from app settings:
+
+4. Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
+5. Add your [Request URL](/apis/events-api/#subscribing) and click **Save Changes**. Slack will send HTTP POST requests corresponding to events to this Request URL endpoint.
+
+You can now stop the app by pressing `CTRL+C` in the terminal.
+
+:::warning[Can you hear me now?]
+
+Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads).
+
+When configuring your Request URL within your app configuration, you'll append `/slack/events`:
+
+```text
+https://example.ngrok.io/slack/events
+```
+
+:::
+
 </TabItem>
 </Tabs>
 
-Now let's actually run your app!
+With the app constructed, save your `app.js` file.
 
 ## Running the app {#running-the-app}
 
-Save your `app.js` file, then from the command line run the following:
+Now let's actually run your app! From the command line run the following:
 
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
@@ -304,13 +314,15 @@ $ node app.js
 
 Your app should let you know that it's up and running. It's not actually listening for anything though. Let's change that.
 
+Stop your app by pressing `CTRL+C` in the terminal then read on.
+
 ## Subscribing to events {#subscribing-to-events}
 
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.
 
-To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](/apis/events-api/).
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API](/apis/events-api/) to subscribe to event types.
 
-Scroll down to **Subscribe to Bot Events**. There are four events related to messages:
+Open [app settings](https://api.slack.com/apps) for your app and find the **Event Subscriptions** tab, toggle "Enable Events" on, then scroll down to **Subscribe to Bot Events**. There are four events related to messages:
 
 - [`message.channels`](/reference/events/message.channels) listens for messages in public channels that your app is added to
 - [`message.groups`](/reference/events/message.groups) listens for messages in 🔒 private channels that your app is added to
@@ -319,9 +331,11 @@ Scroll down to **Subscribe to Bot Events**. There are four events related to mes
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
+You will also have to reinstall the app since new scopes are added for these events. Return to the **Install App** page to reinstall the app to your team.
+
 ## Listening and responding to messages {#listening-and-responding-to-messages}
 
-Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
+Your app is now ready for some logic. Let's start by using the [`message`](/tools/bolt-js/concepts/message-listening) method to attach a listener for messages.
 
 The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello". Insert the highlighted lines into `app.js`.
 
@@ -603,5 +617,5 @@ You just built a [Bolt for JavaScript app](https://github.com/slack-samples/bolt
 Now that you have an app up and running, you can start exploring how to make your Bolt app truly yours. Here are some ideas about what to explore next:
 
 - Read through the various concepts pages to learn about the different methods and features accessible to your Bolt app.
-- Explore the different events your bot can listen to with the [`events()`](/tools/bolt-js/concepts/event-listening) method. [View all of the events within the API docs](/reference/events).
+- Explore the different events your bot can listen to with the [`event`](/tools/bolt-js/concepts/event-listening) method. [View all of the events within the API docs](/reference/events).
 - The Bolt framework allows you to [call Web API methods](/tools/bolt-js/concepts/web-api) with the client attached to your app. [View the over 200 methods within the API docs](/reference/methods).
