@@ -47,14 +47,14 @@ The [Events API](/legacy/legacy-bot-users#handling-events) is a bot's equivalent
 
 :::info
 
-Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/tools/bolt-js/getting-started) and [setting up events](/tools/bolt-js/getting-started#setting-up-events) in the Getting Started guide.
+Before you configure your bot’s events, you’ll need a public URL. If you’ve never created a Bolt for JavaScript app or never used the Events API, it’d be helpful to go through [setting up your local Bolt project](/tools/bolt-js/building-an-app) and [setting up events](/tools/bolt-js/building-an-app#preparing-receive-events) in the Getting Started guide.
 
 :::
 
 ### Listening for messages
 All Hubot apps can listen to messages by default, so we need to configure your bot user to do the same.
 
-After walking through [setting up events](/tools/bolt-js/getting-started#setting-up-events), your Request URL should be verified. Scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
+After walking through [setting up events](/tools/bolt-js/building-an-app#preparing-receive-events), your Request URL should be verified. Scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
 
 If you only want your bot to listen to messages in channels, you can listen to `message.channels` and `message.groups`. Or if you want your bot to listen to messages from everywhere it is, choose all four message events.
 

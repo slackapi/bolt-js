@@ -18,7 +18,7 @@ When you’re finished, you’ll have this ⚡️[Deploying to AWS Lambda app](h
 
 If you don't already have an account, you should [sign up for AWS](https://aws.amazon.com/) and follow the on-screen instructions.
 
-:::info 
+:::info
 
 You may be asked for payment information during the sign up. Don't worry, this guide only uses the [free tier](https://aws.amazon.com/lambda/pricing/).
 
@@ -30,7 +30,7 @@ Next, you'll need programmatic access to your AWS account to deploy onto Lambda.
 
 We recommend watching this short, step-by-step video to 🍿 [create an IAM user and download the access keys](https://www.youtube.com/watch?v=KngM5bfpttA).
 
-:::tip[Do you already have an IAM user?] 
+:::tip[Do you already have an IAM user?]
 
 Follow the official AWS guide to [create access keys for existing IAM users](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds).
 
@@ -82,10 +82,10 @@ You're now set up with the Serverless tools! Let's move on to preparing your Bol
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Getting Started guide](/tools/bolt-js/getting-started) or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Quickstart guide](/tools/bolt-js/getting-started) or clone the template app below:
 
 ```shell
-git clone https://github.com/slackapi/bolt-js-getting-started-app.git
+git clone https://github.com/slack-samples/bolt-js-getting-started-app.git
 ```
 
 After you have a Bolt app, navigate to its directory:
@@ -115,7 +115,7 @@ const app = new App({
 
 Next, we'll customize your Bolt app's [`receiver`](/tools/bolt-js/concepts/receiver) to respond to Lambda function events.
 
-Update the [source code that imports your modules](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
+Update the [source code that imports your modules](https://github.com/slack-samples/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
 ```javascript
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
@@ -127,7 +127,7 @@ If implementing authentication with OAuth, you must use the [`ExpressReceiver`](
 
 :::
 
-Then update the [source code that initializes your Bolt app](https://github.com/slackapi/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
+Then update the [source code that initializes your Bolt app](https://github.com/slack-samples/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L10-L14) to create a custom receiver using AwsLambdaReceiver:
 
 ```javascript
 // Initialize your custom receiver
@@ -151,7 +151,7 @@ const app = new App({
 });
 ```
 
-Finally, at the bottom of your app, update the [source code that starts the HTTP server](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L47-L52) to now respond to an AWS Lambda function event:
+Finally, at the bottom of your app, update the [source code that starts the HTTP server](https://github.com/slack-samples/bolt-js-getting-started-app/blob/main/app.js#L47-L52) to now respond to an AWS Lambda function event:
 
 ```javascript
 // Handle the Lambda function event
@@ -189,11 +189,11 @@ plugins:
   - serverless-offline
 ```
 
-:::info 
+:::info
 
 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be environment variables on your local machine.
 
-You can [learn how to export Slack environment variables](/tools/bolt-js/getting-started#setting-up-your-project) in our Getting Started guide.
+You can [learn how to export Slack environment variables](/tools/bolt-js/getting-started#creating-a-project) in our Quickstart guide.
 
 :::
 
@@ -233,9 +233,9 @@ Next, use ngrok to forward Slack events to your local machine:
 ngrok http 3000
 ```
 
-:::info 
+:::info
 
-[Learn how to use ngrok](/tools/bolt-js/getting-started#setting-up-events) to create a public URL and forward requests to your local machine.
+[Learn how to use ngrok](/tools/bolt-js/building-an-app#preparing-receive-events) to create a public URL and forward requests to your local machine.
 
 :::
 
@@ -255,7 +255,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 ### 3. Test your Slack app
 
-Now you can test your Slack app by inviting your app to a channel then saying “hello” (lower-case). Just like in the [Getting Started guide](/tools/bolt-js/getting-started), your app should respond back:
+Now you can test your Slack app by inviting your app to a channel then saying “hello” (lower-case). Just like in the [Quickstart guide](/tools/bolt-js/getting-started#running-the-app), your app should respond back:
 
 ```
 > 👩‍💻 hello

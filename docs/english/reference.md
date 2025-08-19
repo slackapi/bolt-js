@@ -4,7 +4,7 @@ sidebar_label: Reference
 
 # Bolt for JavaScript interface and configuration reference
 
-This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️[Getting Started guide](/tools/bolt-js/getting-started) to learn the basics of building Bolt for JavaScript apps.
+This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️[Building an app guide](/tools/bolt-js/building-an-app) to learn the basics of building Bolt for JavaScript apps.
 
 ---
 

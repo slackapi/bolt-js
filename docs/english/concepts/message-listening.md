@@ -1,6 +1,6 @@
 # Listening to messages
 
-To listen to messages that [your app has access to receive](https:///messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren’t of type `message` .A `message()` listener is equivalent to `event('message')`
+To listen to messages that [your app has access to receive](/messaging/retrieving-messages/#permissions), you can use the `message()` method which filters out events that aren’t of type `message`. A `message()` listener is equivalent to `event('message')`.
 
 The `message()` listener accepts an optional `pattern` parameter of type `string` or `RegExp` object which filters out any messages that don’t match the pattern.
 
