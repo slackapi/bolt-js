@@ -24,9 +24,6 @@ You'll need a workspace where development can happen. We recommend using [develo
 
 We recommend using the [**Slack CLI**](/tools/slack-cli/) for the smoothest experience, but you can also choose to follow along in the terminal as long as you have Node.js.
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 

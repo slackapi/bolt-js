@@ -6,9 +6,6 @@ sidebar_label: Quickstart
 
 This quickstart guide aims to help you get a Slack app using Bolt for JavaScript up and running as soon as possible!
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 When complete, you'll have a local environment configured with a customized [app](https://github.com/slack-samples/bolt-js-getting-started-app) running that responds to a simple greeting.
 
 :::tip[Reference for readers]
