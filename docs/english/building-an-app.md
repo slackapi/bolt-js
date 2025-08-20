@@ -50,11 +50,11 @@ $ slack login
 </TabItem>
 <TabItem value="terminal" label="Terminal">
 
-You can follow along in this guide as long as you have a newish version of Node installed:
+You can follow along in this guide as long as you have Node installed. We recommend the latest active release:
 
 - [Node.js](https://nodejs.org/en/download)
 
-Once installed, make sure a recent version is being used:
+Once installed, make sure the right version is being used:
 
 ```sh
 $ node --version
