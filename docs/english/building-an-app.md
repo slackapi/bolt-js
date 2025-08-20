@@ -4,7 +4,9 @@ sidebar_label: Building an App
 
 # Building an app with Bolt for JavaScript
 
-This guide will walk you through creating and using a Slack app built with Bolt for JavaScript. On this journey, you'll:
+This guide will walk you through creating and using a Slack app built with Bolt for JavaScript.
+
+On this journey, you'll:
 
 - set up your local environment,
 - create a new Slack app,
