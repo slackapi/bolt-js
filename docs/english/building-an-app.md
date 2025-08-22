@@ -332,7 +332,7 @@ Open [app settings](https://api.slack.com/apps) for your app and find the **Even
 - [`message.im`](/reference/events/message.im) listens for messages in your app's DMs with users
 - [`message.mpim`](/reference/events/message.mpim) listens for messages in multi-person DMs that your app is added to
 
-If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
+If you want your bot to listen to messages from every conversation it's added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
 You will also have to reinstall the app since new scopes are added for these events. Return to the **Install App** page to reinstall the app to your team.
 
