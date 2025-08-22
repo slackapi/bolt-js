@@ -323,7 +323,7 @@ Stop your app by pressing `CTRL+C` in the terminal then read on.
 
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events.
 
-To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API](/apis/events-api/) to subscribe to event types.
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is added to a message) you'll use the [Events API](/apis/events-api/) to subscribe to event types.
 
 Open [app settings](https://api.slack.com/apps) for your app and find the **Event Subscriptions** tab, toggle "Enable Events" on, then scroll down to **Subscribe to Bot Events**. There are four events related to messages:
 
