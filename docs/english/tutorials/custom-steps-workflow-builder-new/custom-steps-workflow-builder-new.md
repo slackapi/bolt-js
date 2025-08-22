@@ -68,7 +68,7 @@ All of your app's settings can be configured within these screens. By creating a
 
 Navigate to **Event Subscriptions** and expand **Subscribe to bot events** to see that we have subscribed to the `function_executed` event. This is also a requirement for adding workflow steps to our app, as it lets our app know when a step has been triggered, allowing our app to respond to it. 
 
-Another configuration setting to note is **Socket Mode**. We have turned this on for our local development, but socket mode is not intended for use in a production environment. When you are satisfied with your app and ready to deploy it to a production environment, you should switch to using public HTTP request URLs. Read more about getting started with HTTP in [Bolt for JavaScript here](/tools/bolt-js/getting-started).
+Another configuration setting to note is **Socket Mode**. We have turned this on for our local development, but socket mode is not intended for use in a production environment. When you are satisfied with your app and ready to deploy it to a production environment, you should switch to using public HTTP request URLs. Read more about getting started with HTTP in [Bolt for JavaScript here](/tools/bolt-js/building-an-app).
 
 Clicking on **Workflow Steps** in the left nav will show you that one workflow step has been added! This reflects the `function` defined in our manifest: functions are workflow steps. We will get to this step's implementation later.
 

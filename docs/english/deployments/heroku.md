@@ -6,7 +6,7 @@ When you’re finished, you’ll have this ⚡️[Deploying to Heroku app](https
 
 :::warning
 
- Using Heroku dynos to complete this tutorial counts towards your usage. [Delete your app](https://devcenter.heroku.com/articles/heroku-cli-commands#heroku-apps-destroy) as soon as you are done to control costs.
+Using Heroku dynos to complete this tutorial counts towards your usage. [Delete your app](https://devcenter.heroku.com/articles/heroku-cli-commands#heroku-apps-destroy) as soon as you are done to control costs.
 
 :::
 
@@ -14,10 +14,10 @@ When you’re finished, you’ll have this ⚡️[Deploying to Heroku app](https
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Getting Started guide](/tools/bolt-js/getting-started) or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Quickstart guide](/tools/bolt-js/getting-started) or clone the template app below:
 
 ```shell
-git clone https://github.com/slackapi/bolt-js-getting-started-app.git
+git clone https://github.com/slack-samples/bolt-js-getting-started-app.git
 ```
 
 After you have a Bolt app, navigate to its directory:
@@ -36,7 +36,7 @@ Heroku is a flexible platform that requires some configuration to host your app.
 
 ### 1. Use a Git repository
 
-:::info 
+:::info
 
 Skip this step if you used `git clone` in the previous section because you already have a Git repository.
 
@@ -69,7 +69,7 @@ git add Procfile
 git commit -m "Add Procfile"
 ```
 
-:::info 
+:::info
 
 Are you following this guide with an existing Bolt app? If so, please review the guide on [preparing a codebase for Heroku](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port) to listen on the correct port.
 
@@ -106,7 +106,8 @@ The Heroku CLI connects your local machine with your Heroku account. [Sign up fo
 ```shell
 heroku login
 ```
-:::warning 
+
+:::warning
 
 If you're behind a firewall, you may need to [set the proxy environment variables](https://devcenter.heroku.com/articles/using-the-cli#using-an-http-proxy) for the Heroku CLI.
 
@@ -181,9 +182,9 @@ heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
 heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-:::info 
+:::info
 
-If you don't know where to find your credentials, please read about [exporting your signing secret and token](/tools/bolt-js/getting-started#tokens-and-installing-apps) in the Getting Started guide.
+If you don't know where to find your credentials, please read about [exporting your signing secret and token](/tools/bolt-js/building-an-app#preparing-receive-events) in the Building an app guide.
 
 :::
 
@@ -205,7 +206,7 @@ You can now deploy your app with the command:
 git push heroku main
 ```
 
-:::info 
+:::info
 
 Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches will not trigger a deployment.
 
@@ -253,7 +254,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 Your app is now deployed and Slack is updated, so let's try it out!
 
-Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Getting Started guide](/tools/bolt-js/getting-started#sending-and-responding-to-actions), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
+Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Quickstart guide](/tools/bolt-js/getting-started#running-the-app), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
 
 ---
 
