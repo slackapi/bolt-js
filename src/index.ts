@@ -1,16 +1,5 @@
-import AppClass, {
-  AppOptions,
-  Authorize,
-  AuthorizeSourceData,
-  AuthorizeResult,
-  ActionConstraints,
-  LogLevel,
-  Logger,
-} from './App';
-
-// Export App both as default and named export for better ES module compatibility
-export { AppClass as App };
-export default AppClass;
+// Import App for better ES module compatibility
+import AppClass from './App';
 
 export {
   AppOptions,
@@ -20,7 +9,11 @@ export {
   ActionConstraints,
   LogLevel,
   Logger,
-};
+} from './App';
+
+// Export App both as named and default for better ES module compatibility
+export { AppClass as App };
+export default AppClass;
 
 export {
   verifySlackRequest,
