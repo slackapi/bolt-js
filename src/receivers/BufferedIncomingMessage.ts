@@ -5,3 +5,7 @@ import type { IncomingMessage } from 'node:http';
 export interface BufferedIncomingMessage extends IncomingMessage {
   rawBody: Buffer;
 }
+
+export function isBufferedIncomingMessage(request: IncomingMessage): request is BufferedIncomingMessage {
+  return 'rawBody' in request && Buffer.isBuffer(request.rawBody);
+}
