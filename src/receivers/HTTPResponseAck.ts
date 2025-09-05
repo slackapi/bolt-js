@@ -2,14 +2,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Logger } from '@slack/logger';
 import { CustomFunction } from '../CustomFunction';
 import { ReceiverMultipleAckError } from '../errors';
-import type { AckFn, ResponseAck } from '../types';
-import { isBufferedIncomingMessage } from './BufferedIncomingMessage';
+import type { AckFn, ResponseAck, StringIndexed } from '../types';
 import * as httpFunc from './HTTPModuleFunctions';
-
-// biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
-const hasBody = (httpRequest: IncomingMessage): httpRequest is IncomingMessage & Record<'body', any> => {
-  return 'body' in httpRequest && httpRequest.body !== undefined;
-};
 
 export interface AckArgs {
   logger: Logger;
@@ -17,6 +11,7 @@ export interface AckArgs {
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
   httpRequest: IncomingMessage;
+  httpRequestBody?: StringIndexed;
   httpResponse: ServerResponse;
 }
 
@@ -39,6 +34,8 @@ export class HTTPResponseAck implements ResponseAck {
 
   private httpRequest: IncomingMessage;
 
+  private httpRequestBody: StringIndexed;
+
   private httpResponse: ServerResponse;
 
   private noAckTimeoutId?: NodeJS.Timeout;
@@ -54,6 +51,7 @@ export class HTTPResponseAck implements ResponseAck {
     this.unhandledFunctionRequestTimeoutMillis = 10001;
     this.unhandledRequestTimeoutMillis = args.unhandledRequestTimeoutMillis ?? 3001;
     this.httpRequest = args.httpRequest;
+    this.httpRequestBody = args.httpRequestBody ?? {};
     this.httpResponse = args.httpResponse;
     this.storedResponse = undefined;
     this.noAckTimeoutId = undefined;
@@ -75,10 +73,7 @@ export class HTTPResponseAck implements ResponseAck {
      *
      * Goal: Define clear separation between protocol-specific and application-level concerns
      */
-    const body = this.parseRequestBody();
-    const requestTimeout = this.determineRequestTimeout(body);
-
-    this.logger.info(`HERE IS THE TIMEOUT: ${requestTimeout}`);
+    const requestTimeout = this.determineRequestTimeout();
 
     this.noAckTimeoutId = setTimeout(() => {
       if (!this.isAcknowledged) {
@@ -92,28 +87,9 @@ export class HTTPResponseAck implements ResponseAck {
     return this;
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
-  private parseRequestBody(): any {
-    if (hasBody(this.httpRequest)) {
-      return this.httpRequest.body;
-    }
-
-    if (isBufferedIncomingMessage(this.httpRequest)) {
-      return httpFunc.parseHTTPRequestBody(this.httpRequest);
-    }
-
-    return {};
-  }
-
-  // biome-ignore lint/suspicious/noExplicitAny: request bodies can be anything
-  private determineRequestTimeout(body: any): number {
-    if (body && 'event' in body) {
-      const event = body.event;
-      if (event && typeof event === 'object' && 'type' in event) {
-        if (event.type === CustomFunction.EVENT_TYPE) {
-          return this.unhandledFunctionRequestTimeoutMillis;
-        }
-      }
+  private determineRequestTimeout(): number {
+    if (this.httpRequestBody?.event?.type === CustomFunction.EVENT_TYPE) {
+      return this.unhandledFunctionRequestTimeoutMillis;
     }
 
     return this.unhandledRequestTimeoutMillis;
