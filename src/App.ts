@@ -1119,7 +1119,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         messageEventListenerArgs.message = messageEventListenerArgs.payload;
       }
       // Add complete() and fail() utilities for function-related interactivity
-      if (eventListenerArgs.event.type === CustomFunction.EVENT_TYPE) {
+      if (eventListenerArgs.event.type === 'function_executed') {
         listenerArgs.complete = createFunctionComplete(context, client);
         listenerArgs.fail = createFunctionFail(context, client);
         listenerArgs.inputs = eventListenerArgs.event.inputs;
@@ -1165,7 +1165,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       listenerArgs.ack = ack;
     } else {
       const eventListenerArgs = listenerArgs as unknown as SlackEventMiddlewareArgs;
-      if (eventListenerArgs.event?.type === CustomFunction.EVENT_TYPE) {
+      if (eventListenerArgs.event?.type === 'function_executed') {
         listenerArgs.ack = ack;
       } else {
         // Events API requests are acknowledged right away, since there's no data expected
@@ -1652,7 +1652,7 @@ function extractFunctionContext(body: StringIndexed) {
   let functionInputs: FunctionInputs | undefined = undefined;
 
   // function_executed event
-  if (body.event && body.event.type === CustomFunction.EVENT_TYPE && body.event.function_execution_id) {
+  if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
     functionExecutionId = body.event.function_execution_id;
     functionBotAccessToken = body.event.bot_access_token;
     functionInputs = body.event.inputs;

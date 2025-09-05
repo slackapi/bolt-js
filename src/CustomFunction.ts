@@ -49,8 +49,7 @@ export function matchCallbackId(callbackId: string): Middleware<SlackCustomFunct
 
 /** Class */
 export class CustomFunction {
-  public static readonly EVENT_TYPE = 'function_executed';
-
+  /** Function callback_id */
   public callbackId: string;
 
   private listeners: Middleware<SlackCustomFunctionMiddlewareArgs>[];
@@ -73,7 +72,7 @@ export class CustomFunction {
     if (this.options.autoAcknowledge) {
       return [
         onlyEvents,
-        matchEventType(CustomFunction.EVENT_TYPE),
+        matchEventType('function_executed'),
         matchCallbackId(this.callbackId),
         autoAcknowledge,
         ...this.listeners,
@@ -81,7 +80,7 @@ export class CustomFunction {
     }
     return [
       onlyEvents,
-      matchEventType(CustomFunction.EVENT_TYPE),
+      matchEventType('function_executed'),
       matchCallbackId(this.callbackId),
       ...this.listeners,
     ] as Middleware<AnyMiddlewareArgs>[]; // FIXME: workaround for TypeScript 4.7 breaking changes

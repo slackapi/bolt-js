@@ -1,6 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Logger } from '@slack/logger';
-import { CustomFunction } from '../CustomFunction';
 import { ReceiverMultipleAckError } from '../errors';
 import type { AckFn, ResponseAck, StringIndexed } from '../types';
 import * as httpFunc from './HTTPModuleFunctions';
@@ -88,7 +87,7 @@ export class HTTPResponseAck implements ResponseAck {
   }
 
   private determineRequestTimeout(): number {
-    if (this.httpRequestBody?.event?.type === CustomFunction.EVENT_TYPE) {
+    if (this.httpRequestBody?.event?.type === 'function_executed') {
       return this.unhandledFunctionRequestTimeoutMillis;
     }
 
