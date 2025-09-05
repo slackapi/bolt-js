@@ -59,13 +59,13 @@ export class HTTPResponseAck implements ResponseAck {
 
   private init(): HTTPResponseAck {
     /**
-     * TODO: Major refactoring needed
+     * TODO: (semver:major) refactoring needed
      *
-     * 1. For function_executed events, the acknowledgment timeout can vary from 3 to 60 seconds
+     * 1. For function_executed events, the acknowledgment timeout can vary from 3 to 15 seconds
      *    depending on the function context. Currently we only allow users to set a fixed
      *    timeout for all function_executed events, but this may not satisfy all use cases.
      *
-     * 2. Refactor Bolt App and Receiver logic to implement proper Request and Response abstractions:
+     * 2. Refactor Bolt App and Receivers to implement proper Request and Response abstractions:
      *    - Receivers should translate their specific request types to standardized Bolt Requests/Responses
      *    - All acknowledgment behaviors and default routing should be handled by the App, not the receivers
      *    - Prevent multiple request body parsing happening both here and again in the App
@@ -90,7 +90,6 @@ export class HTTPResponseAck implements ResponseAck {
     if (this.httpRequestBody?.event?.type === 'function_executed') {
       return this.unhandledFunctionRequestTimeoutMillis;
     }
-
     return this.unhandledRequestTimeoutMillis;
   }
 
