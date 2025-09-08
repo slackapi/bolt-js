@@ -47,7 +47,7 @@ export class HTTPResponseAck implements ResponseAck {
     this.isAcknowledged = false;
     this.processBeforeResponse = args.processBeforeResponse;
     this.unhandledRequestHandler = args.unhandledRequestHandler ?? httpFunc.defaultUnhandledRequestHandler;
-    this.unhandledFunctionRequestTimeoutMillis = 10001;
+    this.unhandledFunctionRequestTimeoutMillis = 5001;
     this.unhandledRequestTimeoutMillis = args.unhandledRequestTimeoutMillis ?? 3001;
     this.httpRequest = args.httpRequest;
     this.httpRequestBody = args.httpRequestBody ?? {};

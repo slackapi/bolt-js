@@ -161,7 +161,7 @@ describe('HTTPResponseAck', async () => {
       'buildContentResponse called with HTTP Response object and response body.',
     );
   });
-  it('should use extended timeout (10s) when handling function_executed events', async () => {
+  it('should use extended timeout when handling function_executed events', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
@@ -174,8 +174,8 @@ describe('HTTPResponseAck', async () => {
     responseAck.ack(); // no exception
     assert.equal(
       setTimeoutSpy.firstCall.args[1],
-      10001,
-      'a 10 second timeout for the unhandledRequestHandler callback is expected',
+      5001,
+      'a 5 second timeout for the unhandledRequestHandler callback is expected',
     );
   });
   it('should not use extended timeout, when the httpRequestBody is malformed', async () => {
