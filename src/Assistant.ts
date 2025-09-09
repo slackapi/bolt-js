@@ -46,7 +46,7 @@ type SetSuggestedPromptsFn = (
 
 interface SetSuggestedPromptsArguments {
   /** @description Prompt suggestions that appear when opening assistant thread. */
-  prompts: [AssistantPrompt, ...AssistantPrompt[]];
+  prompts: AssistantPrompt[];
   /** @description Title for the prompts. */
   title?: string;
 }
