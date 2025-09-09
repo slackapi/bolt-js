@@ -1,3 +1,4 @@
+import type { AssistantThreadsSetSuggestedPromptsResponse } from '@slack/web-api';
 import { expectError, expectType } from 'tsd';
 import { type AllAssistantMiddlewareArgs, Assistant } from '../../src/Assistant';
 import type { AssistantThreadContext } from '../../src/AssistantThreadContextStore';
@@ -33,8 +34,13 @@ expectType<Assistant>(
 // threadStarted tests
 new Assistant({
   userMessage: asyncNoop,
-  threadStarted: async ({ saveThreadContext }) => {
+  threadStarted: async ({ saveThreadContext, setSuggestedPrompts }) => {
     expectType<void>(await saveThreadContext());
+    expectType<AssistantThreadsSetSuggestedPromptsResponse>(
+      await setSuggestedPrompts({
+        prompts: [],
+      }),
+    );
     return Promise.resolve();
   },
 });
