@@ -46,7 +46,7 @@
     "@slack/oauth": "^3.0.4",
     "@slack/socket-mode": "^2.0.5",
     "@slack/types": "^2.16.0",
-    "@slack/web-api": "^7.10.0",
+    "@slack/web-api": "feat-ai-apps",
     "axios": "^1.8.3",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
