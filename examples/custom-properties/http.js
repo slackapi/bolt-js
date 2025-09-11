@@ -47,8 +47,8 @@ app.use(async ({ logger, context, next }) => {
     await app.init();
     await app.start(process.env.PORT || 3000);
   } catch (e) {
-    console.error(e);
+    app.logger.error(e);
     process.exit(255);
   }
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();

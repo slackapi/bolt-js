@@ -23,5 +23,5 @@ app.use(async ({ logger, context, next }) => {
   // Start your app
   await app.start();
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
