@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Logger } from '@slack/logger';
 import { ReceiverMultipleAckError } from '../errors';
-import type { AckFn, ResponseAck } from '../types';
+import type { AckFn, ResponseAck, StringIndexed } from '../types';
 import * as httpFunc from './HTTPModuleFunctions';
 
 export interface AckArgs {
@@ -10,6 +10,7 @@ export interface AckArgs {
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
   httpRequest: IncomingMessage;
+  httpRequestBody?: StringIndexed;
   httpResponse: ServerResponse;
 }
 
@@ -28,7 +29,11 @@ export class HTTPResponseAck implements ResponseAck {
 
   private unhandledRequestTimeoutMillis: number;
 
+  private unhandledFunctionRequestTimeoutMillis: number;
+
   private httpRequest: IncomingMessage;
+
+  private httpRequestBody: StringIndexed;
 
   private httpResponse: ServerResponse;
 
@@ -42,8 +47,10 @@ export class HTTPResponseAck implements ResponseAck {
     this.isAcknowledged = false;
     this.processBeforeResponse = args.processBeforeResponse;
     this.unhandledRequestHandler = args.unhandledRequestHandler ?? httpFunc.defaultUnhandledRequestHandler;
+    this.unhandledFunctionRequestTimeoutMillis = 5001;
     this.unhandledRequestTimeoutMillis = args.unhandledRequestTimeoutMillis ?? 3001;
     this.httpRequest = args.httpRequest;
+    this.httpRequestBody = args.httpRequestBody ?? {};
     this.httpResponse = args.httpResponse;
     this.storedResponse = undefined;
     this.noAckTimeoutId = undefined;
@@ -51,6 +58,22 @@ export class HTTPResponseAck implements ResponseAck {
   }
 
   private init(): HTTPResponseAck {
+    /**
+     * TODO: (semver:major) refactoring needed
+     *
+     * 1. For function_executed events, the acknowledgment timeout can vary from 3 to 15 seconds
+     *    depending on the function context. Currently we only allow users to set a fixed
+     *    timeout for all function_executed events, but this may not satisfy all use cases.
+     *
+     * 2. Refactor Bolt App and Receivers to implement proper Request and Response abstractions:
+     *    - Receivers should translate their specific request types to standardized Bolt Requests/Responses
+     *    - All acknowledgment behaviors and default routing should be handled by the App, not the receivers
+     *    - Prevent multiple request body parsing happening both here and again in the App
+     *
+     * Goal: Define clear separation between protocol-specific and application-level concerns
+     */
+    const requestTimeout = this.determineRequestTimeout();
+
     this.noAckTimeoutId = setTimeout(() => {
       if (!this.isAcknowledged) {
         this.unhandledRequestHandler({
@@ -59,8 +82,15 @@ export class HTTPResponseAck implements ResponseAck {
           response: this.httpResponse,
         });
       }
-    }, this.unhandledRequestTimeoutMillis);
+    }, requestTimeout);
     return this;
+  }
+
+  private determineRequestTimeout(): number {
+    if (this.httpRequestBody?.event?.type === 'function_executed') {
+      return this.unhandledFunctionRequestTimeoutMillis;
+    }
+    return this.unhandledRequestTimeoutMillis;
   }
 
   public bind(): AckFn<HTTResponseBody> {
