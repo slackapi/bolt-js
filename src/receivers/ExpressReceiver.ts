@@ -318,6 +318,7 @@ export default class ExpressReceiver implements Receiver {
       unhandledRequestHandler: this.unhandledRequestHandler,
       unhandledRequestTimeoutMillis: this.unhandledRequestTimeoutMillis,
       httpRequest: req,
+      httpRequestBody: req.body,
       httpResponse: res,
     });
     const event: ReceiverEvent = {
