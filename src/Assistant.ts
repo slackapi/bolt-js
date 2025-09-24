@@ -1,4 +1,5 @@
 import type {
+  AssistantThreadsSetStatusArguments,
   AssistantThreadsSetStatusResponse,
   AssistantThreadsSetSuggestedPromptsResponse,
   AssistantThreadsSetTitleResponse,
@@ -38,7 +39,9 @@ interface AssistantUtilityArgs {
 
 type GetThreadContextUtilFn = () => Promise<AssistantThreadContext>;
 type SaveThreadContextUtilFn = () => Promise<void>;
-type SetStatusFn = (status: string) => Promise<AssistantThreadsSetStatusResponse>;
+type SetStatusFn = (
+  status: string | Omit<AssistantThreadsSetStatusArguments, 'channel_id' | 'thread_ts'>,
+) => Promise<AssistantThreadsSetStatusResponse>;
 
 type SetSuggestedPromptsFn = (
   params: SetSuggestedPromptsArguments,
@@ -336,12 +339,20 @@ function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const { client, payload } = args;
   const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
 
-  return (status: Parameters<SetStatusFn>[0]) =>
-    client.assistant.threads.setStatus({
+  return (status: Parameters<SetStatusFn>[0]): Promise<AssistantThreadsSetStatusResponse> => {
+    if (typeof status === 'string') {
+      return client.assistant.threads.setStatus({
+        channel_id,
+        thread_ts,
+        status,
+      });
+    }
+    return client.assistant.threads.setStatus({
       channel_id,
       thread_ts,
-      status,
+      ...status,
     });
+  };
 }
 
 /**

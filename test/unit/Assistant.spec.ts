@@ -399,7 +399,7 @@ describe('Assistant class', () => {
           sinon.assert.calledOnce(mockThreadContextStore.get);
         });
 
-        it('setStatus should call assistant.threads.setStatus', async () => {
+        it('setStatus should call assistant.threads.setStatus with a string', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
           const fakeClient = { assistant: { threads: { setStatus: sinon.spy() } } };
@@ -411,7 +411,42 @@ describe('Assistant class', () => {
 
           await threadStartedArgs.setStatus('Status set!');
 
-          sinon.assert.called(fakeClient.assistant.threads.setStatus);
+          sinon.assert.calledWith(fakeClient.assistant.threads.setStatus, {
+            channel_id: 'C1234',
+            thread_ts: '1234.56',
+            status: 'Status set!',
+          });
+        });
+
+        it('setStatus should call assistant.threads.setStatus with method arguments', async () => {
+          const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
+
+          const fakeClient = { assistant: { threads: { setStatus: sinon.spy() } } };
+          mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
+          const mockThreadContextStore = createMockThreadContextStore();
+
+          const { enrichAssistantArgs } = importAssistant();
+          const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
+
+          await threadStartedArgs.setStatus({
+            status: 'Loading...',
+            loading_messages: [
+              'Thinking about a response...',
+              'Wondering what to say next...',
+              'Writing a first draft...',
+            ],
+          });
+
+          sinon.assert.calledWith(fakeClient.assistant.threads.setStatus, {
+            channel_id: 'C1234',
+            thread_ts: '1234.56',
+            status: 'Loading...',
+            loading_messages: [
+              'Thinking about a response...',
+              'Wondering what to say next...',
+              'Writing a first draft...',
+            ],
+          });
         });
 
         it('setSuggestedPrompts should call assistant.threads.setSuggestedPrompts', async () => {
