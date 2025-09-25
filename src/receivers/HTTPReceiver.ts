@@ -486,6 +486,7 @@ export default class HTTPReceiver implements Receiver {
         unhandledRequestHandler: this.unhandledRequestHandler,
         unhandledRequestTimeoutMillis: this.unhandledRequestTimeoutMillis,
         httpRequest: bufferedReq,
+        httpRequestBody: body,
         httpResponse: res,
       });
       // Structure the ReceiverEvent
