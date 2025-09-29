@@ -1,0 +1,28 @@
+{
+  "id": "concepts/deferring-initialization",
+  "title": "Deferring app initialization",
+  "description": "Bolt offers a way to defer full initialization via the deferInitialization option and to call the equivalent App#init() in your code, putting more control over asynchronous execution required for initialization into your hands as the developer.",
+  "source": "@site/content/concepts/deferring-initialization.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/deferring-initialization",
+  "permalink": "/bolt-js/concepts/deferring-initialization",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/deferring-initialization.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Deferring app initialization",
+    "lang": "en",
+    "slug": "/concepts/deferring-initialization"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Adding custom HTTP routes",
+    "permalink": "/bolt-js/concepts/custom-routes"
+  },
+  "next": {
+    "title": "Customizing a receiver",
+    "permalink": "/bolt-js/concepts/receiver"
+  }
+}

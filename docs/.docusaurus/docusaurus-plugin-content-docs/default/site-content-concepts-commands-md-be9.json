@@ -1,0 +1,28 @@
+{
+  "id": "concepts/commands",
+  "title": "Listening & responding to commands",
+  "description": "Your app can use the command() method to listen to incoming slash command requests. The method requires a commandName of type string or RegExp.",
+  "source": "@site/content/concepts/commands.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/commands",
+  "permalink": "/bolt-js/concepts/commands",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/commands.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Listening & responding to commands",
+    "lang": "en",
+    "slug": "/concepts/commands"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Listening & responding to shortcuts",
+    "permalink": "/bolt-js/concepts/shortcuts"
+  },
+  "next": {
+    "title": "Listening & responding to actions",
+    "permalink": "/bolt-js/concepts/actions"
+  }
+}

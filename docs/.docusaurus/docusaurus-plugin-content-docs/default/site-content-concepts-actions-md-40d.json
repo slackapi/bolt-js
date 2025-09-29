@@ -1,0 +1,28 @@
+{
+  "id": "concepts/actions",
+  "title": "Listening & responding to actions",
+  "description": "Your app can listen and respond to user actions like button clicks, and menu selects, using the action method.",
+  "source": "@site/content/concepts/actions.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/actions",
+  "permalink": "/bolt-js/concepts/actions",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/actions.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Listening & responding to actions",
+    "lang": "en",
+    "slug": "/concepts/actions"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Listening & responding to commands",
+    "permalink": "/bolt-js/concepts/commands"
+  },
+  "next": {
+    "title": "Opening modals",
+    "permalink": "/bolt-js/concepts/creating-modals"
+  }
+}

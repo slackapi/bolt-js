@@ -1,0 +1,28 @@
+{
+  "id": "concepts/socket-mode",
+  "title": "Using Socket Mode",
+  "description": "Socket Mode allows your app to connect and receive data from Slack via a WebSocket connection. To handle the connection, Bolt for JavaScript includes a SocketModeReceiver (in @slack/bolt@3.0.0 and higher). Before using Socket Mode, be sure to enable it within your app configuration.",
+  "source": "@site/content/concepts/socket-mode.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/socket-mode",
+  "permalink": "/bolt-js/concepts/socket-mode",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/socket-mode.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Using Socket Mode",
+    "lang": "en",
+    "slug": "/concepts/socket-mode"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Custom Steps",
+    "permalink": "/bolt-js/concepts/custom-steps"
+  },
+  "next": {
+    "title": "Handling errors",
+    "permalink": "/bolt-js/concepts/error-handling"
+  }
+}

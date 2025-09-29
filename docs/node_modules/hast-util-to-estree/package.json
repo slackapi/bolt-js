@@ -1,0 +1,117 @@
+{
+  "name": "hast-util-to-estree",
+  "version": "3.1.0",
+  "description": "hast utility to transform to estree (JavaScript AST) JSX",
+  "license": "MIT",
+  "keywords": [
+    "unist",
+    "hast",
+    "hast-util",
+    "util",
+    "utility",
+    "html",
+    "change",
+    "transform",
+    "rehype",
+    "estree",
+    "jsx",
+    "javascript",
+    "ecmascript",
+    "mdx"
+  ],
+  "repository": "syntax-tree/hast-util-to-estree",
+  "bugs": "https://github.com/syntax-tree/hast-util-to-estree/issues",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/unified"
+  },
+  "author": "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "exports": "./index.js",
+  "files": [
+    "lib/",
+    "index.d.ts",
+    "index.js"
+  ],
+  "dependencies": {
+    "@types/estree": "^1.0.0",
+    "@types/estree-jsx": "^1.0.0",
+    "@types/hast": "^3.0.0",
+    "comma-separated-tokens": "^2.0.0",
+    "devlop": "^1.0.0",
+    "estree-util-attach-comments": "^3.0.0",
+    "estree-util-is-identifier-name": "^3.0.0",
+    "hast-util-whitespace": "^3.0.0",
+    "mdast-util-mdx-expression": "^2.0.0",
+    "mdast-util-mdx-jsx": "^3.0.0",
+    "mdast-util-mdxjs-esm": "^2.0.0",
+    "property-information": "^6.0.0",
+    "space-separated-tokens": "^2.0.0",
+    "style-to-object": "^0.4.0",
+    "unist-util-position": "^5.0.0",
+    "zwitch": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "acorn-jsx": "^5.0.0",
+    "c8": "^8.0.0",
+    "esast-util-from-js": "^2.0.0",
+    "estree-util-to-js": "^2.0.0",
+    "estree-walker": "^3.0.0",
+    "hastscript": "^8.0.0",
+    "mdast-util-from-markdown": "^2.0.0",
+    "mdast-util-mdx": "^3.0.0",
+    "mdast-util-to-hast": "^13.0.0",
+    "micromark-extension-mdxjs": "^2.0.0",
+    "prettier": "^3.0.0",
+    "remark-cli": "^11.0.0",
+    "remark-preset-wooorm": "^9.0.0",
+    "type-coverage": "^2.0.0",
+    "typescript": "^5.0.0",
+    "unist-util-visit": "^5.0.0",
+    "xo": "^0.56.0"
+  },
+  "scripts": {
+    "prepack": "npm run build && npm run format",
+    "build": "tsc --build --clean && tsc --build && type-coverage",
+    "format": "remark . -qfo && prettier . -w --log-level warn && xo --fix",
+    "test-api": "node --conditions development test.js",
+    "test-coverage": "c8 --100 --reporter lcov npm run test-api",
+    "test": "npm run build && npm run format && npm run test-coverage"
+  },
+  "prettier": {
+    "bracketSpacing": false,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "none",
+    "useTabs": false
+  },
+  "remarkConfig": {
+    "plugins": [
+      "remark-preset-wooorm"
+    ]
+  },
+  "typeCoverage": {
+    "atLeast": 100,
+    "detail": true,
+    "ignoreCatch": true,
+    "#": "needed any",
+    "ignoreFiles": [
+      "lib/state.d.ts",
+      "lib/state.js"
+    ],
+    "strict": true
+  },
+  "xo": {
+    "prettier": true,
+    "rules": {
+      "unicorn/prefer-code-point": "off",
+      "unicorn/prefer-string-replace-all": "off"
+    }
+  }
+}

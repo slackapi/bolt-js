@@ -1,0 +1,29 @@
+{
+  "id": "reference",
+  "title": "Bolt for JavaScript interface and configuration reference",
+  "description": "This guide is intended to detail the Bolt interface–including listeners and their arguments, initialization options, and errors. It may be helpful to first go through the ⚡️Getting Started guide to learn the basics of building Bolt for JavaScript apps.",
+  "source": "@site/content/reference.md",
+  "sourceDirName": ".",
+  "slug": "/reference",
+  "permalink": "/bolt-js/reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/reference.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Bolt for JavaScript interface and configuration reference",
+    "sidebar_label": "Reference",
+    "slug": "reference",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Conversation stores",
+    "permalink": "/bolt-js/concepts/conversation-store"
+  },
+  "next": {
+    "title": "AI Assistant",
+    "permalink": "/bolt-js/tutorials/ai-assistant"
+  }
+}

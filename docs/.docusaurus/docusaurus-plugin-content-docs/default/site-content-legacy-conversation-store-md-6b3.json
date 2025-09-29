@@ -1,0 +1,28 @@
+{
+  "id": "legacy/conversation-store",
+  "title": "Conversation stores",
+  "description": "Bolt for JavaScript includes support for a store, which sets and retrieves state related to a conversation.",
+  "source": "@site/content/legacy/conversation-store.md",
+  "sourceDirName": "legacy",
+  "slug": "/concepts/conversation-store",
+  "permalink": "/bolt-js/concepts/conversation-store",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/legacy/conversation-store.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Conversation stores",
+    "lang": "en",
+    "slug": "/concepts/conversation-store"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Steps from Apps",
+    "permalink": "/bolt-js/legacy/steps-from-apps"
+  },
+  "next": {
+    "title": "Reference",
+    "permalink": "/bolt-js/reference"
+  }
+}

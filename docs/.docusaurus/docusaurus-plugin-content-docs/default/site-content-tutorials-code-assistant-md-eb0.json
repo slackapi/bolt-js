@@ -1,0 +1,28 @@
+{
+  "id": "tutorials/code-assistant",
+  "title": "AI Code Assistant with Hugging Face",
+  "description": "In this tutorial, we will create an AI app with the Bolt framework and integrate a Hugging Face model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.",
+  "source": "@site/content/tutorials/code-assistant.md",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/code-assistant",
+  "permalink": "/bolt-js/tutorials/code-assistant",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/tutorials/code-assistant.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "AI Code Assistant with Hugging Face",
+    "slug": "/tutorials/code-assistant",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "AI Assistant",
+    "permalink": "/bolt-js/tutorials/ai-assistant"
+  },
+  "next": {
+    "title": "Custom Steps",
+    "permalink": "/bolt-js/tutorials/custom-steps"
+  }
+}

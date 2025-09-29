@@ -1,0 +1,28 @@
+{
+  "id": "concepts/token-rotation",
+  "title": "Token rotation",
+  "description": "Supported in Bolt for JavaScript as of v3.5.0, token rotation provides an extra layer of security for your access tokens and is defined by the OAuth V2 RFC.",
+  "source": "@site/content/concepts/token-rotation.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/token-rotation",
+  "permalink": "/bolt-js/concepts/token-rotation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/token-rotation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Token rotation",
+    "lang": "en",
+    "slug": "/concepts/token-rotation"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Authorization",
+    "permalink": "/bolt-js/concepts/authorization"
+  },
+  "next": {
+    "title": "Deploying to AWS Lambda",
+    "permalink": "/bolt-js/deployments/aws-lambda"
+  }
+}

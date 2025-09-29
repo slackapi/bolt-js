@@ -1,0 +1,28 @@
+{
+  "id": "concepts/view-submissions",
+  "title": "Listening to views",
+  "description": "You may listen for user interactions with views using the view method.",
+  "source": "@site/content/concepts/view-submissions.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/view-submissions",
+  "permalink": "/bolt-js/concepts/view-submissions",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/view-submissions.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Listening to views",
+    "lang": "en",
+    "slug": "/concepts/view-submissions"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Updating & pushing views",
+    "permalink": "/bolt-js/concepts/updating-pushing-views"
+  },
+  "next": {
+    "title": "Listening & responding to select menu options",
+    "permalink": "/bolt-js/concepts/options"
+  }
+}

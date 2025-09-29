@@ -1,0 +1,28 @@
+{
+  "id": "concepts/authenticating-oauth",
+  "title": "Authenticating with OAuth",
+  "description": "OAuth allows installation of your app to any workspace and is an important step in distributing your app. This is because each app installation issues unique access tokens with related installation information that can be retrieved for incoming events and used to make scoped API requests.",
+  "source": "@site/content/concepts/authenticating-oauth.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/authenticating-oauth",
+  "permalink": "/bolt-js/concepts/authenticating-oauth",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/authenticating-oauth.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Authenticating with OAuth",
+    "lang": "en",
+    "slug": "/concepts/authenticating-oauth"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Adding context",
+    "permalink": "/bolt-js/concepts/context"
+  },
+  "next": {
+    "title": "Authorization",
+    "permalink": "/bolt-js/concepts/authorization"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "concepts/publishing-views",
+  "title": "Publishing views to App Home",
+  "description": "Home tabs are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a user_id and view payload to the views.publish method.",
+  "source": "@site/content/concepts/publishing-views.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/publishing-views",
+  "permalink": "/bolt-js/concepts/publishing-views",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/publishing-views.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Publishing views to App Home",
+    "lang": "en",
+    "slug": "/concepts/publishing-views"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Listening & responding to select menu options",
+    "permalink": "/bolt-js/concepts/options"
+  },
+  "next": {
+    "title": "AI Apps",
+    "permalink": "/bolt-js/concepts/ai-apps"
+  }
+}

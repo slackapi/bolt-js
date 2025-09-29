@@ -1,0 +1,28 @@
+{
+  "id": "concepts/custom-steps",
+  "title": "Custom Steps",
+  "description": "Your app can use the function() method to listen to incoming custom step requests. Custom steps are used in Workflow Builder to build workflows. The method requires a step callbackid of type string. This callbackid must also be defined in your Function definition. Custom steps must be finalized using the complete() or fail() listener arguments to notify Slack that your app has processed the request.",
+  "source": "@site/content/concepts/custom-steps.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/custom-steps",
+  "permalink": "/bolt-js/concepts/custom-steps",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/custom-steps.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Custom Steps",
+    "lang": "en",
+    "slug": "/concepts/custom-steps"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "AI Apps",
+    "permalink": "/bolt-js/concepts/ai-apps"
+  },
+  "next": {
+    "title": "Using Socket Mode",
+    "permalink": "/bolt-js/concepts/socket-mode"
+  }
+}

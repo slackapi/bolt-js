@@ -1,0 +1,46 @@
+{
+  "name": "postcss-svgo",
+  "version": "7.0.1",
+  "description": "Optimise inline SVG with PostCSS.",
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "LICENSE-MIT",
+    "src",
+    "types"
+  ],
+  "keywords": [
+    "css",
+    "minify",
+    "optimise",
+    "postcss",
+    "postcss-plugin",
+    "svg",
+    "svgo"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cssnano/cssnano",
+  "author": {
+    "name": "Ben Briggs",
+    "email": "beneb.info@gmail.com",
+    "url": "http://beneb.info"
+  },
+  "repository": "cssnano/cssnano",
+  "dependencies": {
+    "postcss-value-parser": "^4.2.0",
+    "svgo": "^3.3.2"
+  },
+  "bugs": {
+    "url": "https://github.com/cssnano/cssnano/issues"
+  },
+  "engines": {
+    "node": "^18.12.0 || ^20.9.0 || >= 18"
+  },
+  "devDependencies": {
+    "pleeease-filters": "^4.0.0",
+    "postcss": "^8.4.38"
+  },
+  "peerDependencies": {
+    "postcss": "^8.4.31"
+  }
+}

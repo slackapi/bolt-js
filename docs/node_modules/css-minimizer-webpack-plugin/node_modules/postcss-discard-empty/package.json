@@ -1,0 +1,41 @@
+{
+  "name": "postcss-discard-empty",
+  "version": "7.0.0",
+  "description": "Discard empty rules and values with PostCSS.",
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "src",
+    "LICENSE-MIT",
+    "types"
+  ],
+  "keywords": [
+    "compress",
+    "css",
+    "empty",
+    "minify",
+    "optimisation",
+    "postcss",
+    "postcss-plugin"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cssnano/cssnano",
+  "author": {
+    "name": "Ben Briggs",
+    "email": "beneb.info@gmail.com",
+    "url": "http://beneb.info"
+  },
+  "repository": "cssnano/cssnano",
+  "bugs": {
+    "url": "https://github.com/cssnano/cssnano/issues"
+  },
+  "engines": {
+    "node": "^18.12.0 || ^20.9.0 || >=22.0"
+  },
+  "devDependencies": {
+    "postcss": "^8.4.38"
+  },
+  "peerDependencies": {
+    "postcss": "^8.4.31"
+  }
+}

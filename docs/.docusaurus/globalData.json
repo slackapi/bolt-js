@@ -1,0 +1,243 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/bolt-js/",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/bolt-js/",
+          "mainDocId": "index",
+          "docs": [
+            {
+              "id": "concepts/acknowledge",
+              "path": "/bolt-js/concepts/acknowledge",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/actions",
+              "path": "/bolt-js/concepts/actions",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/ai-apps",
+              "path": "/bolt-js/concepts/ai-apps",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/authenticating-oauth",
+              "path": "/bolt-js/concepts/authenticating-oauth",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/authorization",
+              "path": "/bolt-js/concepts/authorization",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/commands",
+              "path": "/bolt-js/concepts/commands",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/context",
+              "path": "/bolt-js/concepts/context",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/creating-modals",
+              "path": "/bolt-js/concepts/creating-modals",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/custom-routes",
+              "path": "/bolt-js/concepts/custom-routes",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/custom-steps",
+              "path": "/bolt-js/concepts/custom-steps",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/deferring-initialization",
+              "path": "/bolt-js/concepts/deferring-initialization",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/error-handling",
+              "path": "/bolt-js/concepts/error-handling",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/event-listening",
+              "path": "/bolt-js/concepts/event-listening",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/global-middleware",
+              "path": "/bolt-js/concepts/global-middleware",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/listener-middleware",
+              "path": "/bolt-js/concepts/listener-middleware",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/logging",
+              "path": "/bolt-js/concepts/logging",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/message-listening",
+              "path": "/bolt-js/concepts/message-listening",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/message-sending",
+              "path": "/bolt-js/concepts/message-sending",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/publishing-views",
+              "path": "/bolt-js/concepts/publishing-views",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/receiver",
+              "path": "/bolt-js/concepts/receiver",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/select-menu-options",
+              "path": "/bolt-js/concepts/options",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/shortcuts",
+              "path": "/bolt-js/concepts/shortcuts",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/socket-mode",
+              "path": "/bolt-js/concepts/socket-mode",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/token-rotation",
+              "path": "/bolt-js/concepts/token-rotation",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/updating-pushing-views",
+              "path": "/bolt-js/concepts/updating-pushing-views",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/view-submissions",
+              "path": "/bolt-js/concepts/view-submissions",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "concepts/web-api",
+              "path": "/bolt-js/concepts/web-api",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "deployments/aws-lambda",
+              "path": "/bolt-js/deployments/aws-lambda",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "deployments/heroku",
+              "path": "/bolt-js/deployments/heroku",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "getting-started",
+              "path": "/bolt-js/getting-started",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "index",
+              "path": "/bolt-js/",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "legacy/conversation-store",
+              "path": "/bolt-js/concepts/conversation-store",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "legacy/hubot-migration",
+              "path": "/bolt-js/tutorial/hubot-migration",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "legacy/steps-from-apps",
+              "path": "/bolt-js/legacy/steps-from-apps",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "migration/migration-v2",
+              "path": "/bolt-js/tutorial/migration-v2",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "migration/migration-v3",
+              "path": "/bolt-js/tutorial/migration-v3",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "migration/migration-v4",
+              "path": "/bolt-js/tutorial/migration-v4",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "reference",
+              "path": "/bolt-js/reference",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "tutorials/ai-assistant",
+              "path": "/bolt-js/tutorials/ai-assistant",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "tutorials/code-assistant",
+              "path": "/bolt-js/tutorials/code-assistant",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "tutorials/custom-steps",
+              "path": "/bolt-js/tutorials/custom-steps",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "tutorials/custom-steps-workflow-builder-existing",
+              "path": "/bolt-js/tutorials/custom-steps-workflow-builder-existing",
+              "sidebar": "sidebarJSBolt"
+            },
+            {
+              "id": "tutorials/custom-steps-workflow-builder-new",
+              "path": "/bolt-js/tutorials/custom-steps-workflow-builder-new",
+              "sidebar": "sidebarJSBolt"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "sidebarJSBolt": {
+              "link": {
+                "path": "/bolt-js/",
+                "label": "Bolt for JavaScript"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": false
+    }
+  }
+}

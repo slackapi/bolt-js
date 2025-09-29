@@ -1,0 +1,28 @@
+{
+  "id": "concepts/web-api",
+  "title": "Using the Web API",
+  "description": "You can call any Web API method using the WebClient provided to your app's listeners as client. This uses either the token that initialized your app or the token that is returned from the authorize function for the incoming event. The built-in OAuth support handles the second case by default.",
+  "source": "@site/content/concepts/web-api.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/web-api",
+  "permalink": "/bolt-js/concepts/web-api",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/web-api.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Using the Web API",
+    "lang": "en",
+    "slug": "/concepts/web-api"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Sending messages",
+    "permalink": "/bolt-js/concepts/message-sending"
+  },
+  "next": {
+    "title": "Listening to messages",
+    "permalink": "/bolt-js/concepts/message-listening"
+  }
+}

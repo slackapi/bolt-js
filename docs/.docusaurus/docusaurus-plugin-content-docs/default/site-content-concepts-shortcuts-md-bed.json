@@ -1,0 +1,28 @@
+{
+  "id": "concepts/shortcuts",
+  "title": "Listening & responding to shortcuts",
+  "description": "The shortcut() method supports both global shortcuts and message shortcuts.",
+  "source": "@site/content/concepts/shortcuts.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/shortcuts",
+  "permalink": "/bolt-js/concepts/shortcuts",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/shortcuts.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Listening & responding to shortcuts",
+    "lang": "en",
+    "slug": "/concepts/shortcuts"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Acknowledging requests",
+    "permalink": "/bolt-js/concepts/acknowledge"
+  },
+  "next": {
+    "title": "Listening & responding to commands",
+    "permalink": "/bolt-js/concepts/commands"
+  }
+}

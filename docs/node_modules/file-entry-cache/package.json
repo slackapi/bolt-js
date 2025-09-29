@@ -1,0 +1,59 @@
+{
+  "name": "file-entry-cache",
+  "version": "9.1.0",
+  "description": "Super simple cache for file metadata, useful for process that work o a given series of files and that only need to repeat the job on the changed ones since the previous run of the process",
+  "repository": "jaredwray/file-entry-cache",
+  "license": "MIT",
+  "author": {
+    "name": "Jared Wray",
+    "url": "https://jaredwray.com"
+  },
+  "main": "cache.js",
+  "files": [
+    "cache.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "clean": "rimraf ./coverage /node_modules ./package-lock.json ./yarn.lock ./pnpm-lock.yaml",
+    "test": "xo --fix && c8 mocha -R spec test/specs/cache.js test/relative.js",
+    "test:relative": "rimraf ./rfixtures ./tfixtures && mocha test/relative.js",
+    "test:ci": "xo && c8 --reporter=lcov mocha -R spec test/specs/cache.js test/relative.js",
+    "perf": "node perf.js"
+  },
+  "prepush": [
+    "npm run test"
+  ],
+  "precommit": [
+    "npm run test"
+  ],
+  "keywords": [
+    "file cache",
+    "task cache files",
+    "file cache",
+    "key par",
+    "key value",
+    "cache"
+  ],
+  "devDependencies": {
+    "c8": "^10.1.2",
+    "chai": "^4.3.10",
+    "glob-expand": "^0.2.1",
+    "mocha": "^10.5.1",
+    "rimraf": "^5.0.7",
+    "webpack": "^5.92.1",
+    "write": "^2.0.0",
+    "xo": "^0.58.0"
+  },
+  "dependencies": {
+    "flat-cache": "^5.0.0"
+  },
+  "xo": {
+    "rules": {
+      "unicorn/prefer-module": "off",
+      "n/prefer-global/process": "off",
+      "unicorn/prevent-abbreviations": "off"
+    }
+  }
+}

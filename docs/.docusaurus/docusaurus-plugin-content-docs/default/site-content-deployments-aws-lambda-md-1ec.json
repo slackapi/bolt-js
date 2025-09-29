@@ -1,0 +1,27 @@
+{
+  "id": "deployments/aws-lambda",
+  "title": "Deploying to AWS Lambda",
+  "description": "This guide walks you through preparing and deploying a Slack app using Bolt for JavaScript, the Serverless Framework, and AWS Lambda.",
+  "source": "@site/content/deployments/aws-lambda.md",
+  "sourceDirName": "deployments",
+  "slug": "/deployments/aws-lambda",
+  "permalink": "/bolt-js/deployments/aws-lambda",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/deployments/aws-lambda.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Deploying to AWS Lambda",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Token rotation",
+    "permalink": "/bolt-js/concepts/token-rotation"
+  },
+  "next": {
+    "title": "Deploying to Heroku",
+    "permalink": "/bolt-js/deployments/heroku"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "migration/migration-v4",
+  "title": "Migrating to V4",
+  "description": "This guide will walk you through the process of updating your app from using @slack/bolt@3.x to @slack/bolt@4.x. There may be a few changes you'll need to make depending on which features you use, but for most apps, these changes can be applied in a few minutes. Some apps may need no changes at all.",
+  "source": "@site/content/migration/migration-v4.md",
+  "sourceDirName": "migration",
+  "slug": "/tutorial/migration-v4",
+  "permalink": "/bolt-js/tutorial/migration-v4",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/migration/migration-v4.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Migrating to V4",
+    "slug": "/tutorial/migration-v4",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Migrating to V3",
+    "permalink": "/bolt-js/tutorial/migration-v3"
+  },
+  "next": {
+    "title": "Hubot app migration",
+    "permalink": "/bolt-js/tutorial/hubot-migration"
+  }
+}

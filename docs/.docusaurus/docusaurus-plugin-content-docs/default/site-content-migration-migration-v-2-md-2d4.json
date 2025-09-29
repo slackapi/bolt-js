@@ -1,0 +1,28 @@
+{
+  "id": "migration/migration-v2",
+  "title": "Migrating to V2",
+  "description": "End of life for @slack/bolt@1.x was  April 30th, 2021. Development has been fully stopped for @slack/bolt@1.x and all remaining open issues and pull requests have been closed.",
+  "source": "@site/content/migration/migration-v2.md",
+  "sourceDirName": "migration",
+  "slug": "/tutorial/migration-v2",
+  "permalink": "/bolt-js/tutorial/migration-v2",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/migration/migration-v2.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Migrating to V2",
+    "slug": "/tutorial/migration-v2",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Deploying to Heroku",
+    "permalink": "/bolt-js/deployments/heroku"
+  },
+  "next": {
+    "title": "Migrating to V3",
+    "permalink": "/bolt-js/tutorial/migration-v3"
+  }
+}

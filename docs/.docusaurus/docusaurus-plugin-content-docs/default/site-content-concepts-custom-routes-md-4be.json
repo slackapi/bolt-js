@@ -1,0 +1,28 @@
+{
+  "id": "concepts/custom-routes",
+  "title": "Adding custom HTTP routes",
+  "description": "As of v3.7.0, custom HTTP routes can be easily added by passing in an array of routes as customRoutes when initializing App.",
+  "source": "@site/content/concepts/custom-routes.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/custom-routes",
+  "permalink": "/bolt-js/concepts/custom-routes",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/custom-routes.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Adding custom HTTP routes",
+    "lang": "en",
+    "slug": "/concepts/custom-routes"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Logging",
+    "permalink": "/bolt-js/concepts/logging"
+  },
+  "next": {
+    "title": "Deferring app initialization",
+    "permalink": "/bolt-js/concepts/deferring-initialization"
+  }
+}

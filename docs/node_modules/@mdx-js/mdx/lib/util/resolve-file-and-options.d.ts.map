@@ -1,0 +1,1 @@
+{"version":3,"file":"resolve-file-and-options.d.ts","sourceRoot":"","sources":["resolve-file-and-options.js"],"names":[],"mappings":"AASA;;;;;;;;;;GAUG;AACH,uDAPW,SAAS,UAAU,CAAC,YAEpB,SAAS,cAAc,CAAC,GAAG,IAAI,GAAG,SAAS;UAElC,KAAK;aAAW,gBAAgB;EAoBnD;yBApCY,OAAO,OAAO,EAAE,UAAU;6BAC1B,OAAO,eAAe,EAAE,cAAc;+BACtC,OAAO,YAAY,EAAE,gBAAgB;sBAG9B,OAAO"}

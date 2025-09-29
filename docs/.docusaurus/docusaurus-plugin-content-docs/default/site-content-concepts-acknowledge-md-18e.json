@@ -1,0 +1,28 @@
+{
+  "id": "concepts/acknowledge",
+  "title": "Acknowledging requests",
+  "description": "Actions, commands, and options requests must always be acknowledged using the ack() function. This lets Slack know that the request was received and updates the Slack user interface accordingly. Depending on the type of request, your acknowledgement may be different. For example, when acknowledging a modal submission you will call ack() with validation errors if the submission contains errors, or with no parameters if the submission is valid.",
+  "source": "@site/content/concepts/acknowledge.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/acknowledge",
+  "permalink": "/bolt-js/concepts/acknowledge",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/acknowledge.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Acknowledging requests",
+    "lang": "en",
+    "slug": "/concepts/acknowledge"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Listening to events",
+    "permalink": "/bolt-js/concepts/event-listening"
+  },
+  "next": {
+    "title": "Listening & responding to shortcuts",
+    "permalink": "/bolt-js/concepts/shortcuts"
+  }
+}

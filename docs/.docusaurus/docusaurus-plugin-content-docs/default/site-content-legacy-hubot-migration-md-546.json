@@ -1,0 +1,29 @@
+{
+  "id": "legacy/hubot-migration",
+  "title": "Migrating apps from Hubot to Bolt for JavaScript",
+  "description": "Bolt was created to reduce the time and complexity it takes to build Slack apps. It provides Slack developers a single interface to build using modern features and best practices. This guide is meant to step you through the process of migrating your app from using Hubot to Bolt for JavaScript.",
+  "source": "@site/content/legacy/hubot-migration.md",
+  "sourceDirName": "legacy",
+  "slug": "/tutorial/hubot-migration",
+  "permalink": "/bolt-js/tutorial/hubot-migration",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/legacy/hubot-migration.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Migrating apps from Hubot to Bolt for JavaScript",
+    "sidebar_label": "Hubot app migration",
+    "slug": "/tutorial/hubot-migration",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Migrating to V4",
+    "permalink": "/bolt-js/tutorial/migration-v4"
+  },
+  "next": {
+    "title": "Steps from Apps",
+    "permalink": "/bolt-js/legacy/steps-from-apps"
+  }
+}

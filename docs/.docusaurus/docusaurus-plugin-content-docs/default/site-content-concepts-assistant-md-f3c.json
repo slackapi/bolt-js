@@ -1,0 +1,28 @@
+{
+  "id": "concepts/assistant",
+  "title": "Agents & Assistants",
+  "description": "If you don't have a paid workspace for development, you can join the Developer Program and provision a sandbox with access to all Slack features for free.",
+  "source": "@site/content/concepts/assistant.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/assistant",
+  "permalink": "/bolt-js/concepts/assistant",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/assistant.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Agents & Assistants",
+    "lang": "en",
+    "slug": "/concepts/assistant"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Publishing views to App Home",
+    "permalink": "/bolt-js/concepts/publishing-views"
+  },
+  "next": {
+    "title": "Custom Steps",
+    "permalink": "/bolt-js/concepts/custom-steps"
+  }
+}

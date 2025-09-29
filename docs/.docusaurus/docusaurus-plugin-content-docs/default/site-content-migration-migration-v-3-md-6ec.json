@@ -1,0 +1,28 @@
+{
+  "id": "migration/migration-v3",
+  "title": "Migrating to V3",
+  "description": "End of life for @slack/bolt@2.x was May 31st, 2021. Development has been fully stopped for @slack/bolt@2.x and all remaining open issues and pull requests have been closed.",
+  "source": "@site/content/migration/migration-v3.md",
+  "sourceDirName": "migration",
+  "slug": "/tutorial/migration-v3",
+  "permalink": "/bolt-js/tutorial/migration-v3",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/migration/migration-v3.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Migrating to V3",
+    "slug": "/tutorial/migration-v3",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Migrating to V2",
+    "permalink": "/bolt-js/tutorial/migration-v2"
+  },
+  "next": {
+    "title": "Migrating to V4",
+    "permalink": "/bolt-js/tutorial/migration-v4"
+  }
+}

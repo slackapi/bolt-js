@@ -1,0 +1,28 @@
+{
+  "id": "concepts/message-sending",
+  "title": "Sending messages",
+  "description": "Within your listener function, say() is available whenever there is an associated conversation (for example, a conversation where the event or action which triggered the listener occurred). say() accepts a string to post simple messages and JSON payloads to send more complex messages. The message payload you pass in will be sent to the associated conversation.",
+  "source": "@site/content/concepts/message-sending.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/message-sending",
+  "permalink": "/bolt-js/concepts/message-sending",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/message-sending.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Sending messages",
+    "lang": "en",
+    "slug": "/concepts/message-sending"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Getting Started",
+    "permalink": "/bolt-js/getting-started"
+  },
+  "next": {
+    "title": "Using the Web API",
+    "permalink": "/bolt-js/concepts/web-api"
+  }
+}

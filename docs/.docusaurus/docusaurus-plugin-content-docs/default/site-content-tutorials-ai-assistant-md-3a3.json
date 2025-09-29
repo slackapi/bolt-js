@@ -1,0 +1,28 @@
+{
+  "id": "tutorials/ai-assistant",
+  "title": "AI Assistant",
+  "description": "In this tutorial, you will create an app, enable the features to make it an AI app, and explore adding code to set suggested prompts, respond to assistant-related events, and integrate an LLM with which you can correspond.",
+  "source": "@site/content/tutorials/ai-assistant.md",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/ai-assistant",
+  "permalink": "/bolt-js/tutorials/ai-assistant",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/tutorials/ai-assistant.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "AI Assistant",
+    "slug": "/tutorials/ai-assistant",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Reference",
+    "permalink": "/bolt-js/reference"
+  },
+  "next": {
+    "title": "AI Code Assistant with Hugging Face",
+    "permalink": "/bolt-js/tutorials/code-assistant"
+  }
+}

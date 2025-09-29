@@ -1,0 +1,26 @@
+{
+  "id": "tutorials/custom-steps",
+  "title": "Custom Steps",
+  "description": "If you don't have a paid workspace for development, you can join the Developer Program and provision a sandbox with access to all Slack features for free.",
+  "source": "@site/content/tutorials/custom-steps.md",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/custom-steps",
+  "permalink": "/bolt-js/tutorials/custom-steps",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/tutorials/custom-steps.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Custom Steps"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "AI Code Assistant with Hugging Face",
+    "permalink": "/bolt-js/tutorials/code-assistant"
+  },
+  "next": {
+    "title": "Custom Steps for Workflow Builder (new app)",
+    "permalink": "/bolt-js/tutorials/custom-steps-workflow-builder-new"
+  }
+}

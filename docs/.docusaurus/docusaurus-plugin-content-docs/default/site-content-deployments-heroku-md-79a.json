@@ -1,0 +1,27 @@
+{
+  "id": "deployments/heroku",
+  "title": "Deploying to Heroku",
+  "description": "This guide will walk you through preparing and deploying a Slack app using Bolt for JavaScript and the Heroku platform. Along the way, we’ll download a Bolt Slack app, prepare it for Heroku, and deploy it.",
+  "source": "@site/content/deployments/heroku.md",
+  "sourceDirName": "deployments",
+  "slug": "/deployments/heroku",
+  "permalink": "/bolt-js/deployments/heroku",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/deployments/heroku.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Deploying to Heroku",
+    "lang": "en"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Deploying to AWS Lambda",
+    "permalink": "/bolt-js/deployments/aws-lambda"
+  },
+  "next": {
+    "title": "Migrating to V2",
+    "permalink": "/bolt-js/tutorial/migration-v2"
+  }
+}

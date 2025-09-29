@@ -1,6 +1,4 @@
----
-sidebar_label: Quickstart
----
+
 
 # Quickstart with Bolt for JavaScript
 

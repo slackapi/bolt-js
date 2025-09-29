@@ -1,0 +1,28 @@
+{
+  "id": "concepts/authorization",
+  "title": "Authorization",
+  "description": "Authorization is the process of deciding which Slack credentials (such as a bot token) should be available while processing a specific incoming request.",
+  "source": "@site/content/concepts/authorization.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/authorization",
+  "permalink": "/bolt-js/concepts/authorization",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/authorization.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Authorization",
+    "lang": "en",
+    "slug": "/concepts/authorization"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Authenticating with OAuth",
+    "permalink": "/bolt-js/concepts/authenticating-oauth"
+  },
+  "next": {
+    "title": "Token rotation",
+    "permalink": "/bolt-js/concepts/token-rotation"
+  }
+}

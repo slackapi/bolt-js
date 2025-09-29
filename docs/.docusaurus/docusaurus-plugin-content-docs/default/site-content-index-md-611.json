@@ -1,0 +1,20 @@
+{
+  "id": "index",
+  "title": "Bolt for JavaScript",
+  "description": "Bolt for JavaScript is a JavaScript framework to build Slack apps with the latest Slack platform features. Read the Getting Started Guide to set up and run your first Bolt app.",
+  "source": "@site/content/index.md",
+  "sourceDirName": ".",
+  "slug": "/",
+  "permalink": "/bolt-js/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "sidebarJSBolt",
+  "next": {
+    "title": "Getting Started",
+    "permalink": "/bolt-js/getting-started"
+  }
+}

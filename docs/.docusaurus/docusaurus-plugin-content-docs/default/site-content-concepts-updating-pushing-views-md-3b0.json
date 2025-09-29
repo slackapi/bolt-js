@@ -1,0 +1,28 @@
+{
+  "id": "concepts/updating-pushing-views",
+  "title": "Updating & pushing views",
+  "description": "Modals contain a stack of views. When you call the views.open method, you add the root view to the modal. After the initial call, you can dynamically update a view by calling the views.update method, or stack a new view on top of the root view by calling the views.push method.",
+  "source": "@site/content/concepts/updating-pushing-views.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/updating-pushing-views",
+  "permalink": "/bolt-js/concepts/updating-pushing-views",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/updating-pushing-views.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Updating & pushing views",
+    "lang": "en",
+    "slug": "/concepts/updating-pushing-views"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Opening modals",
+    "permalink": "/bolt-js/concepts/creating-modals"
+  },
+  "next": {
+    "title": "Listening to views",
+    "permalink": "/bolt-js/concepts/view-submissions"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "concepts/global-middleware",
+  "title": "Global middleware",
+  "description": "Global middleware is run for all incoming requests before any listener middleware. You can add any number of global middleware to your app by utilizing app.use(fn). The middleware function fn is called with the same arguments as listeners and an additional next function.",
+  "source": "@site/content/concepts/global-middleware.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/global-middleware",
+  "permalink": "/bolt-js/concepts/global-middleware",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/global-middleware.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Global middleware",
+    "lang": "en",
+    "slug": "/concepts/global-middleware"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Customizing a receiver",
+    "permalink": "/bolt-js/concepts/receiver"
+  },
+  "next": {
+    "title": "Listener middleware",
+    "permalink": "/bolt-js/concepts/listener-middleware"
+  }
+}

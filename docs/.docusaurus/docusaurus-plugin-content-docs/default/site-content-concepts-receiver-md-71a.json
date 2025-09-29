@@ -1,0 +1,28 @@
+{
+  "id": "concepts/receiver",
+  "title": "Customizing a receiver",
+  "description": "Writing a custom receiver",
+  "source": "@site/content/concepts/receiver.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/receiver",
+  "permalink": "/bolt-js/concepts/receiver",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/receiver.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Customizing a receiver",
+    "lang": "en",
+    "slug": "/concepts/receiver"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Deferring app initialization",
+    "permalink": "/bolt-js/concepts/deferring-initialization"
+  },
+  "next": {
+    "title": "Global middleware",
+    "permalink": "/bolt-js/concepts/global-middleware"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "legacy/steps-from-apps",
+  "title": "Steps from Apps",
+  "description": "Steps from Apps is a deprecated feature.",
+  "source": "@site/content/legacy/steps-from-apps.md",
+  "sourceDirName": "legacy",
+  "slug": "/legacy/steps-from-apps",
+  "permalink": "/bolt-js/legacy/steps-from-apps",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/legacy/steps-from-apps.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Steps from Apps",
+    "lang": "en",
+    "slug": "/legacy/steps-from-apps"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Hubot app migration",
+    "permalink": "/bolt-js/tutorial/hubot-migration"
+  },
+  "next": {
+    "title": "Conversation stores",
+    "permalink": "/bolt-js/concepts/conversation-store"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "concepts/event-listening",
+  "title": "Listening to events",
+  "description": "You can listen to any Events API event using the event() method after subscribing to it in your app configuration. This allows your app to take action when something happens in Slack, like a user reacting to a message or joining a channel.",
+  "source": "@site/content/concepts/event-listening.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/event-listening",
+  "permalink": "/bolt-js/concepts/event-listening",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/event-listening.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Listening to events",
+    "lang": "en",
+    "slug": "/concepts/event-listening"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Listening to messages",
+    "permalink": "/bolt-js/concepts/message-listening"
+  },
+  "next": {
+    "title": "Acknowledging requests",
+    "permalink": "/bolt-js/concepts/acknowledge"
+  }
+}

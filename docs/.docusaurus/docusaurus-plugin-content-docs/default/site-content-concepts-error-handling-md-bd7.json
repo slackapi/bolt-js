@@ -1,0 +1,28 @@
+{
+  "id": "concepts/error-handling",
+  "title": "Handling errors",
+  "description": "Since v2, error handling has improved! View the migration guide for V2 to learn about the changes.",
+  "source": "@site/content/concepts/error-handling.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/error-handling",
+  "permalink": "/bolt-js/concepts/error-handling",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/error-handling.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Handling errors",
+    "lang": "en",
+    "slug": "/concepts/error-handling"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Using Socket Mode",
+    "permalink": "/bolt-js/concepts/socket-mode"
+  },
+  "next": {
+    "title": "Logging",
+    "permalink": "/bolt-js/concepts/logging"
+  }
+}

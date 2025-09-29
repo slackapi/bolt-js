@@ -1,0 +1,1 @@
+{"version":3,"file":"list.d.ts","sourceRoot":"","sources":["list.js"],"names":[],"mappings":"AAiBA,wBAAwB;AACxB,mBADW,SAAS,CAMnB;mBAtBY,OAAO,sBAAsB,EAAE,IAAI;wBACnC,OAAO,sBAAsB,EAAE,SAAS;6BACxC,OAAO,sBAAsB,EAAE,cAAc;qBAC7C,OAAO,sBAAsB,EAAE,MAAM;oBACrC,OAAO,sBAAsB,EAAE,KAAK;8BACpC,OAAO,sBAAsB,EAAE,eAAe;wBAC9C,OAAO,sBAAsB,EAAE,SAAS"}

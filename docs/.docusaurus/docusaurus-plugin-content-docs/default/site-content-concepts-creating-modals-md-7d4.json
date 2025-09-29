@@ -1,0 +1,28 @@
+{
+  "id": "concepts/creating-modals",
+  "title": "Opening modals",
+  "description": "Modals are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid trigger_id and a view payload to the built-in client's views.open method.",
+  "source": "@site/content/concepts/creating-modals.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/creating-modals",
+  "permalink": "/bolt-js/concepts/creating-modals",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/creating-modals.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Opening modals",
+    "lang": "en",
+    "slug": "/concepts/creating-modals"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Listening & responding to actions",
+    "permalink": "/bolt-js/concepts/actions"
+  },
+  "next": {
+    "title": "Updating & pushing views",
+    "permalink": "/bolt-js/concepts/updating-pushing-views"
+  }
+}

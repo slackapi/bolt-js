@@ -1,0 +1,28 @@
+{
+  "id": "concepts/ai-apps",
+  "title": "AI Apps",
+  "description": "If you don't have a paid workspace for development, you can join the Developer Program and provision a sandbox with access to all Slack features for free.",
+  "source": "@site/content/concepts/ai-apps.md",
+  "sourceDirName": "concepts",
+  "slug": "/concepts/ai-apps",
+  "permalink": "/bolt-js/concepts/ai-apps",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/concepts/ai-apps.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "AI Apps",
+    "lang": "en",
+    "slug": "/concepts/ai-apps"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Publishing views to App Home",
+    "permalink": "/bolt-js/concepts/publishing-views"
+  },
+  "next": {
+    "title": "Custom Steps",
+    "permalink": "/bolt-js/concepts/custom-steps"
+  }
+}

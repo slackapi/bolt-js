@@ -1,0 +1,22 @@
+{
+  "id": "tutorials/custom-steps-workflow-builder-existing",
+  "title": "Custom Steps for Workflow Builder (existing app)",
+  "description": "If you don't have a paid workspace for development, you can join the Developer Program and provision a sandbox with access to all Slack features for free.",
+  "source": "@site/content/tutorials/custom-steps-workflow-builder-existing.md",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/custom-steps-workflow-builder-existing",
+  "permalink": "/bolt-js/tutorials/custom-steps-workflow-builder-existing",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/slackapi/bolt-js/tree/main/docs/content/tutorials/custom-steps-workflow-builder-existing.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Custom Steps for Workflow Builder (existing app)"
+  },
+  "sidebar": "sidebarJSBolt",
+  "previous": {
+    "title": "Custom Steps for Workflow Builder (new app)",
+    "permalink": "/bolt-js/tutorials/custom-steps-workflow-builder-new"
+  }
+}

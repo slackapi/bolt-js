@@ -1,0 +1,41 @@
+{
+  "name": "postcss-ordered-values",
+  "version": "7.0.1",
+  "description": "Ensure values are ordered consistently in your CSS.",
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "src",
+    "LICENSE-MIT",
+    "types"
+  ],
+  "keywords": [
+    "css",
+    "postcss",
+    "postcss-plugin"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cssnano/cssnano",
+  "author": {
+    "name": "Ben Briggs",
+    "email": "beneb.info@gmail.com",
+    "url": "http://beneb.info"
+  },
+  "repository": "cssnano/cssnano",
+  "dependencies": {
+    "postcss-value-parser": "^4.2.0",
+    "cssnano-utils": "^5.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/cssnano/cssnano/issues"
+  },
+  "engines": {
+    "node": "^18.12.0 || ^20.9.0 || >=22.0"
+  },
+  "devDependencies": {
+    "postcss": "^8.4.38"
+  },
+  "peerDependencies": {
+    "postcss": "^8.4.31"
+  }
+}
