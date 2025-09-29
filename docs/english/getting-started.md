@@ -1,6 +1,6 @@
 ---
 sidebar_label: Quickstart
-title: Quickstart with Bolt for JavaScript
+
 ---
 
 This quickstart guide aims to help you get a Slack app using Bolt for JavaScript up and running as soon as possible!
