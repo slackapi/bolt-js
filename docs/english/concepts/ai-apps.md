@@ -312,7 +312,7 @@ The following example uses OpenAI's streaming API with the new `chatStream` func
 
 ## Adding and handling feedback
 
-Use the feedback block to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
+Use the [feedback buttons block element](reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
 
 ```js
 const feedbackBlock = {
@@ -336,11 +336,30 @@ const feedbackBlock = {
 };
 ```
 
-Use the `streamer` utility to render the feedback block at the bottom of your app's message.
+Use the `chatStream` utility to render the feedback block at the bottom of your app's message.
 
 ```js
 ...
+// Provide a response to the user
+const streamer = client.chatStream({
+  channel: channel,
+  recipient_team_id: teamId,
+  recipient_user_id: userId,
+  thread_ts: thread_ts,
+});
+
+// Feed-in stream from LLM
+for await (const chunk of llmResponse) {
+  if (chunk.type === 'response.output_text.delta') {
+    await streamer.append({
+      markdown_text: chunk.delta,
+    });
+  }
+}
+
+// End stream and provide feedback buttons to user
 await streamer.stop({ blocks: [feedbackBlock] });
+return;
 ...
 ```
 
