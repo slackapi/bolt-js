@@ -171,7 +171,7 @@ There are three [utilities](/tools/bolt-js/reference#the-assistantconfig-configu
 * `setTitle`
 * `setStatus`
 
-Within the `setStatue` utility, you can cycle through strings passed into a `loading_messages` array.
+Within the `setStatus` utility, you can cycle through strings passed into a `loading_messages` array.
 
 
 ```js
@@ -252,9 +252,12 @@ The following example uses OpenAI's streaming API with the new `chatStream` func
 
 ### Text streaming in messages {#text-streaming}
 
-Three Web API methods work together to provide users a text streaming experience. Use the [`chat.startStream`](/reference/methods/chat.startstream) method to start a text stream, the [`chat.appendStream`](/reference/methods/chat.appendstream) method to append it, and the [`chat.stopStream`](/reference/methods/chat.stopstream) method to stop it. These allow the user to see the response from the LLM as a text stream, rather than a single block of text sent all at once. This provides closer alignment with expected behavior from other major LLM tools.
+Three Web API methods work together to provide users a text streaming experience: 
+* the [`chat.startStream`](/reference/methods/chat.startstream) method starts the text stream, 
+* the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends the text stream, and 
+* the [`chat.stopStream`](/reference/methods/chat.stopstream) method stops it.
 
-We've simplified it a bit when using the Bolt framework or Slack SDKs. Use the `streamer` helper to handle all three aspects of streaming in your app's messages.
+Since you're using Bolt for JS, built upon the Node Slack SDK, you can use the [`chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) utility to streamline all three aspects of streaming in your app's messages.
 
 ```js
 ...
