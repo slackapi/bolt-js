@@ -253,6 +253,7 @@ The following example uses OpenAI's streaming API with the new `chatStream` func
 ### Text streaming in messages {#text-streaming}
 
 Three Web API methods work together to provide users a text streaming experience: 
+
 * the [`chat.startStream`](/reference/methods/chat.startstream) method starts the text stream, 
 * the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends the text stream, and 
 * the [`chat.stopStream`](/reference/methods/chat.stopstream) method stops it.
