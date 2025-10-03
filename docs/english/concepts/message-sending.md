@@ -42,3 +42,62 @@ app.event('reaction_added', async ({ event, say }) => {
   }
 });
 ```
+
+## Streaming messages {#streaming-messages}
+
+You can have your app's messages stream in to replicate conventional AI chatbot behavior. This is done through three Web API methods:
+
+* [`chat_startStream`](/reference/methods/chat.startstream)
+* [`chat_appendStream`](/reference/methods/chat.appendstream)
+* [`chat_stopStream`](/reference/methods/chat.stopstream)
+
+The Node Slack SDK provides a [`chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-js-assistant-template)
+
+```js
+// Provide a response to the user
+const streamer = client.chatStream({
+  channel: channel,
+  recipient_team_id: teamId,
+  recipient_user_id: userId,
+  thread_ts: thread_ts,
+});
+
+// response from your LLM of choice; OpenAI is the example here
+for await (const chunk of llmResponse) {
+  if (chunk.type === 'response.output_text.delta') {
+    await streamer.append({
+      markdown_text: chunk.delta,
+    });
+  }
+}
+
+// End stream and provide feedback buttons to user
+await streamer.stop({ blocks: [feedbackBlock] });
+return;
+```
+
+In that example, a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element is passed to `streamer.stop` to provide feedback buttons to the user at the bottom of the message. Interaction with these buttons will send a block action event to your app to receive the feedback.
+
+```js
+const feedbackBlock = {
+  type: 'context_actions',
+  elements: [
+    {
+      type: 'feedback_buttons',
+      action_id: 'feedback',
+      positive_button: {
+        text: { type: 'plain_text', text: 'Good Response' },
+        accessibility_label: 'Submit positive feedback on this response',
+        value: 'good-feedback',
+      },
+      negative_button: {
+        text: { type: 'plain_text', text: 'Bad Response' },
+        accessibility_label: 'Submit negative feedback on this response',
+        value: 'bad-feedback',
+      },
+    },
+  ],
+};
+```
+
+Read more about streaming messages in the [_Using AI in Apps_](/tools/bolt-js/concepts/ai-apps) guide.
