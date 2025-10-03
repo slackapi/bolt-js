@@ -222,8 +222,6 @@ const assistant = new Assistant({
       });
 ```
 
-### Passing the response to an AI client
-
 The following example uses OpenAI but you can substitute it with the AI client of your choice.
 
 ```js 
