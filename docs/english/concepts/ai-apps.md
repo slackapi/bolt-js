@@ -223,7 +223,7 @@ const assistant = new Assistant({
       });
 ```
 
-The following example uses OpenAI but you can substitute it with the AI client of your choice.
+The following example uses OpenAI but you can substitute it with the LLM provider of your choice.
 
 ```js 
       ...
@@ -249,7 +249,7 @@ The following example uses OpenAI but you can substitute it with the AI client o
       });
 
       // Provide a response to the user
-      await say({ text: llmResponse.choices[0].message.content });
+      await say({ markdown_text: llmResponse.choices[0].message.content });
     } catch (e) {
       logger.error(e);
 
@@ -268,7 +268,7 @@ app.assistant(assistant);
 Three Web API methods work together to provide users a text streaming experience: 
 
 * the [`chat.startStream`](/reference/methods/chat.startstream) method starts the text stream, 
-* the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends the text stream, and 
+* the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends text to the stream, and 
 * the [`chat.stopStream`](/reference/methods/chat.stopstream) method stops it.
 
 Since you're using Bolt for JS, built upon the Node Slack SDK, you can use the [`chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) utility to streamline all three aspects of streaming in your app's messages.
@@ -312,7 +312,7 @@ The following example uses OpenAI's streaming API with the new `chatStream` func
 
 ## Adding and handling feedback
 
-Use the [feedback buttons block element](reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
+Use the [feedback buttons block element](/reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
 
 ```js
 const feedbackBlock = {
