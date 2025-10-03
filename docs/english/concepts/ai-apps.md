@@ -1,35 +1,18 @@
 # Using AI in Apps
 
+The Slack platform offers features tailored for AI agents and assistants. Your apps can [utilize the `Assistant` class](#assistant) for a side-panel view designed with AI in mind, or they can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback).
+
+If you're unfamiliar with using these feature within Slack, you may want to read the [API documentation on the subject](/ai/). Then come back here to implement them with Bolt!
+
+## The `Assistant` class instance {#assistant}
+
 :::info[Some features within this guide require a paid plan]
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-The Slack platform offers features tailored for AI agents and assistants. Your apps can [utilize the `Assistant` class](#assistant) for a side-panel view designed with AI in mind, or they can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming)
+The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. 
 
-If you're unfamiliar with using these feature within Slack, you may want to read the [API documentation on the subject](/ai/). Then come back here to implement them with Bolt!
-
-## Configuring your app to support AI features
-
-1. Within [App Settings](https://api.slack.com/apps), enable the **Agents & AI Apps** feature.
-
-2. Within the App Settings **OAuth & Permissions** page, add the following scopes: 
-  * [`assistant:write`](/reference/scopes/assistant.write)
-  * [`chat:write`](/reference/scopes/chat.write)
-  * [`im:history`](/reference/scopes/im.history)
-
-3. Within the App Settings **Event Subscriptions** page, subscribe to the following events: 
-  * [`assistant_thread_started`](/reference/events/assistant_thread_started)
-  * [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed)
-  * [`message.im`](/reference/events/message.im)
-
-
-## The `Assistant` class instance {#assistant}
-
-:::info[Consider the following]
-You _could_ go it alone and [listen](/tools/bolt-js/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
-:::
-
-The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
+A typical flow would look like:
 
 1. [The user starts a thread](#handling-new-thread). The `Assistant` class handles the incoming [`assistant_thread_started`](/reference/events/assistant_thread_started) event.
 2. [The thread context may change at any point](#handling-thread-context-changes). The `Assistant` class can handle any incoming [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed) events. The class also provides a default `context` store to keep track of thread context changes as the user moves through Slack.
@@ -68,12 +51,30 @@ const assistant = new Assistant({
 });
 ```
 
+:::info[Consider the following]
+You _could_ go it alone and [listen](/tools/bolt-js/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
+:::
+
 While the `assistant_thread_started` and `assistant_thread_context_changed` events do provide Slack-client thread context information, the `message.im` event does not. Any subsequent user message events won't contain thread context data. For that reason, Bolt not only provides a way to store thread context — the `threadContextStore` property — but it also provides a `DefaultThreadContextStore` instance that is utilized by default. This implementation relies on storing and retrieving [message metadata](/messaging/message-metadata/) as the user interacts with the app. 
 
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
 :::tip[Be sure to give the [reference docs](/tools/bolt-js/reference#agents--assistants) a look!]
 :::
+
+### Configuring your app to support the `Assistant` class
+
+1. Within [App Settings](https://api.slack.com/apps), enable the **Agents & AI Apps** feature.
+
+2. Within the App Settings **OAuth & Permissions** page, add the following scopes: 
+  * [`assistant:write`](/reference/scopes/assistant.write)
+  * [`chat:write`](/reference/scopes/chat.write)
+  * [`im:history`](/reference/scopes/im.history)
+
+3. Within the App Settings **Event Subscriptions** page, subscribe to the following events: 
+  * [`assistant_thread_started`](/reference/events/assistant_thread_started)
+  * [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed)
+  * [`message.im`](/reference/events/message.im)
 
 ### Handling a new thread {#handling-new-thread}
 
