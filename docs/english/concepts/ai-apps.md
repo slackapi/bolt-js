@@ -75,7 +75,7 @@ If you do provide your own `threadContextStore` property, it must feature `get` 
 :::tip[Be sure to give the [reference docs](/tools/bolt-js/reference#agents--assistants) a look!]
 :::
 
-## Handling a new thread {#handling-new-thread}
+### Handling a new thread {#handling-new-thread}
 
 When the user opens a new thread with your AI-enabled app, the [`assistant_thread_started`](/reference/events/assistant_thread_started) event will be sent to your app. Capture this with the `threadStarted` handler to allow your app to respond. 
 
@@ -149,7 +149,7 @@ threadStarted: async ({ event, logger, say, setSuggestedPrompts, saveThreadConte
 You can grab that info using the `getThreadContext()` utility, as subsequent user message event payloads won't include the channel info. 
 :::
 
-## Handling thread context changes {#handling-thread-context-changes}
+### Handling thread context changes {#handling-thread-context-changes}
 
 When the user switches channels, the [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed) event will be sent to your app. Capture this with the `threadContextChanged` handler.
 
@@ -163,7 +163,7 @@ When the user switches channels, the [`assistant_thread_context_changed`](/refer
 
 If you use the built-in `AssistantThreadContextStore` without any custom configuration, you can skip this — the updated thread context data is automatically saved as [message metadata](/messaging/message-metadata/) on the first reply from the app.
 
-## Handling the user response {#handling-user-response}
+### Handling the user response {#handling-user-response}
 
 When the user messages your app, the [`message.im`](/reference/events/message.im) event will be sent to your app. Capture this with the `userMessage` handler. 
 
@@ -224,7 +224,7 @@ const assistant = new Assistant({
 
 ### Passing the response to an AI client
 
-The following example uses OpenAI's streaming API with the new `chatStream` functionality, but you can substitute it with the AI client of your choice.
+The following example uses OpenAI but you can substitute it with the AI client of your choice.
 
 ```js 
       ...
@@ -246,9 +246,21 @@ The following example uses OpenAI's streaming API with the new `chatStream` func
       // Send message history and newest question to LLM
       const llmResponse = await openai.responses.create({
         model: 'gpt-4o-mini',
-        input: `System: ${DEFAULT_SYSTEM_CONTENT}\n\n${parsedThreadHistory}\nUser: ${message.text}`,
-        stream: true,
+        input: `System: ${DEFAULT_SYSTEM_CONTENT}\n\n${parsedThreadHistory}\nUser: ${message.text}`
       });
+
+      // Provide a response to the user
+      await say({ text: llmResponse.choices[0].message.content });
+    } catch (e) {
+      logger.error(e);
+
+      // Send message to advise user and clear processing status if a failure occurs
+      await say({ text: 'Sorry, something went wrong!' });
+    }
+  },
+});
+
+app.assistant(assistant);
 ...
 ```
 
@@ -262,8 +274,17 @@ Three Web API methods work together to provide users a text streaming experience
 
 Since you're using Bolt for JS, built upon the Node Slack SDK, you can use the [`chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) utility to streamline all three aspects of streaming in your app's messages.
 
+The following example uses OpenAI's streaming API with the new `chatStream` functionality, but you can substitute it with the AI client of your choice.
+
 ```js
 ...
+      // Send message history and newest question to LLM
+      const llmResponse = await openai.responses.create({
+        model: 'gpt-4o-mini',
+        input: `System: ${DEFAULT_SYSTEM_CONTENT}\n\n${parsedThreadHistory}\nUser: ${message.text}`,
+        stream: true,
+      });
+
       const streamer = client.chatStream({
         channel: channel,
         recipient_team_id: teamId,
