@@ -4,7 +4,9 @@
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-The Slack platform offers features tailored for AI agents and assistants. If you're unfamiliar with using these feature within Slack, you may want to read the [API documentation on the subject](/ai/). Then come back here to implement them with Bolt!
+The Slack platform offers features tailored for AI agents and assistants. Your apps can [utilize the `Assistant` class](#assistant) for a side-panel view designed with AI in mind, or they can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming)
+
+If you're unfamiliar with using these feature within Slack, you may want to read the [API documentation on the subject](/ai/). Then come back here to implement them with Bolt!
 
 ## Configuring your app to support AI features
 
@@ -20,11 +22,12 @@ The Slack platform offers features tailored for AI agents and assistants. If you
   * [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed)
   * [`message.im`](/reference/events/message.im)
 
+
+## The `Assistant` class instance {#assistant}
+
 :::info[Consider the following]
 You _could_ go it alone and [listen](/tools/bolt-js/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 :::
-
-## The `Assistant` class instance
 
 The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
 
@@ -223,7 +226,6 @@ const assistant = new Assistant({
 
 The following example uses OpenAI's streaming API with the new `chatStream` functionality, but you can substitute it with the AI client of your choice.
 
-
 ```js 
       ...
       // Retrieve the Assistant thread history for context of question being asked
@@ -250,7 +252,7 @@ The following example uses OpenAI's streaming API with the new `chatStream` func
 ...
 ```
 
-### Text streaming in messages {#text-streaming}
+## Text streaming in messages {#text-streaming}
 
 Three Web API methods work together to provide users a text streaming experience: 
 
@@ -288,7 +290,7 @@ Since you're using Bolt for JS, built upon the Node Slack SDK, you can use the [
 ...
 ```
 
-### Adding and handling feedback
+## Adding and handling feedback
 
 Use the feedback block to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
 
@@ -314,7 +316,7 @@ const feedbackBlock = {
 };
 ```
 
-Use the streamer helper to render the feedback block at the bottom of your app's message.
+Use the `streamer` utility to render the feedback block at the bottom of your app's message.
 
 ```js
 ...
@@ -369,7 +371,7 @@ app.action('feedback', async ({ ack, body, client, logger }) => {
 
 ## Full example : App Agent & Assistant Template
 
-Below is the app.js file of the App Agent & Assistant Template repo we've created for you to build off of.
+Below is the `app.js` file of the [App Agent & Assistant Template](https://github.com/slack-samples/bolt-js-assistant-template) repo we've created for you to build off of.
 
 <details>
 <summary>View example app</summary>
