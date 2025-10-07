@@ -10,6 +10,8 @@ import type { ViewOutput, ViewStateValue } from '../view';
  */
 export type BlockElementAction =
   | ButtonAction
+  | FeedbackButtonsAction
+  | IconButtonAction
   | UsersSelectAction
   | MultiUsersSelectAction
   | StaticSelectAction
@@ -49,6 +51,23 @@ export interface ButtonAction extends BasicElementAction<'button'> {
   text: PlainTextElement;
   url?: string;
   confirm?: Confirmation;
+}
+
+/**
+ * An action from feedback buttons
+ */
+export interface FeedbackButtonsAction extends BasicElementAction<'feedback_buttons'> {
+  value: string;
+  text: PlainTextElement;
+}
+
+/**
+ * An action from icon button
+ */
+export interface IconButtonAction extends BasicElementAction<'icon_button'> {
+  icon: string;
+  value: string;
+  text: PlainTextElement;
 }
 
 /**
@@ -329,6 +348,8 @@ export interface BlockAction<ElementAction extends BasicElementAction = BlockEle
  * Aliases - these types help make common usages shorter and less intimidating.
  */
 export type BlockButtonAction = BlockAction<ButtonAction>;
+export type BlockFeedbackButtonsAction = BlockAction<FeedbackButtonsAction>;
+export type BlockIconButtonAction = BlockAction<IconButtonAction>;
 export type BlockStaticSelectAction = BlockAction<StaticSelectAction>;
 export type BlockUsersSelectAction = BlockAction<UsersSelectAction>;
 export type BlockConversationsSelectAction = BlockAction<ConversationsSelectAction>;
