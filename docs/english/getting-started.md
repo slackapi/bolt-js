@@ -279,7 +279,7 @@ This will open the following page:
 
 On these pages you're free to make changes such as updating your app icon, configuring app features, and perhaps even distributing your app!
 
-## Add AI features {#ai-features}
+## Adding AI features {#ai-features}
 
 Now that you're familiar with a basic app setup, try it out again, this time using the AI agent template!
 
@@ -294,7 +294,7 @@ $ cd ai-app
 ```
 
 </TabItem>
-<TabItem value="terminaL" label="Terminal">
+<TabItem value="terminal" label="Terminal">
 
 Get started with the agent template:
 
