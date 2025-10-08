@@ -281,9 +281,9 @@ On these pages you're free to make changes such as updating your app icon, confi
 
 ## Add AI features {#ai-features}
 
-Now that you're familiar with a basic app setup, try it out again, this time use the AI agent template!
+Now that you're familiar with a basic app setup, try it out again, this time using the AI agent template!
 
-<Tabs>
+<Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
 
 Get started with the agent template:
@@ -304,12 +304,12 @@ $ cd ai-app
 $ npm install
 ```
 
-Using this method, be sure to set the app and bot tokens as outlined [above](#running-the-app) in the `Browser` tab.
+Using this method, be sure to set the app and bot tokens as we did in the [Running the app](#running-the-app) section above.
 
 </TabItem>
 </Tabs>
 
-Once the project is created, update the `.env.sample` file by setting the `OPENAI_API_KEY` and removing the `.sample` from the file name.
+Once the project is created, update the `.env.sample` file by setting the `OPENAI_API_KEY` with the value of your key and removing the `.sample` from the file name.
 
 In the `ai` folder of this app, you'll find default instructions for the LLM and an OpenAI client setup. 
 
