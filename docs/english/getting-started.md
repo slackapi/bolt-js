@@ -307,6 +307,7 @@ $ npm install
 Using this method, be sure to set the app and bot tokens as outlined [above](#running-the-app) in the `Browser` tab.
 
 </TabItem>
+</Tabs>
 
 Once the project is created, update the `.env.sample` file by setting the `OPENAI_API_KEY` and removing the `.sample` from the file name.
 
