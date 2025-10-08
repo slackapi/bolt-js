@@ -167,7 +167,7 @@ The above example works on Linux and macOS, but [similar commands are available 
 
 :::danger[Keep your tokens and signing secret secure]
 
-At a minimum, you should avoid checking tokens and signing secrets into public version control, and you should access them via environment variables as shown above. Check out the API docs for more [app security best practices](/authentication/best-practices-for-security).
+At a minimum, you should avoid checking tokens and signing secrets into public version control, and you should access them via environment variables as shown above. Check out the guide to [app security best practices](/authentication/best-practices-for-security) for more insights.
 
 :::
 
@@ -620,5 +620,6 @@ You just built a [Bolt for JavaScript app](https://github.com/slack-samples/bolt
 Now that you have an app up and running, you can start exploring how to make your Bolt app truly yours. Here are some ideas about what to explore next:
 
 - Read through the various concepts pages to learn about the different methods and features accessible to your Bolt app.
-- Explore the different events your bot can listen to with the [`event`](/tools/bolt-js/concepts/event-listening) method. [View all of the events within the API docs](/reference/events).
-- The Bolt framework allows you to [call Web API methods](/tools/bolt-js/concepts/web-api) with the client attached to your app. [View the over 200 methods within the API docs](/reference/methods).
+- Explore the different events your bot can listen to with the [`event`](/tools/bolt-js/concepts/event-listening) method. View the full events reference docs [here](/reference/events).
+- The Bolt framework allows you to [call Web API methods](/tools/bolt-js/concepts/web-api) with the client attached to your app. View the over 200 methods [here](/reference/methods).
+- Check out how to use AI in your app with the [Using AI in apps](/tools/bolt-js/concepts/ai-apps) guide.

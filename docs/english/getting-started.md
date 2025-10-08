@@ -279,6 +279,42 @@ This will open the following page:
 
 On these pages you're free to make changes such as updating your app icon, configuring app features, and perhaps even distributing your app!
 
+## Adding AI features {#ai-features}
+
+Now that you're familiar with a basic app setup, try it out again, this time using the AI agent template!
+
+<Tabs groupId="cli-or-terminal">
+<TabItem value="cli" label="Slack CLI">
+
+Get started with the agent template:
+
+```sh
+$ slack create ai-app --template slack-samples/bolt-js-assistant-template
+$ cd ai-app
+```
+
+</TabItem>
+<TabItem value="terminal" label="Terminal">
+
+Get started with the agent template:
+
+```sh
+$ git clone https://github.com/slack-samples/bolt-js-assistant-template ai-app
+$ cd ai-app
+$ npm install
+```
+
+Using this method, be sure to set the app and bot tokens as we did in the [Running the app](#running-the-app) section above.
+
+</TabItem>
+</Tabs>
+
+Once the project is created, update the `.env.sample` file by setting the `OPENAI_API_KEY` with the value of your key and removing the `.sample` from the file name.
+
+In the `ai` folder of this app, you'll find default instructions for the LLM and an OpenAI client setup. 
+
+The `listeners` include utilities intended for messaging with an LLM. Those are outlined in detail in the guide to [Using AI in apps](/tools/bolt-js/concepts/ai-apps) and [Sending messages](/tools/bolt-js/concepts/message-sending).
+
 ## Next steps {#next-steps}
 
 Congrats once more on getting up and running with this quick start.
