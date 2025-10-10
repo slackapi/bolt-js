@@ -376,12 +376,26 @@ export function createDummyCustomFunctionMiddlewareArgs(
     type: 'event_callback',
   } as const;
 
+  let completeCalled = false;
+  const complete = () => {
+    completeCalled = true;
+    return Promise.resolve({ ok: true });
+  };
+  complete.hasBeenCalled = () => completeCalled;
+
+  let failCalled = false;
+  const fail = () => {
+    failCalled = true;
+    return Promise.resolve({ ok: true });
+  };
+  fail.hasBeenCalled = () => failCalled;
+
   return {
     ack: () => Promise.resolve(),
     body,
-    complete: () => Promise.resolve({ ok: true }),
+    complete,
     event,
-    fail: () => Promise.resolve({ ok: true }),
+    fail,
     inputs: functionOverrides.inputs,
     payload: event,
   };
