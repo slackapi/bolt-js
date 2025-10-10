@@ -32,6 +32,9 @@ interface FunctionFailArguments {
 
 export type FunctionFailFn = {
   (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
+  /**
+   * @description Returns true if the function execution has been marked "fail" already.
+   */
   hasBeenCalled(): boolean;
 };
 
