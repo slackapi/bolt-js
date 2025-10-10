@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "4.4.0-featWorkObjectsBeta.1",
+  "version": "4.5.0-featWorkObjectsBeta.1",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
