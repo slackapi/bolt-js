@@ -20,6 +20,9 @@ interface FunctionCompleteArguments {
 }
 export type FunctionCompleteFn = {
   (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
+  /**
+   * @description Returns true if the function execution has been marked "complete" already.
+   */
   hasBeenCalled(): boolean;
 };
 
