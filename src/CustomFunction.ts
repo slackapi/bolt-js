@@ -21,7 +21,7 @@ interface FunctionCompleteArguments {
 export type FunctionCompleteFn = {
   (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
   /**
-   * @description Returns true if the function execution has been marked "complete" already.
+   * @description Check if this complete function has been called.
    */
   hasBeenCalled(): boolean;
 };
@@ -33,7 +33,7 @@ interface FunctionFailArguments {
 export type FunctionFailFn = {
   (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
   /**
-   * @description Returns true if the function execution has been marked "fail" already.
+   * @description Check if this fail function has been called.
    */
   hasBeenCalled(): boolean;
 };
