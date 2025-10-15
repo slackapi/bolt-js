@@ -4,13 +4,10 @@ import type { AckFn, RespondFn, SayArguments, SayFn } from '../utilities';
 import type { BlockAction } from './block-action';
 import type { DialogSubmitAction, DialogValidation } from './dialog-action';
 import type { InteractiveMessage } from './interactive-message';
-import type { WorkflowStepEdit } from './workflow-step-edit';
 
 export * from './block-action';
 export * from './interactive-message';
 export * from './dialog-action';
-// TODO: remove workflow step stuff in bolt v5
-export * from './workflow-step-edit';
 
 /**
  * All known actions from Slack's Block Kit interactive components, message actions, dialogs, and legacy interactive
@@ -26,8 +23,7 @@ export * from './workflow-step-edit';
  * offered when no generic parameter is bound would be limited to BasicElementAction rather than the union of known
  * actions - ElementAction.
  */
-// TODO: remove workflow step stuff in bolt v5
-export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction | WorkflowStepEdit;
+export type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction;
 
 export interface ActionConstraints<A extends SlackAction = SlackAction> {
   type?: A['type'];
@@ -66,8 +62,7 @@ export type SlackActionMiddlewareArgs<Action extends SlackAction = SlackAction> 
   complete?: FunctionCompleteFn;
   fail?: FunctionFailFn;
   inputs?: FunctionInputs;
-  // TODO: remove workflow step stuff in bolt v5
-} & (Action extends Exclude<SlackAction, DialogSubmitAction | WorkflowStepEdit>
+} & (Action extends Exclude<SlackAction, DialogSubmitAction>
   ? // all action types except dialog submission and steps from apps have a channel context
     // TODO: not exactly true: a block action could occur from a view. should improve this.
     { say: SayFn }

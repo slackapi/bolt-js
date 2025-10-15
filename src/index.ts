@@ -61,14 +61,6 @@ export {
 } from './Assistant';
 
 export {
-  WorkflowStep,
-  WorkflowStepConfig,
-  WorkflowStepEditMiddleware,
-  WorkflowStepSaveMiddleware,
-  WorkflowStepExecuteMiddleware,
-} from './WorkflowStep';
-
-export {
   Installation,
   InstallURLOptions,
   InstallationQuery,
