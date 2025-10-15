@@ -2,7 +2,7 @@ const { App, LogLevel, SocketModeReceiver } = require('@slack/bolt');
 
 const clientOptions = {
   // enable this for dev instance
-  // slackApiUrl: 'https://dev.slack.com/api/',
+  // slackApiUrl: 'https://dev.slack.com/api/'
 };
 
 // const socketModeReceiver = new SocketModeReceiver({
@@ -238,15 +238,7 @@ const sample_file_entity = {
         slack_file: {
           id: 'F012345678',
         },
-      },
-      created_by: {
-        value: 'Joe Smith',
-        type: 'string',
-      },
-      last_modified_by: {
-        value: 'Joe Smith',
-        type: 'string',
-      },
+      }
     },
   },
 };
@@ -315,11 +307,9 @@ const sample_item_entity = {
         value: [
           {
             value: 'abra',
-            type: 'string',
           },
           {
             value: 'kadabra',
-            type: 'string',
           },
         ],
       },

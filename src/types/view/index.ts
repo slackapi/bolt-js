@@ -64,7 +64,7 @@ export interface ViewSubmitAction {
   view: ViewOutput;
   api_app_id: string;
   token: string;
-  trigger_id: string; // undocumented
+  trigger_id: string;
   // exists for enterprise installs
   is_enterprise_install?: boolean;
   enterprise?: {
@@ -313,6 +313,11 @@ export interface ViewOutput {
   clear_on_close: boolean;
   notify_on_close: boolean;
   external_id?: string;
+  entity_url?: string;
+  external_ref?: { id: string, type?: string };
+  app_unfurl_url?: string;
+  message_ts?: string;
+  channel?: string;
 }
 
 export interface ViewUpdateResponseAction {
