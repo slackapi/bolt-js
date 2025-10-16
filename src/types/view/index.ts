@@ -314,7 +314,7 @@ export interface ViewOutput {
   notify_on_close: boolean;
   external_id?: string;
   entity_url?: string;
-  external_ref?: { id: string, type?: string };
+  external_ref?: { id: string; type?: string };
   app_unfurl_url?: string;
   message_ts?: string;
   channel?: string;

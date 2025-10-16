@@ -24,7 +24,7 @@ Then navigate to **App Home**. Under **Show tabs**, toggle the **Home tab** opti
 
 Lastly, in **Events Subscription**, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`. 
 
-To test link unfurl functionality, also subscribe to the `link_shared` and `entity_details_requested` events and add a domain under **App unfurl domains**. You can use `https://myappdomain.com` or replace this string with your domain.
+To test link unfurl functionality, also subscribe to the `link_shared` event and add a domain under **App unfurl domains**. The example uses `https://myappdomain.com`.
 
 ## Setup Environment Variables
 
