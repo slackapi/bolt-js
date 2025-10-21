@@ -9,10 +9,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^4.4.0"
+    "@slack/bolt": "^4.5.0"
   },
   "devDependencies": {
-    "serverless": "^4.18.1",
+    "serverless": "^4.21.1",
     "serverless-offline": "^14.4.0"
   }
 }

@@ -18,13 +18,25 @@ interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
 }
-export type FunctionCompleteFn = (params?: FunctionCompleteArguments) => Promise<FunctionsCompleteSuccessResponse>;
+export type FunctionCompleteFn = {
+  (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
+  /**
+   * @description Check if this complete function has been called.
+   */
+  hasBeenCalled(): boolean;
+};
 
 interface FunctionFailArguments {
   error: string;
 }
 
-export type FunctionFailFn = (params: FunctionFailArguments) => Promise<FunctionsCompleteErrorResponse>;
+export type FunctionFailFn = {
+  (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
+  /**
+   * @description Check if this fail function has been called.
+   */
+  hasBeenCalled(): boolean;
+};
 
 export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'function_executed'>;
 
@@ -123,11 +135,17 @@ export function createFunctionComplete(context: Context, client: WebClient): Fun
     throw new CustomFunctionCompleteSuccessError(errorMsg);
   }
 
-  return (params: FunctionCompleteArguments = {}) =>
-    client.functions.completeSuccess({
+  let called = false;
+  const complete = (params: FunctionCompleteArguments = {}) => {
+    called = true;
+    return client.functions.completeSuccess({
       outputs: params.outputs || {},
       function_execution_id: functionExecutionId,
     });
+  };
+  complete.hasBeenCalled = () => called;
+
+  return complete;
 }
 
 /**
@@ -141,10 +159,15 @@ export function createFunctionFail(context: Context, client: WebClient): Functio
     throw new CustomFunctionCompleteFailError(errorMsg);
   }
 
-  return (params: FunctionFailArguments) => {
+  let called = false;
+  const fail = (params: FunctionFailArguments) => {
+    called = true;
     return client.functions.completeError({
       error: params.error,
       function_execution_id: functionExecutionId,
     });
   };
+  fail.hasBeenCalled = () => called;
+
+  return fail;
 }

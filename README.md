@@ -31,7 +31,7 @@ const app = new App({
   // Start the app
   await app.start(process.env.PORT || 3000);
 
-  console.log('⚡️ Bolt app is running!');
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
