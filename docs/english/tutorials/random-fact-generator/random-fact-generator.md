@@ -2,7 +2,7 @@
 title: Build a random fact generator
 ---
 
-In this tutorial, we’ll create a workflow that fetches data from a third-party API and sends a formatted message to a Slack channel with the results. We’ll use the [random useless facts API](https://uselessfacts.jsph.pl/) to post a daily fact to a Slack channel. You’ll also learn how to use the [Bolt for JavaScript](/bolt-js) framework to add custom steps that can be used in Workflow Builder, the no-code workflow tool in Slack.
+In this tutorial, we’ll create a workflow that fetches data from a third-party API and sends a formatted message to a Slack channel with the results. We’ll use the [random useless facts API](https://uselessfacts.jsph.pl/) to post a daily fact to a Slack channel. You’ll also learn how to use the [Bolt for JavaScript](/tools/bolt-js) framework to add custom steps that can be used in Workflow Builder, the no-code workflow tool in Slack.
 
 ![Random fact image](random-fact-app-1.png)
 
@@ -78,19 +78,17 @@ First, log in to your Slack workspace or [join the Developer Program](https://ap
 
 Note the app manifest includes a function named `useless_fact_step` and declares the function returns one value named “Fact” as its output. We'll get to this later.
 
-### Tokens
+### Save tokens
 
 Once your app has been created, scroll down to **App-Level Tokens** on the **Basic Information** page and create a token that requests the [`connections:write`](/reference/scopes/connections.write) scope. This token will allow you to use [Socket Mode](/apis/events-api/using-socket-mode), which is a secure way to develop on Slack through the use of WebSockets. Save the value of your app token and store it in a safe place. Also, save the **Signing Secret** from the **App Credentials** section of this page. We’ll use these later.
 
-### Install app
+### Install app in workspace
 
 Still in the app settings, navigate to the **Install App** page in the left sidebar. Install your app. When you press **Allow**, this means you’re agreeing to install your app with the permissions that it’s requesting. Copy the bot token that you receive and store it in a safe place for subsequent steps.
 
-### Start coding
-
 Now that you’ve completed the app setup, it’s time to write some code!
 
-#### Install Node and set up the project
+### Install Node and set up the project
 
 Open your terminal or command prompt. First, check to see that you have Node.js installed and it is a recent long-term support (LTS) version by typing the following command.
 
@@ -119,7 +117,7 @@ Initialize a new Node.js project using the following command; answer each questi
 npm init
 ```
 
-Our project is going to use two packages: the Slack [Bolt for JavaScript](/bolt-js/) framework and [Axios](https://www.npmjs.com/package/axios), a popular HTTP client for making API calls. Install these dependencies with the following command.
+Our project is going to use two packages: the Slack [Bolt for JavaScript](/tools/bolt-js/) framework and [Axios](https://www.npmjs.com/package/axios), a popular HTTP client for making API calls. Install these dependencies with the following command.
 
 ```sh
 npm install @slack/bolt axios
@@ -155,7 +153,7 @@ Next, edit the `package.json` file with the following settings, then save the fi
 "type": "module"
 ```
 
-#### Add function code
+### Add function code
 
 Create a new file named `app.js` and add the following code.
 
@@ -216,7 +214,7 @@ main();
 
 The code in the `app.js` file initializes the Bolt app using your tokens and signing secret and enables Socket Mode. Next, it defines the `getUselessFact()` function that retrieves a random fact using Axios. It uses the Bolt framework to create a Slack function named `useless_fact_step`. This is the same function we registered in the app manifest previously; the function's name, inputs, and outputs in the code must match with the what is defined in the app manifest. Finally, a function named `main()` is used to start the Bolt app.
 
-### Run your Bolt app
+## Run your Bolt app
 
 From your terminal, enter the following command:
 
@@ -250,7 +248,7 @@ Every workflow starts with a trigger. For this workflow, it may make sense to ha
 2. From the list of events, click **On a schedule**.
 3. Configure the schedule for your app to run. Under **Starts on**, choose today’s date. Change the time to 15 or 30 minutes from now (you can update the scheduled time and frequency after you verify it is working). Under **Frequency**, choose **Every weekday (Monday to Friday)**. Click **Continue**.
 
-### Add your Bolt app's function to the Workflow
+### Add the Bolt app's function to the workflow
 
 After the workflow is triggered, the next step is to call the function in the Bolt app. This is done using a custom step.
 
@@ -260,7 +258,7 @@ After the workflow is triggered, the next step is to call the function in the Bo
 4. Click **Useless Fact Custom Step**.
 5. Click **Save**.
 
-### Add a step to send a message to a channel
+### Add a channel message step
 
 After calling the Bolt app and retrieving a random fact, the next step is to send a message to a channel.
 
@@ -284,9 +282,7 @@ Almost there! The final task is to publish the workflow and wait for the next sc
 
 Wait for the scheduled time and see your new custom Bolt app in action!
 
-![Image of random fact app](random-fact-app-3.png)
-
-### Make changes or schedule
+### Make changes to the workflow
 
 If needed, you can always make changes to elements of your workflow, such as the schedule, channel, or message. 
 

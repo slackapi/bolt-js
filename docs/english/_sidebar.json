@@ -112,7 +112,8 @@
       "tools/bolt-js/tutorials/code-assistant",
       "tools/bolt-js/tutorials/custom-steps",
       "tools/bolt-js/tutorials/custom-steps-workflow-builder-new/custom-steps-workflow-builder-new",
-      "tools/bolt-js/tutorials/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing"
+      "tools/bolt-js/tutorials/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing",
+      "tools/bolt-js/tutorials/random-fact-generator"
     ]
   },
   { "type": "html", "value": "<hr>" },
