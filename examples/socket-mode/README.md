@@ -22,7 +22,9 @@ Next, click on **Basic Information** and generate a `App Level Token` with the `
 
 Then navigate to **App Home**. Under **Show tabs**, toggle the **Home tab** option.
 
-Lastly, in **Events Subscription**, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`.
+Lastly, in **Events Subscription**, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`. 
+
+To test link unfurl functionality, also subscribe to the `link_shared` event and add a domain under **App unfurl domains**. The example uses `myappdomain.com`.
 
 ## Setup Environment Variables
 
@@ -30,9 +32,9 @@ This app requires you setup a few environment variables. You can find these valu
 
 ```
 // can get this from OAuth & Permission page in app configuration
-export BOT_TOKEN=YOUR_SLACK_BOT_TOKEN
+export SLACK_BOT_TOKEN=YOUR_SLACK_BOT_TOKEN
 // can generate the app level token from basic information page in app configuration
-export APP_TOKEN=YOUR_SLACK_APP_TOKEN 
+export SLACK_APP_TOKEN=YOUR_SLACK_APP_TOKEN
 
 // if using OAuth, also export the following
 export CLIENT_ID=YOUR_SLACK_CLIENT_ID
