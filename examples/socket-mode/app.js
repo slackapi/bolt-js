@@ -185,33 +185,6 @@ app.command('/socketslash', async ({ command, ack, say }) => {
   await say(`${command.text}`);
 });
 
-// Respond to a link with a Block Kit unfurl
-app.event('link_shared', async ({ event, client, logger }) => {
-  try {
-    await client.chat.unfurl({
-      channel: event.channel,
-      ts: event.message_ts,
-      unfurls: {
-        'https://myappdomain.com/id/123': {
-          blocks: [
-            {
-              type: 'section',
-              text: { type: 'mrkdwn', text: 'Take a look at this carafe, just another cousin of glass' },
-              accessory: {
-                type: 'image',
-                image_url: 'https://gentle-buttons.com/img/carafe-filled-with-red-wine.png',
-                alt_text: "Stein's wine carafe",
-              },
-            },
-          ],
-        },
-      },
-    });
-  } catch (error) {
-    logger.error(error);
-  }
-});
-
 const APP_DOMAIN_UNFURL_URL = 'https://myappdomain.com/id/123';
 
 const sample_file_entity = {
@@ -240,6 +213,33 @@ const sample_file_entity = {
         },
       },
     },
+    custom_fields: [
+      {
+        "type": "array",
+        "key": "array-of-strings",
+        "label": "Array of Strings",
+        "item_type": "string",
+        "value": [
+          {
+            "value": "Red",
+            "tag_color": "red"
+          },
+          {
+            "value": "Green",
+            "tag_color": "green"
+          }
+        ]
+      },
+      {
+        "type": "string",
+        "key": "my-string",
+        "label": "My String",
+        "value": "Hello World!",
+        "edit": {
+          "enabled": true
+        }
+      }
+    ]
   },
 };
 
@@ -258,11 +258,29 @@ app.event('link_shared', async ({ event, client, logger }) => {
   }
 });
 
+// Respond to a work object unfurl being previewed in Slack (provide data to display in the flexpane)
 app.event('entity_details_requested', async ({ event, client, logger }) => {
   try {
     await client.entity.presentDetails({
       metadata: sample_file_entity,
       trigger_id: event.trigger_id,
+    });
+  } catch (error) {
+    logger.error(error);
+  }
+});
+
+// Respond to a work object being edited in Slack
+app.view("work-object-edit", async ({ ack, view, body, client, logger }) => {
+  await ack();
+
+  // Inspect changes to the entity, persist changes to your datastore, and respond to Slack with the updated metadata
+  sample_file_entity.entity_payload.custom_fields[1].value = view.state.values['my-string']['my-string.input'].value;
+
+  try {
+    await client.entity.presentDetails({
+      metadata: sample_file_entity,
+      trigger_id: body.trigger_id,
     });
   } catch (error) {
     logger.error(error);
