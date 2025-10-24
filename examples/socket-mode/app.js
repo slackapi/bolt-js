@@ -215,31 +215,31 @@ const sample_file_entity = {
     },
     custom_fields: [
       {
-        "type": "array",
-        "key": "array-of-strings",
-        "label": "Array of Strings",
-        "item_type": "string",
-        "value": [
+        type: 'array',
+        key: 'array-of-strings',
+        label: 'Array of Strings',
+        item_type: 'string',
+        value: [
           {
-            "value": "Red",
-            "tag_color": "red"
+            value: 'Red',
+            tag_color: 'red',
           },
           {
-            "value": "Green",
-            "tag_color": "green"
-          }
-        ]
+            value: 'Green',
+            tag_color: 'green',
+          },
+        ],
       },
       {
-        "type": "string",
-        "key": "my-string",
-        "label": "My String",
-        "value": "Hello World!",
-        "edit": {
-          "enabled": true
-        }
-      }
-    ]
+        type: 'string',
+        key: 'my-string',
+        label: 'My String',
+        value: 'Hello World!',
+        edit: {
+          enabled: true,
+        },
+      },
+    ],
   },
 };
 
@@ -271,7 +271,7 @@ app.event('entity_details_requested', async ({ event, client, logger }) => {
 });
 
 // Respond to a work object being edited in Slack
-app.view("work-object-edit", async ({ ack, view, body, client, logger }) => {
+app.view('work-object-edit', async ({ ack, view, body, client, logger }) => {
   await ack();
 
   // Inspect changes to the entity, persist changes to your datastore, and respond to Slack with the updated metadata
