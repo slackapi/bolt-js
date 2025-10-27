@@ -43,18 +43,18 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
     const conversationId: string | undefined = (() => {
       let foundConversationId: string;
       if ('channel' in event) {
-        if (typeof event.channel === 'string') {
-          foundConversationId = event.channel;
-        } else if ('id' in event.channel) {
-          foundConversationId = event.channel.id;
+        if (typeof event?.channel === 'string') {
+          foundConversationId = event?.channel;
+        } else if ('id' in event?.channel) {
+          foundConversationId = event?.channel?.id;
         }
       }
       if ('channel_id' in event) {
-        foundConversationId = event.channel_id;
+        foundConversationId = event?.channel_id;
       }
-      if ('item' in event && 'channel' in event.item) {
+      if ('item' in event && 'channel' in event?.item) {
         // no channel for reaction_added, reaction_removed, star_added, or star_removed with file or file_comment items
-        foundConversationId = event.item.channel as string;
+        foundConversationId = event?.item?.channel as string;
       }
       // Using non-null assertion (!) because the alternative is to use `foundConversation: (string | undefined)`, which
       // impedes the very useful type checker help above that ensures the value is only defined to strings, not
@@ -142,7 +142,7 @@ export function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'],
  * https://github.com/slackapi/bolt-js/issues/674
  */
 export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
-  return eventTypesToSkipAuthorize.includes(event.body.event?.type);
+  return eventTypesToSkipAuthorize.includes(event?.body?.event?.type);
 }
 
 /* istanbul ignore next */
