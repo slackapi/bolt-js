@@ -45,16 +45,16 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       if ('channel' in event) {
         if (typeof event?.channel === 'string') {
           foundConversationId = event?.channel;
-        } else if (typeof event?.channel === 'object' && 'id' in event?.channel) {
-          foundConversationId = event?.channel?.id;
+        } else if (typeof event?.channel === 'object' && 'id' in event.channel) {
+          foundConversationId = event.channel.id;
         }
       }
       if ('channel_id' in event) {
-        foundConversationId = event?.channel_id;
+        foundConversationId = event.channel_id;
       }
-      if ('item' in event && 'channel' in event?.item) {
+      if ('item' in event && 'channel' in event.item) {
         // no channel for reaction_added, reaction_removed, star_added, or star_removed with file or file_comment items
-        foundConversationId = event?.item?.channel as string;
+        foundConversationId = event.item.channel as string;
       }
       // Using non-null assertion (!) because the alternative is to use `foundConversation: (string | undefined)`, which
       // impedes the very useful type checker help above that ensures the value is only defined to strings, not
