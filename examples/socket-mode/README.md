@@ -22,9 +22,7 @@ Next, click on **Basic Information** and generate a `App Level Token` with the `
 
 Then navigate to **App Home**. Under **Show tabs**, toggle the **Home tab** option.
 
-Lastly, in **Events Subscription**, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`. 
-
-To test link unfurl functionality, also subscribe to the `link_shared` event and add a domain under **App unfurl domains**. The example uses `myappdomain.com`.
+Lastly, in **Events Subscription**, click **Subscribe to bot events** and add `app_home_opened`, `app_mentioned`, and `message.channels`.
 
 ## Setup Environment Variables
 
