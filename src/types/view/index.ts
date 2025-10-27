@@ -317,6 +317,7 @@ export interface ViewOutput {
   external_ref?: { id: string; type?: string };
   app_unfurl_url?: string;
   message_ts?: string;
+  thread_ts?: string;
   channel?: string;
 }
 
