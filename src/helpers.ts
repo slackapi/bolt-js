@@ -43,9 +43,9 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
     const conversationId: string | undefined = (() => {
       let foundConversationId: string;
       if ('channel' in event) {
-        if (typeof event.channel === 'string') {
+        if (typeof event?.channel === 'string') {
           foundConversationId = event.channel;
-        } else if (event.channel && 'id' in event.channel) {
+        } else if (typeof event?.channel === 'object' && 'id' in event.channel) {
           foundConversationId = event.channel.id;
         }
       }
@@ -142,7 +142,7 @@ export function isBodyWithTypeEnterpriseInstall(body: AnyMiddlewareArgs['body'],
  * https://github.com/slackapi/bolt-js/issues/674
  */
 export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
-  return eventTypesToSkipAuthorize.includes(event.body.event?.type);
+  return eventTypesToSkipAuthorize.includes(event.body?.event?.type);
 }
 
 /* istanbul ignore next */
