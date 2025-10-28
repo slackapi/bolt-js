@@ -44,7 +44,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       let foundConversationId: string;
       if ('channel' in event) {
         if (typeof event?.channel === 'string') {
-          foundConversationId = event?.channel;
+          foundConversationId = event.channel;
         } else if (typeof event?.channel === 'object' && 'id' in event.channel) {
           foundConversationId = event.channel.id;
         }
