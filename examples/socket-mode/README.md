@@ -30,9 +30,9 @@ This app requires you setup a few environment variables. You can find these valu
 
 ```
 // can get this from OAuth & Permission page in app configuration
-export BOT_TOKEN=YOUR_SLACK_BOT_TOKEN
+export SLACK_BOT_TOKEN=YOUR_SLACK_BOT_TOKEN
 // can generate the app level token from basic information page in app configuration
-export APP_TOKEN=YOUR_SLACK_APP_TOKEN 
+export SLACK_APP_TOKEN=YOUR_SLACK_APP_TOKEN
 
 // if using OAuth, also export the following
 export CLIENT_ID=YOUR_SLACK_CLIENT_ID
