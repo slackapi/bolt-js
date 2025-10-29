@@ -54,7 +54,6 @@ First, log in to your Slack workspace or [join the Developer Program](https://ap
     "org_deploy_enabled": true,
     "socket_mode_enabled": true,
     "token_rotation_enabled": false,
-    "hermes_app_type": "remote",
     "function_runtime": "remote"
   },
   "functions": {
@@ -80,7 +79,7 @@ Note the app manifest includes a function named `useless_fact_step` and declares
 
 ### Save tokens
 
-Once your app has been created, scroll down to **App-Level Tokens** on the **Basic Information** page and create a token that requests the [`connections:write`](/reference/scopes/connections.write) scope. This token will allow you to use [Socket Mode](/apis/events-api/using-socket-mode), which is a secure way to develop on Slack through the use of WebSockets. Save the value of your app token and store it in a safe place. Also, save the **Signing Secret** from the **App Credentials** section of this page. We’ll use these later.
+Once your app has been created, scroll down to **App-Level Tokens** on the **Basic Information** page and create a token that requests the [`connections:write`](/reference/scopes/connections.write) scope. This token will allow you to use [Socket Mode](/apis/events-api/using-socket-mode), which is a secure way to develop on Slack through the use of WebSockets. Save the value of your app token and store it in a safe place. We’ll use these later.
 
 ### Install app in workspace
 
@@ -117,19 +116,17 @@ Initialize a new Node.js project using the following command; answer each questi
 npm init
 ```
 
-Our project is going to use two packages: the Slack [Bolt for JavaScript](/tools/bolt-js/) framework and [Axios](https://www.npmjs.com/package/axios), a popular HTTP client for making API calls. Install these dependencies with the following command.
+Our project is going to use the Slack [Bolt for JavaScript](/tools/bolt-js/) framework to help with app development. Install this dependency with the following command.
 
 ```sh
-npm install @slack/bolt axios
+npm install @slack/bolt
 ```
 
 Open the project in VS Code or your favorite code editor, then create a new file in the project folder named `.env`. Open the file and paste the following, replacing the placeholders with the values you saved earlier. 
 
-```sh
-SLACK_SIGNING_SECRET={your-app-signing-secret}
+```txt
 SLACK_BOT_TOKEN={your-bot-token-xoxb-1234}
 SLACK_APP_TOKEN={your-app-token-xapp-1234}
-PORT=3000
 ```
 
 Next, edit the `package.json` file with the following settings, then save the file.
@@ -143,7 +140,7 @@ Next, edit the `package.json` file with the following settings, then save the fi
 
 ```json
 "scripts": {
-  "dev": "node –env-file=.env –watch app.js"
+  "dev": "node --env-file=.env --watch app.js"
 }
 ```
 
@@ -159,22 +156,24 @@ Create a new file named `app.js` and add the following code.
 
 ```js
 import bolt from "@slack/bolt";
-import axios from "axios";
 
 const { App } = bolt;
 
 // Initialize the Bolt app
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
 });
 
 // Make an API call to retrieve a random fact
 async function getUselessFact() {
-  const res = await axios.get("https://uselessfacts.jsph.pl/api/v2/facts/random");
-  return res.status === 200 ? res.data : null;
+  const res = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random");
+	  if (!res.ok) {
+	    return null;
+	  }
+	  const data = await res.json();
+	  return data;
 }
 
 // Define the function for Workflow Builder
@@ -205,14 +204,14 @@ app.function("useless_fact_step", async ({ complete, fail, logger }) => {
 
 // Start the Bolt App!
 async function main() {
-  await app.start(process.env.PORT || 3000);
+  await app.start();
   app.logger.info("⚡️ Bolt app is running!");
 }
 
 main();
 ```
 
-The code in the `app.js` file initializes the Bolt app using your tokens and signing secret and enables Socket Mode. Next, it defines the `getUselessFact()` function that retrieves a random fact using Axios. It uses the Bolt framework to create a Slack function named `useless_fact_step`. This is the same function we registered in the app manifest previously; the function's name, inputs, and outputs in the code must match with the what is defined in the app manifest. Finally, a function named `main()` is used to start the Bolt app.
+The code in the `app.js` file initializes the Bolt app using your tokens and enables Socket Mode. Next, it defines the `getUselessFact()` function that fetches a random fact. It uses the Bolt framework to create a Slack function named `useless_fact_step`. This is the same function we registered in the app manifest previously; the function's name, inputs, and outputs in the code must match with the what is defined in the app manifest. Finally, a function named `main()` is used to start the Bolt app.
 
 ## Run your Bolt app
 
@@ -294,4 +293,4 @@ If needed, you can always make changes to elements of your workflow, such as the
 
 Congratulations! You’ve learned how to create a Bolt app using the [Bolt for JavaScript](/tools/bolt-js) framework and a daily scheduled workflow using [Workflow Builder](/workflows/workflow-builder)! 
 
-The Bolt app will continue to work as long as you have it running on your computer. This is acceptable for development and testing purposes, but a better long-term solution is to deploy the application to a production environment. You can follow the guides available for [Deploying to AWS Lambda](/tools/bolt-js/deployments/aws-lambda/) or [Deploying to Heroku](https://tools.slack.dev/bolt-js/deployments/heroku) for steps on deploying to those environments. Alternatively, you can deploy to any platform that supports JavaScript serverless functions or Node.js applications.
+The Bolt app will continue to work as long as you have it running on your computer. This is acceptable for development and testing purposes, but a better long-term solution is to deploy the application to a production environment. You can follow the guides available for [Deploying to AWS Lambda](/tools/bolt-js/deployments/aws-lambda/) or [Deploying to Heroku](/tools/bolt-js/deployments/heroku) for steps on deploying to those environments. Alternatively, you can deploy to any platform that supports JavaScript serverless functions or Node.js applications.
