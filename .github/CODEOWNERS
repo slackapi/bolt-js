@@ -1,0 +1,11 @@
+# Salesforce Open Source configuration
+#ECCN:Open Source
+#GUSINFO:Open Source,Open Source Workflow
+
+# @slackapi/slack-platform-javascript
+# will be added as code reviewers to all files in this repo.
+* @slackapi/slack-platform-javascript
+
+# @slackapi/developer-education
+# owns any file in the `/docs` directory in the root of this repo.
+/docs/ @slackapi/developer-education
