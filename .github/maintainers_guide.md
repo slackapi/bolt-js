@@ -51,7 +51,7 @@ The `/docs` folder contains two types of docs files:
 * markdown files
 * sidebar.json
 
-The private repo containing the tools.slack.dev site pulls these in at build time.
+The private repo containing the docs.slack.dev site pulls these in at build time.
 
 Maintainers need to use the `run workflow` button associated with the `deploy` workflow in that private repo to update the docs with changes from here. 
 
