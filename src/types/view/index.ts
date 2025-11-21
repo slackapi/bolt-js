@@ -5,11 +5,7 @@ import type { AckFn, RespondFn } from '../utilities';
 /**
  * Known view action types
  */
-export type SlackViewAction =
-  | ViewSubmitAction
-  | ViewClosedAction
-  | ViewWorkflowStepSubmitAction // TODO: remove workflow step stuff in bolt v5
-  | ViewWorkflowStepClosedAction;
+export type SlackViewAction = ViewSubmitAction | ViewClosedAction;
 // <ViewAction extends SlackViewAction = ViewSubmitAction>
 // TODO: add a type parameter here, just like the other constraint interfaces have.
 export interface ViewConstraints {
@@ -103,39 +99,6 @@ export interface ViewClosedAction {
     name: string;
   };
 }
-
-/**
- * A Slack view_submission step from app event
- *
- * This describes the additional JSON-encoded body details for a step's view_submission event
- * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
- * version.
- */
-export interface ViewWorkflowStepSubmitAction extends ViewSubmitAction {
-  trigger_id: string;
-  response_urls?: ViewResponseUrl[];
-  workflow_step: {
-    workflow_step_edit_id: string;
-    workflow_id: string;
-    step_id: string;
-  };
-}
-
-/**
- * A Slack view_closed step from app event
- *
- * This describes the additional JSON-encoded body details for a step's view_closed event
- * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
- * version.
- */
-export interface ViewWorkflowStepClosedAction extends ViewClosedAction {
-  workflow_step: {
-    workflow_step_edit_id: string;
-    workflow_id: string;
-    step_id: string;
-  };
-}
-
 export interface ViewStateSelectedOption {
   text: PlainTextElement;
   value: string;

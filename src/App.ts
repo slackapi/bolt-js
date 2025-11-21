@@ -13,7 +13,6 @@ import {
   createFunctionComplete,
   createFunctionFail,
 } from './CustomFunction';
-import type { WorkflowStep } from './WorkflowStep';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
 import {
   AppInitializationError,
@@ -84,7 +83,6 @@ import type {
   SlashCommand,
   ViewConstraints,
   ViewOutput,
-  WorkflowStepEdit,
 } from './types';
 import { contextBuiltinKeys } from './types';
 import { type StringIndexed, isRejected } from './types/utilities';
@@ -518,19 +516,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    */
   public assistant(assistant: Assistant): this {
     const m = assistant.getMiddleware();
-    this.middleware.push(m);
-    return this;
-  }
-
-  /**
-   * Register WorkflowStep middleware
-   *
-   * @param workflowStep global workflow step middleware function
-   * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
-   * version.
-   */
-  public step(workflowStep: WorkflowStep): this {
-    const m = workflowStep.getMiddleware();
     this.middleware.push(m);
     return this;
   }
@@ -1022,11 +1007,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    // TODO: remove workflow step stuff in bolt v5
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     let payload:
       | DialogSubmitAction
-      | WorkflowStepEdit
       | SlackShortcut
       | KnownEventFromType<string>
       | SlashCommand

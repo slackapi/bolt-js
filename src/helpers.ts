@@ -81,8 +81,7 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       conversationId: optionsBody.channel !== undefined ? optionsBody.channel.id : undefined,
     };
   }
-  // TODO: remove workflow_step stuff in v5
-  if (body.actions !== undefined || body.type === 'dialog_submission' || body.type === 'workflow_step_edit') {
+  if (body.actions !== undefined || body.type === 'dialog_submission') {
     const actionBody = body as SlackActionMiddlewareArgs<SlackAction>['body'];
     return {
       type: IncomingEventType.Action,
