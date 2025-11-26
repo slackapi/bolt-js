@@ -134,7 +134,7 @@ export interface AppOptions {
   /**
    * Configurations for the web client used to send Slack API method requests.
    *
-   * See {@link https://tools.slack.dev/node-slack-sdk/reference/web-api/interfaces/WebClientOptions} for more information.
+   * See {@link https://docs.slack.dev/tools/node-slack-sdk/reference/web-api/interfaces/WebClientOptions/} for more information.
    */
   clientOptions?: WebClientOptions;
   socketMode?: boolean;
@@ -540,7 +540,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param callbackId Unique callback ID of a step.
    * @param [options] Configurations for the listener.
    * @param listeners Middleware handlers to call.
-   * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps}
+   * @see {@link https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/}
    * @see {@link https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options}
    */
   public function(
@@ -1343,7 +1343,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://tools.slack.dev/bolt-js/concepts/authenticating-oauth/ for these required fields.\n`,
+        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://docs.slack.dev/tools/bolt-js/concepts/authenticating-oauth/ for these required fields.\n`,
       );
       // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && usingOauth) {
