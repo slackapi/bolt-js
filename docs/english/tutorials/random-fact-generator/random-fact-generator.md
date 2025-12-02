@@ -110,49 +110,23 @@ For Windows, the command looks like this:
 md useless-fact-app
 ```
 
-Initialize a new Node.js project using the following command; answer each question with defaults.
+In your terminal window, run the following command to clone the starter template repository locally:
 
-```sh
-npm init
+```bash
+# Clone this project onto your machine
+git clone https://github.com/slack-samples/bolt-js-starter-template.git .
 ```
 
-Our project is going to use the Slack [Bolt for JavaScript](/tools/bolt-js/) framework to help with app development. Install this dependency with the following command.
-
-```sh
-npm install @slack/bolt
-```
-
-Open the project in VS Code or your favorite code editor, then create a new file in the project folder named `.env`. Open the file and paste the following, replacing the placeholders with the values you saved earlier. 
+Open the project in VS Code or your favorite code editor. Rename the `.env.sample` file to `.env`. Open the file and paste the following, replacing the placeholders with the values you saved earlier. 
 
 ```txt
 SLACK_BOT_TOKEN={your-bot-token-xoxb-1234}
 SLACK_APP_TOKEN={your-app-token-xapp-1234}
 ```
 
-Next, edit the `package.json` file with the following settings, then save the file.
-* Change `"main"` to:
-
-```json
-"main": "app.js",
-```
-
-* Change `"scripts"` to:
-
-```json
-"scripts": {
-  "dev": "node --env-file=.env --watch app.js"
-}
-```
-
-* Change `"type"` to `"module"` or add this line if it is not already present:
-
-```json
-"type": "module"
-```
-
 ### Add function code
 
-Create a new file named `app.js` and add the following code.
+Replace the contents of the `app.js` with the code shown here.
 
 ```js
 import bolt from "@slack/bolt";
@@ -235,7 +209,7 @@ Your Bolt app is running, and you can now use it in your Slack workspace!
 
 ## Create a new workflow using Workflow Builder
 
-To create a new workflow, you will need to open Workflow Builder in Slack. You can open Workflow Builder using one of the following methods.
+To create a new workflow, open Workflow Builder in Slack using one of the following methods.
 
 * **Use the message box:** In any channel, type `/workflow` and select **Create a workflow**.
 * **Use the sidebar:** Navigate to the left sidebar in Slack and click **More**, then **Tools**, then **Workflows**. Click **+New** then **Build Workflow** to create a new workflow.
