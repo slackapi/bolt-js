@@ -318,7 +318,7 @@ The `setStatus` method calls the [`assistant.threads.setStatus`](/reference/meth
 await setStatus('');
 ```
 
-We show a couple of examples in this sample app of how to handle user message processing: use channel history to give context to the user's message, and use thread history to give context to the user's message. Here is how to do each and prepare the information for sending to OpenAI
+We show a couple of examples in this sample app of how to handle user message processing: use channel history to give context to the user's message, and use thread history to give context to the user's message. Here is how to do each and prepare the information for sending to OpenAI.
 
 #### Using channel history for context {#channel-history}
 
