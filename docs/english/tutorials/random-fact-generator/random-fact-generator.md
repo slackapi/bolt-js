@@ -130,6 +130,7 @@ Replace the contents of the `app.js` with the code shown here.
 
 ```js
 import bolt from "@slack/bolt";
+import "dotenv/config";
 
 const { App } = bolt;
 
