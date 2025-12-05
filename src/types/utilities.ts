@@ -37,6 +37,7 @@ export type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'chann
   replace_original?: boolean;
   delete_original?: boolean;
   text?: string;
+  thread_ts?: string;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: TODO: check if we can type this more strictly than any
