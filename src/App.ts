@@ -111,7 +111,6 @@ export interface AppOptions {
   appToken?: string; // TODO should this be included in AuthorizeResult
   attachFunctionToken?: boolean;
   authorize?: Authorize<boolean>; // either token or authorize
-  autoReconnectEnabled?: SocketModeOptions['autoReconnectEnabled'];
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
   clientId?: HTTPReceiverOptions['clientId'];
@@ -121,7 +120,6 @@ export interface AppOptions {
    * See {@link https://tools.slack.dev/node-slack-sdk/reference/web-api/interfaces/WebClientOptions} for more information.
    */
   clientOptions?: WebClientOptions;
-  clientPingTimeout?: SocketModeOptions['clientPingTimeout'];
   clientSecret?: HTTPReceiverOptions['clientSecret'];
   clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
@@ -135,13 +133,12 @@ export interface AppOptions {
   installerOptions?: HTTPReceiverOptions['installerOptions'];
   logger?: Logger;
   logLevel?: LogLevel;
-  pingPongLoggingEnabled?: SocketModeOptions['pingPongLoggingEnabled'];
   port?: HTTPReceiverOptions['port'];
   processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
   receiver?: Receiver;
   redirectUri?: HTTPReceiverOptions['redirectUri'];
   scopes?: HTTPReceiverOptions['scopes'];
-  serverPingTimeout?: SocketModeOptions['serverPingTimeout'];
+  socketModeOptions?: Omit<SocketModeOptions, 'appToken'>;
   signatureVerification?: HTTPReceiverOptions['signatureVerification'];
   signingSecret?: HTTPReceiverOptions['signingSecret'];
   socketMode?: boolean;
@@ -284,12 +281,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     agent = undefined,
     appToken = undefined,
     attachFunctionToken = true,
-    autoReconnectEnabled = undefined,
     botId = undefined,
     botUserId = undefined,
     clientId = undefined,
     clientOptions = undefined,
-    clientPingTimeout = undefined,
     clientSecret = undefined,
     clientTls = undefined,
     convoStore = undefined,
@@ -307,13 +302,12 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     port = undefined,
     receiver = undefined,
     token = undefined,
-    pingPongLoggingEnabled = undefined,
     redirectUri = undefined,
-    serverPingTimeout = undefined,
     scopes = undefined,
     signatureVerification = true,
     signingSecret = undefined,
     socketMode = undefined,
+    socketModeOptions = undefined,
     stateSecret = undefined,
     tokenVerificationEnabled = true,
   }: AppOptions = {}) {
@@ -429,10 +423,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       scopes,
       appToken,
       logger,
-      autoReconnectEnabled,
-      clientPingTimeout,
-      pingPongLoggingEnabled,
-      serverPingTimeout,
+      socketModeOptions,
     );
 
     /* ------------------------ Set authorize ----------------------------- */
@@ -1280,10 +1271,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     scopes?: HTTPReceiverOptions['scopes'],
     appToken?: string,
     logger?: Logger,
-    autoReconnectEnabled?: SocketModeOptions['autoReconnectEnabled'],
-    clientPingTimeout?: SocketModeOptions['clientPingTimeout'],
-    pingPongLoggingEnabled?: SocketModeOptions['pingPongLoggingEnabled'],
-    serverPingTimeout?: SocketModeOptions['serverPingTimeout'],
+    socketModeOptions?: Omit<SocketModeOptions, 'appToken'>,
   ): Receiver {
     if (receiver !== undefined) {
       // Custom receiver supplied
@@ -1301,16 +1289,13 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       this.logger.debug('Initializing SocketModeReceiver');
       return new SocketModeReceiver({
         appToken,
-        autoReconnectEnabled,
         clientId,
-        clientPingTimeout,
         clientSecret,
         customRoutes,
         installerOptions: this.installerOptions,
         installationStore,
-        pingPongLoggingEnabled,
         redirectUri,
-        serverPingTimeout,
+        ...socketModeOptions,
         stateSecret,
         scopes,
         logger,
