@@ -8,8 +8,10 @@ export {
   AuthorizeResult,
   ActionConstraints,
   LogLevel,
-  Logger,
 } from './App';
+
+// Re-export Logger type for TypeScript consumers
+export type { Logger } from './App';
 
 // Export App both as named and default for better ES module compatibility
 export { AppClass as App };
@@ -20,10 +22,17 @@ export {
   isValidSlackRequest,
 } from './receivers/verify-request';
 
-export { default as ExpressReceiver, ExpressReceiverOptions } from './receivers/ExpressReceiver';
-export { default as SocketModeReceiver, SocketModeReceiverOptions } from './receivers/SocketModeReceiver';
-export { default as HTTPReceiver, HTTPReceiverOptions } from './receivers/HTTPReceiver';
-export { default as AwsLambdaReceiver, AwsLambdaReceiverOptions } from './receivers/AwsLambdaReceiver';
+// Import receivers first, then re-export for better ESM compatibility
+import AwsLambdaReceiver from './receivers/AwsLambdaReceiver';
+import ExpressReceiver from './receivers/ExpressReceiver';
+import HTTPReceiver from './receivers/HTTPReceiver';
+import SocketModeReceiver from './receivers/SocketModeReceiver';
+
+export { ExpressReceiver, SocketModeReceiver, HTTPReceiver, AwsLambdaReceiver };
+export type { ExpressReceiverOptions } from './receivers/ExpressReceiver';
+export type { SocketModeReceiverOptions } from './receivers/SocketModeReceiver';
+export type { HTTPReceiverOptions } from './receivers/HTTPReceiver';
+export type { AwsLambdaReceiverOptions } from './receivers/AwsLambdaReceiver';
 
 export { BufferedIncomingMessage } from './receivers/BufferedIncomingMessage';
 export {
@@ -68,13 +77,15 @@ export {
   WorkflowStepExecuteMiddleware,
 } from './WorkflowStep';
 
-export {
+// Re-export OAuth runtime classes
+export { MemoryInstallationStore, FileInstallationStore } from '@slack/oauth';
+
+// Re-export OAuth types for TypeScript consumers
+export type {
   Installation,
   InstallURLOptions,
   InstallationQuery,
   InstallationStore,
-  MemoryInstallationStore,
-  FileInstallationStore,
   StateStore,
   InstallProviderOptions,
 } from '@slack/oauth';
