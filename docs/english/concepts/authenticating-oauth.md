@@ -495,7 +495,7 @@ installation in your app configuration settings under **Org Level Apps**.
 
 #### Admin installation state verficiation
 
-Installing an [org-wide](/enterprise-grid/) app from admin
+Installing an [org-wide](/enterprise/) app from admin
 pages requires additional configuration to work with Bolt. In that scenario, the
 recommended `state` parameter is not supplied. Bolt will try to verify `state`
 and stop the installation from progressing.
@@ -713,8 +713,8 @@ for additional details for common error codes.
 [oauth-node]: /tools/node-slack-sdk/oauth
 [oauth-v2]: /authentication/installing-with-oauth
 [oidc]: /tools/node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
-[org-ready]: /enterprise-grid/developing-for-enterprise-grid#opt
-[org-ready-oauth]: /enterprise-grid/developing-for-enterprise-grid#oauth
+[org-ready]: /enterprise/developing-for-enterprise-orgs#opt
+[org-ready-oauth]: /enterprise/developing-for-enterprise-orgs#oauth
 [scopes]: /reference/scopes
 [settings]: https://api.slack.com/apps
 [siws]: /authentication/sign-in-with-slack/
