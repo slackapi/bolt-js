@@ -6,7 +6,7 @@ Bolt アプリケーションは、トップレベルに `app.client` も持っ�
 
 トップレベルのクライアントを使ってもリスナー関数でのクライアントを使っても、[`WebClient`](/tools/node-slack-sdk/web-api) が提供するメソッドを呼び出すと、それへの Slack からのレスポンスを含む Promise の値が返されます。
 
-[OrG 全体へのインストール機能](/enterprise-grid/)の導入により、[いくつかの Web API](/enterprise-grid/developing-for-enterprise-grid#using-apis) は、動作しているワークスペースを伝えるために `team_id` パラメーターを必要とします。Bolt for JavaScript は、この `team_id` を Slack から受け取ったペイロードを元に判定し、`client` インスタンスに設定します。これは、既存のアプリケーションにとっても OrG 全体へのインストールに対応する上で有用です。既存の Web API 呼び出しの処理をアップデートする必要はありません。
+[OrG 全体へのインストール機能](/enterprise/)の導入により、[いくつかの Web API](/enterprise/developing-for-enterprise-grid#using-apis) は、動作しているワークスペースを伝えるために `team_id` パラメーターを必要とします。Bolt for JavaScript は、この `team_id` を Slack から受け取ったペイロードを元に判定し、`client` インスタンスに設定します。これは、既存のアプリケーションにとっても OrG 全体へのインストールに対応する上で有用です。既存の Web API 呼び出しの処理をアップデートする必要はありません。
 
 ```javascript
 // September 30, 2019 11:59:59 PM を Unix エポックタイムで表示
