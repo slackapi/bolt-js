@@ -167,7 +167,7 @@ The above example works on Linux and macOS, but [similar commands are available 
 
 :::danger[Keep your tokens and signing secret secure]
 
-At a minimum, you should avoid checking tokens and signing secrets into public version control, and you should access them via environment variables as shown above. Check out the guide to [app security best practices](/authentication/best-practices-for-security) for more insights.
+At a minimum, you should avoid checking tokens and signing secrets into public version control, and you should access them via environment variables as shown above. Check out the guide to [app security best practices](/security) for more insights.
 
 :::
 

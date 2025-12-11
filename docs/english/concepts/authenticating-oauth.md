@@ -713,8 +713,8 @@ for additional details for common error codes.
 [oauth-node]: /tools/node-slack-sdk/oauth
 [oauth-v2]: /authentication/installing-with-oauth
 [oidc]: /tools/node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
-[org-ready]: /enterprise/developing-for-enterprise-grid#opt
-[org-ready-oauth]: /enterprise/developing-for-enterprise-grid#oauth
+[org-ready]: /enterprise/developing-for-enterprise-orgs#opt
+[org-ready-oauth]: /enterprise/developing-for-enterprise-orgs#oauth
 [scopes]: /reference/scopes
 [settings]: https://api.slack.com/apps
 [siws]: /authentication/sign-in-with-slack/

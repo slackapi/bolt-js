@@ -6,7 +6,7 @@ Your Bolt app also has a top-level `app.client` which you can manually pass the 
 
 Calling one of the [`WebClient`](/tools/node-slack-sdk/web-api) methods will return a Promise containing the response from Slack, regardless of whether you use the top-level or listener's client.
 
-Since the introduction of [org wide app installations](/enterprise/), [some web-api methods](/enterprise/developing-for-enterprise-grid#using-apis) now require a `team_id` parameter to indicate which workspace to act on. Bolt for JavaScript will attempt to infer the `team_id` value based on incoming payloads and pass it along to `client`. This is handy for existing applications looking to add support for org wide installations and not spend time updating all of these web-api calls.
+Since the introduction of [org wide app installations](/enterprise/), [some web-api methods](/enterprise/developing-for-enterprise-orgs#using-apis) now require a `team_id` parameter to indicate which workspace to act on. Bolt for JavaScript will attempt to infer the `team_id` value based on incoming payloads and pass it along to `client`. This is handy for existing applications looking to add support for org wide installations and not spend time updating all of these web-api calls.
 
 ```javascript
 // Unix Epoch time for September 30, 2019 11:59:59 PM
