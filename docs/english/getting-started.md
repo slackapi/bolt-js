@@ -149,7 +149,7 @@ The above command works on Linux and macOS but [similar commands are available o
 
 :::warning[Keep it secret. Keep it safe]
 
-Treat your tokens like a password and [keep it safe](/authentication/best-practices-for-security). Your app uses these to retrieve and send information to Slack.
+Treat your tokens like a password and [keep it safe](/security). Your app uses these to retrieve and send information to Slack.
 
 :::
 

@@ -267,9 +267,9 @@ app.assistant(assistant);
 
 Three Web API methods work together to provide users a text streaming experience: 
 
-* the [`chat.startStream`](/reference/methods/chat.startstream) method starts the text stream, 
-* the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends text to the stream, and 
-* the [`chat.stopStream`](/reference/methods/chat.stopstream) method stops it.
+* the [`chat.startStream`](/reference/methods/chat.startStream) method starts the text stream, 
+* the [`chat.appendStream`](/reference/methods/chat.appendStream) method appends text to the stream, and 
+* the [`chat.stopStream`](/reference/methods/chat.stopStream) method stops it.
 
 Since you're using Bolt for JS, built upon the Node Slack SDK, you can use the [`chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) utility to streamline all three aspects of streaming in your app's messages.
 
