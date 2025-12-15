@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@koa/router": "^15",
+    "@koa/router": "^15.0.0",
     "@slack/bolt": "^4",
     "@slack/logger": "^4.0.0",
     "@slack/oauth": "^3",
@@ -20,7 +20,7 @@
     "koa": "^3"
   },
   "devDependencies": {
-    "@types/koa__router": "^12",
+    "@types/koa": "^3.0.1",
     "@types/node": "^24",
     "ts-node": "^10",
     "typescript": "5.9.3"
