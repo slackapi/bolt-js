@@ -28,20 +28,24 @@ import { verifyRedirectOpts } from './verify-redirect-opts';
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?
 // if that's the reason, let's document that with a comment.
 export interface SocketModeReceiverOptions {
-  logger?: Logger;
-  logLevel?: LogLevel;
-  clientId?: string;
-  clientSecret?: string;
-  stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
-  redirectUri?: string;
-  installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
-  scopes?: InstallURLOptions['scopes'];
-  installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
-  customRoutes?: CustomRoute[];
+  autoReconnectEnabled?: boolean;
+  clientId?: string;
+  clientPingTimeout?: number;
+  clientSecret?: string;
   // biome-ignore lint/suspicious/noExplicitAny: user-provided custom properties can be anything
   customPropertiesExtractor?: (args: any) => StringIndexed;
+  customRoutes?: CustomRoute[];
+  installationStore?: InstallProviderOptions['installationStore']; // default MemoryInstallationStore
+  installerOptions?: InstallerOptions;
+  logger?: Logger;
+  logLevel?: LogLevel;
+  pingPongLoggingEnabled?: boolean;
   processEventErrorHandler?: (args: SocketModeReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
+  redirectUri?: string;
+  scopes?: InstallURLOptions['scopes'];
+  serverPingTimeout?: number;
+  stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
 }
 
 export interface CustomRoute {
@@ -94,24 +98,32 @@ export default class SocketModeReceiver implements Receiver {
 
   public constructor({
     appToken,
+    autoReconnectEnabled = false,
+    clientId = undefined,
+    clientPingTimeout = undefined,
+    clientSecret = undefined,
+    customPropertiesExtractor = (_args) => ({}),
+    customRoutes = [],
+    installerOptions = {},
+    installationStore = undefined,
     logger = undefined,
     logLevel = LogLevel.INFO,
-    clientId = undefined,
-    clientSecret = undefined,
-    stateSecret = undefined,
-    redirectUri = undefined,
-    installationStore = undefined,
-    scopes = undefined,
-    installerOptions = {},
-    customRoutes = [],
-    customPropertiesExtractor = (_args) => ({}),
+    pingPongLoggingEnabled = false,
     processEventErrorHandler = defaultProcessEventErrorHandler,
+    redirectUri = undefined,
+    scopes = undefined,
+    serverPingTimeout = undefined,
+    stateSecret = undefined,
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
-      logLevel,
-      logger,
+      autoReconnectEnabled,
       clientOptions: installerOptions.clientOptions,
+      clientPingTimeout,
+      logger,
+      logLevel,
+      pingPongLoggingEnabled,
+      serverPingTimeout,
     });
 
     this.logger =
