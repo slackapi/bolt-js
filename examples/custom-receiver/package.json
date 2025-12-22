@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/koa": "^3.0.1",
-    "@types/node": "^24",
+    "@types/node": "^25",
     "ts-node": "^10",
     "typescript": "5.9.3"
   }
