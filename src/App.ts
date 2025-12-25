@@ -950,7 +950,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         const e = error as any;
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
         e.code = ErrorCode.AuthorizationError;
-        return this.handleError({
+        this.handleError({
           error: e,
           logger: this.logger,
           body: bodyArg,
@@ -958,6 +958,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
             isEnterpriseInstall,
           },
         });
+
+        await ack();
       }
     }
 
