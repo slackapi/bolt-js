@@ -959,7 +959,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           },
         });
 
-        await ack();
+        return ack();
       }
     }
 
