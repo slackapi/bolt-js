@@ -84,7 +84,7 @@ describe('App global middleware Processing', () => {
     assert.isAtLeast(fakeLogger.warn.callCount, invalidReceiverEvents.length);
   });
 
-  it('should warn, send to global error handler, and skip when a receiver event fails authorization', async () => {
+  it('should warn, send to global error handler, acknowledge, and skip when a receiver event fails authorization', async () => {
     const fakeLogger = createFakeLogger();
     const fakeMiddleware = sinon.fake(noopMiddleware);
     const dummyOrigError = new Error('auth failed');
@@ -99,13 +99,14 @@ describe('App global middleware Processing', () => {
     });
     app.use(fakeMiddleware);
     app.error(fakeErrorHandler);
-    await fakeReceiver.sendEvent(dummyReceiverEvent);
+    await fakeReceiver.sendEvent({ ...dummyReceiverEvent, ack: fakeAck });
 
     assert(fakeMiddleware.notCalled);
     assert(fakeLogger.warn.called);
     assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
     assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
     assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'original', dummyAuthorizationError.original);
+    assert(fakeAck.called);
   });
 
   it('should error if next called multiple times', async () => {
