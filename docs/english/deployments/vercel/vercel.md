@@ -25,11 +25,11 @@ You will then be prompted to select a Git provider. Select your preferred provid
 
 Select your provider as the Git Scope and rename the repo if you'd like. Next, click **Create**.
 
-Keep this browser tab open; we'll be back to it soon. Next, we'll need to add environment variables for our app. To obtain these, direct your attention to the Slack app settings page. 
+Keep this browser tab open; we'll be back to it soon. Next, we'll need to add a couple of variables for our app. To obtain these, direct your attention to the Slack app settings page. 
 
 ## Create a Slack app
 
-Next, create a new Slack app through [this link](https://api.slack.com/apps?new_app=1), then select **from a manifest** and select a workspace you have permission to install apps in. Click **Next**, then copy and paste the project manifest code here, replacing the placeholder text in the JSON tab.
+Create a new Slack app through [this link](https://api.slack.com/apps?new_app=1), then select **from a manifest**. Next, choose a workspace you have permission to install apps in. Click **Next**, then copy and paste the project manifest code here, replacing the placeholder text in the JSON tab.
 
 ```js reference
 https://github.com/vercel-partner-solutions/slack-agent-template/blob/main/manifest.json
@@ -39,17 +39,17 @@ Click **Next** and then **Create**.
 
 ## Install app
 
-Still in the app settings, navigate to the **Install App** section and click the button to install your app to the workspace. After installing the app, a bot token will be available. Copy and paste this token back in the Vercel setup where it says `SLACK_BOT_TOKEN`.
+Still in the app settings, navigate to the **Install App** section and click the button to install your app to the workspace. After installing the app, a bot token will be available. Copy this token and paste it in the Vercel setup where it says `SLACK_BOT_TOKEN`.
 
-Back in the Slack app settings, navigate to the **Basic Information** section and find the **Signing Secret**. Copy and paste this token in the Vercel setup where it says `SLACK_SIGNING_SECRET`, then click **Deploy**.
+Back in the Slack app settings, navigate to the **Basic Information** section and find the **Signing Secret**. Copy this token and paste it in the Vercel setup where it says `SLACK_SIGNING_SECRET`, then click **Deploy**.
 
 ![Environment variables](env_variables.png)
 
-Now it’ll work through the deployment process and give you updates as to where it is and what it is doing. Be patient. Deployment is hard work. Once it's finished, you'll see a confirmation screen with a button to **Continue to Dashboard**. Click that button. Here you can see that your app has been deployed! Use this dashboard to keep tabas on build logs, deployment checks and more.
+Now it’ll work through the deployment process and give you updates on what it is doing. Be patient. Deployment is hard work! Once it's finished, you'll see a confirmation screen with a button to **Continue to Dashboard**. Click that button. Here you can see that your app has been deployed! Use this dashboard to keep tabs on build logs, deployment checks and more.
 
 ## Update URLs
 
-One last step is required. Once the deployment has completed, navigate back to the Slack [app settings](https://api.slack.com/apps) and open the **App Manifest** from the sidebar. 
+Once the deployment has completed, navigate back to the Slack [app settings](https://api.slack.com/apps) and open the **App Manifest** from the sidebar. 
 
 Update the manifest so that all of the `reference_url` and `url` fields use your domain. Click **Save** and verify the URL.
 
