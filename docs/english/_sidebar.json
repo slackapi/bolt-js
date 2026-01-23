@@ -75,7 +75,11 @@
   {
     "type": "category",
     "label": "Deployments",
-    "items": ["tools/bolt-js/deployments/aws-lambda", "tools/bolt-js/deployments/heroku"]
+    "items": [
+      "tools/bolt-js/deployments/aws-lambda",
+      "tools/bolt-js/deployments/heroku",
+      "tools/bolt-js/deployments/vercel/vercel"
+    ]
   },
   {
     "type": "category",
