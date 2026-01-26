@@ -10,7 +10,7 @@ When you’re finished, you’ll have this ⚡️[Slack agent template](https://
 
 First things first, take a few moments to set up the following: 
 
-* Make sure you have a development environment where you have permission to install apps. You can get a free sandbox with the [Slack developer program](https://api.slack.com/developer-program). 
+* Make sure you have a development environment where you have permission to install apps. You can get a free sandbox with the [Slack Developer Program](https://api.slack.com/developer-program). 
 * Ensure you have an account with a Git provider (GitHub, GitLab, or Bitbucket).
 
 ## Create a new Vercel project
@@ -23,13 +23,13 @@ You will then be prompted to select a Git provider. Select your preferred provid
 
 ![New project](new_project.png)
 
-Select your provider as the Git Scope and rename the repo if you'd like. Next, click **Create**.
+Select your provider as the Git Scope and rename the repo if you'd like. Click **Create**.
 
 Keep this browser tab open; we'll be back to it soon. Next, we'll need to add a couple of variables for our app. To obtain these, direct your attention to the Slack app settings page. 
 
 ## Create a Slack app
 
-Create a new Slack app through [this link](https://api.slack.com/apps?new_app=1), then select **from a manifest**. Next, choose a workspace you have permission to install apps in. Click **Next**, then copy and paste the project manifest code here, replacing the placeholder text in the JSON tab.
+Create a new Slack app through [this link](https://api.slack.com/apps?new_app=1), then select **from a manifest**. Next, choose a workspace you have permission to install apps in. Click **Next**, then copy and paste the project manifest code here, replacing the placeholder text in the **JSON** tab.
 
 ```js reference
 https://github.com/vercel-partner-solutions/slack-agent-template/blob/main/manifest.json
@@ -45,7 +45,7 @@ Back in the Slack app settings, navigate to the **Basic Information** section an
 
 ![Environment variables](env_variables.png)
 
-Now it’ll work through the deployment process and give you updates on what it is doing. Be patient. Deployment is hard work! Once it's finished, you'll see a confirmation screen with a button to **Continue to Dashboard**. Click that button. Here you can see that your app has been deployed! Use this dashboard to keep tabs on build logs, deployment checks and more.
+The deployment process will kick off, and you'll receive progress updates. Be patient. Deployment is hard work! Once it's finished, you'll see a confirmation screen with a button to **Continue to Dashboard**. Click that button. Here you can see that your app has been deployed! Use this dashboard to keep tabs on build logs, deployment checks, and more.
 
 ## Update URLs
 
