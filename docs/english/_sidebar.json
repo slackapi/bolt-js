@@ -78,7 +78,7 @@
     "items": [
       "tools/bolt-js/deployments/aws-lambda",
       "tools/bolt-js/deployments/heroku",
-      "tools/bolt-js/deployments/vercel/vercel"
+      "tools/bolt-js/deployments/vercel/index"
     ]
   },
   {
