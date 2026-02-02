@@ -47,11 +47,38 @@ Back in the Slack app settings, navigate to the **Basic Information** section an
 
 The deployment process will kick off, and you'll receive progress updates. Be patient. Deployment is hard work! Once it's finished, you'll see a confirmation screen with a button to **Continue to Dashboard**. Click that button. Here you can see that your app has been deployed! Use this dashboard to keep tabs on build logs, deployment checks, and more.
 
+## Set AI Gateway token
+
+Follow these steps to create an AI Gateway API key from the Vercel dashboard.
+1. From the Vercel dashboard, click on the **AI Gateway** tab in the top nav bar.
+2. On the left sidebar, select **API Keys**. 
+3. Click **Create Key**, give it a name, and copy the value (it won't be shown again).
+
+Once you have the key, you need to add it to your project so your code can use it. There are two primary ways to do this: through the dashboard and for local development.
+
+Through the dashboard:
+1. Go to your project in Vercel.
+2. Click the **Settings** tab in the top nav bar.
+3. Select **Environment Variables** from the left-hand menu.
+4. Select **Add Environment Variable** to add a variable with the `Key` set to `AI_GATEWAY_API_KEY` and the `Value` set to the key value you just copied.
+5. Click **Save**. Redeploy your app for these changes to take effect.
+
+For local development, open your terminal and set the environment variable `AI_GATEWAY_API_KEY` to the value of the key you copied.
+
+```sh
+export AI_GATEWAY_API_KEY=<your-key-here>
+```
+
 ## Update URLs
 
 Once the deployment has completed, navigate back to the Slack [app settings](https://api.slack.com/apps) and open the **App Manifest** from the sidebar. 
 
-Update the manifest so that all of the `reference_url` and `url` fields use your domain. Click **Save** and verify the URL.
+Update the manifest so that all of the `reference_url` and `url` fields use your domain. Here are some examples:
+* **Slash commands URL**: `https://slack-agent-template-example.vercel.app/api/slack/events`
+* **Event subscriptions**: `https://slack-agent-template-example.vercel.app/api/slack/events`
+* **Interactivity request URL**: `https://slack-agent-template-example.vercel.app/api/slack/events`
+
+Click **Save** and verify the URL.
 
 ## Run the app
 
