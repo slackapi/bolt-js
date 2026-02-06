@@ -49,7 +49,12 @@ The deployment process will kick off, and you'll receive progress updates. Be pa
 
 ## Set AI Gateway token
 
-Follow these steps to create an AI Gateway API key from the Vercel dashboard.
+Follow these steps to create an AI Gateway API token from the Vercel dashboard.
+
+:::tip[Token only needed locally]
+You will only need the AI Gateway token if you are running the app locally. All deployments on Vercel have access to the gateway via OpenID Connect (OIDC).
+:::
+
 1. From the Vercel dashboard, click on the **AI Gateway** tab in the top nav bar.
 2. On the left sidebar, select **API Keys**. 
 3. Click **Create Key**, give it a name, and copy the value (it won't be shown again).
