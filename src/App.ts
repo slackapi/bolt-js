@@ -2,6 +2,7 @@ import type { Agent } from 'node:http';
 import type { SecureContextOptions } from 'node:tls';
 import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import type { SocketModeOptions } from '@slack/socket-mode';
 import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import type { Assistant } from './Assistant';
@@ -106,43 +107,44 @@ const tokenUsage =
 
 /** App initialization options */
 export interface AppOptions {
-  signingSecret?: HTTPReceiverOptions['signingSecret'];
-  endpoints?: HTTPReceiverOptions['endpoints'];
-  port?: HTTPReceiverOptions['port'];
-  customRoutes?: HTTPReceiverOptions['customRoutes'];
-  processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
-  signatureVerification?: HTTPReceiverOptions['signatureVerification'];
-  clientId?: HTTPReceiverOptions['clientId'];
-  clientSecret?: HTTPReceiverOptions['clientSecret'];
-  stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
-  redirectUri?: HTTPReceiverOptions['redirectUri'];
-  installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
-  scopes?: HTTPReceiverOptions['scopes'];
-  installerOptions?: HTTPReceiverOptions['installerOptions'];
   agent?: Agent;
-  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
-  convoStore?: ConversationStore | false;
-  token?: AuthorizeResult['botToken']; // either token or authorize
   appToken?: string; // TODO should this be included in AuthorizeResult
+  attachFunctionToken?: boolean;
+  authorize?: Authorize<boolean>; // either token or authorize
   botId?: AuthorizeResult['botId']; // only used when authorize is not defined, shortcut for fetching
   botUserId?: AuthorizeResult['botUserId']; // only used when authorize is not defined, shortcut for fetching
-  authorize?: Authorize<boolean>; // either token or authorize
-  receiver?: Receiver;
-  logger?: Logger;
-  logLevel?: LogLevel;
-  ignoreSelf?: boolean;
+  clientId?: HTTPReceiverOptions['clientId'];
   /**
    * Configurations for the web client used to send Slack API method requests.
    *
    * See {@link https://docs.slack.dev/tools/node-slack-sdk/reference/web-api/interfaces/WebClientOptions/} for more information.
    */
   clientOptions?: WebClientOptions;
-  socketMode?: boolean;
-  developerMode?: boolean;
-  tokenVerificationEnabled?: boolean;
+  clientSecret?: HTTPReceiverOptions['clientSecret'];
+  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
+  convoStore?: ConversationStore | false;
+  customRoutes?: HTTPReceiverOptions['customRoutes'];
   deferInitialization?: boolean;
+  developerMode?: boolean;
+  endpoints?: HTTPReceiverOptions['endpoints'];
   extendedErrorHandler?: boolean;
-  attachFunctionToken?: boolean;
+  ignoreSelf?: boolean;
+  installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
+  installerOptions?: HTTPReceiverOptions['installerOptions'];
+  logger?: Logger;
+  logLevel?: LogLevel;
+  port?: HTTPReceiverOptions['port'];
+  processBeforeResponse?: HTTPReceiverOptions['processBeforeResponse'];
+  receiver?: Receiver;
+  redirectUri?: HTTPReceiverOptions['redirectUri'];
+  scopes?: HTTPReceiverOptions['scopes'];
+  socketModeOptions?: Omit<SocketModeOptions, 'appToken'>;
+  signatureVerification?: HTTPReceiverOptions['signatureVerification'];
+  signingSecret?: HTTPReceiverOptions['signingSecret'];
+  socketMode?: boolean;
+  stateSecret?: HTTPReceiverOptions['stateSecret']; // required when using default stateStore
+  token?: AuthorizeResult['botToken']; // either token or authorize
+  tokenVerificationEnabled?: boolean;
 }
 
 export { LogLevel, Logger } from '@slack/logger';
@@ -275,38 +277,39 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   private attachFunctionToken: boolean;
 
   public constructor({
-    signingSecret = undefined,
-    endpoints = undefined,
-    port = undefined,
-    customRoutes = undefined,
+    authorize = undefined,
     agent = undefined,
-    clientTls = undefined,
-    receiver = undefined,
-    convoStore = undefined,
-    token = undefined,
     appToken = undefined,
+    attachFunctionToken = true,
     botId = undefined,
     botUserId = undefined,
-    authorize = undefined,
+    clientId = undefined,
+    clientOptions = undefined,
+    clientSecret = undefined,
+    clientTls = undefined,
+    convoStore = undefined,
+    customRoutes = undefined,
+    deferInitialization = false,
+    developerMode = false,
+    endpoints = undefined,
+    extendedErrorHandler = false,
+    ignoreSelf = true,
+    installationStore = undefined,
+    installerOptions = undefined,
     logger = undefined,
     logLevel = undefined,
-    ignoreSelf = true,
-    clientOptions = undefined,
     processBeforeResponse = false,
-    signatureVerification = true,
-    clientId = undefined,
-    clientSecret = undefined,
-    stateSecret = undefined,
+    port = undefined,
+    receiver = undefined,
+    token = undefined,
     redirectUri = undefined,
-    installationStore = undefined,
     scopes = undefined,
-    installerOptions = undefined,
+    signatureVerification = true,
+    signingSecret = undefined,
     socketMode = undefined,
-    developerMode = false,
+    socketModeOptions = undefined,
+    stateSecret = undefined,
     tokenVerificationEnabled = true,
-    extendedErrorHandler = false,
-    deferInitialization = false,
-    attachFunctionToken = true,
   }: AppOptions = {}) {
     /* ------------------------ Developer mode ----------------------------- */
     this.developerMode = developerMode;
@@ -420,6 +423,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       scopes,
       appToken,
       logger,
+      socketModeOptions,
     );
 
     /* ------------------------ Set authorize ----------------------------- */
@@ -1269,6 +1273,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     scopes?: HTTPReceiverOptions['scopes'],
     appToken?: string,
     logger?: Logger,
+    socketModeOptions?: Omit<SocketModeOptions, 'appToken'>,
   ): Receiver {
     if (receiver !== undefined) {
       // Custom receiver supplied
@@ -1288,14 +1293,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         appToken,
         clientId,
         clientSecret,
-        stateSecret,
-        redirectUri,
+        customRoutes,
+        installerOptions: this.installerOptions,
         installationStore,
+        redirectUri,
+        ...socketModeOptions,
+        stateSecret,
         scopes,
         logger,
         logLevel: this.logLevel,
-        installerOptions: this.installerOptions,
-        customRoutes,
       });
     }
     if (signatureVerification === true && signingSecret === undefined) {
