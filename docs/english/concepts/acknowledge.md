@@ -4,6 +4,8 @@ Actions, commands, and options requests must **always** be acknowledged using th
 
 We recommend calling `ack()` right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.
 
+## Example
+
 ```javascript
 // Regex to determine if this is a valid email
 let isEmail = /^[\w\-\.]+@([\w\-]+\.)+[\w\-]+$/;

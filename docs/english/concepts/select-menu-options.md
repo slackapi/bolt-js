@@ -8,6 +8,8 @@ use the constraints object to filter on a `callback_id`.
 
 To respond to options requests, you'll need to `ack()` with valid options. Find [external select response examples](/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select) on our API site.
 
+## Example
+
 ```javascript
 // Example of responding to an external_select options request
 app.options('external_action', async ({ options, ack }) => {

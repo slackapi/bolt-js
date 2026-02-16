@@ -14,6 +14,8 @@ There are two ways to respond to slash commands. The first way is to use `say()`
 
 When configuring commands within your app configuration, you'll continue to append `/slack/events` to your request URL.
 
+## Example
+
 ```javascript
 // The echo command simply echoes on command
 app.command('/echo', async ({ command, ack, respond }) => {

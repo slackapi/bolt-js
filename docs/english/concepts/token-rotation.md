@@ -6,6 +6,8 @@ Instead of an access token representing an existing installation of your Slack a
 
 Bolt for JavaScript will rotate tokens automatically in response to incoming events so long as the [built-in OAuth](/tools/bolt-js/concepts/authenticating-oauth) functionality is used.
 
+## Using the `InstallProvider` utility
+
 To rotate tokens on a separate schedule, consider implementing the `InstallProvider` from the [`@slack/oauth`](/tools/node-slack-sdk/oauth) package for use of the provided `authorize` method:
 
 ```js
