@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@slack/logger": "^4.0.1",
-    "@slack/oauth": "^3.0.4",
+    "@slack/oauth": "^3.0.5",
     "@slack/socket-mode": "^2.0.6",
     "@slack/types": "^2.20.1",
     "@slack/web-api": "^7.15.0",
