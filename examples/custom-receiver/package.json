@@ -20,7 +20,7 @@
     "koa": "^3"
   },
   "devDependencies": {
-    "@types/koa": "^3.0.1",
+    "@types/koa": "^3.0.2",
     "@types/node": "^22",
     "ts-node": "^10",
     "typescript": "5.9.3"
