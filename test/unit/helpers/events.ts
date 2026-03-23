@@ -54,6 +54,7 @@ const channel = 'C1234';
 const token = 'xoxb-1234';
 const app_id = 'A1234';
 const say: SayFn = (_msg) => Promise.resolve({ ok: true });
+const sayStream = async (_args?: unknown) => ({}) as Awaited<ReturnType<WebClient['chatStream']>>;
 const respond: RespondFn = (_msg) => Promise.resolve();
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
@@ -92,6 +93,7 @@ export function createDummyAppHomeOpenedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -120,6 +122,7 @@ export function createDummyMemberChannelEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -150,6 +153,7 @@ export function createDummyReactionAddedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -185,6 +189,7 @@ export function createDummyMessageEventMiddlewareArgs(
     message: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -209,12 +214,14 @@ export function createDummyAppMentionEventMiddlewareArgs(
     event: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+    sayStream,
   };
 }
 function enrichDummyAssistantMiddlewareArgs() {
   return {
     getThreadContext: sinon.spy(),
     saveThreadContext: sinon.spy(),
+    sayStream,
     setStatus: sinon.spy(),
     setSuggestedPrompts: sinon.spy(),
     setTitle: sinon.spy(),

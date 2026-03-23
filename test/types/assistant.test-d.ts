@@ -1,5 +1,6 @@
 import type { AssistantThreadsSetSuggestedPromptsResponse } from '@slack/web-api';
 import { expectError, expectType } from 'tsd';
+import type { SayStreamFn } from '../../';
 import { type AllAssistantMiddlewareArgs, Assistant } from '../../src/Assistant';
 import type { AssistantThreadContext } from '../../src/AssistantThreadContextStore';
 
@@ -47,8 +48,9 @@ new Assistant({
 
 // userMessage tests
 new Assistant({
-  userMessage: async ({ getThreadContext }) => {
+  userMessage: async ({ getThreadContext, sayStream }) => {
     expectType<AssistantThreadContext>(await getThreadContext());
+    expectType<SayStreamFn>(sayStream);
     return Promise.resolve();
   },
   threadStarted: asyncNoop,

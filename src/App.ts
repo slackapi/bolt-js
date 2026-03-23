@@ -47,6 +47,7 @@ import {
 import processMiddleware from './middleware/process';
 import HTTPReceiver, { type HTTPReceiverOptions } from './receivers/HTTPReceiver';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
+import { createSayStream } from './say-stream';
 import type {
   AckFn,
   ActionConstraints,
@@ -70,6 +71,7 @@ import type {
   RespondArguments,
   RespondFn,
   SayFn,
+  SayStreamFn,
   ShortcutConstraints,
   SlackAction,
   SlackActionMiddlewareArgs,
@@ -1066,6 +1068,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
       /** Say function might be set below */
       say?: SayFn;
+      /** SayStream function might be set below */
+      sayStream?: SayStreamFn;
       /** Respond function might be set below */
       respond?: RespondFn;
       /** Ack function might be set below */
@@ -1116,6 +1120,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       // TODO: assigning eventListenerArgs by reference to set properties of listenerArgs is error prone, there should be a better way to do this!
       const eventListenerArgs = listenerArgs as SlackEventMiddlewareArgs;
       eventListenerArgs.event = eventListenerArgs.payload;
+      if (conversationId !== undefined) {
+        listenerArgs.sayStream = createSayStream({ channelId: conversationId, client, context, body: bodyArg });
+      }
       if (eventListenerArgs.event.type === 'message') {
         const messageEventListenerArgs = eventListenerArgs as SlackEventMiddlewareArgs<'message'>;
         messageEventListenerArgs.message = messageEventListenerArgs.payload;

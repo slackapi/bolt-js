@@ -10,15 +10,16 @@ import type {
   UserStatusChangedEvent,
 } from '@slack/types';
 import { expectType } from 'tsd';
-import type { SayFn } from '../../';
+import type { SayFn, SayStreamFn } from '../../';
 import App from '../../src/App';
 
 const app = new App({ token: 'TOKEN', signingSecret: 'Signing Secret' });
 
-app.event('message', async ({ event, say, message }) => {
+app.event('message', async ({ event, say, sayStream, message }) => {
   expectType<MessageEvent>(event);
   expectType<MessageEvent>(message);
   expectType<SayFn>(say);
+  expectType<SayStreamFn>(sayStream);
 });
 
 app.event('app_mention', async ({ event }) => {
@@ -45,8 +46,9 @@ app.event('user_status_changed', async ({ event }) => {
   expectType<UserStatusChangedEvent>(event);
 });
 
-app.event('pin_added', async ({ say, event }) => {
+app.event('pin_added', async ({ say, sayStream, event }) => {
   expectType<SayFn>(say);
+  expectType<SayStreamFn>(sayStream);
   expectType<PinAddedEvent>(event);
 });
 

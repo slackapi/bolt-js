@@ -13,7 +13,15 @@ import {
 } from './AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import processMiddleware from './middleware/process';
-import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
+import { createSayStream } from './say-stream';
+import type {
+  AllMiddlewareArgs,
+  AnyMiddlewareArgs,
+  Middleware,
+  SayFn,
+  SayStreamFn,
+  SlackEventMiddlewareArgs,
+} from './types';
 
 /**
  * Configuration object used to instantiate the Assistant
@@ -32,6 +40,7 @@ interface AssistantUtilityArgs {
   getThreadContext: GetThreadContextUtilFn;
   saveThreadContext: SaveThreadContextUtilFn;
   say: SayFn;
+  sayStream: SayStreamFn;
   setStatus: SetStatusFn;
   setSuggestedPrompts: SetSuggestedPromptsFn;
   setTitle: SetTitleFn;
@@ -82,14 +91,14 @@ export type AssistantMiddlewareArgs =
 
 // TODO: revisit Omit of `say`, as it's added on as part of the enrichment step
 export interface AssistantThreadStartedMiddlewareArgs
-  extends Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say'>,
+  extends Omit<SlackEventMiddlewareArgs<'assistant_thread_started'>, 'say' | 'sayStream'>,
     AssistantUtilityArgs {}
 export interface AssistantThreadContextChangedMiddlewareArgs
-  extends Omit<SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, 'say'>,
+  extends Omit<SlackEventMiddlewareArgs<'assistant_thread_context_changed'>, 'say' | 'sayStream'>,
     AssistantUtilityArgs {}
 // TODO: extending from SlackEventMiddlewareArgs<'message'> likely insufficient as not all message event payloads contain thread_ts - whereas assistant user message events do. Likely need to narrow this down further.
 export interface AssistantUserMessageMiddlewareArgs
-  extends Omit<SlackEventMiddlewareArgs<'message'>, 'say'>,
+  extends Omit<SlackEventMiddlewareArgs<'message'>, 'say' | 'sayStream'>,
     AssistantUtilityArgs {}
 
 export type AllAssistantMiddlewareArgs<T extends AssistantMiddlewareArgs = AssistantMiddlewareArgs> = T &
@@ -181,6 +190,13 @@ export function enrichAssistantArgs(
   preparedArgs.saveThreadContext = () => threadContextStore.save(args);
 
   preparedArgs.say = createSay(preparedArgs);
+  const { channelId } = extractThreadInfo(preparedArgs.payload);
+  preparedArgs.sayStream = createSayStream({
+    channelId,
+    context: args.context,
+    client: preparedArgs.client,
+    body: preparedArgs.body,
+  });
   preparedArgs.setStatus = createSetStatus(preparedArgs);
   preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
   preparedArgs.setTitle = createSetTitle(preparedArgs);

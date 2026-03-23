@@ -1,4 +1,4 @@
-import type { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
+import type { ChatPostMessageArguments, ChatPostMessageResponse, WebClient } from '@slack/web-api';
 // TODO: breaking change: remove, unnecessary abstraction, just use Record directly
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
@@ -44,3 +44,15 @@ export type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'chann
 export type RespondFn = (message: string | RespondArguments) => Promise<any>;
 
 export type AckFn<Response> = (response?: Response) => Promise<void>;
+
+type ChatStreamer = ReturnType<WebClient['chatStream']>;
+
+export interface SayStreamArguments {
+  buffer_size?: number;
+  channel?: string;
+  recipient_team_id?: string;
+  recipient_user_id?: string;
+  thread_ts?: string;
+}
+
+export type SayStreamFn = (args?: SayStreamArguments) => Promise<ChatStreamer>;
