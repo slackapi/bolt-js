@@ -120,7 +120,6 @@ Listeners receive a single object with these properties (availability depends on
 ## Critical Rules
 
 1. **Use Biome exclusively** -- never ESLint or Prettier. Config is in `biome.json`.
-2. **Always `ack()` interactive events** -- actions, commands, shortcuts, views, and options handlers must call `ack()` within 3 seconds.
 3. **Run `npm test` before submitting** -- this runs the full pipeline (build + lint + types + coverage).
 4. **Follow existing patterns** -- when adding new listener types, middleware, or receivers, match the structure and style of existing implementations.
 5. **Don't duplicate `package.json` values** -- reference it for versions, engines, and dependency lists.
