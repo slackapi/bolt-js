@@ -50,7 +50,7 @@ Incoming events flow through a middleware chain before reaching listeners:
 5. **Listener-specific middleware** chains execute
 6. **Listener handler** runs with full context
 
-For FaaS environments (`processBeforeResponse: true`), acknowledgment happens before the handler executes.
+For FaaS environments (`processBeforeResponse: true`), acknowledgment happens after the handler executes.
 
 ### Core Classes
 
