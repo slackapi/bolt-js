@@ -18,6 +18,7 @@ import type {
   AssistantUserMessageMiddlewareArgs,
 } from '../../../src/Assistant';
 import type { SlackCustomFunctionMiddlewareArgs } from '../../../src/CustomFunction';
+import type { SayStreamFn } from '../../../src/context/create-say-stream';
 import type {
   AckFn,
   AllMiddlewareArgs,
@@ -54,6 +55,7 @@ const channel = 'C1234';
 const token = 'xoxb-1234';
 const app_id = 'A1234';
 const say: SayFn = (_msg) => Promise.resolve({ ok: true });
+const sayStream: SayStreamFn = (_args?) => ({}) as ReturnType<WebClient['chatStream']>;
 const respond: RespondFn = (_msg) => Promise.resolve();
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
@@ -92,6 +94,7 @@ export function createDummyAppHomeOpenedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -120,6 +123,7 @@ export function createDummyMemberChannelEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -150,6 +154,7 @@ export function createDummyReactionAddedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -185,6 +190,7 @@ export function createDummyMessageEventMiddlewareArgs(
     message: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+    sayStream,
   };
 }
 
@@ -209,6 +215,7 @@ export function createDummyAppMentionEventMiddlewareArgs(
     event: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+    sayStream,
   };
 }
 function enrichDummyAssistantMiddlewareArgs() {
@@ -239,6 +246,7 @@ export function createDummyAssistantThreadContextChangedEventMiddlewareArgs(
     event: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+    sayStream,
     ...enrichDummyAssistantMiddlewareArgs(),
   };
 }
@@ -261,6 +269,7 @@ export function createDummyAssistantThreadStartedEventMiddlewareArgs(
     event: payload,
     body: envelopeEvent(payload, bodyOverrides),
     say,
+    sayStream,
     ...enrichDummyAssistantMiddlewareArgs(),
   };
 }

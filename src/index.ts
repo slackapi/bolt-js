@@ -52,6 +52,7 @@ export {
 export * from './errors';
 export * from './middleware/builtin';
 export * from './types';
+export type { SayStreamFn, SayStreamArguments } from './context/create-say-stream';
 
 export { ConversationStore, MemoryStore } from './conversation-store';
 

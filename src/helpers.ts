@@ -10,6 +10,7 @@ import type {
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
 } from './types';
+import type { StringIndexed } from './types/utilities';
 
 /**
  * Internal data type for capturing the class of event processed in App#onIncomingEvent()
@@ -55,6 +56,9 @@ export function getTypeAndConversation(body: any): { type?: IncomingEventType; c
       if ('item' in event && 'channel' in event.item) {
         // no channel for reaction_added, reaction_removed, star_added, or star_removed with file or file_comment items
         foundConversationId = event.item.channel as string;
+      }
+      if ('assistant_thread' in event && event.assistant_thread && 'channel_id' in event.assistant_thread) {
+        foundConversationId = event.assistant_thread.channel_id as string;
       }
       // Using non-null assertion (!) because the alternative is to use `foundConversation: (string | undefined)`, which
       // impedes the very useful type checker help above that ensures the value is only defined to strings, not
@@ -150,4 +154,24 @@ export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
 /** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
 export function assertNever(x?: never): never {
   throw new Error(`Unexpected object: ${x}`);
+}
+
+export function extractThreadTs(body: StringIndexed): string | undefined {
+  const event = body.event;
+  if (event == null || typeof event !== 'object') return undefined;
+  if (typeof event.thread_ts === 'string') return event.thread_ts;
+  if (typeof event.assistant_thread?.thread_ts === 'string') return event.assistant_thread.thread_ts;
+  if (typeof event.message?.thread_ts === 'string') return event.message.thread_ts;
+  if (typeof event.previous_message?.thread_ts === 'string') return event.previous_message.thread_ts;
+  return undefined;
+}
+
+export function extractMessageTs(body: StringIndexed): string | undefined {
+  const event = body.event;
+  if (event == null || typeof event !== 'object') return undefined;
+  if (typeof event.message?.ts === 'string') return event.message.ts;
+  if (typeof event.previous_message?.ts === 'string') return event.previous_message.ts;
+  if (typeof event.ts === 'string') return event.ts;
+  if (typeof event.item?.ts === 'string') return event.item.ts;
+  return undefined;
 }

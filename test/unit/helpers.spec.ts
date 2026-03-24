@@ -1,6 +1,8 @@
 import { assert } from 'chai';
 import {
   IncomingEventType,
+  extractMessageTs,
+  extractThreadTs,
   getTypeAndConversation,
   isBodyWithTypeEnterpriseInstall,
   isEventTypeToSkipAuthorize,
@@ -228,6 +230,122 @@ describe('Helpers', () => {
         assert(isEnterpriseInstall === false);
       });
     });
+  });
+
+  describe('extractThreadTs()', () => {
+    const threadTsBodies = [
+      { name: 'app_mention with thread_ts', body: { event: { type: 'app_mention', thread_ts: '123.456' } } },
+      { name: 'message with thread_ts', body: { event: { type: 'message', thread_ts: '123.456' } } },
+      {
+        name: 'bot_message in thread',
+        body: { event: { type: 'message', subtype: 'bot_message', thread_ts: '123.456' } },
+      },
+      {
+        name: 'file_share in thread',
+        body: { event: { type: 'message', subtype: 'file_share', thread_ts: '123.456' } },
+      },
+      {
+        name: 'thread_broadcast',
+        body: { event: { type: 'message', subtype: 'thread_broadcast', thread_ts: '123.456' } },
+      },
+      { name: 'link_shared with thread_ts', body: { event: { type: 'link_shared', thread_ts: '123.456' } } },
+      {
+        name: 'message_changed with thread_ts in message',
+        body: { event: { type: 'message', subtype: 'message_changed', message: { thread_ts: '123.456' } } },
+      },
+      {
+        name: 'message_deleted with thread_ts in previous_message',
+        body: {
+          event: { type: 'message', subtype: 'message_deleted', previous_message: { thread_ts: '123.456' } },
+        },
+      },
+      {
+        name: 'assistant_thread_started',
+        body: { event: { type: 'assistant_thread_started', assistant_thread: { thread_ts: '123.456' } } },
+      },
+      {
+        name: 'assistant_thread_context_changed',
+        body: { event: { type: 'assistant_thread_context_changed', assistant_thread: { thread_ts: '123.456' } } },
+      },
+    ];
+
+    for (const { name, body } of threadTsBodies) {
+      it(`should extract thread_ts from ${name}`, () => {
+        assert.equal(extractThreadTs(body), '123.456');
+      });
+    }
+
+    const noThreadTsBodies = [
+      { name: 'reaction_added', body: { event: { type: 'reaction_added', item: { channel: 'C1234' } } } },
+      { name: 'channel_created', body: { event: { type: 'channel_created', channel: { id: 'C1234' } } } },
+      { name: 'message without thread_ts', body: { event: { type: 'message', ts: '111.222' } } },
+      { name: 'body without event', body: {} },
+    ];
+
+    for (const { name, body } of noThreadTsBodies) {
+      it(`should return undefined for ${name}`, () => {
+        assert.isUndefined(extractThreadTs(body));
+      });
+    }
+  });
+
+  describe('extractMessageTs()', () => {
+    const tsBodies = [
+      { name: 'regular message', body: { event: { type: 'message', ts: '111.222' } } },
+      { name: 'app_mention', body: { event: { type: 'app_mention', ts: '111.222' } } },
+      {
+        body: { event: { type: 'message', subtype: 'bot_message', ts: '111.222' } },
+      },
+      {
+        name: 'file_share',
+        body: { event: { type: 'message', subtype: 'file_share', ts: '111.222' } },
+      },
+      {
+        name: 'thread_broadcast',
+        body: { event: { type: 'message', subtype: 'thread_broadcast', ts: '111.222' } },
+      },
+      {
+        name: 'message_changed (prefers message.ts)',
+        body: { event: { type: 'message', subtype: 'message_changed', ts: '999.000', message: { ts: '111.222' } } },
+      },
+      {
+        name: 'message_deleted (prefers previous_message.ts)',
+        body: {
+          event: { type: 'message', subtype: 'message_deleted', ts: '999.000', previous_message: { ts: '111.222' } },
+        },
+      },
+      {
+        name: 'message_replied (prefers message.ts)',
+        body: { event: { type: 'message', subtype: 'message_replied', ts: '999.000', message: { ts: '111.222' } } },
+      },
+      {
+        name: 'reaction_added',
+        body: { event: { type: 'reaction_added', item: { ts: '111.222', channel: 'C1234' } } },
+      },
+      {
+        name: 'reaction_removed',
+        body: { event: { type: 'reaction_removed', item: { ts: '111.222', channel: 'C1234' } } },
+      },
+    ];
+
+    for (const { name, body } of tsBodies) {
+      it(`should extract ts from ${name}`, () => {
+        assert.equal(extractMessageTs(body), '111.222');
+      });
+    }
+
+    const noTsBodies = [
+      { name: 'channel_created', body: { event: { type: 'channel_created', channel: { id: 'C1234' } } } },
+      { name: 'body without event', body: {} },
+      { name: 'event is null', body: { event: null } },
+      { name: 'event is a string', body: { event: 'not_an_object' } },
+    ];
+
+    for (const { name, body } of noTsBodies) {
+      it(`should return undefined for ${name}`, () => {
+        assert.isUndefined(extractMessageTs(body));
+      });
+    }
   });
 });
 

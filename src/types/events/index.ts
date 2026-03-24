@@ -1,5 +1,6 @@
 import type { FunctionExecutedEvent, SlackEvent } from '@slack/types';
 import type { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
+import type { SayStreamFn } from '../../context/create-say-stream';
 import type { AckFn, SayFn, StringIndexed } from '../utilities';
 
 export type SlackEventMiddlewareArgsOptions = { autoAcknowledge: boolean };
@@ -18,6 +19,13 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
     ? // If this event contains a channel, add a `say` utility function
       { say: SayFn }
+    : unknown) &
+  (EventFromType<EventType> extends
+    | { channel: string }
+    | { item: { channel: string } }
+    | { assistant_thread: { channel_id: string } }
+    ? // If this event contains a channel context, add a `sayStream` utility function
+      { sayStream: SayStreamFn }
     : unknown) &
   (EventType extends 'function_executed'
     ? {
