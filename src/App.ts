@@ -1133,7 +1133,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
-      listenerArgs.say = createSay(this.client, token, conversationId);
+      listenerArgs.say = createSay(client, conversationId);
     }
 
     // Set respond() utility
