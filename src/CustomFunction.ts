@@ -9,10 +9,12 @@ import type {
   SlackEventMiddlewareArgsOptions,
 } from './types';
 
+// TODO: move this type to src/context/create-function-complete.ts
 interface FunctionCompleteArguments {
   // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
   outputs?: Record<string, any>;
 }
+// TODO: move this type to src/context/create-function-complete.ts
 export type FunctionCompleteFn = {
   (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
   /**
@@ -21,10 +23,12 @@ export type FunctionCompleteFn = {
   hasBeenCalled(): boolean;
 };
 
+// TODO: move this type to src/context/create-function-fail.ts
 interface FunctionFailArguments {
   error: string;
 }
 
+// TODO: move this type to src/context/create-function-fail.ts
 export type FunctionFailFn = {
   (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
   /**
