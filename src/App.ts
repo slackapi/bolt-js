@@ -2,18 +2,17 @@ import type { Agent } from 'node:http';
 import type { SecureContextOptions } from 'node:tls';
 import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
-import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
-import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import { WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
+import axios, { type AxiosInstance } from 'axios';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
   type FunctionCompleteFn,
   type FunctionFailFn,
   type SlackCustomFunctionMiddlewareArgs,
-  createFunctionComplete,
-  createFunctionFail,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
+import { createFunctionComplete, createFunctionFail, createRespond, createSay } from './context';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
 import {
   AppInitializationError,
@@ -67,7 +66,6 @@ import type {
   OptionsSource,
   Receiver,
   ReceiverEvent,
-  RespondArguments,
   RespondFn,
   SayFn,
   ShortcutConstraints,
@@ -1006,22 +1004,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
-    // Factory for say() utility
-    // TODO: could this be move out of processEvent, use the same token from below or perhaps even a client from the pool
-    const createSay = (channelId: string): SayFn => {
-      const token = selectToken(context, this.attachFunctionToken);
-      return (message) => {
-        let postMessageArguments: ChatPostMessageArguments;
-        if (typeof message === 'string') {
-          postMessageArguments = { token, text: message, channel: channelId };
-        } else {
-          postMessageArguments = { ...message, token, channel: channelId };
-        }
-
-        return this.client.chat.postMessage(postMessageArguments);
-      };
-    };
-
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     // TODO: remove workflow step stuff in bolt v5
@@ -1151,15 +1133,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
-      listenerArgs.say = createSay(conversationId);
+      listenerArgs.say = createSay(this.client, token, conversationId);
     }
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = buildRespondFn(this.axios, body.response_url);
+      listenerArgs.respond = createRespond(this.axios, body.response_url);
     } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
       // This can exist only when view_submission payloads - response_url_enabled: true
-      listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
+      listenerArgs.respond = createRespond(this.axios, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
@@ -1624,16 +1606,6 @@ function selectToken(context: Context, attachFunctionToken: boolean): string | u
     return context.functionBotAccessToken;
   }
   return context.botToken !== undefined ? context.botToken : context.userToken;
-}
-
-function buildRespondFn(
-  axiosInstance: AxiosInstance,
-  responseUrl: string,
-): (response: string | RespondArguments) => Promise<AxiosResponse> {
-  return async (message: string | RespondArguments) => {
-    const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
-    return axiosInstance.post(responseUrl, normalizedArgs);
-  };
 }
 
 function escapeHtml(input: string | undefined | null): string {

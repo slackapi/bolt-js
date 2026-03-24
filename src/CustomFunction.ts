@@ -1,14 +1,9 @@
-import type { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse, WebClient } from '@slack/web-api';
-import {
-  CustomFunctionCompleteFailError,
-  CustomFunctionCompleteSuccessError,
-  CustomFunctionInitializationError,
-} from './errors';
+import type { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse } from '@slack/web-api';
+import { CustomFunctionInitializationError } from './errors';
 import { autoAcknowledge, matchEventType, onlyEvents } from './middleware/builtin';
 import type {
   AllMiddlewareArgs,
   AnyMiddlewareArgs,
-  Context,
   Middleware,
   SlackEventMiddlewareArgs,
   SlackEventMiddlewareArgsOptions,
@@ -122,52 +117,4 @@ export function validate(callbackId: string, middleware: Middleware<SlackCustomF
       }
     }
   }
-}
-
-/**
- * Factory for `complete()` utility
- */
-export function createFunctionComplete(context: Context, client: WebClient): FunctionCompleteFn {
-  const { functionExecutionId } = context;
-
-  if (!functionExecutionId) {
-    const errorMsg = 'No function_execution_id found';
-    throw new CustomFunctionCompleteSuccessError(errorMsg);
-  }
-
-  let called = false;
-  const complete = (params: FunctionCompleteArguments = {}) => {
-    called = true;
-    return client.functions.completeSuccess({
-      outputs: params.outputs || {},
-      function_execution_id: functionExecutionId,
-    });
-  };
-  complete.hasBeenCalled = () => called;
-
-  return complete;
-}
-
-/**
- * Factory for `fail()` utility
- */
-export function createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
-  const { functionExecutionId } = context;
-
-  if (!functionExecutionId) {
-    const errorMsg = 'No function_execution_id found';
-    throw new CustomFunctionCompleteFailError(errorMsg);
-  }
-
-  let called = false;
-  const fail = (params: FunctionFailArguments) => {
-    called = true;
-    return client.functions.completeError({
-      error: params.error,
-      function_execution_id: functionExecutionId,
-    });
-  };
-  fail.hasBeenCalled = () => called;
-
-  return fail;
 }
