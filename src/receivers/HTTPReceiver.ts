@@ -34,6 +34,12 @@ import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import { type CustomRoute, type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
+export interface HTTPReceiverInvalidRequestSignatureHandlerArgs {
+  rawBody: string;
+  signature: string | undefined;
+  ts: number | undefined;
+}
+
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
   'ALPNProtocols',
@@ -81,6 +87,7 @@ export interface HTTPReceiverOptions {
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
   signatureVerification?: boolean;
+  invalidRequestSignatureHandler?: (args: HTTPReceiverInvalidRequestSignatureHandlerArgs) => void;
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
@@ -137,6 +144,8 @@ export default class HTTPReceiver implements Receiver {
 
   private signatureVerification: boolean;
 
+  private invalidRequestSignatureHandler: (args: HTTPReceiverInvalidRequestSignatureHandlerArgs) => void;
+
   private app?: App;
 
   public requestListener: RequestListener;
@@ -178,6 +187,7 @@ export default class HTTPReceiver implements Receiver {
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
     signatureVerification = true,
+    invalidRequestSignatureHandler,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -195,6 +205,8 @@ export default class HTTPReceiver implements Receiver {
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
+    this.invalidRequestSignatureHandler =
+      invalidRequestSignatureHandler ?? this.defaultInvalidRequestSignatureHandler.bind(this);
     this.logger =
       logger ??
       (() => {
@@ -448,6 +460,13 @@ export default class HTTPReceiver implements Receiver {
         const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
+          const requestWithRawBody = req as IncomingMessage & { rawBody?: string };
+          const rawBody = typeof requestWithRawBody.rawBody === 'string' ? requestWithRawBody.rawBody : '';
+          this.invalidRequestSignatureHandler({
+            rawBody,
+            signature: req.headers['x-slack-signature'] as string | undefined,
+            ts: req.headers['x-slack-request-timestamp'] ? Number(req.headers['x-slack-request-timestamp']) : undefined,
+          });
         } else {
           this.logger.warn(`Failed to parse the request body: ${e.message}`);
         }
@@ -564,5 +583,9 @@ export default class HTTPReceiver implements Receiver {
     } else {
       installer.handleCallback(req, res, installCallbackOptions).catch(errorHandler);
     }
+  }
+
+  private defaultInvalidRequestSignatureHandler(_args: HTTPReceiverInvalidRequestSignatureHandlerArgs): void {
+    // noop - signature verification failure is already logged and a 401 is returned
   }
 }
