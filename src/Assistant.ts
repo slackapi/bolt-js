@@ -14,6 +14,7 @@ import {
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import processMiddleware from './middleware/process';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
+import { extractThreadTs } from './helpers';
 
 /**
  * Configuration object used to instantiate the Assistant
@@ -417,11 +418,14 @@ export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']
     }
   }
 
+  threadTs = extractThreadTs(payload)
+
   // user message in thread
   if ('channel' in payload && 'thread_ts' in payload && payload.thread_ts !== undefined) {
     channelId = payload.channel;
     threadTs = payload.thread_ts;
   }
+  threadTs = extractThreadTs(payload)
 
   // throw error if `channel` or `thread_ts` are missing
   if (!channelId || !threadTs) {
