@@ -294,6 +294,7 @@ describe('Helpers', () => {
       { name: 'regular message', body: { event: { type: 'message', ts: '111.222' } } },
       { name: 'app_mention', body: { event: { type: 'app_mention', ts: '111.222' } } },
       {
+        name: 'bot_message',
         body: { event: { type: 'message', subtype: 'bot_message', ts: '111.222' } },
       },
       {
