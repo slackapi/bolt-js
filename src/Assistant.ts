@@ -12,6 +12,7 @@ import {
   DefaultThreadContextStore,
 } from './AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
+import { extractEventChannelId, extractEventThreadTs, isRecord } from './helpers';
 import processMiddleware from './middleware/process';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
 
@@ -399,39 +400,24 @@ export function extractThreadInfo(payload: AllAssistantMiddlewareArgs['payload']
   threadTs: string;
   context: AssistantThreadContext;
 } {
-  let channelId = '';
-  let threadTs = '';
   let context: AssistantThreadContext = {};
 
-  // assistant_thread_started, asssistant_thread_context_changed
-  if (
-    'assistant_thread' in payload &&
-    payload.assistant_thread &&
-    typeof payload.assistant_thread.channel_id === 'string' &&
-    typeof payload.assistant_thread.thread_ts === 'string'
-  ) {
-    channelId = payload.assistant_thread.channel_id;
-    threadTs = payload.assistant_thread.thread_ts;
-    if (typeof payload.assistant_thread.context === 'object' && payload.assistant_thread.context !== null) {
+  if ('assistant_thread' in payload && isRecord(payload.assistant_thread)) {
+    if (isRecord(payload.assistant_thread.context)) {
       context = payload.assistant_thread.context;
     }
   }
 
-  // user message in thread
-  if ('channel' in payload && 'thread_ts' in payload && payload.thread_ts !== undefined) {
-    channelId = payload.channel;
-    threadTs = payload.thread_ts;
-  }
+  const channelId = extractEventChannelId(payload);
+  const threadTs = extractEventThreadTs(payload);
 
-  // throw error if `channel` or `thread_ts` are missing
   if (!channelId || !threadTs) {
     const missingProps: string[] = [];
     if (!channelId) missingProps.push('channel_id');
     if (!threadTs) missingProps.push('thread_ts');
-    if (missingProps.length > 0) {
-      const errorMsg = `Assistant message event is missing required properties: ${missingProps.join(', ')}`;
-      throw new AssistantMissingPropertyError(errorMsg);
-    }
+    throw new AssistantMissingPropertyError(
+      `Assistant message event is missing required properties: ${missingProps.join(', ')}`,
+    );
   }
 
   return { channelId, threadTs, context };
