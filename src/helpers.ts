@@ -1,5 +1,6 @@
 import type {
   AnyMiddlewareArgs,
+  KnownEventFromType,
   MessageShortcut,
   OptionsSource,
   ReceiverEvent,
@@ -149,29 +150,76 @@ export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
   return eventTypesToSkipAuthorize.includes(event.body.event?.type);
 }
 
-/* istanbul ignore next */
-
 /** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
 export function assertNever(x?: never): never {
   throw new Error(`Unexpected object: ${x}`);
 }
 
-export function extractThreadTs(body: StringIndexed): string | undefined {
-  const event = body.event;
-  if (event == null || typeof event !== 'object') return undefined;
-  if (typeof event.thread_ts === 'string') return event.thread_ts;
-  if (typeof event.assistant_thread?.thread_ts === 'string') return event.assistant_thread.thread_ts;
-  if (typeof event.message?.thread_ts === 'string') return event.message.thread_ts;
-  if (typeof event.previous_message?.thread_ts === 'string') return event.previous_message.thread_ts;
+/**
+ * Extracts thread_ts from the event payload, checking common locations where it may appear.
+ */
+export function extractEventThreadTs<T extends string>(event: KnownEventFromType<T>): string | undefined {
+  if (hasStringProperty(event, 'thread_ts')) {
+    return event.thread_ts;
+  }
+  if ('assistant_thread' in event && hasStringProperty(event.assistant_thread, 'thread_ts')) {
+    return event.assistant_thread.thread_ts;
+  }
+  if ('message' in event && hasStringProperty(event.message, 'thread_ts')) {
+    return event.message.thread_ts;
+  }
+  if ('previous_message' in event && hasStringProperty(event.previous_message, 'thread_ts')) {
+    return event.previous_message.thread_ts;
+  }
   return undefined;
 }
 
-export function extractMessageTs(body: StringIndexed): string | undefined {
-  const event = body.event;
-  if (event == null || typeof event !== 'object') return undefined;
-  if (typeof event.message?.ts === 'string') return event.message.ts;
-  if (typeof event.previous_message?.ts === 'string') return event.previous_message.ts;
-  if (typeof event.ts === 'string') return event.ts;
-  if (typeof event.item?.ts === 'string') return event.item.ts;
+/**
+ * Extracts the channel ID from the event payload, checking common locations where it may appear.
+ *
+ * TODO: When ready use this in getTypeAndConversation
+ * Note: this intentionally prefers channel (string) > channel (object.id) > channel_id > item.channel > assistant_thread.channel_id,
+ * which differs from getTypeAndConversation where channel_id overwrites channel. Align when consolidating.
+ */
+export function extractEventChannelId<T extends string>(event: KnownEventFromType<T>): string | undefined {
+  if (hasStringProperty(event, 'channel')) {
+    return event.channel;
+  }
+  if ('channel' in event && hasStringProperty(event.channel, 'id')) {
+    return event.channel.id;
+  }
+  if (hasStringProperty(event, 'channel_id')) {
+    return event.channel_id;
+  }
+  if ('item' in event && hasStringProperty(event.item, 'channel')) {
+    return event.item.channel;
+  }
+  if ('assistant_thread' in event && hasStringProperty(event.assistant_thread, 'channel_id')) {
+    return event.assistant_thread.channel_id;
+  }
   return undefined;
+}
+
+/**
+ * Type guard that narrows an unknown value to a record (non-null object).
+ * @example
+ * isRecord({ key: 'value' }) // true
+ * isRecord(null)             // false
+ * isRecord('string')         // false
+ */
+export function isRecord<T extends Record<PropertyKey, unknown> = Record<PropertyKey, unknown>>(
+  value: unknown,
+): value is T {
+  return typeof value === 'object' && value !== null;
+}
+
+/**
+ * Type guard that checks whether an object contains a specific key with a string value.
+ * @example
+ * hasStringProperty({ channel: 'C123' }, 'channel') // true
+ * hasStringProperty({ count: 42 }, 'count')         // false (not a string)
+ * hasStringProperty({}, 'channel')                   // false (key missing)
+ */
+export function hasStringProperty<T, K extends PropertyKey>(obj: T, key: K): obj is T & Record<K, string> {
+  return isRecord(obj) && key in obj && typeof obj[key] === 'string';
 }

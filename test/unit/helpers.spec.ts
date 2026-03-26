@@ -1,13 +1,15 @@
 import { assert } from 'chai';
 import {
   IncomingEventType,
-  extractMessageTs,
-  extractThreadTs,
+  extractEventChannelId,
+  extractEventThreadTs,
   getTypeAndConversation,
+  hasStringProperty,
   isBodyWithTypeEnterpriseInstall,
   isEventTypeToSkipAuthorize,
+  isRecord,
 } from '../../src/helpers';
-import type { AnyMiddlewareArgs, ReceiverEvent, SlackEventMiddlewareArgs } from '../../src/types';
+import type { AnyMiddlewareArgs, KnownEventFromType, ReceiverEvent, SlackEventMiddlewareArgs } from '../../src/types';
 
 describe('Helpers', () => {
   describe('getTypeAndConversation()', () => {
@@ -231,122 +233,165 @@ describe('Helpers', () => {
       });
     });
   });
+  describe(`${isRecord.name}()`, () => {
+    it('should return true for plain objects', () => {
+      assert.isTrue(isRecord({}));
+      assert.isTrue(isRecord({ key: 'value' }));
+    });
 
-  describe('extractThreadTs()', () => {
-    const threadTsBodies = [
-      { name: 'app_mention with thread_ts', body: { event: { type: 'app_mention', thread_ts: '123.456' } } },
-      { name: 'message with thread_ts', body: { event: { type: 'message', thread_ts: '123.456' } } },
+    it('should return true for arrays', () => {
+      assert.isTrue(isRecord([]));
+    });
+
+    it('should return false for null', () => {
+      assert.isFalse(isRecord(null));
+    });
+
+    it('should return false for undefined', () => {
+      assert.isFalse(isRecord(undefined));
+    });
+
+    it('should return false for primitives', () => {
+      assert.isFalse(isRecord('string'));
+      assert.isFalse(isRecord(42));
+      assert.isFalse(isRecord(true));
+    });
+  });
+
+  describe(`${hasStringProperty.name}()`, () => {
+    it('should return true when key exists with a string value', () => {
+      assert.isTrue(hasStringProperty({ name: 'test' }, 'name'));
+    });
+
+    it('should return false when key exists with a non-string value', () => {
+      assert.isFalse(hasStringProperty({ count: 42 }, 'count'));
+      assert.isFalse(hasStringProperty({ flag: true }, 'flag'));
+      assert.isFalse(hasStringProperty({ nested: {} }, 'nested'));
+    });
+
+    it('should return false when key does not exist', () => {
+      assert.isFalse(hasStringProperty({ other: 'value' }, 'missing'));
+    });
+
+    it('should return false for null or undefined input', () => {
+      assert.isFalse(hasStringProperty(null, 'key'));
+      assert.isFalse(hasStringProperty(undefined, 'key'));
+    });
+  });
+
+  describe(`${extractEventThreadTs.name}()`, () => {
+    const threadTsEvents = [
+      { name: 'app_mention with thread_ts', event: { type: 'app_mention', thread_ts: '123.456' } },
+      { name: 'message with thread_ts', event: { type: 'message', thread_ts: '123.456' } },
       {
         name: 'bot_message in thread',
-        body: { event: { type: 'message', subtype: 'bot_message', thread_ts: '123.456' } },
+        event: { type: 'message', subtype: 'bot_message', thread_ts: '123.456' },
       },
       {
         name: 'file_share in thread',
-        body: { event: { type: 'message', subtype: 'file_share', thread_ts: '123.456' } },
+        event: { type: 'message', subtype: 'file_share', thread_ts: '123.456' },
       },
       {
         name: 'thread_broadcast',
-        body: { event: { type: 'message', subtype: 'thread_broadcast', thread_ts: '123.456' } },
+        event: { type: 'message', subtype: 'thread_broadcast', thread_ts: '123.456' },
       },
-      { name: 'link_shared with thread_ts', body: { event: { type: 'link_shared', thread_ts: '123.456' } } },
+      { name: 'link_shared with thread_ts', event: { type: 'link_shared', thread_ts: '123.456' } },
       {
         name: 'message_changed with thread_ts in message',
-        body: { event: { type: 'message', subtype: 'message_changed', message: { thread_ts: '123.456' } } },
+        event: { type: 'message', subtype: 'message_changed', message: { thread_ts: '123.456' } },
       },
       {
         name: 'message_deleted with thread_ts in previous_message',
-        body: {
-          event: { type: 'message', subtype: 'message_deleted', previous_message: { thread_ts: '123.456' } },
-        },
+        event: { type: 'message', subtype: 'message_deleted', previous_message: { thread_ts: '123.456' } },
       },
       {
         name: 'assistant_thread_started',
-        body: { event: { type: 'assistant_thread_started', assistant_thread: { thread_ts: '123.456' } } },
+        event: { type: 'assistant_thread_started', assistant_thread: { thread_ts: '123.456' } },
       },
       {
         name: 'assistant_thread_context_changed',
-        body: { event: { type: 'assistant_thread_context_changed', assistant_thread: { thread_ts: '123.456' } } },
+        event: { type: 'assistant_thread_context_changed', assistant_thread: { thread_ts: '123.456' } },
       },
     ];
 
-    for (const { name, body } of threadTsBodies) {
+    for (const { name, event } of threadTsEvents) {
       it(`should extract thread_ts from ${name}`, () => {
-        assert.equal(extractThreadTs(body), '123.456');
+        assert.equal(extractEventThreadTs(event as KnownEventFromType<string>), '123.456');
       });
     }
 
-    const noThreadTsBodies = [
-      { name: 'reaction_added', body: { event: { type: 'reaction_added', item: { channel: 'C1234' } } } },
-      { name: 'channel_created', body: { event: { type: 'channel_created', channel: { id: 'C1234' } } } },
-      { name: 'message without thread_ts', body: { event: { type: 'message', ts: '111.222' } } },
-      { name: 'body without event', body: {} },
+    const noThreadTsEvents = [
+      { name: 'reaction_added', event: { type: 'reaction_added', item: { channel: 'C1234' } } },
+      { name: 'channel_created', event: { type: 'channel_created', channel: { id: 'C1234' } } },
+      { name: 'message without thread_ts', event: { type: 'message', ts: '111.222' } },
     ];
 
-    for (const { name, body } of noThreadTsBodies) {
+    for (const { name, event } of noThreadTsEvents) {
       it(`should return undefined for ${name}`, () => {
-        assert.isUndefined(extractThreadTs(body));
+        assert.isUndefined(extractEventThreadTs(event as KnownEventFromType<string>));
       });
     }
   });
 
-  describe('extractMessageTs()', () => {
-    const tsBodies = [
-      { name: 'regular message', body: { event: { type: 'message', ts: '111.222' } } },
-      { name: 'app_mention', body: { event: { type: 'app_mention', ts: '111.222' } } },
+  describe(`${extractEventChannelId.name}()`, () => {
+    const channelEvents = [
+      { name: 'message with channel', event: { type: 'message', channel: 'C1234' } },
+      { name: 'app_mention with channel', event: { type: 'app_mention', channel: 'C1234' } },
+      { name: 'member_joined_channel', event: { type: 'member_joined_channel', channel: 'C1234' } },
       {
-        name: 'bot_message',
-        body: { event: { type: 'message', subtype: 'bot_message', ts: '111.222' } },
+        name: 'channel_created with channel object',
+        event: { type: 'channel_created', channel: { id: 'C1234', name: 'general' } },
       },
       {
-        name: 'file_share',
-        body: { event: { type: 'message', subtype: 'file_share', ts: '111.222' } },
+        name: 'channel_archive with channel object',
+        event: { type: 'channel_archive', channel: { id: 'C1234' } },
+      },
+      { name: 'event with channel_id', event: { type: 'some_event', channel_id: 'C1234' } },
+      {
+        name: 'reaction_added with item.channel',
+        event: { type: 'reaction_added', item: { channel: 'C1234', ts: '111.222' } },
+      },
+      { name: 'pin_added with item.channel', event: { type: 'pin_added', item: { channel: 'C1234' } } },
+      {
+        name: 'assistant_thread_started',
+        event: { type: 'assistant_thread_started', assistant_thread: { channel_id: 'C1234', thread_ts: '123.456' } },
       },
       {
-        name: 'thread_broadcast',
-        body: { event: { type: 'message', subtype: 'thread_broadcast', ts: '111.222' } },
-      },
-      {
-        name: 'message_changed (prefers message.ts)',
-        body: { event: { type: 'message', subtype: 'message_changed', ts: '999.000', message: { ts: '111.222' } } },
-      },
-      {
-        name: 'message_deleted (prefers previous_message.ts)',
-        body: {
-          event: { type: 'message', subtype: 'message_deleted', ts: '999.000', previous_message: { ts: '111.222' } },
+        name: 'assistant_thread_context_changed',
+        event: {
+          type: 'assistant_thread_context_changed',
+          assistant_thread: { channel_id: 'C1234', thread_ts: '123.456' },
         },
       },
-      {
-        name: 'message_replied (prefers message.ts)',
-        body: { event: { type: 'message', subtype: 'message_replied', ts: '999.000', message: { ts: '111.222' } } },
-      },
-      {
-        name: 'reaction_added',
-        body: { event: { type: 'reaction_added', item: { ts: '111.222', channel: 'C1234' } } },
-      },
-      {
-        name: 'reaction_removed',
-        body: { event: { type: 'reaction_removed', item: { ts: '111.222', channel: 'C1234' } } },
-      },
     ];
 
-    for (const { name, body } of tsBodies) {
-      it(`should extract ts from ${name}`, () => {
-        assert.equal(extractMessageTs(body), '111.222');
+    for (const { name, event } of channelEvents) {
+      it(`should extract channel from ${name}`, () => {
+        assert.equal(extractEventChannelId(event as KnownEventFromType<string>), 'C1234');
       });
     }
 
-    const noTsBodies = [
-      { name: 'channel_created', body: { event: { type: 'channel_created', channel: { id: 'C1234' } } } },
-      { name: 'body without event', body: {} },
-      { name: 'event is null', body: { event: null } },
-      { name: 'event is a string', body: { event: 'not_an_object' } },
+    const noChannelEvents = [
+      { name: 'tokens_revoked', event: { type: 'tokens_revoked' } },
+      { name: 'team_join', event: { type: 'team_join', user: { id: 'U1234' } } },
+      { name: 'app_home_opened without channel', event: { type: 'app_home_opened', user: 'U1234' } },
     ];
 
-    for (const { name, body } of noTsBodies) {
+    for (const { name, event } of noChannelEvents) {
       it(`should return undefined for ${name}`, () => {
-        assert.isUndefined(extractMessageTs(body));
+        assert.isUndefined(extractEventChannelId(event as KnownEventFromType<string>));
       });
     }
+
+    it('should prefer channel over channel_id when both exist', () => {
+      const event = { type: 'some_event', channel: 'C_FROM_CHANNEL', channel_id: 'C_FROM_CHANNEL_ID' };
+      assert.equal(extractEventChannelId(event as KnownEventFromType<string>), 'C_FROM_CHANNEL');
+    });
+
+    it('should extract channel.id from object when channel is not a string', () => {
+      const event = { type: 'some_event', channel: { id: 'C_FROM_OBJ' }, channel_id: 'C_FROM_CHANNEL_ID' };
+      assert.equal(extractEventChannelId(event as KnownEventFromType<string>), 'C_FROM_OBJ');
+    });
   });
 });
 
