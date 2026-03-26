@@ -2,6 +2,7 @@ import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import { LogLevel } from '../../../../src/App';
+import type { SayStreamFn } from '../../../../src/context/create-say-stream';
 import type { ReceiverEvent, SayFn } from '../../../../src/types';
 import {
   FakeReceiver,
@@ -18,6 +19,7 @@ import {
   noop,
   noopMiddleware,
   withAxiosPost,
+  withChatStream,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,
@@ -660,6 +662,100 @@ describe('App middleware and listener arguments', () => {
 
         sinon.assert.callCount(fakeErrorHandler, dummyReceiverEvents.length);
       });
+    });
+  });
+
+  describe('sayStream()', () => {
+    it('should be available for events with channel and ts context', async () => {
+      const fakeChatStream = sinon.fake.returns({});
+      overrides = buildOverrides([withChatStream(fakeChatStream)]);
+      const MockApp = importApp(overrides);
+
+      const assertionAggregator = sinon.fake();
+      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      app.use(async (args) => {
+        // biome-ignore lint/suspicious/noExplicitAny: test utility
+        const sayStream = (args as any).sayStream as SayStreamFn;
+        assert.isFunction(sayStream);
+        assertionAggregator();
+      });
+      app.error(fakeErrorHandler);
+
+      // Event with channel and ts (message event)
+      await fakeReceiver.sendEvent({
+        ...baseEvent,
+        body: {
+          event: {
+            type: 'message',
+            channel: dummyChannelId,
+            ts: '1234.5678',
+          },
+          team_id: 'TEAM_ID',
+        },
+      });
+
+      sinon.assert.calledOnce(assertionAggregator);
+      sinon.assert.notCalled(fakeErrorHandler);
+    });
+
+    it('should call client.chatStream when invoked', async () => {
+      const fakeChatStream = sinon.fake.returns({});
+      overrides = buildOverrides([withChatStream(fakeChatStream)]);
+      const MockApp = importApp(overrides);
+
+      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      app.use(async (args) => {
+        // biome-ignore lint/suspicious/noExplicitAny: test utility
+        const sayStream = (args as any).sayStream as SayStreamFn;
+        if (sayStream) {
+          sayStream();
+        }
+      });
+      app.error(fakeErrorHandler);
+
+      await fakeReceiver.sendEvent({
+        ...baseEvent,
+        body: {
+          event: {
+            type: 'message',
+            channel: dummyChannelId,
+            ts: '1234.5678',
+            thread_ts: '1111.2222',
+          },
+          team_id: 'TEAM_ID',
+        },
+      });
+
+      sinon.assert.calledOnce(fakeChatStream);
+      const chatStreamArgs = fakeChatStream.firstCall.args[0] as Record<string, unknown>;
+      assert.equal(chatStreamArgs.channel, dummyChannelId);
+      assert.equal(chatStreamArgs.thread_ts, '1111.2222');
+      sinon.assert.notCalled(fakeErrorHandler);
+    });
+
+    it('should not be available for events without channel context', async () => {
+      overrides = buildOverrides([withNoopWebClient()]);
+      const MockApp = importApp(overrides);
+
+      const assertionAggregator = sinon.fake();
+      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      app.use(async (args) => {
+        assert.notProperty(args, 'sayStream');
+        assertionAggregator();
+      });
+
+      // Event without channel context
+      await fakeReceiver.sendEvent({
+        ...baseEvent,
+        body: {
+          event: {
+            type: 'tokens_revoked',
+          },
+          team_id: 'TEAM_ID',
+        },
+      });
+
+      sinon.assert.calledOnce(assertionAggregator);
     });
   });
 

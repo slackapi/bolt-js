@@ -28,7 +28,7 @@ export function createSayStream(
       );
     }
     return client.chatStream({
-      buffer_size: args?.buffer_size,
+      ...(args?.buffer_size !== undefined && { buffer_size: args.buffer_size }),
       channel: args?.channel ?? channelId,
       thread_ts,
       recipient_team_id: args?.recipient_team_id ?? context.teamId ?? context.enterpriseId,

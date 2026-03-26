@@ -3,6 +3,7 @@ import {
   IncomingEventType,
   extractEventChannelId,
   extractEventThreadTs,
+  extractEventTs,
   getTypeAndConversation,
   hasStringProperty,
   isBodyWithTypeEnterpriseInstall,
@@ -329,6 +330,34 @@ describe('Helpers', () => {
     for (const { name, event } of noThreadTsEvents) {
       it(`should return undefined for ${name}`, () => {
         assert.isUndefined(extractEventThreadTs(event as KnownEventFromType<string>));
+      });
+    }
+  });
+
+  describe(`${extractEventTs.name}()`, () => {
+    const tsEvents = [
+      { name: 'message with ts', event: { type: 'message', ts: '111.222' } },
+      { name: 'app_mention with ts', event: { type: 'app_mention', ts: '111.222' } },
+      { name: 'reaction_added with ts', event: { type: 'reaction_added', ts: '111.222' } },
+    ];
+
+    for (const { name, event } of tsEvents) {
+      it(`should extract ts from ${name}`, () => {
+        assert.equal(extractEventTs(event as KnownEventFromType<string>), '111.222');
+      });
+    }
+
+    const noTsEvents = [
+      {
+        name: 'assistant_thread_started',
+        event: { type: 'assistant_thread_started', assistant_thread: { thread_ts: '123.456' } },
+      },
+      { name: 'event without ts', event: { type: 'tokens_revoked' } },
+    ];
+
+    for (const { name, event } of noTsEvents) {
+      it(`should return undefined for ${name}`, () => {
+        assert.isUndefined(extractEventTs(event as KnownEventFromType<string>));
       });
     }
   });
