@@ -49,6 +49,4 @@ updates:
     ignore:
       - dependency-name: "@types/node"
         versions:
-          - "23.x"
-          - "24.x"
           - "25.x"
