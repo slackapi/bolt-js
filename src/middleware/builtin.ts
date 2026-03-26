@@ -339,6 +339,79 @@ export const ignoreSelf: Middleware<AnyMiddlewareArgs> = async (args) => {
   await args.next();
 };
 
+/**
+ * Well-known user ID for Slackbot. Messages from this user are not flagged with bot_id,
+ * so they require a separate check.
+ */
+const SLACKBOT_USER_ID = 'USLACKBOT';
+
+/**
+ * Options for configuring the agent event filter.
+ */
+export interface AgentEventFilterOptions {
+  /**
+   * Subtypes to allow through the filter. By default, all subtypes are blocked.
+   * For example, `{ allow: ['file_share'] }` lets file upload messages pass through
+   * alongside plain user messages.
+   */
+  allow?: string[];
+  /**
+   * Additional subtypes to block. Use this to block events that would otherwise
+   * pass the default filter.
+   */
+  block?: string[];
+}
+
+/**
+ * Listener middleware that filters out events agents typically don't need.
+ * Works with any event listener: `app.message()`, `app.event('app_mention')`, etc.
+ *
+ * By default (no arguments), only plain human user messages pass through.
+ * Everything else is blocked:
+ * - All message subtypes (message_changed, message_deleted, channel_join, etc.)
+ * - Bot messages (any event with bot_id, including subtype 'bot_message')
+ * - Slackbot messages
+ *
+ * Use `allow` to let specific subtypes through, and `block` to add extra restrictions.
+ *
+ * @example
+ * // Default: only plain user messages
+ * app.message(agentEventFilter(), async ({ message }) => { ... });
+ * app.event('app_mention', agentEventFilter(), async ({ event }) => { ... });
+ *
+ * // Also allow file_share messages from users
+ * app.message(agentEventFilter({ allow: ['file_share'] }), async ({ message }) => { ... });
+ */
+export function agentEventFilter(options?: AgentEventFilterOptions): Middleware<SlackEventMiddlewareArgs> {
+  const allowedSubtypes = new Set(options?.allow ?? []);
+  const blockedSubtypes = new Set(options?.block ?? []);
+
+  return async (args) => {
+    const event = args.event;
+    if (!event) return;
+
+    // Block bots and slackbot
+    if (isEventFromBot(event)) return;
+
+    const eventSubtype = 'subtype' in event ? event.subtype : undefined;
+
+    // Has a subtype — blocked by default, unless explicitly allowed
+    if (eventSubtype !== undefined) {
+      if (allowedSubtypes.has(eventSubtype) && !blockedSubtypes.has(eventSubtype)) {
+        await args.next();
+      }
+      return;
+    }
+
+    // No subtype, not a bot — plain user message, let it through
+    await args.next();
+  };
+}
+
+function isEventFromBot(event: SlackEventMiddlewareArgs['event']): boolean {
+  return ('bot_id' in event && event.bot_id !== undefined) || ('user' in event && event.user === SLACKBOT_USER_ID);
+}
+
 // TODO: breaking change: constrain the subtype argument to be a valid message subtype
 /**
  * Filters out any message events whose subtype does not match the provided subtype.

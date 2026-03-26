@@ -369,6 +369,272 @@ describe('Built-in global middleware', () => {
       });
     });
 
+    describe('agentEventFilter', () => {
+      describe('default (no options)', () => {
+        it('should continue for plain user messages', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(createDummyMessageEventMiddlewareArgs(), ctx);
+          await builtins.agentEventFilter()(args);
+          sinon.assert.calledOnce(args.next);
+        });
+
+        it('should continue for plain app_mention events from users', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
+          await builtins.agentEventFilter()(args);
+          sinon.assert.calledOnce(args.next);
+        });
+
+        it('should filter out any event with a subtype', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: 'message_changed',
+                channel,
+                channel_type: 'channel',
+                event_ts: ts,
+                ts,
+                hidden: true,
+                message: {
+                  type: 'message',
+                  text: 'edited text',
+                  user: 'U1234',
+                  ts,
+                  // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+                } as any,
+                previous_message: {
+                  type: 'message',
+                  text: 'original text',
+                  user: 'U1234',
+                  ts,
+                  // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+                } as any,
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter()(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should filter out bot_message subtypes', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: 'bot_message',
+                bot_id: 'B1234',
+                channel,
+                channel_type: 'channel',
+                event_ts: ts,
+                text: 'bot says hi',
+                ts,
+              },
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter()(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should filter out messages with bot_id even without subtype', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: undefined,
+                event_ts: ts,
+                channel,
+                channel_type: 'channel',
+                user: 'U1234',
+                ts,
+                text: 'hi',
+                blocks: [],
+                bot_id: 'B5678',
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter()(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should filter out slackbot messages', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ user: 'USLACKBOT' }), ctx);
+          await builtins.agentEventFilter()(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should filter out app_mention events from bots', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyAppMentionEventMiddlewareArgs({
+              event: {
+                type: 'app_mention',
+                text: '<@U1234> hi',
+                user: 'U5678',
+                bot_id: 'B1234',
+                channel,
+                ts,
+                event_ts: ts,
+              },
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter()(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should allow edited messages that have no subtype', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: undefined,
+                event_ts: ts,
+                channel,
+                channel_type: 'channel',
+                user: 'U1234',
+                ts,
+                text: 'edited text',
+                blocks: [],
+                edited: { user: 'U1234', ts },
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter()(args);
+          sinon.assert.calledOnce(args.next);
+        });
+      });
+
+      describe('allow option', () => {
+        it('should let allowed subtypes through', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: 'file_share',
+                text: 'uploaded a file',
+                user: 'U1234',
+                channel,
+                channel_type: 'channel',
+                ts,
+                event_ts: ts,
+                files: [],
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter({ allow: ['file_share'] })(args);
+          sinon.assert.calledOnce(args.next);
+        });
+
+        it('should still block subtypes not in allow list', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: 'message_changed',
+                channel,
+                channel_type: 'channel',
+                event_ts: ts,
+                ts,
+                hidden: true,
+                message: {
+                  type: 'message',
+                  text: 'edited',
+                  user: 'U1234',
+                  ts,
+                  // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+                } as any,
+                previous_message: {
+                  type: 'message',
+                  text: 'original',
+                  user: 'U1234',
+                  ts,
+                  // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+                } as any,
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter({ allow: ['file_share'] })(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should still block allowed subtypes from bots', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: 'file_share',
+                text: 'uploaded a file',
+                user: 'U1234',
+                bot_id: 'B1234',
+                channel,
+                channel_type: 'channel',
+                ts,
+                event_ts: ts,
+                files: [],
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          await builtins.agentEventFilter({ allow: ['file_share'] })(args);
+          sinon.assert.notCalled(args.next);
+        });
+
+        it('should still allow plain user messages alongside allowed subtypes', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(createDummyMessageEventMiddlewareArgs(), ctx);
+          await builtins.agentEventFilter({ allow: ['file_share'] })(args);
+          sinon.assert.calledOnce(args.next);
+        });
+      });
+
+      describe('block option', () => {
+        it('should block additional subtypes', async () => {
+          const ctx = { ...dummyContext };
+          const args = wrapMiddleware(
+            createDummyMessageEventMiddlewareArgs({
+              message: {
+                type: 'message',
+                subtype: 'file_share',
+                text: 'uploaded a file',
+                user: 'U1234',
+                channel,
+                channel_type: 'channel',
+                ts,
+                event_ts: ts,
+                files: [],
+                // biome-ignore lint/suspicious/noExplicitAny: mock event structure
+              } as any,
+            }),
+            ctx,
+          );
+          // file_share is allowed, but block overrides it
+          await builtins.agentEventFilter({ allow: ['file_share'], block: ['file_share'] })(args);
+          sinon.assert.notCalled(args.next);
+        });
+      });
+    });
+
     describe('subtype', () => {
       it('should continue middleware processing for match message subtypes', async () => {
         const ctx = { ...dummyContext };
