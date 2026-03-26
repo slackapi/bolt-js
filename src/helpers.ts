@@ -146,8 +146,6 @@ export function isEventTypeToSkipAuthorize(event: ReceiverEvent): boolean {
   return eventTypesToSkipAuthorize.includes(event.body.event?.type);
 }
 
-/* istanbul ignore next */
-
 /** Helper that should never be called, but is useful for exhaustiveness checking in conditional branches */
 export function assertNever(x?: never): never {
   throw new Error(`Unexpected object: ${x}`);
@@ -200,6 +198,10 @@ export function extractEventChannelId<T extends string>(event: KnownEventFromTyp
 
 /**
  * Type guard that narrows an unknown value to a record (non-null object).
+ * @example
+ * isRecord({ key: 'value' }) // true
+ * isRecord(null)             // false
+ * isRecord('string')         // false
  */
 export function isRecord<T extends Record<PropertyKey, unknown> = Record<PropertyKey, unknown>>(
   value: unknown,
@@ -209,6 +211,10 @@ export function isRecord<T extends Record<PropertyKey, unknown> = Record<Propert
 
 /**
  * Type guard that checks whether an object contains a specific key with a string value.
+ * @example
+ * hasStringProperty({ channel: 'C123' }, 'channel') // true
+ * hasStringProperty({ count: 42 }, 'count')         // false (not a string)
+ * hasStringProperty({}, 'channel')                   // false (key missing)
  */
 export function hasStringProperty<T, K extends PropertyKey>(obj: T, key: K): obj is T & Record<K, string> {
   return isRecord(obj) && key in obj && typeof obj[key] === 'string';
