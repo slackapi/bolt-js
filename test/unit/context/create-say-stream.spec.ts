@@ -59,34 +59,6 @@ describe('createSayStream', () => {
     assert.equal(args.buffer_size, 512);
   });
 
-  it('should throw when no thread_ts can be determined', () => {
-    const sayStream = createSayStream(client, ctx, 'C1234');
-    assert.throws(
-      () => sayStream(),
-      'sayStream requires a thread_ts but none could be determined from the event context',
-    );
-  });
-
-  it('should use ts as fallback when threadTs is undefined', () => {
-    const sayStream = createSayStream(client, ctx, 'C1234', undefined, '3333.4444');
-    sayStream();
-
-    assert(chatStreamStub.calledOnce);
-    const args = chatStreamStub.firstCall.args[0];
-
-    assert.equal(args.thread_ts, '3333.4444');
-  });
-
-  it('should prefer threadTs over ts', () => {
-    const sayStream = createSayStream(client, ctx, 'C1234', '1111.2222', '3333.4444');
-    sayStream();
-
-    assert(chatStreamStub.calledOnce);
-    const args = chatStreamStub.firstCall.args[0];
-
-    assert.equal(args.thread_ts, '1111.2222');
-  });
-
   it('should use enterpriseId when teamId is not available', () => {
     const sayStream = createSayStream(
       client,

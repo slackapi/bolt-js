@@ -1114,12 +1114,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         listenerArgs.fail = createFunctionFail(context, client);
         listenerArgs.inputs = eventListenerArgs.event.inputs;
       }
-      // Set sayStream() utility - only for events with channel context
+      // Set sayStream() utility - only for events with channel and thread context
       const eventChannelId = extractEventChannelId(eventListenerArgs.event);
       if (eventChannelId !== undefined) {
         const threadTs = extractEventThreadTs(eventListenerArgs.event);
         const eventTs = extractEventTs(eventListenerArgs.event);
-        listenerArgs.sayStream = createSayStream(client, context, eventChannelId, threadTs, eventTs);
+        const resolvedThreadTs = threadTs ?? eventTs;
+        if (resolvedThreadTs !== undefined) {
+          listenerArgs.sayStream = createSayStream(client, context, eventChannelId, resolvedThreadTs);
+        }
       }
     } else if (type === IncomingEventType.Action) {
       const actionListenerArgs = listenerArgs as SlackActionMiddlewareArgs;
