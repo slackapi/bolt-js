@@ -78,6 +78,7 @@ export class AssistantInitializationError extends Error implements CodedError {
   public code = ErrorCode.AssistantInitializationError;
 }
 
+// TODO: Replace with ContextMissingPropertyError - this error is only used for missing context properties in Assistant
 export class AssistantMissingPropertyError extends Error implements CodedError {
   public code = ErrorCode.AssistantMissingPropertyError;
 }
@@ -168,10 +169,12 @@ export class CustomFunctionInitializationError extends Error implements CodedErr
   public code = ErrorCode.CustomFunctionInitializationError;
 }
 
+// TODO: Replace with ContextMissingPropertyError - this error is only used for a missing functionExecutionId context property
 export class CustomFunctionCompleteSuccessError extends Error implements CodedError {
   public code = ErrorCode.CustomFunctionCompleteSuccessError;
 }
 
+// TODO: Replace with ContextMissingPropertyError - this error is only used for a missing functionExecutionId context property
 export class CustomFunctionCompleteFailError extends Error implements CodedError {
   public code = ErrorCode.CustomFunctionCompleteFailError;
 }

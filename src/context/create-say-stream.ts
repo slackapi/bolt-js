@@ -1,4 +1,5 @@
 import type { WebClient } from '@slack/web-api';
+import { ContextMissingPropertyError } from '../errors';
 import type { Context } from '../types';
 
 export interface SayStreamArguments {
@@ -16,11 +17,15 @@ export function createSayStream(
   context: Context,
   channelId: string,
   threadTs?: string,
+  ts?: string,
 ): SayStreamFn {
   return (args?: SayStreamArguments) => {
-    const thread_ts = args?.thread_ts ?? threadTs;
+    const thread_ts = args?.thread_ts ?? threadTs ?? ts;
     if (!thread_ts) {
-      throw new Error('sayStream requires a thread_ts but none could be determined from the event context');
+      throw new ContextMissingPropertyError(
+        'thread_ts',
+        'sayStream requires a thread_ts but none could be determined from the event context',
+      );
     }
     return client.chatStream({
       buffer_size: args?.buffer_size,

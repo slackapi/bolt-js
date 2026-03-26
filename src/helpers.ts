@@ -11,7 +11,6 @@ import type {
   SlackOptionsMiddlewareArgs,
   SlackShortcutMiddlewareArgs,
 } from './types';
-import type { StringIndexed } from './types/utilities';
 
 /**
  * Internal data type for capturing the class of event processed in App#onIncomingEvent()
@@ -170,6 +169,16 @@ export function extractEventThreadTs<T extends string>(event: KnownEventFromType
   }
   if ('previous_message' in event && hasStringProperty(event.previous_message, 'thread_ts')) {
     return event.previous_message.thread_ts;
+  }
+  return undefined;
+}
+
+/**
+ * Extracts ts from the event payload.
+ */
+export function extractEventTs<T extends string>(event: KnownEventFromType<T>): string | undefined {
+  if (hasStringProperty(event, 'ts')) {
+    return event.ts;
   }
   return undefined;
 }

@@ -94,7 +94,6 @@ export function createDummyAppHomeOpenedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
-    sayStream,
   };
 }
 
@@ -123,7 +122,6 @@ export function createDummyMemberChannelEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
-    sayStream,
   };
 }
 
@@ -154,7 +152,6 @@ export function createDummyReactionAddedEventMiddlewareArgs(
     event,
     body: envelopeEvent(event, bodyOverrides),
     say,
-    sayStream,
   };
 }
 

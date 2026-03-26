@@ -65,6 +65,43 @@ describe('createSayStream', () => {
     );
   });
 
+  it('should use ts as fallback when threadTs is undefined', () => {
+    const client = new WebClient('token');
+    const chatStreamStub = sinon.stub(client, 'chatStream').returns({} as ReturnType<WebClient['chatStream']>);
+
+    const ctx = { teamId: 'T1234', userId: 'U1234', isEnterpriseInstall: false } as Context;
+    const sayStream = createSayStream(client, ctx, 'C1234', undefined, '3333.4444');
+    sayStream();
+
+    assert(chatStreamStub.calledOnce);
+    const args = chatStreamStub.firstCall.args[0] as Record<string, unknown>;
+    assert.equal(args.thread_ts, '3333.4444');
+  });
+
+  it('should prefer threadTs over ts', () => {
+    const client = new WebClient('token');
+    const chatStreamStub = sinon.stub(client, 'chatStream').returns({} as ReturnType<WebClient['chatStream']>);
+
+    const ctx = { teamId: 'T1234', userId: 'U1234', isEnterpriseInstall: false } as Context;
+    const sayStream = createSayStream(client, ctx, 'C1234', '1111.2222', '3333.4444');
+    sayStream();
+
+    assert(chatStreamStub.calledOnce);
+    const args = chatStreamStub.firstCall.args[0] as Record<string, unknown>;
+    assert.equal(args.thread_ts, '1111.2222');
+  });
+
+  it('should throw when both threadTs and ts are undefined', () => {
+    const client = new WebClient('token');
+    sinon.stub(client, 'chatStream').returns({} as ReturnType<WebClient['chatStream']>);
+
+    const sayStream = createSayStream(client, { isEnterpriseInstall: false } as Context, 'C1234', undefined, undefined);
+    assert.throws(
+      () => sayStream(),
+      'sayStream requires a thread_ts but none could be determined from the event context',
+    );
+  });
+
   it('should use enterpriseId when teamId is not available', () => {
     const client = new WebClient('token');
     const chatStreamStub = sinon.stub(client, 'chatStream').returns({} as ReturnType<WebClient['chatStream']>);

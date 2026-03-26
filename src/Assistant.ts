@@ -15,7 +15,6 @@ import { AssistantInitializationError, AssistantMissingPropertyError } from './e
 import { extractEventChannelId, extractEventThreadTs, isRecord } from './helpers';
 import processMiddleware from './middleware/process';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, SayFn, SlackEventMiddlewareArgs } from './types';
-import { extractThreadTs } from './helpers';
 
 /**
  * Configuration object used to instantiate the Assistant
