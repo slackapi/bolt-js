@@ -16,7 +16,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version:
+          - 18.x
+          - 20.x
+          - 22.x
+          - 24.x
         example:
           - examples/getting-started-typescript
           - examples/custom-receiver
@@ -43,7 +47,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version:
+          - 18.x
+          - 20.x
+          - 22.x
+          - 24.x
         sample:
           - slack-samples/bolt-ts-starter-template
           - slack-samples/bolt-ts-custom-function-template
