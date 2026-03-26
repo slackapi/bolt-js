@@ -111,10 +111,6 @@ export function withChatStream(spy: SinonSpy): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
-        public chat = {
-          postMessage: sinon.fake.resolves({}),
-        };
-
         public chatStream = spy;
       },
     },
