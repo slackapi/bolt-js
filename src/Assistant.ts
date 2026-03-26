@@ -11,6 +11,8 @@ import {
   type AssistantThreadContextStore,
   DefaultThreadContextStore,
 } from './AssistantThreadContextStore';
+import { createSayStream } from './context';
+import type { SayStreamFn } from './context';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import { extractEventChannelId, extractEventThreadTs, isRecord } from './helpers';
 import processMiddleware from './middleware/process';
@@ -33,6 +35,7 @@ interface AssistantUtilityArgs {
   getThreadContext: GetThreadContextUtilFn;
   saveThreadContext: SaveThreadContextUtilFn;
   say: SayFn;
+  sayStream: SayStreamFn;
   setStatus: SetStatusFn;
   setSuggestedPrompts: SetSuggestedPromptsFn;
   setTitle: SetTitleFn;
@@ -182,6 +185,7 @@ export function enrichAssistantArgs(
   preparedArgs.saveThreadContext = () => threadContextStore.save(args);
 
   preparedArgs.say = createSay(preparedArgs);
+  preparedArgs.sayStream = createAssistantSayStream(preparedArgs);
   preparedArgs.setStatus = createSetStatus(preparedArgs);
   preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
   preparedArgs.setTitle = createSetTitle(preparedArgs);
@@ -330,6 +334,16 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
 
     return client.chat.postMessage(postMessageArgument);
   };
+}
+
+/**
+ * Creates utility `sayStream()` to stream responses in the assistant thread.
+ * https://api.slack.com/methods/chat.stream
+ */
+function createAssistantSayStream(args: AllAssistantMiddlewareArgs): SayStreamFn {
+  const { client, context, payload } = args;
+  const { channelId, threadTs } = extractThreadInfo(payload);
+  return createSayStream(client, context, channelId, threadTs);
 }
 
 /**
