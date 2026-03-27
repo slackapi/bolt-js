@@ -20,9 +20,10 @@
     "koa": "^3"
   },
   "devDependencies": {
+    "@tsconfig/node18": "^18.2.6",
     "@types/koa": "^3.0.2",
     "@types/node": "^24",
     "ts-node": "^10",
-    "typescript": "5.9.3"
+    "typescript": "6.0.2"
   }
 }
