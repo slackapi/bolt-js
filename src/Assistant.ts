@@ -1,6 +1,4 @@
 import type {
-  AssistantThreadsSetStatusArguments,
-  AssistantThreadsSetStatusResponse,
   AssistantThreadsSetSuggestedPromptsResponse,
   AssistantThreadsSetTitleResponse,
   ChatPostMessageArguments,
@@ -11,8 +9,9 @@ import {
   type AssistantThreadContextStore,
   DefaultThreadContextStore,
 } from './AssistantThreadContextStore';
-import { createSayStream } from './context';
+import { createSayStream, createSetStatus } from './context';
 import type { SayStreamFn } from './context';
+import type { SetStatusFn } from './context';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import { extractEventChannelId, extractEventThreadTs, isRecord } from './helpers';
 import processMiddleware from './middleware/process';
@@ -43,9 +42,6 @@ interface AssistantUtilityArgs {
 
 type GetThreadContextUtilFn = () => Promise<AssistantThreadContext>;
 type SaveThreadContextUtilFn = () => Promise<void>;
-type SetStatusFn = (
-  status: string | Omit<AssistantThreadsSetStatusArguments, 'channel_id' | 'thread_ts'>,
-) => Promise<AssistantThreadsSetStatusResponse>;
 
 type SetSuggestedPromptsFn = (
   params: SetSuggestedPromptsArguments,
@@ -186,7 +182,7 @@ export function enrichAssistantArgs(
 
   preparedArgs.say = createSay(preparedArgs);
   preparedArgs.sayStream = createAssistantSayStream(preparedArgs);
-  preparedArgs.setStatus = createSetStatus(preparedArgs);
+  preparedArgs.setStatus = createAssistantSetStatus(preparedArgs);
   preparedArgs.setSuggestedPrompts = createSetSuggestedPrompts(preparedArgs);
   preparedArgs.setTitle = createSetTitle(preparedArgs);
   return preparedArgs;
@@ -350,24 +346,10 @@ function createAssistantSayStream(args: AllAssistantMiddlewareArgs): SayStreamFn
  * Creates utility `setStatus()` to set the status and indicate active processing.
  * https://api.slack.com/methods/assistant.threads.setStatus
  */
-function createSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
+function createAssistantSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const { client, payload } = args;
-  const { channelId: channel_id, threadTs: thread_ts } = extractThreadInfo(payload);
-
-  return (status: Parameters<SetStatusFn>[0]): Promise<AssistantThreadsSetStatusResponse> => {
-    if (typeof status === 'string') {
-      return client.assistant.threads.setStatus({
-        channel_id,
-        thread_ts,
-        status,
-      });
-    }
-    return client.assistant.threads.setStatus({
-      channel_id,
-      thread_ts,
-      ...status,
-    });
-  };
+  const { channelId, threadTs } = extractThreadInfo(payload);
+  return createSetStatus(client, channelId, threadTs);
 }
 
 /**

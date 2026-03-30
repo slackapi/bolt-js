@@ -1,6 +1,7 @@
 import type { FunctionExecutedEvent, SlackEvent } from '@slack/types';
 import type { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
 import type { SayStreamFn } from '../../context/create-say-stream';
+import type { SetStatusFn } from '../../context/create-set-status';
 import type { AckFn, SayFn, StringIndexed } from '../utilities';
 
 export type SlackEventMiddlewareArgsOptions = { autoAcknowledge: boolean };
@@ -49,7 +50,7 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
     : unknown) &
   (EventFromType<EventType> extends EventWithChannelContext
     ? EventFromType<EventType> extends EventWithThreadTsContext | EventWithTsContext
-      ? { sayStream: SayStreamFn }
+      ? { sayStream: SayStreamFn; setStatus: SetStatusFn }
       : unknown
     : unknown) &
   (EventType extends 'function_executed'

@@ -12,8 +12,15 @@ import {
   type SlackCustomFunctionMiddlewareArgs,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
-import { createFunctionComplete, createFunctionFail, createRespond, createSay, createSayStream } from './context';
-import type { SayStreamFn } from './context';
+import {
+  createFunctionComplete,
+  createFunctionFail,
+  createRespond,
+  createSay,
+  createSayStream,
+  createSetStatus,
+} from './context';
+import type { SayStreamFn, SetStatusFn } from './context';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
 import {
   AppInitializationError,
@@ -1054,6 +1061,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       say?: SayFn;
       /** SayStream function might be set below */
       sayStream?: SayStreamFn;
+      /** SetStatus function might be set below */
+      setStatus?: SetStatusFn;
       /** Respond function might be set below */
       respond?: RespondFn;
       /** Ack function might be set below */
@@ -1122,6 +1131,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         const resolvedThreadTs = threadTs ?? eventTs;
         if (resolvedThreadTs !== undefined) {
           listenerArgs.sayStream = createSayStream(client, context, eventChannelId, resolvedThreadTs);
+          listenerArgs.setStatus = createSetStatus(client, eventChannelId, resolvedThreadTs);
         }
       }
     } else if (type === IncomingEventType.Action) {

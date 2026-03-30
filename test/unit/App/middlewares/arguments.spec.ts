@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import { LogLevel } from '../../../../src/App';
 import type { SayStreamFn } from '../../../../src/context/create-say-stream';
+import type { SetStatusFn } from '../../../../src/context/create-set-status';
 import type { ReceiverEvent, SayFn } from '../../../../src/types';
 import {
   FakeReceiver,
@@ -25,6 +26,7 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
   withPostMessage,
+  withSetStatus,
   withSuccessfulBotUserFetchingWebClient,
 } from '../../helpers';
 
@@ -741,6 +743,65 @@ describe('App middleware and listener arguments', () => {
       const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       app.use(async (args) => {
         assert.notProperty(args, 'sayStream');
+        assertionAggregator();
+      });
+
+      // Event without channel context
+      await fakeReceiver.sendEvent({
+        ...baseEvent,
+        body: {
+          event: {
+            type: 'tokens_revoked',
+          },
+          team_id: 'TEAM_ID',
+        },
+      });
+
+      sinon.assert.calledOnce(assertionAggregator);
+    });
+  });
+
+  describe('setStatus()', () => {
+    it('should be available for events with channel and ts context', async () => {
+      const fakeSetStatus = sinon.fake.resolves({ ok: true });
+      overrides = buildOverrides([withSetStatus(fakeSetStatus)]);
+      const MockApp = importApp(overrides);
+
+      const assertionAggregator = sinon.fake();
+      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      app.use(async (args) => {
+        // biome-ignore lint/suspicious/noExplicitAny: test utility
+        const setStatus = (args as any).setStatus as SetStatusFn;
+        assert.isFunction(setStatus);
+        assertionAggregator();
+      });
+      app.error(fakeErrorHandler);
+
+      // Event with channel and ts (message event)
+      await fakeReceiver.sendEvent({
+        ...baseEvent,
+        body: {
+          event: {
+            type: 'message',
+            channel: dummyChannelId,
+            ts: '1234.5678',
+          },
+          team_id: 'TEAM_ID',
+        },
+      });
+
+      sinon.assert.calledOnce(assertionAggregator);
+      sinon.assert.notCalled(fakeErrorHandler);
+    });
+
+    it('should not be available for events without channel context', async () => {
+      overrides = buildOverrides([withNoopWebClient()]);
+      const MockApp = importApp(overrides);
+
+      const assertionAggregator = sinon.fake();
+      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      app.use(async (args) => {
+        assert.notProperty(args, 'setStatus');
         assertionAggregator();
       });
 

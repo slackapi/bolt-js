@@ -117,6 +117,20 @@ export function withChatStream(spy: SinonSpy): Override {
   };
 }
 
+export function withSetStatus(spy: SinonSpy): Override {
+  return {
+    '@slack/web-api': {
+      WebClient: class {
+        public assistant = {
+          threads: {
+            setStatus: spy,
+          },
+        };
+      },
+    },
+  };
+}
+
 export function withAxiosPost(spy: SinonSpy): Override {
   return {
     axios: {

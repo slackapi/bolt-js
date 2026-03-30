@@ -19,6 +19,7 @@ import type {
 } from '../../../src/Assistant';
 import type { SlackCustomFunctionMiddlewareArgs } from '../../../src/CustomFunction';
 import type { SayStreamFn } from '../../../src/context/create-say-stream';
+import type { SetStatusFn } from '../../../src/context/create-set-status';
 import type {
   AckFn,
   AllMiddlewareArgs,
@@ -56,6 +57,7 @@ const token = 'xoxb-1234';
 const app_id = 'A1234';
 const say: SayFn = (_msg) => Promise.resolve({ ok: true });
 const sayStream: SayStreamFn = (_args?) => ({}) as ReturnType<WebClient['chatStream']>;
+const setStatus: SetStatusFn = (_status) => Promise.resolve({ ok: true });
 const respond: RespondFn = (_msg) => Promise.resolve();
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
@@ -188,6 +190,7 @@ export function createDummyMessageEventMiddlewareArgs(
     body: envelopeEvent(payload, bodyOverrides),
     say,
     sayStream,
+    setStatus,
   };
 }
 
@@ -213,6 +216,7 @@ export function createDummyAppMentionEventMiddlewareArgs(
     body: envelopeEvent(payload, bodyOverrides),
     say,
     sayStream,
+    setStatus,
   };
 }
 function enrichDummyAssistantMiddlewareArgs() {

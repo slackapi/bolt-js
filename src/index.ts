@@ -53,6 +53,7 @@ export * from './errors';
 export * from './middleware/builtin';
 export * from './types';
 export type { SayStreamFn, SayStreamArguments } from './context/create-say-stream';
+export type { SetStatusFn, SetStatusArguments } from './context/create-set-status';
 
 export { ConversationStore, MemoryStore } from './conversation-store';
 
