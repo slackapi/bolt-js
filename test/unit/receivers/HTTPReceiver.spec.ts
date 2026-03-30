@@ -571,6 +571,125 @@ describe('HTTPReceiver', () => {
       });
     });
 
+    describe('invalidRequestSignatureHandler', () => {
+      it('should call the custom handler when signature verification fails', async () => {
+        const spy = sinon.spy();
+        const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
+        const fakeBuildNoBodyResponse = sinon.fake();
+
+        const overridesWithFakeVerify = mergeOverrides(overrides, {
+          './HTTPModuleFunctions': {
+            parseAndVerifyHTTPRequest: fakeParseAndVerify,
+            parseHTTPRequestBody: sinon.fake(),
+            buildNoBodyResponse: fakeBuildNoBodyResponse,
+            '@noCallThru': true,
+          },
+        });
+
+        const HTTPReceiver = importHTTPReceiver(overridesWithFakeVerify);
+        const receiver = new HTTPReceiver({
+          signingSecret: 'secret',
+          logger: noopLogger,
+          invalidRequestSignatureHandler: spy,
+        });
+        assert.isNotNull(receiver);
+
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as unknown as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        fakeReq.headers = {
+          'x-slack-signature': 'v0=bad',
+          'x-slack-request-timestamp': '1234567890',
+        };
+        (fakeReq as IncomingMessage & { rawBody?: string }).rawBody = '{"token":"test"}';
+
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+        receiver.requestListener(fakeReq, fakeRes);
+
+        // Wait for the async closure inside handleIncomingEvent to settle
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        assert(spy.calledOnce, 'invalidRequestSignatureHandler should be called once');
+        const args = spy.firstCall.args[0];
+        assert.equal(args.rawBody, '{"token":"test"}');
+        assert.equal(args.signature, 'v0=bad');
+        assert.equal(args.ts, 1234567890);
+      });
+
+      it('should use the default noop handler when no custom handler is provided', async () => {
+        const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
+        const fakeBuildNoBodyResponse = sinon.fake();
+
+        const overridesWithFakeVerify = mergeOverrides(overrides, {
+          './HTTPModuleFunctions': {
+            parseAndVerifyHTTPRequest: fakeParseAndVerify,
+            parseHTTPRequestBody: sinon.fake(),
+            buildNoBodyResponse: fakeBuildNoBodyResponse,
+            '@noCallThru': true,
+          },
+        });
+
+        const HTTPReceiver = importHTTPReceiver(overridesWithFakeVerify);
+        const receiver = new HTTPReceiver({
+          signingSecret: 'secret',
+          logger: noopLogger,
+        });
+
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as unknown as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        fakeReq.headers = {};
+
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+        // Should not throw even without a custom handler
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        sinon.assert.calledOnce(fakeBuildNoBodyResponse);
+        sinon.assert.calledWith(fakeBuildNoBodyResponse, fakeRes, 401);
+      });
+
+      it('should pass undefined for signature and ts when headers are missing', async () => {
+        const spy = sinon.spy();
+        const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
+        const fakeBuildNoBodyResponse = sinon.fake();
+
+        const overridesWithFakeVerify = mergeOverrides(overrides, {
+          './HTTPModuleFunctions': {
+            parseAndVerifyHTTPRequest: fakeParseAndVerify,
+            parseHTTPRequestBody: sinon.fake(),
+            buildNoBodyResponse: fakeBuildNoBodyResponse,
+            '@noCallThru': true,
+          },
+        });
+
+        const HTTPReceiver = importHTTPReceiver(overridesWithFakeVerify);
+        const receiver = new HTTPReceiver({
+          signingSecret: 'secret',
+          logger: noopLogger,
+          invalidRequestSignatureHandler: spy,
+        });
+
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as unknown as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        fakeReq.headers = {};
+
+        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        assert(spy.calledOnce);
+        const args = spy.firstCall.args[0];
+        assert.equal(args.rawBody, '');
+        assert.isUndefined(args.signature);
+        assert.isUndefined(args.ts);
+      });
+    });
+
     it("should throw if request doesn't match install path, redirect URI path, or custom routes", async () => {
       const installProviderStub = sinon.createStubInstance(InstallProvider);
       const HTTPReceiver = importHTTPReceiver(overrides);
