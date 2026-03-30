@@ -338,7 +338,7 @@ function createSay(args: AllAssistantMiddlewareArgs): SayFn {
 
 /**
  * Creates utility `sayStream()` to stream responses in the assistant thread.
- * https://api.slack.com/methods/chat.stream
+ * https://docs.slack.dev/tools/bolt-js/concepts/message-sending#streaming-messages
  */
 function createAssistantSayStream(args: AllAssistantMiddlewareArgs): SayStreamFn {
   const { client, context, payload } = args;
