@@ -216,8 +216,8 @@ describe('Assistant class', () => {
         } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
-        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setStatus);
+        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setSuggestedPrompts);
         assert.exists(assistantArgs.setTitle);
       });
@@ -232,8 +232,8 @@ describe('Assistant class', () => {
         } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
-        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setStatus);
+        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setSuggestedPrompts);
         assert.exists(assistantArgs.setTitle);
       });
@@ -248,8 +248,8 @@ describe('Assistant class', () => {
         } as AllAssistantMiddlewareArgs);
 
         assert.exists(assistantArgs.say);
-        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setStatus);
+        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setSuggestedPrompts);
         assert.exists(assistantArgs.setTitle);
       });
