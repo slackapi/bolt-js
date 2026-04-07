@@ -48,12 +48,12 @@ If you're not touching the `/docs` folder, you don't need to worry about the doc
 
 The `/docs` folder contains two types of docs files:
 
-* markdown files
-* sidebar.json
+- markdown files
+- sidebar.json
 
 The private repo containing the docs.slack.dev site pulls these in at build time.
 
-Maintainers need to use the `run workflow` button associated with the `deploy` workflow in that private repo to update the docs with changes from here. 
+Maintainers need to use the `run workflow` button associated with the `deploy` workflow in that private repo to update the docs with changes from here.
 
 #### Markdown Files
 
@@ -61,11 +61,11 @@ The markdown files here are secretly mdx files in disguise.
 
 If you'd like to add images to pages, add the image files to the same folder the md file is in.
 
-We appreciate markdown edits from anyone!!! 
+We appreciate markdown edits from anyone!!!
 
 #### Sidebar
 
-`_sidebar.json` sets the Bolt JS docs sidebar 
+`_sidebar.json` sets the Bolt JS docs sidebar
 
 Sidebar values take the form of `bolt-js/path-within-docs/`.
 
@@ -75,77 +75,77 @@ value: `bolt-js/concepts/sending-variables`
 
 For info on syntax see https://docusaurus.io/docs/sidebar.
 
-This file is copied to slackapi.github.io/bolt-js/_sidebar.json, then called in slackapi.github.io/sidebars.js
+This file is copied to slackapi.github.io/bolt-js/\_sidebar.json, then called in slackapi.github.io/sidebars.js
 
-### Releases
-_For beta releases, see Beta Releases section below:_
+### 🎁 Updating Changesets
 
-Releasing can feel intimidating at first, but rest assured: if you make a mistake, don't fret! npm allows you to unpublish a release within the first 72 hours of publishing (you just won’t be able to use the same version number again). Venture on!
+This project uses [Changesets](https://github.com/changesets/changesets) to track changes and automate releases.
 
-1. Check the status of the package's GitHub Milestone for issues that should be shipped with the release.
-    -  If all issues have been closed, continue with the release.
-    -  If issues are still open, discuss with the team about whether the open issues should be moved to a future release or if the release should be held off until the issues are resolved.
-    -  Take a look at all issues under the Milestone to make sure that the type of issues included aligns with the Milestone name based on [semantic versioning](https://semver.org/). If the issues do not align with the naming of the Milestone (ex: if the issues are all bug fixes, but the Milestone is labeled as a minor release), then you can tweak the Milestone name to reflect the correct versioning.
+Each changeset describes a change to the package and its [semver](https://semver.org/) impact, and a new changeset should be added when updating the package with some change that affects consumers:
 
-2. Make sure your local `main` branch has the latest changes.
-    - Run `git rebase main` from your feature branch (this will rebase your feature branch from `main`). You can opt for `git merge main` if you are not comfortable with rebasing.
-    - If you do not have a feature branch, you can also use generic release candidate branch name like `<next-version>rc`, i.e. `2.5.0rc`.
+```sh
+npm run changeset
+```
 
-3. Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `package.json`. (see [Versioning and Tags](https://github.com/slackapi/node-slack-sdk/blob/main/.github/maintainers_guide.md#versioning-and-tags))
-    - The version must be in the format of `Major.Minor.Patch-BetaNamespace.BetaVersion` (ex: `5.10.0-workflowStepsBeta.1`, `2.5.0-rc.1`)
-    -  Update any dependency versions in `package.json` and install locally `rm -r node_modules package-lock.json && npm install`
-    -  Confirm tests pass and code is free of linting errors by running `npm test`.
-    -  Make a single commit with a message for the version bump ([Example](https://github.com/slackapi/bolt-js/pull/1133/commits/bcc421cd05b50ddcdeb806fcb27a38d7d9f8ede8)).
-    - Create a pull request for the version change ([Example](https://github.com/slackapi/bolt-js/pull/1133))
-    - Add appropriate labels on the PR, including `release`
-4. Once the PR has been approved and tests have passed, merged to main repository.
-    -  Check out your local `main` branch and update it to get the latest changes: `git checkout main && git pull origin main`
-    -  Add a version tag (ie, `git tag @slack/bolt@3.6.0`)
-    -  Push the new tag up to origin: `git push --tags origin`
-5. Publish the release to npm
-    - To publish, you need to be a member of the `slack Org` on npm and set up 2-Factor Auth with your password generator of choice. Before you can publish with npm, you must run `npm login` from the command line.
-    - Before publishing a new version, run `rm -rf node_modules/ dist/` to clean your module dependencies in the project first (usually this is not required but in some cases, `npm publish` cannot include all the required files in a package) 
-    - Just in case, run `npm i && npm test && npm pack` and check if the list of the files that will be included in the package contain, at a minimum: `package.json`, `README.md`, `LICENSE`, `dist/index.js`, `dist/App.js`
-    - Publish the release by running `npm publish --tag <dist-tag> . --otp YOUR_OTP_CODE`.
-        - Stable releases should use `latest` for the `<dist-tag>`. This label is reserved only for the latest non-beta release!
-        - Beta releases should use a representative label for `<dist-tag>`. It could be feature-specific (e.g. `feat-token-rotation`) or it can be a generic release candidate (e.g. `2.5.0rc`). As long as it's _not_ `latest`.
-        - All current dist tags can be viewed by running `npm info`.
-        - An OTP (One Time Password) can be generated for `YOUR_OTP_CODE` with the password generator of your choice (Duo, 1Password).
-6. Close GitHub Milestone
-    - Close the relevant GitHub Milestone(s) for the release(s)
-    - Check the existing GitHub Milestones to see if the next minor version exists. If it doesn't, then create a GitHub Milestone for new issues to live in. Typically, you'll create a new minor version - however, if there are any bugs that need to be carried over from the current GitHub Milestone, you could make a Milestone for a patch version to reflect those issues
-    - Move any unfinished, open issues to the next GitHub Milestone
-7. Create GitHub Release(s) with release notes
-    - From the repository, navigate to the **Releases** section and draft a new release
-    - When creating the release notes, select the tag you generated earlier for your release and title the release the same name as the tag
-    - Release notes should mention contributors, issues and PRs ([Example](https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%403.13.2))
-        - Related changes should be grouped together, such as enhancements, bug fixes, documentation, dependencies, or others.
-    - Once the release notes are ready, click the "Publish Release" button to make them public
+Updates to documentation, tests, or CI might not require new entries.
 
-8. Communicate the release (as appropriate)
-    - **Internal**
-      - Include a brief description and link to the GitHub release
-    - **External**
-      - **community.slack.com**: Post updates in relevant channels (e.g. #lang-javascript, #tools-bolt)
-      - **Twitter**: Primarily for major updates. Coordinate with Developer Marketing.
+When a PR containing changesets is merged to `main`, a different PR is opened or updated using [changesets/action](https://github.com/changesets/action) which consumes the pending changesets, bumps the package version, and updates the `CHANGELOG` in preparation to release.
 
+### 🚀 Releases
+
+Releasing can feel intimidating at first, but don't fret! If you make a mistake, npm allows you to unpublish within the first 72 hours. The one catch is that you can't reuse the same version number. Venture on!
+
+> For beta releases, read the [**Beta Releases**](#beta-release) section below.
+
+New official package versions are published when the release PR created from changesets is merged and the publish workflow is approved. Follow these steps to build confidence:
+
+1. **Check GitHub Milestones**: Before merging the release PR please check the relevant [Milestones](https://github.com/slackapi/bolt-js/milestones). If issues or pull requests are still open either decide to postpone the release or save those changes for a future update.
+
+2. **Review the release PR**: Verify that the version bump matches expectations, `CHANGELOG` entries are clear, and CI checks pass.
+
+3. **Merge and approve**: Merge the release PR, then approve the publish workflow to release the package to npm.
+
+4. **Update Milestones**: Close the relevant [Milestones](https://github.com/slackapi/bolt-js/milestones) and rename these to match the released package version. Open a new Milestone for the next version, e.g. `@slack/bolt@next`.
+
+5. **Communicate the release**:
+   - **Internal**: Post a brief description and link to the GitHub release.
+   - **External**: Post in relevant channels (e.g. #lang-javascript, #tools-bolt) on [Slack Community](https://community.slack.com/). Include a link to the package on `npmjs.com/package/@slack/bolt` as well as the release notes.
 
 #### Beta Release
 
-1. Create the commit for the release:
-    * Follow normal release steps above for creating a release with a few minor changes:
-        *  Set version to the format of `Major.Minor.Patch-BetaNameSpace-BetaVersion` (example: `2.1.1-workflowStepsBeta.1`)
+Beta releases are currently a manual process since [Changesets pre-releases](https://github.com/changesets/changesets/blob/main/docs/prereleases.md) add significant workflow complexity.
 
-2. Merge into feature branch on origin
-    * Push commit + git tag to origin. example: `git push origin feat-the-feature && git push --tags origin`
+1. Create a feature branch off of `main` (e.g. `feat-the-feature` or `2.5.0rc`) and ensure it has the latest changes from `main` via rebase or merge.
 
-3. Distribute the release
-    *  Publish to the package manager. Once you have permission to publish on npm, you can run `npm publish . --otp YOUR_OTP_CODE`.
-        * Update `latest` dist-tag on npm back to the last non beta release `npm dist-tag add @slack/bolt@VERSION latest --otp YOUR-OTP-CODE`
-        * Add a new dist-tag for your feature. `npm dist-tag add @slack/bolt@VERSION-BetaNameSpace-BetaVersion feat-the-feature --otp YOUR-OTP-CODE`
-    *  Create a GitHub Release with release notes. Release notes should mention contributors (@-mentions) and issues/PRs (#-mentions) for the release. Make sure to check the pre release option.
-    *  Example release: https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.1.1-workflowStepsBeta.1
+2. On the feature branch, bump the version and commit:
 
+   ```sh
+   npm version 2.1.1-workflowStepsBeta.1 --no-git-tag-version
+   git add package.json
+   git commit -m "chore(release): version 2.1.1-workflowStepsBeta.1"
+   ```
+
+3. Tag and push the branch to origin:
+
+   ```sh
+   git tag @slack/bolt@2.1.1-workflowStepsBeta.1
+   git push origin feat-the-feature @slack/bolt@2.1.1-workflowStepsBeta.1
+   ```
+
+4. Publish to npm with a non-`latest` dist-tag:
+
+   ```sh
+   npm publish --tag <dist-tag> --otp YOUR_OTP_CODE
+   ```
+
+   Verify with `npm info @slack/bolt dist-tags`. If `latest` was accidentally overwritten:
+
+   ```sh
+   npm dist-tag add @slack/bolt@VERSION latest --otp YOUR_OTP_CODE
+   ```
+
+5. (Optional) Create a [GitHub Release](https://github.com/slackapi/bolt-js/releases/new) and mark it as a **pre-release**. Release notes should mention contributors and issues/PRs.
+   - Example release: https://github.com/slackapi/bolt-js/releases/tag/%40slack%2Fbolt%402.1.1-workflowStepsBeta.1
 
 ## Workflow
 
@@ -171,18 +171,17 @@ After a major version increment, there also may be maintenance branches created 
 
 Labels are used to run issues through an organized workflow. Here are the basic definitions:
 
-*  `bug`: A confirmed bug report. A bug is considered confirmed when reproduction steps have been
-   documented and the issue has been reproduced.
-*  `enhancement`: A feature request for something this package might not already do.
-*  `docs`: An issue that is purely about documentation work.
-*  `tests`: An issue that is purely about testing work.
-*  `needs feedback`: An issue that may have claimed to be a bug but was not reproducible, or was otherwise missing some information.
-*  `discussion`: An issue that is purely meant to hold a discussion. Typically the maintainers are looking for feedback in this issues.
-*  `question`: An issue that is like a support request because the user's usage was not correct.
-*  `semver:major|minor|patch`: Metadata about how resolving this issue would affect the version number.
-*  `security`: An issue that has special consideration for security reasons.
-*  `good first contribution`: An issue that has a well-defined relatively-small scope, with clear expectations. It helps when the testing approach is also known.
-*  `duplicate`: An issue that is functionally the same as another issue. Apply this only if you've linked the other issue by number.
+- `bug`: A confirmed bug report. A bug is considered confirmed when reproduction steps have been documented and the issue has been reproduced.
+- `enhancement`: A feature request for something this package might not already do.
+- `docs`: An issue that is purely about documentation work.
+- `tests`: An issue that is purely about testing work.
+- `needs feedback`: An issue that may have claimed to be a bug but was not reproducible, or was otherwise missing some information.
+- `discussion`: An issue that is purely meant to hold a discussion. Typically the maintainers are looking for feedback in this issues.
+- `question`: An issue that is like a support request because the user's usage was not correct.
+- `semver:major|minor|patch`: Metadata about how resolving this issue would affect the version number.
+- `security`: An issue that has special consideration for security reasons.
+- `good first contribution`: An issue that has a well-defined relatively-small scope, with clear expectations. It helps when the testing approach is also known.
+- `duplicate`: An issue that is functionally the same as another issue. Apply this only if you've linked the other issue by number.
 
 **Triage** is the process of taking new issues that aren't yet "seen" and marking them with a basic
 level of information with labels. An issue should have **one** of the following labels applied:

@@ -25,6 +25,7 @@
     "npm": ">=8.6.0"
   },
   "scripts": {
+    "changeset": "npx @changesets/cli",
     "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
@@ -58,6 +59,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
+    "@changesets/cli": "^2.29.8",
     "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
