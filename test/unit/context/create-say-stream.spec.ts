@@ -1,5 +1,5 @@
 import { WebClient } from '@slack/web-api';
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import { createSayStream } from '../../../src/context';
 import type { Context } from '../../../src/types';

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import type { WebClient } from '@slack/web-api';
-import { assert } from './helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import {
   type AllWorkflowStepMiddlewareArgs,
@@ -38,12 +38,12 @@ describe('WorkflowStep class', () => {
   describe('constructor', () => {
     it('should accept config as single functions', async () => {
       const ws = new WorkflowStep('test_callback_id', MOCK_CONFIG_SINGLE);
-      assert.isNotNull(ws);
+      assert.notStrictEqual(ws, null);
     });
 
     it('should accept config as multiple functions', async () => {
       const ws = new WorkflowStep('test_callback_id', MOCK_CONFIG_MULTIPLE);
-      assert.isNotNull(ws);
+      assert.notStrictEqual(ws, null);
     });
   });
 
@@ -153,9 +153,9 @@ describe('WorkflowStep class', () => {
       const viewIsStepEvent = isStepEvent(fakeSaveArgs);
       const executeIsStepEvent = isStepEvent(fakeExecuteArgs);
 
-      assert.isTrue(editIsStepEvent);
-      assert.isTrue(viewIsStepEvent);
-      assert.isTrue(executeIsStepEvent);
+      assert.strictEqual(editIsStepEvent, true);
+      assert.strictEqual(viewIsStepEvent, true);
+      assert.strictEqual(executeIsStepEvent, true);
     });
 
     it('should return false if not a recognized workflow step payload type', async () => {
@@ -165,7 +165,7 @@ describe('WorkflowStep class', () => {
       const { isStepEvent } = importWorkflowStep();
       const actionIsStepEvent = isStepEvent(fakeEditArgs);
 
-      assert.isFalse(actionIsStepEvent);
+      assert.strictEqual(actionIsStepEvent, false);
     });
   });
 
@@ -182,9 +182,9 @@ describe('WorkflowStep class', () => {
       const viewStepArgs = prepareStepArgs(fakeSaveArgs);
       const executeStepArgs = prepareStepArgs(fakeExecuteArgs);
 
-      assert.notExists(editStepArgs.next);
-      assert.notExists(viewStepArgs.next);
-      assert.notExists(executeStepArgs.next);
+      assert.equal(editStepArgs.next ?? null, null);
+      assert.equal(viewStepArgs.next ?? null, null);
+      assert.equal(executeStepArgs.next ?? null, null);
     });
 
     it('should augment workflow_step_edit args with step and configure()', async () => {
@@ -193,8 +193,8 @@ describe('WorkflowStep class', () => {
       // casting to returned type because prepareStepArgs isn't built to do so
       const stepArgs = prepareStepArgs(fakeArgs as AllWorkflowStepMiddlewareArgs<WorkflowStepEditMiddlewareArgs>);
 
-      assert.exists(stepArgs.step);
-      assert.property(stepArgs, 'configure');
+      assert.notEqual(stepArgs.step ?? null, null);
+      assert.ok('configure' in stepArgs);
     });
 
     it('should augment view_submission with step and update()', async () => {
@@ -205,8 +205,8 @@ describe('WorkflowStep class', () => {
         fakeArgs as unknown as AllWorkflowStepMiddlewareArgs<WorkflowStepSaveMiddlewareArgs>,
       );
 
-      assert.exists(stepArgs.step);
-      assert.property(stepArgs, 'update');
+      assert.notEqual(stepArgs.step ?? null, null);
+      assert.ok('update' in stepArgs);
     });
 
     it('should augment workflow_step_execute with step, complete() and fail()', async () => {
@@ -217,9 +217,9 @@ describe('WorkflowStep class', () => {
         fakeArgs as unknown as AllWorkflowStepMiddlewareArgs<WorkflowStepExecuteMiddlewareArgs>,
       );
 
-      assert.exists(stepArgs.step);
-      assert.property(stepArgs, 'complete');
-      assert.property(stepArgs, 'fail');
+      assert.notEqual(stepArgs.step ?? null, null);
+      assert.ok('complete' in stepArgs);
+      assert.ok('fail' in stepArgs);
     });
   });
 

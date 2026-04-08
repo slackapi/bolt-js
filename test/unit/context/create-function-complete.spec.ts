@@ -1,5 +1,5 @@
 import { WebClient } from '@slack/web-api';
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import { createFunctionComplete } from '../../../src/context';
 import { describe, it } from 'node:test';
@@ -29,9 +29,9 @@ describe('createFunctionComplete', () => {
     sinon.stub(client.functions, 'completeSuccess').resolves();
     const complete = createFunctionComplete({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
 
-    assert.isFalse(complete.hasBeenCalled(), 'hasBeenCalled should be false initially');
+    assert.strictEqual(complete.hasBeenCalled(), false, 'hasBeenCalled should be false initially');
 
     await complete();
-    assert.isTrue(complete.hasBeenCalled(), 'hasBeenCalled should be true after invoking complete');
+    assert.strictEqual(complete.hasBeenCalled(), true, 'hasBeenCalled should be true after invoking complete');
   });
 });

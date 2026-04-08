@@ -1,4 +1,4 @@
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import type App from '../../../src/App';
 import {
@@ -66,8 +66,8 @@ describe('App function() routing', () => {
       const testInputs = { test: true };
       const testHandler = sinon.spy(async ({ inputs, complete, fail, client }) => {
         assert.equal(inputs, testInputs);
-        assert.typeOf(complete, 'function');
-        assert.typeOf(fail, 'function');
+        assert.strictEqual(typeof complete, 'function');
+        assert.strictEqual(typeof fail, 'function');
         assert.equal(client.token, 'xwfp-valid');
       });
       app.function('my_id', testHandler);

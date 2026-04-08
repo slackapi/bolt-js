@@ -3,7 +3,7 @@ import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import type { InstallProvider } from '@slack/oauth';
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import type { Application, IRouter, Request, Response } from 'express';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';
@@ -87,7 +87,7 @@ describe('ExpressReceiver', () => {
         },
         customPropertiesExtractor: (req) => ({ headers: req.headers }),
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
     it('should accept custom Express app / router', async () => {
       const app = {
@@ -114,7 +114,7 @@ describe('ExpressReceiver', () => {
         app: app as unknown as Application,
         router: router as unknown as IRouter,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(app.use);
       sinon.assert.calledOnce(router.get);
       sinon.assert.calledOnce(router.post);
@@ -139,10 +139,9 @@ describe('ExpressReceiver', () => {
         redirectUri,
         installerOptions,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       // missing redirectUriPath
-      assert.throws(
-        () =>
+      assert.throws(() =>
           new ExpressReceiver({
             clientId,
             clientSecret,
@@ -150,12 +149,9 @@ describe('ExpressReceiver', () => {
             stateSecret,
             scopes,
             redirectUri,
-          }),
-        AppInitializationError,
-      );
+          }), AppInitializationError);
       // inconsistent redirectUriPath
-      assert.throws(
-        () =>
+      assert.throws(() =>
           new ExpressReceiver({
             clientId: 'my-clientId',
             clientSecret,
@@ -166,12 +162,9 @@ describe('ExpressReceiver', () => {
             installerOptions: {
               redirectUriPath: '/hiya',
             },
-          }),
-        AppInitializationError,
-      );
+          }), AppInitializationError);
       // inconsistent redirectUri
-      assert.throws(
-        () =>
+      assert.throws(() =>
           new ExpressReceiver({
             clientId: 'my-clientId',
             clientSecret,
@@ -180,9 +173,7 @@ describe('ExpressReceiver', () => {
             scopes,
             redirectUri: 'http://example.com/hiya',
             installerOptions,
-          }),
-        AppInitializationError,
-      );
+          }), AppInitializationError);
     });
   });
 
@@ -231,7 +222,7 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, Error);
+      assert.ok(caughtError instanceof Error);
     });
     it('should reject with an error when the built-in HTTP server returns undefined', async () => {
       const fakeCreateUndefinedServer = sinon.fake.returns(undefined);
@@ -250,8 +241,10 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+            assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok('code' in caughtError);
+      assert.deepStrictEqual((caughtError as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ReceiverInconsistentStateError);
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = importExpressReceiver(overrides);
@@ -266,8 +259,10 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+            assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok('code' in caughtError);
+      assert.deepStrictEqual((caughtError as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ReceiverInconsistentStateError);
     });
   });
 
@@ -291,8 +286,10 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+            assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok('code' in caughtError);
+      assert.deepStrictEqual((caughtError as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ReceiverInconsistentStateError);
     });
     it('should reject when a built-in HTTP server raises an error when closing', async () => {
       fakeServer = new FakeServer(
@@ -315,7 +312,7 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, Error);
+      assert.ok(caughtError instanceof Error);
       assert.equal(caughtError?.message, 'this error will be raised by the underlying HTTP server during close()');
     });
   });
@@ -613,21 +610,21 @@ describe('ExpressReceiver', () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildExpressRequest(), state);
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     it('should verify requests on GCP', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state);
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     it('should verify requests on GCP using async signingSecret', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state, () => Promise.resolve(signingSecret));
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     // ----------------------------

@@ -1,4 +1,4 @@
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import { AuthorizationError, ReceiverMultipleAckError } from '../../../src/errors';
 import { defaultProcessEventErrorHandler } from '../../../src/receivers/SocketModeFunctions';
 import type { ReceiverEvent } from '../../../src/types';
@@ -20,7 +20,7 @@ describe('SocketModeFunctions', async () => {
           logger,
           event,
         });
-        assert.isFalse(shouldBeAcked);
+        assert.strictEqual(shouldBeAcked, false);
       });
       it('should return true if passed an AuthorizationError', async () => {
         const event: ReceiverEvent = {
@@ -32,7 +32,7 @@ describe('SocketModeFunctions', async () => {
           logger,
           event,
         });
-        assert.isTrue(shouldBeAcked);
+        assert.strictEqual(shouldBeAcked, true);
       });
     });
   });

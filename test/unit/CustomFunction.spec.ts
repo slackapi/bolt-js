@@ -1,4 +1,4 @@
-import { assert } from './helpers/assert';
+import assert from 'node:assert/strict';
 import {
   CustomFunction,
   type SlackCustomFunctionMiddlewareArgs,
@@ -20,12 +20,12 @@ describe('CustomFunction', () => {
   describe('constructor', () => {
     it('should accept single function as middleware', async () => {
       const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
-      assert.isNotNull(fn);
+      assert.notStrictEqual(fn, null);
     });
 
     it('should accept multiple functions as middleware', async () => {
       const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE, { autoAcknowledge: true });
-      assert.isNotNull(fn);
+      assert.notStrictEqual(fn, null);
     });
   });
 
@@ -46,7 +46,7 @@ describe('CustomFunction', () => {
       const cbId = 'test_executed_callback_id';
       const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: false });
       const listeners = fn.getListeners();
-      assert.isFalse(listeners.includes(autoAcknowledge));
+      assert.strictEqual(listeners.includes(autoAcknowledge), false);
     });
   });
 

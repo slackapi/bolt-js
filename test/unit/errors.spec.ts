@@ -1,4 +1,4 @@
-import { assert } from './helpers/assert';
+import assert from 'node:assert/strict';
 import {
   AppInitializationError,
   AuthorizationError,
@@ -29,7 +29,7 @@ describe('Errors', () => {
   });
 
   it('wraps non-coded errors', () => {
-    assert.instanceOf(asCodedError(new Error('AHH!')), UnknownError);
+    assert.ok(asCodedError(new Error('AHH!')) instanceof UnknownError);
   });
 
   it('passes coded errors through', () => {

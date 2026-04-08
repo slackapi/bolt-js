@@ -1,4 +1,4 @@
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { SocketModeResponseAck } from '../../../src/receivers/SocketModeResponseAck';
@@ -19,8 +19,8 @@ describe('SocketModeResponseAck', async () => {
       logger: fakeLogger,
       socketModeClientAck: fakeSocketModeClientAck,
     });
-    assert.isDefined(responseAck);
-    assert.isDefined(responseAck.bind());
+    assert.notStrictEqual(responseAck, undefined);
+    assert.notStrictEqual(responseAck.bind(), undefined);
     expectType<ResponseAck>(responseAck);
   });
 

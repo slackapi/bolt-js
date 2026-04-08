@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto';
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import { isValidSlackRequest, verifySlackRequest } from '../../../src/receivers/verify-request';
 import { describe, it } from 'node:test';
 
@@ -38,11 +38,9 @@ describe('Request verification', async () => {
           body: rawBody,
         });
       } catch (e) {
-        assert.propertyVal(
-          e,
-          'message',
-          'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
-        );
+                assert.ok(e && typeof e === 'object');
+        assert.ok('message' in e);
+        assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale');
       }
     });
     it('should detect an invalid signature', async () => {
@@ -58,7 +56,9 @@ describe('Request verification', async () => {
           body: rawBody,
         });
       } catch (e) {
-        assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
+                assert.ok(e && typeof e === 'object');
+        assert.ok('message' in e);
+        assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: signature mismatch');
       }
     });
   });
@@ -70,16 +70,14 @@ describe('Request verification', async () => {
       const hmac = createHmac('sha256', signingSecret);
       hmac.update(`v0:${timestamp}:${rawBody}`);
       const signature = hmac.digest('hex');
-      assert.isTrue(
-        isValidSlackRequest({
+      assert.strictEqual(isValidSlackRequest({
           signingSecret,
           headers: {
             'x-slack-signature': `v0=${signature}`,
             'x-slack-request-timestamp': timestamp,
           },
           body: rawBody,
-        }),
-      );
+        }), true);
     });
     it('should detect an invalid timestamp', async () => {
       const timestamp = Math.floor(Date.now() / 1000) - 600; // 10 minutes
@@ -87,30 +85,26 @@ describe('Request verification', async () => {
       const hmac = createHmac('sha256', signingSecret);
       hmac.update(`v0:${timestamp}:${rawBody}`);
       const signature = hmac.digest('hex');
-      assert.isFalse(
-        isValidSlackRequest({
+      assert.strictEqual(isValidSlackRequest({
           signingSecret,
           headers: {
             'x-slack-signature': `v0=${signature}`,
             'x-slack-request-timestamp': timestamp,
           },
           body: rawBody,
-        }),
-      );
+        }), false);
     });
     it('should detect an invalid signature', async () => {
       const timestamp = Math.floor(Date.now() / 1000);
       const rawBody = '{"foo":"bar"}';
-      assert.isFalse(
-        isValidSlackRequest({
+      assert.strictEqual(isValidSlackRequest({
           signingSecret,
           headers: {
             'x-slack-signature': 'v0=invalid-signature',
             'x-slack-request-timestamp': timestamp,
           },
           body: rawBody,
-        }),
-      );
+        }), false);
     });
   });
 });

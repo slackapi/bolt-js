@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
-import { assert, AssertionError } from './helpers/assert';
+import assert, { AssertionError } from 'node:assert/strict';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
@@ -70,8 +70,8 @@ describe('conversationContext middleware', () => {
     // Assert
     assert(fakeLogger.debug.called);
     assert(fakeNext.called);
-    assert.notProperty(dummyContext, 'updateConversation');
-    assert.notProperty(dummyContext, 'conversation');
+    assert.ok(!('updateConversation' in dummyContext));
+    assert.ok(!('conversation' in dummyContext));
   });
 
   it('should add to the context for events within a conversation that was not previously stored and pass expiresAt', async () => {
@@ -101,7 +101,7 @@ describe('conversationContext middleware', () => {
     await middleware(fakeArgs);
 
     assert(fakeNext.called);
-    assert.notProperty(dummyContext, 'conversation');
+    assert.ok(!('conversation' in dummyContext));
     if (dummyContext.updateConversation === undefined) {
       assert.fail();
     }
@@ -137,7 +137,7 @@ describe('conversationContext middleware', () => {
 
     // Assert
     assert(fakeNext.called);
-    assert.notProperty(dummyContext, 'conversation');
+    assert.ok(!('conversation' in dummyContext));
     // NOTE: node:assert types do not offer assertion signatures here.
     if (dummyContext.updateConversation === undefined) {
       assert.fail();
@@ -196,7 +196,7 @@ describe('MemoryStore', () => {
       const store = new MemoryStore();
 
       // Assert
-      assert.isOk(store);
+      assert.ok(store);
     });
   });
 
@@ -230,8 +230,8 @@ describe('MemoryStore', () => {
         assert.fail();
       } catch (error) {
         // Assert
-        assert.instanceOf(error, Error);
-        assert.notInstanceOf(error, AssertionError);
+        assert.ok(error instanceof Error);
+        assert.ok(!(error instanceof AssertionError));
       }
     });
 
@@ -251,8 +251,8 @@ describe('MemoryStore', () => {
         assert.fail();
       } catch (error) {
         // Assert
-        assert.instanceOf(error, Error);
-        assert.notInstanceOf(error, AssertionError);
+        assert.ok(error instanceof Error);
+        assert.ok(!(error instanceof AssertionError));
       }
     });
   });

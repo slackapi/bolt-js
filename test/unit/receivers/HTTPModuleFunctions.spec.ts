@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import { describe, it } from 'node:test';
 
@@ -15,7 +15,7 @@ describe('HTTPModuleFunctions', async () => {
       it('should work when the header does not exist', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         const result = func.extractRetryNumFromHTTPRequest(req);
-        assert.isUndefined(result);
+        assert.strictEqual(result, undefined);
       });
       it('should parse a single value header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -34,7 +34,7 @@ describe('HTTPModuleFunctions', async () => {
       it('should work when the header does not exist', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         const result = func.extractRetryReasonFromHTTPRequest(req);
-        assert.isUndefined(result);
+        assert.strictEqual(result, undefined);
       });
       it('should parse a valid header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -78,7 +78,7 @@ describe('HTTPModuleFunctions', async () => {
           func.getHeader(req, 'Cookie');
           assert.fail('Error should be thrown here');
         } catch (e) {
-          assert.isTrue((e as Error).message.length > 0);
+          assert.strictEqual((e as Error).message.length > 0, true);
         }
       });
       it('should parse a valid header', async () => {
@@ -107,7 +107,7 @@ describe('HTTPModuleFunctions', async () => {
         } as unknown as BufferedIncomingMessage;
         const res = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
-        assert.isDefined(result.rawBody);
+        assert.notStrictEqual(result.rawBody, undefined);
       });
       it('should detect an invalid timestamp', async () => {
         const signingSecret = 'secret';
@@ -128,11 +128,9 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.propertyVal(
-            e,
-            'message',
-            'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
-          );
+                    assert.ok(e && typeof e === 'object');
+          assert.ok('message' in e);
+          assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale');
         }
       });
       it('should detect an invalid signature', async () => {
@@ -151,7 +149,9 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
+                    assert.ok(e && typeof e === 'object');
+          assert.ok('message' in e);
+          assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: signature mismatch');
         }
       });
       it('should parse a ssl_check request body without signature verification', async () => {
@@ -165,7 +165,7 @@ describe('HTTPModuleFunctions', async () => {
         } as unknown as BufferedIncomingMessage;
         const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
-        assert.isDefined(result.rawBody);
+        assert.notStrictEqual(result.rawBody, undefined);
         assert.equal(result.rawBody.toString(), 'ssl_check=1');
       });
       it('should strip smuggled event payloads from ssl_check requests', async () => {
@@ -195,7 +195,8 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.ok(e instanceof Error);
+          assert.match(e.message, /Failed to verify authenticity/);
         }
       });
       it('should not bypass signature verification when ssl_check=true', async () => {
@@ -212,7 +213,8 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.ok(e instanceof Error);
+          assert.match(e.message, /Failed to verify authenticity/);
         }
       });
       it('should not bypass signature verification for ssl_check=1 with JSON content-type', async () => {
@@ -229,7 +231,8 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.ok(e instanceof Error);
+          assert.match(e.message, /Failed to verify authenticity/);
         }
       });
       it('should not bypass signature verification when ssl_check is empty', async () => {
@@ -246,7 +249,8 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.ok(e instanceof Error);
+          assert.match(e.message, /Failed to verify authenticity/);
         }
       });
       it('should detect invalid signature for application/x-www-form-urlencoded body', async () => {
@@ -265,7 +269,9 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
+                    assert.ok(e && typeof e === 'object');
+          assert.ok('message' in e);
+          assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: signature mismatch');
         }
       });
     });
@@ -275,24 +281,24 @@ describe('HTTPModuleFunctions', async () => {
     it('should have buildContentResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildContentResponse(res as unknown as ServerResponse, 'OK');
-      assert.isTrue(res.writeHead.calledWith(200));
+      assert.strictEqual(res.writeHead.calledWith(200), true);
     });
     it('should have buildNoBodyResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildNoBodyResponse(res as unknown as ServerResponse, 500);
-      assert.isTrue(res.writeHead.calledWith(500));
+      assert.strictEqual(res.writeHead.calledWith(500), true);
     });
     it('should have buildSSLCheckResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildSSLCheckResponse(res as unknown as ServerResponse);
-      assert.isTrue(res.writeHead.calledWith(200));
+      assert.strictEqual(res.writeHead.calledWith(200), true);
     });
     it('should have buildUrlVerificationResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildUrlVerificationResponse(res as unknown as ServerResponse, {
         challenge: '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P',
       });
-      assert.isTrue(res.writeHead.calledWith(200));
+      assert.strictEqual(res.writeHead.calledWith(200), true);
     });
   });
 
@@ -309,7 +315,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(500));
+        assert.strictEqual(response.writeHead.calledWith(500), true);
       });
       it('should properly handle HTTPReceiverDeferredRequestError', async () => {
         const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -320,7 +326,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(404));
+        assert.strictEqual(response.writeHead.calledWith(404), true);
       });
     });
 
@@ -335,7 +341,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(500));
+        assert.strictEqual(response.writeHead.calledWith(500), true);
       });
       it('should properly handle AuthorizationError', async () => {
         const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -347,7 +353,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(401));
+        assert.strictEqual(response.writeHead.calledWith(401), true);
       });
     });
 
@@ -360,7 +366,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(404));
+        assert.strictEqual(response.writeHead.calledWith(404), true);
       });
     });
   });

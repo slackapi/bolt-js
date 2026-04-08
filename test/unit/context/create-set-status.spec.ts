@@ -1,5 +1,5 @@
 import { WebClient } from '@slack/web-api';
-import { assert } from '../helpers/assert';
+import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import { createSetStatus } from '../../../src/context';
 import { afterEach, beforeEach, describe, it } from 'node:test';
