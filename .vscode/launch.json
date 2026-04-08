@@ -12,18 +12,15 @@
       "stopOnEntry": false,
       "args": [
         "--inspect-brk",
-        "--require",
-        "ts-node/register",
-        "--require",
-        "source-map-support/register",
+        "--import",
+        "tsx",
         "--test",
         "test/unit/**/*.spec.ts"
       ],
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "testing",
-        "TS_NODE_FILES": "true",
-        "TS_NODE_PROJECT": "tsconfig.test.json"
+        "TSX_TSCONFIG_PATH": "tsconfig.test.json"
       },
       "skipFiles": ["<node_internals>/**"]
     }

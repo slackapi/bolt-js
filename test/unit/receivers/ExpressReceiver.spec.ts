@@ -19,7 +19,6 @@ import ExpressReceiver, {
   verifySignatureAndParseRawBody,
   buildBodyParserMiddleware,
 } from '../../../src/receivers/ExpressReceiver';
-import * as httpFunc from '../../../src/receivers/HTTPModuleFunctions';
 import type { ReceiverEvent } from '../../../src/types';
 import {
   FakeServer,
@@ -30,7 +29,7 @@ import {
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
-import { afterEach, beforeEach, after, describe, it } from 'node:test';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 
 // Loading the system under test using overrides
 function importExpressReceiver(
@@ -318,10 +317,10 @@ describe('ExpressReceiver', () => {
   });
 
   describe('#requestHandler()', () => {
-    const extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
-    const extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
-    const buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
-    const buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
+    let extractRetryNumStub: sinon.SinonStub;
+    let extractRetryReasonStub: sinon.SinonStub;
+    let buildNoBodyResponseStub: sinon.SinonStub;
+    let buildContentResponseStub: sinon.SinonStub;
     const processStub = sinon.stub<[ReceiverEvent]>().resolves({});
     const ackStub = function ackStub() {};
     ackStub.prototype.bind = function () {
@@ -329,20 +328,26 @@ describe('ExpressReceiver', () => {
     };
     ackStub.prototype.ack = sinon.spy();
     beforeEach(() => {
+      extractRetryNumStub = sinon.stub().returns(undefined);
+      extractRetryReasonStub = sinon.stub().returns(undefined);
+      buildNoBodyResponseStub = sinon.stub().returns(undefined);
+      buildContentResponseStub = sinon.stub().returns(undefined);
       overrides = mergeOverrides(
         withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         { './HTTPResponseAck': { HTTPResponseAck: ackStub } },
+        {
+          './HTTPModuleFunctions': {
+            extractRetryNumFromHTTPRequest: extractRetryNumStub,
+            extractRetryReasonFromHTTPRequest: extractRetryReasonStub,
+            buildNoBodyResponse: buildNoBodyResponseStub,
+            buildContentResponse: buildContentResponseStub,
+          },
+        },
       );
     });
     afterEach(() => {
       sinon.reset();
-    });
-    after(() => {
-      extractRetryNumStub.restore();
-      extractRetryReasonStub.restore();
-      buildNoBodyResponseStub.restore();
-      buildContentResponseStub.restore();
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);
