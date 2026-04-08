@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import type App from '../../../src/App';
 import {

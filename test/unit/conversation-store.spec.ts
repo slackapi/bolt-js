@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
-import { assert, AssertionError } from 'chai';
+import { assert, AssertionError } from './helpers/assert';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
@@ -137,7 +137,7 @@ describe('conversationContext middleware', () => {
     // Assert
     assert(fakeNext.called);
     assert.notProperty(dummyContext, 'conversation');
-    // NOTE: chai types do not offer assertion signatures yet, and neither do node's assert module types.
+    // NOTE: node:assert types do not offer assertion signatures here.
     if (dummyContext.updateConversation === undefined) {
       assert.fail();
     }
@@ -173,7 +173,7 @@ describe('conversationContext middleware', () => {
 
     // Assert
     assert.equal(dummyContext.conversation, dummyConversationState);
-    // NOTE: chai types do not offer assertion signatures yet, and neither do node's assert module types.
+    // NOTE: node:assert types do not offer assertion signatures here.
     if (dummyContext.updateConversation === undefined) {
       assert.fail();
     }

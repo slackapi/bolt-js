@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { AssistantThreadStartedEvent } from '@slack/types';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
+import { assert } from './helpers/assert';
 import sinon from 'sinon';
 import {
   type AllAssistantMiddlewareArgs,

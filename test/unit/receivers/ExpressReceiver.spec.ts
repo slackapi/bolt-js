@@ -3,7 +3,7 @@ import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import type { InstallProvider } from '@slack/oauth';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import type { Application, IRouter, Request, Response } from 'express';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';

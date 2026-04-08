@@ -1,5 +1,5 @@
 import { LogLevel } from '@slack/logger';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';

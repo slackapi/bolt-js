@@ -1,5 +1,5 @@
 import { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { createFunctionFail } from '../../../src/context';
 

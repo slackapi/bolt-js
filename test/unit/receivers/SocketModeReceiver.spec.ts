@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import sinon from 'sinon';

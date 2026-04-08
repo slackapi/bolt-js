@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import { isValidSlackRequest, verifySlackRequest } from '../../../src/receivers/verify-request';
 
 describe('Request verification', async () => {

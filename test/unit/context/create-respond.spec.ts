@@ -1,5 +1,5 @@
 import type { AxiosInstance } from 'axios';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { createRespond } from '../../../src/context';
 

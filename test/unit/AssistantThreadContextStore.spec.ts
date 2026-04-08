@@ -1,5 +1,5 @@
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
+import { assert } from './helpers/assert';
 import sinon from 'sinon';
 import { extractThreadInfo } from '../../src/Assistant';
 import { DefaultThreadContextStore } from '../../src/AssistantThreadContextStore';

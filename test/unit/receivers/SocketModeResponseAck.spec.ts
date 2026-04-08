@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { SocketModeResponseAck } from '../../../src/receivers/SocketModeResponseAck';

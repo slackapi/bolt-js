@@ -1,5 +1,5 @@
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
+import { assert } from '../../helpers/assert';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import type { ExtendedErrorHandlerArgs } from '../../../../src/App';

@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ReceiverMultipleAckError } from '../../../src/errors';
@@ -52,7 +52,7 @@ describe('HTTPResponseAck', async () => {
       'a 3 seconds timeout for the unhandledRequestHandler callback is expected',
     );
   });
-  it('should trigger unhandledRequestHandler if unacknowledged', (done) => {
+  it('should trigger unhandledRequestHandler if unacknowledged', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const unhandledRequestTimeoutMillis = 1;
@@ -70,12 +70,10 @@ describe('HTTPResponseAck', async () => {
       unhandledRequestTimeoutMillis,
       `a ${unhandledRequestTimeoutMillis} timeout for the unhandledRequestHandler callback is expected`,
     );
-    setTimeout(() => {
-      assert(spy.calledOnce);
-      done();
-    }, 2);
+    await new Promise((resolve) => setTimeout(resolve, 2));
+    assert(spy.calledOnce);
   });
-  it('should not trigger unhandledRequestHandler if acknowledged', (done) => {
+  it('should not trigger unhandledRequestHandler if acknowledged', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const spy = sinon.spy();
@@ -88,10 +86,8 @@ describe('HTTPResponseAck', async () => {
       httpResponse,
     });
     responseAck.ack();
-    setTimeout(() => {
-      assert(spy.notCalled);
-      done();
-    }, 2);
+    await new Promise((resolve) => setTimeout(resolve, 2));
+    assert(spy.notCalled);
   });
   it('should throw an error if a bound Ack invocation was already acknowledged', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;

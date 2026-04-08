@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import { assert } from '../../helpers/assert';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import { ErrorCode, isCodedError } from '../../../../src/errors';

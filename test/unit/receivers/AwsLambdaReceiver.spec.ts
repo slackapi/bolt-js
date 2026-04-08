@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {

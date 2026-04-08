@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import { assert } from '../helpers/assert';
 import { AuthorizationError, ReceiverMultipleAckError } from '../../../src/errors';
 import { defaultProcessEventErrorHandler } from '../../../src/receivers/SocketModeFunctions';
 import type { ReceiverEvent } from '../../../src/types';
