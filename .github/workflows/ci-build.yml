@@ -19,7 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version:
+          - 18.x
+          - 20.x
+          - 22.x
+          - 24.x
     permissions:
       contents: read
     steps:
@@ -27,14 +31,14 @@ jobs:
         with:
           persist-credentials: false
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install --verbose
       - run: npm test
       - name: Upload coverage to Codecov
         if: matrix.node-version == '22.x'
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: coverage
@@ -47,7 +51,7 @@ jobs:
     if: ${{ !success() && github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Send notifications of failing tests
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
           errors: true
           webhook: ${{ secrets.SLACK_REGRESSION_FAILURES_WEBHOOK_URL }}

@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "4.6.0",
+  "version": "4.7.0",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -36,7 +36,10 @@
     "test:types": "tsd --files test/types",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
-  "repository": "slackapi/bolt-js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slackapi/bolt-js.git"
+  },
   "homepage": "https://docs.slack.dev/tools/bolt-js",
   "bugs": {
     "url": "https://github.com/slackapi/bolt-js/issues"
