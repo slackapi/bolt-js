@@ -32,10 +32,10 @@
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "prepare": "npm run build",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
-    "test:unit": "TS_NODE_PROJECT=tsconfig.test.json TS_NODE_FILES=true node --require ts-node/register --require source-map-support/register --require ./test/unit/node-test-globals.cjs --test test/unit/**/*.spec.ts",
-    "test:coverage": "TS_NODE_PROJECT=tsconfig.test.json TS_NODE_FILES=true node --experimental-test-coverage --require ts-node/register --require source-map-support/register --require ./test/unit/node-test-globals.cjs --test test/unit/**/*.spec.ts",
-    "test:types": "tsd --files test/types", 
-    "version": "npm run changeset version && npm install",
+    "test:unit": "TS_NODE_PROJECT=tsconfig.test.json TS_NODE_FILES=true node --require ts-node/register --require source-map-support/register --test test/unit/**/*.spec.ts",
+    "test:coverage": "TS_NODE_PROJECT=tsconfig.test.json TS_NODE_FILES=true node --experimental-test-coverage --require ts-node/register --require source-map-support/register --test test/unit/**/*.spec.ts",
+    "test:types": "tsd --files test/types",
+    "version": "npm run changeset version && npm install", 
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": {

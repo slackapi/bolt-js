@@ -24,6 +24,7 @@ import {
   wrapMiddleware,
 } from './helpers';
 import { team } from './helpers/events';
+import { describe, it } from 'node:test';
 
 function importAssistant(overrides: Override = {}): typeof import('../../src/Assistant') {
   const absolutePath = path.resolve(__dirname, '../../src/Assistant');

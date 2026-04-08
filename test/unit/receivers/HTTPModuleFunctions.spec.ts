@@ -2,6 +2,7 @@ import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { assert } from '../helpers/assert';
 import sinon from 'sinon';
+import { describe, it } from 'node:test';
 
 import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../../../src/errors';
 import type { BufferedIncomingMessage } from '../../../src/receivers/BufferedIncomingMessage';

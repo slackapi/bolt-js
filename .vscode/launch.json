@@ -16,15 +16,14 @@
         "ts-node/register",
         "--require",
         "source-map-support/register",
-        "--require",
-        "./test/unit/node-test-globals.cjs",
         "--test",
         "test/unit/**/*.spec.ts"
       ],
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "testing",
-        "TS_NODE_PROJECT": "tsconfig.json"
+        "TS_NODE_FILES": "true",
+        "TS_NODE_PROJECT": "tsconfig.test.json"
       },
       "skipFiles": ["<node_internals>/**"]
     }

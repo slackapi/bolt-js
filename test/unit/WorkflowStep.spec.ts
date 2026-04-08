@@ -15,6 +15,7 @@ import {
 import { WorkflowStepInitializationError } from '../../src/errors';
 import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
 import { type Override, noopVoid, proxyquire } from './helpers';
+import { describe, it } from 'node:test';
 
 function importWorkflowStep(overrides: Override = {}): typeof import('../../src/WorkflowStep') {
   const absolutePath = path.resolve(__dirname, '../../src/WorkflowStep');

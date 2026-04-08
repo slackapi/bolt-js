@@ -2,6 +2,7 @@ import { WebClient } from '@slack/web-api';
 import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { createSay } from '../../../src/context';
+import { describe, it } from 'node:test';
 
 describe('createSay', () => {
   it('should call chat.postMessage with text when given a string', async () => {

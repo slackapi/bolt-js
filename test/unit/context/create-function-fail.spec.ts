@@ -2,6 +2,7 @@ import { WebClient } from '@slack/web-api';
 import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { createFunctionFail } from '../../../src/context';
+import { describe, it } from 'node:test';
 
 describe('createFunctionFail', () => {
   it('fail should call functions.completeError', async () => {

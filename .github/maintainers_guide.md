@@ -21,7 +21,7 @@ Test code should be written in syntax that runs on the oldest supported Node.js 
 
 #### Debugging
 
-A useful trick for debugging inside tests is to use the Chrome Debugging Protocol feature of Node.js to set breakpoints and interactively debug. In order to do this you should have already linted the source (`npm run lint`), manually. You can then run a specific test file with Node.js's test runner, for example: `node --inspect-brk --require ts-node/register --require source-map-support/register --require ./test/unit/node-test-globals.cjs --test test/unit/{test-name}.spec.ts` (replace `{test-name}` with an actual test file path).
+A useful trick for debugging inside tests is to use the Chrome Debugging Protocol feature of Node.js to set breakpoints and interactively debug. In order to do this you should have already linted the source (`npm run lint`), manually. You can then run a specific test file with Node.js's test runner, for example: `node --inspect-brk --require ts-node/register --require source-map-support/register --test test/unit/{test-name}.spec.ts` (replace `{test-name}` with an actual test file path).
 
 #### Local Development
 

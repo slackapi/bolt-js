@@ -5,6 +5,7 @@ import { assert, AssertionError } from './helpers/assert';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
+import { describe, it } from 'node:test';
 
 /* Testing Harness */
 

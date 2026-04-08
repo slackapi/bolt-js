@@ -2,6 +2,7 @@ import { WebClient } from '@slack/web-api';
 import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { createFunctionComplete } from '../../../src/context';
+import { describe, it } from 'node:test';
 
 describe('createFunctionComplete', () => {
   it('complete should call functions.completeSuccess', async () => {

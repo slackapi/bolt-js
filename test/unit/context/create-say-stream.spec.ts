@@ -3,6 +3,7 @@ import { assert } from '../helpers/assert';
 import sinon from 'sinon';
 import { createSayStream } from '../../../src/context';
 import type { Context } from '../../../src/types';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 
 describe('createSayStream', () => {
   const sandbox = sinon.createSandbox();

@@ -173,7 +173,7 @@ test/types/         # tsd type tests
 - **Test files** use `*.spec.ts` suffix
 - **Assertions** use the local `test/unit/helpers/assert.ts` compatibility helper backed by Node.js `assert` and Sinon assertions
 - **Mocking** uses sinon (`stub`, `spy`, `fake`) and proxyquire for module-level dependency replacement
-- **Test config** lives in `package.json` scripts plus `test/unit/node-test-globals.cjs`
+- **Test config** lives in `package.json` scripts plus direct `node:test` imports in the spec files
 - **Where to put new tests:** Mirror the source structure. For `src/Foo.ts`, add `test/unit/Foo.spec.ts`. For `src/receivers/Bar.ts`, add `test/unit/receivers/Bar.spec.ts`.
 
 ### CI

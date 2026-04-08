@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto';
 import { assert } from '../helpers/assert';
 import { isValidSlackRequest, verifySlackRequest } from '../../../src/receivers/verify-request';
+import { describe, it } from 'node:test';
 
 describe('Request verification', async () => {
   const signingSecret = 'secret';

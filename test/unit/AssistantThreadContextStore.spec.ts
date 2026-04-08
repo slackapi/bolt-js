@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import { extractThreadInfo } from '../../src/Assistant';
 import { DefaultThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { createDummyAssistantThreadStartedEventMiddlewareArgs, wrapMiddleware } from './helpers';
+import { describe, it } from 'node:test';
 
 describe('DefaultThreadContextStore class', () => {
   describe('get', () => {

@@ -3,6 +3,7 @@ import { AuthorizationError, ReceiverMultipleAckError } from '../../../src/error
 import { defaultProcessEventErrorHandler } from '../../../src/receivers/SocketModeFunctions';
 import type { ReceiverEvent } from '../../../src/types';
 import { createFakeLogger } from '../helpers';
+import { describe, it } from 'node:test';
 
 describe('SocketModeFunctions', async () => {
   describe('Error handlers for event processing', async () => {

@@ -10,6 +10,7 @@ import {
   UnknownError,
   asCodedError,
 } from '../../src/errors';
+import { describe, it } from 'node:test';
 
 describe('Errors', () => {
   it('has errors matching codes', () => {

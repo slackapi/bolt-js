@@ -16,6 +16,7 @@ import {
   proxyquire,
   wrapMiddleware,
 } from '../helpers';
+import { beforeEach, describe, it } from 'node:test';
 
 interface DummyContext extends Context {
   matches?: RegExpExecArray;

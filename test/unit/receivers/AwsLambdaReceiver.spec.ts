@@ -12,6 +12,7 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
+import { describe, it } from 'node:test';
 
 const fakeAuthTestResponse = {
   ok: true,
