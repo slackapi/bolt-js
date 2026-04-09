@@ -47,7 +47,7 @@ app.event('reaction_added', async ({ event, say }) => {
 
 ## Streaming messages {#streaming-messages}
 
-You can have your app's messages stream in to replicate conventional agent behavior. Bolt for Python provides a `sayStream` utility as a listener argument available for `app.event` and `assistant` listeners. 
+You can have your app's messages stream in to replicate conventional agent behavior. Bolt for JavaScript provides a `sayStream` utility as a listener argument available for `app.event` and `app.message` listeners. 
 
 The `sayStream` utility streamlines calling the Node Slack SDK's [`WebClient.chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) helper utility by sourcing parameter values from the relevant event payload.
 
@@ -73,18 +73,15 @@ appToken: process.env.SLACK_APP_TOKEN,
 logLevel: LogLevel.DEBUG,
 });
 
-app.event('app_mention', async ({ sayStream }) => {
-const stream = sayStream({ buffer_size: 100 });
-
-await stream.append({ markdown_text: '*Someone rang the bat signal!* :bat:\n\n' });
-await stream.stop();
-});
-
-app.message('', async ({ sayStream }) => {
-const stream = sayStream({ buffer_size: 100 });
-
-await stream.append({ markdown_text: 'Let me consult my *vast knowledge database*...\n\n' });
-await stream.stop({ blocks: [feedbackBlock] });
+app.event('app_mention', async ({ sayStream, setStatus }) => {
+  setStatus({
+    status: 'Thinking...',
+    loading_messages: ['Waking up...', 'Loading a witty response...'],
+  });
+  const stream = sayStream({ buffer_size: 100 });
+  await stream.append({ markdown_text: 'Thinking... :thinking_face:\n\n' });
+  await stream.append({ markdown_text: 'Here is my response!' });
+  await stream.stop({ blocks: [feedbackBlock] });
 });
 
 (async () => {
