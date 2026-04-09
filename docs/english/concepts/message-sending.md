@@ -120,4 +120,4 @@ const feedbackBlock = {
 };
 ```
 
-Read more about streaming messages in the [_Using AI in Apps_](/tools/bolt-js/concepts/ai-apps) guide.
+Read more about streaming messages in the [_Adding agent features_](/tools/bolt-js/adding-agent-features) guide.
