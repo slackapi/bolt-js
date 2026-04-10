@@ -9,6 +9,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^4.6.0"
+    "@slack/bolt": "^4.7.0"
   }
 }
