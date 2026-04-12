@@ -10,7 +10,7 @@
     "type": "html",
     "value": "<hr>"
   },
-  "tools/bolt-js/building-an-app",
+  "tools/bolt-js/creating-an-app",
   {
     "type": "category",
     "label": "Slack API calls",
@@ -36,7 +36,15 @@
       "tools/bolt-js/concepts/publishing-views"
     ]
   },
-  "tools/bolt-js/concepts/ai-apps",
+  {
+    "type": "category",
+    "label": "AI & Agents",
+    "link": {
+      "type": "doc",
+      "id": "tools/bolt-js/concepts/adding-agent-features"
+    },
+    "items": ["tools/bolt-js/concepts/adding-agent-features", "tools/bolt-js/concepts/using-the-assistant-class"]
+  },
   {
     "type": "category",
     "label": "Custom Steps",

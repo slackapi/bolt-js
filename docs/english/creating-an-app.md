@@ -2,7 +2,7 @@
 sidebar_label: Building an App
 ---
 
-# Building an app with Bolt for JavaScript
+# Creating an app with Bolt for JavaScript
 
 This guide will walk you through creating and using a Slack app built with Bolt for JavaScript.
 
