@@ -36,8 +36,9 @@ import { verifyRedirectOpts } from './verify-redirect-opts';
 
 export interface HTTPReceiverInvalidRequestSignatureHandlerArgs {
   rawBody: string;
-  signature: string | undefined;
-  ts: number | undefined;
+  signature: string;
+  ts: number;
+  logger: Logger;
 }
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
@@ -87,6 +88,15 @@ export interface HTTPReceiverOptions {
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
   signatureVerification?: boolean;
+  /**
+   * Called when an incoming request fails signature verification. Override to
+   * emit custom telemetry, return a specific response body, or suppress the
+   * default warn log. The receiver still returns `401 Unauthorized` to the
+   * client regardless of what the handler does.
+   *
+   * Defaults to a handler that logs a warning with the received
+   * `x-slack-signature` and `x-slack-request-timestamp` values.
+   */
   invalidRequestSignatureHandler?: (args: HTTPReceiverInvalidRequestSignatureHandlerArgs) => void;
   clientId?: string;
   clientSecret?: string;
@@ -459,13 +469,13 @@ export default class HTTPReceiver implements Receiver {
       } catch (err) {
         const e = err as Error;
         if (this.signatureVerification) {
-          this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
           const requestWithRawBody = req as IncomingMessage & { rawBody?: string };
           const rawBody = typeof requestWithRawBody.rawBody === 'string' ? requestWithRawBody.rawBody : '';
           this.invalidRequestSignatureHandler({
             rawBody,
-            signature: req.headers['x-slack-signature'] as string | undefined,
-            ts: req.headers['x-slack-request-timestamp'] ? Number(req.headers['x-slack-request-timestamp']) : undefined,
+            signature: (req.headers['x-slack-signature'] as string) ?? '',
+            ts: Number(req.headers['x-slack-request-timestamp']) || 0,
+            logger: this.logger,
           });
         } else {
           this.logger.warn(`Failed to parse the request body: ${e.message}`);
@@ -585,7 +595,11 @@ export default class HTTPReceiver implements Receiver {
     }
   }
 
-  private defaultInvalidRequestSignatureHandler(_args: HTTPReceiverInvalidRequestSignatureHandlerArgs): void {
-    // noop - signature verification failure is already logged and a 401 is returned
+  private defaultInvalidRequestSignatureHandler(args: HTTPReceiverInvalidRequestSignatureHandlerArgs): void {
+    const { signature, ts, logger } = args;
+
+    logger.warn(
+      `Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`,
+    );
   }
 }

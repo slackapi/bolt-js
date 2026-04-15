@@ -615,6 +615,7 @@ describe('HTTPReceiver', () => {
         assert.equal(args.rawBody, '{"token":"test"}');
         assert.equal(args.signature, 'v0=bad');
         assert.equal(args.ts, 1234567890);
+        assert.isDefined(args.logger, 'logger should be passed to the handler');
       });
 
       it('should use the default noop handler when no custom handler is provided', async () => {
@@ -651,7 +652,7 @@ describe('HTTPReceiver', () => {
         sinon.assert.calledWith(fakeBuildNoBodyResponse, fakeRes, 401);
       });
 
-      it('should pass undefined for signature and ts when headers are missing', async () => {
+      it('should pass empty signature and zero ts when headers are missing', async () => {
         const spy = sinon.spy();
         const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
         const fakeBuildNoBodyResponse = sinon.fake();
@@ -685,8 +686,9 @@ describe('HTTPReceiver', () => {
         assert(spy.calledOnce);
         const args = spy.firstCall.args[0];
         assert.equal(args.rawBody, '');
-        assert.isUndefined(args.signature);
-        assert.isUndefined(args.ts);
+        assert.equal(args.signature, '');
+        assert.equal(args.ts, 0);
+        assert.isDefined(args.logger);
       });
     });
 
