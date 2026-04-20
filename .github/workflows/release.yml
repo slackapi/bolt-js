@@ -29,7 +29,7 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm install --verbose
+        run: npm ci --verbose
 
       - name: Create or update release PR
         id: changesets
@@ -63,7 +63,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        run: npm install --verbose
+        run: npm ci --verbose
 
       - name: Publish to npm and create GitHub releases
         uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
