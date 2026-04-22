@@ -101,14 +101,13 @@ New official package versions are published when the release PR created from cha
 
 1. **Check GitHub Milestones**: Before merging the release PR please check the relevant [Milestones](https://github.com/slackapi/bolt-js/milestones). If issues or pull requests are still open either decide to postpone the release or save those changes for a future update.
 
-2. **Review the release PR**: Verify that the version bump matches expectations, `CHANGELOG` entries are clear, and CI checks pass.
+2. **Review the release PR**: Verify that the version bump matches expectations, `CHANGELOG` entries are clear, and CI checks pass. Use `npm install` to update versions in the `package-lock.json` file.
 
 3. **Merge and approve**: Merge the release PR, then approve the publish workflow to release the package to npm.
 
 4. **Update Milestones**: Close the relevant [Milestones](https://github.com/slackapi/bolt-js/milestones) and rename these to match the released package version. Open a new Milestone for the next version, e.g. `@slack/bolt@next`.
 
 5. **Communicate the release**:
-   - **Internal**: Post a brief description and link to the GitHub release.
    - **External**: Post in relevant channels (e.g. #lang-javascript, #tools-bolt) on [Slack Community](https://community.slack.com/). Include a link to the package on `npmjs.com/package/@slack/bolt` as well as the release notes.
 
 #### Beta Release
