@@ -10,13 +10,13 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^4.6.0",
+    "@slack/bolt": "^4.7.0",
     "dotenv": "^17"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.6",
     "@types/node": "^24",
     "ts-node": "^10",
-    "typescript": "6.0.2"
+    "typescript": "6.0.3"
   }
 }
