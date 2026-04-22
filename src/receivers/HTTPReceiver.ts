@@ -38,7 +38,6 @@ export interface HTTPReceiverInvalidRequestSignatureHandlerArgs {
   rawBody: string;
   signature: string;
   ts: number;
-  logger: Logger;
 }
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
@@ -475,7 +474,6 @@ export default class HTTPReceiver implements Receiver {
             rawBody,
             signature: (req.headers['x-slack-signature'] as string) ?? '',
             ts: Number(req.headers['x-slack-request-timestamp']) || 0,
-            logger: this.logger,
           });
         } else {
           this.logger.warn(`Failed to parse the request body: ${e.message}`);
@@ -596,9 +594,9 @@ export default class HTTPReceiver implements Receiver {
   }
 
   private defaultInvalidRequestSignatureHandler(args: HTTPReceiverInvalidRequestSignatureHandlerArgs): void {
-    const { signature, ts, logger } = args;
+    const { signature, ts } = args;
 
-    logger.warn(
+    this.logger.warn(
       `Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`,
     );
   }

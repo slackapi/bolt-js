@@ -615,7 +615,10 @@ describe('HTTPReceiver', () => {
         assert.equal(args.rawBody, '{"token":"test"}');
         assert.equal(args.signature, 'v0=bad');
         assert.equal(args.ts, 1234567890);
-        assert.isDefined(args.logger, 'logger should be passed to the handler');
+        assert.isUndefined(
+          (args as { logger?: unknown }).logger,
+          'logger should not be passed to the handler (parity with AwsLambdaReceiver)',
+        );
       });
 
       it('should use the default noop handler when no custom handler is provided', async () => {
@@ -688,7 +691,7 @@ describe('HTTPReceiver', () => {
         assert.equal(args.rawBody, '');
         assert.equal(args.signature, '');
         assert.equal(args.ts, 0);
-        assert.isDefined(args.logger);
+        assert.isUndefined((args as { logger?: unknown }).logger);
       });
     });
 
