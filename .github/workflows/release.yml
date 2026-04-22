@@ -66,9 +66,31 @@ jobs:
         run: npm ci --verbose
 
       - name: Publish to npm and create GitHub releases
+        id: changesets
         uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
         with:
           createGithubReleases: true
           publish: npm run changeset -- publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get publication details
+        if: steps.changesets.outputs.published == 'true'
+        id: release
+        run: |
+          echo "url=$(gh release view --json url -q .url)" >> "$GITHUB_OUTPUT"
+          echo "message=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "\(.name)@\(.version)"' | paste -sd ', ' -)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+
+      - name: Notify Slack
+        if: steps.changesets.outputs.published == 'true'
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+        with:
+          webhook: ${{ secrets.SLACK_RELEASE_ANNOUNCEMENTS_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
+          payload: |
+            action_url: "${{ steps.release.outputs.url }}"
+            message: "${{ steps.release.outputs.message }}"
+            repository: "${{ github.repository }}"
