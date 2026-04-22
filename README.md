@@ -41,7 +41,7 @@ The Slack **Request URL** for a Bolt app must have the path set to `/slack/event
 For example: `https://my-slack-app.example.com/slack/events`.  
 Otherwise, all incoming requests from Slack won't be handled.
 
-Apps typically react to a collection of incoming events, which can correspond [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
+Apps typically react to a collection of incoming events, which can correspond [Events API events](https://docs.slack.dev/apis/events-api), [actions](https://docs.slack.dev/interactivity/handling-user-interaction), [shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts), [slash commands](https://docs.slack.dev/interactivity/implementing-slash-commands) or [options requests](https://docs.slack.dev/reference/block-kit/block-elements/select-menu-element#external-data-source). For each type of
 request, there's a method to build a listener function.
 
 ```js
@@ -80,8 +80,8 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 
 | Argument  | Description  |
 | :---: | :--- |
-| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` array. The `payload` object is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangeably. **An easy way to understand what's in a payload is to log it**, or use TypeScript. |
-| `say` | Function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and objects (for messages containing blocks). `say` returns a promise that will resolve with a [`chat.postMessage` response](https://api.slack.com/methods/chat.postMessage).
+| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://docs.slack.dev/apis/events-api#event-type-structure). For a block action, it will be the action from within the `actions` array. The `payload` object is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangeably. **An easy way to understand what's in a payload is to log it**, or use TypeScript. |
+| `say` | Function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and objects (for messages containing blocks). `say` returns a promise that will resolve with a [`chat.postMessage` response](https://docs.slack.dev/reference/methods/chat.postMessage).
 | `ack` | Function that **must** be called to acknowledge that an incoming event was received by your app. `ack` exists for all actions, shortcuts, view, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](#acknowledging-events)
 | `client` | Web API client that uses the token associated with that event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by the `authorize` function.
 | `respond` | Function that responds to an incoming event **if** it contains a `response_url` (actions, shortcuts, view submissions, and slash commands). `respond` returns a promise that resolves with the results of responding using the `response_url`.
@@ -97,7 +97,7 @@ The arguments are grouped into properties of one object, so that it's easier to 
 ```js
 // Reverse all messages the app can hear
 app.message(async ({ message, say }) => {
-  // Filter out message events with subtypes (see https://api.slack.com/events/message)
+  // Filter out message events with subtypes (see https://docs.slack.dev/reference/events/message)
   if (message.subtype === undefined || message.subtype === 'bot_message') {
     const reversedText = [...message.text].reverse().join("");
     await say(reversedText);
@@ -119,7 +119,7 @@ Depending on the type of incoming event a listener is meant for, `ack()` should 
 
 *  Block actions, global shortcuts, and message shortcuts: Call `ack()` with no parameters.
 
-* View submissions: Call `ack()` with no parameters or with a [response action](https://api.slack.com/surfaces/modals/using#updating_response).
+* View submissions: Call `ack()` with no parameters or with a [response action](https://docs.slack.dev/surfaces/modals#updating-response).
 
 *  Options requests: Call `ack()` with an object containing the options for the user to see.
 
