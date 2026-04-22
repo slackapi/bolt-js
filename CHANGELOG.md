@@ -4,4 +4,4 @@
 
 ### Patch Changes
 
-- 54f3577: fix: correct InvalidCustomPropertyError code and MemoryStore promise handling
+- a18c359: fix: correct InvalidCustomPropertyError code and MemoryStore promise handling
