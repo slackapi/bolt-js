@@ -25,16 +25,17 @@
     "npm": ">=8.6.0"
   },
   "scripts": {
-    "changeset": "npx @changesets/cli",
-    "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
+    "changeset": "npx @changesets/cli",
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
+    "prepare": "npm run build",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
-    "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
     "test:coverage": "c8 npm run test:unit",
     "test:types": "tsd --files test/types",
+    "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
+    "version": "npm run changeset version && npm install",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": {
