@@ -366,6 +366,21 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       // Since v3.4, WebClient starts sharing logger with App
       this.clientOptions.logger = this.logger;
     }
+
+    // Tag the User-Agent with the concrete receiver class before any
+    // WebClient is constructed. WebClient snapshots `getUserAgent()` into
+    // its axios headers at construction time, so this must run before
+    // `new WebClient(...)` below (see #1150).
+    const receiverTypeName = receiver
+      ? receiver.constructor.name
+      : this.socketMode
+        ? 'SocketModeReceiver'
+        : 'HTTPReceiver';
+    addAppMetadata({
+      name: `${packageJson.name}-${receiverTypeName}`,
+      version: packageJson.version,
+    });
+
     // The public WebClient instance (app.client)
     // Since v3.4, it can have the passed token in the case of single workspace installation.
     this.client = new WebClient(token, this.clientOptions);

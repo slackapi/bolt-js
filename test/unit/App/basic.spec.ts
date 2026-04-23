@@ -346,6 +346,23 @@ describe('App basic features', () => {
     // TODO: tests for providing endpoints option
   });
 
+  describe('receiver-type app metadata', () => {
+    it('should tag the user-agent metadata with the concrete receiver class name', () => {
+      const addAppMetadata = sinon.fake();
+      const customOverrides = mergeOverrides(
+        { '@slack/web-api': { addAppMetadata } },
+        withSuccessfulBotUserFetchingWebClient(fakeBotId, fakeBotUserId),
+      );
+      const MockApp = importApp(customOverrides);
+      new MockApp({ receiver: new FakeReceiver(), authorize: noop });
+      const names: string[] = addAppMetadata.getCalls().map((call) => call.args[0].name);
+      assert.isTrue(
+        names.some((name) => name.endsWith('-FakeReceiver')),
+        `expected an addAppMetadata call ending in "-FakeReceiver", got ${JSON.stringify(names)}`,
+      );
+    });
+  });
+
   describe('#start', () => {
     it('should pass calls through to receiver', async () => {
       // Arrange
