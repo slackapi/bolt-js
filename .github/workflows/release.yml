@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
+      releaseExists: ${{ steps.published.outputs.exists }}
     permissions:
       contents: write
       pull-requests: write
@@ -41,10 +42,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check if publish is needed
+        id: published
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if gh release view "v${VERSION}" &>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish:
     name: Publish
     needs: changelog
-    if: needs.changelog.outputs.hasChangesets == 'false'
+    if: needs.changelog.outputs.hasChangesets == 'false' && needs.changelog.outputs.releaseExists != 'true'
     runs-on: ubuntu-latest
     environment: publish
     permissions:
