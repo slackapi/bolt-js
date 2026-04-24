@@ -11,4 +11,4 @@ assignees: ''
 
 ### Requirements
 
-Please read the [Contributing guidelines](https://github.com/slackapi/node-slack-sdk/blob/main/.github/contributing.md) and [Code of Conduct](https://slackhq.github.io/code-of-conduct) before creating this issue or pull request. By submitting, you are agreeing to those rules.
+Please read the [Contributing guidelines](https://github.com/slackapi/bolt-js/blob/main/.github/contributing.md) and [Code of Conduct](https://slackhq.github.io/code-of-conduct) before creating this issue or pull request. By submitting, you are agreeing to those rules.

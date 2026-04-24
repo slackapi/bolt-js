@@ -155,7 +155,7 @@ export const openai = new OpenAI({
 });
 ```
 
-In the `listeners/assistant/index.js` file, we initialize the Bolt Assistant class. The Assistant class is a [Bolt feature](/tools/bolt-js/concepts/ai-apps) that simplifies handling incoming events related to the app assistant.
+In the `listeners/assistant/index.js` file, we initialize the Bolt Assistant class. The Assistant class is a [Bolt feature](/tools/bolt-js/concepts/using-the-assistant-class) that simplifies handling incoming events related to the app assistant.
 
 ```js
 import { Assistant } from '@slack/bolt';
@@ -490,7 +490,7 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ### Learn more {#learn}
 
-➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/tools/bolt-js/concepts/ai-apps).
+➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/tools/bolt-js/concepts/adding-agent-features).
 
 ➡️ Level up your AI game after reading through the [usage guide](/ai/developing-ai-apps) and [Best practices for AI feature-enabled apps](/ai/ai-apps-best-practices).
 

@@ -47,38 +47,56 @@ app.event('reaction_added', async ({ event, say }) => {
 
 ## Streaming messages {#streaming-messages}
 
-You can have your app's messages stream in to replicate conventional AI chatbot behavior. This is done through three Web API methods:
+You can have your app's messages stream in to replicate conventional agent behavior. Bolt for JavaScript provides a `sayStream` utility as a listener argument available for `app.event` and `app.message` listeners. 
 
-- [`chat.startStream`](/reference/methods/chat.startStream)
-- [`chat.appendStream`](/reference/methods/chat.appendStream)
-- [`chat.stopStream`](/reference/methods/chat.stopStream)
+The `sayStream` utility streamlines calling the Node Slack SDK's [`WebClient.chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) helper utility by sourcing parameter values from the relevant event payload.
 
-The Node Slack SDK provides a [`chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-js-assistant-template):
+| Parameter | Value |
+|---|---| 
+| `channel_id` | Sourced from the event payload.
+| `thread_ts` | Sourced from the event payload. Falls back to the `ts` value if available.
+| `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org).
+| `recipient_user_id` | Sourced from the `user_id` of the event.
+
+If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
+---
 
 ```js
-// Provide a response to the user
-const streamer = client.chatStream({
-  channel: channel,
-  recipient_team_id: teamId,
-  recipient_user_id: userId,
-  thread_ts: thread_ts,
+import { App, LogLevel } from '@slack/bolt';
+import 'dotenv/config';
+
+
+const app = new App({
+token: process.env.SLACK_BOT_TOKEN,
+socketMode: true,
+appToken: process.env.SLACK_APP_TOKEN,
+logLevel: LogLevel.DEBUG,
 });
 
-// response from your LLM of choice; OpenAI is the example here
-for await (const chunk of llmResponse) {
-  if (chunk.type === 'response.output_text.delta') {
-    await streamer.append({
-      markdown_text: chunk.delta,
-    });
-  }
-}
+app.event('app_mention', async ({ sayStream, setStatus }) => {
+  setStatus({
+    status: 'Thinking...',
+    loading_messages: ['Waking up...', 'Loading a witty response...'],
+  });
+  const stream = sayStream({ buffer_size: 100 });
+  await stream.append({ markdown_text: 'Thinking... :thinking_face:\n\n' });
+  await stream.append({ markdown_text: 'Here is my response!' });
+  await stream.stop({ blocks: [feedbackBlock] });
+});
 
-// End stream and provide feedback buttons to user
-await streamer.stop({ blocks: [feedbackBlock] });
-return;
+(async () => {
+try {
+  await app.start(process.env.PORT || 3000);
+  app.logger.info('Bolt app is running!');
+} catch (error) {
+  app.logger.error('Unable to start App', error);
+}
+})();
 ```
 
-In that example, a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element is passed to `streamer.stop` to provide feedback buttons to the user at the bottom of the message. Interaction with these buttons will send a block action event to your app to receive the feedback.
+#### Adding feedback buttons after a stream
+
+You can pass a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element to `stream.stop` to provide feedback buttons to the user at the bottom of the message. Interaction with these buttons will send a block action event to your app to receive the feedback.
 
 ```js
 const feedbackBlock = {
@@ -102,4 +120,4 @@ const feedbackBlock = {
 };
 ```
 
-Read more about streaming messages in the [_Using AI in Apps_](/tools/bolt-js/concepts/ai-apps) guide.
+Read more about streaming messages in the [_Adding agent features_](/tools/bolt-js/adding-agent-features) guide.

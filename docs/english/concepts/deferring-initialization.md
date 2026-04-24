@@ -8,6 +8,8 @@ If you call `start()` before `init()`, Bolt will raise an exception.
 
 :::
 
+## Example
+
 ```javascript
 const { App } = require('@slack/bolt');
 

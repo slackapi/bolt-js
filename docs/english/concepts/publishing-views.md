@@ -4,6 +4,8 @@
 
 You can subscribe to the [`app_home_opened`](/reference/events/app_home_opened) event to listen for when users open your App Home.
 
+## Example
+
 ```javascript
 // Listen for users opening your App Home
 app.event('app_home_opened', async ({ event, client, logger }) => {

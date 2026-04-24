@@ -13,6 +13,8 @@ The authorized credentials should also have a few specific properties: `botToken
 
 You should always provide either one or both of the `botToken` and `userToken` properties. At least one of them is necessary to make helpers like `say()` work. If they are both given, then `botToken` will take precedence.
 
+## Example
+
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
 

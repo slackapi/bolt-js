@@ -217,6 +217,7 @@ describe('Assistant class', () => {
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
+        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setSuggestedPrompts);
         assert.exists(assistantArgs.setTitle);
       });
@@ -232,6 +233,7 @@ describe('Assistant class', () => {
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
+        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setSuggestedPrompts);
         assert.exists(assistantArgs.setTitle);
       });
@@ -247,6 +249,7 @@ describe('Assistant class', () => {
 
         assert.exists(assistantArgs.say);
         assert.exists(assistantArgs.setStatus);
+        assert.exists(assistantArgs.sayStream);
         assert.exists(assistantArgs.setSuggestedPrompts);
         assert.exists(assistantArgs.setTitle);
       });

@@ -1,8 +1,37 @@
 import type { FunctionExecutedEvent, SlackEvent } from '@slack/types';
 import type { FunctionCompleteFn, FunctionFailFn } from '../../CustomFunction';
+import type { SayStreamFn } from '../../context/create-say-stream';
+import type { SetStatusFn } from '../../context/create-set-status';
 import type { AckFn, SayFn, StringIndexed } from '../utilities';
 
 export type SlackEventMiddlewareArgsOptions = { autoAcknowledge: boolean };
+
+/**
+ * Union of event shapes from which a channel ID can be extracted at runtime.
+ * MUST stay in sync with `extractEventChannelId` in `src/helpers.ts`.
+ */
+type EventWithChannelContext =
+  | { channel: string }
+  | { channel: { id: string } }
+  | { channel_id: string }
+  | { item: { channel: string } }
+  | { assistant_thread: { channel_id: string } };
+
+/**
+ * Union of event shapes from which a thread_ts can be extracted at runtime.
+ * MUST stay in sync with `extractEventThreadTs` in `src/helpers.ts`.
+ */
+type EventWithThreadTsContext =
+  | { thread_ts: string }
+  | { assistant_thread: { thread_ts: string } }
+  | { message: { thread_ts: string } }
+  | { previous_message: { thread_ts: string } };
+
+/**
+ * Union of event shapes from which a ts can be extracted at runtime.
+ * MUST stay in sync with `extractEventTs` in `src/helpers.ts`.
+ */
+type EventWithTsContext = { ts: string };
 
 /**
  * Arguments which listeners and middleware receive to process an event from Slack's Events API.
@@ -18,6 +47,11 @@ export type SlackEventMiddlewareArgs<EventType extends string = string> = {
   (EventFromType<EventType> extends { channel: string } | { item: { channel: string } }
     ? // If this event contains a channel, add a `say` utility function
       { say: SayFn }
+    : unknown) &
+  (EventFromType<EventType> extends EventWithChannelContext
+    ? EventFromType<EventType> extends EventWithThreadTsContext | EventWithTsContext
+      ? { sayStream: SayStreamFn; setStatus: SetStatusFn }
+      : unknown
     : unknown) &
   (EventType extends 'function_executed'
     ? {
@@ -73,8 +107,3 @@ export type EventFromType<T extends string> = KnownEventFromType<T> extends neve
   ? BaseSlackEvent<T>
   : KnownEventFromType<T>;
 export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;
-
-/**
- * Type function which tests whether or not the given `Event` contains a channel ID context for where the event
- * occurred, and returns `Type` when the test passes. Otherwise this returns `undefined`.
- */

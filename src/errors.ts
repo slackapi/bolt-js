@@ -106,7 +106,7 @@ export class ContextMissingPropertyError extends Error implements CodedError {
 }
 
 export class InvalidCustomPropertyError extends Error implements CodedError {
-  public code = ErrorCode.AppInitializationError;
+  public code = ErrorCode.InvalidCustomPropertyError;
 }
 
 export class CustomRouteInitializationError extends Error implements CodedError {

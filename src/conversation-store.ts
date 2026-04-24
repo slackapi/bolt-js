@@ -36,8 +36,10 @@ export class MemoryStore<ConversationState = any> implements ConversationStore<C
           // release the memory
           this.state.delete(conversationId);
           reject(new Error('Conversation expired'));
+          return;
         }
         resolve(entry.value);
+        return;
       }
       reject(new Error('Conversation not found'));
     });
