@@ -1,5 +1,5 @@
-import { env as cfEnv } from 'cloudflare:workers';
-import { App, CloudflareWorkerReceiver } from '@slack/bolt';
+import { env as cfEnv } from "cloudflare:workers";
+import { App, CloudflareWorkerReceiver, LogLevel } from "@slack/bolt";
 
 // Initialize your custom receiver
 const cloudflareWorkerReceiver = new CloudflareWorkerReceiver({
@@ -17,27 +17,32 @@ const app = new App({
   // the acknowledgement until after your handler has run to ensure your function
   // isn't terminated early by responding to the HTTP request that triggered it.
 
-  // receiver.processBeforeResponse: true
+  // processBeforeResponse: true,
+
+  // `deferInitialization: true` lets us call `await app.init()` inside
+  // `fetch()`. Cloudflare Workers does not allow asynchronous I/O at module
+  // scope.
+  deferInitialization: true,
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message("hello", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        type: 'section',
+        type: "section",
         text: {
-          type: 'mrkdwn',
+          type: "mrkdwn",
           text: `Hey there <@${message.user}>!`,
         },
         accessory: {
-          type: 'button',
+          type: "button",
           text: {
-            type: 'plain_text',
-            text: 'Click Me',
+            type: "plain_text",
+            text: "Click Me",
           },
-          action_id: 'button_click',
+          action_id: "button_click",
         },
       },
     ],
@@ -46,21 +51,29 @@ app.message('hello', async ({ message, say }) => {
 });
 
 // Listens for an action from a button click
-app.action('button_click', async ({ body, ack, say }) => {
+app.action("button_click", async ({ body, ack, say }) => {
   await ack();
 
   await say(`<@${body.user.id}> clicked the button`);
 });
 
 // Listens to incoming messages that contain "goodbye"
-app.message('goodbye', async ({ message, say }) => {
+app.message("goodbye", async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say(`See ya later, <@${message.user}> :wave:`);
 });
 
 // Handle the Worker fetch event
 export default {
-  async fetch(request: Request, env: typeof cfEnv, ctx: unknown): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: typeof cfEnv,
+    ctx: ExecutionContext
+  ): Promise<Response> {
+    // In Cloudflare Workers we need to initialize the app in the fetch because workers don't allow
+    // asynchronous IO in the global scope.
+    await app.init();
+
     const handler = await cloudflareWorkerReceiver.start();
     return handler(request, env, ctx);
   },

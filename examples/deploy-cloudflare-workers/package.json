@@ -5,11 +5,12 @@
   "scripts": {
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^4.7.1"
+    "@slack/bolt": "file:../.."
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
