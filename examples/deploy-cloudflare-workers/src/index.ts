@@ -1,5 +1,5 @@
 import { env as cfEnv } from 'cloudflare:workers';
-import { App, CloudflareWorkerReceiver } from '@slack/bolt';
+import { App, type BlockButtonAction, CloudflareWorkerReceiver } from '@slack/bolt';
 
 // Initialize your custom receiver
 const cloudflareWorkerReceiver = new CloudflareWorkerReceiver({
@@ -27,6 +27,10 @@ const app = new App({
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({ message, say }) => {
+  if (!('user' in message) || typeof message.user !== 'string') {
+    return;
+  }
+
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
@@ -51,7 +55,7 @@ app.message('hello', async ({ message, say }) => {
 });
 
 // Listens for an action from a button click
-app.action('button_click', async ({ body, ack, say }) => {
+app.action<BlockButtonAction>('button_click', async ({ body, ack, say }) => {
   await ack();
 
   await say(`<@${body.user.id}> clicked the button`);
@@ -59,6 +63,10 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 // Listens to incoming messages that contain "goodbye"
 app.message('goodbye', async ({ message, say }) => {
+  if (!('user' in message) || typeof message.user !== 'string') {
+    return;
+  }
+
   // say() sends a message to the channel where the event was triggered
   await say(`See ya later, <@${message.user}> :wave:`);
 });
