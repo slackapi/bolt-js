@@ -58,7 +58,7 @@ jobs:
   publish:
     name: Publish
     needs: changelog
-    if: needs.changelog.outputs.hasChangesets == 'false' && needs.changelog.outputs.releaseExists != 'true'
+    if: needs.changelog.outputs.hasChangesets == 'false' && needs.changelog.outputs.releaseExists == 'false'
     runs-on: ubuntu-latest
     environment: publish
     permissions:
