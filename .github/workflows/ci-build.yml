@@ -37,7 +37,7 @@ jobs:
       - run: npm ci --verbose
       - run: npm test
       - name: Upload coverage to Codecov
-        if: matrix.node-version == '22.x'
+        if: matrix.node-version == '24.x'
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
