@@ -70,9 +70,12 @@ export const parseAndVerifyHTTPRequest = async (
 
   const contentType = req.headers['content-type'];
   if (contentType === 'application/x-www-form-urlencoded') {
-    // `ssl_check=1` requests do not require x-slack-signature verification
     const parsedQs = qsParse(textBody);
     if (parsedQs?.ssl_check) {
+      // ssl_check requests don't require signature verification, but we must
+      // strip any smuggled payload to prevent unauthenticated event injection
+      const sanitized = `ssl_check=${parsedQs.ssl_check}`;
+      bufferedReq.rawBody = Buffer.from(sanitized);
       return bufferedReq;
     }
   }
