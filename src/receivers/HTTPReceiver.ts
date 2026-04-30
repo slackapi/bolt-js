@@ -468,9 +468,10 @@ export default class HTTPReceiver implements Receiver {
         return;
       }
 
-      // Handle SSL checks
-      if (body.ssl_check) {
-        httpFunc.buildNoBodyResponse(res, 200);
+      // Slack sends `ssl_check=1` to verify SSL connectivity
+      // https://docs.slack.dev/interactivity/implementing-slash-commands/#responding_basic_receipt
+      if (body.ssl_check === '1') {
+        httpFunc.buildSSLCheckResponse(res);
         return;
       }
 

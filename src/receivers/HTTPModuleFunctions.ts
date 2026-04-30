@@ -70,8 +70,10 @@ export const parseAndVerifyHTTPRequest = async (
 
   const contentType = req.headers['content-type'];
   if (contentType === 'application/x-www-form-urlencoded') {
+    // Slack sends `ssl_check=1` to verify SSL connectivity, these requests do not require x-slack-signature verification
+    // https://docs.slack.dev/interactivity/implementing-slash-commands/#responding_basic_receipt
     const parsedQs = qsParse(textBody);
-    if (parsedQs?.ssl_check) {
+    if (parsedQs?.ssl_check === '1') {
       // ssl_check requests don't require signature verification, but we must
       // strip any smuggled payload to prevent unauthenticated event injection
       const sanitized = `ssl_check=${parsedQs.ssl_check}`;
