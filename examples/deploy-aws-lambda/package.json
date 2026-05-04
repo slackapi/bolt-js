@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^4.7.1"
+    "@slack/bolt": "^4.7.2"
   },
   "devDependencies": {
     "serverless": "^4.35.0",
