@@ -39,6 +39,10 @@ export interface SocketModeReceiverOptions {
   installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
   customRoutes?: CustomRoute[];
+  clientPingTimeout?: number;
+  serverPingTimeout?: number;
+  pingPongLoggingEnabled?: boolean;
+  autoReconnectEnabled?: boolean;
   // biome-ignore lint/suspicious/noExplicitAny: user-provided custom properties can be anything
   customPropertiesExtractor?: (args: any) => StringIndexed;
   processEventErrorHandler?: (args: SocketModeReceiverProcessEventErrorHandlerArgs) => Promise<boolean>;
@@ -96,6 +100,10 @@ export default class SocketModeReceiver implements Receiver {
     appToken,
     logger = undefined,
     logLevel = LogLevel.INFO,
+    clientPingTimeout = undefined,
+    serverPingTimeout = undefined,
+    pingPongLoggingEnabled = undefined,
+    autoReconnectEnabled = undefined,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -111,6 +119,10 @@ export default class SocketModeReceiver implements Receiver {
       appToken,
       logLevel,
       logger,
+      clientPingTimeout,
+      serverPingTimeout,
+      pingPongLoggingEnabled,
+      autoReconnectEnabled,
       clientOptions: installerOptions.clientOptions,
     });
 

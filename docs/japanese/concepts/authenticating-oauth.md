@@ -98,9 +98,9 @@ Bolt は `fetchInstallation` と `deleteInstallation` ハンドラーに `instal
 
 ##### OrG 全体へのインストール
 
-[Enterprise Grid の OrG 全体へのインストール](/enterprise-grid/)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
+[Enterprise Grid の OrG 全体へのインストール](/enterprise/)への対応を追加する場合、Bolt for JavaScript のバージョン 3.0.0 以上を利用してください。また Slack アプリの設定画面で **Org Level Apps** の設定が有効になっていることを確認してください。
 
-管理者画面からの [Enterprise Grid の OrG 全体へのインストール](/enterprise-grid/) の場合、 Bolt で動作させるために追加の設定が必要です。この利用シナリオでは、推奨の `state` パラメータが提供されず、Bolt アプリでは `state` を検証しようとするため、インストールを継続することができません。
+管理者画面からの [Enterprise Grid の OrG 全体へのインストール](/enterprise/) の場合、 Bolt で動作させるために追加の設定が必要です。この利用シナリオでは、推奨の `state` パラメータが提供されず、Bolt アプリでは `state` を検証しようとするため、インストールを継続することができません。
 
 Bolt アプリ側で `stateVerification` オプションを false に設定することで、 `state` パラメーターの検証を無効することができます。以下の例を参考にしてください。
 

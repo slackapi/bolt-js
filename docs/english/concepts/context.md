@@ -4,6 +4,8 @@ All listeners have access to a `context` object, which can be used to enrich req
 
 `context` is just an object, so you can add to it by setting it to a modified version of itself.
 
+## Example
+
 ```javascript
 async function addTimezoneContext({ payload, client, context, next }) {
   const user = await client.users.info({

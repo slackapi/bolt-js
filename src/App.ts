@@ -2,18 +2,25 @@ import type { Agent } from 'node:http';
 import type { SecureContextOptions } from 'node:tls';
 import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
-import { type ChatPostMessageArguments, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
-import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import { WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
+import axios, { type AxiosInstance } from 'axios';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
   type FunctionCompleteFn,
   type FunctionFailFn,
   type SlackCustomFunctionMiddlewareArgs,
-  createFunctionComplete,
-  createFunctionFail,
 } from './CustomFunction';
 import type { WorkflowStep } from './WorkflowStep';
+import {
+  createFunctionComplete,
+  createFunctionFail,
+  createRespond,
+  createSay,
+  createSayStream,
+  createSetStatus,
+} from './context';
+import type { SayStreamFn, SetStatusFn } from './context';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
 import {
   AppInitializationError,
@@ -26,6 +33,9 @@ import {
 import {
   IncomingEventType,
   assertNever,
+  extractEventChannelId,
+  extractEventThreadTs,
+  extractEventTs,
   getTypeAndConversation,
   isBodyWithTypeEnterpriseInstall,
   isEventTypeToSkipAuthorize,
@@ -67,7 +77,6 @@ import type {
   OptionsSource,
   Receiver,
   ReceiverEvent,
-  RespondArguments,
   RespondFn,
   SayFn,
   ShortcutConstraints,
@@ -134,7 +143,7 @@ export interface AppOptions {
   /**
    * Configurations for the web client used to send Slack API method requests.
    *
-   * See {@link https://tools.slack.dev/node-slack-sdk/reference/web-api/interfaces/WebClientOptions} for more information.
+   * See {@link https://docs.slack.dev/tools/node-slack-sdk/reference/web-api/interfaces/WebClientOptions/} for more information.
    */
   clientOptions?: WebClientOptions;
   socketMode?: boolean;
@@ -540,7 +549,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param callbackId Unique callback ID of a step.
    * @param [options] Configurations for the listener.
    * @param listeners Middleware handlers to call.
-   * @see {@link https://tools.slack.dev/bolt-js/concepts/custom-steps}
+   * @see {@link https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/}
    * @see {@link https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options}
    */
   public function(
@@ -950,7 +959,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         const e = error as any;
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
         e.code = ErrorCode.AuthorizationError;
-        return this.handleError({
+        await this.handleError({
           error: e,
           logger: this.logger,
           body: bodyArg,
@@ -958,6 +967,8 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
             isEnterpriseInstall,
           },
         });
+
+        return ack();
       }
     }
 
@@ -1004,22 +1015,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       }
     }
 
-    // Factory for say() utility
-    // TODO: could this be move out of processEvent, use the same token from below or perhaps even a client from the pool
-    const createSay = (channelId: string): SayFn => {
-      const token = selectToken(context, this.attachFunctionToken);
-      return (message) => {
-        let postMessageArguments: ChatPostMessageArguments;
-        if (typeof message === 'string') {
-          postMessageArguments = { token, text: message, channel: channelId };
-        } else {
-          postMessageArguments = { ...message, token, channel: channelId };
-        }
-
-        return this.client.chat.postMessage(postMessageArguments);
-      };
-    };
-
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
     // TODO: remove workflow step stuff in bolt v5
@@ -1064,6 +1059,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     const listenerArgs: Pick<AnyMiddlewareArgs, 'body' | 'payload'> & {
       /** Say function might be set below */
       say?: SayFn;
+      /** SayStream function might be set below */
+      sayStream?: SayStreamFn;
+      /** SetStatus function might be set below */
+      setStatus?: SetStatusFn;
       /** Respond function might be set below */
       respond?: RespondFn;
       /** Ack function might be set below */
@@ -1124,6 +1123,17 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         listenerArgs.fail = createFunctionFail(context, client);
         listenerArgs.inputs = eventListenerArgs.event.inputs;
       }
+      // Set sayStream() utility - only for events with channel and thread context
+      const eventChannelId = extractEventChannelId(eventListenerArgs.event);
+      if (eventChannelId !== undefined) {
+        const threadTs = extractEventThreadTs(eventListenerArgs.event);
+        const eventTs = extractEventTs(eventListenerArgs.event);
+        const resolvedThreadTs = threadTs ?? eventTs;
+        if (resolvedThreadTs !== undefined) {
+          listenerArgs.sayStream = createSayStream(client, context, eventChannelId, resolvedThreadTs);
+          listenerArgs.setStatus = createSetStatus(client, eventChannelId, resolvedThreadTs);
+        }
+      }
     } else if (type === IncomingEventType.Action) {
       const actionListenerArgs = listenerArgs as SlackActionMiddlewareArgs;
       actionListenerArgs.action = actionListenerArgs.payload;
@@ -1149,15 +1159,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set say() utility
     if (conversationId !== undefined && type !== IncomingEventType.Options) {
-      listenerArgs.say = createSay(conversationId);
+      listenerArgs.say = createSay(client, conversationId);
     }
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = buildRespondFn(this.axios, body.response_url);
+      listenerArgs.respond = createRespond(this.axios, body.response_url);
     } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
       // This can exist only when view_submission payloads - response_url_enabled: true
-      listenerArgs.respond = buildRespondFn(this.axios, body.response_urls[0].response_url);
+      listenerArgs.respond = createRespond(this.axios, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
@@ -1343,7 +1353,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     if (authorize === undefined && !usingOauth) {
       throw new AppInitializationError(
-        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://tools.slack.dev/bolt-js/concepts/authenticating-oauth/ for these required fields.\n`,
+        `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://docs.slack.dev/tools/bolt-js/concepts/authenticating-oauth/ for these required fields.\n`,
       );
       // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
     } else if (authorize !== undefined && usingOauth) {
@@ -1622,16 +1632,6 @@ function selectToken(context: Context, attachFunctionToken: boolean): string | u
     return context.functionBotAccessToken;
   }
   return context.botToken !== undefined ? context.botToken : context.userToken;
-}
-
-function buildRespondFn(
-  axiosInstance: AxiosInstance,
-  responseUrl: string,
-): (response: string | RespondArguments) => Promise<AxiosResponse> {
-  return async (message: string | RespondArguments) => {
-    const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
-    return axiosInstance.post(responseUrl, normalizedArgs);
-  };
 }
 
 function escapeHtml(input: string | undefined | null): string {

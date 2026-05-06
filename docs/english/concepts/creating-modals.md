@@ -6,6 +6,8 @@ Your app receives `trigger_id` parameters in payloads sent to your Request URL t
 
 Read more about modal composition in the [API documentation](/surfaces/modals#composing_views)
 
+### Example
+
 ```javascript
 // Listen for a slash command invocation
 app.command('/ticket', async ({ ack, body, client, logger }) => {

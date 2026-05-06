@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import { InstallProvider } from '@slack/oauth';
@@ -95,6 +96,115 @@ describe('SocketModeReceiver', () => {
         customPropertiesExtractor: ({ type, body }) => ({ payload_type: type, body }),
       });
       assert.isNotNull(receiver);
+    });
+    it('should pass clientPingTimeout to SocketModeClient', async () => {
+      const constructorSpy = sinon.spy();
+      class FakeSocketModeClient extends EventEmitter {
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        constructor(opts: any) {
+          super();
+          constructorSpy(opts);
+        }
+      }
+      const smOverrides = mergeOverrides(overrides, {
+        '@slack/socket-mode': {
+          SocketModeClient: FakeSocketModeClient,
+        },
+      });
+      const SocketModeReceiver = importSocketModeReceiver(smOverrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        clientPingTimeout: 15000,
+      });
+      assert.isNotNull(receiver);
+      sinon.assert.calledOnce(constructorSpy);
+      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.equal(constructorArgs.clientPingTimeout, 15000);
+    });
+    it('should pass serverPingTimeout to SocketModeClient', async () => {
+      const constructorSpy = sinon.spy();
+      class FakeSocketModeClient extends EventEmitter {
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        constructor(opts: any) {
+          super();
+          constructorSpy(opts);
+        }
+      }
+      const smOverrides = mergeOverrides(overrides, {
+        '@slack/socket-mode': {
+          SocketModeClient: FakeSocketModeClient,
+        },
+      });
+      const SocketModeReceiver = importSocketModeReceiver(smOverrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        serverPingTimeout: 60000,
+      });
+      assert.isNotNull(receiver);
+      sinon.assert.calledOnce(constructorSpy);
+      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.equal(constructorArgs.serverPingTimeout, 60000);
+    });
+    it('should pass all socket mode timeout options to SocketModeClient', async () => {
+      const constructorSpy = sinon.spy();
+      class FakeSocketModeClient extends EventEmitter {
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        constructor(opts: any) {
+          super();
+          constructorSpy(opts);
+        }
+      }
+      const smOverrides = mergeOverrides(overrides, {
+        '@slack/socket-mode': {
+          SocketModeClient: FakeSocketModeClient,
+        },
+      });
+      const SocketModeReceiver = importSocketModeReceiver(smOverrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        clientPingTimeout: 15000,
+        serverPingTimeout: 60000,
+        pingPongLoggingEnabled: true,
+        autoReconnectEnabled: false,
+      });
+      assert.isNotNull(receiver);
+      sinon.assert.calledOnce(constructorSpy);
+      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.equal(constructorArgs.clientPingTimeout, 15000);
+      assert.equal(constructorArgs.serverPingTimeout, 60000);
+      assert.equal(constructorArgs.pingPongLoggingEnabled, true);
+      assert.equal(constructorArgs.autoReconnectEnabled, false);
+    });
+    it('should use defaults when socket mode timeout options are not provided', async () => {
+      const constructorSpy = sinon.spy();
+      class FakeSocketModeClient extends EventEmitter {
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        constructor(opts: any) {
+          super();
+          constructorSpy(opts);
+        }
+      }
+      const smOverrides = mergeOverrides(overrides, {
+        '@slack/socket-mode': {
+          SocketModeClient: FakeSocketModeClient,
+        },
+      });
+      const SocketModeReceiver = importSocketModeReceiver(smOverrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+      });
+      assert.isNotNull(receiver);
+      sinon.assert.calledOnce(constructorSpy);
+      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.equal(constructorArgs.appToken, 'my-secret');
+      assert.isUndefined(constructorArgs.clientPingTimeout);
+      assert.isUndefined(constructorArgs.serverPingTimeout);
+      assert.isUndefined(constructorArgs.pingPongLoggingEnabled);
+      assert.isUndefined(constructorArgs.autoReconnectEnabled);
     });
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const SocketModeReceiver = importSocketModeReceiver(overrides);

@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  changelog:
+    name: Changelog
+    runs-on: ubuntu-latest
+    outputs:
+      hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
+      releaseExists: ${{ steps.published.outputs.exists }}
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci --verbose
+
+      - name: Create or update release PR
+        id: changesets
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
+        with:
+          commit: "chore: release"
+          title: "chore: release"
+          version: npm run version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if publish is needed
+        id: published
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if gh release view "v${VERSION}" &>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish
+    needs: changelog
+    if: needs.changelog.outputs.hasChangesets == 'false' && needs.changelog.outputs.releaseExists == 'false'
+    runs-on: ubuntu-latest
+    environment: publish
+    permissions:
+      contents: write
+      id-token: write # OIDC: https://docs.npmjs.com/trusted-publishers
+    steps:
+      - name: Gather credentials
+        id: credentials
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        with:
+          client-id: ${{ secrets.GH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+
+      - name: Checkout repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: true
+          token: ${{ steps.credentials.outputs.token }}
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci --verbose
+
+      - name: Publish to npm and create GitHub releases
+        id: changesets
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
+        with:
+          createGithubReleases: true
+          publish: npm run changeset -- publish
+        env:
+          GITHUB_TOKEN: ${{ steps.credentials.outputs.token }}
+
+      - name: Get publication details
+        if: steps.changesets.outputs.published == 'true'
+        id: release
+        run: |
+          echo "url=$(gh release view --json url -q .url)" >> "$GITHUB_OUTPUT"
+          echo "message=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "\(.name)@\(.version)"' | paste -sd ', ' -)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.credentials.outputs.token }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+
+      - name: Notify Slack
+        if: steps.changesets.outputs.published == 'true'
+        uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c # v3.0.2
+        with:
+          webhook: ${{ secrets.SLACK_RELEASE_ANNOUNCEMENTS_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
+          payload: |
+            action_url: "${{ steps.release.outputs.url }}"
+            message: "${{ steps.release.outputs.message }}"
+            repository: "${{ github.repository }}"

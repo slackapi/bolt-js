@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "4.6.0",
+  "version": "4.7.2",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -25,28 +25,33 @@
     "npm": ">=8.6.0"
   },
   "scripts": {
-    "prepare": "npm run build",
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
+    "changeset": "npx @changesets/cli",
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
+    "prepare": "npm run build",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
-    "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
     "test:coverage": "c8 npm run test:unit",
     "test:types": "tsd --files test/types",
+    "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
+    "version": "npm run changeset version && npm install",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
-  "repository": "slackapi/bolt-js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slackapi/bolt-js.git"
+  },
   "homepage": "https://docs.slack.dev/tools/bolt-js",
   "bugs": {
     "url": "https://github.com/slackapi/bolt-js/issues"
   },
   "dependencies": {
-    "@slack/logger": "^4.0.0",
-    "@slack/oauth": "^3.0.4",
-    "@slack/socket-mode": "^2.0.5",
-    "@slack/types": "^2.19.0",
-    "@slack/web-api": "^7.13.0",
+    "@slack/logger": "^4.0.1",
+    "@slack/oauth": "^3.0.5",
+    "@slack/socket-mode": "^2.0.7",
+    "@slack/types": "^2.20.1",
+    "@slack/web-api": "^7.15.1",
     "axios": "^1.12.0",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
@@ -55,10 +60,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
+    "@changesets/cli": "^2.29.8",
     "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
-    "@types/node": "24.10.1",
+    "@types/node": "18.19.130",
     "@types/proxyquire": "^1.3.31",
     "@types/sinon": "^17.0.4",
     "@types/tsscmp": "^1.0.0",

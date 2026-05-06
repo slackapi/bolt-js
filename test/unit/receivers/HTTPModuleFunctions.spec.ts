@@ -165,6 +165,88 @@ describe('HTTPModuleFunctions', async () => {
         const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         assert.isDefined(result.rawBody);
+        assert.equal(result.rawBody.toString(), 'ssl_check=1');
+      });
+      it('should strip smuggled event payloads from ssl_check requests', async () => {
+        const signingSecret = 'secret';
+        const rawBody = `ssl_check=1&payload=${encodeURIComponent('{"type":"event_callback"}')}`;
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+        assert.equal(result.rawBody.toString(), 'ssl_check=1');
+      });
+      it('should not bypass signature verification when ssl_check=0', async () => {
+        const signingSecret = 'secret';
+        const rawBody = 'ssl_check=0&token=legacy-fixed-verification-token';
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        try {
+          await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+          assert.fail('Expected an error to be thrown');
+        } catch (e) {
+          assert.include((e as Error).message, 'Failed to verify authenticity');
+        }
+      });
+      it('should not bypass signature verification when ssl_check=true', async () => {
+        const signingSecret = 'secret';
+        const rawBody = 'ssl_check=true&token=legacy-fixed-verification-token';
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        try {
+          await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+          assert.fail('Expected an error to be thrown');
+        } catch (e) {
+          assert.include((e as Error).message, 'Failed to verify authenticity');
+        }
+      });
+      it('should not bypass signature verification for ssl_check=1 with JSON content-type', async () => {
+        const signingSecret = 'secret';
+        const rawBody = '{"ssl_check":"1"}';
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/json',
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        try {
+          await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+          assert.fail('Expected an error to be thrown');
+        } catch (e) {
+          assert.include((e as Error).message, 'Failed to verify authenticity');
+        }
+      });
+      it('should not bypass signature verification when ssl_check is empty', async () => {
+        const signingSecret = 'secret';
+        const rawBody = 'ssl_check=&token=legacy-fixed-verification-token';
+        const req = {
+          rawBody: Buffer.from(rawBody),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+        } as unknown as BufferedIncomingMessage;
+        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        try {
+          await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
+          assert.fail('Expected an error to be thrown');
+        } catch (e) {
+          assert.include((e as Error).message, 'Failed to verify authenticity');
+        }
       });
       it('should detect invalid signature for application/x-www-form-urlencoded body', async () => {
         const signingSecret = 'secret';

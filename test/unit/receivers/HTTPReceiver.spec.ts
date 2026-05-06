@@ -609,5 +609,65 @@ describe('HTTPReceiver', () => {
 
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
     });
+
+    describe('ssl_check handling', () => {
+      let fakeHttpFunctions: Record<string, sinon.SinonSpy>;
+      let receiver: InstanceType<ReturnType<typeof importHTTPReceiver>>;
+      let fakeRes: ServerResponse;
+
+      beforeEach(() => {
+        fakeHttpFunctions = {
+          parseAndVerifyHTTPRequest: sinon.fake.resolves({
+            rawBody: Buffer.from(''),
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          }),
+          parseHTTPRequestBody: sinon.fake(),
+          buildSSLCheckResponse: sinon.fake(),
+          buildNoBodyResponse: sinon.fake(),
+          extractRetryNumFromHTTPRequest: sinon.fake.returns(undefined),
+          extractRetryReasonFromHTTPRequest: sinon.fake.returns(undefined),
+        };
+        const HTTPReceiver = importHTTPReceiver(
+          mergeOverrides(overrides, { './HTTPModuleFunctions': fakeHttpFunctions }),
+        );
+        receiver = new HTTPReceiver({
+          logger: noopLogger,
+          clientId: 'my-clientId',
+          clientSecret: 'my-client-secret',
+          signingSecret: 'secret',
+        });
+        fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      });
+
+      it('should respond to ssl_check=1 with 200', async () => {
+        fakeHttpFunctions.parseHTTPRequestBody = sinon.fake.returns({ ssl_check: '1' });
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setImmediate(resolve));
+        sinon.assert.calledOnce(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+
+      it('should not treat ssl_check=0 as an ssl_check request', async () => {
+        fakeHttpFunctions.parseHTTPRequestBody = sinon.fake.returns({ ssl_check: '0' });
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setImmediate(resolve));
+        sinon.assert.notCalled(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+
+      it('should not treat an empty ssl_check value as an ssl_check request', async () => {
+        fakeHttpFunctions.parseHTTPRequestBody = sinon.fake.returns({ ssl_check: '' });
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setImmediate(resolve));
+        sinon.assert.notCalled(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+    });
   });
 });
