@@ -1,12 +1,16 @@
-import type { AxiosInstance, AxiosResponse } from 'axios';
+import type { FetchFunction } from '@slack/web-api';
 import type { RespondArguments } from '../types';
 
 export function createRespond(
-  axiosInstance: AxiosInstance,
+  fetchFn: FetchFunction,
   responseUrl: string,
-): (response: string | RespondArguments) => Promise<AxiosResponse> {
+): (response: string | RespondArguments) => Promise<Response> {
   return async (message: string | RespondArguments) => {
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
-    return axiosInstance.post(responseUrl, normalizedArgs);
+    return fetchFn(responseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(normalizedArgs),
+    });
   };
 }
