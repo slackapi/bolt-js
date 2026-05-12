@@ -21,8 +21,8 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">=18",
-    "npm": ">=8.6.0"
+    "node": ">= 20",
+    "npm": ">=9.6.4"
   },
   "scripts": {
     "build": "npm run build:clean && tsc",

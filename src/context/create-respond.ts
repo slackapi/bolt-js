@@ -1,10 +1,7 @@
 import type { FetchFunction } from '@slack/web-api';
-import type { RespondArguments } from '../types';
+import type { RespondArguments, RespondFn } from '../types';
 
-export function createRespond(
-  fetchFn: FetchFunction,
-  responseUrl: string,
-): (response: string | RespondArguments) => Promise<Response> {
+export function createRespond(fetchFn: FetchFunction, responseUrl: string): RespondFn {
   return async (message: string | RespondArguments) => {
     const normalizedArgs: RespondArguments = typeof message === 'string' ? { text: message } : message;
     return fetchFn(responseUrl, {
