@@ -134,10 +134,10 @@
     "label": "日本語 (日本)",
     "link": {
       "type": "doc",
-      "id": "tools/bolt-js/ja-jp/getting-started"
+      "id": "tools/bolt-js/ja-jp/creating-an-app"
     },
     "items": [
-      "tools/bolt-js/ja-jp/getting-started",
+      "tools/bolt-js/ja-jp/creating-an-app",
       {
         "type": "category",
         "label": "Slack API コール",
