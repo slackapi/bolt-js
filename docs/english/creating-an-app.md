@@ -1,5 +1,5 @@
 ---
-sidebar_label: Building an App
+sidebar_label: Creating an App
 ---
 
 # Creating an app with Bolt for JavaScript
