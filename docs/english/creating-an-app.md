@@ -95,6 +95,7 @@ Create and move into a new directory before you initialize the project:
 $ mkdir first-bolt-app
 $ cd first-bolt-app
 $ npm init
+$ npm pkg set type=module
 ```
 
 You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
@@ -211,7 +212,7 @@ $ export SLACK_APP_TOKEN=xapp-<your-app-token>
 Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -248,7 +249,7 @@ $ export SLACK_SIGNING_SECRET=<your-signing-secret>
 2. Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -346,7 +347,7 @@ The following example listens and responds to all messages in channels/DMs where
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -375,7 +376,7 @@ app.message("hello", async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -440,7 +441,7 @@ Below, the `app.js` file from the last section is modified to send a message con
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -488,7 +489,7 @@ app.message("hello", async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -559,7 +560,7 @@ https://github.com/slack-samples/bolt-js-getting-started-app/blob/main/app.js
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
