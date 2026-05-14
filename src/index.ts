@@ -24,15 +24,17 @@ export {
 
 // Import receivers first, then re-export for better ESM compatibility
 import AwsLambdaReceiver from './receivers/AwsLambdaReceiver';
+import CloudflareWorkerReceiver from './receivers/CloudflareWorkerReceiver';
 import ExpressReceiver from './receivers/ExpressReceiver';
 import HTTPReceiver from './receivers/HTTPReceiver';
 import SocketModeReceiver from './receivers/SocketModeReceiver';
 
-export { ExpressReceiver, SocketModeReceiver, HTTPReceiver, AwsLambdaReceiver };
+export { ExpressReceiver, SocketModeReceiver, HTTPReceiver, AwsLambdaReceiver, CloudflareWorkerReceiver };
 export type { ExpressReceiverOptions } from './receivers/ExpressReceiver';
 export type { SocketModeReceiverOptions } from './receivers/SocketModeReceiver';
 export type { HTTPReceiverOptions } from './receivers/HTTPReceiver';
 export type { AwsLambdaReceiverOptions } from './receivers/AwsLambdaReceiver';
+export type { CloudflareWorkerReceiverOptions } from './receivers/CloudflareWorkerReceiver';
 
 export { BufferedIncomingMessage } from './receivers/BufferedIncomingMessage';
 export {

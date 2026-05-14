@@ -100,3 +100,23 @@ export function createDummyAWSPayload(
     isBase64Encoded,
   };
 }
+
+export function createDummyCloudflareRequest(
+  body: string,
+  timestamp: number = Math.floor(Date.now() / 1000),
+  headers?: Record<string, string>,
+): Request {
+  const signature = crypto.createHmac('sha256', 'my-secret').update(`v0:${timestamp}:${body}`).digest('hex');
+  return new Request('https://xxx.example.workers.dev/slack/events', {
+    method: 'POST',
+    headers: headers || {
+      Accept: 'application/json,*/*',
+      'Content-Type': 'application/json',
+      Host: 'xxx.example.workers.dev',
+      'User-Agent': 'Slackbot 1.0 (+https://api.slack.com/robots)',
+      'X-Slack-Request-Timestamp': `${timestamp}`,
+      'X-Slack-Signature': `v0=${signature}`,
+    },
+    body,
+  });
+}

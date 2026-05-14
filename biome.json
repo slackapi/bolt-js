@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["examples/**/dist"]
+    "ignore": ["examples/**/dist", "examples/deploy-cloudflare-workers/worker-configuration.d.ts"]
   },
   "formatter": {
     "enabled": true,

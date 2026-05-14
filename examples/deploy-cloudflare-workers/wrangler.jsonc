@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "bolt-js-cloudflare-worker-receiver",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"]
+}
