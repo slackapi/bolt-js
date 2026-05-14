@@ -47,12 +47,11 @@
     "url": "https://github.com/slackapi/bolt-js/issues"
   },
   "dependencies": {
-    "@slack/logger": "^4.0.1",
-    "@slack/oauth": "^3.0.5",
-    "@slack/socket-mode": "^2.0.7",
-    "@slack/types": "^2.21.1",
-    "@slack/web-api": "^7.15.2",
-    "axios": "^1.12.0",
+    "@slack/logger": "^5.0.0-rc.1",
+    "@slack/oauth": "^4.0.0-rc.1",
+    "@slack/socket-mode": "^3.0.0-rc.2",
+    "@slack/types": "^3.0.0-rc.1",
+    "@slack/web-api": "^8.0.0-rc.1",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",

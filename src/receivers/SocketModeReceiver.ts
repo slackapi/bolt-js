@@ -9,6 +9,7 @@ import {
   type InstallURLOptions,
 } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
+import type { SocketModeOptions } from '@slack/socket-mode';
 import type { AppsConnectionsOpenResponse } from '@slack/web-api';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
@@ -38,6 +39,7 @@ export interface SocketModeReceiverOptions {
   scopes?: InstallURLOptions['scopes'];
   installerOptions?: InstallerOptions;
   appToken: string; // App Level Token
+  dispatcher?: SocketModeOptions['dispatcher'];
   customRoutes?: CustomRoute[];
   clientPingTimeout?: number;
   serverPingTimeout?: number;
@@ -98,6 +100,7 @@ export default class SocketModeReceiver implements Receiver {
 
   public constructor({
     appToken,
+    dispatcher,
     logger = undefined,
     logLevel = LogLevel.INFO,
     clientPingTimeout = undefined,
@@ -117,6 +120,7 @@ export default class SocketModeReceiver implements Receiver {
   }: SocketModeReceiverOptions) {
     this.client = new SocketModeClient({
       appToken,
+      dispatcher,
       logLevel,
       logger,
       clientPingTimeout,

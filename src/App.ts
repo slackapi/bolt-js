@@ -1,9 +1,6 @@
-import type { Agent } from 'node:http';
-import type { SecureContextOptions } from 'node:tls';
 import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
-import { WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
-import axios, { type AxiosInstance } from 'axios';
+import { type FetchFunction, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
@@ -126,8 +123,6 @@ export interface AppOptions {
   installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
   scopes?: HTTPReceiverOptions['scopes'];
   installerOptions?: HTTPReceiverOptions['installerOptions'];
-  agent?: Agent;
-  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
   appToken?: string; // TODO should this be included in AuthorizeResult
@@ -254,7 +249,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
   private errorHandler: AnyErrorHandler;
 
-  private axios: AxiosInstance;
+  private fetchFn: FetchFunction;
 
   private installerOptions: HTTPReceiverOptions['installerOptions'];
 
@@ -286,8 +281,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     endpoints = undefined,
     port = undefined,
     customRoutes = undefined,
-    agent = undefined,
-    clientTls = undefined,
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
@@ -351,12 +344,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     /* ------------------------ Set client options ------------------------*/
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
-    if (agent !== undefined && this.clientOptions.agent === undefined) {
-      this.clientOptions.agent = agent;
-    }
-    if (clientTls !== undefined && this.clientOptions.tls === undefined) {
-      this.clientOptions.tls = clientTls;
-    }
     if (logLevel !== undefined && logger === undefined) {
       // only logLevel is passed
       this.clientOptions.logLevel = logLevel;
@@ -368,16 +355,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Since v3.4, it can have the passed token in the case of single workspace installation.
     this.client = new WebClient(token, this.clientOptions);
 
-    this.axios = axios.create({
-      httpAgent: agent,
-      httpsAgent: agent,
-      // disabling axios' automatic proxy support:
-      // axios would read from env vars to configure a proxy automatically, but it doesn't support TLS destinations.
-      // for compatibility with https://api.slack.com, and for a larger set of possible proxies (SOCKS or other
-      // protocols), users of this package should use the `agent` option to configure a proxy.
-      proxy: false,
-      ...clientTls,
-    });
+    this.fetchFn = this.clientOptions.fetch ?? globalThis.fetch;
 
     this.middleware = [];
     this.listeners = [];
@@ -1147,10 +1125,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = createRespond(this.axios, body.response_url);
+      listenerArgs.respond = createRespond(this.fetchFn, body.response_url);
     } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
       // This can exist only when view_submission payloads - response_url_enabled: true
-      listenerArgs.respond = createRespond(this.axios, body.response_urls[0].response_url);
+      listenerArgs.respond = createRespond(this.fetchFn, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
