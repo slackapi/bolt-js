@@ -18,7 +18,7 @@ npm install @slack/bolt
 Create an app by calling the constructor, which is a top-level export.
 
 ```js
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,

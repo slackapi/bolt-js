@@ -66,6 +66,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 mkdir first-bolt-app
 cd first-bolt-app
 npm init
+npm pkg set type=module
 ```
 
 新しいプロジェクトを説明するための一連の質問が表示されます (特に問題がなければ、各プロンプトで <kbd>Enter</kbd> を押すと、デフォルトを受け入れることができます)。完了すると、ディレクトリ内に新しい `package.json` ファイルが作成されます。
@@ -99,7 +100,7 @@ npm install @slack/bolt
 このディレクトリ内に `app.js` という名前の新しいファイルを作成し、以下のコードを追加します。
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 // ボットトークンと Signing Secret を使ってアプリを初期化します
 const app = new App({
@@ -224,7 +225,7 @@ const app = new App({
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -254,7 +255,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -321,7 +322,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -370,7 +371,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -431,7 +432,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -487,7 +488,7 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from "@slack/bolt";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
