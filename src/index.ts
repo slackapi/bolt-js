@@ -71,14 +71,6 @@ export {
   AssistantUserMessageMiddleware,
 } from './Assistant';
 
-export {
-  WorkflowStep,
-  WorkflowStepConfig,
-  WorkflowStepEditMiddleware,
-  WorkflowStepSaveMiddleware,
-  WorkflowStepExecuteMiddleware,
-} from './WorkflowStep';
-
 // Re-export OAuth runtime classes
 export { MemoryInstallationStore, FileInstallationStore } from '@slack/oauth';
 
