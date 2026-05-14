@@ -103,9 +103,9 @@ describe('App global middleware Processing', () => {
 
     assert(fakeMiddleware.notCalled);
     assert(fakeLogger.warn.called);
-    assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+    assert.instanceOf(fakeErrorHandler.firstCall.args[0], AuthorizationError);
     assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
-    assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'original', dummyAuthorizationError.original);
+    assert.strictEqual(fakeErrorHandler.firstCall.args[0].original, dummyAuthorizationError);
     assert(fakeAck.called);
   });
 
