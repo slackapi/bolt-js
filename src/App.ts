@@ -1,6 +1,14 @@
 import util from 'node:util';
 import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
-import { type FetchFunction, WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
+import {
+  type FetchFunction,
+  WebAPIHTTPError,
+  WebAPIPlatformError,
+  WebAPIRateLimitedError,
+  WebClient,
+  type WebClientOptions,
+  addAppMetadata,
+} from '@slack/web-api';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
@@ -20,8 +28,8 @@ import type { SayStreamFn, SetStatusFn } from './context';
 import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
 import {
   AppInitializationError,
+  AuthorizationError,
   type CodedError,
-  ErrorCode,
   InvalidCustomPropertyError,
   MultipleListenerError,
   asCodedError,
@@ -918,12 +926,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       try {
         authorizeResult = await this.authorize(source, bodyArg);
       } catch (error) {
-        // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
-        const e = error as any;
+        const e = error instanceof Error ? error : new Error(String(error));
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-        e.code = ErrorCode.AuthorizationError;
+        const authError = new AuthorizationError(`Authorization of incoming event did not succeed. ${e.message}`, e);
         await this.handleError({
-          error: e,
+          error: authError,
           logger: this.logger,
           body: bodyArg,
           context: {
@@ -1351,7 +1358,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error: CodedError) => {
-    logger.error(error);
+    if (error instanceof WebAPIPlatformError) {
+      logger.error(`Slack API error: ${error.data.error}`);
+    } else if (error instanceof WebAPIRateLimitedError) {
+      logger.error(`Rate limited, retry after ${error.retryAfter}s`);
+    } else if (error instanceof WebAPIHTTPError) {
+      logger.error(`HTTP error ${error.statusCode}: ${error.statusMessage}`);
+    } else {
+      logger.error(error);
+    }
 
     return Promise.reject(error);
   };
