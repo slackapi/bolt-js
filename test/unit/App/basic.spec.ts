@@ -4,9 +4,9 @@ import sinon from 'sinon';
 import { ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
 import {
-  FakeReceiver,
   createFakeConversationStore,
   createFakeLogger,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noop,

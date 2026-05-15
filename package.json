@@ -58,7 +58,7 @@
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.0",
+    "@biomejs/biome": "^2.4.15",
     "@changesets/cli": "^2.29.8",
     "@tsconfig/node20": "^20.1.5",
     "@types/chai": "^4.1.7",
