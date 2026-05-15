@@ -6,11 +6,11 @@ import type { ExtendedErrorHandlerArgs } from '../../../../src/App';
 import { AuthorizationError, type CodedError, ErrorCode, UnknownError } from '../../../../src/errors';
 import type { NextFn, ReceiverEvent } from '../../../../src/types';
 import {
-  FakeReceiver,
   createDummyCustomFunctionMiddlewareArgs,
   createDummyReceiverEvent,
   createFakeLogger,
   delay,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noopMiddleware,

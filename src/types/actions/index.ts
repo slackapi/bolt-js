@@ -7,8 +7,8 @@ import type { InteractiveMessage } from './interactive-message';
 import type { WorkflowStepEdit } from './workflow-step-edit';
 
 export * from './block-action';
-export * from './interactive-message';
 export * from './dialog-action';
+export * from './interactive-message';
 // TODO: remove workflow step stuff in bolt v5
 export * from './workflow-step-edit';
 
