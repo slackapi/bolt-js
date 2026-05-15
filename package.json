@@ -33,7 +33,7 @@
     "prepare": "npm run build",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
     "test:unit": "TSX_TSCONFIG_PATH=tsconfig.test.json tsx --test test/unit/**/*.spec.ts",
-    "test:coverage": "TSX_TSCONFIG_PATH=tsconfig.test.json node --experimental-test-coverage --import tsx --test test/unit/**/*.spec.ts",
+    "test:coverage": "npm run build && shx mkdir -p coverage && TSX_TSCONFIG_PATH=tsconfig.test.json node --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --import tsx --test test/unit/**/*.spec.ts",
     "test:types": "tsd --files test/types",
     "version": "npm run changeset version && npm install", 
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
