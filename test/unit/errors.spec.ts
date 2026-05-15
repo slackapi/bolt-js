@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import {
   AppInitializationError,
   AuthorizationError,
+  asCodedError,
   type CodedError,
   ContextMissingPropertyError,
   ErrorCode,
   ReceiverAuthenticityError,
   ReceiverMultipleAckError,
   UnknownError,
-  asCodedError,
 } from '../../src/errors';
 import { describe, it } from 'node:test';
 

@@ -11,7 +11,6 @@ import type {
 } from '@slack/types';
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
-import { createFakeLogger } from '.';
 import type {
   AssistantThreadContextChangedMiddlewareArgs,
   AssistantThreadStartedMiddlewareArgs,
@@ -48,6 +47,7 @@ import type {
   ViewOutput,
   ViewSubmitAction,
 } from '../../../src/types';
+import { createFakeLogger } from '.';
 
 const ts = '1234.56';
 const user = 'U1234';

@@ -14,17 +14,17 @@ import {
   ReceiverInconsistentStateError,
 } from '../../../src/errors';
 import ExpressReceiver, {
+  buildBodyParserMiddleware,
   respondToSslCheck,
   respondToUrlVerification,
   verifySignatureAndParseRawBody,
-  buildBodyParserMiddleware,
 } from '../../../src/receivers/ExpressReceiver';
 import type { ReceiverEvent } from '../../../src/types';
 import {
-  FakeServer,
-  type Override,
   createFakeLogger,
+  FakeServer,
   mergeOverrides,
+  type Override,
   proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,

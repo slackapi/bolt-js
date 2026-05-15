@@ -1,6 +1,6 @@
-import { type Server, type ServerResponse, createServer } from 'node:http';
+import { createServer, type Server, type ServerResponse } from 'node:http';
 import { URL } from 'node:url';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import {
   type CallbackOptions,
   type InstallPathOptions,
@@ -16,13 +16,13 @@ import type App from '../App';
 import type { CodedError } from '../errors';
 import type { Receiver, ReceiverEvent } from '../types';
 import type { StringIndexed } from '../types/utilities';
+import { buildReceiverRoutes, type ReceiverRoutes } from './custom-routes';
 import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import {
-  type SocketModeReceiverProcessEventErrorHandlerArgs,
   defaultProcessEventErrorHandler,
+  type SocketModeReceiverProcessEventErrorHandlerArgs,
 } from './SocketModeFunctions';
 import { SocketModeResponseAck } from './SocketModeResponseAck';
-import { type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // TODO: we throw away the key names for endpoints, so maybe we should use this interface. is it better for migrations?

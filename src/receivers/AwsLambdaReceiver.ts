@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import querystring from 'node:querystring';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import tsscmp from 'tsscmp';
 import type App from '../App';
 import { ReceiverMultipleAckError } from '../errors';

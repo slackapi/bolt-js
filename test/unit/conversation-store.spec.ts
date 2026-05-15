@@ -1,3 +1,4 @@
+import { describe, it } from 'node:test';
 import path from 'node:path';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
@@ -5,7 +6,6 @@ import assert, { AssertionError } from 'node:assert/strict';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
-import { describe, it } from 'node:test';
 
 /* Testing Harness */
 

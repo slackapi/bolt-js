@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
-  createDummyAWSPayload,
   createDummyAppMentionEventMiddlewareArgs,
+  createDummyAWSPayload,
   createFakeLogger,
   importApp,
   mergeOverrides,

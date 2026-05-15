@@ -1,13 +1,13 @@
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import {
-  FakeReceiver,
-  type Override,
   createDummyMessageShortcutMiddlewareArgs,
   createFakeLogger,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noopMiddleware,
+  type Override,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,
@@ -95,7 +95,7 @@ describe('App shortcut() routing', () => {
   });
 
   it('should throw if provided a constraint with unknown shortcut constraint keys', async () => {
-    // @ts-ignore providing known invalid shortcut constraint parameter
+    // @ts-expect-error providing known invalid shortcut constraint parameter
     app.shortcut({ id: 'boom' }, fakeHandler);
     sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
   });

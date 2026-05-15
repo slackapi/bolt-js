@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import { ErrorCode, isCodedError } from '../../../../src/errors';
 import { FakeReceiver, createDummyReceiverEvent, importApp } from '../../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 describe('App listener middleware processing', () => {
   let fakeReceiver: FakeReceiver;

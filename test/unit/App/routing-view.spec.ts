@@ -1,14 +1,14 @@
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import {
-  FakeReceiver,
-  type Override,
   createDummyViewClosedMiddlewareArgs,
   createDummyViewSubmissionMiddlewareArgs,
   createFakeLogger,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noopMiddleware,
+  type Override,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,
@@ -50,7 +50,7 @@ describe('App view() routing', () => {
   });
 
   it('should throw if provided a constraint with unknown view constraint keys', async () => {
-    // @ts-ignore providing known invalid view constraint parameter
+    // @ts-expect-error providing known invalid view constraint parameter
     app.view({ id: 'boom' }, fakeHandler);
     sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
   });

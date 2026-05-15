@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import {
-  FakeReceiver,
-  type Override,
   createDummyBlockActionEventMiddlewareArgs,
   createDummyFunctionScopedBlockActionEventMiddlewareArgs,
   createFakeLogger,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noopMiddleware,
+  type Override,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,
@@ -88,7 +88,7 @@ describe('App action() routing', () => {
   });
 
   it('should throw if provided a constraint with unknown action constraint keys', async () => {
-    // @ts-ignore providing known invalid action constraint parameter
+    // @ts-expect-error providing known invalid action constraint parameter
     app.action({ id: 'boom' }, fakeHandler);
     sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
   });

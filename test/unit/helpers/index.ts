@@ -6,11 +6,11 @@ import type { NextFn } from '../../../src/types';
 
 // Ensure that the module gets loaded fresh every time
 proxyquire.noPreserveCache();
-export { proxyquire };
 
 export * from './app';
 export * from './events';
 export * from './receivers';
+export { proxyquire };
 
 export function createFakeLogger() {
   return sinon.createStubInstance(ConsoleLogger);
