@@ -23,7 +23,7 @@ const app = new App({
 });
 
 // Slack interactions like listening for events are methods on app
-app.event('message', async () => {
+app.event('message', async ({ event, client }) => {
   // Do some slack-specific stuff here
   // await client.chat.postMessage(...);
 });
