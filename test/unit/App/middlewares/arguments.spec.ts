@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import { LogLevel } from '../../../../src/App';
 import type { SayStreamFn } from '../../../../src/context/create-say-stream';
@@ -439,7 +440,7 @@ describe('App middleware and listener arguments', () => {
 
       sinon.assert.calledThrice(fakeAck);
 
-      assert.isUndefined(app.client.token);
+      assert.strictEqual(app.client.token, undefined);
       assert.equal(clients[0].token, 'xoxb-123');
       assert.equal(clients[1].token, 'xoxp-456');
       assert.equal(clients[2].token, 'xoxb-123');
@@ -556,8 +557,12 @@ describe('App middleware and listener arguments', () => {
         // Assert that each call to fakePostMessage had the right arguments
         for (const call of fakePostMessage.getCalls()) {
           const firstArg = call.args[0];
-          assert.propertyVal(firstArg, 'text', dummyMessage);
-          assert.propertyVal(firstArg, 'channel', dummyChannelId);
+          assert.ok(firstArg && typeof firstArg === 'object');
+          assert.ok('text' in firstArg);
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).text, dummyMessage);
+          assert.ok(firstArg && typeof firstArg === 'object');
+          assert.ok('channel' in firstArg);
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).channel, dummyChannelId);
         }
         sinon.assert.notCalled(fakeErrorHandler);
       });
@@ -583,8 +588,12 @@ describe('App middleware and listener arguments', () => {
         // Assert that each call to fakePostMessage had the right arguments
         for (const call of fakePostMessage.getCalls()) {
           const firstArg = call.args[0];
-          assert.propertyVal(firstArg, 'channel', dummyChannelId);
-          assert.propertyVal(firstArg, 'text', dummyMessage.text);
+          assert.ok(firstArg && typeof firstArg === 'object');
+          assert.ok('channel' in firstArg);
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).channel, dummyChannelId);
+          assert.ok(firstArg && typeof firstArg === 'object');
+          assert.ok('text' in firstArg);
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).text, dummyMessage.text);
         }
         sinon.assert.notCalled(fakeErrorHandler);
       });
@@ -645,7 +654,7 @@ describe('App middleware and listener arguments', () => {
 
         const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
         app.use(async (args) => {
-          assert.notProperty(args, 'say');
+          assert.ok(!('say' in args));
           // If the above assertion fails, then it would throw an AssertionError and the following line will not be
           // called
           assertionAggregator();
@@ -689,7 +698,7 @@ describe('App middleware and listener arguments', () => {
       app.use(async (args) => {
         // biome-ignore lint/suspicious/noExplicitAny: test utility
         const sayStream = (args as any).sayStream as SayStreamFn;
-        assert.isFunction(sayStream);
+        assert.strictEqual(typeof sayStream, 'function');
         assertionAggregator();
       });
       app.error(fakeErrorHandler);
@@ -753,7 +762,7 @@ describe('App middleware and listener arguments', () => {
       const assertionAggregator = sinon.fake();
       const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       app.use(async (args) => {
-        assert.notProperty(args, 'sayStream');
+        assert.ok(!('sayStream' in args));
         assertionAggregator();
       });
 
@@ -783,7 +792,7 @@ describe('App middleware and listener arguments', () => {
       app.use(async (args) => {
         // biome-ignore lint/suspicious/noExplicitAny: test utility
         const setStatus = (args as any).setStatus as SetStatusFn;
-        assert.isFunction(setStatus);
+        assert.strictEqual(typeof setStatus, 'function');
         assertionAggregator();
       });
       app.error(fakeErrorHandler);
@@ -812,7 +821,7 @@ describe('App middleware and listener arguments', () => {
       const assertionAggregator = sinon.fake();
       const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
       app.use(async (args) => {
-        assert.notProperty(args, 'setStatus');
+        assert.ok(!('setStatus' in args));
         assertionAggregator();
       });
 
@@ -967,7 +976,7 @@ describe('App middleware and listener arguments', () => {
         ack: fakeAck,
       });
 
-      assert.isTrue(called);
+      assert.strictEqual(called, true);
       sinon.assert.calledOnce(fakeAck);
     });
 

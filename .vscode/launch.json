@@ -8,14 +8,19 @@
       "type": "node",
       "request": "launch",
       "name": "Spec tests",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "runtimeExecutable": "node",
       "stopOnEntry": false,
-      "args": ["--config", ".mocharc.json", "--no-timeouts", "src/*.spec.ts", "src/**/*.spec.ts"],
+      "args": [
+        "--inspect-brk",
+        "--import",
+        "tsx",
+        "--test",
+        "test/unit/**/*.spec.ts"
+      ],
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": null,
       "env": {
         "NODE_ENV": "testing",
-        "TS_NODE_PROJECT": "tsconfig.test.json"
+        "TSX_TSCONFIG_PATH": "tsconfig.test.json"
       },
       "skipFiles": ["<node_internals>/**"]
     }

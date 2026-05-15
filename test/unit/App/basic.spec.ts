@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { LogLevel } from '@slack/logger';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
@@ -34,13 +35,17 @@ describe('App basic features', () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '', port: 9999 });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'port', 9999);
+        assert.ok(app['receiver'] && typeof app['receiver'] === 'object');
+        assert.ok('port' in app.receiver);
+        assert.deepStrictEqual((app.receiver as unknown as Record<PropertyKey, unknown>).port, 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '', port: 7777, installerOptions: { port: 9999 } });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'port', 9999);
+        assert.ok(app['receiver'] && typeof app['receiver'] === 'object');
+        assert.ok('port' in app.receiver);
+        assert.deepStrictEqual((app.receiver as unknown as Record<PropertyKey, unknown>).port, 9999);
       });
     });
 
@@ -65,7 +70,9 @@ describe('App basic features', () => {
           installationStore,
         });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
+        assert.ok(app['receiver'] && typeof app['receiver'] === 'object');
+        assert.ok('httpServerPort' in app.receiver);
+        assert.deepStrictEqual((app.receiver as unknown as Record<PropertyKey, unknown>).httpServerPort, 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = importApp(overrides);
@@ -82,7 +89,9 @@ describe('App basic features', () => {
           installationStore,
         });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
+        assert.ok(app['receiver'] && typeof app['receiver'] === 'object');
+        assert.ok('httpServerPort' in app.receiver);
+        assert.deepStrictEqual((app.receiver as unknown as Record<PropertyKey, unknown>).httpServerPort, 9999);
       });
     });
 
@@ -93,12 +102,12 @@ describe('App basic features', () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: '' });
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
-        assert.instanceOf(app, MockApp);
+        assert.ok(app instanceof MockApp);
       });
       it('should pass the given token to app.client', async () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: 'xoxb-foo-bar', signingSecret: '' });
-        assert.isDefined(app.client);
+        assert.notStrictEqual(app.client, undefined);
         assert.equal(app.client.token, 'xoxb-foo-bar');
       });
     });
@@ -114,7 +123,12 @@ describe('App basic features', () => {
         new MockApp({ signingSecret: '' });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.AppInitializationError,
+        );
       }
     });
     it('should fail when both a token and authorize callback are specified', async () => {
@@ -124,7 +138,12 @@ describe('App basic features', () => {
         new MockApp({ token: '', authorize: authorizeCallback, signingSecret: '' });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.AppInitializationError,
+        );
         assert(authorizeCallback.notCalled);
       }
     });
@@ -135,7 +154,12 @@ describe('App basic features', () => {
         new MockApp({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.AppInitializationError,
+        );
         assert(authorizeCallback.notCalled);
       }
     });
@@ -152,7 +176,12 @@ describe('App basic features', () => {
         });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.AppInitializationError,
+        );
         assert(authorizeCallback.notCalled);
       }
     });
@@ -171,7 +200,12 @@ describe('App basic features', () => {
         new MockApp({ authorize: noop });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.AppInitializationError,
+        );
       }
     });
     it('should fail when both socketMode and a custom receiver are specified', async () => {
@@ -181,7 +215,12 @@ describe('App basic features', () => {
         new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.AppInitializationError,
+        );
       }
     });
     it('should succeed when both socketMode and SocketModeReceiver are specified', async () => {
@@ -220,7 +259,7 @@ describe('App basic features', () => {
         const dummyConvoStore = createFakeConversationStore();
         const MockApp = importApp(overrides);
         const app = new MockApp({ convoStore: dummyConvoStore, authorize: noop, signingSecret: '' });
-        assert.instanceOf(app, MockApp);
+        assert.ok(app instanceof MockApp);
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
@@ -231,7 +270,12 @@ describe('App basic features', () => {
           new MockApp({ token: '', signingSecret: '', redirectUri: 'http://example.com/redirect' }); // eslint-disable-line no-new
           assert.fail();
         } catch (error) {
-          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+          assert.ok(error && typeof error === 'object');
+          assert.ok('code' in error);
+          assert.deepStrictEqual(
+            (error as unknown as Record<PropertyKey, unknown>).code,
+            ErrorCode.AppInitializationError,
+          );
         }
       });
       it('should fail when missing installerOptions.redirectUriPath', async () => {
@@ -245,7 +289,12 @@ describe('App basic features', () => {
           });
           assert.fail();
         } catch (error) {
-          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+          assert.ok(error && typeof error === 'object');
+          assert.ok('code' in error);
+          assert.deepStrictEqual(
+            (error as unknown as Record<PropertyKey, unknown>).code,
+            ErrorCode.AppInitializationError,
+          );
         }
       });
     });
@@ -306,14 +355,15 @@ describe('App basic features', () => {
           signingSecret: 'invalid-one',
           deferInitialization: true,
         });
-        assert.instanceOf(app, MockApp);
+        assert.ok(app instanceof MockApp);
         try {
           await app.start();
           assert.fail('The start() method should fail before init() call');
         } catch (err) {
-          assert.propertyVal(
-            err,
-            'message',
+          assert.ok(err && typeof err === 'object');
+          assert.ok('message' in err);
+          assert.deepStrictEqual(
+            (err as unknown as Record<PropertyKey, unknown>).message,
             'This App instance is not yet initialized. Call `await App#init()` before starting the app.',
           );
         }
@@ -322,7 +372,9 @@ describe('App basic features', () => {
           assert.fail('The init() method should fail here');
         } catch (err) {
           console.log(err);
-          assert.propertyVal(err, 'message', exception);
+          assert.ok(err && typeof err === 'object');
+          assert.ok('message' in err);
+          assert.deepStrictEqual((err as unknown as Record<PropertyKey, unknown>).message, exception);
         }
       });
     });
@@ -336,8 +388,12 @@ describe('App basic features', () => {
         const fakeLogger = createFakeLogger();
         const MockApp = importApp(overrides);
         const app = new MockApp({ logger: fakeLogger, token: '', appToken: fakeAppToken, developerMode: true });
-        assert.propertyVal(app, 'logLevel', LogLevel.DEBUG);
-        assert.propertyVal(app, 'socketMode', true);
+        assert.ok(app && typeof app === 'object');
+        assert.ok('logLevel' in app);
+        assert.deepStrictEqual((app as unknown as Record<PropertyKey, unknown>).logLevel, LogLevel.DEBUG);
+        assert.ok(app && typeof app === 'object');
+        assert.ok('socketMode' in app);
+        assert.deepStrictEqual((app as unknown as Record<PropertyKey, unknown>).socketMode, true);
       });
     });
 

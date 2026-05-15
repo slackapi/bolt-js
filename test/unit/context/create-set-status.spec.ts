@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { createSetStatus } from '../../../src/context';
 

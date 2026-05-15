@@ -1,4 +1,5 @@
-import { assert } from 'chai';
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import {
@@ -118,8 +119,8 @@ describe('App action() routing', () => {
     const testInputs = { test: true };
     const testHandler = sinon.spy(async ({ inputs, complete, fail, client }) => {
       assert.equal(inputs, testInputs);
-      assert.typeOf(complete, 'function');
-      assert.typeOf(fail, 'function');
+      assert.strictEqual(typeof complete, 'function');
+      assert.strictEqual(typeof fail, 'function');
       assert.equal(client.token, 'xwfp-valid');
     });
     app.action('my_id', testHandler);

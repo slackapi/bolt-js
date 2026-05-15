@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import { assert } from 'chai';
+import { describe, it } from 'node:test';
 import sinon from 'sinon';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
@@ -30,7 +31,7 @@ describe('AwsLambdaReceiver', () => {
       signingSecret: 'my-secret',
       logger: noopLogger,
     });
-    assert.isNotNull(awsReceiver);
+    assert.notStrictEqual(awsReceiver, null);
   });
 
   it('should have start method', async () => {
@@ -39,7 +40,7 @@ describe('AwsLambdaReceiver', () => {
       logger: noopLogger,
     });
     const startedHandler = await awsReceiver.start();
-    assert.isNotNull(startedHandler);
+    assert.notStrictEqual(startedHandler, null);
   });
 
   it('should have stop method', async () => {

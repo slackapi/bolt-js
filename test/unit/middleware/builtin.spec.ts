@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
-import { assert } from 'chai';
+import { beforeEach, describe, it } from 'node:test';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ErrorCode } from '../../../src/errors';
@@ -40,7 +41,7 @@ describe('Built-in global middleware', () => {
     function matchesPatternTestCase(
       pattern: string | RegExp,
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
-    ): Mocha.AsyncFunc {
+    ): () => Promise<void> {
       return async () => {
         const { matchMessage } = builtins;
         const middleware = matchMessage(pattern);
@@ -52,7 +53,7 @@ describe('Built-in global middleware', () => {
         // The following assertion(s) check behavior that is only targeted at RegExp patterns
         if (typeof pattern !== 'string') {
           if (ctx.matches !== undefined) {
-            assert.lengthOf(ctx.matches, 1);
+            assert.strictEqual(ctx.matches.length, 1);
           } else {
             assert.fail();
           }
@@ -63,7 +64,7 @@ describe('Built-in global middleware', () => {
     function notMatchesPatternTestCase(
       pattern: string | RegExp,
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
-    ): Mocha.AsyncFunc {
+    ): () => Promise<void> {
       return async () => {
         const { matchMessage } = builtins;
         const middleware = matchMessage(pattern);
@@ -72,7 +73,7 @@ describe('Built-in global middleware', () => {
         await middleware(args);
 
         sinon.assert.notCalled(args.next);
-        assert.notProperty(ctx, 'matches');
+        assert.ok(!('matches' in ctx));
       };
     }
 
@@ -161,9 +162,16 @@ describe('Built-in global middleware', () => {
           error = err as Error;
         }
 
-        assert.instanceOf(error, Error);
-        assert.propertyVal(error, 'code', ErrorCode.ContextMissingPropertyError);
-        assert.propertyVal(error, 'missingProperty', 'botUserId');
+        assert.ok(error instanceof Error);
+        assert.ok(error && typeof error === 'object');
+        assert.ok('code' in error);
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.ContextMissingPropertyError,
+        );
+        assert.ok(error && typeof error === 'object');
+        assert.ok('missingProperty' in error);
+        assert.deepStrictEqual((error as unknown as Record<PropertyKey, unknown>).missingProperty, 'botUserId');
       });
 
       it('should match message events that mention the bot user ID at the beginning of message text', async () => {
@@ -417,7 +425,7 @@ describe('Built-in global middleware', () => {
   describe(isSlackEventMiddlewareArgsOptions.name, () => {
     it('should return true if object is SlackEventMiddlewareArgsOptions', async () => {
       const actual = isSlackEventMiddlewareArgsOptions({ autoAcknowledge: true });
-      assert.isTrue(actual);
+      assert.strictEqual(actual, true);
     });
 
     it('should narrow proper type if object is SlackEventMiddlewareArgsOptions', async () => {
@@ -431,7 +439,7 @@ describe('Built-in global middleware', () => {
 
     it('should return false if object is Middleware', async () => {
       const actual = isSlackEventMiddlewareArgsOptions(async () => {});
-      assert.isFalse(actual);
+      assert.strictEqual(actual, false);
     });
   });
 });

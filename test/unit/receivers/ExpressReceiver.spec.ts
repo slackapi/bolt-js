@@ -1,9 +1,10 @@
+import assert from 'node:assert/strict';
 import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import type { InstallProvider } from '@slack/oauth';
-import { assert } from 'chai';
 import type { Application, IRouter, Request, Response } from 'express';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';
@@ -19,7 +20,6 @@ import ExpressReceiver, {
   respondToUrlVerification,
   verifySignatureAndParseRawBody,
 } from '../../../src/receivers/ExpressReceiver';
-import * as httpFunc from '../../../src/receivers/HTTPModuleFunctions';
 import type { ReceiverEvent } from '../../../src/types';
 import {
   createFakeLogger,
@@ -86,7 +86,7 @@ describe('ExpressReceiver', () => {
         },
         customPropertiesExtractor: (req) => ({ headers: req.headers }),
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
     it('should accept custom Express app / router', async () => {
       const app = {
@@ -113,7 +113,7 @@ describe('ExpressReceiver', () => {
         app: app as unknown as Application,
         router: router as unknown as IRouter,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(app.use);
       sinon.assert.calledOnce(router.get);
       sinon.assert.calledOnce(router.post);
@@ -138,7 +138,7 @@ describe('ExpressReceiver', () => {
         redirectUri,
         installerOptions,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       // missing redirectUriPath
       assert.throws(
         () =>
@@ -230,7 +230,7 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, Error);
+      assert.ok(caughtError instanceof Error);
     });
     it('should reject with an error when the built-in HTTP server returns undefined', async () => {
       const fakeCreateUndefinedServer = sinon.fake.returns(undefined);
@@ -249,8 +249,13 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+      assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok('code' in caughtError);
+      assert.deepStrictEqual(
+        (caughtError as unknown as Record<PropertyKey, unknown>).code,
+        ErrorCode.ReceiverInconsistentStateError,
+      );
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = importExpressReceiver(overrides);
@@ -265,8 +270,13 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+      assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok('code' in caughtError);
+      assert.deepStrictEqual(
+        (caughtError as unknown as Record<PropertyKey, unknown>).code,
+        ErrorCode.ReceiverInconsistentStateError,
+      );
     });
   });
 
@@ -290,8 +300,13 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+      assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok('code' in caughtError);
+      assert.deepStrictEqual(
+        (caughtError as unknown as Record<PropertyKey, unknown>).code,
+        ErrorCode.ReceiverInconsistentStateError,
+      );
     });
     it('should reject when a built-in HTTP server raises an error when closing', async () => {
       fakeServer = new FakeServer(
@@ -314,16 +329,16 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, Error);
+      assert.ok(caughtError instanceof Error);
       assert.equal(caughtError?.message, 'this error will be raised by the underlying HTTP server during close()');
     });
   });
 
   describe('#requestHandler()', () => {
-    const extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
-    const extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
-    const buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
-    const buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
+    let extractRetryNumStub: sinon.SinonStub;
+    let extractRetryReasonStub: sinon.SinonStub;
+    let buildNoBodyResponseStub: sinon.SinonStub;
+    let buildContentResponseStub: sinon.SinonStub;
     const processStub = sinon.stub<[ReceiverEvent]>().resolves({});
     const ackStub = function ackStub() {};
     ackStub.prototype.bind = function () {
@@ -331,20 +346,26 @@ describe('ExpressReceiver', () => {
     };
     ackStub.prototype.ack = sinon.spy();
     beforeEach(() => {
+      extractRetryNumStub = sinon.stub().returns(undefined);
+      extractRetryReasonStub = sinon.stub().returns(undefined);
+      buildNoBodyResponseStub = sinon.stub().returns(undefined);
+      buildContentResponseStub = sinon.stub().returns(undefined);
       overrides = mergeOverrides(
         withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         { './HTTPResponseAck': { HTTPResponseAck: ackStub } },
+        {
+          './HTTPModuleFunctions': {
+            extractRetryNumFromHTTPRequest: extractRetryNumStub,
+            extractRetryReasonFromHTTPRequest: extractRetryReasonStub,
+            buildNoBodyResponse: buildNoBodyResponseStub,
+            buildContentResponse: buildContentResponseStub,
+          },
+        },
       );
     });
     afterEach(() => {
       sinon.reset();
-    });
-    after(() => {
-      extractRetryNumStub.restore();
-      extractRetryReasonStub.restore();
-      buildNoBodyResponseStub.restore();
-      buildContentResponseStub.restore();
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);
@@ -612,21 +633,21 @@ describe('ExpressReceiver', () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildExpressRequest(), state);
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     it('should verify requests on GCP', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state);
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     it('should verify requests on GCP using async signingSecret', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state, () => Promise.resolve(signingSecret));
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     // ----------------------------

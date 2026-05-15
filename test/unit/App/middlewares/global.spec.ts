@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import type { ExtendedErrorHandlerArgs } from '../../../../src/App';
@@ -81,7 +82,7 @@ describe('App global middleware Processing', () => {
 
     assert(fakeErrorHandler.notCalled);
     assert(fakeMiddleware.notCalled);
-    assert.isAtLeast(fakeLogger.warn.callCount, invalidReceiverEvents.length);
+    assert.ok(fakeLogger.warn.callCount >= invalidReceiverEvents.length);
   });
 
   it('should warn, send to global error handler, acknowledge, and skip when a receiver event fails authorization', async () => {
@@ -103,9 +104,19 @@ describe('App global middleware Processing', () => {
 
     assert(fakeMiddleware.notCalled);
     assert(fakeLogger.warn.called);
-    assert.instanceOf(fakeErrorHandler.firstCall.args[0], AuthorizationError);
-    assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
-    assert.strictEqual(fakeErrorHandler.firstCall.args[0].original, dummyAuthorizationError);
+    assert.ok(fakeErrorHandler.firstCall.args[0] instanceof Error);
+    assert.ok(fakeErrorHandler.firstCall.args[0] && typeof fakeErrorHandler.firstCall.args[0] === 'object');
+    assert.ok('code' in fakeErrorHandler.firstCall.args[0]);
+    assert.deepStrictEqual(
+      (fakeErrorHandler.firstCall.args[0] as unknown as Record<PropertyKey, unknown>).code,
+      ErrorCode.AuthorizationError,
+    );
+    assert.ok(fakeErrorHandler.firstCall.args[0] && typeof fakeErrorHandler.firstCall.args[0] === 'object');
+    assert.ok('original' in fakeErrorHandler.firstCall.args[0]);
+    assert.deepStrictEqual(
+      (fakeErrorHandler.firstCall.args[0] as unknown as Record<PropertyKey, unknown>).original,
+      dummyAuthorizationError.original,
+    );
     assert(fakeAck.called);
   });
 
@@ -123,7 +134,7 @@ describe('App global middleware Processing', () => {
     await fakeReceiver.sendEvent(dummyReceiverEvent);
 
     // Assert
-    assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+    assert.ok(fakeErrorHandler.firstCall.args[0] instanceof Error);
   });
 
   it('correctly waits for async listeners', async () => {
@@ -137,7 +148,7 @@ describe('App global middleware Processing', () => {
     });
 
     await fakeReceiver.sendEvent(dummyReceiverEvent);
-    assert.isTrue(changed);
+    assert.strictEqual(changed, true);
     assert(fakeErrorHandler.notCalled);
   });
 
@@ -216,7 +227,7 @@ describe('App global middleware Processing', () => {
     });
 
     app.error(async (codedError: CodedError) => {
-      assert.instanceOf(codedError, UnknownError);
+      assert.ok(codedError instanceof UnknownError);
       assert.equal(codedError.message, error.message);
     });
 
@@ -233,14 +244,14 @@ describe('App global middleware Processing', () => {
     });
 
     app.error(async (args: ExtendedErrorHandlerArgs) => {
-      assert.property(args, 'error');
-      assert.property(args, 'body');
-      assert.property(args, 'context');
-      assert.property(args, 'logger');
-      assert.isDefined(args.error);
-      assert.isDefined(args.body);
-      assert.isDefined(args.context);
-      assert.isDefined(args.logger);
+      assert.ok('error' in args);
+      assert.ok('body' in args);
+      assert.ok('context' in args);
+      assert.ok('logger' in args);
+      assert.notStrictEqual(args.error, undefined);
+      assert.notStrictEqual(args.body, undefined);
+      assert.notStrictEqual(args.context, undefined);
+      assert.notStrictEqual(args.logger, undefined);
       assert.equal(args.error.message, error.message);
     });
 
@@ -265,7 +276,7 @@ describe('App global middleware Processing', () => {
       actualError = err;
     }
 
-    assert.instanceOf(actualError, UnknownError);
+    assert.ok(actualError instanceof UnknownError);
     assert.equal(actualError.message, error.message);
   });
 
@@ -283,7 +294,7 @@ describe('App global middleware Processing', () => {
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
-    assert.isDefined(clientArg);
+    assert.notStrictEqual(clientArg, undefined);
     assert.equal(clientArg.token, 'xwfp-valid');
   });
 
@@ -302,7 +313,7 @@ describe('App global middleware Processing', () => {
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
-    assert.isDefined(clientArg);
+    assert.notStrictEqual(clientArg, undefined);
     assert.equal(clientArg.token, undefined);
   });
 
@@ -320,11 +331,11 @@ describe('App global middleware Processing', () => {
     const testData = createDummyCustomFunctionMiddlewareArgs({ options: { autoAcknowledge: false } });
     await fakeReceiver.sendEvent({ ack: fakeAck, body: testData.body });
 
-    assert.isDefined(clientArg);
+    assert.notStrictEqual(clientArg, undefined);
     assert.equal(clientArg.token, 'xwfp-valid');
 
     await fakeReceiver.sendEvent(dummyReceiverEvent);
-    assert.isDefined(clientArg);
+    assert.notStrictEqual(clientArg, undefined);
     assert.equal(clientArg.token, 'xoxb-valid');
   });
 });

@@ -1,7 +1,8 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
+import { describe, it } from 'node:test';
 import type { AssistantThreadStartedEvent } from '@slack/types';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import {
   type AllAssistantMiddlewareArgs,
@@ -48,12 +49,12 @@ describe('Assistant class', () => {
   describe('constructor', () => {
     it('should accept config as single functions', async () => {
       const assistant = new Assistant(MOCK_CONFIG_SINGLE);
-      assert.isNotNull(assistant);
+      assert.notStrictEqual(assistant, null);
     });
 
     it('should accept config as multiple functions', async () => {
       const assistant = new Assistant(MOCK_CONFIG_MULTIPLE);
-      assert.isNotNull(assistant);
+      assert.notStrictEqual(assistant, null);
     });
 
     describe('validate', () => {
@@ -133,7 +134,7 @@ describe('Assistant class', () => {
       it('should return false if not a recognized assistant event', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs());
         const { isAssistantEvent } = importAssistant();
-        assert.isFalse(isAssistantEvent(fakeMessageArgs));
+        assert.strictEqual(isAssistantEvent(fakeMessageArgs), false);
       });
     });
 
@@ -148,7 +149,7 @@ describe('Assistant class', () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
         const { matchesConstraints } = importAssistant();
         // casting here as we intentionally are providing type-mismatched argument as a runtime test
-        assert.isFalse(matchesConstraints(fakeMessageArgs as unknown as AssistantMiddlewareArgs));
+        assert.strictEqual(matchesConstraints(fakeMessageArgs as unknown as AssistantMiddlewareArgs), false);
       });
 
       it('should return true if not message event', async () => {
@@ -168,19 +169,19 @@ describe('Assistant class', () => {
       it('should return false if not correct subtype', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ thread_ts: '1234.56' }));
         const { isAssistantMessage } = importAssistant();
-        assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
+        assert.strictEqual(isAssistantMessage(fakeMessageArgs.payload), false);
       });
 
       it('should return false if thread_ts is missing', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
         const { isAssistantMessage } = importAssistant();
-        assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
+        assert.strictEqual(isAssistantMessage(fakeMessageArgs.payload), false);
       });
 
       it('should return false if channel_type is incorrect', async () => {
         const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs({ channel_type: 'mpim' }));
         const { isAssistantMessage } = importAssistant();
-        assert.isFalse(isAssistantMessage(fakeMessageArgs.payload));
+        assert.strictEqual(isAssistantMessage(fakeMessageArgs.payload), false);
       });
     });
   });
@@ -201,9 +202,9 @@ describe('Assistant class', () => {
         const threadContextChangedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadContextChangedArgs);
         const userMessageArgs = enrichAssistantArgs(mockThreadContextStore, mockUserMessageArgs);
 
-        assert.notExists(threadStartedArgs.next);
-        assert.notExists(threadContextChangedArgs.next);
-        assert.notExists(userMessageArgs.next);
+        assert.equal(threadStartedArgs.next ?? null, null);
+        assert.equal(threadContextChangedArgs.next ?? null, null);
+        assert.equal(userMessageArgs.next ?? null, null);
       });
 
       it('should augment assistant_thread_started args with utilities', async () => {
@@ -215,11 +216,11 @@ describe('Assistant class', () => {
           payload,
         } as AllAssistantMiddlewareArgs);
 
-        assert.exists(assistantArgs.say);
-        assert.exists(assistantArgs.setStatus);
-        assert.exists(assistantArgs.sayStream);
-        assert.exists(assistantArgs.setSuggestedPrompts);
-        assert.exists(assistantArgs.setTitle);
+        assert.notEqual(assistantArgs.say ?? null, null);
+        assert.notEqual(assistantArgs.setStatus ?? null, null);
+        assert.notEqual(assistantArgs.sayStream ?? null, null);
+        assert.notEqual(assistantArgs.setSuggestedPrompts ?? null, null);
+        assert.notEqual(assistantArgs.setTitle ?? null, null);
       });
 
       it('should augment assistant_thread_context_changed args with utilities', async () => {
@@ -231,11 +232,11 @@ describe('Assistant class', () => {
           payload,
         } as AllAssistantMiddlewareArgs);
 
-        assert.exists(assistantArgs.say);
-        assert.exists(assistantArgs.setStatus);
-        assert.exists(assistantArgs.sayStream);
-        assert.exists(assistantArgs.setSuggestedPrompts);
-        assert.exists(assistantArgs.setTitle);
+        assert.notEqual(assistantArgs.say ?? null, null);
+        assert.notEqual(assistantArgs.setStatus ?? null, null);
+        assert.notEqual(assistantArgs.sayStream ?? null, null);
+        assert.notEqual(assistantArgs.setSuggestedPrompts ?? null, null);
+        assert.notEqual(assistantArgs.setTitle ?? null, null);
       });
 
       it('should augment message args with utilities', async () => {
@@ -247,11 +248,11 @@ describe('Assistant class', () => {
           payload,
         } as AllAssistantMiddlewareArgs);
 
-        assert.exists(assistantArgs.say);
-        assert.exists(assistantArgs.setStatus);
-        assert.exists(assistantArgs.sayStream);
-        assert.exists(assistantArgs.setSuggestedPrompts);
-        assert.exists(assistantArgs.setTitle);
+        assert.notEqual(assistantArgs.say ?? null, null);
+        assert.notEqual(assistantArgs.setStatus ?? null, null);
+        assert.notEqual(assistantArgs.sayStream ?? null, null);
+        assert.notEqual(assistantArgs.setSuggestedPrompts ?? null, null);
+        assert.notEqual(assistantArgs.setTitle ?? null, null);
       });
 
       describe('extractThreadInfo', () => {
@@ -288,7 +289,13 @@ describe('Assistant class', () => {
           assert.equal(payload.channel, channelId);
           // @ts-expect-error TODO: AssistantUserMessageMiddlewareArgs extends from too broad of a message event type, which contains types that explicitly DO NOT have a thread_ts. this is at odds with the expectation around assistant user message events.
           assert.equal(payload.thread_ts, threadTs);
-          assert.isEmpty(context);
+          if (Array.isArray(context) || typeof context === 'string') {
+            assert.strictEqual(context.length, 0);
+          } else if (context && typeof context === 'object') {
+            assert.strictEqual(Object.keys(context).length, 0);
+          } else {
+            assert.fail('expected value to be empty');
+          }
         });
 
         it('should throw error if `channel_id` or `thread_ts` are missing', async () => {

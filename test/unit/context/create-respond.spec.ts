@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import type { FetchFunction } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { createRespond } from '../../../src/context';
 
