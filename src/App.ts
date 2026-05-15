@@ -11,7 +11,6 @@ import {
   type FunctionFailFn,
   type SlackCustomFunctionMiddlewareArgs,
 } from './CustomFunction';
-import type { SayStreamFn, SetStatusFn } from './context';
 import {
   createFunctionComplete,
   createFunctionFail,
@@ -19,6 +18,8 @@ import {
   createSay,
   createSayStream,
   createSetStatus,
+  type SayStreamFn,
+  type SetStatusFn,
 } from './context';
 import { type ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
