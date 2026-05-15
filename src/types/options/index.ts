@@ -35,9 +35,8 @@ export interface BasicOptionsPayload<Type extends string = string> {
   value: string;
 }
 // TODO: Is this useful? Events have something similar
-export type OptionsPayloadFromType<T extends string> = KnownOptionsPayloadFromType<T> extends never
-  ? BasicOptionsPayload<T>
-  : KnownOptionsPayloadFromType<T>;
+export type OptionsPayloadFromType<T extends string> =
+  KnownOptionsPayloadFromType<T> extends never ? BasicOptionsPayload<T> : KnownOptionsPayloadFromType<T>;
 export type KnownOptionsPayloadFromType<T extends string> = Extract<SlackOptions, { type: T }>;
 
 /**

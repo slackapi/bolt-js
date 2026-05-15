@@ -4,9 +4,10 @@ import type { AckFn, RespondFn, SayArguments, SayFn } from '../utilities';
 import type { BlockAction } from './block-action';
 import type { DialogSubmitAction, DialogValidation } from './dialog-action';
 import type { InteractiveMessage } from './interactive-message';
+
 export * from './block-action';
-export * from './interactive-message';
 export * from './dialog-action';
+export * from './interactive-message';
 
 /**
  * All known actions from Slack's Block Kit interactive components, message actions, dialogs, and legacy interactive

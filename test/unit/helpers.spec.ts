@@ -1,11 +1,11 @@
 import { assert } from 'chai';
 import {
-  IncomingEventType,
   extractEventChannelId,
   extractEventThreadTs,
   extractEventTs,
   getTypeAndConversation,
   hasStringProperty,
+  IncomingEventType,
   isBodyWithTypeEnterpriseInstall,
   isEventTypeToSkipAuthorize,
   isRecord,

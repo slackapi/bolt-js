@@ -1,19 +1,19 @@
 import {
+  createServer,
   type IncomingMessage,
   type RequestListener,
   type Server,
   type ServerOptions,
   type ServerResponse,
-  createServer,
 } from 'node:http';
 import {
+  createServer as createHttpsServer,
   type Server as HTTPSServer,
   type ServerOptions as HTTPSServerOptions,
-  createServer as createHttpsServer,
 } from 'node:https';
 import type { ListenOptions } from 'node:net';
 import { URL } from 'node:url';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import {
   type CallbackOptions,
   type InstallPathOptions,
@@ -28,10 +28,10 @@ import { type CodedError, HTTPReceiverDeferredRequestError, ReceiverInconsistent
 import type { Receiver, ReceiverEvent } from '../types';
 import type { StringIndexed } from '../types/utilities';
 import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import { buildReceiverRoutes, type CustomRoute, type ReceiverRoutes } from './custom-routes';
 import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
-import { type CustomRoute, type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
