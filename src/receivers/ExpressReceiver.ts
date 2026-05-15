@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import { createServer, type Server, type ServerOptions } from 'node:http';
+import { createServer, type IncomingMessage, type Server, type ServerOptions, type ServerResponse } from 'node:http';
 import {
   createServer as createHttpsServer,
   type Server as HTTPSServer,
