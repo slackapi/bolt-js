@@ -113,7 +113,7 @@ Listeners receive a single object with these properties (availability depends on
 
 ## Code Conventions
 
-- **TypeScript** throughout. Compiler options in `tsconfig.json` (extends `@tsconfig/node18`, CommonJS output).
+- **TypeScript** throughout. Compiler options in `tsconfig.json` (extends `@tsconfig/node20`, CommonJS output).
 - **Biome** for formatting and linting. Configuration in `biome.json`.
 - **Testing:** See the Testing section below for test frameworks and conventions.
 

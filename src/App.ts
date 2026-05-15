@@ -1,9 +1,14 @@
-import type { Agent } from 'node:http';
-import type { SecureContextOptions } from 'node:tls';
 import util from 'node:util';
 import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
-import { addAppMetadata, WebClient, type WebClientOptions } from '@slack/web-api';
-import axios, { type AxiosInstance } from 'axios';
+import {
+  addAppMetadata,
+  type FetchFunction,
+  WebAPIHTTPError,
+  WebAPIPlatformError,
+  WebAPIRateLimitedError,
+  WebClient,
+  type WebClientOptions,
+} from '@slack/web-api';
 import type { Assistant } from './Assistant';
 import {
   CustomFunction,
@@ -24,9 +29,9 @@ import {
 import { type ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   AppInitializationError,
+  AuthorizationError,
   asCodedError,
   type CodedError,
-  ErrorCode,
   InvalidCustomPropertyError,
   MultipleListenerError,
 } from './errors';
@@ -93,11 +98,9 @@ import type {
   SlashCommand,
   ViewConstraints,
   ViewOutput,
-  WorkflowStepEdit,
 } from './types';
 import { contextBuiltinKeys } from './types';
 import { isRejected, type StringIndexed } from './types/utilities';
-import type { WorkflowStep } from './WorkflowStep';
 
 const packageJson = require('../package.json');
 
@@ -130,8 +133,6 @@ export interface AppOptions {
   installationStore?: HTTPReceiverOptions['installationStore']; // default MemoryInstallationStore
   scopes?: HTTPReceiverOptions['scopes'];
   installerOptions?: HTTPReceiverOptions['installerOptions'];
-  agent?: Agent;
-  clientTls?: Pick<SecureContextOptions, 'pfx' | 'key' | 'passphrase' | 'cert' | 'ca'>;
   convoStore?: ConversationStore | false;
   token?: AuthorizeResult['botToken']; // either token or authorize
   appToken?: string; // TODO should this be included in AuthorizeResult
@@ -258,7 +259,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
   private errorHandler: AnyErrorHandler;
 
-  private axios: AxiosInstance;
+  private fetchFn: FetchFunction;
 
   private installerOptions: HTTPReceiverOptions['installerOptions'];
 
@@ -290,8 +291,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     endpoints = undefined,
     port = undefined,
     customRoutes = undefined,
-    agent = undefined,
-    clientTls = undefined,
     receiver = undefined,
     convoStore = undefined,
     token = undefined,
@@ -355,12 +354,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     /* ------------------------ Set client options ------------------------*/
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
-    if (agent !== undefined && this.clientOptions.agent === undefined) {
-      this.clientOptions.agent = agent;
-    }
-    if (clientTls !== undefined && this.clientOptions.tls === undefined) {
-      this.clientOptions.tls = clientTls;
-    }
     if (logLevel !== undefined && logger === undefined) {
       // only logLevel is passed
       this.clientOptions.logLevel = logLevel;
@@ -372,16 +365,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
     // Since v3.4, it can have the passed token in the case of single workspace installation.
     this.client = new WebClient(token, this.clientOptions);
 
-    this.axios = axios.create({
-      httpAgent: agent,
-      httpsAgent: agent,
-      // disabling axios' automatic proxy support:
-      // axios would read from env vars to configure a proxy automatically, but it doesn't support TLS destinations.
-      // for compatibility with https://api.slack.com, and for a larger set of possible proxies (SOCKS or other
-      // protocols), users of this package should use the `agent` option to configure a proxy.
-      proxy: false,
-      ...clientTls,
-    });
+    this.fetchFn = this.clientOptions.fetch ?? globalThis.fetch;
 
     this.middleware = [];
     this.listeners = [];
@@ -529,19 +513,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    */
   public assistant(assistant: Assistant): this {
     const m = assistant.getMiddleware();
-    this.middleware.push(m);
-    return this;
-  }
-
-  /**
-   * Register WorkflowStep middleware
-   *
-   * @param workflowStep global workflow step middleware function
-   * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
-   * version.
-   */
-  public step(workflowStep: WorkflowStep): this {
-    const m = workflowStep.getMiddleware();
     this.middleware.push(m);
     return this;
   }
@@ -957,12 +928,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       try {
         authorizeResult = await this.authorize(source, bodyArg);
       } catch (error) {
-        // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
-        const e = error as any;
+        const e = error instanceof Error ? error : new Error(String(error));
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
-        e.code = ErrorCode.AuthorizationError;
+        const authError = new AuthorizationError(`Authorization of incoming event did not succeed. ${e.message}`, e);
         await this.handleError({
-          error: e,
+          error: authError,
           logger: this.logger,
           body: bodyArg,
           context: {
@@ -1019,11 +989,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set body and payload
     // TODO: this value should eventually conform to AnyMiddlewareArgs
-    // TODO: remove workflow step stuff in bolt v5
     // TODO: can we instead use type predicates in these switch cases to allow for narrowing of the body simultaneously? we have isEvent, isView, isShortcut, isAction already in types/utilities / helpers
     let payload:
       | DialogSubmitAction
-      | WorkflowStepEdit
       | SlackShortcut
       | KnownEventFromType<string>
       | SlashCommand
@@ -1166,10 +1134,10 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // Set respond() utility
     if (body.response_url) {
-      listenerArgs.respond = createRespond(this.axios, body.response_url);
+      listenerArgs.respond = createRespond(this.fetchFn, body.response_url);
     } else if (typeof body.response_urls !== 'undefined' && body.response_urls.length > 0) {
       // This can exist only when view_submission payloads - response_url_enabled: true
-      listenerArgs.respond = createRespond(this.axios, body.response_urls[0].response_url);
+      listenerArgs.respond = createRespond(this.fetchFn, body.response_urls[0].response_url);
     }
 
     // Set ack() utility
@@ -1391,7 +1359,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error: CodedError) => {
-    logger.error(error);
+    if (error instanceof WebAPIPlatformError) {
+      logger.error(`Slack API error: ${error.data.error}`);
+    } else if (error instanceof WebAPIRateLimitedError) {
+      logger.error(`Rate limited, retry after ${error.retryAfter}s`);
+    } else if (error instanceof WebAPIHTTPError) {
+      logger.error(`HTTP error ${error.statusCode}: ${error.statusMessage}`);
+    } else {
+      logger.error(error);
+    }
 
     return Promise.reject(error);
   };
