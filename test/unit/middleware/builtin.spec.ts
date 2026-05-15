@@ -1,5 +1,6 @@
-import path from 'node:path';
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import { beforeEach, describe, it } from 'node:test';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ErrorCode } from '../../../src/errors';
@@ -16,7 +17,6 @@ import {
   proxyquire,
   wrapMiddleware,
 } from '../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 interface DummyContext extends Context {
   matches?: RegExpExecArray;
@@ -163,12 +163,15 @@ describe('Built-in global middleware', () => {
         }
 
         assert.ok(error instanceof Error);
-                assert.ok(error && typeof error === 'object');
+        assert.ok(error && typeof error === 'object');
         assert.ok('code' in error);
-        assert.deepStrictEqual((error as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ContextMissingPropertyError);
-                assert.ok(error && typeof error === 'object');
+        assert.deepStrictEqual(
+          (error as unknown as Record<PropertyKey, unknown>).code,
+          ErrorCode.ContextMissingPropertyError,
+        );
+        assert.ok(error && typeof error === 'object');
         assert.ok('missingProperty' in error);
-        assert.deepStrictEqual((error as unknown as Record<PropertyKey, unknown>)['missingProperty'], 'botUserId');
+        assert.deepStrictEqual((error as unknown as Record<PropertyKey, unknown>).missingProperty, 'botUserId');
       });
 
       it('should match message events that mention the bot user ID at the beginning of message text', async () => {

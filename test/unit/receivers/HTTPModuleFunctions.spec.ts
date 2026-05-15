@@ -1,8 +1,8 @@
+import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
-import assert from 'node:assert/strict';
-import sinon from 'sinon';
 import { describe, it } from 'node:test';
+import sinon from 'sinon';
 
 import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../../../src/errors';
 import type { BufferedIncomingMessage } from '../../../src/receivers/BufferedIncomingMessage';
@@ -128,9 +128,12 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-                    assert.ok(e && typeof e === 'object');
+          assert.ok(e && typeof e === 'object');
           assert.ok('message' in e);
-          assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale');
+          assert.deepStrictEqual(
+            (e as unknown as Record<PropertyKey, unknown>).message,
+            'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
+          );
         }
       });
       it('should detect an invalid signature', async () => {
@@ -149,9 +152,12 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-                    assert.ok(e && typeof e === 'object');
+          assert.ok(e && typeof e === 'object');
           assert.ok('message' in e);
-          assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: signature mismatch');
+          assert.deepStrictEqual(
+            (e as unknown as Record<PropertyKey, unknown>).message,
+            'Failed to verify authenticity: signature mismatch',
+          );
         }
       });
       it('should parse a ssl_check request body without signature verification', async () => {
@@ -269,9 +275,12 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-                    assert.ok(e && typeof e === 'object');
+          assert.ok(e && typeof e === 'object');
           assert.ok('message' in e);
-          assert.deepStrictEqual((e as unknown as Record<PropertyKey, unknown>)['message'], 'Failed to verify authenticity: signature mismatch');
+          assert.deepStrictEqual(
+            (e as unknown as Record<PropertyKey, unknown>).message,
+            'Failed to verify authenticity: signature mismatch',
+          );
         }
       });
     });

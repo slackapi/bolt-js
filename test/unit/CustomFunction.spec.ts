@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import {
   CustomFunction,
   matchCallbackId,
@@ -8,7 +9,6 @@ import {
 import { CustomFunctionInitializationError } from '../../src/errors';
 import { autoAcknowledge, matchEventType, onlyEvents } from '../../src/middleware/builtin';
 import type { Middleware } from '../../src/types';
-import { describe, it } from 'node:test';
 
 const MOCK_FN = async () => {};
 const MOCK_FN_2 = async () => {};

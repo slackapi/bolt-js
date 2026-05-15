@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from 'node:test';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import { ErrorCode, isCodedError } from '../../../../src/errors';
-import { FakeReceiver, createDummyReceiverEvent, importApp } from '../../helpers';
+import { createDummyReceiverEvent, FakeReceiver, importApp } from '../../helpers';
 
 describe('App listener middleware processing', () => {
   let fakeReceiver: FakeReceiver;
@@ -58,7 +58,11 @@ describe('App listener middleware processing', () => {
     assert.ok(isCodedError(error));
     assert(error.code === ErrorCode.MultipleListenerError);
     assert.ok(Array.isArray(error.originals));
-    if (error.originals)     assert.deepStrictEqual([...error.originals].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))), [...errorsToThrow].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))));
+    if (error.originals)
+      assert.deepStrictEqual(
+        [...error.originals].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+        [...errorsToThrow].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+      );
   });
 
   // https://github.com/slackapi/bolt-js/issues/1457

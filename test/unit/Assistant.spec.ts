@@ -1,7 +1,8 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
+import { describe, it } from 'node:test';
 import type { AssistantThreadStartedEvent } from '@slack/types';
 import type { WebClient } from '@slack/web-api';
-import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import {
   type AllAssistantMiddlewareArgs,
@@ -24,7 +25,6 @@ import {
   wrapMiddleware,
 } from './helpers';
 import { team } from './helpers/events';
-import { describe, it } from 'node:test';
 
 function importAssistant(overrides: Override = {}): typeof import('../../src/Assistant') {
   const absolutePath = path.resolve(__dirname, '../../src/Assistant');
@@ -289,7 +289,7 @@ describe('Assistant class', () => {
           assert.equal(payload.channel, channelId);
           // @ts-expect-error TODO: AssistantUserMessageMiddlewareArgs extends from too broad of a message event type, which contains types that explicitly DO NOT have a thread_ts. this is at odds with the expectation around assistant user message events.
           assert.equal(payload.thread_ts, threadTs);
-                    if (Array.isArray(context) || typeof context === 'string') {
+          if (Array.isArray(context) || typeof context === 'string') {
             assert.strictEqual(context.length, 0);
           } else if (context && typeof context === 'object') {
             assert.strictEqual(Object.keys(context).length, 0);

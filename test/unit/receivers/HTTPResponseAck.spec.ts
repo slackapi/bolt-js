@@ -1,13 +1,13 @@
+import assert from 'node:assert/strict';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
-import assert from 'node:assert/strict';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ReceiverMultipleAckError } from '../../../src/errors';
 import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
 import type { ResponseAck } from '../../../src/types';
 import { createFakeLogger, proxyquire } from '../helpers';
-import { afterEach, beforeEach, describe, it } from 'node:test';
 
 function importHTTPResponseAck(overrides = {}): typeof import('../../../src/receivers/HTTPResponseAck') {
   const absolutePath = path.resolve(__dirname, '../../../src/receivers/HTTPResponseAck');
@@ -52,7 +52,11 @@ describe('HTTPResponseAck', async () => {
     });
     responseAck.ack(); // no exception
     assert(setTimeoutSpy.calledOnce, 'unhandledRequestHandler is set as a timeout callback exactly once');
-    assert.equal(setTimeoutSpy.firstCall.args[1], 3001, 'a 3 seconds timeout for the unhandledRequestHandler callback is expected');
+    assert.equal(
+      setTimeoutSpy.firstCall.args[1],
+      3001,
+      'a 3 seconds timeout for the unhandledRequestHandler callback is expected',
+    );
   });
   it('should trigger unhandledRequestHandler if unacknowledged', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -67,7 +71,11 @@ describe('HTTPResponseAck', async () => {
       httpRequest,
       httpResponse,
     });
-    assert.equal(setTimeoutSpy.firstCall.args[1], unhandledRequestTimeoutMillis, `a ${unhandledRequestTimeoutMillis} timeout for the unhandledRequestHandler callback is expected`);
+    assert.equal(
+      setTimeoutSpy.firstCall.args[1],
+      unhandledRequestTimeoutMillis,
+      `a ${unhandledRequestTimeoutMillis} timeout for the unhandledRequestHandler callback is expected`,
+    );
     await new Promise((resolve) => setTimeout(resolve, 2));
     assert(spy.calledOnce);
   });
@@ -131,7 +139,11 @@ describe('HTTPResponseAck', async () => {
     const bound = responseAck.bind();
     const body = false;
     await bound(body);
-    assert.equal(responseAck.storedResponse, '', 'Falsy body passed to bound handler not stored as empty string in Ack instance.');
+    assert.equal(
+      responseAck.storedResponse,
+      '',
+      'Falsy body passed to bound handler not stored as empty string in Ack instance.',
+    );
   });
   it('should call buildContentResponse with response body if processBeforeResponse=false', async () => {
     const stub = sinon.stub();
@@ -167,7 +179,11 @@ describe('HTTPResponseAck', async () => {
       httpResponse,
     });
     responseAck.ack(); // no exception
-    assert.equal(setTimeoutSpy.firstCall.args[1], 5001, 'a 5 second timeout for the unhandledRequestHandler callback is expected');
+    assert.equal(
+      setTimeoutSpy.firstCall.args[1],
+      5001,
+      'a 5 second timeout for the unhandledRequestHandler callback is expected',
+    );
   });
   it('should not use extended timeout, when the httpRequestBody is malformed', async () => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -180,6 +196,10 @@ describe('HTTPResponseAck', async () => {
       httpResponse,
     });
     responseAck.ack(); // no exception
-    assert.equal(setTimeoutSpy.firstCall.args[1], 3001, 'a 3 second timeout for the unhandledRequestHandler callback is expected');
+    assert.equal(
+      setTimeoutSpy.firstCall.args[1],
+      3001,
+      'a 3 second timeout for the unhandledRequestHandler callback is expected',
+    );
   });
 });

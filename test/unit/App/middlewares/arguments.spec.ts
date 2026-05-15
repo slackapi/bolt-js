@@ -1,5 +1,6 @@
-import type { WebClient } from '@slack/web-api';
 import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
+import type { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import { LogLevel } from '../../../../src/App';
 import type { SayStreamFn } from '../../../../src/context/create-say-stream';
@@ -29,7 +30,6 @@ import {
   withSetStatus,
   withSuccessfulBotUserFetchingWebClient,
 } from '../../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 describe('App middleware and listener arguments', () => {
   let fakeReceiver: FakeReceiver;
@@ -546,12 +546,12 @@ describe('App middleware and listener arguments', () => {
         // Assert that each call to fakePostMessage had the right arguments
         for (const call of fakePostMessage.getCalls()) {
           const firstArg = call.args[0];
-                    assert.ok(firstArg && typeof firstArg === 'object');
+          assert.ok(firstArg && typeof firstArg === 'object');
           assert.ok('text' in firstArg);
-          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>)['text'], dummyMessage);
-                    assert.ok(firstArg && typeof firstArg === 'object');
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).text, dummyMessage);
+          assert.ok(firstArg && typeof firstArg === 'object');
           assert.ok('channel' in firstArg);
-          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>)['channel'], dummyChannelId);
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).channel, dummyChannelId);
         }
         sinon.assert.notCalled(fakeErrorHandler);
       });
@@ -577,12 +577,12 @@ describe('App middleware and listener arguments', () => {
         // Assert that each call to fakePostMessage had the right arguments
         for (const call of fakePostMessage.getCalls()) {
           const firstArg = call.args[0];
-                    assert.ok(firstArg && typeof firstArg === 'object');
+          assert.ok(firstArg && typeof firstArg === 'object');
           assert.ok('channel' in firstArg);
-          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>)['channel'], dummyChannelId);
-                    assert.ok(firstArg && typeof firstArg === 'object');
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).channel, dummyChannelId);
+          assert.ok(firstArg && typeof firstArg === 'object');
           assert.ok('text' in firstArg);
-          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>)['text'], dummyMessage.text);
+          assert.deepStrictEqual((firstArg as unknown as Record<PropertyKey, unknown>).text, dummyMessage.text);
         }
         sinon.assert.notCalled(fakeErrorHandler);
       });

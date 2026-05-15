@@ -1,8 +1,8 @@
-import type { AxiosInstance } from 'axios';
 import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import type { AxiosInstance } from 'axios';
 import sinon from 'sinon';
 import { createRespond } from '../../../src/context';
-import { describe, it } from 'node:test';
 
 describe('createRespond', () => {
   it('should post to the response URL with text when given a string', async () => {

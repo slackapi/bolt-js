@@ -1,10 +1,10 @@
-import type { WebClient } from '@slack/web-api';
 import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import type { WebClient } from '@slack/web-api';
 import sinon from 'sinon';
 import { extractThreadInfo } from '../../src/Assistant';
 import { DefaultThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { createDummyAssistantThreadStartedEventMiddlewareArgs, wrapMiddleware } from './helpers';
-import { describe, it } from 'node:test';
 
 describe('DefaultThreadContextStore class', () => {
   describe('get', () => {
@@ -43,7 +43,7 @@ describe('DefaultThreadContextStore class', () => {
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-            if (Array.isArray(threadContext) || typeof threadContext === 'string') {
+      if (Array.isArray(threadContext) || typeof threadContext === 'string') {
         assert.strictEqual(threadContext.length, 0);
       } else if (threadContext && typeof threadContext === 'object') {
         assert.strictEqual(Object.keys(threadContext).length, 0);
@@ -71,7 +71,7 @@ describe('DefaultThreadContextStore class', () => {
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-            if (Array.isArray(threadContext) || typeof threadContext === 'string') {
+      if (Array.isArray(threadContext) || typeof threadContext === 'string') {
         assert.strictEqual(threadContext.length, 0);
       } else if (threadContext && typeof threadContext === 'object') {
         assert.strictEqual(Object.keys(threadContext).length, 0);

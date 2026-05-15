@@ -1,7 +1,8 @@
+import assert from 'node:assert/strict';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
+import { beforeEach, describe, it } from 'node:test';
 import { InstallProvider } from '@slack/oauth';
-import assert from 'node:assert/strict';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import sinon from 'sinon';
@@ -21,7 +22,6 @@ import {
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 // Loading the system under test using overrides
 function importHTTPReceiver(overrides: Override = {}): typeof import('../../../src/receivers/HTTPReceiver').default {
@@ -97,18 +97,18 @@ describe('HTTPReceiver', () => {
         signingSecret: 'secret',
       });
       assert.notStrictEqual(defaultPort, null);
-            assert.ok(defaultPort && typeof defaultPort === 'object');
+      assert.ok(defaultPort && typeof defaultPort === 'object');
       assert.ok('port' in defaultPort);
-      assert.deepStrictEqual((defaultPort as unknown as Record<PropertyKey, unknown>)['port'], 3000);
+      assert.deepStrictEqual((defaultPort as unknown as Record<PropertyKey, unknown>).port, 3000);
 
       const customPort = new HTTPReceiver({
         port: 9999,
         signingSecret: 'secret',
       });
       assert.notStrictEqual(customPort, null);
-            assert.ok(customPort && typeof customPort === 'object');
+      assert.ok(customPort && typeof customPort === 'object');
       assert.ok('port' in customPort);
-      assert.deepStrictEqual((customPort as unknown as Record<PropertyKey, unknown>)['port'], 9999);
+      assert.deepStrictEqual((customPort as unknown as Record<PropertyKey, unknown>).port, 9999);
 
       const customPort2 = new HTTPReceiver({
         port: 7777,
@@ -118,9 +118,9 @@ describe('HTTPReceiver', () => {
         },
       });
       assert.notStrictEqual(customPort2, null);
-            assert.ok(customPort2 && typeof customPort2 === 'object');
+      assert.ok(customPort2 && typeof customPort2 === 'object');
       assert.ok('port' in customPort2);
-      assert.deepStrictEqual((customPort2 as unknown as Record<PropertyKey, unknown>)['port'], 9999);
+      assert.deepStrictEqual((customPort2 as unknown as Record<PropertyKey, unknown>).port, 9999);
     });
 
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
@@ -146,7 +146,8 @@ describe('HTTPReceiver', () => {
       });
       assert.notStrictEqual(receiver, null);
       // redirectUri supplied, but missing redirectUriPath
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new HTTPReceiver({
             clientId,
             clientSecret,
@@ -154,9 +155,12 @@ describe('HTTPReceiver', () => {
             stateSecret,
             scopes,
             redirectUri,
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUriPath
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new HTTPReceiver({
             clientId: 'my-clientId',
             clientSecret,
@@ -167,9 +171,12 @@ describe('HTTPReceiver', () => {
             installerOptions: {
               redirectUriPath: '/hiya',
             },
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUri
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new HTTPReceiver({
             clientId: 'my-clientId',
             clientSecret,
@@ -178,7 +185,9 @@ describe('HTTPReceiver', () => {
             scopes,
             redirectUri: 'http://example.com/hiya',
             installerOptions,
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
     });
   });
   describe('start() method', () => {
@@ -189,9 +198,9 @@ describe('HTTPReceiver', () => {
         signingSecret: 'secret',
       });
       assert.notStrictEqual(defaultPort, null);
-            assert.ok(defaultPort && typeof defaultPort === 'object');
+      assert.ok(defaultPort && typeof defaultPort === 'object');
       assert.ok('port' in defaultPort);
-      assert.deepStrictEqual((defaultPort as unknown as Record<PropertyKey, unknown>)['port'], 3000);
+      assert.deepStrictEqual((defaultPort as unknown as Record<PropertyKey, unknown>).port, 3000);
       await defaultPort.start(9001);
       sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(9001));
       await defaultPort.stop();
@@ -559,12 +568,15 @@ describe('HTTPReceiver', () => {
         const HTTPReceiver = importHTTPReceiver();
         const customRoutes = [{ path: '/test' }] as CustomRoute[];
 
-        assert.throws(() =>
+        assert.throws(
+          () =>
             new HTTPReceiver({
               clientSecret: 'my-client-secret',
               signingSecret: 'secret',
               customRoutes,
-            }), CustomRouteInitializationError);
+            }),
+          CustomRouteInitializationError,
+        );
       });
     });
 

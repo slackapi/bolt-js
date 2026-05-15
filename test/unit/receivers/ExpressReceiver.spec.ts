@@ -1,9 +1,10 @@
+import assert from 'node:assert/strict';
 import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import type { InstallProvider } from '@slack/oauth';
-import assert from 'node:assert/strict';
 import type { Application, IRouter, Request, Response } from 'express';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';
@@ -29,7 +30,6 @@ import {
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
-import { afterEach, beforeEach, describe, it } from 'node:test';
 
 // Loading the system under test using overrides
 function importExpressReceiver(
@@ -140,7 +140,8 @@ describe('ExpressReceiver', () => {
       });
       assert.notStrictEqual(receiver, null);
       // missing redirectUriPath
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new ExpressReceiver({
             clientId,
             clientSecret,
@@ -148,9 +149,12 @@ describe('ExpressReceiver', () => {
             stateSecret,
             scopes,
             redirectUri,
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUriPath
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new ExpressReceiver({
             clientId: 'my-clientId',
             clientSecret,
@@ -161,9 +165,12 @@ describe('ExpressReceiver', () => {
             installerOptions: {
               redirectUriPath: '/hiya',
             },
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUri
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new ExpressReceiver({
             clientId: 'my-clientId',
             clientSecret,
@@ -172,7 +179,9 @@ describe('ExpressReceiver', () => {
             scopes,
             redirectUri: 'http://example.com/hiya',
             installerOptions,
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
     });
   });
 
@@ -241,9 +250,12 @@ describe('ExpressReceiver', () => {
       }
 
       assert.ok(caughtError instanceof ReceiverInconsistentStateError);
-            assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok(caughtError && typeof caughtError === 'object');
       assert.ok('code' in caughtError);
-      assert.deepStrictEqual((caughtError as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ReceiverInconsistentStateError);
+      assert.deepStrictEqual(
+        (caughtError as unknown as Record<PropertyKey, unknown>).code,
+        ErrorCode.ReceiverInconsistentStateError,
+      );
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = importExpressReceiver(overrides);
@@ -259,9 +271,12 @@ describe('ExpressReceiver', () => {
       }
 
       assert.ok(caughtError instanceof ReceiverInconsistentStateError);
-            assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok(caughtError && typeof caughtError === 'object');
       assert.ok('code' in caughtError);
-      assert.deepStrictEqual((caughtError as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ReceiverInconsistentStateError);
+      assert.deepStrictEqual(
+        (caughtError as unknown as Record<PropertyKey, unknown>).code,
+        ErrorCode.ReceiverInconsistentStateError,
+      );
     });
   });
 
@@ -286,9 +301,12 @@ describe('ExpressReceiver', () => {
       }
 
       assert.ok(caughtError instanceof ReceiverInconsistentStateError);
-            assert.ok(caughtError && typeof caughtError === 'object');
+      assert.ok(caughtError && typeof caughtError === 'object');
       assert.ok('code' in caughtError);
-      assert.deepStrictEqual((caughtError as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.ReceiverInconsistentStateError);
+      assert.deepStrictEqual(
+        (caughtError as unknown as Record<PropertyKey, unknown>).code,
+        ErrorCode.ReceiverInconsistentStateError,
+      );
     });
     it('should reject when a built-in HTTP server raises an error when closing', async () => {
       fakeServer = new FakeServer(

@@ -1,3 +1,4 @@
+import { beforeEach, describe, it } from 'node:test';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import { Assistant } from '../../../src/Assistant';
@@ -16,7 +17,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 function buildOverrides(secondOverrides: Override[]): Override {
   return mergeOverrides(

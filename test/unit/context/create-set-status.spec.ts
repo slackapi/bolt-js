@@ -1,8 +1,8 @@
-import { WebClient } from '@slack/web-api';
 import assert from 'node:assert/strict';
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import { WebClient } from '@slack/web-api';
 import sinon from 'sinon';
 import { createSetStatus } from '../../../src/context';
-import { afterEach, beforeEach, describe, it } from 'node:test';
 
 describe('createSetStatus', () => {
   const sandbox = sinon.createSandbox();

@@ -1,5 +1,6 @@
-import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import { describe, it } from 'node:test';
 import sinon from 'sinon';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
@@ -12,7 +13,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
-import { describe, it } from 'node:test';
 
 const fakeAuthTestResponse = {
   ok: true,

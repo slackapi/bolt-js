@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
 import sinon from 'sinon';
 import type App from '../../../src/App';
 import {
@@ -14,7 +15,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 function buildOverrides(secondOverrides: Override[]): Override {
   return mergeOverrides(

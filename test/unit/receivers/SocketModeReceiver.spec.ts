@@ -1,9 +1,10 @@
+import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
+import { beforeEach, describe, it } from 'node:test';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
-import assert from 'node:assert/strict';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import sinon from 'sinon';
@@ -22,7 +23,6 @@ import {
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 // Loading the system under test using overrides
 function importSocketModeReceiver(
@@ -230,7 +230,8 @@ describe('SocketModeReceiver', () => {
       });
       assert.notStrictEqual(receiver, null);
       // redirectUri supplied, but no redirectUriPath
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new SocketModeReceiver({
             appToken,
             clientId,
@@ -238,9 +239,12 @@ describe('SocketModeReceiver', () => {
             stateSecret,
             scopes,
             redirectUri,
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUriPath
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new SocketModeReceiver({
             appToken,
             clientId: 'my-clientId',
@@ -251,9 +255,12 @@ describe('SocketModeReceiver', () => {
             installerOptions: {
               redirectUriPath: '/hiya',
             },
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
       // inconsistent redirectUri
-      assert.throws(() =>
+      assert.throws(
+        () =>
           new SocketModeReceiver({
             appToken,
             clientId: 'my-clientId',
@@ -262,7 +269,9 @@ describe('SocketModeReceiver', () => {
             scopes,
             redirectUri: 'http://example.com/hiya',
             installerOptions,
-          }), AppInitializationError);
+          }),
+        AppInitializationError,
+      );
     });
   });
   describe('request handling', () => {
@@ -704,7 +713,10 @@ describe('SocketModeReceiver', () => {
         // biome-ignore lint/suspicious/noExplicitAny: typing as any to intentionally have missing required keys
         const customRoutes = [{ handler: sinon.fake() }] as any;
 
-        assert.throws(() => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }), CustomRouteInitializationError);
+        assert.throws(
+          () => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }),
+          CustomRouteInitializationError,
+        );
       });
     });
   });

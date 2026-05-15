@@ -1,5 +1,6 @@
-import type { WebClient } from '@slack/web-api';
 import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
+import type { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import type { ExtendedErrorHandlerArgs } from '../../../../src/App';
@@ -19,7 +20,6 @@ import {
   withNoopAppMetadata,
   withNoopWebClient,
 } from '../../helpers';
-import { beforeEach, describe, it } from 'node:test';
 
 describe('App global middleware Processing', () => {
   let fakeReceiver: FakeReceiver;
@@ -105,12 +105,18 @@ describe('App global middleware Processing', () => {
     assert(fakeMiddleware.notCalled);
     assert(fakeLogger.warn.called);
     assert.ok(fakeErrorHandler.firstCall.args[0] instanceof Error);
-        assert.ok(fakeErrorHandler.firstCall.args[0] && typeof fakeErrorHandler.firstCall.args[0] === 'object');
+    assert.ok(fakeErrorHandler.firstCall.args[0] && typeof fakeErrorHandler.firstCall.args[0] === 'object');
     assert.ok('code' in fakeErrorHandler.firstCall.args[0]);
-    assert.deepStrictEqual((fakeErrorHandler.firstCall.args[0] as unknown as Record<PropertyKey, unknown>)['code'], ErrorCode.AuthorizationError);
-        assert.ok(fakeErrorHandler.firstCall.args[0] && typeof fakeErrorHandler.firstCall.args[0] === 'object');
+    assert.deepStrictEqual(
+      (fakeErrorHandler.firstCall.args[0] as unknown as Record<PropertyKey, unknown>).code,
+      ErrorCode.AuthorizationError,
+    );
+    assert.ok(fakeErrorHandler.firstCall.args[0] && typeof fakeErrorHandler.firstCall.args[0] === 'object');
     assert.ok('original' in fakeErrorHandler.firstCall.args[0]);
-    assert.deepStrictEqual((fakeErrorHandler.firstCall.args[0] as unknown as Record<PropertyKey, unknown>)['original'], dummyAuthorizationError.original);
+    assert.deepStrictEqual(
+      (fakeErrorHandler.firstCall.args[0] as unknown as Record<PropertyKey, unknown>).original,
+      dummyAuthorizationError.original,
+    );
     assert(fakeAck.called);
   });
 

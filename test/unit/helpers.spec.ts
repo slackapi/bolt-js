@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import {
   extractEventChannelId,
   extractEventThreadTs,
@@ -11,7 +12,6 @@ import {
   isRecord,
 } from '../../src/helpers';
 import type { AnyMiddlewareArgs, KnownEventFromType, ReceiverEvent, SlackEventMiddlewareArgs } from '../../src/types';
-import { describe, it } from 'node:test';
 
 describe('Helpers', () => {
   describe('getTypeAndConversation()', () => {
@@ -117,7 +117,7 @@ describe('Helpers', () => {
         const typeAndConversation = getTypeAndConversation(fakeEventBody);
 
         // Assert
-                if (Array.isArray(typeAndConversation) || typeof typeAndConversation === 'string') {
+        if (Array.isArray(typeAndConversation) || typeof typeAndConversation === 'string') {
           assert.strictEqual(typeAndConversation.length, 0);
         } else if (typeAndConversation && typeof typeAndConversation === 'object') {
           assert.strictEqual(Object.keys(typeAndConversation).length, 0);
