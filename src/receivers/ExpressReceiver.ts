@@ -1,14 +1,14 @@
 import crypto from 'node:crypto';
-import { type Server, type ServerOptions, createServer } from 'node:http';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { createServer, type Server, type ServerOptions } from 'node:http';
 import {
+  createServer as createHttpsServer,
   type Server as HTTPSServer,
   type ServerOptions as HTTPSServerOptions,
-  createServer as createHttpsServer,
 } from 'node:https';
 import type { ListenOptions } from 'node:net';
 import querystring from 'node:querystring';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import {
   type CallbackOptions,
   type InstallPathOptions,
@@ -17,12 +17,12 @@ import {
   type InstallURLOptions,
 } from '@slack/oauth';
 import express, {
-  type Request,
-  type Response,
   type Application,
-  type RequestHandler,
-  Router,
   type IRouter,
+  type Request,
+  type RequestHandler,
+  type Response,
+  Router,
 } from 'express';
 import rawBody from 'raw-body';
 import tsscmp from 'tsscmp';

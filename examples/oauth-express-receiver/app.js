@@ -23,13 +23,13 @@ const app = new App({
 });
 
 // Slack interactions like listening for events are methods on app
-app.event('message', async ({ event, client }) => {
+app.event('message', async () => {
   // Do some slack-specific stuff here
   // await client.chat.postMessage(...);
 });
 
 // Set up other handling for other web requests as methods on receiver.router
-receiver.router.get('/secret-page', (req, res) => {
+receiver.router.get('/secret-page', (_req, res) => {
   // You're working with an express req and res now.
   res.send('yay!');
 });

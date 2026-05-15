@@ -1,4 +1,4 @@
-const { App, LogLevel, SocketModeReceiver } = require('@slack/bolt');
+const { App, LogLevel } = require('@slack/bolt');
 
 const clientOptions = {
   // enable this for dev instance
@@ -57,7 +57,7 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 // Message Shortcut example
-app.shortcut('launch_msg_shortcut', async ({ shortcut, body, ack, context, client, logger }) => {
+app.shortcut('launch_msg_shortcut', async ({ shortcut, ack, logger }) => {
   await ack();
   logger.info(shortcut);
 });
@@ -65,13 +65,13 @@ app.shortcut('launch_msg_shortcut', async ({ shortcut, body, ack, context, clien
 // Global Shortcut example
 // setup global shortcut in App config with `launch_shortcut` as callback id
 // add `commands` scope
-app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client, logger }) => {
+app.shortcut('launch_shortcut', async ({ shortcut, ack, client, logger }) => {
   try {
     // Acknowledge shortcut request
     await ack();
 
     // Call the views.open method using one of the built-in WebClients
-    const result = await client.views.open({
+    const _result = await client.views.open({
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
@@ -110,7 +110,7 @@ app.shortcut('launch_shortcut', async ({ shortcut, body, ack, context, client, l
 
 // subscribe to 'app_mention' event in your App config
 // need app_mentions:read and chat:write scopes
-app.event('app_mention', async ({ event, context, client, logger, say }) => {
+app.event('app_mention', async ({ event, logger, say }) => {
   try {
     await say({
       blocks: [
@@ -167,7 +167,7 @@ app.message('hello', async ({ message, say }) => {
 });
 
 // Listen and respond to button click
-app.action('first_button', async ({ action, ack, say, context, logger }) => {
+app.action('first_button', async ({ action, ack, say, logger }) => {
   logger.info('button clicked');
   logger.info(action);
   // acknowledge the request right away

@@ -6,13 +6,13 @@ import { ErrorCode } from '../../../src/errors';
 import { isSlackEventMiddlewareArgsOptions } from '../../../src/middleware/builtin';
 import type { Context, SlackEventMiddlewareArgs, SlackEventMiddlewareArgsOptions } from '../../../src/types';
 import {
-  type Override,
   createDummyAppHomeOpenedEventMiddlewareArgs,
   createDummyAppMentionEventMiddlewareArgs,
   createDummyCommandMiddlewareArgs,
   createDummyMemberChannelEventMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
   createDummyReactionAddedEventMiddlewareArgs,
+  type Override,
   proxyquire,
   wrapMiddleware,
 } from '../helpers';
@@ -154,7 +154,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyMessageEventMiddlewareArgs(), ctx);
 
-        let error: Error | undefined = undefined;
+        let error: Error | undefined;
         try {
           await builtins.directMention(args);
         } catch (err) {

@@ -9,9 +9,8 @@ import {
   type AssistantThreadContextStore,
   DefaultThreadContextStore,
 } from './AssistantThreadContextStore';
+import type { SayStreamFn, SetStatusFn } from './context';
 import { createSayStream, createSetStatus } from './context';
-import type { SayStreamFn } from './context';
-import type { SetStatusFn } from './context';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import { extractEventChannelId, extractEventThreadTs, isRecord } from './helpers';
 import processMiddleware from './middleware/process';

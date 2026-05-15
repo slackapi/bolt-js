@@ -2,6 +2,8 @@ import path from 'node:path';
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import { WorkflowStepInitializationError } from '../../src/errors';
+import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
 import {
   type AllWorkflowStepMiddlewareArgs,
   type SlackWorkflowStepMiddlewareArgs,
@@ -12,9 +14,7 @@ import {
   type WorkflowStepMiddleware,
   type WorkflowStepSaveMiddlewareArgs,
 } from '../../src/WorkflowStep';
-import { WorkflowStepInitializationError } from '../../src/errors';
-import type { AllMiddlewareArgs, AnyMiddlewareArgs, Middleware, WorkflowStepEdit } from '../../src/types';
-import { type Override, noopVoid, proxyquire } from './helpers';
+import { noopVoid, type Override, proxyquire } from './helpers';
 
 function importWorkflowStep(overrides: Override = {}): typeof import('../../src/WorkflowStep') {
   const absolutePath = path.resolve(__dirname, '../../src/WorkflowStep');

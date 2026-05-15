@@ -103,7 +103,6 @@ interface Authorization {
  * When the string matches known event(s) from the `SlackEvent` union, only those types are returned (also as a union).
  * Otherwise, the `BasicSlackEvent<T>` type is returned.
  */
-export type EventFromType<T extends string> = KnownEventFromType<T> extends never
-  ? BaseSlackEvent<T>
-  : KnownEventFromType<T>;
+export type EventFromType<T extends string> =
+  KnownEventFromType<T> extends never ? BaseSlackEvent<T> : KnownEventFromType<T>;
 export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;

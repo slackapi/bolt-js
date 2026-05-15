@@ -1,8 +1,8 @@
 import type { Agent } from 'node:http';
 import type { SecureContextOptions } from 'node:tls';
 import util from 'node:util';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
-import { WebClient, type WebClientOptions, addAppMetadata } from '@slack/web-api';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
+import { addAppMetadata, WebClient, type WebClientOptions } from '@slack/web-api';
 import axios, { type AxiosInstance } from 'axios';
 import type { Assistant } from './Assistant';
 import {
@@ -11,7 +11,7 @@ import {
   type FunctionFailFn,
   type SlackCustomFunctionMiddlewareArgs,
 } from './CustomFunction';
-import type { WorkflowStep } from './WorkflowStep';
+import type { SayStreamFn, SetStatusFn } from './context';
 import {
   createFunctionComplete,
   createFunctionFail,
@@ -20,23 +20,22 @@ import {
   createSayStream,
   createSetStatus,
 } from './context';
-import type { SayStreamFn, SetStatusFn } from './context';
-import { type ConversationStore, MemoryStore, conversationContext } from './conversation-store';
+import { type ConversationStore, conversationContext, MemoryStore } from './conversation-store';
 import {
   AppInitializationError,
+  asCodedError,
   type CodedError,
   ErrorCode,
   InvalidCustomPropertyError,
   MultipleListenerError,
-  asCodedError,
 } from './errors';
 import {
-  IncomingEventType,
   assertNever,
   extractEventChannelId,
   extractEventThreadTs,
   extractEventTs,
   getTypeAndConversation,
+  IncomingEventType,
   isBodyWithTypeEnterpriseInstall,
   isEventTypeToSkipAuthorize,
 } from './helpers';
@@ -96,7 +95,9 @@ import type {
   WorkflowStepEdit,
 } from './types';
 import { contextBuiltinKeys } from './types';
-import { type StringIndexed, isRejected } from './types/utilities';
+import { isRejected, type StringIndexed } from './types/utilities';
+import type { WorkflowStep } from './WorkflowStep';
+
 const packageJson = require('../package.json');
 
 export type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from './types';
@@ -154,7 +155,7 @@ export interface AppOptions {
   attachFunctionToken?: boolean;
 }
 
-export { LogLevel, Logger } from '@slack/logger';
+export { Logger, LogLevel } from '@slack/logger';
 
 /** Authorization function - seeds the middleware processing and listeners with an authorization context */
 export type Authorize<IsEnterpriseInstall extends boolean = false> = (
@@ -1083,7 +1084,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     // TODO: this logic should be isolated and tested according to the expected behavior
     if (token !== undefined) {
-      let pool: WebClientPool | undefined = undefined;
+      let pool: WebClientPool | undefined;
       const clientOptionsCopy = { ...this.clientOptions };
       if (authorizeResult.teamId !== undefined) {
         pool = this.clients[authorizeResult.teamId];
@@ -1228,7 +1229,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
           const rejectedListenerResults = settledListenerResults.filter(isRejected);
           if (rejectedListenerResults.length === 1) {
             throw rejectedListenerResults[0].reason;
-            // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
           } else if (rejectedListenerResults.length > 1) {
             throw new MultipleListenerError(rejectedListenerResults.map((rlr) => rlr.reason));
           }
@@ -1355,15 +1355,15 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       throw new AppInitializationError(
         `${tokenUsage} \n\nSince you have not provided a token or authorize, you might be missing one or more required oauth installer options. See https://docs.slack.dev/tools/bolt-js/concepts/authenticating-oauth/ for these required fields.\n`,
       );
-      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
-    } else if (authorize !== undefined && usingOauth) {
+    }
+    if (authorize !== undefined && usingOauth) {
       throw new AppInitializationError(`You cannot provide both authorize and oauth installer options. ${tokenUsage}`);
-      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
-    } else if (authorize === undefined && usingOauth) {
+    }
+    if (authorize === undefined && usingOauth) {
       // biome-ignore lint/style/noNonNullAssertion: we know installer is truthy here
       return httpReceiver.installer!.authorize;
-      // biome-ignore lint/style/noUselessElse: I think this is a biome issue actually...
-    } else if (authorize !== undefined && !usingOauth) {
+    }
+    if (authorize !== undefined && !usingOauth) {
       return authorize as Authorize<boolean>;
     }
     return undefined;
@@ -1647,9 +1647,9 @@ function escapeHtml(input: string | undefined | null): string {
 }
 
 function extractFunctionContext(body: StringIndexed) {
-  let functionExecutionId: string | undefined = undefined;
-  let functionBotAccessToken: string | undefined = undefined;
-  let functionInputs: FunctionInputs | undefined = undefined;
+  let functionExecutionId: string | undefined;
+  let functionBotAccessToken: string | undefined;
+  let functionInputs: FunctionInputs | undefined;
 
   // function_executed event
   if (body.event && body.event.type === 'function_executed' && body.event.function_execution_id) {
