@@ -29,7 +29,7 @@ app.event('message', async ({ event, client }) => {
 });
 
 // Set up other handling for other web requests as methods on receiver.router
-receiver.router.get('/secret-page', (_req, res) => {
+receiver.router.get('/secret-page', (req, res) => {
   // You're working with an express req and res now.
   res.send('yay!');
 });
