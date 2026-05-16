@@ -63,6 +63,7 @@ export type { ExpressReceiverOptions } from './receivers/ExpressReceiver';
 export * as HTTPModuleFunctions from './receivers/HTTPModuleFunctions';
 export {
   ReceiverDispatchErrorHandlerArgs,
+  ReceiverInvalidRequestSignatureHandlerArgs,
   ReceiverProcessEventErrorHandlerArgs,
   ReceiverUnhandledRequestHandlerArgs,
   RequestVerificationOptions,

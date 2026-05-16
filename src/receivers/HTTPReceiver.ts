@@ -96,6 +96,7 @@ export interface HTTPReceiverOptions {
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
+  invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
 }
 
 // All the available argument for OAuth flow enabled apps
@@ -169,6 +170,8 @@ export default class HTTPReceiver implements Receiver {
 
   private unhandledRequestTimeoutMillis: number;
 
+  private invalidRequestSignatureHandler: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
+
   public constructor({
     signingSecret = '',
     endpoints = ['/slack/events'],
@@ -190,6 +193,7 @@ export default class HTTPReceiver implements Receiver {
     processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
+    invalidRequestSignatureHandler = httpFunc.defaultInvalidRequestSignatureHandler,
   }: HTTPReceiverOptions) {
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
@@ -254,6 +258,7 @@ export default class HTTPReceiver implements Receiver {
     this.processEventErrorHandler = processEventErrorHandler;
     this.unhandledRequestHandler = unhandledRequestHandler;
     this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
+    this.invalidRequestSignatureHandler = invalidRequestSignatureHandler;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
@@ -448,6 +453,15 @@ export default class HTTPReceiver implements Receiver {
         const e = err as Error;
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
+          const signature = req.headers['x-slack-signature'];
+          const ts = req.headers['x-slack-request-timestamp'];
+          this.invalidRequestSignatureHandler({
+            signature: Array.isArray(signature) ? signature[0] : signature,
+            ts: ts ? Number(Array.isArray(ts) ? ts[0] : ts) : undefined,
+            body: '',
+            request: req,
+            response: res,
+          });
         } else {
           this.logger.warn(`Failed to parse the request body: ${e.message}`);
         }
