@@ -17,7 +17,7 @@ import type { CodedError } from '../errors';
 import type { Receiver, ReceiverEvent } from '../types';
 import type { StringIndexed } from '../types/utilities';
 import { buildReceiverRoutes, type ReceiverRoutes } from './custom-routes';
-import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
+import type { ParamsIncomingMessage, QueryDictionary } from './ParamsIncomingMessage';
 import {
   defaultProcessEventErrorHandler,
   type SocketModeReceiverProcessEventErrorHandlerArgs,
@@ -209,7 +209,8 @@ export default class SocketModeReceiver implements Receiver {
         if (customRoutes.length && req.url) {
           // NOTE: the domain and scheme are irrelevant here.
           // The URL object is only used to safely obtain the path to match
-          const { pathname: path } = new URL(req.url as string, 'http://localhost');
+          const parsedUrl = new URL(req.url as string, 'http://localhost');
+          const { pathname: path } = parsedUrl;
           const routes = Object.keys(this.routes);
           for (let i = 0; i < routes.length; i += 1) {
             const route = routes[i];
@@ -217,7 +218,8 @@ export default class SocketModeReceiver implements Receiver {
             const pathMatch = matchRegex(path);
             if (pathMatch && this.routes[route][method] !== undefined) {
               const params = pathMatch.params as ParamsDictionary;
-              const message: ParamsIncomingMessage = Object.assign(req, { params });
+              const query = parseSearchParams(parsedUrl.searchParams);
+              const message: ParamsIncomingMessage = Object.assign(req, { params, query });
               this.routes[route][method](message, res);
               return;
             }
@@ -290,4 +292,13 @@ export default class SocketModeReceiver implements Receiver {
       }
     });
   }
+}
+
+function parseSearchParams(searchParams: URLSearchParams): QueryDictionary {
+  const query: QueryDictionary = {};
+  for (const key of searchParams.keys()) {
+    const values = searchParams.getAll(key);
+    query[key] = values.length === 1 ? values[0] : values;
+  }
+  return query;
 }
