@@ -31,7 +31,7 @@ import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { buildReceiverRoutes, type CustomRoute, type ReceiverRoutes } from './custom-routes';
 import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
-import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
+import type { ParamsIncomingMessage, QueryDictionary } from './ParamsIncomingMessage';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
@@ -413,7 +413,9 @@ export default class HTTPReceiver implements Receiver {
       const pathMatch = matchRegex(path);
       if (pathMatch && this.routes[route][method] !== undefined) {
         const params = pathMatch.params as ParamsDictionary;
-        const message: ParamsIncomingMessage = Object.assign(req, { params });
+        const parsedUrl = new URL(req.url as string, 'http://localhost');
+        const query = parseSearchParams(parsedUrl.searchParams);
+        const message: ParamsIncomingMessage = Object.assign(req, { params, query });
         return this.routes[route][method](message, res);
       }
     }
@@ -566,4 +568,13 @@ export default class HTTPReceiver implements Receiver {
       installer.handleCallback(req, res, installCallbackOptions).catch(errorHandler);
     }
   }
+}
+
+function parseSearchParams(searchParams: URLSearchParams): QueryDictionary {
+  const query: QueryDictionary = {};
+  for (const key of searchParams.keys()) {
+    const values = searchParams.getAll(key);
+    query[key] = values.length === 1 ? values[0] : values;
+  }
+  return query;
 }
