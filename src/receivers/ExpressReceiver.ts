@@ -116,6 +116,7 @@ export interface ExpressReceiverOptions {
   // we can add a different name function for it.
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
+  invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
 }
 
 // Additional Installer Options
@@ -192,6 +193,7 @@ export default class ExpressReceiver implements Receiver {
     processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
+    invalidRequestSignatureHandler = httpFunc.defaultInvalidRequestSignatureHandler,
   }: ExpressReceiverOptions) {
     this.app = app !== undefined ? app : express();
 
@@ -204,7 +206,7 @@ export default class ExpressReceiver implements Receiver {
 
     this.signatureVerification = signatureVerification;
     const bodyParser = this.signatureVerification
-      ? buildVerificationBodyParserMiddleware(this.logger, signingSecret)
+      ? buildVerificationBodyParserMiddleware(this.logger, signingSecret, invalidRequestSignatureHandler)
       : buildBodyParserMiddleware(this.logger);
     const expressMiddleware: RequestHandler[] = [
       bodyParser,
@@ -455,6 +457,7 @@ export function verifySignatureAndParseRawBody(
 function buildVerificationBodyParserMiddleware(
   logger: Logger,
   signingSecret: string | (() => PromiseLike<string>),
+  invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void,
 ): RequestHandler {
   return async (req, res, next): Promise<void> => {
     // *** Parsing body ***
@@ -474,6 +477,17 @@ function buildVerificationBodyParserMiddleware(
       if (error) {
         if (error instanceof ReceiverAuthenticityError) {
           logError(logger, 'Request verification failed', error);
+          if (invalidRequestSignatureHandler) {
+            const signature = req.headers['x-slack-signature'];
+            const ts = req.headers['x-slack-request-timestamp'];
+            invalidRequestSignatureHandler({
+              signature: Array.isArray(signature) ? signature[0] : signature,
+              ts: ts ? Number(Array.isArray(ts) ? ts[0] : ts) : undefined,
+              body: stringBody,
+              request: req,
+              response: res,
+            });
+          }
           res.status(401).send();
           return;
         }

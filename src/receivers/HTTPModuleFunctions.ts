@@ -263,3 +263,23 @@ export interface ReceiverUnhandledRequestHandlerArgs {
   request: IncomingMessage;
   response: ServerResponse;
 }
+
+// The arguments for the invalidRequestSignatureHandler,
+// which handles requests with invalid signatures.
+export interface ReceiverInvalidRequestSignatureHandlerArgs {
+  signature: string | undefined;
+  ts: number | undefined;
+  body: string;
+  request: IncomingMessage;
+  response: ServerResponse;
+}
+
+// The default invalidRequestSignatureHandler implementation:
+// Developers can customize this behavior by passing invalidRequestSignatureHandler to the constructor
+export const defaultInvalidRequestSignatureHandler = (args: ReceiverInvalidRequestSignatureHandlerArgs): void => {
+  const { signature, ts } = args;
+  // Intentionally does nothing by default. The receiver already responds with 401.
+  // This hook allows developers to add custom logging, metrics, or alerting.
+  void signature;
+  void ts;
+};
