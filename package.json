@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "4.7.2",
+  "version": "5.0.0-rc.1",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -21,8 +21,8 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">=18",
-    "npm": ">=8.6.0"
+    "node": ">=20",
+    "npm": ">=9.6.4"
   },
   "scripts": {
     "build": "npm run build:clean && tsc",
@@ -47,12 +47,11 @@
     "url": "https://github.com/slackapi/bolt-js/issues"
   },
   "dependencies": {
-    "@slack/logger": "^4.0.1",
-    "@slack/oauth": "^3.0.5",
-    "@slack/socket-mode": "^2.0.7",
-    "@slack/types": "^2.21.1",
-    "@slack/web-api": "^7.16.0",
-    "axios": "^1.12.0",
+    "@slack/logger": "^5.0.0-rc.1",
+    "@slack/oauth": "^4.0.0-rc.1",
+    "@slack/socket-mode": "^3.0.0-rc.2",
+    "@slack/types": "^3.0.0-rc.1",
+    "@slack/web-api": "^8.0.0-rc.1",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",
@@ -61,10 +60,10 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
     "@changesets/cli": "^2.29.8",
-    "@tsconfig/node18": "^18.2.4",
+    "@tsconfig/node20": "^20.1.5",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
-    "@types/node": "18.19.130",
+    "@types/node": "20.19.0",
     "@types/proxyquire": "^1.3.31",
     "@types/sinon": "^17.0.4",
     "@types/tsscmp": "^1.0.0",
