@@ -24,6 +24,10 @@ export interface SlackRequestVerificationOptions {
  * If the request is invalid, this method throws an exception with the error details.
  */
 export function verifySlackRequest(options: SlackRequestVerificationOptions): void {
+  if (!options.signingSecret) {
+    throw new Error(`${verifyErrorPrefix}: signingSecret is empty or undefined`);
+  }
+
   const requestTimestampSec = options.headers['x-slack-request-timestamp'];
   const signature = options.headers['x-slack-signature'];
   if (Number.isNaN(requestTimestampSec)) {

@@ -505,6 +505,12 @@ function verifyRequestSignature(
   signature: string | undefined,
   requestTimestamp: string | undefined,
 ): void {
+  if (!signingSecret) {
+    throw new ReceiverAuthenticityError(
+      'Slack request signing verification failed. signingSecret is empty or undefined.',
+    );
+  }
+
   if (signature === undefined || requestTimestamp === undefined) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Some headers are missing.');
   }

@@ -17,6 +17,7 @@ import ExpressReceiver, {
   buildBodyParserMiddleware,
   respondToSslCheck,
   respondToUrlVerification,
+  verifySignatureAndParseBody,
   verifySignatureAndParseRawBody,
 } from '../../../src/receivers/ExpressReceiver';
 import * as httpFunc from '../../../src/receivers/HTTPModuleFunctions';
@@ -852,6 +853,20 @@ describe('ExpressReceiver', () => {
       };
       const req = untypedReq as Request;
       await verifySignatureMismatch(req);
+    });
+
+    it('should reject an empty signingSecret at request time', async () => {
+      try {
+        verifySignatureAndParseBody('', body, {
+          'x-slack-signature': signature,
+          'x-slack-request-timestamp': requestTimestamp,
+          'content-type': 'application/x-www-form-urlencoded',
+        });
+        assert.fail('Expected error to be thrown');
+      } catch (e) {
+        assert.instanceOf(e, Error);
+        assert.include((e as Error).message, 'signingSecret is empty or undefined');
+      }
     });
   });
 
