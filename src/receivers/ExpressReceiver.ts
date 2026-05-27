@@ -194,7 +194,6 @@ export default class ExpressReceiver implements Receiver {
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
   }: ExpressReceiverOptions) {
-    verifySigningSecret(signingSecret, signatureVerification);
     this.app = app !== undefined ? app : express();
 
     if (typeof logger !== 'undefined') {
@@ -204,6 +203,9 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
+    if (typeof signingSecret !== 'function') {
+      verifySigningSecret(signingSecret, signatureVerification);
+    }
     this.signatureVerification = signatureVerification;
     const bodyParser = this.signatureVerification
       ? buildVerificationBodyParserMiddleware(this.logger, signingSecret)
