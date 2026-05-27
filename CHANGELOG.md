@@ -1,5 +1,11 @@
 # @slack/bolt
 
+## 4.7.3
+
+### Patch Changes
+
+- 341b60e: Reject empty `signingSecret` at initialization to prevent accidental HMAC signature forgery.
+
 ## 4.7.2
 
 ### Patch Changes
