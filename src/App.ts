@@ -1307,7 +1307,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
         customRoutes,
       });
     }
-    if (signatureVerification === true && signingSecret === undefined) {
+    if (signatureVerification === true && !signingSecret) {
       // Using default receiver HTTPReceiver, signature verification enabled, missing signingSecret
       throw new AppInitializationError(
         'signingSecret is required to initialize the default receiver. Set signingSecret or use a ' +
