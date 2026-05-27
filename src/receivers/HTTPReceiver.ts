@@ -33,6 +33,7 @@ import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import { verifySigningSecret } from './verify-signing-secret';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -170,7 +171,7 @@ export default class HTTPReceiver implements Receiver {
   private unhandledRequestTimeoutMillis: number;
 
   public constructor({
-    signingSecret = '',
+    signingSecret,
     endpoints = ['/slack/events'],
     port = 3000,
     customRoutes = [],
@@ -191,6 +192,7 @@ export default class HTTPReceiver implements Receiver {
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
   }: HTTPReceiverOptions) {
+    verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;

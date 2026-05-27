@@ -32,6 +32,7 @@ import type { StringIndexed } from '../types/utilities';
 import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import { verifySigningSecret } from './verify-signing-secret';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -172,7 +173,7 @@ export default class ExpressReceiver implements Receiver {
   private unhandledRequestTimeoutMillis: number;
 
   public constructor({
-    signingSecret = '',
+    signingSecret,
     logger = undefined,
     logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
@@ -193,6 +194,7 @@ export default class ExpressReceiver implements Receiver {
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
   }: ExpressReceiverOptions) {
+    verifySigningSecret(signingSecret, signatureVerification);
     this.app = app !== undefined ? app : express();
 
     if (typeof logger !== 'undefined') {

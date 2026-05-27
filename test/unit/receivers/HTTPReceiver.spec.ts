@@ -116,6 +116,22 @@ describe('HTTPReceiver', () => {
       assert.propertyVal(customPort2, 'port', 9999);
     });
 
+    it('should throw an error if signingSecret is empty string and signature verification enabled', async () => {
+      const HTTPReceiver = importHTTPReceiver(overrides);
+      try {
+        new HTTPReceiver({ signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        assert.instanceOf(error, AppInitializationError);
+      }
+    });
+
+    it('should succeed with empty signingSecret when signatureVerification is false', async () => {
+      const HTTPReceiver = importHTTPReceiver(overrides);
+      const receiver = new HTTPReceiver({ signingSecret: '', signatureVerification: false });
+      assert.isNotNull(receiver);
+    });
+
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const HTTPReceiver = importHTTPReceiver();
       const clientId = 'my-clientId';

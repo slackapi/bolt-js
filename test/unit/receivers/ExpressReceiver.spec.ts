@@ -69,6 +69,20 @@ describe('ExpressReceiver', () => {
   });
 
   describe('constructor', () => {
+    it('should throw an error if signingSecret is empty string and signature verification enabled', async () => {
+      try {
+        new ExpressReceiver({ signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        assert.instanceOf(error, AppInitializationError);
+      }
+    });
+
+    it('should succeed with empty signingSecret when signatureVerification is false', async () => {
+      const receiver = new ExpressReceiver({ signingSecret: '', signatureVerification: false });
+      assert.isNotNull(receiver);
+    });
+
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments', async () => {
       const receiver = new ExpressReceiver({
@@ -188,7 +202,7 @@ describe('ExpressReceiver', () => {
   describe('#start()', () => {
     it('should start listening for requests using the built-in HTTP server', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       const server = await receiver.start(port);
@@ -203,7 +217,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(fakeCreateServer),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
       const tlsOptions = { key: '', cert: '' };
 
@@ -220,7 +234,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       let caughtError: Error | undefined;
@@ -239,7 +253,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       let caughtError: Error | undefined;
@@ -254,7 +268,7 @@ describe('ExpressReceiver', () => {
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       let caughtError: Error | undefined;
@@ -273,7 +287,7 @@ describe('ExpressReceiver', () => {
   describe('#stop()', () => {
     it('should stop listening for requests when a built-in HTTP server is already started', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
       await receiver.start(port);
 
@@ -281,7 +295,7 @@ describe('ExpressReceiver', () => {
     });
     it('should reject when a built-in HTTP server is not started', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
 
       let caughtError: Error | undefined;
       try {
@@ -304,7 +318,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       await receiver.start(12345);
 
       let caughtError: Error | undefined;
@@ -348,7 +362,7 @@ describe('ExpressReceiver', () => {
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -365,7 +379,7 @@ describe('ExpressReceiver', () => {
         return Promise.resolve({});
       });
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -377,7 +391,7 @@ describe('ExpressReceiver', () => {
     it('should throw and build an HTTP 500 response with no body if processEvent raises an uncoded Error or a coded, non-Authorization Error', async () => {
       processStub.callsFake(() => Promise.reject(new Error('uh oh')));
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -393,7 +407,7 @@ describe('ExpressReceiver', () => {
     it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async () => {
       processStub.callsFake(() => Promise.reject(new AuthorizationError('uh oh', new Error())));
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -412,7 +426,7 @@ describe('ExpressReceiver', () => {
     describe('install path route', () => {
       it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async () => {
         const ER = importExpressReceiver(overrides);
-        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '' });
+        const receiver = new ER({ signingSecret: 'test-secret', clientSecret: '', clientId: '', stateSecret: '' });
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleInstallPath').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/install', method: 'GET' } as Request;
@@ -434,7 +448,7 @@ describe('ExpressReceiver', () => {
           callbackOptions,
         };
         const receiver = new ER({
-          signingSecret: '',
+          signingSecret: 'test-secret',
           clientSecret: '',
           clientId: '',
           stateSecret: '',
@@ -459,7 +473,7 @@ describe('ExpressReceiver', () => {
           callbackOptions,
         };
         const receiver = new ER({
-          signingSecret: '',
+          signingSecret: 'test-secret',
           clientSecret: '',
           clientId: '',
           stateSecret: '',
@@ -481,7 +495,7 @@ describe('ExpressReceiver', () => {
   describe('state management for built-in server', () => {
     it('should be able to start after it was stopped', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
       await receiver.start(port);
       await receiver.stop();
