@@ -112,9 +112,9 @@ const app = new App({
 
 ---
 
-### We've updated `SocketModeReceiver` to use `dispatcher` instead of proxy agents
+### We've updated the `SocketModeReceiver` class to accept a `dispatcher` option instead of proxy agents
 
-The `SocketModeReceiver` now accepts a `dispatcher` option (from `@slack/socket-mode` v3) for unified proxy and TLS configuration of both the WebSocket connection and HTTP API calls ([#2929](https://github.com/slackapi/bolt-js/pull/2929)).
+The `SocketModeReceiver` class now accepts a `dispatcher` option for unified proxy and TLS configuration of both the WebSocket connection and HTTP API calls.
 
 **Before (v4):**
 
@@ -130,9 +130,9 @@ const app = new App({
 });
 ```
 
-#### Preferred: Built-in proxy support
+#### Preferred: Use built-in proxy support
 
-Node.js can read proxy env vars natively via [`http.setGlobalProxyFromEnv()`](https://nodejs.org/docs/latest/api/http.html#httpsetglobalproxyfromenvproxyenv). Call it once at startup and both the WebSocket connection and API calls route through your proxy automatically.
+Node.js can read proxy environment variables natively via [`http.setGlobalProxyFromEnv()`](https://nodejs.org/docs/latest/api/http.html#httpsetglobalproxyfromenvproxyenv). Call it once at startup and both the WebSocket connection and API calls route through your proxy automatically.
 
 ```typescript
 import http from 'node:http';
@@ -147,7 +147,7 @@ const app = new App({
 });
 ```
 
-#### Alternative: undici dispatcher for proxy + TLS
+#### Alternative: Use a undici dispatcher for proxy and TLS
 
 If you need per-client configuration, pass a `dispatcher` to both the `SocketModeReceiver` (for the WebSocket connection) and `clientOptions.fetch` (for the app's internal `WebClient` API calls):
 
@@ -173,17 +173,18 @@ const app = new App({
 
 ---
 
-### 4. Workflow Steps removed entirely
+### We've entirely removed Workflow Steps from Apps
 
-The `WorkflowStep` class, `app.step()` method, and all related types have been deleted ([#2928](https://github.com/slackapi/bolt-js/pull/2928)). Slack retired the Steps from Apps feature in September 2024. Use `app.function()` with custom functions instead.
+The Workflow Steps from Apps feature [was retired in September 2024](/changelog/2023-08-workflow-steps-from-apps-step-back/). The `WorkflowStep` class, `app.step()` method, and all related types have been deleted from Bolt for JS. You should remove any imports of `WorkflowStep` or `WorkflowStepEdit`.
 
-Remove any imports of `WorkflowStep` or `WorkflowStepEdit` — they no longer exist.
+Use the `app.function()` method with custom functions instead.
+
 
 ---
 
-### 5. `respond()` returns native `Response` instead of axios response
+### The `respond()` utility returns native `Response` instead of axios response
 
-The `respond()` utility now uses native fetch internally ([#2929](https://github.com/slackapi/bolt-js/pull/2929)). If you inspect the return value, the shape has changed from an axios response to a standard Fetch [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response).
+The `respond()` utility now uses native fetch internally. If you inspect the return value, the shape has changed from an axios response to a standard Fetch [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response).
 
 **Before (v4):**
 
@@ -215,29 +216,24 @@ If you're just calling `await respond(...)` without using the return value (the 
 
 ---
 
-### 6. Upgraded `@slack/*` dependencies
+### We've upgraded the Node Slack SDK dependencies
 
-All internal `@slack/*` packages have been bumped to their next major versions ([#2929](https://github.com/slackapi/bolt-js/pull/2929)). If you import from these packages directly, check their respective migration guides:
+All Node Slack SDK packages have been bumped to their next major versions.
 
-| Dependency | v4 range | v5 range | Migration guide |
-| --- | --- | --- | --- |
-| `@slack/web-api` | ^7 | ^8 | [web-api v8 migration](./web-api-v8-migration.md) |
-| `@slack/socket-mode` | ^2 | ^3 | [socket-mode v3 migration](./socket-mode-v3-migration.md) |
-| `@slack/oauth` | ^3 | ^4 | — |
-| `@slack/logger` | ^4 | ^5 | — |
-| `@slack/types` | ^2 | ^3 | — |
+* The `logger` package has been updated to v5.
+* The `oauth` package has been updated to v4.
+* The `types` package has been updated to v3.
 
-Key inherited changes:
+Three packages have more substantial breaking changes:
 
-- **`@slack/web-api` v8** removes `agent`, `tls`, `requestInterceptor`, and `adapter` options from `WebClientOptions`. If you pass any of these via `clientOptions` in your `App` constructor, they no longer exist — use `clientOptions.fetch` instead.
-- **`@slack/web-api` v8** errors are now proper `Error` subclasses with `instanceof` support. See the [web-api v8 error handling section](./web-api-v8-migration.md#7-error-handling-overhaul).
-- **`@slack/socket-mode` v3** replaces the `ws` library with undici's WebSocket implementation. See the [socket-mode v3 migration](./socket-mode-v3-migration.md).
+* The `socket-mode` package has been updated to v3. See the guide on [migrating @slack/socket-mode from v2 to v3](/tools/node-slack-sdk/migration/socket-mode/migrating-socket-mode-package-to-v3) for handling breaking changes. 
+* The `web-api` package has been updated to v8. See the guide on [migrating @slack/web-api from v7 to v8](/tools/node-slack-sdk/migration/web-api/migrating-web-api-package-to-v8) for handling breaking changes.
 
 ---
 
-### 7. Error handling improvements
+### 7. We've improved error handling throughout
 
-Bolt v5 leverages the new error classes from `@slack/web-api` v8 ([#2930](https://github.com/slackapi/bolt-js/pull/2930)). Errors thrown by the internal `WebClient` are now proper `Error` subclasses — `instanceof` checks work and TypeScript narrows types correctly.
+This version of Bolt leverages the new error classes from v8 of the `@slack/web-api` Node Slack SDK package. Errors thrown by the internal `WebClient` are now proper `Error` subclasses.
 
 **Before (v4):**
 
@@ -274,14 +270,14 @@ app.error(async ({ error }) => {
 
 ## New Features
 
-### `dispatcher` option on `SocketModeReceiver`
+### We've added a `dispatcher` option to the `SocketModeReceiver` class
 
 Unified proxy and TLS configuration for both WebSocket connections and HTTP API calls. Pass any undici-compatible dispatcher. See [Breaking Change #3](#3-socketmodereceiver-uses-dispatcher-instead-of-proxy-agents).
 
-### Error classes with `instanceof` support
+### We'ved added `instanceof` support to error classes
 
-Both Bolt's own errors (e.g., `AppInitializationError`, `AuthorizationError`) and the underlying `@slack/web-api` errors now properly extend `Error`. Use `instanceof` for type-safe error handling instead of string comparisons on `error.code`.
+Both Bolt's own errors (e.g., `AppInitializationError`, `AuthorizationError`) and the underlying `@slack/web-api` Node Slack SDK package errors now properly extend `Error`. Use `instanceof` for type-safe error handling instead of string comparisons on `error.code`.
 
-### `app.function()` as the sole custom step mechanism
+### We've made `app.function()` the sole custom step mechanism
 
 While `app.function()` already existed in Bolt v4, it is now the only way to handle custom function executions (replacing the removed `app.step()` / `WorkflowStep`). It provides `complete()` and `fail()` callbacks for signaling outcomes, and `inputs` for accessing function parameters.
