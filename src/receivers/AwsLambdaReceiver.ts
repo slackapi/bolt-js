@@ -6,6 +6,7 @@ import type App from '../App';
 import { ReceiverMultipleAckError } from '../errors';
 import type { Receiver, ReceiverEvent } from '../types/receiver';
 import type { StringIndexed } from '../types/utilities';
+import { verifySigningSecret } from './verify-signing-secret';
 
 export type AwsEvent = AwsEventV1 | AwsEventV2;
 type AwsEventStringParameters = Record<string, string | undefined>;
@@ -146,6 +147,7 @@ export default class AwsLambdaReceiver implements Receiver {
     invalidRequestSignatureHandler,
     unhandledRequestTimeoutMillis = 3001,
   }: AwsLambdaReceiverOptions) {
+    verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;

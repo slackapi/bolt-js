@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { assert } from 'chai';
 import sinon from 'sinon';
+import { AppInitializationError } from '../../../src/errors';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
   createDummyAppMentionEventMiddlewareArgs,
@@ -24,6 +25,20 @@ const appOverrides = mergeOverrides(withNoopAppMetadata(), withNoopWebClient(fak
 
 describe('AwsLambdaReceiver', () => {
   const noopLogger = createFakeLogger();
+
+  it('should throw an error if signingSecret is empty string and signature verification enabled', async () => {
+    try {
+      new AwsLambdaReceiver({ signingSecret: '' });
+      assert.fail();
+    } catch (error) {
+      assert.instanceOf(error, AppInitializationError);
+    }
+  });
+
+  it('should succeed with empty signingSecret when signatureVerification is false', async () => {
+    const receiver = new AwsLambdaReceiver({ signingSecret: '', signatureVerification: false });
+    assert.isNotNull(receiver);
+  });
 
   it('should instantiate with default logger', async () => {
     const awsReceiver = new AwsLambdaReceiver({

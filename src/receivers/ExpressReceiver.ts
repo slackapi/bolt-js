@@ -32,6 +32,7 @@ import type { StringIndexed } from '../types/utilities';
 import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import { verifySigningSecret } from './verify-signing-secret';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -172,7 +173,7 @@ export default class ExpressReceiver implements Receiver {
   private unhandledRequestTimeoutMillis: number;
 
   public constructor({
-    signingSecret = '',
+    signingSecret,
     logger = undefined,
     logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
@@ -202,6 +203,9 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
+    if (typeof signingSecret !== 'function') {
+      verifySigningSecret(signingSecret, signatureVerification);
+    }
     this.signatureVerification = signatureVerification;
     const bodyParser = this.signatureVerification
       ? buildVerificationBodyParserMiddleware(this.logger, signingSecret)
@@ -501,6 +505,12 @@ function verifyRequestSignature(
   signature: string | undefined,
   requestTimestamp: string | undefined,
 ): void {
+  if (!signingSecret) {
+    throw new ReceiverAuthenticityError(
+      'Slack request signing verification failed. signingSecret is empty or undefined.',
+    );
+  }
+
   if (signature === undefined || requestTimestamp === undefined) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Some headers are missing.');
   }
