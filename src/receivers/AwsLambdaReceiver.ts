@@ -46,6 +46,15 @@ export interface AwsEventV2 {
   version: string;
 }
 
+/**
+ * Legacy callback signature retained for backwards compatibility with consumer
+ * code. `AwsHandler` is now a 2-arg promise-based signature; this callback is
+ * no longer invoked by `AwsLambdaReceiver`.
+ *
+ * @deprecated Lambda's Node.js 24+ runtimes reject callback-style handlers
+ * (`Runtime.CallbackHandlerDeprecated`). Return a `Promise<AwsResponse>`
+ * directly instead.
+ */
 // biome-ignore lint/suspicious/noExplicitAny: userland function results can be anything
 export type AwsCallback = (error?: Error | string | null, result?: any) => void;
 
@@ -70,7 +79,7 @@ export interface AwsResponse {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: request context can be anything
-export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
+export type AwsHandler = (event: AwsEvent, context: any) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
   /**
@@ -191,8 +200,12 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   public toHandler(): AwsHandler {
+    // Returns a 2-arg promise-based handler so the resulting function has
+    // `length === 2`. Lambda's Node.js 24+ runtimes reject 3-arg handlers
+    // up front with `Runtime.CallbackHandlerDeprecated` before the handler
+    // is invoked.
     // biome-ignore lint/suspicious/noExplicitAny: request context can be anything
-    return async (awsEvent: AwsEvent, _awsContext: any, _awsCallback: AwsCallback): Promise<AwsResponse> => {
+    return async (awsEvent: AwsEvent, _awsContext: any): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
       const rawBody = this.getRawBody(awsEvent);
