@@ -213,24 +213,5 @@
         ]
       }
     ]
-  },
-  {
-    "type": "html",
-    "value": "<hr>"
-  },
-  {
-    "type": "link",
-    "label": "Release notes",
-    "href": "https://github.com/slackapi/bolt-js/releases"
-  },
-  {
-    "type": "link",
-    "label": "Code on GitHub",
-    "href": "https://github.com/SlackAPI/bolt-js"
-  },
-  {
-    "type": "link",
-    "label": "Contributors Guide",
-    "href": "https://github.com/SlackAPI/bolt-js/blob/main/.github/contributing.md"
   }
 ]

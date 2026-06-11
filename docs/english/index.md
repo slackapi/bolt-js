@@ -19,3 +19,7 @@ These docs live within the [Bolt-JS](https://github.com/slackapi/bolt-js/) repos
 
 We welcome contributions from everyone! Please check out our
 [Contributor's Guide](https://github.com/slackapi/bolt-js/blob/main/.github/contributing.md) for how to contribute in a helpful and collaborative way.
+
+## Release notes
+
+Check out the [Bolt for JavaScript release notes](https://github.com/slackapi/bolt-js/releases) for all the latest happenings.
