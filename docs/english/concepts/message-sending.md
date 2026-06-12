@@ -120,4 +120,4 @@ const feedbackBlock = {
 };
 ```
 
-Read more about streaming messages in the [_Adding agent features_](/tools/bolt-js/adding-agent-features) guide.
+Read more about streaming messages in the [_Adding agent features_](/tools/bolt-js/concepts/adding-agent-features) guide.
