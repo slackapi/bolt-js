@@ -9,7 +9,7 @@ When complete, you'll have a local environment configured with a customized [app
 
 :::tip[Reference for readers]
 
-In search of the complete guide to building an app from scratch? Check out the [building an app](/tools/bolt-js/building-an-app) guide.
+In search of the complete guide to building an app from scratch? Check out the [building an app](/tools/bolt-js/creating-an-app) guide.
 
 :::
 
@@ -147,7 +147,7 @@ The above command works on Linux and macOS but [similar commands are available o
 
 :::warning[Keep it secret. Keep it safe]
 
-Treat your tokens like a password and [keep it safe](/security). Your app uses these to retrieve and send information to Slack.
+Treat your tokens like a password and [keep it safe](/concepts/security). Your app uses these to retrieve and send information to Slack.
 
 :::
 

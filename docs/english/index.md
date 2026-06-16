@@ -13,6 +13,10 @@ If you otherwise get stuck, we're here to help. The following are the best ways 
 * [Issue Tracker](http://github.com/slackapi/bolt-js/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for JavaScript. Try searching for an existing issue before creating a new one.
 * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`.
 
+## Release notes
+
+Check out the [Bolt for JavaScript release notes](https://github.com/slackapi/bolt-js/releases) for all the latest happenings.
+
 ## Contributing
 
 These docs live within the [Bolt-JS](https://github.com/slackapi/bolt-js/) repository and are open source.
