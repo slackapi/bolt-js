@@ -36,6 +36,8 @@ export enum ErrorCode {
 
   HTTPReceiverDeferredRequestError = 'slack_bolt_http_receiver_deferred_request_error',
 
+  RespondError = 'slack_bolt_respond_error',
+
   /**
    * This value is used to assign to errors that occur inside the framework but do not have a code, to keep interfaces
    * in terms of CodedError.
@@ -137,6 +139,17 @@ export class HTTPReceiverDeferredRequestError extends Error implements CodedErro
     super(message);
     this.req = req;
     this.res = res;
+  }
+}
+
+export class RespondError extends Error implements CodedError {
+  public code = ErrorCode.RespondError;
+
+  public statusCode: number;
+
+  public constructor(message: string, statusCode: number) {
+    super(message);
+    this.statusCode = statusCode;
   }
 }
 
