@@ -370,7 +370,59 @@ describe('App basic features', () => {
       });
     });
 
-    // TODO: tests for logger and logLevel option
+    describe('with logger option', () => {
+      // Regression for https://github.com/slackapi/bolt-js/issues/2521.
+      // When `logger` was omitted, the constructor still built a named
+      // `bolt-app` ConsoleLogger on `this.logger`, but threaded the
+      // *raw* (undefined) `logger` argument into `initReceiver`. The
+      // default HTTPReceiver / SocketModeReceiver then constructed their
+      // own anonymous ConsoleLogger, so receiver-side log lines (e.g.
+      // "An unhandled HTTP request (GET) made to /ohno was ignored")
+      // appeared without the `bolt-app` name prefix.
+      it("should share the app's named ConsoleLogger with the default receiver when no logger is provided", async () => {
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
+        );
+        const MockApp = importApp(overrides);
+        const app = new MockApp({ token: '', signingSecret: 'signing-secret' });
+
+        // The receiver should be holding the same Logger instance the
+        // app surfaces as `.logger`; without the fix the receiver had
+        // its own unnamed ConsoleLogger and receiver-side log lines
+        // dropped the `bolt-app` name prefix.
+        const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
+        const appLogger = (app as unknown as { logger: unknown }).logger;
+        assert.isDefined(receiverLogger, 'default receiver should expose a logger');
+        assert.strictEqual(
+          receiverLogger,
+          appLogger,
+          'receiver logger should be the same instance as app.logger',
+        );
+      });
+
+      it("should still honor an explicit logger option and pass it to the receiver", async () => {
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
+        );
+        const fakeLogger = createFakeLogger();
+        const MockApp = importApp(overrides);
+        const app = new MockApp({
+          token: '',
+          signingSecret: 'signing-secret',
+          logger: fakeLogger,
+        });
+
+        const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
+        assert.strictEqual(
+          receiverLogger,
+          fakeLogger,
+          'an explicit logger must reach the receiver unchanged',
+        );
+      });
+    });
+
     // TODO: tests for providing botId and botUserId options
     // TODO: tests for providing endpoints option
   });
