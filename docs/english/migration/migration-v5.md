@@ -22,6 +22,22 @@ We've dropped support for Node.js 18. Node.js 20 or later is required.
 
 ---
 
+### TypeScript consumers target ES2022 or later {#typescript-es2022-target}
+
+Bolt v5 depends on v8 of the `@slack/web-api` Node Slack SDK package, whose error classes use the ES2022 [`Error(message, { cause })`](https://developer.mozilla.org/en-US/docs/Web/API/Error/Error) constructor. Its type definitions reference the global `ErrorOptions` type.
+
+If your project's `tsconfig.json` targets an older ECMAScript library and does not set `skipLibCheck`, your build may fail after upgrading with an error like:
+
+```text
+error TS2304: Cannot find name 'ErrorOptions'.
+```
+
+To fix it we recommend raising your compilation target to `es2022` or later, as it aligns with the Node.js 20 baseline.
+
+Alternatively, set `"skipLibCheck": true` to skip type-checking of dependency declaration files. Note that Bolt's own build and its sample apps already extend [`@tsconfig/node20`](https://www.npmjs.com/package/@tsconfig/node20), which targets `es2022`, so projects based on those templates are unaffected.
+
+---
+
 ### We've removed the `agent` and `clientTls` options from the `AppOptions` interface {#removed-agent-clienttls}
 
 You should configure transport via the `clientOptions.fetch` option or use the Node.js built-in proxy support.
