@@ -95,4 +95,4 @@ Your app is now set up to build and deploy whenever you commit to your repo.
 
 ✨ Explore Vercel documentation [here](https://vercel.com/docs/git).
 
-✨ Learn all about [developing apps with AI features](/ai/developing-ai-apps).
+✨ Learn all about [developing apps with AI features](/ai/developing-agents).

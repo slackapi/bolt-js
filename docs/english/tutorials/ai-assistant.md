@@ -459,7 +459,7 @@ After getting the thread replies, we map them to the appropriate object structur
   }
 ```
 
-The entirety of the user message processing in this example is wrapped in a try-catch block to provide the user an error message when something goes wrong, which is a best practice. If successful, the final action we take is to call the `say` method with the LLM response. This sample also shows how to implement [text streaming](/ai/developing-ai-apps#streaming) in code. Omitting the `streamer` would result in the app responding with one block of text, versus providing chunks at a time.
+The entirety of the user message processing in this example is wrapped in a try-catch block to provide the user an error message when something goes wrong, which is a best practice. If successful, the final action we take is to call the `say` method with the LLM response. This sample also shows how to implement [text streaming](/ai/developing-agents#streaming) in code. Omitting the `streamer` would result in the app responding with one block of text, versus providing chunks at a time.
 
 #### Using the markdown block in `say` {#markdown-block}
 
@@ -492,7 +492,7 @@ This sample app uses Socket Mode to receive events. This is great for developing
 
 ➡️ Read more about Bolt support for apps using platform AI features in the documentation [here](/tools/bolt-js/concepts/adding-agent-features).
 
-➡️ Level up your AI game after reading through the [usage guide](/ai/developing-ai-apps) and [Best practices for AI feature-enabled apps](/ai/ai-apps-best-practices).
+➡️ Level up your AI game after reading through the [usage guide](/ai/developing-agents) and [Best practices for AI feature-enabled apps](/ai/developing-agents/).
 
 ### Explore pre-built apps using AI features {#marketplace}
 
