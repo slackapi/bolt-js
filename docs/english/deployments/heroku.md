@@ -184,7 +184,7 @@ heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 
 :::info
 
-If you don't know where to find your credentials, please read about [exporting your signing secret and token](/tools/bolt-js/building-an-app#preparing-receive-events) in the Building an app guide.
+If you don't know where to find your credentials, please read about [exporting your signing secret and token](/tools/bolt-js/creating-an-app/#preparing-receive-events) in the Building an app guide.
 
 :::
 

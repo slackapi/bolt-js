@@ -80,6 +80,8 @@ export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   token: string;
   team_id: string;
   enterprise_id?: string;
+  context_team_id?: string;
+  context_enterprise_id?: string;
   api_app_id: string;
   event: Event;
   type: 'event_callback';

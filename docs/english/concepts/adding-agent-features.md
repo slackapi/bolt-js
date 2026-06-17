@@ -10,7 +10,7 @@ The code snippets throughout this guide are from our [Support Agent sample app](
 View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey. Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
 :::
 
-Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-js/concepts/assistant-class) for a side-panel view designed with AI in mind.
+Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-js/concepts/using-the-assistant-class) for a side-panel view designed with AI in mind.
 
 If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/). Then come back here to implement them with Bolt!
 
