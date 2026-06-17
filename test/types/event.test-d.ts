@@ -65,5 +65,14 @@ app.event('reaction_removed', async ({ say, event }) => {
   expectType<ReactionRemovedEvent>(event);
 });
 
+// Slack Connect / Enterprise Grid org-wide context fields on the envelope.
+// Both must be optional `string | undefined` — they are absent on classic
+// single-workspace event deliveries and present on cross-workspace ones.
+// Regression coverage for https://github.com/slackapi/bolt-js/issues/2773.
+app.event('message', async ({ body }) => {
+  expectType<string | undefined>(body.context_team_id);
+  expectType<string | undefined>(body.context_enterprise_id);
+});
+
 // TODO: we should not allow providing bogus event names
 // app.event('garbage', async ({ event }) => {});

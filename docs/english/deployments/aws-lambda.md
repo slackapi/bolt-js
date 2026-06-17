@@ -235,7 +235,7 @@ ngrok http 3000
 
 :::info
 
-[Learn how to use ngrok](/tools/bolt-js/building-an-app#preparing-receive-events) to create a public URL and forward requests to your local machine.
+[Learn how to use ngrok](/tools/bolt-js/creating-an-app/#preparing-receive-events) to create a public URL and forward requests to your local machine.
 
 :::
 
