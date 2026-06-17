@@ -81,10 +81,6 @@ export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   team_id: string;
   enterprise_id?: string;
   context_team_id?: string;
-  /**
-   * Enterprise grid org where the event originated. Companion to `context_team_id`;
-   * present alongside it on Slack Connect / org-wide app payloads.
-   */
   context_enterprise_id?: string;
   api_app_id: string;
   event: Event;
