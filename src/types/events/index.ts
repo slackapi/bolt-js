@@ -80,12 +80,6 @@ export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   token: string;
   team_id: string;
   enterprise_id?: string;
-  /**
-   * Workspace where the event originated. Sent by Slack on Slack Connect channels and
-   * Enterprise Grid org-wide apps, where `team_id` may refer to a different workspace
-   * than the one the bot is installed in. Prefer this over `team_id` when routing by
-   * workspace. See https://docs.slack.dev/enterprise-grid/org-wide-apps#context-team-id
-   */
   context_team_id?: string;
   /**
    * Enterprise grid org where the event originated. Companion to `context_team_id`;
