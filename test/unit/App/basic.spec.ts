@@ -394,14 +394,10 @@ describe('App basic features', () => {
         const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
         const appLogger = (app as unknown as { logger: unknown }).logger;
         assert.isDefined(receiverLogger, 'default receiver should expose a logger');
-        assert.strictEqual(
-          receiverLogger,
-          appLogger,
-          'receiver logger should be the same instance as app.logger',
-        );
+        assert.strictEqual(receiverLogger, appLogger, 'receiver logger should be the same instance as app.logger');
       });
 
-      it("should still honor an explicit logger option and pass it to the receiver", async () => {
+      it('should still honor an explicit logger option and pass it to the receiver', async () => {
         const overrides = mergeOverrides(
           withNoopAppMetadata(),
           withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
@@ -415,11 +411,7 @@ describe('App basic features', () => {
         });
 
         const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
-        assert.strictEqual(
-          receiverLogger,
-          fakeLogger,
-          'an explicit logger must reach the receiver unchanged',
-        );
+        assert.strictEqual(receiverLogger, fakeLogger, 'an explicit logger must reach the receiver unchanged');
       });
     });
 

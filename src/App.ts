@@ -430,13 +430,6 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       installationStore,
       scopes,
       appToken,
-      // Use the constructed `this.logger` rather than the raw constructor
-      // argument so the receivers share the `bolt-app`-named ConsoleLogger
-      // when no logger was supplied. Previously this passed `logger`
-      // (potentially undefined), and HTTPReceiver / SocketModeReceiver
-      // each built their own unnamed ConsoleLogger — so messages like
-      // "An unhandled HTTP request (GET) made to /ohno was ignored"
-      // logged without the `bolt-app` prefix (issue #2521).
       this.logger,
     );
 
