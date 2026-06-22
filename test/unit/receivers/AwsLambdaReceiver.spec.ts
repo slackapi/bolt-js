@@ -66,6 +66,19 @@ describe('AwsLambdaReceiver', () => {
     await awsReceiver.stop();
   });
 
+  // Regression for slackapi/bolt-js#2761: Lambda's Node.js 24+ runtime rejects
+  // handlers whose `.length` is > 2 with `Runtime.CallbackHandlerDeprecated`
+  // before the handler is ever invoked. `toHandler()` must return a 2-arg
+  // promise-based function.
+  it('should return a 2-arg promise-based handler (Node.js 24+ Lambda runtime)', () => {
+    const awsReceiver = new AwsLambdaReceiver({
+      signingSecret: 'my-secret',
+      logger: noopLogger,
+    });
+    const handler = awsReceiver.toHandler();
+    assert.equal(handler.length, 2);
+  });
+
   it('should return a 404 if app has no registered handlers for an incoming event, and return a 200 if app does have registered handlers', async () => {
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
@@ -76,7 +89,7 @@ describe('AwsLambdaReceiver', () => {
     const args = createDummyAppMentionEventMiddlewareArgs();
     const body = JSON.stringify(args.body);
     const awsEvent = createDummyAWSPayload(body, timestamp);
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {});
     assert.equal(response1.statusCode, 404);
     const App = importApp(appOverrides);
     const app = new App({
@@ -84,7 +97,7 @@ describe('AwsLambdaReceiver', () => {
       receiver: awsReceiver,
     });
     app.event('app_mention', noopVoid);
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response2 = await handler(awsEvent, {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -106,7 +119,7 @@ describe('AwsLambdaReceiver', () => {
       'x-slack-request-timestamp': `${timestamp}`,
       'x-slack-signature': `v0=${signature}`,
     });
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {});
     assert.equal(response1.statusCode, 404);
     const App = importApp(appOverrides);
     const app = new App({
@@ -114,7 +127,7 @@ describe('AwsLambdaReceiver', () => {
       receiver: awsReceiver,
     });
     app.event('app_mention', noopVoid);
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response2 = await handler(awsEvent, {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -136,7 +149,7 @@ describe('AwsLambdaReceiver', () => {
       'X-Slack-Request-Timestamp': `${timestamp}`,
       'X-Slack-Signature': `v0=${signature}`,
     });
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {});
     assert.equal(response1.statusCode, 404);
     const App = importApp(appOverrides);
     const app = new App({
@@ -146,7 +159,7 @@ describe('AwsLambdaReceiver', () => {
     app.shortcut('bolt-js-aws-lambda-shortcut', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response2 = await handler(awsEvent, {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -168,7 +181,7 @@ describe('AwsLambdaReceiver', () => {
       'X-Slack-Request-Timestamp': `${timestamp}`,
       'X-Slack-Signature': `v0=${signature}`,
     });
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {});
     assert.equal(response1.statusCode, 404);
     const App = importApp(appOverrides);
     const app = new App({
@@ -178,7 +191,7 @@ describe('AwsLambdaReceiver', () => {
     app.command('/hello-bolt-js', async ({ ack }) => {
       await ack();
     });
-    const response2 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response2 = await handler(awsEvent, {});
     assert.equal(response2.statusCode, 200);
   });
 
@@ -192,7 +205,7 @@ describe('AwsLambdaReceiver', () => {
     const args = createDummyAppMentionEventMiddlewareArgs();
     const body = JSON.stringify(args.body);
     const awsEvent = createDummyAWSPayload(body, timestamp, undefined, true);
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {});
     assert.equal(response1.statusCode, 404);
   });
 
@@ -213,7 +226,7 @@ describe('AwsLambdaReceiver', () => {
       'X-Slack-Request-Timestamp': `${timestamp}`,
       'X-Slack-Signature': `v0=${signature}`,
     });
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -231,7 +244,7 @@ describe('AwsLambdaReceiver', () => {
     });
     const handler = awsReceiver.toHandler();
     const awsEvent = createDummyAWSPayload(urlVerificationBody, timestamp);
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -269,7 +282,7 @@ describe('AwsLambdaReceiver', () => {
       body: urlVerificationBody,
       isBase64Encoded: false,
     };
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 401);
     assert(spy.calledOnce);
   });
@@ -282,7 +295,7 @@ describe('AwsLambdaReceiver', () => {
     const handler = awsReceiver.toHandler();
     const timestamp = Math.floor(Date.now() / 1000) - 600; // 10 minutes ago
     const awsEvent = createDummyAWSPayload(urlVerificationBody, timestamp);
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 401);
   });
 
@@ -294,7 +307,7 @@ describe('AwsLambdaReceiver', () => {
     });
     const handler = awsReceiver.toHandler();
     const awsEvent = createDummyAWSPayload(urlVerificationBody);
-    const response = await handler(awsEvent, {}, (_error, _result) => {});
+    const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 200);
   });
 
@@ -311,7 +324,7 @@ describe('AwsLambdaReceiver', () => {
     const args = createDummyAppMentionEventMiddlewareArgs();
     const body = JSON.stringify(args.body);
     const awsEvent = createDummyAWSPayload(body, timestamp);
-    const response1 = await handler(awsEvent, {}, (_error, _result) => {});
+    const response1 = await handler(awsEvent, {});
     assert.equal(response1.statusCode, 404);
     await new Promise((res) => {
       setTimeout(res, delay + 2);
