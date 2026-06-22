@@ -691,10 +691,19 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): void;
   // TODO: expose a type parameter for overriding the MessageEvent type (just like shortcut() and action() does) https://github.com/slackapi/bolt-js/issues/796
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | (string | RegExp)[]
+      | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>
+    )[]
   ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
-      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
+      if (
+        typeof patternOrMiddleware === 'string' ||
+        util.types.isRegExp(patternOrMiddleware) ||
+        Array.isArray(patternOrMiddleware)
+      ) {
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;

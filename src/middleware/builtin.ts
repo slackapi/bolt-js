@@ -1,3 +1,4 @@
+import util from 'node:util';
 import type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
 import type {
@@ -228,28 +229,44 @@ export function matchConstraints(
  * Middleware that filters out messages that don't match pattern
  */
 export function matchMessage(
-  pattern: string | RegExp,
+  pattern: string | RegExp | (string | RegExp)[],
 ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
   return async ({ event, context, next }) => {
-    let tempMatches: RegExpMatchArray | null;
+    let tempMatches: RegExpMatchArray | null = null;
+    let patternArray: (string | RegExp)[] = [];
 
     if (!('text' in event) || event.text === undefined) {
       return;
     }
 
-    // Filter out messages or app mentions that don't contain the pattern
-    if (typeof pattern === 'string') {
-      if (!event.text.includes(pattern)) {
-        return;
-      }
+    // Normalize a single pattern into an array of patterns
+    if (typeof pattern === 'string' || util.types.isRegExp(pattern)) {
+      patternArray = [pattern];
     } else {
-      tempMatches = event.text.match(pattern);
+      patternArray = pattern;
+    }
 
-      if (tempMatches !== null) {
-        context.matches = tempMatches;
+    // Filter out messages or app mentions that don't contain any of the patterns
+    let matched = false;
+    for (let i = 0; i < patternArray.length; i += 1) {
+      const patternArrayItem = patternArray[i];
+      if (typeof patternArrayItem === 'string') {
+        if (event.text.includes(patternArrayItem)) {
+          matched = true;
+          break;
+        }
       } else {
-        return;
+        tempMatches = event.text.match(patternArrayItem);
+        if (tempMatches !== null) {
+          context.matches = tempMatches;
+          matched = true;
+          break;
+        }
       }
+    }
+
+    if (matched === false) {
+      return;
     }
 
     await next();

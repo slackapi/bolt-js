@@ -96,6 +96,21 @@ app.message(async ({ message }) => {
   await Promise.resolve(message);
 });
 
+// Patterns: a single string pattern should be accepted
+app.message('hello', async ({ message }) => {
+  await Promise.resolve(message);
+});
+
+// Patterns: a single RegExp pattern should be accepted
+app.message(/hello/, async ({ message }) => {
+  await Promise.resolve(message);
+});
+
+// Patterns: an array of string | RegExp patterns should be accepted (issue #281)
+app.message(['hello', 'hi', 'bonjour', /\w{2,8}\s*\w{0,7}!?\.?/], async ({ message }) => {
+  await Promise.resolve(message);
+});
+
 interface MyContext {
   doesnt: 'matter';
 }
