@@ -1,4 +1,3 @@
-import util from 'node:util';
 import type { ActionConstraints, OptionsConstraints, ShortcutConstraints, ViewConstraints } from '../App';
 import { ContextMissingPropertyError } from '../errors';
 import type {
@@ -231,41 +230,32 @@ export function matchConstraints(
 export function matchMessage(
   pattern: string | RegExp | (string | RegExp)[],
 ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
+  // Normalize a single pattern into an array of patterns once, at registration time
+  const patterns = Array.isArray(pattern) ? pattern : [pattern];
   return async ({ event, context, next }) => {
-    let tempMatches: RegExpMatchArray | null = null;
-    let patternArray: (string | RegExp)[] = [];
-
     if (!('text' in event) || event.text === undefined) {
       return;
     }
 
-    // Normalize a single pattern into an array of patterns
-    if (typeof pattern === 'string' || util.types.isRegExp(pattern)) {
-      patternArray = [pattern];
-    } else {
-      patternArray = pattern;
-    }
-
-    // Filter out messages or app mentions that don't contain any of the patterns
+    // Filter out messages or app mentions that don't match any of the patterns. The first matching
+    // pattern wins; for a matching RegExp its capture groups are exposed via context.matches.
     let matched = false;
-    for (let i = 0; i < patternArray.length; i += 1) {
-      const patternArrayItem = patternArray[i];
-      if (typeof patternArrayItem === 'string') {
-        if (event.text.includes(patternArrayItem)) {
-          matched = true;
-          break;
-        }
+    for (const candidate of patterns) {
+      if (typeof candidate === 'string') {
+        matched = event.text.includes(candidate);
       } else {
-        tempMatches = event.text.match(patternArrayItem);
+        const tempMatches = event.text.match(candidate);
         if (tempMatches !== null) {
           context.matches = tempMatches;
           matched = true;
-          break;
         }
+      }
+      if (matched) {
+        break;
       }
     }
 
-    if (matched === false) {
+    if (!matched) {
       return;
     }
 
