@@ -35,6 +35,12 @@ import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
 import { verifyRedirectOpts } from './verify-redirect-opts';
 import { verifySigningSecret } from './verify-signing-secret';
 
+export interface HTTPReceiverInvalidRequestSignatureHandlerArgs {
+  rawBody: string;
+  signature: string;
+  ts: number;
+}
+
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
   'ALPNProtocols',
@@ -82,6 +88,16 @@ export interface HTTPReceiverOptions {
   logLevel?: LogLevel;
   processBeforeResponse?: boolean;
   signatureVerification?: boolean;
+  /**
+   * Called when an incoming request fails signature verification. Override to
+   * emit custom telemetry, return a specific response body, or suppress the
+   * default warn log. The receiver still returns `401 Unauthorized` to the
+   * client regardless of what the handler does.
+   *
+   * Defaults to a handler that logs a warning with the received
+   * `x-slack-signature` and `x-slack-request-timestamp` values.
+   */
+  invalidRequestSignatureHandler?: (args: HTTPReceiverInvalidRequestSignatureHandlerArgs) => void;
   clientId?: string;
   clientSecret?: string;
   stateSecret?: InstallProviderOptions['stateSecret']; // required when using default stateStore
@@ -138,6 +154,8 @@ export default class HTTPReceiver implements Receiver {
 
   private signatureVerification: boolean;
 
+  private invalidRequestSignatureHandler: (args: HTTPReceiverInvalidRequestSignatureHandlerArgs) => void;
+
   private app?: App;
 
   public requestListener: RequestListener;
@@ -179,6 +197,7 @@ export default class HTTPReceiver implements Receiver {
     logLevel = LogLevel.INFO,
     processBeforeResponse = false,
     signatureVerification = true,
+    invalidRequestSignatureHandler,
     clientId = undefined,
     clientSecret = undefined,
     stateSecret = undefined,
@@ -197,6 +216,8 @@ export default class HTTPReceiver implements Receiver {
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
+    this.invalidRequestSignatureHandler =
+      invalidRequestSignatureHandler ?? this.defaultInvalidRequestSignatureHandler.bind(this);
     this.logger =
       logger ??
       (() => {
@@ -449,7 +470,13 @@ export default class HTTPReceiver implements Receiver {
       } catch (err) {
         const e = err as Error;
         if (this.signatureVerification) {
-          this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
+          const requestWithRawBody = req as IncomingMessage & { rawBody?: string };
+          const rawBody = typeof requestWithRawBody.rawBody === 'string' ? requestWithRawBody.rawBody : '';
+          this.invalidRequestSignatureHandler({
+            rawBody,
+            signature: (req.headers['x-slack-signature'] as string) ?? '',
+            ts: Number(req.headers['x-slack-request-timestamp']) || 0,
+          });
         } else {
           this.logger.warn(`Failed to parse the request body: ${e.message}`);
         }
@@ -567,5 +594,13 @@ export default class HTTPReceiver implements Receiver {
     } else {
       installer.handleCallback(req, res, installCallbackOptions).catch(errorHandler);
     }
+  }
+
+  private defaultInvalidRequestSignatureHandler(args: HTTPReceiverInvalidRequestSignatureHandlerArgs): void {
+    const { signature, ts } = args;
+
+    this.logger.warn(
+      `Invalid request signature detected (X-Slack-Signature: ${signature}, X-Slack-Request-Timestamp: ${ts})`,
+    );
   }
 }
