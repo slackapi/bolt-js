@@ -23,6 +23,7 @@ updates:
           - "23.x"
           - "24.x"
           - "25.x"
+          - "26.x"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -50,3 +51,4 @@ updates:
       - dependency-name: "@types/node"
         versions:
           - "25.x"
+          - "26.x"
