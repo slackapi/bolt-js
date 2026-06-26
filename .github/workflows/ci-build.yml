@@ -24,6 +24,7 @@ jobs:
           - 20.x
           - 22.x
           - 24.x
+          - 26.x
     permissions:
       contents: read
     steps:
