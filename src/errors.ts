@@ -36,14 +36,13 @@ export enum ErrorCode {
 
   HTTPReceiverDeferredRequestError = 'slack_bolt_http_receiver_deferred_request_error',
 
+  RespondError = 'slack_bolt_respond_error',
+
   /**
    * This value is used to assign to errors that occur inside the framework but do not have a code, to keep interfaces
    * in terms of CodedError.
    */
   UnknownError = 'slack_bolt_unknown_error',
-
-  // TODO: remove workflow step stuff in bolt v5
-  WorkflowStepInitializationError = 'slack_bolt_workflow_step_initialization_error',
 
   CustomFunctionInitializationError = 'slack_bolt_custom_function_initialization_error',
   CustomFunctionCompleteSuccessError = 'slack_bolt_custom_function_complete_success_error',
@@ -143,6 +142,17 @@ export class HTTPReceiverDeferredRequestError extends Error implements CodedErro
   }
 }
 
+export class RespondError extends Error implements CodedError {
+  public code = ErrorCode.RespondError;
+
+  public statusCode: number;
+
+  public constructor(message: string, statusCode: number) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
 export class MultipleListenerError extends Error implements CodedError {
   public code = ErrorCode.MultipleListenerError;
 
@@ -156,14 +166,6 @@ export class MultipleListenerError extends Error implements CodedError {
     this.originals = originals;
   }
 }
-/**
- * @deprecated Steps from Apps are no longer supported and support for them will be removed in the next major bolt-js
- * version.
- */
-export class WorkflowStepInitializationError extends Error implements CodedError {
-  public code = ErrorCode.WorkflowStepInitializationError;
-}
-
 export class CustomFunctionInitializationError extends Error implements CodedError {
   public code = ErrorCode.CustomFunctionInitializationError;
 }

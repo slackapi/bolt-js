@@ -113,7 +113,7 @@ Listeners receive a single object with these properties (availability depends on
 
 ## Code Conventions
 
-- **TypeScript** throughout. Compiler options in `tsconfig.json` (extends `@tsconfig/node18`, CommonJS output).
+- **TypeScript** throughout. Compiler options in `tsconfig.json` (extends `@tsconfig/node20`, CommonJS output).
 - **Biome** for formatting and linting. Configuration in `biome.json`.
 - **Testing:** See the Testing section below for test frameworks and conventions.
 
@@ -125,7 +125,7 @@ Listeners receive a single object with these properties (availability depends on
 4. **Don't duplicate `package.json` values** -- reference it for versions, engines, and dependency lists.
 5. **Don't add `WorkflowStep` code** -- it is deprecated. Use `CustomFunction` and `app.function()` instead.
 6. **Build before running unit tests directly** -- `npm test` handles this automatically, but `npm run test:unit` requires a build to exist first.
-7. **Keep the Receiver abstraction clean** -- receivers should only handle transport concerns (ingesting events, sending ack responses). Business logic belongs in middleware and listeners.
+7. **Keep the Receiver abstraction clean** -- receivers should only handle transport concerns (ingesting events, sending ack responses). Business logic belongs in middleware and listeners. Do **not** add receiver-specific options to `AppOptions`: configuration that only a particular receiver understands (e.g. proxy/TLS via an undici `dispatcher` for Socket Mode) must be set on the receiver instance, which is then passed to `App` via the `receiver` option. The long-term goal is for `App` to be fully agnostic of which receiver is in use, so avoid growing the App's surface with transport concerns.
 8. **Prefer middleware for cross-cutting concerns** -- authorization, logging, validation, and feature-level request handling (like `Assistant`) all use the middleware pattern.
 9. **TypeScript types are part of the API** -- changes to exported types are breaking changes. Add type tests for new public types.
 10. **Every listener type needs four things:** type definitions, built-in middleware matchers, an App method, and tests.
