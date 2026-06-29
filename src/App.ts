@@ -414,7 +414,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       installationStore,
       scopes,
       appToken,
-      logger,
+      this.logger,
     );
 
     /* ------------------------ Set authorize ----------------------------- */
