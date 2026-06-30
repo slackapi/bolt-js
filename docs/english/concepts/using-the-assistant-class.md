@@ -4,7 +4,11 @@
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. 
+The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the **Agents** feature enabled. 
+
+:::info[The `Assistant` class targets the assistant messaging experience]
+The `Assistant` class handles the [assistant messaging experience](/ai/developing-agents) (`assistant_view`), in which agent conversations happen in separate Chat and History tabs. Apps going forward use the agent messaging experience (`agent_view`) by default, where conversations happen in the Messages tab and you handle events such as [`app_home_opened`](/reference/events/app_home_opened) and [`message.im`](/reference/events/message.im) directly. Refer to [Adding agent features](/tools/bolt-js/concepts/adding-agent-features) and the [agent messaging experience changelog entry](/changelog/2026/06/30/agent-messages-tab) for the default experience and migration guidance.
+:::
 
 A typical flow would look like:
 
@@ -58,7 +62,7 @@ If you do provide your own `threadContextStore` property, it must feature `get` 
 
 ### Configuring your app to support the `Assistant` class
 
-1. Within [App Settings](https://api.slack.com/apps), enable the **Agents & AI Apps** feature.
+1. Within [App Settings](https://api.slack.com/apps), enable the **Agents** feature.
 
 2. Within the App Settings **OAuth & Permissions** page, add the following scopes: 
   * [`assistant:write`](/reference/scopes/assistant.write)

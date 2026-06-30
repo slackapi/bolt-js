@@ -42,7 +42,7 @@ slack install -E local
 
 5. Enable MCP for your app:
    - Run `slack app settings` to open your app's settings
-   - Navigate to **Agents & AI Apps** in the left-side navigation
+   - Navigate to **Agents** in the left-side navigation
    - Toggle **Model Context Protocol** on
 
 6. Update your `.env` OAuth environment variables:
@@ -179,7 +179,48 @@ export async function handleMessage({ client, context, event, logger, say, saySt
 
 </TabItem>
 
-<TabItem value="assistant" label = "Assistant thread">
+<TabItem value="dm" label = "Agent DM">
+
+How you greet a user and set suggested prompts when they open the agent's DM depends on which [messaging experience](/ai/developing-agents) your app uses:
+
+* The **agent messaging experience** (`agent_view`) is the default and the only experience available to apps going forward. Conversations happen in the app's **Messages** tab, so you listen for the [`app_home_opened`](/reference/events/app_home_opened) event and check for the `messages` tab to detect when a user opens the DM, then set suggested prompts at the top of the tab (no `thread_ts` required). Casey uses this approach.
+* The **assistant messaging experience** (`assistant_view`) is the legacy experience, with separate **Chat** and **History** tabs. You listen for the [`assistant_thread_started`](/reference/events/assistant_thread_started) event to detect a thread, then set suggested prompts on it via `thread_ts`. Existing apps can continue to use this but should migrate to the agent messaging experience.
+
+Refer to the [agent messaging experience changelog entry](/changelog/2026/06/30/agent-messages-tab) for the full list of changes and a migration checklist.
+
+<Tabs groupId="messaging-experience">
+<TabItem value="agent_view" label = "agent_view (default)">
+
+```javascript
+const SUGGESTED_PROMPTS = [
+  { title: 'Reset Password', message: 'I need to reset my password' },
+  { title: 'Request Access', message: 'I need access to a system or tool' },
+  { title: 'Network Issues', message: "I'm having network connectivity issues" },
+];
+
+export async function handleAppHomeOpened({ client, event, context, logger }) {
+  try {
+    // Under agent_view, app_home_opened fires for both the Home tab and the
+    // Messages tab (the agent DM). Branch on event.tab.
+    if (event.tab === 'messages') {
+      // Suggested prompts pin to the top of the Messages tab; no thread_ts required.
+      await client.assistant.threads.setSuggestedPrompts({
+        channel_id: event.channel,
+        title: 'How can I help you today?',
+        prompts: SUGGESTED_PROMPTS,
+      });
+      return;
+    }
+
+    // event.tab === 'home': publish your App Home Block Kit view here
+  } catch (e) {
+    logger.error(`Failed to handle app_home_opened: ${e}`);
+  }
+}
+```
+
+</TabItem>
+<TabItem value="assistant_view" label = "assistant_view (legacy)">
 
 ```javascript
 const SUGGESTED_PROMPTS = [
@@ -203,6 +244,9 @@ export async function handleAssistantThreadStarted({ client, event, logger }) {
   }
 }
 ```
+
+</TabItem>
+</Tabs>
 
 </TabItem>
 </Tabs>
@@ -391,8 +435,12 @@ export async function handleAppMentioned({ client, context, event, logger, say, 
     const existingSessionId = sessionStore.getSession(channelId, threadTs);
 
     // Run the agent with deps for tool access
-    const deps = { client, userId, channelId, threadTs, messageTs: event.ts };
-    const { responseText, sessionId: newSessionId } = await runCaseyAgent(cleanedText, existingSessionId, deps);
+    const deps = { client, userId, channelId, threadTs, messageTs: event.ts, userToken: context.userToken };
+    const { responseText, sessionId: newSessionId } = await runCaseyAgent(
+      cleanedText,
+      existingSessionId ?? undefined,
+      deps,
+    );
 
     // Stream response in thread with feedback buttons
     const streamer = sayStream();
@@ -418,9 +466,7 @@ export async function handleAppMentioned({ client, context, event, logger, say, 
 <TabItem value="openai" label = "OpenAI Agents SDK">
 
 ```javascript title="listeners/events/app-mentioned.js"
-import { run } from '@openai/agents';
-
-import { CaseyDeps, caseyAgent } from '../../agent/index.js';
+import { CaseyDeps, runCasey } from '../../agent/index.js';
 import { conversationStore } from '../../thread-context/index.js';
 import { buildFeedbackBlocks } from '../views/feedback-builder.js';
 
@@ -468,8 +514,8 @@ export async function handleAppMentioned({ client, context, event, logger, say, 
     const inputItems = history ? [...history, { role: 'user', content: cleanedText }] : cleanedText;
 
     // Run the agent
-    const deps = new CaseyDeps(client, userId, channelId, threadTs, event.ts);
-    const result = await run(caseyAgent, inputItems, { context: deps });
+    const deps = new CaseyDeps(client, userId, channelId, threadTs, event.ts, context.userToken);
+    const result = await runCasey(inputItems, deps);
 
     // Stream response in thread with feedback buttons
     const streamer = sayStream();
@@ -547,10 +593,10 @@ const caseyToolsServer = createSdkMcpServer({
 });
 ```
 
-4. Add to `CASEY_TOOLS`:
+4. Add to `ALLOWED_TOOLS`:
 
 ```javascript title="agent/casey.js"
-const CASEY_TOOLS = [
+const ALLOWED_TOOLS = [
   'check_github_status',  // Add here
   // ... other tools
 ];
