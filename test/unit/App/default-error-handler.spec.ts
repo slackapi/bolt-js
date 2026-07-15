@@ -50,9 +50,10 @@ describe('App default error handler', () => {
     try {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
-    } catch (_) {
+    } catch (thrown) {
       assert.ok(fakeLogger.error.calledOnce);
       assert.strictEqual(fakeLogger.error.firstCall.args[0], 'Slack API error: channel_not_found');
+      assert.strictEqual(fakeLogger.error.firstCall.args[1], thrown);
     }
   });
 
@@ -64,9 +65,10 @@ describe('App default error handler', () => {
     try {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
-    } catch (_) {
+    } catch (thrown) {
       assert.ok(fakeLogger.error.calledOnce);
       assert.strictEqual(fakeLogger.error.firstCall.args[0], 'Rate limited, retry after 30s');
+      assert.strictEqual(fakeLogger.error.firstCall.args[1], thrown);
     }
   });
 
@@ -78,9 +80,10 @@ describe('App default error handler', () => {
     try {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
-    } catch (_) {
+    } catch (thrown) {
       assert.ok(fakeLogger.error.calledOnce);
       assert.strictEqual(fakeLogger.error.firstCall.args[0], 'HTTP error 500: Internal Server Error');
+      assert.strictEqual(fakeLogger.error.firstCall.args[1], thrown);
     }
   });
 

@@ -58,7 +58,7 @@ const app_id = 'A1234';
 const say: SayFn = (_msg) => Promise.resolve({ ok: true });
 const sayStream: SayStreamFn = (_args?) => ({}) as ReturnType<WebClient['chatStream']>;
 const setStatus: SetStatusFn = (_status) => Promise.resolve({ ok: true });
-const respond: RespondFn = (_msg) => Promise.resolve();
+const respond: RespondFn = (_msg) => Promise.resolve({} as Awaited<ReturnType<RespondFn>>);
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
 export function wrapMiddleware<Args extends AnyMiddlewareArgs>(

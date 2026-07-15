@@ -928,7 +928,7 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
       try {
         authorizeResult = await this.authorize(source, bodyArg);
       } catch (error) {
-        const e = error instanceof Error ? error : new Error(String(error));
+        const e = error instanceof Error ? error : new Error(String(error), { cause: error });
         this.logger.warn('Authorization of incoming event did not succeed. No listeners will be called.');
         const authError = new AuthorizationError(`Authorization of incoming event did not succeed. ${e.message}`, e);
         await this.handleError({
@@ -1360,11 +1360,11 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 function defaultErrorHandler(logger: Logger): ErrorHandler {
   return (error: CodedError) => {
     if (error instanceof WebAPIPlatformError) {
-      logger.error(`Slack API error: ${error.data.error}`);
+      logger.error(`Slack API error: ${error.data.error}`, error);
     } else if (error instanceof WebAPIRateLimitedError) {
-      logger.error(`Rate limited, retry after ${error.retryAfter}s`);
+      logger.error(`Rate limited, retry after ${error.retryAfter}s`, error);
     } else if (error instanceof WebAPIHTTPError) {
-      logger.error(`HTTP error ${error.statusCode}: ${error.statusMessage}`);
+      logger.error(`HTTP error ${error.statusCode}: ${error.statusMessage}`, error);
     } else {
       logger.error(error);
     }
