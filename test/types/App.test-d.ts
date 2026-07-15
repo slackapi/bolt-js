@@ -1,4 +1,3 @@
-import { Agent } from 'node:http';
 import { ConsoleLogger, LogLevel } from '@slack/logger';
 import type { Installation, InstallationQuery } from '@slack/oauth';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -50,7 +49,6 @@ expectAssignable<App>(
 expectAssignable<App>(
   new App({
     clientOptions: {
-      agent: new Agent(),
       allowAbsoluteUrls: false,
       logger: new ConsoleLogger(),
       retryConfig: {

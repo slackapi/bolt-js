@@ -20,7 +20,7 @@
     "koa": "^3"
   },
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.6",
+    "@tsconfig/node20": "^20.1.5",
     "@types/koa": "^3.0.3",
     "@types/node": "^24",
     "ts-node": "^10",

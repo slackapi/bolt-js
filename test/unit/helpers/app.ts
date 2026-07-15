@@ -131,16 +131,6 @@ export function withSetStatus(spy: SinonSpy): Override {
   };
 }
 
-export function withAxiosPost(spy: SinonSpy): Override {
-  return {
-    axios: {
-      create: () => ({
-        post: spy,
-      }),
-    },
-  };
-}
-
 export function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId: string): Override {
   return {
     '@slack/web-api': {
