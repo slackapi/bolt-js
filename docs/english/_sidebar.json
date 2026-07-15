@@ -95,7 +95,8 @@
     "items": [
       "tools/bolt-js/migration/migration-v2",
       "tools/bolt-js/migration/migration-v3",
-      "tools/bolt-js/migration/migration-v4"
+      "tools/bolt-js/migration/migration-v4",
+      "tools/bolt-js/migration/migration-v5"
     ]
   },
   {
