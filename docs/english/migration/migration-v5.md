@@ -8,7 +8,7 @@ _Minimum Node.js version: 20_
 
 Bolt for JS v5 follows the Node Slack SDK's shift from axios to the native [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). It also removes the deprecated Workflow Steps feature (retired by Slack in September 2024) and raises the minimum Node.js version to 20.
 
-All internal `@slack/*` Node Slack SDK dependencies have been bumped to their next major versions. See the section below on [Upgrading the Node Slack SDK dependencies]({#node-slack-sdk-dependencies}) for information and migration instructions.
+All internal `@slack/*` Node Slack SDK dependencies have been bumped to their next major versions.
 
 If your app doesn't use proxy/TLS configuration or inspect `respond()` utility function return values, this upgrade is likely a version bump and done.
 
@@ -18,7 +18,7 @@ If your app doesn't use proxy/TLS configuration or inspect `respond()` utility f
 
 ### We've raised the minimum Node.js version to 20 {#minimum-node-version}
 
-We've dropped support for Node.js 18. Node.js 20 or later is required.
+We've dropped support for Node.js 18. Node.js 20 or later is required. The minimum npm version has also been raised to 9.6.4.
 
 ---
 
@@ -224,6 +224,8 @@ app.command('/ticket', async ({ command, ack, respond }) => {
   console.log(result.headers);       // Headers object
 });
 ```
+
+In addition, `respond()` now **throws** a `RespondError` when the `response_url` request returns a non-2xx status (for example, an expired `response_url` or a rate limit). This restores the throw-on-failure behavior that axios previously provided. The `RespondError` (importable from `@slack/bolt`) carries a `statusCode` property with the HTTP status of the failed response. If you previously wrapped `respond()` in a `try/catch`, you will now catch a `RespondError` instead of an `AxiosError`.
 
 If you're only calling `await respond(...)` without using the return value (the common case), no changes are needed.
 
