@@ -14,7 +14,7 @@
     "@koa/router": "^15.7.0",
     "@slack/bolt": "^4",
     "@slack/logger": "^4.0.0",
-    "@slack/oauth": "^3",
+    "@slack/oauth": "^4",
     "dotenv": "^17",
     "fastify": "^5",
     "koa": "^3"
