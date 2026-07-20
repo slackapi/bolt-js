@@ -24,7 +24,7 @@ export interface AwsEventV1 {
   // v1-only properties:
   httpMethod: string;
   multiValueHeaders: AwsEventMultiValueStringParameters;
-  multiValueQueryStringParameters: AwsEventMultiValueStringParameters;
+  multiValueQueryStringParameters: AwsEventMultiValueStringParameters | null;
   path: string;
   resource: string;
 }
