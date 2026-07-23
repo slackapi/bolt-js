@@ -228,28 +228,35 @@ export function matchConstraints(
  * Middleware that filters out messages that don't match pattern
  */
 export function matchMessage(
-  pattern: string | RegExp,
+  pattern: string | RegExp | (string | RegExp)[],
 ): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>> {
+  // Normalize a single pattern into an array of patterns once, at registration time
+  const patterns = Array.isArray(pattern) ? pattern : [pattern];
   return async ({ event, context, next }) => {
-    let tempMatches: RegExpMatchArray | null;
-
     if (!('text' in event) || event.text === undefined) {
       return;
     }
 
-    // Filter out messages or app mentions that don't contain the pattern
-    if (typeof pattern === 'string') {
-      if (!event.text.includes(pattern)) {
-        return;
-      }
-    } else {
-      tempMatches = event.text.match(pattern);
-
-      if (tempMatches !== null) {
-        context.matches = tempMatches;
+    // Filter out messages or app mentions that don't match any of the patterns. The first matching
+    // pattern wins; for a matching RegExp its capture groups are exposed via context.matches.
+    let matched = false;
+    for (const candidate of patterns) {
+      if (typeof candidate === 'string') {
+        matched = event.text.includes(candidate);
       } else {
-        return;
+        const tempMatches = event.text.match(candidate);
+        if (tempMatches !== null) {
+          context.matches = tempMatches;
+          matched = true;
+        }
       }
+      if (matched) {
+        break;
+      }
+    }
+
+    if (!matched) {
+      return;
     }
 
     await next();

@@ -96,6 +96,55 @@ app.message(async ({ message }) => {
   await Promise.resolve(message);
 });
 
+// Pattern arguments to message(). These validate the supported pattern shapes type-check and that the
+// message argument is still correctly inferred. Array support: https://github.com/slackapi/bolt-js/issues/281
+
+// A single string pattern
+app.message('hello', async ({ message }) => {
+  expectType<MessageEvent>(message);
+});
+
+// A single RegExp pattern
+app.message(/hello/, async ({ message }) => {
+  expectType<MessageEvent>(message);
+});
+
+// An array of string patterns
+app.message(['hello', 'hi', 'bonjour'], async ({ message }) => {
+  expectType<MessageEvent>(message);
+});
+
+// An array of RegExp patterns
+app.message([/hello/, /hi/], async ({ message }) => {
+  expectType<MessageEvent>(message);
+});
+
+// A mixed array of string and RegExp patterns
+app.message(['hello', 'hi', 'bonjour', /\w{2,8}\s*\w{0,7}!?\.?/], async ({ message }) => {
+  expectType<MessageEvent>(message);
+});
+
+// A filter middleware followed by an array pattern
+app.message(
+  async ({ next }) => {
+    await next();
+  },
+  ['hello', 'hi'],
+  async ({ message }) => {
+    expectType<MessageEvent>(message);
+  },
+);
+
+// A mix of single and array patterns provided as variadic arguments
+app.message('hello', /world/, ['hi', 'bonjour'], async ({ message }) => {
+  expectType<MessageEvent>(message);
+});
+
+// Patterns must be strings or RegExps; other element types are rejected
+expectError(app.message(123, async () => {}));
+expectError(app.message([123], async () => {}));
+expectError(app.message([true, 'hello'], async () => {}));
+
 interface MyContext {
   doesnt: 'matter';
 }
