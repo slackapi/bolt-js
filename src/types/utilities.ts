@@ -1,4 +1,4 @@
-import type { ChatPostMessageArguments, ChatPostMessageResponse } from '@slack/web-api';
+import type { ChatPostMessageArguments, ChatPostMessageResponse, FetchFunction } from '@slack/web-api';
 // TODO: breaking change: remove, unnecessary abstraction, just use Record directly
 /**
  * Extend this interface to build a type that is treated as an open set of properties, where each key is a string.
@@ -40,7 +40,6 @@ export type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'chann
   thread_ts?: string;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: TODO: check if we can type this more strictly than any
-export type RespondFn = (message: string | RespondArguments) => Promise<any>;
+export type RespondFn = (message: string | RespondArguments) => Promise<Awaited<ReturnType<FetchFunction>>>;
 
 export type AckFn<Response> = (response?: Response) => Promise<void>;

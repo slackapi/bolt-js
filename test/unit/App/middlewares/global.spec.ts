@@ -103,9 +103,28 @@ describe('App global middleware Processing', () => {
 
     assert(fakeMiddleware.notCalled);
     assert(fakeLogger.warn.called);
-    assert.instanceOf(fakeErrorHandler.firstCall.args[0], Error);
+    assert.instanceOf(fakeErrorHandler.firstCall.args[0], AuthorizationError);
     assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'code', ErrorCode.AuthorizationError);
-    assert.propertyVal(fakeErrorHandler.firstCall.args[0], 'original', dummyAuthorizationError.original);
+    assert.strictEqual(fakeErrorHandler.firstCall.args[0].original, dummyAuthorizationError);
+    assert(fakeAck.called);
+  });
+
+  it('should preserve a non-Error authorization rejection via the original error cause', async () => {
+    const fakeLogger = createFakeLogger();
+    const dummyRejection = { code: 'no_install', teamId: 'T-non-error' };
+    const dummyReceiverEvent = createDummyReceiverEvent();
+    const MockApp = importApp();
+
+    const app = new MockApp({
+      receiver: fakeReceiver,
+      logger: fakeLogger,
+      authorize: () => Promise.reject(dummyRejection),
+    });
+    app.error(fakeErrorHandler);
+    await fakeReceiver.sendEvent({ ...dummyReceiverEvent, ack: fakeAck });
+
+    assert.instanceOf(fakeErrorHandler.firstCall.args[0], AuthorizationError);
+    assert.strictEqual(fakeErrorHandler.firstCall.args[0].original.cause, dummyRejection);
     assert(fakeAck.called);
   });
 

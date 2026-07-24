@@ -19,7 +19,6 @@ import {
   noop,
   noopMiddleware,
   type Override,
-  withAxiosPost,
   withChatStream,
   withConversationContext,
   withMemoryStore,
@@ -59,8 +58,7 @@ describe('App middleware and listener arguments', () => {
 
   describe('authorize', () => {
     it('should extract valid enterprise_id in a shared channel #935', async () => {
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
       const fakeHandler = sinon.fake();
 
@@ -96,8 +94,7 @@ describe('App middleware and listener arguments', () => {
       sinon.assert.calledOnce(fakeHandler);
     });
     it('should be skipped for tokens_revoked events #674', async () => {
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
       const fakeAuthorize = sinon.fake.resolves({});
       const fakeHandler = sinon.fake();
@@ -137,8 +134,7 @@ describe('App middleware and listener arguments', () => {
       sinon.assert.calledOnce(fakeHandler);
     });
     it('should be skipped for app_uninstalled events #674', async () => {
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
       const fakeAuthorize = sinon.fake.resolves({});
       const fakeHandler = sinon.fake();
@@ -180,11 +176,15 @@ describe('App middleware and listener arguments', () => {
       const responseText = 'response';
       const response_url = 'https://fake.slack/response_url';
       const action_id = 'block_action_id';
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      const fakeFetch = sinon.fake.resolves(new Response(null, { status: 200 }));
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        clientOptions: { fetch: fakeFetch },
+      });
       app.action(action_id, async ({ respond }) => {
         await respond(responseText);
       });
@@ -207,19 +207,24 @@ describe('App middleware and listener arguments', () => {
       );
 
       sinon.assert.notCalled(fakeErrorHandler);
-      // Assert that each call to fakeAxiosPost had the right arguments
-      sinon.assert.calledOnceWithExactly(fakeAxiosPost, response_url, { text: responseText });
+      sinon.assert.calledOnce(fakeFetch);
+      assert.equal(fakeFetch.firstCall.args[0], response_url);
+      assert.deepEqual(JSON.parse(fakeFetch.firstCall.args[1].body), { text: responseText });
     });
 
     it('should respond with a response object', async () => {
       const responseObject = { text: 'response' };
       const response_url = 'https://fake.slack/response_url';
       const action_id = 'block_action_id';
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      const fakeFetch = sinon.fake.resolves(new Response(null, { status: 200 }));
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        clientOptions: { fetch: fakeFetch },
+      });
       app.action(action_id, async ({ respond }) => {
         await respond(responseObject);
       });
@@ -241,17 +246,22 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      // Assert that each call to fakeAxiosPost had the right arguments
-      sinon.assert.calledOnceWithExactly(fakeAxiosPost, response_url, responseObject);
+      sinon.assert.calledOnce(fakeFetch);
+      assert.equal(fakeFetch.firstCall.args[0], response_url);
+      assert.deepEqual(JSON.parse(fakeFetch.firstCall.args[1].body), responseObject);
     });
     it('should be able to use respond for view_submission payloads', async () => {
       const responseObject = { text: 'response' };
       const responseUrl = 'https://fake.slack/response_url';
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      const fakeFetch = sinon.fake.resolves(new Response(null, { status: 200 }));
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        clientOptions: { fetch: fakeFetch },
+      });
       app.view('view-id', async ({ respond }) => {
         await respond(responseObject);
       });
@@ -276,8 +286,9 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      // Assert that each call to fakeAxiosPost had the right arguments
-      sinon.assert.calledOnceWithExactly(fakeAxiosPost, responseUrl, responseObject);
+      sinon.assert.calledOnce(fakeFetch);
+      assert.equal(fakeFetch.firstCall.args[0], responseUrl);
+      assert.deepEqual(JSON.parse(fakeFetch.firstCall.args[1].body), responseObject);
     });
   });
 
@@ -891,8 +902,7 @@ describe('App middleware and listener arguments', () => {
 
   describe('context', () => {
     it('should be able to use the app_installed_team_id when provided by the payload', async () => {
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
       const callback_id = 'view-id';
       const app_installed_team_id = 'T-installed-workspace';
@@ -921,8 +931,7 @@ describe('App middleware and listener arguments', () => {
     });
 
     it('should have function executed event details from a custom step payload', async () => {
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
       const callbackId = 'reverse_string';
       const functionBotAccessToken = 'xwfp-example';
@@ -963,8 +972,7 @@ describe('App middleware and listener arguments', () => {
     });
 
     it('should have function executed event details from a block actions payload', async () => {
-      const fakeAxiosPost = sinon.fake.resolves({});
-      overrides = buildOverrides([withNoopWebClient(), withAxiosPost(fakeAxiosPost)]);
+      overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
       const callbackId = 'reverse_string_button';
       const functionBotAccessToken = 'xwfp-example';

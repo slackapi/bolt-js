@@ -75,11 +75,4 @@ export {
 } from './receivers/SocketModeFunctions';
 export type { SocketModeReceiverOptions } from './receivers/SocketModeReceiver';
 export * from './types';
-export {
-  WorkflowStep,
-  WorkflowStepConfig,
-  WorkflowStepEditMiddleware,
-  WorkflowStepExecuteMiddleware,
-  WorkflowStepSaveMiddleware,
-} from './WorkflowStep';
 export { AwsLambdaReceiver, ExpressReceiver, HTTPReceiver, SocketModeReceiver };

@@ -1,5 +1,5 @@
 import type { Logger } from '@slack/logger';
-import { type CodedError, ErrorCode, isCodedError } from '../errors';
+import { AuthorizationError, type CodedError } from '../errors';
 import type { ReceiverEvent } from '../types';
 
 export async function defaultProcessEventErrorHandler(
@@ -11,7 +11,7 @@ export async function defaultProcessEventErrorHandler(
   // to return more properties to 'slack_event' listeners
   logger.error(`An unhandled error occurred while Bolt processed (type: ${event.body?.type}, error: ${error})`);
   logger.debug(`Error details: ${error}, retry num: ${event.retryNum}, retry reason: ${event.retryReason}`);
-  if (isCodedError(error) && error.code === ErrorCode.AuthorizationError) {
+  if (error instanceof AuthorizationError) {
     // The `authorize` function threw an exception, which means there is no valid installation data.
     // In this case, we can tell the Slack server-side to stop retries.
     return true;

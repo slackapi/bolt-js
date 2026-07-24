@@ -100,7 +100,7 @@ Before getting started, you will need the following:
 4. Review the configuration and click **Create**. Clicking around in these settings, you can see what the manifest has created for us. Some highlights:
 
 * Within **App Home**, we've enabled the **Chat Tab**. This will allow users to access your app both in the split-view container as well as within a chat tab of the app.
-* **Agents & AI Apps** is enabled. With this toggled on, the split-view container is available for your app.
+* **Agents** is enabled. With this toggled on, the split-view container is available for your app.
 * A custom step has been added to **Workflow Steps**. A workflow step is a custom step that can be used in Workflow Builder. Setting up information about that step here (its name, input parameters, and output parameters) lets Slack know what data to collect from the workflow to send to the function. We'll implement the logic step for this in code.
 * **Org Level Apps** has been enabled. This means that your app will be installed at the organization level. Upon installation, it is not added to any workspaces, but the workspace admin can choose which workspaces in the org to add the app to.
 * Within **OAuth & Permissions**, you will find several bot scopes have been added.

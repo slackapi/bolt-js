@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { parse as qsParse } from 'node:querystring';
 import type { Logger } from '@slack/logger';
 import rawBody from 'raw-body';
-import { type CodedError, ErrorCode } from '../errors';
+import { AuthorizationError, type CodedError, HTTPReceiverDeferredRequestError } from '../errors';
 import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { verifySlackRequest } from './verify-request';
 
@@ -166,13 +166,11 @@ export const buildContentResponse = (res: ServerResponse, body: any): void => {
 // Note that it was not possible to make this function async due to the limitation of http module
 export const defaultDispatchErrorHandler = (args: ReceiverDispatchErrorHandlerArgs): void => {
   const { error, logger, request, response } = args;
-  if ('code' in error) {
-    if (error.code === ErrorCode.HTTPReceiverDeferredRequestError) {
-      logger.info(`Unhandled HTTP request (${request.method}) made to ${request.url}`);
-      response.writeHead(404);
-      response.end();
-      return;
-    }
+  if (error instanceof HTTPReceiverDeferredRequestError) {
+    logger.info(`Unhandled HTTP request (${request.method}) made to ${request.url}`);
+    response.writeHead(404);
+    response.end();
+    return;
   }
   logger.error(`An unexpected error occurred during a request (${request.method}) made to ${request.url}`);
   logger.debug(`Error details: ${error}`);
@@ -196,13 +194,11 @@ export const defaultProcessEventErrorHandler = async (args: ReceiverProcessEvent
     return false;
   }
 
-  if ('code' in error) {
-    if (error.code === ErrorCode.AuthorizationError) {
-      // authorize function threw an exception, which means there is no valid installation data
-      response.writeHead(401);
-      response.end();
-      return true;
-    }
+  if (error instanceof AuthorizationError) {
+    // authorize function threw an exception, which means there is no valid installation data
+    response.writeHead(401);
+    response.end();
+    return true;
   }
   logger.error('An unhandled error occurred while Bolt processed an event');
   logger.debug(`Error details: ${error}, storedResponse: ${storedResponse}`);
