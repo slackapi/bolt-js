@@ -1,8 +1,8 @@
 # Deploying to Vercel
 
-This guide walks you through preparing and deploying a Slack app using Bolt for JavaScript, [Workflow DevKit's](https://useworkflow.dev/) `DurableAgent`, [AI SDK](https://ai-sdk.dev/) tools, the [Nitro](https://nitro.build/) server framework, and [Vercel](https://vercel.com/home).
+This guide walks you through preparing and deploying a Slack app using Bolt for JavaScript and [Vercel](https://vercel.com/home).
 
-When you’re finished, you’ll have this ⚡️[Slack agent template](https://github.com/vercel-partner-solutions/slack-agent-template) to run, modify, and make your own.
+When you’re finished, you’ll have this ⚡️[Slack agent template](https://github.com/vercel-labs/slack-bolt/tree/master/examples/nextjs) to run, modify, and make your own.
 
 ---
 
@@ -17,7 +17,7 @@ First things first, take a few moments to set up the following:
 
 Create a new Vercel project based on a Bolt for JavaScript template by clicking the button below.
 
-<Button label="Deploy with Vercel" link="https://vercel.com/new/clone?demo-description=This+is+a+Slack+Agent+template+built+with+Bolt+for+JavaScript+%28TypeScript%29+and+the+Nitro+server+framework.&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2FSs9t7RkKlPtProrbDhZFM%2F0d11b9095ecf84c87a68fbdef6f12ad1%2FFrame__1_.png&demo-title=Slack+Agent+Template&demo-url=https%3A%2F%2Fgithub.com%2Fvercel-partner-solutions%2Fslack-agent-template&env=SLACK_SIGNING_SECRET%2CSLACK_BOT_TOKEN&envDescription=These+environment+variables+are+required+to+deploy+your+Slack+app+to+Vercel&envLink=https%3A%2F%2Fapi.slack.com%2Fapps&from=templates&project-name=Slack+Agent+Template&project-names=Comma+separated+list+of+project+names%2Cto+match+the+root-directories&repository-name=slack-agent-template&repository-url=https%3A%2F%2Fgithub.com%2Fvercel-partner-solutions%2Fslack-agent-template&root-directories=List+of+directory+paths+for+the+directories+to+clone+into+projects&skippable-integrations=1&teamSlug=vercel-partner-demo" />
+<Button label="Deploy with Vercel" link="https://vercel.com/new/clone?demo-description=This+is+a+generic+Bolt+for+JavaScript+%28TypeScript%29+template+app+used+to+build+out+Slack+apps+with+Next.js&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F1BL852bc5uyQQuswDrLggh%2F7f91aaaebace15775b982649b153354a%2FFrame.png&demo-title=Slack+Bolt+with+Next.js&demo-url=https%3A%2F%2Fgithub.com%2Fvercel-partner-solutions%2Fslack-bolt-with-nextjs&env=SLACK_SIGNING_SECRET%2CSLACK_BOT_TOKEN&envDescription=These+environment+variables+are+required+to+deploy+your+Slack+app+to+Vercel&envLink=https%3A%2F%2Fapi.slack.com%2Fapps&from=templates&project-name=Slack+Bolt+with+Next.js&project-names=Comma+separated+list+of+project+names%2Cto+match+the+root-directories&repository-name=slack-bolt-with-next-js&repository-url=https%3A%2F%2Fgithub.com%2Fvercel-partner-solutions%2Fslack-bolt-with-nextjs&root-directories=List+of+directory+paths+for+the+directories+to+clone+into+projects&skippable-integrations=1&teamSlug=haleychaas-projects" />
 
 You will then be prompted to select a Git provider. Select your preferred provider and log in. 
 
@@ -32,7 +32,7 @@ Keep this browser tab open; we'll be back to it soon. Next, we'll need to add a 
 Create a new Slack app through [this link](https://api.slack.com/apps?new_app=1), then select **from a manifest**. Next, choose a workspace you have permission to install apps in. Click **Next**, then copy and paste the project manifest code here, replacing the placeholder text in the **JSON** tab.
 
 ```js reference
-https://github.com/vercel-partner-solutions/slack-agent-template/blob/main/manifest.json
+https://github.com/vercel-partner-solutions/slack-bolt-with-next/blob/main/manifest.json
 ```
 
 Click **Next** and then **Create**.
