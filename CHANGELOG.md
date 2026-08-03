@@ -1,5 +1,11 @@
 # @slack/bolt
 
+## 5.0.1
+
+### Patch Changes
+
+- b9acd4f: Fix `AwsEventV1.multiValueQueryStringParameters` to allow `null`, matching the actual AWS API Gateway payload and the `@types/aws-lambda` `APIGatewayProxyEvent` type. This resolves the type error when passing an `APIGatewayProxyEvent` directly to the handler returned by `AwsLambdaReceiver`.
+
 ## 5.0.0
 
 ### Major Changes
