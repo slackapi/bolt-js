@@ -68,6 +68,7 @@ export {
   RequestVerificationOptions,
 } from './receivers/HTTPModuleFunctions';
 export type { HTTPReceiverOptions } from './receivers/HTTPReceiver';
+export type { ParamsIncomingMessage, QueryDictionary } from './receivers/ParamsIncomingMessage';
 export { HTTPResponseAck } from './receivers/HTTPResponseAck';
 export {
   defaultProcessEventErrorHandler,
