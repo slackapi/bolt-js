@@ -11,6 +11,8 @@ When complete, you'll have a local environment configured with a customized [app
 
 In search of the complete guide to building an app from scratch? Check out the [building an app](/tools/bolt-js/creating-an-app) guide.
 
+If your app will receive events over HTTP instead of Socket Mode, start with the [HTTP setup section](/tools/bolt-js/creating-an-app#preparing-receive-events) in that guide.
+
 :::
 
 #### Prerequisites
