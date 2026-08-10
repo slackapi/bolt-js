@@ -80,6 +80,6 @@
   },
   "peerDependencies": {
     "@types/express": "^5.0.0",
-    "undici": "^7.0.0"
+    "undici": "^7.28.0"
   }
 }
