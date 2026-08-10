@@ -2,14 +2,6 @@
 
 [Socket Mode](/apis/events-api/using-socket-mode) allows your app to connect and receive data from Slack via a WebSocket connection. To handle the connection, Bolt for JavaScript includes a `SocketModeReceiver` (in `@slack/bolt@3.0.0` and higher). Before using Socket Mode, be sure to enable it within your app configuration.
 
-> #### Installing `undici`
->
-> Socket Mode uses [`undici`](https://www.npmjs.com/package/undici) for its WebSocket connection, declared as a peer dependency. npm installs it automatically, but on strict package managers (Yarn Berry, pnpm) you may need to install it explicitly:
->
-> ```shell
-> npm install undici
-> ```
-
 To use the `SocketModeReceiver`, just pass in `socketMode:true` and `appToken:YOUR_APP_TOKEN` when initializing `App`. You can get your App Level Token in your app configuration under the **Basic Information** section.
 
 ```javascript
