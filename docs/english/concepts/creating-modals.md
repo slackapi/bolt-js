@@ -74,7 +74,7 @@ app.command('/ticket', async ({ ack, body, client, logger }) => {
 
 ### Making input blocks optional
 
-Set `optional: true` on the enclosing `input` block when users should be able to submit the view without providing a value. This setting applies to the element inside the block, including select menus such as `multi_external_select`; the element itself does not need an `optional` field.
+Set `optional: true` on the enclosing `input` block when users should be able to submit the view without providing a value. This setting applies to elements inside the block, including select menus such as `multi_external_select`; the element itself does not need an `optional` field.
 
 ```javascript
 {
