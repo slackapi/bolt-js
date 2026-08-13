@@ -649,5 +649,32 @@ describe('SocketModeReceiver', () => {
       await receiver.stop();
       assert(clientStub.disconnect.called);
     });
+
+    it('should wait for SocketModeClient to disconnect', async () => {
+      const clientStub = sinon.createStubInstance(SocketModeClient);
+      let resolveDisconnect = () => {
+        throw new Error('SocketModeClient.disconnect() was not invoked');
+      };
+      clientStub.disconnect.callsFake(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveDisconnect = resolve;
+          }),
+      );
+      const SocketModeReceiver = await importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({ appToken: 'my-secret', logger: noopLogger });
+      receiver.client = clientStub as unknown as SocketModeClient;
+
+      let stopped = false;
+      const stopPromise = receiver.stop().then(() => {
+        stopped = true;
+      });
+      await Promise.resolve();
+
+      assert.isFalse(stopped);
+      resolveDisconnect();
+      await stopPromise;
+      assert.isTrue(stopped);
+    });
   });
 });

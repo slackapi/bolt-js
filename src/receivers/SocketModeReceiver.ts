@@ -260,20 +260,13 @@ export default class SocketModeReceiver implements Receiver {
     return this.client.start();
   }
 
-  public stop(): Promise<void> {
+  public async stop(): Promise<void> {
     if (this.httpServer !== undefined) {
       // This HTTP server is only for the OAuth flow support
       this.httpServer.close((error) => {
         if (error) this.logger.error(`Failed to shutdown the HTTP server for OAuth flow: ${error}`);
       });
     }
-    return new Promise((resolve, reject) => {
-      try {
-        this.client.disconnect();
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    });
+    await this.client.disconnect();
   }
 }
