@@ -14,7 +14,7 @@
     "dotenv": "^17"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.9",
+    "@tsconfig/node20": "^20.1.10",
     "@types/node": "^24",
     "ts-node": "^10",
     "typescript": "7.0.2"
