@@ -1,9 +1,3 @@
----
-sidebar_label: "AssistantUserMessageMiddleware"
----
-
-[@slack/bolt](../index.md) / AssistantUserMessageMiddleware
-
 # Type Alias: AssistantUserMessageMiddleware
 
 ```ts

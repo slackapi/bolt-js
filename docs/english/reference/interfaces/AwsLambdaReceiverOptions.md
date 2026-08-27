@@ -1,9 +1,3 @@
----
-sidebar_label: "AwsLambdaReceiverOptions"
----
-
-[@slack/bolt](../index.md) / AwsLambdaReceiverOptions
-
 # Interface: AwsLambdaReceiverOptions
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L84)

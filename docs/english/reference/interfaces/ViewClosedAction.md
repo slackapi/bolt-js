@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewClosedAction"
----
-
-[@slack/bolt](../index.md) / ViewClosedAction
-
 # Interface: ViewClosedAction
 
 Defined in: [src/types/view/index.ts:78](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L78)

@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockIconButtonAction"
----
-
-[@slack/bolt](../index.md) / BlockIconButtonAction
-
 # Type Alias: BlockIconButtonAction
 
 ```ts

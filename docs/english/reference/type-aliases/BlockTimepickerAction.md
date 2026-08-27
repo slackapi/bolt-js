@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockTimepickerAction"
----
-
-[@slack/bolt](../index.md) / BlockTimepickerAction
-
 # Type Alias: BlockTimepickerAction
 
 ```ts

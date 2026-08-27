@@ -1,9 +1,3 @@
----
-sidebar_label: "ReceiverProcessEventErrorHandlerArgs"
----
-
-[@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / ReceiverProcessEventErrorHandlerArgs
-
 # Interface: ReceiverProcessEventErrorHandlerArgs
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:245](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L245)

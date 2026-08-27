@@ -1,9 +1,3 @@
----
-sidebar_label: "CustomFunctionCompleteSuccessError"
----
-
-[@slack/bolt](../index.md) / CustomFunctionCompleteSuccessError
-
 # Class: CustomFunctionCompleteSuccessError
 
 Defined in: [src/errors.ts:173](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L173)

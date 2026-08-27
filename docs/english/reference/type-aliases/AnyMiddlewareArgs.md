@@ -1,9 +1,3 @@
----
-sidebar_label: "AnyMiddlewareArgs"
----
-
-[@slack/bolt](../index.md) / AnyMiddlewareArgs
-
 # Type Alias: AnyMiddlewareArgs
 
 ```ts

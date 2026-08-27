@@ -1,9 +1,3 @@
----
-sidebar_label: "SetStatusFn"
----
-
-[@slack/bolt](../index.md) / SetStatusFn
-
 # Type Alias: SetStatusFn
 
 ```ts

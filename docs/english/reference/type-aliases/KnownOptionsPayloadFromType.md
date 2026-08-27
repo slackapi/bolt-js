@@ -1,9 +1,3 @@
----
-sidebar_label: "KnownOptionsPayloadFromType"
----
-
-[@slack/bolt](../index.md) / KnownOptionsPayloadFromType
-
 # Type Alias: KnownOptionsPayloadFromType\<T\>
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "onlyShortcuts"
----
-
-[@slack/bolt](../index.md) / onlyShortcuts
-
 # Variable: onlyShortcuts
 
 ```ts

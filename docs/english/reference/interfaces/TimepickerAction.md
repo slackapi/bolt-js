@@ -1,9 +1,3 @@
----
-sidebar_label: "TimepickerAction"
----
-
-[@slack/bolt](../index.md) / TimepickerAction
-
 # Interface: TimepickerAction
 
 Defined in: [src/types/actions/block-action.ts:205](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L205)

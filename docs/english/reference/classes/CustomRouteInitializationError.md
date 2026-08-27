@@ -1,9 +1,3 @@
----
-sidebar_label: "CustomRouteInitializationError"
----
-
-[@slack/bolt](../index.md) / CustomRouteInitializationError
-
 # Class: CustomRouteInitializationError
 
 Defined in: [src/errors.ts:111](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L111)

@@ -1,9 +1,3 @@
----
-sidebar_label: "RequestVerificationOptions"
----
-
-[@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / RequestVerificationOptions
-
 # Interface: RequestVerificationOptions
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:228](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L228)

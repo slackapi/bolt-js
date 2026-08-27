@@ -1,9 +1,3 @@
----
-sidebar_label: "AssistantMissingPropertyError"
----
-
-[@slack/bolt](../index.md) / AssistantMissingPropertyError
-
 # Class: AssistantMissingPropertyError
 
 Defined in: [src/errors.ts:80](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L80)

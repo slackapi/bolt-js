@@ -1,9 +1,3 @@
----
-sidebar_label: "ReceiverMultipleAckError"
----
-
-[@slack/bolt](../index.md) / ReceiverMultipleAckError
-
 # Class: ReceiverMultipleAckError
 
 Defined in: [src/errors.ts:115](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L115)

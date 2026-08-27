@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewErrorsResponseAction"
----
-
-[@slack/bolt](../index.md) / ViewErrorsResponseAction
-
 # Interface: ViewErrorsResponseAction
 
 Defined in: [src/types/view/index.ts:302](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L302)

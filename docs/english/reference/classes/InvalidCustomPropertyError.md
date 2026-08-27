@@ -1,9 +1,3 @@
----
-sidebar_label: "InvalidCustomPropertyError"
----
-
-[@slack/bolt](../index.md) / InvalidCustomPropertyError
-
 # Class: InvalidCustomPropertyError
 
 Defined in: [src/errors.ts:107](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L107)

@@ -1,9 +1,3 @@
----
-sidebar_label: "HTTPResponseAck"
----
-
-[@slack/bolt](../index.md) / HTTPResponseAck
-
 # Class: HTTPResponseAck
 
 Defined in: [src/receivers/HTTPResponseAck.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPResponseAck.ts#L21)

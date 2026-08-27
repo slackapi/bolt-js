@@ -1,9 +1,3 @@
----
-sidebar_label: "AssistantThreadContextChangedMiddleware"
----
-
-[@slack/bolt](../index.md) / AssistantThreadContextChangedMiddleware
-
 # Type Alias: AssistantThreadContextChangedMiddleware
 
 ```ts

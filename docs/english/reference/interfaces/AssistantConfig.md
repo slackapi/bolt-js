@@ -1,9 +1,3 @@
----
-sidebar_label: "AssistantConfig"
----
-
-[@slack/bolt](../index.md) / AssistantConfig
-
 # Interface: AssistantConfig
 
 Defined in: [src/Assistant.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L21)

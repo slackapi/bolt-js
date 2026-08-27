@@ -1,9 +1,3 @@
----
-sidebar_label: "SlackOptionsMiddlewareArgs"
----
-
-[@slack/bolt](../index.md) / SlackOptionsMiddlewareArgs
-
 # Interface: SlackOptionsMiddlewareArgs\<Source\>
 
 Defined in: [src/types/options/index.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L8)

@@ -1,9 +1,3 @@
----
-sidebar_label: "buildUrlVerificationResponse"
----
-
-[@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / buildUrlVerificationResponse
-
 # Function: buildUrlVerificationResponse()
 
 ```ts

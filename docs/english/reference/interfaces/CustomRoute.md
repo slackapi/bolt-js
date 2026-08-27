@@ -1,9 +1,3 @@
----
-sidebar_label: "CustomRoute"
----
-
-[@slack/bolt](../index.md) / CustomRoute
-
 # Interface: CustomRoute
 
 Defined in: [src/receivers/custom-routes.ts:5](https://github.com/slackapi/bolt-js/blob/main/src/receivers/custom-routes.ts#L5)

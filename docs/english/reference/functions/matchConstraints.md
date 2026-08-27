@@ -1,9 +1,3 @@
----
-sidebar_label: "matchConstraints"
----
-
-[@slack/bolt](../index.md) / matchConstraints
-
 # Function: matchConstraints()
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "PlainTextInputAction"
----
-
-[@slack/bolt](../index.md) / PlainTextInputAction
-
 # Interface: PlainTextInputAction
 
 Defined in: [src/types/actions/block-action.ts:233](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L233)

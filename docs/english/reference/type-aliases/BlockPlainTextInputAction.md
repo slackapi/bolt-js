@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockPlainTextInputAction"
----
-
-[@slack/bolt](../index.md) / BlockPlainTextInputAction
-
 # Type Alias: BlockPlainTextInputAction
 
 ```ts

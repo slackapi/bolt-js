@@ -1,9 +1,3 @@
----
-sidebar_label: "CheckboxesAction"
----
-
-[@slack/bolt](../index.md) / CheckboxesAction
-
 # Interface: CheckboxesAction
 
 Defined in: [src/types/actions/block-action.ts:224](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L224)

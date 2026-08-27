@@ -1,9 +1,3 @@
----
-sidebar_label: "RadioButtonsAction"
----
-
-[@slack/bolt](../index.md) / RadioButtonsAction
-
 # Interface: RadioButtonsAction
 
 Defined in: [src/types/actions/block-action.ts:215](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L215)

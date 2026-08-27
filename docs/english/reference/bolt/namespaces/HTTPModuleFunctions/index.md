@@ -1,9 +1,3 @@
----
-sidebar_label: "HTTPModuleFunctions"
----
-
-[@slack/bolt](../../../index.md) / HTTPModuleFunctions
-
 # HTTPModuleFunctions
 
 ## Interfaces

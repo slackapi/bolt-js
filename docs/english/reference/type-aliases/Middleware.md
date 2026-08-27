@@ -1,9 +1,3 @@
----
-sidebar_label: "Middleware"
----
-
-[@slack/bolt](../index.md) / Middleware
-
 # Type Alias: Middleware\<Args, CustomContext\>
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "AppOptions"
----
-
-[@slack/bolt](../index.md) / AppOptions
-
 # Interface: AppOptions
 
 Defined in: [src/App.ts:122](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L122)

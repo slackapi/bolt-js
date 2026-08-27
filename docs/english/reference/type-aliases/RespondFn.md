@@ -1,9 +1,3 @@
----
-sidebar_label: "RespondFn"
----
-
-[@slack/bolt](../index.md) / RespondFn
-
 # Type Alias: RespondFn
 
 ```ts

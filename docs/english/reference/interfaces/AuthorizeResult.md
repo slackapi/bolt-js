@@ -1,9 +1,3 @@
----
-sidebar_label: "AuthorizeResult"
----
-
-[@slack/bolt](../index.md) / AuthorizeResult
-
 # Interface: AuthorizeResult
 
 Defined in: [src/App.ts:178](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L178)

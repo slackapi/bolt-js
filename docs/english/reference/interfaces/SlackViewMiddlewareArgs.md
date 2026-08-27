@@ -1,9 +1,3 @@
----
-sidebar_label: "SlackViewMiddlewareArgs"
----
-
-[@slack/bolt](../index.md) / SlackViewMiddlewareArgs
-
 # Interface: SlackViewMiddlewareArgs\<ViewActionType\>
 
 Defined in: [src/types/view/index.ts:19](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L19)

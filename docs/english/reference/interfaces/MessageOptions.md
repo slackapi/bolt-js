@@ -1,9 +1,3 @@
----
-sidebar_label: "MessageOptions"
----
-
-[@slack/bolt](../index.md) / MessageOptions
-
 # Interface: MessageOptions
 
 Defined in: [src/types/options/index.ts:163](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L163)

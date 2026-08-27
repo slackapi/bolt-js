@@ -1,9 +1,3 @@
----
-sidebar_label: "AuthorizeSourceData"
----
-
-[@slack/bolt](../index.md) / AuthorizeSourceData
-
 # Interface: AuthorizeSourceData\<IsEnterpriseInstall\>
 
 Defined in: [src/App.ts:169](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L169)

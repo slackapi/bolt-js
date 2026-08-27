@@ -1,9 +1,3 @@
----
-sidebar_label: "isCodedError"
----
-
-[@slack/bolt](../index.md) / isCodedError
-
 # Function: isCodedError()
 
 ```ts

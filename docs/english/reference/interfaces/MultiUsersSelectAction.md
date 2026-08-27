@@ -1,9 +1,3 @@
----
-sidebar_label: "MultiUsersSelectAction"
----
-
-[@slack/bolt](../index.md) / MultiUsersSelectAction
-
 # Interface: MultiUsersSelectAction
 
 Defined in: [src/types/actions/block-action.ts:112](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L112)

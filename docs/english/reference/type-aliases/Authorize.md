@@ -1,9 +1,3 @@
----
-sidebar_label: "Authorize"
----
-
-[@slack/bolt](../index.md) / Authorize
-
 # Type Alias: Authorize\<IsEnterpriseInstall\>
 
 ```ts

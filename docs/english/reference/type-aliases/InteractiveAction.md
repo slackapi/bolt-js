@@ -1,9 +1,3 @@
----
-sidebar_label: "InteractiveAction"
----
-
-[@slack/bolt](../index.md) / InteractiveAction
-
 # Type Alias: InteractiveAction
 
 ```ts

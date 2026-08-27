@@ -1,9 +1,3 @@
----
-sidebar_label: "SocketModeReceiver"
----
-
-[@slack/bolt](../index.md) / SocketModeReceiver
-
 # Class: SocketModeReceiver
 
 Defined in: [src/receivers/SocketModeReceiver.ts:83](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L83)

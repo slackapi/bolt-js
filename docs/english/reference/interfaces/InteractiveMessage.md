@@ -1,9 +1,3 @@
----
-sidebar_label: "InteractiveMessage"
----
-
-[@slack/bolt](../index.md) / InteractiveMessage
-
 # Interface: InteractiveMessage\<Action\>
 
 Defined in: [src/types/actions/interactive-message.ts:32](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L32)

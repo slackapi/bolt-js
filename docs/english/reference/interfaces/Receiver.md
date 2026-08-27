@@ -1,9 +1,3 @@
----
-sidebar_label: "Receiver"
----
-
-[@slack/bolt](../index.md) / Receiver
-
 # Interface: Receiver
 
 Defined in: [src/types/receiver.ts:26](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L26)

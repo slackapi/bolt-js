@@ -1,9 +1,3 @@
----
-sidebar_label: "defaultUnhandledRequestHandler"
----
-
-[@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / defaultUnhandledRequestHandler
-
 # Function: defaultUnhandledRequestHandler()
 
 ```ts

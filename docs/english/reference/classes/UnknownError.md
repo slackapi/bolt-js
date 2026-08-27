@@ -1,9 +1,3 @@
----
-sidebar_label: "UnknownError"
----
-
-[@slack/bolt](../index.md) / UnknownError
-
 # Class: UnknownError
 
 Defined in: [src/errors.ts:52](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L52)

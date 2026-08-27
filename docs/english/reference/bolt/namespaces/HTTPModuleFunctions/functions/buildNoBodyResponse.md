@@ -1,9 +1,3 @@
----
-sidebar_label: "buildNoBodyResponse"
----
-
-[@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / buildNoBodyResponse
-
 # Function: buildNoBodyResponse()
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "MultiStaticSelectAction"
----
-
-[@slack/bolt](../index.md) / MultiStaticSelectAction
-
 # Interface: MultiStaticSelectAction
 
 Defined in: [src/types/actions/block-action.ts:89](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L89)

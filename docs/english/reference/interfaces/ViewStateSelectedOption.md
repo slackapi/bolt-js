@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewStateSelectedOption"
----
-
-[@slack/bolt](../index.md) / ViewStateSelectedOption
-
 # Interface: ViewStateSelectedOption
 
 Defined in: [src/types/view/index.ts:103](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L103)

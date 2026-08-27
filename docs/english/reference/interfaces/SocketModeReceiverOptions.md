@@ -1,9 +1,3 @@
----
-sidebar_label: "SocketModeReceiverOptions"
----
-
-[@slack/bolt](../index.md) / SocketModeReceiverOptions
-
 # Interface: SocketModeReceiverOptions
 
 Defined in: [src/receivers/SocketModeReceiver.ts:31](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L31)

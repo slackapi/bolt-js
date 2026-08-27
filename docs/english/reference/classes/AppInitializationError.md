@@ -1,9 +1,3 @@
----
-sidebar_label: "AppInitializationError"
----
-
-[@slack/bolt](../index.md) / AppInitializationError
-
 # Class: AppInitializationError
 
 Defined in: [src/errors.ts:72](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L72)

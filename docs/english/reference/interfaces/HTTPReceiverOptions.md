@@ -1,9 +1,3 @@
----
-sidebar_label: "HTTPReceiverOptions"
----
-
-[@slack/bolt](../index.md) / HTTPReceiverOptions
-
 # Interface: HTTPReceiverOptions
 
 Defined in: [src/receivers/HTTPReceiver.ts:76](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L76)

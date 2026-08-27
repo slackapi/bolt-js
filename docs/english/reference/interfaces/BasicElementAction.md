@@ -1,9 +1,3 @@
----
-sidebar_label: "BasicElementAction"
----
-
-[@slack/bolt](../index.md) / BasicElementAction
-
 # Interface: BasicElementAction\<T\>
 
 Defined in: [src/types/actions/block-action.ts:39](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L39)

@@ -1,9 +1,3 @@
----
-sidebar_label: "DialogSuggestion"
----
-
-[@slack/bolt](../index.md) / DialogSuggestion
-
 # Interface: DialogSuggestion
 
 Defined in: [src/types/options/index.ts:118](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L118)

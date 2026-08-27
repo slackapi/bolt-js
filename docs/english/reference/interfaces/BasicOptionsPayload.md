@@ -1,9 +1,3 @@
----
-sidebar_label: "BasicOptionsPayload"
----
-
-[@slack/bolt](../index.md) / BasicOptionsPayload
-
 # Interface: BasicOptionsPayload\<Type\>
 
 Defined in: [src/types/options/index.ts:33](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L33)

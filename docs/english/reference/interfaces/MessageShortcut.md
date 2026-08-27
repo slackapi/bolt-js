@@ -1,9 +1,3 @@
----
-sidebar_label: "MessageShortcut"
----
-
-[@slack/bolt](../index.md) / MessageShortcut
-
 # Interface: MessageShortcut
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L7)

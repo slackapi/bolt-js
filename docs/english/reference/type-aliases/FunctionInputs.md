@@ -1,9 +1,3 @@
----
-sidebar_label: "FunctionInputs"
----
-
-[@slack/bolt](../index.md) / FunctionInputs
-
 # Type Alias: FunctionInputs
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "RespondError"
----
-
-[@slack/bolt](../index.md) / RespondError
-
 # Class: RespondError
 
 Defined in: [src/errors.ts:145](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L145)

@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockConversationsSelectAction"
----
-
-[@slack/bolt](../index.md) / BlockConversationsSelectAction
-
 # Type Alias: BlockConversationsSelectAction
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "buildReceiverRoutes"
----
-
-[@slack/bolt](../index.md) / buildReceiverRoutes
-
 # Function: buildReceiverRoutes()
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "MultiChannelsSelectAction"
----
-
-[@slack/bolt](../index.md) / MultiChannelsSelectAction
-
 # Interface: MultiChannelsSelectAction
 
 Defined in: [src/types/actions/block-action.ts:152](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L152)

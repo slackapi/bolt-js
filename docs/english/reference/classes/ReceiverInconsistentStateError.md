@@ -1,9 +1,3 @@
----
-sidebar_label: "ReceiverInconsistentStateError"
----
-
-[@slack/bolt](../index.md) / ReceiverInconsistentStateError
-
 # Class: ReceiverInconsistentStateError
 
 Defined in: [src/errors.ts:127](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L127)

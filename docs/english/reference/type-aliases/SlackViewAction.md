@@ -1,9 +1,3 @@
----
-sidebar_label: "SlackViewAction"
----
-
-[@slack/bolt](../index.md) / SlackViewAction
-
 # Type Alias: SlackViewAction
 
 ```ts

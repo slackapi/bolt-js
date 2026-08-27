@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewUpdateResponseAction"
----
-
-[@slack/bolt](../index.md) / ViewUpdateResponseAction
-
 # Interface: ViewUpdateResponseAction
 
 Defined in: [src/types/view/index.ts:288](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L288)

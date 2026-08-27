@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockAction"
----
-
-[@slack/bolt](../index.md) / BlockAction
-
 # Interface: BlockAction\<ElementAction\>
 
 Defined in: [src/types/actions/block-action.ts:249](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L249)

@@ -1,9 +1,3 @@
----
-sidebar_label: "defaultProcessEventErrorHandler"
----
-
-[@slack/bolt](../index.md) / defaultProcessEventErrorHandler
-
 # Function: defaultProcessEventErrorHandler()
 
 ```ts

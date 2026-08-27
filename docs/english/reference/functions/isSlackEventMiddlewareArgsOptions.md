@@ -1,9 +1,3 @@
----
-sidebar_label: "isSlackEventMiddlewareArgsOptions"
----
-
-[@slack/bolt](../index.md) / isSlackEventMiddlewareArgsOptions
-
 # Function: isSlackEventMiddlewareArgsOptions()
 
 ```ts

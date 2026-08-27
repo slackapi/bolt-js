@@ -1,9 +1,3 @@
----
-sidebar_label: "CustomFunctionInitializationError"
----
-
-[@slack/bolt](../index.md) / CustomFunctionInitializationError
-
 # Class: CustomFunctionInitializationError
 
 Defined in: [src/errors.ts:169](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L169)

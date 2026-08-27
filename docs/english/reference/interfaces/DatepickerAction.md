@@ -1,9 +1,3 @@
----
-sidebar_label: "DatepickerAction"
----
-
-[@slack/bolt](../index.md) / DatepickerAction
-
 # Interface: DatepickerAction
 
 Defined in: [src/types/actions/block-action.ts:195](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L195)

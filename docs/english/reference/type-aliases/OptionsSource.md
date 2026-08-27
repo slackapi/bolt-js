@@ -1,9 +1,3 @@
----
-sidebar_label: "OptionsSource"
----
-
-[@slack/bolt](../index.md) / OptionsSource
-
 # Type Alias: OptionsSource
 
 ```ts

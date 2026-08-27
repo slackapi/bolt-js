@@ -1,9 +1,3 @@
----
-sidebar_label: "XOR"
----
-
-[@slack/bolt](../index.md) / XOR
-
 # Type Alias: XOR\<T, U\>
 
 ```ts

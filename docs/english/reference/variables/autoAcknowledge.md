@@ -1,9 +1,3 @@
----
-sidebar_label: "autoAcknowledge"
----
-
-[@slack/bolt](../index.md) / autoAcknowledge
-
 # Variable: autoAcknowledge
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "FeedbackButtonsAction"
----
-
-[@slack/bolt](../index.md) / FeedbackButtonsAction
-
 # Interface: FeedbackButtonsAction
 
 Defined in: [src/types/actions/block-action.ts:59](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L59)

@@ -1,9 +1,3 @@
----
-sidebar_label: "matchCommandName"
----
-
-[@slack/bolt](../index.md) / matchCommandName
-
 # Function: matchCommandName()
 
 ```ts

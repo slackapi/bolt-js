@@ -1,9 +1,3 @@
----
-sidebar_label: "Context"
----
-
-[@slack/bolt](../index.md) / Context
-
 # Interface: Context
 
 Defined in: [src/types/middleware.ts:37](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L37)

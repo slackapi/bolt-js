@@ -1,9 +1,3 @@
----
-sidebar_label: "EnvelopedEvent"
----
-
-[@slack/bolt](../index.md) / EnvelopedEvent
-
 # Interface: EnvelopedEvent\<Event\>
 
 Defined in: [src/types/events/index.ts:79](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L79)

@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewClearResponseAction"
----
-
-[@slack/bolt](../index.md) / ViewClearResponseAction
-
 # Interface: ViewClearResponseAction
 
 Defined in: [src/types/view/index.ts:298](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L298)

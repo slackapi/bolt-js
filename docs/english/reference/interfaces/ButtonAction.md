@@ -1,9 +1,3 @@
----
-sidebar_label: "ButtonAction"
----
-
-[@slack/bolt](../index.md) / ButtonAction
-
 # Interface: ButtonAction
 
 Defined in: [src/types/actions/block-action.ts:49](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L49)

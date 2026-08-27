@@ -1,9 +1,3 @@
----
-sidebar_label: "matchEventType"
----
-
-[@slack/bolt](../index.md) / matchEventType
-
 # Function: matchEventType()
 
 ```ts

@@ -1,9 +1,3 @@
----
-sidebar_label: "AssistantThreadStartedMiddleware"
----
-
-[@slack/bolt](../index.md) / AssistantThreadStartedMiddleware
-
 # Type Alias: AssistantThreadStartedMiddleware
 
 ```ts

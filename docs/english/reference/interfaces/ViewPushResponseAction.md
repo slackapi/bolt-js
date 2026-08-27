@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewPushResponseAction"
----
-
-[@slack/bolt](../index.md) / ViewPushResponseAction
-
 # Interface: ViewPushResponseAction
 
 Defined in: [src/types/view/index.ts:293](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L293)

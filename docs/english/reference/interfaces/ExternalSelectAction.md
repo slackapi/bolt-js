@@ -1,9 +1,3 @@
----
-sidebar_label: "ExternalSelectAction"
----
-
-[@slack/bolt](../index.md) / ExternalSelectAction
-
 # Interface: ExternalSelectAction
 
 Defined in: [src/types/actions/block-action.ts:162](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L162)

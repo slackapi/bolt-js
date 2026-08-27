@@ -1,9 +1,3 @@
----
-sidebar_label: "onlyActions"
----
-
-[@slack/bolt](../index.md) / onlyActions
-
 # Variable: onlyActions
 
 ```ts

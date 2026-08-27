@@ -1,9 +1,3 @@
----
-sidebar_label: "BaseSlackEvent"
----
-
-[@slack/bolt](../index.md) / BaseSlackEvent
-
 # Interface: BaseSlackEvent\<T\>
 
 Defined in: [src/types/events/index.ts:68](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L68)

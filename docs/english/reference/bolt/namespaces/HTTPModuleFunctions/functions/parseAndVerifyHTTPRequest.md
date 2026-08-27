@@ -1,9 +1,3 @@
----
-sidebar_label: "parseAndVerifyHTTPRequest"
----
-
-[@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / parseAndVerifyHTTPRequest
-
 # Function: parseAndVerifyHTTPRequest()
 
 ```ts

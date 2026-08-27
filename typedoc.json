@@ -1,7 +1,8 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["src/index.ts"],
-  "plugin": ["typedoc-plugin-markdown", "./typedoc-plugin-sidebar-labels.mjs"],
+  "plugin": ["typedoc-plugin-markdown"],
+  "hideBreadcrumbs": true,
   "outputs": [
     {
       "name": "markdown",

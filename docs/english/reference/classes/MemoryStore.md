@@ -1,9 +1,3 @@
----
-sidebar_label: "MemoryStore"
----
-
-[@slack/bolt](../index.md) / MemoryStore
-
 # Class: MemoryStore\<ConversationState\>
 
 Defined in: [src/conversation-store.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/conversation-store.ts#L21)

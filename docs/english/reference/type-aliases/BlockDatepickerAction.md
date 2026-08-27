@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockDatepickerAction"
----
-
-[@slack/bolt](../index.md) / BlockDatepickerAction
-
 # Type Alias: BlockDatepickerAction
 
 ```ts

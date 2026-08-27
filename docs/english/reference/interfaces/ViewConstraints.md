@@ -1,9 +1,3 @@
----
-sidebar_label: "ViewConstraints"
----
-
-[@slack/bolt](../index.md) / ViewConstraints
-
 # Interface: ViewConstraints
 
 Defined in: [src/types/view/index.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L11)

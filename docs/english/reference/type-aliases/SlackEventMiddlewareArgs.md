@@ -1,9 +1,3 @@
----
-sidebar_label: "SlackEventMiddlewareArgs"
----
-
-[@slack/bolt](../index.md) / SlackEventMiddlewareArgs
-
 # Type Alias: SlackEventMiddlewareArgs\<EventType\>
 
 ```ts

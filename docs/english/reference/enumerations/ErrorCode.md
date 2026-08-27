@@ -1,9 +1,3 @@
----
-sidebar_label: "ErrorCode"
----
-
-[@slack/bolt](../index.md) / ErrorCode
-
 # Enumeration: ErrorCode
 
 Defined in: [src/errors.ts:18](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L18)

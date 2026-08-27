@@ -1,9 +1,3 @@
----
-sidebar_label: "ChannelsSelectAction"
----
-
-[@slack/bolt](../index.md) / ChannelsSelectAction
-
 # Interface: ChannelsSelectAction
 
 Defined in: [src/types/actions/block-action.ts:142](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L142)

@@ -1,9 +1,3 @@
----
-sidebar_label: "ShortcutConstraints"
----
-
-[@slack/bolt](../index.md) / ShortcutConstraints
-
 # Interface: ShortcutConstraints\<S\>
 
 Defined in: [src/types/shortcuts/index.ts:14](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/index.ts#L14)

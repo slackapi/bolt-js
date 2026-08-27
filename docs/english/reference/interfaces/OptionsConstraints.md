@@ -1,9 +1,3 @@
----
-sidebar_label: "OptionsConstraints"
----
-
-[@slack/bolt](../index.md) / OptionsConstraints
-
 # Interface: OptionsConstraints\<A\>
 
 Defined in: [src/types/options/index.ts:18](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L18)

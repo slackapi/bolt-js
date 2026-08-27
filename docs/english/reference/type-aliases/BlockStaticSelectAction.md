@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockStaticSelectAction"
----
-
-[@slack/bolt](../index.md) / BlockStaticSelectAction
-
 # Type Alias: BlockStaticSelectAction
 
 ```ts

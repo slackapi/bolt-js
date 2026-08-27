@@ -1,9 +1,3 @@
----
-sidebar_label: "GlobalShortcut"
----
-
-[@slack/bolt](../index.md) / GlobalShortcut
-
 # Interface: GlobalShortcut
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L7)

@@ -1,9 +1,3 @@
----
-sidebar_label: "AuthorizationError"
----
-
-[@slack/bolt](../index.md) / AuthorizationError
-
 # Class: AuthorizationError
 
 Defined in: [src/errors.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L84)

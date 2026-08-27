@@ -1,9 +1,3 @@
----
-sidebar_label: "StaticSelectAction"
----
-
-[@slack/bolt](../index.md) / StaticSelectAction
-
 # Interface: StaticSelectAction
 
 Defined in: [src/types/actions/block-action.ts:76](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L76)

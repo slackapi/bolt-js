@@ -1,9 +1,3 @@
----
-sidebar_label: "onlyOptions"
----
-
-[@slack/bolt](../index.md) / onlyOptions
-
 # Variable: onlyOptions
 
 ```ts

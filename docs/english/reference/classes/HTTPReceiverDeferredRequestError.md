@@ -1,9 +1,3 @@
----
-sidebar_label: "HTTPReceiverDeferredRequestError"
----
-
-[@slack/bolt](../index.md) / HTTPReceiverDeferredRequestError
-
 # Class: HTTPReceiverDeferredRequestError
 
 Defined in: [src/errors.ts:131](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L131)

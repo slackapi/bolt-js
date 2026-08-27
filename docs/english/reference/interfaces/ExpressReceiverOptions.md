@@ -1,9 +1,3 @@
----
-sidebar_label: "ExpressReceiverOptions"
----
-
-[@slack/bolt](../index.md) / ExpressReceiverOptions
-
 # Interface: ExpressReceiverOptions
 
 Defined in: [src/receivers/ExpressReceiver.ts:92](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L92)

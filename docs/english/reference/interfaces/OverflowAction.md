@@ -1,9 +1,3 @@
----
-sidebar_label: "OverflowAction"
----
-
-[@slack/bolt](../index.md) / OverflowAction
-
 # Interface: OverflowAction
 
 Defined in: [src/types/actions/block-action.ts:184](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L184)

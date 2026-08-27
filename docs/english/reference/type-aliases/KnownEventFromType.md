@@ -1,9 +1,3 @@
----
-sidebar_label: "KnownEventFromType"
----
-
-[@slack/bolt](../index.md) / KnownEventFromType
-
 # Type Alias: KnownEventFromType\<T\>
 
 ```ts

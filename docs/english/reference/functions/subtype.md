@@ -1,9 +1,3 @@
----
-sidebar_label: "subtype"
----
-
-[@slack/bolt](../index.md) / subtype
-
 # Function: subtype()
 
 ```ts

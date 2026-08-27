@@ -1,9 +1,3 @@
----
-sidebar_label: "isFulfilled"
----
-
-[@slack/bolt](../index.md) / isFulfilled
-
 # Function: isFulfilled()
 
 ```ts

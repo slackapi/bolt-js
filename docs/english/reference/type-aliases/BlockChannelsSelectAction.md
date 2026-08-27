@@ -1,9 +1,3 @@
----
-sidebar_label: "BlockChannelsSelectAction"
----
-
-[@slack/bolt](../index.md) / BlockChannelsSelectAction
-
 # Type Alias: BlockChannelsSelectAction
 
 ```ts

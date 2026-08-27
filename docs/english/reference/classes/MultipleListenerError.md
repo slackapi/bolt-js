@@ -1,9 +1,3 @@
----
-sidebar_label: "MultipleListenerError"
----
-
-[@slack/bolt](../index.md) / MultipleListenerError
-
 # Class: MultipleListenerError
 
 Defined in: [src/errors.ts:156](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L156)

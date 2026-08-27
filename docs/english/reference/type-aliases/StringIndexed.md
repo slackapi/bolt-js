@@ -1,9 +1,3 @@
----
-sidebar_label: "StringIndexed"
----
-
-[@slack/bolt](../index.md) / StringIndexed
-
 # Type Alias: StringIndexed
 
 ```ts
