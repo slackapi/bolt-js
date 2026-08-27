@@ -1547,7 +1547,21 @@ function buildSource<IsEnterpriseInstall extends boolean>(
   const userId: string | undefined = (() => {
     if (type === IncomingEventType.Event) {
       // NOTE: no type system backed exhaustiveness check within this incoming event type
-      const { event } = body as SlackEventMiddlewareArgs['body'];
+      const bodyAsEvent = body as SlackEventMiddlewareArgs['body'];
+      // The authorizations array names the installing user this event was
+      // delivered for. Event payload fields like `event.user` reference the
+      // user that *triggered* the event, who may never have installed the
+      // app (e.g. the invitee in `member_joined_channel`), which sends
+      // `authorize`/`fetchInstallation` looking up the wrong installation.
+      // Mirrors the teamId/enterpriseId extraction above. See #2271.
+      if (
+        Array.isArray(bodyAsEvent.authorizations) &&
+        bodyAsEvent.authorizations[0] !== undefined &&
+        bodyAsEvent.authorizations[0].user_id !== null
+      ) {
+        return bodyAsEvent.authorizations[0].user_id;
+      }
+      const { event } = bodyAsEvent;
       if ('user' in event) {
         if (typeof event.user === 'string') {
           return event.user;
