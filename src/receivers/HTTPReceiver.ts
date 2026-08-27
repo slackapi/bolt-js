@@ -97,6 +97,7 @@ export interface HTTPReceiverOptions {
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
+  invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
 }
 
 // All the available argument for OAuth flow enabled apps
@@ -137,6 +138,8 @@ export default class HTTPReceiver implements Receiver {
   private processBeforeResponse: boolean;
 
   private signatureVerification: boolean;
+
+  private invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
 
   private app?: App;
 
@@ -191,6 +194,7 @@ export default class HTTPReceiver implements Receiver {
     processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
+    invalidRequestSignatureHandler = undefined,
   }: HTTPReceiverOptions) {
     verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
@@ -256,6 +260,7 @@ export default class HTTPReceiver implements Receiver {
     this.processEventErrorHandler = processEventErrorHandler;
     this.unhandledRequestHandler = unhandledRequestHandler;
     this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
+    this.invalidRequestSignatureHandler = invalidRequestSignatureHandler;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
@@ -443,6 +448,7 @@ export default class HTTPReceiver implements Receiver {
             // If enabled: false, this method returns bufferedReq without verification
             enabled: this.signatureVerification,
             signingSecret: this.signingSecret,
+            invalidRequestSignatureHandler: this.invalidRequestSignatureHandler,
           },
           req,
         );
