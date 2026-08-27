@@ -1,4 +1,4 @@
-# Type Alias: Middleware\<Args, CustomContext\>
+# Middleware\<Args, CustomContext\>
 
 ```ts
 type Middleware<Args, CustomContext> = (args) => Promise<void>;

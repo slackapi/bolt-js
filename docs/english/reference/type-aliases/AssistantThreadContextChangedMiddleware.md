@@ -1,4 +1,4 @@
-# Type Alias: AssistantThreadContextChangedMiddleware
+# AssistantThreadContextChangedMiddleware
 
 ```ts
 type AssistantThreadContextChangedMiddleware = Middleware<AssistantThreadContextChangedMiddlewareArgs>;

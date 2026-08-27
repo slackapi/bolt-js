@@ -1,4 +1,4 @@
-# Function: isSlackEventMiddlewareArgsOptions()
+# isSlackEventMiddlewareArgsOptions()
 
 ```ts
 function isSlackEventMiddlewareArgsOptions<EventType>(optionOrListener): optionOrListener is SlackEventMiddlewareArgsOptions;

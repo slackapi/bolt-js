@@ -1,4 +1,4 @@
-# Type Alias: BlockTimepickerAction
+# BlockTimepickerAction
 
 ```ts
 type BlockTimepickerAction = BlockAction<TimepickerAction>;

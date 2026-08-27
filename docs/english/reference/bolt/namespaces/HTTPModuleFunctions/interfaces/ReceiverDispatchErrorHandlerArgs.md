@@ -1,4 +1,4 @@
-# Interface: ReceiverDispatchErrorHandlerArgs
+# ReceiverDispatchErrorHandlerArgs
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:236](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L236)
 

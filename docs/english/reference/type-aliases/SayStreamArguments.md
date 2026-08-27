@@ -1,4 +1,4 @@
-# Type Alias: SayStreamArguments
+# SayStreamArguments
 
 ```ts
 type SayStreamArguments = Partial<Omit<ChatStreamParams, "token">>;

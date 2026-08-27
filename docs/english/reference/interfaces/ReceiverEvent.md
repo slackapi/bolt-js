@@ -1,4 +1,4 @@
-# Interface: ReceiverEvent
+# ReceiverEvent
 
 Defined in: [src/types/receiver.ts:5](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L5)
 

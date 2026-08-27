@@ -1,4 +1,4 @@
-# Type Alias: SayFn
+# SayFn
 
 ```ts
 type SayFn = (message) => Promise<ChatPostMessageResponse>;

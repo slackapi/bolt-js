@@ -1,4 +1,4 @@
-# Interface: ViewStateValue
+# ViewStateValue
 
 Defined in: [src/types/view/index.ts:236](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L236)
 

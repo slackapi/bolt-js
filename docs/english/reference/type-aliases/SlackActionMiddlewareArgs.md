@@ -1,4 +1,4 @@
-# Type Alias: SlackActionMiddlewareArgs\<Action\>
+# SlackActionMiddlewareArgs\<Action\>
 
 ```ts
 type SlackActionMiddlewareArgs<Action> = object & Action extends Exclude<SlackAction, DialogSubmitAction> ? object : unknown;

@@ -1,4 +1,4 @@
-# Interface: AllMiddlewareArgs\<CustomContext\>
+# AllMiddlewareArgs\<CustomContext\>
 
 Defined in: [src/types/middleware.ts:20](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L20)
 

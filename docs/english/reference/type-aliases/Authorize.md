@@ -1,4 +1,4 @@
-# Type Alias: Authorize\<IsEnterpriseInstall\>
+# Authorize\<IsEnterpriseInstall\>
 
 ```ts
 type Authorize<IsEnterpriseInstall> = (source, body?) => Promise<AuthorizeResult>;

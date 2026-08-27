@@ -1,4 +1,4 @@
-# Interface: MenuSelect
+# MenuSelect
 
 Defined in: [src/types/actions/interactive-message.ts:19](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L19)
 

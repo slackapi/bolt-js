@@ -1,4 +1,4 @@
-# Type Alias: BlockCheckboxesAction
+# BlockCheckboxesAction
 
 ```ts
 type BlockCheckboxesAction = BlockAction<CheckboxesAction>;

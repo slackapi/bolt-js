@@ -1,4 +1,4 @@
-# Type Alias: SayStreamFn
+# SayStreamFn
 
 ```ts
 type SayStreamFn = (args?) => ReturnType<WebClient["chatStream"]>;

@@ -1,4 +1,4 @@
-# Interface: OptionGroups\<Options\>
+# OptionGroups\<Options\>
 
 Defined in: [src/types/options/index.ts:172](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L172)
 

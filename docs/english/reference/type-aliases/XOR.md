@@ -1,4 +1,4 @@
-# Type Alias: XOR\<T, U\>
+# XOR\<T, U\>
 
 ```ts
 type XOR<T, U> = T | U extends Record<string, unknown> ? Without<T, U> & U | Without<U, T> & T : T | U;

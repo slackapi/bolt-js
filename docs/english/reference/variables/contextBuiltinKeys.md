@@ -1,4 +1,4 @@
-# Variable: contextBuiltinKeys
+# contextBuiltinKeys
 
 ```ts
 const contextBuiltinKeys: string[];

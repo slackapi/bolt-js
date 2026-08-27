@@ -1,4 +1,4 @@
-# Class: AwsLambdaReceiver
+# AwsLambdaReceiver
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:131](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L131)
 

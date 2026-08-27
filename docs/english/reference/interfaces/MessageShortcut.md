@@ -1,4 +1,4 @@
-# Interface: MessageShortcut
+# MessageShortcut
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L7)
 

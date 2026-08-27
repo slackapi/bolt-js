@@ -1,4 +1,4 @@
-# Type Alias: BlockElementAction
+# BlockElementAction
 
 ```ts
 type BlockElementAction = 

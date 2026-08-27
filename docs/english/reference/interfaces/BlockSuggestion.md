@@ -1,4 +1,4 @@
-# Interface: BlockSuggestion
+# BlockSuggestion
 
 Defined in: [src/types/options/index.ts:45](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L45)
 

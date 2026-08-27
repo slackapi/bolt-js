@@ -1,4 +1,4 @@
-# Type Alias: OptionsPayloadFromType\<T\>
+# OptionsPayloadFromType\<T\>
 
 ```ts
 type OptionsPayloadFromType<T> = KnownOptionsPayloadFromType<T> extends never ? BasicOptionsPayload<T> : KnownOptionsPayloadFromType<T>;

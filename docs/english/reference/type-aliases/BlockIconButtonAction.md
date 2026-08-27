@@ -1,4 +1,4 @@
-# Type Alias: BlockIconButtonAction
+# BlockIconButtonAction
 
 ```ts
 type BlockIconButtonAction = BlockAction<IconButtonAction>;

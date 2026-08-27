@@ -1,4 +1,4 @@
-# Function: isCodedError()
+# isCodedError()
 
 ```ts
 function isCodedError(err): err is CodedError;

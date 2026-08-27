@@ -1,4 +1,4 @@
-# Interface: SlashCommand
+# SlashCommand
 
 Defined in: [src/types/command/index.ts:20](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L20)
 

@@ -1,4 +1,4 @@
-# Function: buildSSLCheckResponse()
+# buildSSLCheckResponse()
 
 ```ts
 function buildSSLCheckResponse(res): void;

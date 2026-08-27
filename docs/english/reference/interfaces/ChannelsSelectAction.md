@@ -1,4 +1,4 @@
-# Interface: ChannelsSelectAction
+# ChannelsSelectAction
 
 Defined in: [src/types/actions/block-action.ts:142](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L142)
 

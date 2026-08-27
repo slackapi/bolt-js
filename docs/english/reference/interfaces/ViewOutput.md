@@ -1,4 +1,4 @@
-# Interface: ViewOutput
+# ViewOutput
 
 Defined in: [src/types/view/index.ts:254](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L254)
 

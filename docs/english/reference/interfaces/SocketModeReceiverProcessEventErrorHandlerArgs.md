@@ -1,4 +1,4 @@
-# Interface: SocketModeReceiverProcessEventErrorHandlerArgs
+# SocketModeReceiverProcessEventErrorHandlerArgs
 
 Defined in: [src/receivers/SocketModeFunctions.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeFunctions.ts#L24)
 

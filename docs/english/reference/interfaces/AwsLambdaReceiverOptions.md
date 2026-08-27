@@ -1,4 +1,4 @@
-# Interface: AwsLambdaReceiverOptions
+# AwsLambdaReceiverOptions
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L84)
 

@@ -1,4 +1,4 @@
-# Type Alias: FunctionInputs
+# FunctionInputs
 
 ```ts
 type FunctionInputs = Record<string, unknown>;

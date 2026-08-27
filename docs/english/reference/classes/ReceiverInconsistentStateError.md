@@ -1,4 +1,4 @@
-# Class: ReceiverInconsistentStateError
+# ReceiverInconsistentStateError
 
 Defined in: [src/errors.ts:127](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L127)
 

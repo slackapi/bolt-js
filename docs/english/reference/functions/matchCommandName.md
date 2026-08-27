@@ -1,4 +1,4 @@
-# Function: matchCommandName()
+# matchCommandName()
 
 ```ts
 function matchCommandName(pattern): Middleware<SlackCommandMiddlewareArgs>;

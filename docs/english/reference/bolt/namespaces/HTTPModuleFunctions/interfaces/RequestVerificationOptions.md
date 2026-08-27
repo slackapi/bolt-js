@@ -1,4 +1,4 @@
-# Interface: RequestVerificationOptions
+# RequestVerificationOptions
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:228](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L228)
 

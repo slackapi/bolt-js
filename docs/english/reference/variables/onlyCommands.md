@@ -1,4 +1,4 @@
-# Variable: onlyCommands
+# onlyCommands
 
 ```ts
 const onlyCommands: Middleware<AnyMiddlewareArgs>;

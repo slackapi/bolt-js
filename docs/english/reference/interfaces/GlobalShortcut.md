@@ -1,4 +1,4 @@
-# Interface: GlobalShortcut
+# GlobalShortcut
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L7)
 

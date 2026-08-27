@@ -3,6 +3,11 @@
   "entryPoints": ["src/index.ts"],
   "plugin": ["typedoc-plugin-markdown", "./typedoc-plugin-sidebar-labels.mjs"],
   "hideBreadcrumbs": true,
+  "pageTitleTemplates": {
+    "index": "{projectName}",
+    "member": "{name}",
+    "module": "{name}"
+  },
   "outputs": [
     {
       "name": "markdown",

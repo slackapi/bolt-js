@@ -1,4 +1,4 @@
-# Type Alias: StringIndexed
+# StringIndexed
 
 ```ts
 type StringIndexed = Record<string, any>;

@@ -1,4 +1,4 @@
-# Interface: AssistantConfig
+# AssistantConfig
 
 Defined in: [src/Assistant.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L21)
 

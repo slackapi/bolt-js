@@ -1,4 +1,4 @@
-# Interface: IconButtonAction
+# IconButtonAction
 
 Defined in: [src/types/actions/block-action.ts:67](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L67)
 

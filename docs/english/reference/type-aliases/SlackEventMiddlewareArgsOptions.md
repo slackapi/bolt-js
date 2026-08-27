@@ -1,4 +1,4 @@
-# Type Alias: SlackEventMiddlewareArgsOptions
+# SlackEventMiddlewareArgsOptions
 
 ```ts
 type SlackEventMiddlewareArgsOptions = object;

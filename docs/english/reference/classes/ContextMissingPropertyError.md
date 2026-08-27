@@ -1,4 +1,4 @@
-# Class: ContextMissingPropertyError
+# ContextMissingPropertyError
 
 Defined in: [src/errors.ts:96](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L96)
 

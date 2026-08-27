@@ -1,4 +1,4 @@
-# Function: isFulfilled()
+# isFulfilled()
 
 ```ts
 function isFulfilled<T>(p): p is PromiseFulfilledResult<T>;

@@ -1,4 +1,4 @@
-# Function: isRejected()
+# isRejected()
 
 ```ts
 function isRejected<T>(p): p is PromiseRejectedResult;

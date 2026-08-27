@@ -1,4 +1,4 @@
-# Interface: CodedError
+# CodedError
 
 Defined in: [src/errors.ts:4](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L4)
 

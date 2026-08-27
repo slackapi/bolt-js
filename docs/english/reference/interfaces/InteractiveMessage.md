@@ -1,4 +1,4 @@
-# Interface: InteractiveMessage\<Action\>
+# InteractiveMessage\<Action\>
 
 Defined in: [src/types/actions/interactive-message.ts:32](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L32)
 

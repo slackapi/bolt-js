@@ -1,4 +1,4 @@
-# Type Alias: BlockOverflowAction
+# BlockOverflowAction
 
 ```ts
 type BlockOverflowAction = BlockAction<OverflowAction>;

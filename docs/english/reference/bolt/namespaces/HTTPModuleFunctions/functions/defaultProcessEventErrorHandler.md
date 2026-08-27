@@ -1,4 +1,4 @@
-# Function: defaultProcessEventErrorHandler()
+# defaultProcessEventErrorHandler()
 
 ```ts
 function defaultProcessEventErrorHandler(args): Promise<boolean>;

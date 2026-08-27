@@ -1,4 +1,4 @@
-# Type Alias: SetStatusArguments
+# SetStatusArguments
 
 ```ts
 type SetStatusArguments = Omit<AssistantThreadsSetStatusArguments, "channel_id" | "thread_ts">;

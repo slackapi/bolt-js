@@ -1,4 +1,4 @@
-# Function: getHeader()
+# getHeader()
 
 ```ts
 function getHeader(req, header): string;

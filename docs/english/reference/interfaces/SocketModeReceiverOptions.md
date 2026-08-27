@@ -1,4 +1,4 @@
-# Interface: SocketModeReceiverOptions
+# SocketModeReceiverOptions
 
 Defined in: [src/receivers/SocketModeReceiver.ts:31](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L31)
 

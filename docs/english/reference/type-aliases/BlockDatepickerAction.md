@@ -1,4 +1,4 @@
-# Type Alias: BlockDatepickerAction
+# BlockDatepickerAction
 
 ```ts
 type BlockDatepickerAction = BlockAction<DatepickerAction>;

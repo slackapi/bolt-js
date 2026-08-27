@@ -1,4 +1,4 @@
-# Type Alias: OptionsSource
+# OptionsSource
 
 ```ts
 type OptionsSource = SlackOptions["type"];

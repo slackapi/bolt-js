@@ -1,4 +1,4 @@
-# Function: buildReceiverRoutes()
+# buildReceiverRoutes()
 
 ```ts
 function buildReceiverRoutes(customRoutes): ReceiverRoutes;

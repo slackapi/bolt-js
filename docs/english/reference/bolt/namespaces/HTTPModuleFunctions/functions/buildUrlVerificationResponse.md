@@ -1,4 +1,4 @@
-# Function: buildUrlVerificationResponse()
+# buildUrlVerificationResponse()
 
 ```ts
 function buildUrlVerificationResponse(res, body): void;

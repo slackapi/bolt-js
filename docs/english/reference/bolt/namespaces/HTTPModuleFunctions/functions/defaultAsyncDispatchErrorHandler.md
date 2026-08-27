@@ -1,4 +1,4 @@
-# Function: defaultAsyncDispatchErrorHandler()
+# defaultAsyncDispatchErrorHandler()
 
 ```ts
 function defaultAsyncDispatchErrorHandler(args): Promise<void>;

@@ -1,4 +1,4 @@
-# Type Alias: AnyMiddlewareArgs
+# AnyMiddlewareArgs
 
 ```ts
 type AnyMiddlewareArgs = 

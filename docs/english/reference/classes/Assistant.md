@@ -1,4 +1,4 @@
-# Class: Assistant
+# Assistant
 
 Defined in: [src/Assistant.ts:99](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L99)
 

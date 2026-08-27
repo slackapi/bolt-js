@@ -1,4 +1,4 @@
-# Function: bufferIncomingMessage()
+# bufferIncomingMessage()
 
 ```ts
 function bufferIncomingMessage(req): Promise<BufferedIncomingMessage>;

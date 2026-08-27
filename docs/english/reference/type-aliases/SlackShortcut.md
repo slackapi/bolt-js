@@ -1,4 +1,4 @@
-# Type Alias: SlackShortcut
+# SlackShortcut
 
 ```ts
 type SlackShortcut = 

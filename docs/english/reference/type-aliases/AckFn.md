@@ -1,4 +1,4 @@
-# Type Alias: AckFn\<Response\>
+# AckFn\<Response\>
 
 ```ts
 type AckFn<Response> = (response?) => Promise<void>;

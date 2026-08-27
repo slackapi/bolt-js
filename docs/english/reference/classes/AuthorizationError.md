@@ -1,4 +1,4 @@
-# Class: AuthorizationError
+# AuthorizationError
 
 Defined in: [src/errors.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L84)
 

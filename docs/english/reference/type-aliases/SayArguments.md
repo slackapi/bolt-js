@@ -1,4 +1,4 @@
-# Type Alias: SayArguments
+# SayArguments
 
 ```ts
 type SayArguments = DistributiveOmit<ChatPostMessageArguments, "channel"> & object;

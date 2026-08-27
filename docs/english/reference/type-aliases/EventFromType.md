@@ -1,4 +1,4 @@
-# Type Alias: EventFromType\<T\>
+# EventFromType\<T\>
 
 ```ts
 type EventFromType<T> = KnownEventFromType<T> extends never ? BaseSlackEvent<T> : KnownEventFromType<T>;

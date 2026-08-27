@@ -1,4 +1,4 @@
-# Interface: SlackCommandMiddlewareArgs
+# SlackCommandMiddlewareArgs
 
 Defined in: [src/types/command/index.ts:6](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L6)
 

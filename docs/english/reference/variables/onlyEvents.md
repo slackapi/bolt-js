@@ -1,4 +1,4 @@
-# Variable: onlyEvents
+# onlyEvents
 
 ```ts
 const onlyEvents: Middleware<AnyMiddlewareArgs>;

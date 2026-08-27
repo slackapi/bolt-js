@@ -1,4 +1,4 @@
-# Type Alias: SlackEventMiddlewareArgs\<EventType\>
+# SlackEventMiddlewareArgs\<EventType\>
 
 ```ts
 type SlackEventMiddlewareArgs<EventType> = object & EventType extends "message" ? object : unknown & EventFromType<EventType> extends 

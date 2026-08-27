@@ -1,4 +1,4 @@
-# Type Alias: EventTypePattern
+# EventTypePattern
 
 ```ts
 type EventTypePattern = string | RegExp;

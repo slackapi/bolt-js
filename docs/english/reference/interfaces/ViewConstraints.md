@@ -1,4 +1,4 @@
-# Interface: ViewConstraints
+# ViewConstraints
 
 Defined in: [src/types/view/index.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L11)
 

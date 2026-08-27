@@ -1,4 +1,4 @@
-# Interface: ConversationStore\<ConversationState\>
+# ConversationStore\<ConversationState\>
 
 Defined in: [src/conversation-store.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/conversation-store.ts#L8)
 

@@ -1,4 +1,4 @@
-# Variable: onlyShortcuts
+# onlyShortcuts
 
 ```ts
 const onlyShortcuts: Middleware<AnyMiddlewareArgs>;

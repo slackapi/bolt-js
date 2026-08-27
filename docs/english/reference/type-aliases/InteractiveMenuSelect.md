@@ -1,4 +1,4 @@
-# Type Alias: InteractiveMenuSelect
+# InteractiveMenuSelect
 
 ```ts
 type InteractiveMenuSelect = InteractiveMessage<MenuSelect>;

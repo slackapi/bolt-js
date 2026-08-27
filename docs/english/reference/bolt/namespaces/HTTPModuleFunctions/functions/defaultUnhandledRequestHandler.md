@@ -1,4 +1,4 @@
-# Function: defaultUnhandledRequestHandler()
+# defaultUnhandledRequestHandler()
 
 ```ts
 function defaultUnhandledRequestHandler(args): void;

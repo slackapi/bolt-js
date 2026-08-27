@@ -1,4 +1,4 @@
-# Interface: ButtonClick
+# ButtonClick
 
 Defined in: [src/types/actions/interactive-message.ts:10](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L10)
 

@@ -1,4 +1,4 @@
-# Interface: ViewPushResponseAction
+# ViewPushResponseAction
 
 Defined in: [src/types/view/index.ts:293](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L293)
 

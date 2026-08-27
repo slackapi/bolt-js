@@ -1,4 +1,4 @@
-# Function: subtype()
+# subtype()
 
 ```ts
 function subtype(subtype1): Middleware<SlackEventMiddlewareArgs<"message">>;

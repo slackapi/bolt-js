@@ -1,4 +1,4 @@
-# Type Alias: NextFn
+# NextFn
 
 ```ts
 type NextFn = () => Promise<void>;

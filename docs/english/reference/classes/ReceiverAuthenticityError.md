@@ -1,4 +1,4 @@
-# Class: ReceiverAuthenticityError
+# ReceiverAuthenticityError
 
 Defined in: [src/errors.ts:123](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L123)
 

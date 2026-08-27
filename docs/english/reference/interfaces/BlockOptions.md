@@ -1,4 +1,4 @@
-# Interface: BlockOptions
+# BlockOptions
 
 Defined in: [src/types/options/index.ts:160](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L160)
 

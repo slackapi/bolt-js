@@ -1,4 +1,4 @@
-# Interface: InteractiveMessageSuggestion
+# InteractiveMessageSuggestion
 
 Defined in: [src/types/options/index.ts:82](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L82)
 

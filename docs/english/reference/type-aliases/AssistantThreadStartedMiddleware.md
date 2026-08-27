@@ -1,4 +1,4 @@
-# Type Alias: AssistantThreadStartedMiddleware
+# AssistantThreadStartedMiddleware
 
 ```ts
 type AssistantThreadStartedMiddleware = Middleware<AssistantThreadStartedMiddlewareArgs>;

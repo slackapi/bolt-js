@@ -1,4 +1,4 @@
-# Function: parseHTTPRequestBody()
+# parseHTTPRequestBody()
 
 ```ts
 function parseHTTPRequestBody(req): any;

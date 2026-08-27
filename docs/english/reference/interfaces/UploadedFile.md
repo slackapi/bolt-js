@@ -1,4 +1,4 @@
-# Interface: UploadedFile
+# UploadedFile
 
 Defined in: [src/types/view/index.ts:109](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L109)
 

@@ -1,4 +1,4 @@
-# Function: buildNoBodyResponse()
+# buildNoBodyResponse()
 
 ```ts
 function buildNoBodyResponse(res, status): void;

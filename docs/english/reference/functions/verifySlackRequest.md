@@ -1,4 +1,4 @@
-# Function: verifySlackRequest()
+# verifySlackRequest()
 
 ```ts
 function verifySlackRequest(options): void;

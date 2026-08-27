@@ -1,4 +1,4 @@
-# Type Alias: SlackOptions
+# SlackOptions
 
 ```ts
 type SlackOptions = 

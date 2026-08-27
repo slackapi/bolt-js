@@ -1,4 +1,4 @@
-# Class: HTTPReceiver
+# HTTPReceiver
 
 Defined in: [src/receivers/HTTPReceiver.ts:128](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L128)
 

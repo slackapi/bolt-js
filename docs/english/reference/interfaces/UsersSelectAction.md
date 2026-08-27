@@ -1,4 +1,4 @@
-# Interface: UsersSelectAction
+# UsersSelectAction
 
 Defined in: [src/types/actions/block-action.ts:102](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L102)
 

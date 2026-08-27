@@ -1,4 +1,4 @@
-# Type Alias: RespondFn
+# RespondFn
 
 ```ts
 type RespondFn = (message) => Promise<Awaited<ReturnType<FetchFunction>>>;

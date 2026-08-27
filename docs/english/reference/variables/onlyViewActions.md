@@ -1,4 +1,4 @@
-# Variable: onlyViewActions
+# onlyViewActions
 
 ```ts
 const onlyViewActions: Middleware<AnyMiddlewareArgs>;

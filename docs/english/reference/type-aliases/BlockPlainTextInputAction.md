@@ -1,4 +1,4 @@
-# Type Alias: BlockPlainTextInputAction
+# BlockPlainTextInputAction
 
 ```ts
 type BlockPlainTextInputAction = BlockAction<PlainTextInputAction>;

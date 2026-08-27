@@ -1,4 +1,4 @@
-# Class: ReceiverMultipleAckError
+# ReceiverMultipleAckError
 
 Defined in: [src/errors.ts:115](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L115)
 

@@ -1,4 +1,4 @@
-# Type Alias: KnownOptionsPayloadFromType\<T\>
+# KnownOptionsPayloadFromType\<T\>
 
 ```ts
 type KnownOptionsPayloadFromType<T> = Extract<SlackOptions, {

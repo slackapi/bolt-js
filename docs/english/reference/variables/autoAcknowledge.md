@@ -1,4 +1,4 @@
-# Variable: autoAcknowledge
+# autoAcknowledge
 
 ```ts
 const autoAcknowledge: Middleware<AnyMiddlewareArgs>;

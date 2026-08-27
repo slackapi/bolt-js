@@ -1,4 +1,4 @@
-# Type Alias: BlockUsersSelectAction
+# BlockUsersSelectAction
 
 ```ts
 type BlockUsersSelectAction = BlockAction<UsersSelectAction>;

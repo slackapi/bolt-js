@@ -1,4 +1,4 @@
-# Interface: PlainTextInputAction
+# PlainTextInputAction
 
 Defined in: [src/types/actions/block-action.ts:233](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L233)
 

@@ -1,4 +1,4 @@
-# Function: extractRetryReasonFromHTTPRequest()
+# extractRetryReasonFromHTTPRequest()
 
 ```ts
 function extractRetryReasonFromHTTPRequest(req): string | undefined;

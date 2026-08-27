@@ -1,4 +1,4 @@
-# Interface: ShortcutConstraints\<S\>
+# ShortcutConstraints\<S\>
 
 Defined in: [src/types/shortcuts/index.ts:14](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/index.ts#L14)
 

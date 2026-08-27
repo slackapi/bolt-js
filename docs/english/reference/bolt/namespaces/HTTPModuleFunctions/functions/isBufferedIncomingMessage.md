@@ -1,4 +1,4 @@
-# Function: isBufferedIncomingMessage()
+# isBufferedIncomingMessage()
 
 ```ts
 function isBufferedIncomingMessage(req): req is BufferedIncomingMessage;

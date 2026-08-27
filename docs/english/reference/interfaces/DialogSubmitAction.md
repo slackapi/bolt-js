@@ -1,4 +1,4 @@
-# Interface: DialogSubmitAction
+# DialogSubmitAction
 
 Defined in: [src/types/actions/dialog-action.ts:6](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L6)
 

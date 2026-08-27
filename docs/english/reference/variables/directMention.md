@@ -1,4 +1,4 @@
-# Variable: directMention
+# directMention
 
 ```ts
 const directMention: Middleware<SlackEventMiddlewareArgs<"message">>;

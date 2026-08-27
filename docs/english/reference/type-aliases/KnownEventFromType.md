@@ -1,4 +1,4 @@
-# Type Alias: KnownEventFromType\<T\>
+# KnownEventFromType\<T\>
 
 ```ts
 type KnownEventFromType<T> = Extract<SlackEvent, {

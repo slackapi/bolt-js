@@ -1,4 +1,4 @@
-# Function: parseAndVerifyHTTPRequest()
+# parseAndVerifyHTTPRequest()
 
 ```ts
 function parseAndVerifyHTTPRequest(

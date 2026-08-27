@@ -1,4 +1,4 @@
-# Function: matchMessage()
+# matchMessage()
 
 ```ts
 function matchMessage(pattern): Middleware<SlackEventMiddlewareArgs<"message" | "app_mention">>;

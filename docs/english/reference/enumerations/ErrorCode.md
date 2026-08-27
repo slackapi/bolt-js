@@ -1,4 +1,4 @@
-# Enumeration: ErrorCode
+# ErrorCode
 
 Defined in: [src/errors.ts:18](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L18)
 

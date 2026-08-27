@@ -1,4 +1,4 @@
-# Interface: DialogOptionGroups\<Options\>
+# DialogOptionGroups\<Options\>
 
 Defined in: [src/types/options/index.ts:177](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L177)
 

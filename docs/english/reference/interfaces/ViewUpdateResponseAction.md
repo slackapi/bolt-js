@@ -1,4 +1,4 @@
-# Interface: ViewUpdateResponseAction
+# ViewUpdateResponseAction
 
 Defined in: [src/types/view/index.ts:288](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L288)
 

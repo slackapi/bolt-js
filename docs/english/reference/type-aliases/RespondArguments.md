@@ -1,4 +1,4 @@
-# Type Alias: RespondArguments
+# RespondArguments
 
 ```ts
 type RespondArguments = DistributiveOmit<ChatPostMessageArguments, "channel" | "text"> & object;

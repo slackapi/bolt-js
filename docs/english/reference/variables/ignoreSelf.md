@@ -1,4 +1,4 @@
-# Variable: ignoreSelf
+# ignoreSelf
 
 ```ts
 const ignoreSelf: Middleware<AnyMiddlewareArgs>;

@@ -1,4 +1,4 @@
-# Interface: ConversationsSelectAction
+# ConversationsSelectAction
 
 Defined in: [src/types/actions/block-action.ts:122](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L122)
 

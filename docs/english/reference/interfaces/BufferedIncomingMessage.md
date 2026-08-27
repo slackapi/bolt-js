@@ -1,4 +1,4 @@
-# Interface: BufferedIncomingMessage
+# BufferedIncomingMessage
 
 Defined in: [src/receivers/BufferedIncomingMessage.ts:5](https://github.com/slackapi/bolt-js/blob/main/src/receivers/BufferedIncomingMessage.ts#L5)
 

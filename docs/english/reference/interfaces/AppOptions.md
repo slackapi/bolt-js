@@ -1,4 +1,4 @@
-# Interface: AppOptions
+# AppOptions
 
 Defined in: [src/App.ts:122](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L122)
 

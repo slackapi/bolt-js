@@ -1,4 +1,4 @@
-# Function: isValidSlackRequest()
+# isValidSlackRequest()
 
 ```ts
 function isValidSlackRequest(options): boolean;

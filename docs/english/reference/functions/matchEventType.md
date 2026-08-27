@@ -1,4 +1,4 @@
-# Function: matchEventType()
+# matchEventType()
 
 ```ts
 function matchEventType(pattern): Middleware<SlackEventMiddlewareArgs>;

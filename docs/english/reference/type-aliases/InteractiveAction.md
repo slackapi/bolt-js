@@ -1,4 +1,4 @@
-# Type Alias: InteractiveAction
+# InteractiveAction
 
 ```ts
 type InteractiveAction = 

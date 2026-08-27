@@ -1,4 +1,4 @@
-# Interface: MultiExternalSelectAction
+# MultiExternalSelectAction
 
 Defined in: [src/types/actions/block-action.ts:173](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L173)
 

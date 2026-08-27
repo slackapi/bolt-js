@@ -1,4 +1,4 @@
-# Function: matchConstraints()
+# matchConstraints()
 
 ```ts
 function matchConstraints(constraints): Middleware<

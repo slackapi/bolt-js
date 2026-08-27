@@ -1,4 +1,4 @@
-# Interface: ViewErrorsResponseAction
+# ViewErrorsResponseAction
 
 Defined in: [src/types/view/index.ts:302](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L302)
 

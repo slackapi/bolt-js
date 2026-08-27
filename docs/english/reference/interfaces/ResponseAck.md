@@ -1,4 +1,4 @@
-# Interface: ResponseAck
+# ResponseAck
 
 Defined in: [src/types/receiver.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L34)
 

@@ -1,4 +1,4 @@
-# Function: asCodedError()
+# asCodedError()
 
 ```ts
 function asCodedError(error): CodedError;

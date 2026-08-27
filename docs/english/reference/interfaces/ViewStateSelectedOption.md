@@ -1,4 +1,4 @@
-# Interface: ViewStateSelectedOption
+# ViewStateSelectedOption
 
 Defined in: [src/types/view/index.ts:103](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L103)
 

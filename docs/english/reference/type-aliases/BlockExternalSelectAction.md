@@ -1,4 +1,4 @@
-# Type Alias: BlockExternalSelectAction
+# BlockExternalSelectAction
 
 ```ts
 type BlockExternalSelectAction = BlockAction<ExternalSelectAction>;

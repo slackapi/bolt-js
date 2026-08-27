@@ -1,4 +1,4 @@
-# Type Alias: SlackViewAction
+# SlackViewAction
 
 ```ts
 type SlackViewAction = 

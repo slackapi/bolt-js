@@ -1,4 +1,4 @@
-# Type Alias: ViewResponseAction
+# ViewResponseAction
 
 ```ts
 type ViewResponseAction = 

@@ -1,4 +1,4 @@
-# Type Alias: BlockStaticSelectAction
+# BlockStaticSelectAction
 
 ```ts
 type BlockStaticSelectAction = BlockAction<StaticSelectAction>;

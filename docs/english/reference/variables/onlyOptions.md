@@ -1,4 +1,4 @@
-# Variable: onlyOptions
+# onlyOptions
 
 ```ts
 const onlyOptions: Middleware<AnyMiddlewareArgs>;

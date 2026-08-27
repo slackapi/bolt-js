@@ -1,4 +1,4 @@
-# Class: InvalidCustomPropertyError
+# InvalidCustomPropertyError
 
 Defined in: [src/errors.ts:107](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L107)
 

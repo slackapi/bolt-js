@@ -1,4 +1,4 @@
-# Interface: DatepickerAction
+# DatepickerAction
 
 Defined in: [src/types/actions/block-action.ts:195](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L195)
 

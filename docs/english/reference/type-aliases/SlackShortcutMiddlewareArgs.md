@@ -1,4 +1,4 @@
-# Type Alias: SlackShortcutMiddlewareArgs\<Shortcut\>
+# SlackShortcutMiddlewareArgs\<Shortcut\>
 
 ```ts
 type SlackShortcutMiddlewareArgs<Shortcut> = object & Shortcut extends MessageShortcut ? object : unknown;

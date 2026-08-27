@@ -1,4 +1,4 @@
-# Type Alias: SetStatusFn
+# SetStatusFn
 
 ```ts
 type SetStatusFn = (status) => Promise<AssistantThreadsSetStatusResponse>;

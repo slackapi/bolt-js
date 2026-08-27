@@ -1,4 +1,4 @@
-# Class: ExpressReceiver
+# ExpressReceiver
 
 Defined in: [src/receivers/ExpressReceiver.ts:145](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L145)
 

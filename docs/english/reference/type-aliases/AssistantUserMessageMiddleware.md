@@ -1,4 +1,4 @@
-# Type Alias: AssistantUserMessageMiddleware
+# AssistantUserMessageMiddleware
 
 ```ts
 type AssistantUserMessageMiddleware = Middleware<AssistantUserMessageMiddlewareArgs>;

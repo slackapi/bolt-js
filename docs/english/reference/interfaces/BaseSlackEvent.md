@@ -1,4 +1,4 @@
-# Interface: BaseSlackEvent\<T\>
+# BaseSlackEvent\<T\>
 
 Defined in: [src/types/events/index.ts:68](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L68)
 

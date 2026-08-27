@@ -1,4 +1,4 @@
-# Type Alias: BlockRadioButtonsAction
+# BlockRadioButtonsAction
 
 ```ts
 type BlockRadioButtonsAction = BlockAction<RadioButtonsAction>;

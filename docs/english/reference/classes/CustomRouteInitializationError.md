@@ -1,4 +1,4 @@
-# Class: CustomRouteInitializationError
+# CustomRouteInitializationError
 
 Defined in: [src/errors.ts:111](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L111)
 

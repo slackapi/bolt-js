@@ -1,4 +1,4 @@
-# Interface: ReceiverProcessEventErrorHandlerArgs
+# ReceiverProcessEventErrorHandlerArgs
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:245](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L245)
 

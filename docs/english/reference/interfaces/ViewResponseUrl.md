@@ -1,4 +1,4 @@
-# Interface: ViewResponseUrl
+# ViewResponseUrl
 
 Defined in: [src/types/view/index.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L34)
 

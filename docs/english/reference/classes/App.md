@@ -1,4 +1,4 @@
-# Class: App\<AppCustomContext\>
+# App\<AppCustomContext\>
 
 Defined in: [src/App.ts:233](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L233)
 

@@ -1,4 +1,4 @@
-# Function: extractRetryNumFromHTTPRequest()
+# extractRetryNumFromHTTPRequest()
 
 ```ts
 function extractRetryNumFromHTTPRequest(req): number | undefined;

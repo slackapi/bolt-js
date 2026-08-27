@@ -1,4 +1,4 @@
-# Interface: ActionConstraints\<A\>
+# ActionConstraints\<A\>
 
 Defined in: [src/types/actions/index.ts:28](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L28)
 

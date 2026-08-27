@@ -1,4 +1,4 @@
-# Interface: RadioButtonsAction
+# RadioButtonsAction
 
 Defined in: [src/types/actions/block-action.ts:215](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L215)
 

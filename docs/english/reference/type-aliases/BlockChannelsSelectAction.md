@@ -1,4 +1,4 @@
-# Type Alias: BlockChannelsSelectAction
+# BlockChannelsSelectAction
 
 ```ts
 type BlockChannelsSelectAction = BlockAction<ChannelsSelectAction>;

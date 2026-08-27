@@ -1,4 +1,4 @@
-# Function: buildContentResponse()
+# buildContentResponse()
 
 ```ts
 function buildContentResponse(res, body): void;

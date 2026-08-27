@@ -1,4 +1,4 @@
-# Type Alias: BlockConversationsSelectAction
+# BlockConversationsSelectAction
 
 ```ts
 type BlockConversationsSelectAction = BlockAction<ConversationsSelectAction>;

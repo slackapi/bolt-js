@@ -1,4 +1,4 @@
-# Function: defaultDispatchErrorHandler()
+# defaultDispatchErrorHandler()
 
 ```ts
 function defaultDispatchErrorHandler(args): void;

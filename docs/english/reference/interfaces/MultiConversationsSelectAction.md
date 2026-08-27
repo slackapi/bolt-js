@@ -1,4 +1,4 @@
-# Interface: MultiConversationsSelectAction
+# MultiConversationsSelectAction
 
 Defined in: [src/types/actions/block-action.ts:132](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L132)
 

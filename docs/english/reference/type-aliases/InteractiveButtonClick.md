@@ -1,4 +1,4 @@
-# Type Alias: InteractiveButtonClick
+# InteractiveButtonClick
 
 ```ts
 type InteractiveButtonClick = InteractiveMessage<ButtonClick>;

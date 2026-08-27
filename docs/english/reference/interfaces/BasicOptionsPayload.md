@@ -1,4 +1,4 @@
-# Interface: BasicOptionsPayload\<Type\>
+# BasicOptionsPayload\<Type\>
 
 Defined in: [src/types/options/index.ts:33](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L33)
 
