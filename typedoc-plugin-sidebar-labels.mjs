@@ -17,10 +17,19 @@ import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
  */
 export function load(app) {
   app.renderer.on(MarkdownPageEvent.END, (page) => {
-    const label = page.model?.name;
+    const model = /** @type {any} */ (page.model);
+    const label = model?.name;
     if (!label) {
       return;
     }
-    page.contents = `---\nsidebar_label: ${JSON.stringify(label)}\n---\n\n${page.contents ?? ''}`;
+    const frontmatter = [`sidebar_label: ${JSON.stringify(label)}`];
+    // The project root page (reference/index.md) is emitted as a standalone
+    // sidebar item rather than a category link, so it otherwise sorts
+    // alphabetically as "index" — landing between "functions" and
+    // "interfaces". Pin it to the top of the Reference section.
+    if (typeof model.isProject === 'function' && model.isProject()) {
+      frontmatter.push('sidebar_position: 0');
+    }
+    page.contents = `---\n${frontmatter.join('\n')}\n---\n\n${page.contents ?? ''}`;
   });
 }

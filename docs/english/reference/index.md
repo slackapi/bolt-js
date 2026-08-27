@@ -1,5 +1,6 @@
 ---
 sidebar_label: "@slack/bolt"
+sidebar_position: 0
 ---
 
 # @slack/bolt v5.0.0
