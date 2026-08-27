@@ -44,8 +44,8 @@ Here we've provided a default implementation of the `installationStore` with
 developing and testing your app:
 
 ```javascript
-const { App } = require("@slack/bolt");
-const { FileInstallationStore } = require("@slack/oauth");
+import { App } from "@slack/bolt";
+import { FileInstallationStore } from "@slack/oauth";
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,

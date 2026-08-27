@@ -118,7 +118,7 @@ Next, we'll customize your Bolt app's [`receiver`](/tools/bolt-js/concepts/recei
 Update the [source code that imports your modules](https://github.com/slack-samples/bolt-js-getting-started-app/blob/4c29a21438b40f0cbca71ece0d39b356dfcf88d5/app.js#L1) in `app.js` to require Bolt's AwsLambdaReceiver:
 
 ```javascript
-const { App, AwsLambdaReceiver } = require('@slack/bolt');
+import { App, AwsLambdaReceiver } from '@slack/bolt';
 ```
 
 :::warning
@@ -155,7 +155,7 @@ Finally, at the bottom of your app, update the [source code that starts the HTTP
 
 ```javascript
 // Handle the Lambda function event
-module.exports.handler = async (event, context, callback) => {
+export const handler = async (event, context, callback) => {
     const handler = await awsLambdaReceiver.start();
     return handler(event, context, callback);
 }

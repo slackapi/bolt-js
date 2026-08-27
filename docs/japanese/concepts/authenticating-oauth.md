@@ -12,8 +12,8 @@ OAuth を有効にするために、以下を提供する必要があります�
 開発・テストの際に利用することを想定して `installationStore` オプションのデフォルト実装である `FileInstallationStore` を提供しています。
 
 ```javascript
-const { App } = require('@slack/bolt');
-const { FileInstallationStore } = require('@slack/oauth');
+import { App } from '@slack/bolt';
+import { FileInstallationStore } from '@slack/oauth';
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,

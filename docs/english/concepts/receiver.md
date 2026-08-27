@@ -30,7 +30,7 @@ Use the `customPropertiesExtractor` option to extract custom properties from inc
 This is particularly useful for extracting HTTP headers that you want to propagate to other services, for example, if you need to propagate a header for distributed tracing.
 
 ```javascript
-const { App, HTTPReceiver } = require('@slack/bolt');
+import { App, HTTPReceiver } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,

@@ -122,7 +122,7 @@ const app = new App({
 `app.js` のソースコードの中で[モジュールのインポートを行う部分](https://github.com/slackapi/bolt-js-getting-started-app/blob/main/app.js#L1)を編集し、Bolt の `AwsLambdaReceiver` モジュールを require します。
 
 ```javascript
-const { App, AwsLambdaReceiver } = require('@slack/bolt');
+import { App, AwsLambdaReceiver } from '@slack/bolt';
 ```
 
 :::tip 
@@ -158,7 +158,7 @@ const app = new App({
 
 ```javascript
 // Lambda 関数のイベントを処理します
-module.exports.handler = async (event, context, callback) => {
+export const handler = async (event, context, callback) => {
   const handler = await awsLambdaReceiver.start();
   return handler(event, context, callback);
 }

@@ -11,7 +11,7 @@ Bolt for JavaScript will rotate tokens automatically in response to incoming eve
 To rotate tokens on a separate schedule, consider implementing the `InstallProvider` from the [`@slack/oauth`](/tools/node-slack-sdk/oauth) package for use of the provided `authorize` method:
 
 ```js
-const { InstallProvider } = require("@slack/oauth");
+import { InstallProvider } from "@slack/oauth";
 
 const installer = new InstallProvider({
   clientId: process.env.SLACK_CLIENT_ID,
