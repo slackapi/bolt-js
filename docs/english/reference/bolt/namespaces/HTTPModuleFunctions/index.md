@@ -1,3 +1,7 @@
+---
+sidebar_label: "HTTPModuleFunctions"
+---
+
 # HTTPModuleFunctions
 
 ## Interfaces
