@@ -28,6 +28,7 @@
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
     "changeset": "npx @changesets/cli",
+    "docs": "npx typedoc --plugin typedoc-plugin-markdown",
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "prepare": "npm run build",
@@ -35,7 +36,7 @@
     "test:coverage": "c8 npm run test:unit",
     "test:types": "tsd --files test/types",
     "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
-    "version": "npm run changeset version && npm install",
+    "version": "npm run changeset version && npm install && npm run docs",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": {
@@ -76,6 +77,8 @@
     "source-map-support": "^0.5.12",
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.0",
     "typescript": "5.3.3"
   },
   "peerDependencies": {

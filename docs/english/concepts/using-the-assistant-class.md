@@ -4,7 +4,7 @@
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-The [`Assistant`](/tools/bolt-js/reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the **Agents** feature enabled. 
+The [`Assistant`](/tools/bolt-js/interface-reference#the-assistantconfig-configuration-object) class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the **Agents** feature enabled. 
 
 :::warning[The `Assistant` class targets the assistant messaging experience]
 The `Assistant` class handles the [assistant messaging experience](/ai/developing-agents) (`assistant_view`), in which agent conversations happen in separate Chat and History tabs. Apps going forward use the agent messaging experience (`agent_view`) by default, where conversations happen in the Messages tab and you handle events such as [`app_home_opened`](/reference/events/app_home_opened) and [`message.im`](/reference/events/message.im) directly. Refer to [Adding agent features](/tools/bolt-js/concepts/adding-agent-features) and the [agent messaging experience changelog entry](/changelog/2026/06/30/agent-messages-tab) for the default experience and migration guidance.
@@ -57,7 +57,7 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
-:::tip[Be sure to give the [reference docs](/tools/bolt-js/reference#agents--assistants) a look!]
+:::tip[Be sure to give the [reference docs](/tools/bolt-js/interface-reference#agents--assistants) a look!]
 :::
 
 ### Configuring your app to support the `Assistant` class
@@ -168,7 +168,7 @@ When the user messages your app, the [`message.im`](/reference/events/message.im
 
 Messages sent to the app do not contain a [subtype](/reference/events/message/#subtypes) and must be deduced based on their shape and any provided [message metadata](/messaging/message-metadata/).
 
-There are three [utilities](/tools/bolt-js/reference#the-assistantconfig-configuration-object) that are particularly useful in curating the user experience:
+There are three [utilities](/tools/bolt-js/interface-reference#the-assistantconfig-configuration-object) that are particularly useful in curating the user experience:
 * `say`
 * `setTitle`
 * `setStatus`
