@@ -1,3 +1,7 @@
+---
+sidebar_label: "bufferIncomingMessage"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / bufferIncomingMessage
 
 # Function: bufferIncomingMessage()

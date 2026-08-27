@@ -1,3 +1,7 @@
+---
+sidebar_label: "AssistantMissingPropertyError"
+---
+
 [@slack/bolt](../index.md) / AssistantMissingPropertyError
 
 # Class: AssistantMissingPropertyError

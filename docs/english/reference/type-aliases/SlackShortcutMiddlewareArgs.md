@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackShortcutMiddlewareArgs"
+---
+
 [@slack/bolt](../index.md) / SlackShortcutMiddlewareArgs
 
 # Type Alias: SlackShortcutMiddlewareArgs\<Shortcut\>

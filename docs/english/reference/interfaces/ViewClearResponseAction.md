@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewClearResponseAction"
+---
+
 [@slack/bolt](../index.md) / ViewClearResponseAction
 
 # Interface: ViewClearResponseAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "DialogSuggestion"
+---
+
 [@slack/bolt](../index.md) / DialogSuggestion
 
 # Interface: DialogSuggestion

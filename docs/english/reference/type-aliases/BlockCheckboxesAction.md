@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockCheckboxesAction"
+---
+
 [@slack/bolt](../index.md) / BlockCheckboxesAction
 
 # Type Alias: BlockCheckboxesAction

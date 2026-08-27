@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverRoutes"
+---
+
 [@slack/bolt](../index.md) / ReceiverRoutes
 
 # Interface: ReceiverRoutes

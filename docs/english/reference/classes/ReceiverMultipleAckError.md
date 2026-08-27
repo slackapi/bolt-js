@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverMultipleAckError"
+---
+
 [@slack/bolt](../index.md) / ReceiverMultipleAckError
 
 # Class: ReceiverMultipleAckError

@@ -1,3 +1,7 @@
+---
+sidebar_label: "OverflowAction"
+---
+
 [@slack/bolt](../index.md) / OverflowAction
 
 # Interface: OverflowAction

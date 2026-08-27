@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewResponseUrl"
+---
+
 [@slack/bolt](../index.md) / ViewResponseUrl
 
 # Interface: ViewResponseUrl

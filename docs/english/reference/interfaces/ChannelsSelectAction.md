@@ -1,3 +1,7 @@
+---
+sidebar_label: "ChannelsSelectAction"
+---
+
 [@slack/bolt](../index.md) / ChannelsSelectAction
 
 # Interface: ChannelsSelectAction

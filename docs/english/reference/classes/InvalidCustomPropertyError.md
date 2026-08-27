@@ -1,3 +1,7 @@
+---
+sidebar_label: "InvalidCustomPropertyError"
+---
+
 [@slack/bolt](../index.md) / InvalidCustomPropertyError
 
 # Class: InvalidCustomPropertyError

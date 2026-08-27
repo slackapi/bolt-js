@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverUnhandledRequestHandlerArgs"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / ReceiverUnhandledRequestHandlerArgs
 
 # Interface: ReceiverUnhandledRequestHandlerArgs

@@ -1,3 +1,7 @@
+---
+sidebar_label: "onlyViewActions"
+---
+
 [@slack/bolt](../index.md) / onlyViewActions
 
 # Variable: onlyViewActions

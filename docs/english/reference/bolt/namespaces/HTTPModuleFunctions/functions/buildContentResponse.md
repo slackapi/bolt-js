@@ -1,3 +1,7 @@
+---
+sidebar_label: "buildContentResponse"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / buildContentResponse
 
 # Function: buildContentResponse()

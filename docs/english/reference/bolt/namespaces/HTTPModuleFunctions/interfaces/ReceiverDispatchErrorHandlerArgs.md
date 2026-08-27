@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverDispatchErrorHandlerArgs"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / ReceiverDispatchErrorHandlerArgs
 
 # Interface: ReceiverDispatchErrorHandlerArgs

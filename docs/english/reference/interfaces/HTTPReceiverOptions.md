@@ -1,3 +1,7 @@
+---
+sidebar_label: "HTTPReceiverOptions"
+---
+
 [@slack/bolt](../index.md) / HTTPReceiverOptions
 
 # Interface: HTTPReceiverOptions

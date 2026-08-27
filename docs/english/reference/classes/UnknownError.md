@@ -1,3 +1,7 @@
+---
+sidebar_label: "UnknownError"
+---
+
 [@slack/bolt](../index.md) / UnknownError
 
 # Class: UnknownError

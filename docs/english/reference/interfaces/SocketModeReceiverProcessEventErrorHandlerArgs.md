@@ -1,3 +1,7 @@
+---
+sidebar_label: "SocketModeReceiverProcessEventErrorHandlerArgs"
+---
+
 [@slack/bolt](../index.md) / SocketModeReceiverProcessEventErrorHandlerArgs
 
 # Interface: SocketModeReceiverProcessEventErrorHandlerArgs

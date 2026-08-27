@@ -1,3 +1,7 @@
+---
+sidebar_label: "InteractiveButtonClick"
+---
+
 [@slack/bolt](../index.md) / InteractiveButtonClick
 
 # Type Alias: InteractiveButtonClick

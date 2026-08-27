@@ -1,3 +1,7 @@
+---
+sidebar_label: "buildSSLCheckResponse"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / buildSSLCheckResponse
 
 # Function: buildSSLCheckResponse()

@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverEvent"
+---
+
 [@slack/bolt](../index.md) / ReceiverEvent
 
 # Interface: ReceiverEvent

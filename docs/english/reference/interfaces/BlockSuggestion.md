@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockSuggestion"
+---
+
 [@slack/bolt](../index.md) / BlockSuggestion
 
 # Interface: BlockSuggestion

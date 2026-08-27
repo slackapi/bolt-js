@@ -1,3 +1,7 @@
+---
+sidebar_label: "ErrorCode"
+---
+
 [@slack/bolt](../index.md) / ErrorCode
 
 # Enumeration: ErrorCode

@@ -1,3 +1,7 @@
+---
+sidebar_label: "EnvelopedEvent"
+---
+
 [@slack/bolt](../index.md) / EnvelopedEvent
 
 # Interface: EnvelopedEvent\<Event\>

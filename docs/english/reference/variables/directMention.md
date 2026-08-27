@@ -1,3 +1,7 @@
+---
+sidebar_label: "directMention"
+---
+
 [@slack/bolt](../index.md) / directMention
 
 # Variable: directMention

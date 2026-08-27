@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverProcessEventErrorHandlerArgs"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / ReceiverProcessEventErrorHandlerArgs
 
 # Interface: ReceiverProcessEventErrorHandlerArgs

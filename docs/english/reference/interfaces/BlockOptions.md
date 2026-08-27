@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockOptions"
+---
+
 [@slack/bolt](../index.md) / BlockOptions
 
 # Interface: BlockOptions

@@ -1,3 +1,7 @@
+---
+sidebar_label: "HTTPReceiverDeferredRequestError"
+---
+
 [@slack/bolt](../index.md) / HTTPReceiverDeferredRequestError
 
 # Class: HTTPReceiverDeferredRequestError

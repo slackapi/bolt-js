@@ -1,3 +1,7 @@
+---
+sidebar_label: "SocketModeReceiver"
+---
+
 [@slack/bolt](../index.md) / SocketModeReceiver
 
 # Class: SocketModeReceiver

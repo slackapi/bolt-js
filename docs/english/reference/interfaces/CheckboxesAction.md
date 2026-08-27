@@ -1,3 +1,7 @@
+---
+sidebar_label: "CheckboxesAction"
+---
+
 [@slack/bolt](../index.md) / CheckboxesAction
 
 # Interface: CheckboxesAction

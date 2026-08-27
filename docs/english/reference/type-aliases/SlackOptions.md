@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackOptions"
+---
+
 [@slack/bolt](../index.md) / SlackOptions
 
 # Type Alias: SlackOptions

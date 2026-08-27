@@ -1,3 +1,7 @@
+---
+sidebar_label: "MultiStaticSelectAction"
+---
+
 [@slack/bolt](../index.md) / MultiStaticSelectAction
 
 # Interface: MultiStaticSelectAction

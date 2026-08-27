@@ -1,3 +1,7 @@
+---
+sidebar_label: "BasicOptionsPayload"
+---
+
 [@slack/bolt](../index.md) / BasicOptionsPayload
 
 # Interface: BasicOptionsPayload\<Type\>

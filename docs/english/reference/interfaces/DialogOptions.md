@@ -1,3 +1,7 @@
+---
+sidebar_label: "DialogOptions"
+---
+
 [@slack/bolt](../index.md) / DialogOptions
 
 # Interface: DialogOptions

@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockOverflowAction"
+---
+
 [@slack/bolt](../index.md) / BlockOverflowAction
 
 # Type Alias: BlockOverflowAction

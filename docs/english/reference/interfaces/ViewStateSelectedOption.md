@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewStateSelectedOption"
+---
+
 [@slack/bolt](../index.md) / ViewStateSelectedOption
 
 # Interface: ViewStateSelectedOption

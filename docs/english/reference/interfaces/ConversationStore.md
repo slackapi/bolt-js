@@ -1,3 +1,7 @@
+---
+sidebar_label: "ConversationStore"
+---
+
 [@slack/bolt](../index.md) / ConversationStore
 
 # Interface: ConversationStore\<ConversationState\>

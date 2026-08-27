@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewOutput"
+---
+
 [@slack/bolt](../index.md) / ViewOutput
 
 # Interface: ViewOutput

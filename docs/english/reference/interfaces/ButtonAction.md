@@ -1,3 +1,7 @@
+---
+sidebar_label: "ButtonAction"
+---
+
 [@slack/bolt](../index.md) / ButtonAction
 
 # Interface: ButtonAction

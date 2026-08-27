@@ -28,7 +28,7 @@
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
     "changeset": "npx @changesets/cli",
-    "docs": "npx typedoc --plugin typedoc-plugin-markdown",
+    "docs": "npx typedoc",
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "prepare": "npm run build",

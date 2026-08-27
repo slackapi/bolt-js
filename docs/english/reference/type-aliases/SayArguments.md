@@ -1,3 +1,7 @@
+---
+sidebar_label: "SayArguments"
+---
+
 [@slack/bolt](../index.md) / SayArguments
 
 # Type Alias: SayArguments

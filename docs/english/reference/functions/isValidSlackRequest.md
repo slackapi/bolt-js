@@ -1,3 +1,7 @@
+---
+sidebar_label: "isValidSlackRequest"
+---
+
 [@slack/bolt](../index.md) / isValidSlackRequest
 
 # Function: isValidSlackRequest()

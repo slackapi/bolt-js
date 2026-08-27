@@ -1,3 +1,7 @@
+---
+sidebar_label: "MultiChannelsSelectAction"
+---
+
 [@slack/bolt](../index.md) / MultiChannelsSelectAction
 
 # Interface: MultiChannelsSelectAction

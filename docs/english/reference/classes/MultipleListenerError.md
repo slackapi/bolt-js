@@ -1,3 +1,7 @@
+---
+sidebar_label: "MultipleListenerError"
+---
+
 [@slack/bolt](../index.md) / MultipleListenerError
 
 # Class: MultipleListenerError

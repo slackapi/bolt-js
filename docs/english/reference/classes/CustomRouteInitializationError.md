@@ -1,3 +1,7 @@
+---
+sidebar_label: "CustomRouteInitializationError"
+---
+
 [@slack/bolt](../index.md) / CustomRouteInitializationError
 
 # Class: CustomRouteInitializationError

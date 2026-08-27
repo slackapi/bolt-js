@@ -1,3 +1,7 @@
+---
+sidebar_label: "ShortcutConstraints"
+---
+
 [@slack/bolt](../index.md) / ShortcutConstraints
 
 # Interface: ShortcutConstraints\<S\>

@@ -1,3 +1,7 @@
+---
+sidebar_label: "SayStreamArguments"
+---
+
 [@slack/bolt](../index.md) / SayStreamArguments
 
 # Type Alias: SayStreamArguments

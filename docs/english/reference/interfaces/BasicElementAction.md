@@ -1,3 +1,7 @@
+---
+sidebar_label: "BasicElementAction"
+---
+
 [@slack/bolt](../index.md) / BasicElementAction
 
 # Interface: BasicElementAction\<T\>

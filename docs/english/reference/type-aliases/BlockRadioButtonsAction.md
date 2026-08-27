@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockRadioButtonsAction"
+---
+
 [@slack/bolt](../index.md) / BlockRadioButtonsAction
 
 # Type Alias: BlockRadioButtonsAction

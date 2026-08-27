@@ -1,3 +1,7 @@
+---
+sidebar_label: "PlainTextInputAction"
+---
+
 [@slack/bolt](../index.md) / PlainTextInputAction
 
 # Interface: PlainTextInputAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "ExternalSelectAction"
+---
+
 [@slack/bolt](../index.md) / ExternalSelectAction
 
 # Interface: ExternalSelectAction

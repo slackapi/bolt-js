@@ -1,3 +1,7 @@
+---
+sidebar_label: "AssistantInitializationError"
+---
+
 [@slack/bolt](../index.md) / AssistantInitializationError
 
 # Class: AssistantInitializationError

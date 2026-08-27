@@ -1,3 +1,7 @@
+---
+sidebar_label: "AwsLambdaReceiverOptions"
+---
+
 [@slack/bolt](../index.md) / AwsLambdaReceiverOptions
 
 # Interface: AwsLambdaReceiverOptions

@@ -1,3 +1,7 @@
+---
+sidebar_label: "HTTPResponseAck"
+---
+
 [@slack/bolt](../index.md) / HTTPResponseAck
 
 # Class: HTTPResponseAck

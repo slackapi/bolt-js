@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockUsersSelectAction"
+---
+
 [@slack/bolt](../index.md) / BlockUsersSelectAction
 
 # Type Alias: BlockUsersSelectAction

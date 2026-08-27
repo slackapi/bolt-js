@@ -1,3 +1,7 @@
+---
+sidebar_label: "defaultDispatchErrorHandler"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / defaultDispatchErrorHandler
 
 # Function: defaultDispatchErrorHandler()

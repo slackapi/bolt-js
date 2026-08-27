@@ -1,3 +1,7 @@
+---
+sidebar_label: "SayStreamFn"
+---
+
 [@slack/bolt](../index.md) / SayStreamFn
 
 # Type Alias: SayStreamFn

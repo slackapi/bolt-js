@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewStateValue"
+---
+
 [@slack/bolt](../index.md) / ViewStateValue
 
 # Interface: ViewStateValue

@@ -1,3 +1,7 @@
+---
+sidebar_label: "RequestVerificationOptions"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / RequestVerificationOptions
 
 # Interface: RequestVerificationOptions

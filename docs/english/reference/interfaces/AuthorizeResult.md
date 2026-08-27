@@ -1,3 +1,7 @@
+---
+sidebar_label: "AuthorizeResult"
+---
+
 [@slack/bolt](../index.md) / AuthorizeResult
 
 # Interface: AuthorizeResult

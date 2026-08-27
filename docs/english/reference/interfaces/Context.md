@@ -1,3 +1,7 @@
+---
+sidebar_label: "Context"
+---
+
 [@slack/bolt](../index.md) / Context
 
 # Interface: Context

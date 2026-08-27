@@ -1,3 +1,7 @@
+---
+sidebar_label: "DialogSubmitAction"
+---
+
 [@slack/bolt](../index.md) / DialogSubmitAction
 
 # Interface: DialogSubmitAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "DatepickerAction"
+---
+
 [@slack/bolt](../index.md) / DatepickerAction
 
 # Interface: DatepickerAction

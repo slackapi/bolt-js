@@ -1,3 +1,7 @@
+---
+sidebar_label: "ContextMissingPropertyError"
+---
+
 [@slack/bolt](../index.md) / ContextMissingPropertyError
 
 # Class: ContextMissingPropertyError

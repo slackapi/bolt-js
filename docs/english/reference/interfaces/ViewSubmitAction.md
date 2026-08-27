@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewSubmitAction"
+---
+
 [@slack/bolt](../index.md) / ViewSubmitAction
 
 # Interface: ViewSubmitAction

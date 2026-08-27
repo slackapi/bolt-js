@@ -1,3 +1,7 @@
+---
+sidebar_label: "AppInitializationError"
+---
+
 [@slack/bolt](../index.md) / AppInitializationError
 
 # Class: AppInitializationError

@@ -1,3 +1,7 @@
+---
+sidebar_label: "RespondError"
+---
+
 [@slack/bolt](../index.md) / RespondError
 
 # Class: RespondError

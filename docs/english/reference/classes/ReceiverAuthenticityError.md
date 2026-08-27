@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverAuthenticityError"
+---
+
 [@slack/bolt](../index.md) / ReceiverAuthenticityError
 
 # Class: ReceiverAuthenticityError

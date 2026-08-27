@@ -1,3 +1,7 @@
+---
+sidebar_label: "EventFromType"
+---
+
 [@slack/bolt](../index.md) / EventFromType
 
 # Type Alias: EventFromType\<T\>

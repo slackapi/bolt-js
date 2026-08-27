@@ -1,3 +1,7 @@
+---
+sidebar_label: "AckFn"
+---
+
 [@slack/bolt](../index.md) / AckFn
 
 # Type Alias: AckFn\<Response\>

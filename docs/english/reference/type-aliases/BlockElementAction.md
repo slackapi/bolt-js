@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockElementAction"
+---
+
 [@slack/bolt](../index.md) / BlockElementAction
 
 # Type Alias: BlockElementAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "ConversationsSelectAction"
+---
+
 [@slack/bolt](../index.md) / ConversationsSelectAction
 
 # Interface: ConversationsSelectAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "BufferedIncomingMessage"
+---
+
 [@slack/bolt](../index.md) / BufferedIncomingMessage
 
 # Interface: BufferedIncomingMessage

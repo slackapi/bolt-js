@@ -1,3 +1,7 @@
+---
+sidebar_label: "OptionGroups"
+---
+
 [@slack/bolt](../index.md) / OptionGroups
 
 # Interface: OptionGroups\<Options\>

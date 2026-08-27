@@ -1,3 +1,7 @@
+---
+sidebar_label: "asCodedError"
+---
+
 [@slack/bolt](../index.md) / asCodedError
 
 # Function: asCodedError()

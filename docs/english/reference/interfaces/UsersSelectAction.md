@@ -1,3 +1,7 @@
+---
+sidebar_label: "UsersSelectAction"
+---
+
 [@slack/bolt](../index.md) / UsersSelectAction
 
 # Interface: UsersSelectAction

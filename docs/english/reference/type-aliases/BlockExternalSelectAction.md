@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockExternalSelectAction"
+---
+
 [@slack/bolt](../index.md) / BlockExternalSelectAction
 
 # Type Alias: BlockExternalSelectAction

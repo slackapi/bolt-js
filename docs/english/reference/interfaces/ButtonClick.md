@@ -1,3 +1,7 @@
+---
+sidebar_label: "ButtonClick"
+---
+
 [@slack/bolt](../index.md) / ButtonClick
 
 # Interface: ButtonClick

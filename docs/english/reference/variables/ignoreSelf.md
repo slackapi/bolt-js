@@ -1,3 +1,7 @@
+---
+sidebar_label: "ignoreSelf"
+---
+
 [@slack/bolt](../index.md) / ignoreSelf
 
 # Variable: ignoreSelf

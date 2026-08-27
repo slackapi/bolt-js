@@ -1,3 +1,7 @@
+---
+sidebar_label: "HTTPReceiver"
+---
+
 [@slack/bolt](../index.md) / HTTPReceiver
 
 # Class: HTTPReceiver

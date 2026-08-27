@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewResponseAction"
+---
+
 [@slack/bolt](../index.md) / ViewResponseAction
 
 # Type Alias: ViewResponseAction

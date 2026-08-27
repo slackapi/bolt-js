@@ -1,3 +1,7 @@
+---
+sidebar_label: "ReceiverInconsistentStateError"
+---
+
 [@slack/bolt](../index.md) / ReceiverInconsistentStateError
 
 # Class: ReceiverInconsistentStateError

@@ -1,3 +1,7 @@
+---
+sidebar_label: "AwsLambdaReceiver"
+---
+
 [@slack/bolt](../index.md) / AwsLambdaReceiver
 
 # Class: AwsLambdaReceiver

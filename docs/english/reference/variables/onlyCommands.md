@@ -1,3 +1,7 @@
+---
+sidebar_label: "onlyCommands"
+---
+
 [@slack/bolt](../index.md) / onlyCommands
 
 # Variable: onlyCommands

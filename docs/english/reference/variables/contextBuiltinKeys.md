@@ -1,3 +1,7 @@
+---
+sidebar_label: "contextBuiltinKeys"
+---
+
 [@slack/bolt](../index.md) / contextBuiltinKeys
 
 # Variable: contextBuiltinKeys

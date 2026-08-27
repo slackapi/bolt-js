@@ -1,3 +1,7 @@
+---
+sidebar_label: "SetStatusArguments"
+---
+
 [@slack/bolt](../index.md) / SetStatusArguments
 
 # Type Alias: SetStatusArguments

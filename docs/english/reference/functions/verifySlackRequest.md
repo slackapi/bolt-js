@@ -1,3 +1,7 @@
+---
+sidebar_label: "verifySlackRequest"
+---
+
 [@slack/bolt](../index.md) / verifySlackRequest
 
 # Function: verifySlackRequest()

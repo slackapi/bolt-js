@@ -1,3 +1,7 @@
+---
+sidebar_label: "RadioButtonsAction"
+---
+
 [@slack/bolt](../index.md) / RadioButtonsAction
 
 # Interface: RadioButtonsAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "AssistantConfig"
+---
+
 [@slack/bolt](../index.md) / AssistantConfig
 
 # Interface: AssistantConfig

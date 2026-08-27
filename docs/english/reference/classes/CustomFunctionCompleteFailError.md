@@ -1,3 +1,7 @@
+---
+sidebar_label: "CustomFunctionCompleteFailError"
+---
+
 [@slack/bolt](../index.md) / CustomFunctionCompleteFailError
 
 # Class: CustomFunctionCompleteFailError

@@ -1,3 +1,7 @@
+---
+sidebar_label: "InteractiveMessageSuggestion"
+---
+
 [@slack/bolt](../index.md) / InteractiveMessageSuggestion
 
 # Interface: InteractiveMessageSuggestion

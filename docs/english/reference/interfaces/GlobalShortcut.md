@@ -1,3 +1,7 @@
+---
+sidebar_label: "GlobalShortcut"
+---
+
 [@slack/bolt](../index.md) / GlobalShortcut
 
 # Interface: GlobalShortcut

@@ -1,3 +1,7 @@
+---
+sidebar_label: "onlyEvents"
+---
+
 [@slack/bolt](../index.md) / onlyEvents
 
 # Variable: onlyEvents

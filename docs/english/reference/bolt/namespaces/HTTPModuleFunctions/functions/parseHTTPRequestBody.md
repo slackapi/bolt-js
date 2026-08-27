@@ -1,3 +1,7 @@
+---
+sidebar_label: "parseHTTPRequestBody"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / parseHTTPRequestBody
 
 # Function: parseHTTPRequestBody()

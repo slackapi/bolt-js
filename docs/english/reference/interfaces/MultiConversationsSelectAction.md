@@ -1,3 +1,7 @@
+---
+sidebar_label: "MultiConversationsSelectAction"
+---
+
 [@slack/bolt](../index.md) / MultiConversationsSelectAction
 
 # Interface: MultiConversationsSelectAction

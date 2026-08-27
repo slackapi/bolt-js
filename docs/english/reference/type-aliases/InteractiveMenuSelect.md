@@ -1,3 +1,7 @@
+---
+sidebar_label: "InteractiveMenuSelect"
+---
+
 [@slack/bolt](../index.md) / InteractiveMenuSelect
 
 # Type Alias: InteractiveMenuSelect

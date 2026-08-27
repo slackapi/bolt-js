@@ -1,3 +1,7 @@
+---
+sidebar_label: "TimepickerAction"
+---
+
 [@slack/bolt](../index.md) / TimepickerAction
 
 # Interface: TimepickerAction

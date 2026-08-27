@@ -1,3 +1,7 @@
+---
+sidebar_label: "OptionsPayloadFromType"
+---
+
 [@slack/bolt](../index.md) / OptionsPayloadFromType
 
 # Type Alias: OptionsPayloadFromType\<T\>

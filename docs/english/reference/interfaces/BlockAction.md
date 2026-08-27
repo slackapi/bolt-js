@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockAction"
+---
+
 [@slack/bolt](../index.md) / BlockAction
 
 # Interface: BlockAction\<ElementAction\>

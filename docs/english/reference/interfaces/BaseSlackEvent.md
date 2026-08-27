@@ -1,3 +1,7 @@
+---
+sidebar_label: "BaseSlackEvent"
+---
+
 [@slack/bolt](../index.md) / BaseSlackEvent
 
 # Interface: BaseSlackEvent\<T\>

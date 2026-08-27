@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackOptionsMiddlewareArgs"
+---
+
 [@slack/bolt](../index.md) / SlackOptionsMiddlewareArgs
 
 # Interface: SlackOptionsMiddlewareArgs\<Source\>

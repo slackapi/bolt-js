@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewPushResponseAction"
+---
+
 [@slack/bolt](../index.md) / ViewPushResponseAction
 
 # Interface: ViewPushResponseAction

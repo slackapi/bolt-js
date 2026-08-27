@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewUpdateResponseAction"
+---
+
 [@slack/bolt](../index.md) / ViewUpdateResponseAction
 
 # Interface: ViewUpdateResponseAction

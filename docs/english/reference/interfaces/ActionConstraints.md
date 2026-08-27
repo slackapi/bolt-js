@@ -1,3 +1,7 @@
+---
+sidebar_label: "ActionConstraints"
+---
+
 [@slack/bolt](../index.md) / ActionConstraints
 
 # Interface: ActionConstraints\<A\>

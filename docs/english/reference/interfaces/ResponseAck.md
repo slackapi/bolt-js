@@ -1,3 +1,7 @@
+---
+sidebar_label: "ResponseAck"
+---
+
 [@slack/bolt](../index.md) / ResponseAck
 
 # Interface: ResponseAck

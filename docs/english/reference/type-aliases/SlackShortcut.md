@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackShortcut"
+---
+
 [@slack/bolt](../index.md) / SlackShortcut
 
 # Type Alias: SlackShortcut

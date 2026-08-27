@@ -1,3 +1,7 @@
+---
+sidebar_label: "FeedbackButtonsAction"
+---
+
 [@slack/bolt](../index.md) / FeedbackButtonsAction
 
 # Interface: FeedbackButtonsAction

@@ -1,3 +1,7 @@
+---
+sidebar_label: "NextFn"
+---
+
 [@slack/bolt](../index.md) / NextFn
 
 # Type Alias: NextFn

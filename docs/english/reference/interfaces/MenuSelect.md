@@ -1,3 +1,7 @@
+---
+sidebar_label: "MenuSelect"
+---
+
 [@slack/bolt](../index.md) / MenuSelect
 
 # Interface: MenuSelect

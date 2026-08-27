@@ -1,3 +1,7 @@
+---
+sidebar_label: "@slack/bolt"
+---
+
 # @slack/bolt v5.0.0
 
 ## Namespaces

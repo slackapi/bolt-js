@@ -1,3 +1,7 @@
+---
+sidebar_label: "MessageShortcut"
+---
+
 [@slack/bolt](../index.md) / MessageShortcut
 
 # Interface: MessageShortcut

@@ -1,3 +1,7 @@
+---
+sidebar_label: "MessageOptions"
+---
+
 [@slack/bolt](../index.md) / MessageOptions
 
 # Interface: MessageOptions

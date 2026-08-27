@@ -1,3 +1,7 @@
+---
+sidebar_label: "RespondArguments"
+---
+
 [@slack/bolt](../index.md) / RespondArguments
 
 # Type Alias: RespondArguments

@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackEventMiddlewareArgsOptions"
+---
+
 [@slack/bolt](../index.md) / SlackEventMiddlewareArgsOptions
 
 # Type Alias: SlackEventMiddlewareArgsOptions

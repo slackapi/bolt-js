@@ -1,3 +1,7 @@
+---
+sidebar_label: "AuthorizeSourceData"
+---
+
 [@slack/bolt](../index.md) / AuthorizeSourceData
 
 # Interface: AuthorizeSourceData\<IsEnterpriseInstall\>

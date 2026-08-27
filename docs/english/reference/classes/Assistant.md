@@ -1,3 +1,7 @@
+---
+sidebar_label: "Assistant"
+---
+
 [@slack/bolt](../index.md) / Assistant
 
 # Class: Assistant

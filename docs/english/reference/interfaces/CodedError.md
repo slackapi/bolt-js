@@ -1,3 +1,7 @@
+---
+sidebar_label: "CodedError"
+---
+
 [@slack/bolt](../index.md) / CodedError
 
 # Interface: CodedError

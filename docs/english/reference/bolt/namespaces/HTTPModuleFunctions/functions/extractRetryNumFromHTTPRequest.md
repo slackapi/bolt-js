@@ -1,3 +1,7 @@
+---
+sidebar_label: "extractRetryNumFromHTTPRequest"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / extractRetryNumFromHTTPRequest
 
 # Function: extractRetryNumFromHTTPRequest()

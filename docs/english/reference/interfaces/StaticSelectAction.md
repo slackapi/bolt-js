@@ -1,3 +1,7 @@
+---
+sidebar_label: "StaticSelectAction"
+---
+
 [@slack/bolt](../index.md) / StaticSelectAction
 
 # Interface: StaticSelectAction

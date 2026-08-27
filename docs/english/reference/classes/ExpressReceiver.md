@@ -1,3 +1,7 @@
+---
+sidebar_label: "ExpressReceiver"
+---
+
 [@slack/bolt](../index.md) / ExpressReceiver
 
 # Class: ExpressReceiver

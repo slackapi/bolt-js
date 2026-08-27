@@ -1,3 +1,7 @@
+---
+sidebar_label: "RichTextInputAction"
+---
+
 [@slack/bolt](../index.md) / RichTextInputAction
 
 # Interface: RichTextInputAction

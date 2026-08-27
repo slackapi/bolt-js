@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewErrorsResponseAction"
+---
+
 [@slack/bolt](../index.md) / ViewErrorsResponseAction
 
 # Interface: ViewErrorsResponseAction

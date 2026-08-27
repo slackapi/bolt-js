@@ -1,3 +1,7 @@
+---
+sidebar_label: "ViewClosedAction"
+---
+
 [@slack/bolt](../index.md) / ViewClosedAction
 
 # Interface: ViewClosedAction

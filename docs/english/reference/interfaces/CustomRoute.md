@@ -1,3 +1,7 @@
+---
+sidebar_label: "CustomRoute"
+---
+
 [@slack/bolt](../index.md) / CustomRoute
 
 # Interface: CustomRoute

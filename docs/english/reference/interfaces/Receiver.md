@@ -1,3 +1,7 @@
+---
+sidebar_label: "Receiver"
+---
+
 [@slack/bolt](../index.md) / Receiver
 
 # Interface: Receiver

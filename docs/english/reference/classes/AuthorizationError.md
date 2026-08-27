@@ -1,3 +1,7 @@
+---
+sidebar_label: "AuthorizationError"
+---
+
 [@slack/bolt](../index.md) / AuthorizationError
 
 # Class: AuthorizationError

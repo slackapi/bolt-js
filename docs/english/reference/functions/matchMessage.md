@@ -1,3 +1,7 @@
+---
+sidebar_label: "matchMessage"
+---
+
 [@slack/bolt](../index.md) / matchMessage
 
 # Function: matchMessage()

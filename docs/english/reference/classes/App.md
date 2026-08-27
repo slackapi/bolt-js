@@ -1,3 +1,7 @@
+---
+sidebar_label: "App"
+---
+
 [@slack/bolt](../index.md) / App
 
 # Class: App\<AppCustomContext\>

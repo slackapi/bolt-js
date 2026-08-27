@@ -1,3 +1,7 @@
+---
+sidebar_label: "CustomFunctionInitializationError"
+---
+
 [@slack/bolt](../index.md) / CustomFunctionInitializationError
 
 # Class: CustomFunctionInitializationError

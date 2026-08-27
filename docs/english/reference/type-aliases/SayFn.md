@@ -1,3 +1,7 @@
+---
+sidebar_label: "SayFn"
+---
+
 [@slack/bolt](../index.md) / SayFn
 
 # Type Alias: SayFn

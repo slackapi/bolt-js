@@ -1,3 +1,7 @@
+---
+sidebar_label: "AllMiddlewareArgs"
+---
+
 [@slack/bolt](../index.md) / AllMiddlewareArgs
 
 # Interface: AllMiddlewareArgs\<CustomContext\>

@@ -1,3 +1,7 @@
+---
+sidebar_label: "isRejected"
+---
+
 [@slack/bolt](../index.md) / isRejected
 
 # Function: isRejected()

@@ -1,3 +1,7 @@
+---
+sidebar_label: "BlockFeedbackButtonsAction"
+---
+
 [@slack/bolt](../index.md) / BlockFeedbackButtonsAction
 
 # Type Alias: BlockFeedbackButtonsAction

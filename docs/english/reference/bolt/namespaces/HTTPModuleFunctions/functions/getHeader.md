@@ -1,3 +1,7 @@
+---
+sidebar_label: "getHeader"
+---
+
 [@slack/bolt](../../../../index.md) / [HTTPModuleFunctions](../index.md) / getHeader
 
 # Function: getHeader()

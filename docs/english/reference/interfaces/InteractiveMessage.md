@@ -1,3 +1,7 @@
+---
+sidebar_label: "InteractiveMessage"
+---
+
 [@slack/bolt](../index.md) / InteractiveMessage
 
 # Interface: InteractiveMessage\<Action\>

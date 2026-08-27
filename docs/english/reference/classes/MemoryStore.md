@@ -1,3 +1,7 @@
+---
+sidebar_label: "MemoryStore"
+---
+
 [@slack/bolt](../index.md) / MemoryStore
 
 # Class: MemoryStore\<ConversationState\>

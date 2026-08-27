@@ -1,3 +1,7 @@
+---
+sidebar_label: "ExpressReceiverOptions"
+---
+
 [@slack/bolt](../index.md) / ExpressReceiverOptions
 
 # Interface: ExpressReceiverOptions

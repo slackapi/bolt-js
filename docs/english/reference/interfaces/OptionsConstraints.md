@@ -1,3 +1,7 @@
+---
+sidebar_label: "OptionsConstraints"
+---
+
 [@slack/bolt](../index.md) / OptionsConstraints
 
 # Interface: OptionsConstraints\<A\>

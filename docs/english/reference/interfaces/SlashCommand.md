@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlashCommand"
+---
+
 [@slack/bolt](../index.md) / SlashCommand
 
 # Interface: SlashCommand

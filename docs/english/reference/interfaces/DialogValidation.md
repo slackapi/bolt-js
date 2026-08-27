@@ -1,3 +1,7 @@
+---
+sidebar_label: "DialogValidation"
+---
+
 [@slack/bolt](../index.md) / DialogValidation
 
 # Interface: DialogValidation

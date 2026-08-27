@@ -1,3 +1,7 @@
+---
+sidebar_label: "UploadedFile"
+---
+
 [@slack/bolt](../index.md) / UploadedFile
 
 # Interface: UploadedFile

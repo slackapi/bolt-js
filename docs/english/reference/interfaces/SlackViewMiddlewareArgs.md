@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackViewMiddlewareArgs"
+---
+
 [@slack/bolt](../index.md) / SlackViewMiddlewareArgs
 
 # Interface: SlackViewMiddlewareArgs\<ViewActionType\>

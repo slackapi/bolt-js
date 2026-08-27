@@ -1,3 +1,7 @@
+---
+sidebar_label: "AppOptions"
+---
+
 [@slack/bolt](../index.md) / AppOptions
 
 # Interface: AppOptions
