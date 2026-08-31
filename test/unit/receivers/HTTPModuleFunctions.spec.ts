@@ -1,5 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
+import { Readable } from 'node:stream';
 import { assert } from 'chai';
 import sinon from 'sinon';
 
@@ -7,6 +8,17 @@ import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleA
 import type { BufferedIncomingMessage } from '../../../src/receivers/BufferedIncomingMessage';
 import * as func from '../../../src/receivers/HTTPModuleFunctions';
 import { createFakeLogger } from '../helpers';
+
+// Build a real readable request stream so raw-body actually consumes bytes. The other tests in this
+// file pre-set `rawBody` and bypass the stream read, so they can't exercise the size-limit behavior.
+function streamOf(body: string, headers: Record<string, unknown> = {}): IncomingMessage {
+  const req = new Readable();
+  req.push(body);
+  req.push(null); // indicate EOF
+  // biome-ignore lint/suspicious/noExplicitAny: mock requests can be anything
+  (req as Record<string, any>).headers = headers;
+  return req as unknown as IncomingMessage;
+}
 
 describe('HTTPModuleFunctions', async () => {
   describe('Request header extraction', async () => {
@@ -266,6 +278,66 @@ describe('HTTPModuleFunctions', async () => {
         } catch (e) {
           assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
         }
+      });
+      it('should reject an oversized request body with a 413 error before signature verification', async () => {
+        const signingSecret = 'secret';
+        // enabled: false skips verification but still buffers first, so the limit must apply here too
+        const req = streamOf('x'.repeat(1024), { 'content-type': 'application/json' });
+        const res = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        try {
+          await func.parseAndVerifyHTTPRequest({ signingSecret, enabled: false, bodyLimit: 128 }, req, res);
+          assert.fail('Expected an error to be thrown');
+        } catch (e) {
+          assert.isTrue(func.isRawBodyError(e));
+          assert.equal((e as { statusCode?: number }).statusCode, 413);
+        }
+      });
+    });
+
+    describe('bufferIncomingMessage', async () => {
+      it('should buffer a request body within the configured size limit', async () => {
+        const req = streamOf('{"foo":"bar"}', { 'content-type': 'application/json' });
+        const result = await func.bufferIncomingMessage(req, 1024);
+        assert.equal(result.rawBody.toString(), '{"foo":"bar"}');
+      });
+      it('should reject a request body that exceeds the configured size limit with a 413 error', async () => {
+        const req = streamOf('x'.repeat(1024), { 'content-type': 'application/json' });
+        try {
+          await func.bufferIncomingMessage(req, 128);
+          assert.fail('Expected an error to be thrown');
+        } catch (error) {
+          assert.isTrue(func.isRawBodyError(error));
+          assert.equal((error as { statusCode?: number }).statusCode, 413);
+        }
+      });
+      it('should not enforce any limit when bodyLimit is omitted', async () => {
+        const req = streamOf('x'.repeat(5000), { 'content-type': 'application/json' });
+        const result = await func.bufferIncomingMessage(req);
+        assert.equal(result.rawBody.length, 5000);
+      });
+    });
+
+    describe('defaultBodyLimit', async () => {
+      it('should default to 4 MB', async () => {
+        assert.equal(func.defaultBodyLimit, 4 * 1024 * 1024);
+      });
+    });
+
+    describe('isRawBodyError', async () => {
+      it('should detect http-errors instances by their numeric statusCode', async () => {
+        const tooLarge = Object.assign(new Error('too large'), { type: 'entity.too.large', statusCode: 413 });
+        const aborted = Object.assign(new Error('aborted'), { type: 'request.aborted', statusCode: 400 });
+        assert.isTrue(func.isRawBodyError(tooLarge));
+        assert.isTrue(func.isRawBodyError(aborted));
+      });
+      it('should not flag plain Errors or non-Error values', async () => {
+        // A raw-body error always carries a numeric statusCode; a bare Error does not.
+        assert.isFalse(func.isRawBodyError(new Error('nope')));
+        // A plain object is not an Error instance, so it is not a RawBodyError.
+        assert.isFalse(func.isRawBodyError({ statusCode: 413 }));
+        assert.isFalse(func.isRawBodyError(undefined));
+        assert.isFalse(func.isRawBodyError(null));
+        assert.isFalse(func.isRawBodyError('413'));
       });
     });
   });

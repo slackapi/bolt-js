@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 import { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
@@ -683,6 +684,55 @@ describe('HTTPReceiver', () => {
         receiver.requestListener(fakeReq, fakeRes);
         await new Promise((resolve) => setImmediate(resolve));
         sinon.assert.notCalled(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+    });
+
+    describe('request body size limiting', () => {
+      // Drive a real POST through requestListener with a readable body and let the real raw-body
+      // enforce the limit. handleIncomingEvent is fire-and-forget, so we resolve when the response
+      // is ended rather than guessing how many ticks the stream read takes.
+      async function postBody(
+        receiver: InstanceType<ReturnType<typeof importHTTPReceiver>>,
+        bodyLength: number,
+      ): Promise<sinon.SinonSpy> {
+        const req = new Readable();
+        req.push('x'.repeat(bodyLength));
+        req.push(null); // indicate EOF
+        // biome-ignore lint/suspicious/noExplicitAny: mock requests can be anything
+        const untypedReq = req as Record<string, any>;
+        untypedReq.headers = { 'content-type': 'application/json' };
+        untypedReq.url = '/slack/events';
+        untypedReq.method = 'POST';
+
+        let resolveEnded: () => void = () => {};
+        const ended = new Promise<void>((resolve) => {
+          resolveEnded = resolve;
+        });
+        const writeHead = sinon.fake();
+        const res = { writeHead, end: sinon.fake(() => resolveEnded()) };
+
+        receiver.requestListener(req as unknown as IncomingMessage, res as unknown as ServerResponse);
+        await ended;
+        return writeHead;
+      }
+
+      it('should respond with 413 when the request body exceeds bodyLimit', async () => {
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({ logger: noopLogger, signingSecret: 'secret', bodyLimit: 128 });
+        const writeHead = await postBody(receiver, 1024);
+        sinon.assert.calledWith(writeHead, 413);
+      });
+
+      it('should respond with 413 for oversized bodies even when signatureVerification is false', async () => {
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({
+          logger: noopLogger,
+          signingSecret: 'secret',
+          signatureVerification: false,
+          bodyLimit: 128,
+        });
+        const writeHead = await postBody(receiver, 1024);
+        sinon.assert.calledWith(writeHead, 413);
       });
     });
   });
