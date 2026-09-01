@@ -49,7 +49,7 @@
   "dependencies": {
     "@slack/logger": "^5.0.0",
     "@slack/oauth": "^4.0.0",
-    "@slack/socket-mode": "^3.0.0",
+    "@slack/socket-mode": "^3.0.1",
     "@slack/types": "^3.1.0",
     "@slack/web-api": "^8.0.0",
     "express": "^5.0.0",
