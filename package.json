@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
-    "@changesets/cli": "^2.29.8",
+    "@changesets/cli": "^3.0.1",
     "@tsconfig/node20": "^20.1.5",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
