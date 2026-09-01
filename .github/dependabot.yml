@@ -12,6 +12,8 @@ updates:
       - dependency-name: "@types/node"
       # allow updates for slack official libraries
       - dependency-name: "@slack/*"
+      # allow updates for the changesets release toolchain
+      - dependency-name: "@changesets/*"
     versioning-strategy: increase
     ignore:
       - dependency-name: "@types/node"
