@@ -734,6 +734,21 @@ describe('HTTPReceiver', () => {
         const writeHead = await postBody(receiver, 1024);
         sinon.assert.calledWith(writeHead, 413);
       });
+
+      it('should respond with 413 when a string bodyLimit is exceeded', async () => {
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({ logger: noopLogger, signingSecret: 'secret', bodyLimit: '128b' });
+        const writeHead = await postBody(receiver, 1024);
+        sinon.assert.calledWith(writeHead, 413);
+      });
+
+      it('should not respond with 413 for large bodies when bodyLimit is Infinity', async () => {
+        // Buffering passes (no limit); the request then fails signature verification with 401, never 413.
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({ logger: noopLogger, signingSecret: 'secret', bodyLimit: Infinity });
+        const writeHead = await postBody(receiver, 5000);
+        sinon.assert.neverCalledWith(writeHead, 413);
+      });
     });
   });
 });

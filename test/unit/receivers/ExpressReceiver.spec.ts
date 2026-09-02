@@ -907,6 +907,31 @@ describe('ExpressReceiver', () => {
       assert.isUndefined(next.firstCall.args[0]);
       assert.isUndefined(result.code);
     });
+
+    it('should parse a string bodyLimit and respond 413 when the body exceeds it', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, '128b');
+      await verifier(buildLargeExpressRequest(1024), resp, next);
+      assert.equal(result.code, 413);
+      assert.equal(result.sent, true);
+      sinon.assert.notCalled(next);
+    });
+
+    it('should not enforce any limit when bodyLimit is Infinity', async () => {
+      // A validly-signed request within Infinity passes size and signature checks and calls next().
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, Infinity);
+      await verifier(buildExpressRequest(), resp, next);
+      sinon.assert.calledOnce(next);
+      assert.isUndefined(next.firstCall.args[0]);
+      assert.isUndefined(result.code);
+    });
   });
 
   describe('buildBodyParserMiddleware', () => {
@@ -985,6 +1010,30 @@ describe('ExpressReceiver', () => {
       assert.equal(result.code, 413);
       assert.equal(result.sent, true);
       sinon.assert.notCalled(next);
+    });
+    it('should parse a string bodyLimit and respond 413 when the body exceeds it', async () => {
+      req = new Readable();
+      req.push('x'.repeat(1024));
+      req.push(null); // indicate EOF
+      req.headers = { 'content-type': 'application/json' };
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const parser = buildBodyParserMiddleware(createFakeLogger(), '128b');
+      await parser(req, resp, next);
+      assert.equal(result.code, 413);
+      assert.equal(result.sent, true);
+      sinon.assert.notCalled(next);
+    });
+    it('should not enforce any limit when bodyLimit is Infinity', async () => {
+      req = new Readable();
+      req.push(`a=${'x'.repeat(5000)}`); // large, but valid form body
+      req.push(null); // indicate EOF
+      req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+      const parser = buildBodyParserMiddleware(createFakeLogger(), Infinity);
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.a, 'x'.repeat(5000), 'large body was parsed without hitting a limit');
     });
   });
 });

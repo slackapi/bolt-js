@@ -315,6 +315,37 @@ describe('HTTPModuleFunctions', async () => {
         const result = await func.bufferIncomingMessage(req);
         assert.equal(result.rawBody.length, 5000);
       });
+      it('should parse a string bodyLimit and reject an oversized body with a 413 error', async () => {
+        const req = streamOf('x'.repeat(1024), { 'content-type': 'application/json' });
+        try {
+          await func.bufferIncomingMessage(req, '128b');
+          assert.fail('Expected an error to be thrown');
+        } catch (error) {
+          assert.isTrue(func.isRawBodyError(error));
+          assert.equal((error as { statusCode?: number }).statusCode, 413);
+        }
+      });
+      it('should parse a string bodyLimit and buffer a body within the limit', async () => {
+        const req = streamOf('{"foo":"bar"}', { 'content-type': 'application/json' });
+        const result = await func.bufferIncomingMessage(req, '1kb');
+        assert.equal(result.rawBody.toString(), '{"foo":"bar"}');
+      });
+      it('should treat a unit-less numeric string bodyLimit as a byte count and reject an oversized body', async () => {
+        // '1234' has no unit, so raw-body/bytes interprets it as 1234 bytes; a 5000-byte body exceeds it.
+        const req = streamOf('x'.repeat(5000), { 'content-type': 'application/json' });
+        try {
+          await func.bufferIncomingMessage(req, '1234');
+          assert.fail('Expected an error to be thrown');
+        } catch (error) {
+          assert.isTrue(func.isRawBodyError(error));
+          assert.equal((error as { statusCode?: number }).statusCode, 413);
+        }
+      });
+      it('should not enforce any limit when bodyLimit is Infinity', async () => {
+        const req = streamOf('x'.repeat(5000), { 'content-type': 'application/json' });
+        const result = await func.bufferIncomingMessage(req, Infinity);
+        assert.equal(result.rawBody.length, 5000);
+      });
     });
 
     describe('defaultBodyLimit', async () => {
