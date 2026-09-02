@@ -85,15 +85,27 @@ export const parseAndVerifyHTTPRequest = async (
   // Find the relevant request headers
   const signature = getHeader(req, 'x-slack-signature');
   const requestTimestampSec = Number(getHeader(req, 'x-slack-request-timestamp'));
-  verifySlackRequest({
-    signingSecret,
-    body: textBody,
-    headers: {
-      'x-slack-signature': signature,
-      'x-slack-request-timestamp': requestTimestampSec,
-    },
-    logger: options.logger,
-  });
+  try {
+    verifySlackRequest({
+      signingSecret,
+      body: textBody,
+      headers: {
+        'x-slack-signature': signature,
+        'x-slack-request-timestamp': requestTimestampSec,
+      },
+      logger: options.logger,
+    });
+  } catch (err) {
+    if (options.invalidRequestSignatureHandler) {
+      options.invalidRequestSignatureHandler({
+        rawBody: textBody,
+        signature,
+        requestTimestampSec,
+        request: req,
+      });
+    }
+    throw err;
+  }
 
   // Checks have passed! Return the value that has a side effect (the buffered request)
   return bufferedReq;
@@ -230,6 +242,14 @@ export interface RequestVerificationOptions {
   signingSecret: string;
   nowMilliseconds?: () => number;
   logger?: Logger;
+  invalidRequestSignatureHandler?: (args: ReceiverInvalidRequestSignatureHandlerArgs) => void;
+}
+
+export interface ReceiverInvalidRequestSignatureHandlerArgs {
+  rawBody: string;
+  signature: string;
+  requestTimestampSec: number;
+  request: IncomingMessage;
 }
 
 // which handles errors occurred while dispatching a request
