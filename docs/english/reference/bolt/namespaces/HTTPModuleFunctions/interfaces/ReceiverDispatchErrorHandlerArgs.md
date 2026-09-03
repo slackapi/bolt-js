@@ -1,6 +1,6 @@
 # ReceiverDispatchErrorHandlerArgs
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:236](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L236)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:251](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L251)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:236](https://github.com/slacka
 error: CodedError | Error;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:237](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L237)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:252](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L252)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:237](https://github.com/slacka
 logger: Logger;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:238](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L238)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:253](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L253)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:238](https://github.com/slacka
 request: IncomingMessage;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:239](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L239)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:254](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L254)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:239](https://github.com/slacka
 response: ServerResponse;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:240](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L240)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:255](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L255)

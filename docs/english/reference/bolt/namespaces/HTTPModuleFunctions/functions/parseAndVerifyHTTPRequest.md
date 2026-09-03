@@ -8,7 +8,7 @@ function parseAndVerifyHTTPRequest(
 ): Promise<BufferedIncomingMessage>;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:55](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L55)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:65](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L65)
 
 ## Parameters
 

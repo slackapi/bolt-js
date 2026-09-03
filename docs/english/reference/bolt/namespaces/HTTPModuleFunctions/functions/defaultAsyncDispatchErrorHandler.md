@@ -4,7 +4,7 @@
 function defaultAsyncDispatchErrorHandler(args): Promise<void>;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:181](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L181)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:195](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L195)
 
 ## Parameters
 

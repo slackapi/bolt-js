@@ -4,7 +4,7 @@
 function defaultProcessEventErrorHandler(args): Promise<boolean>;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:187](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L187)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:201](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L201)
 
 ## Parameters
 

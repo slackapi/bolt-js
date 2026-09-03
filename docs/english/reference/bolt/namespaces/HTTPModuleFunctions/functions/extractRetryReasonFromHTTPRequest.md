@@ -4,7 +4,7 @@
 function extractRetryReasonFromHTTPRequest(req): string | undefined;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L24)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L34)
 
 ## Parameters
 

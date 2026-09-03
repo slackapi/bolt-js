@@ -1,6 +1,6 @@
 # ReceiverProcessEventErrorHandlerArgs
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:245](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L245)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:260](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L260)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:245](https://github.com/slacka
 error: CodedError | Error;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:246](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L246)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:261](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L261)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:246](https://github.com/slacka
 logger: Logger;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:247](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L247)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:262](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L262)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:247](https://github.com/slacka
 request: IncomingMessage;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:248](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L248)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:263](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L263)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:248](https://github.com/slacka
 response: ServerResponse;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:249](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L249)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:264](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L264)
 
 ***
 
@@ -50,4 +50,4 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:249](https://github.com/slacka
 storedResponse: any;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:251](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L251)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:266](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L266)

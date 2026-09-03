@@ -1,6 +1,6 @@
 # ReceiverUnhandledRequestHandlerArgs
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:257](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L257)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:272](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L272)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:257](https://github.com/slacka
 logger: Logger;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:258](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L258)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:273](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L273)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:258](https://github.com/slacka
 request: IncomingMessage;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:259](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L259)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:274](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L274)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:259](https://github.com/slacka
 response: ServerResponse;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:260](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L260)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:275](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L275)

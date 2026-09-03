@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -50,9 +50,9 @@
   "dependencies": {
     "@slack/logger": "^5.0.0",
     "@slack/oauth": "^4.0.0",
-    "@slack/socket-mode": "^3.0.0",
-    "@slack/types": "^3.0.0",
-    "@slack/web-api": "^8.0.0",
+    "@slack/socket-mode": "^3.0.1",
+    "@slack/types": "^3.1.0",
+    "@slack/web-api": "^8.1.1",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",
@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
-    "@changesets/cli": "^2.29.8",
+    "@changesets/cli": "^3.0.1",
     "@tsconfig/node20": "^20.1.5",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",

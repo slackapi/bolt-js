@@ -4,6 +4,16 @@ Defined in: [src/receivers/HTTPReceiver.ts:76](https://github.com/slackapi/bolt-
 
 ## Properties
 
+### bodyLimit?
+
+```ts
+optional bodyLimit?: string | number;
+```
+
+Defined in: [src/receivers/HTTPReceiver.ts:100](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L100)
+
+***
+
 ### clientId?
 
 ```ts

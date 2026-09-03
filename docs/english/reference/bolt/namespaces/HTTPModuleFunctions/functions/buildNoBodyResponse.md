@@ -4,7 +4,7 @@
 function buildNoBodyResponse(res, status): void;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:130](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L130)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:144](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L144)
 
 ## Parameters
 

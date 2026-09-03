@@ -14,6 +14,16 @@ Defined in: [src/receivers/ExpressReceiver.ts:110](https://github.com/slackapi/b
 
 ***
 
+### bodyLimit?
+
+```ts
+optional bodyLimit?: string | number;
+```
+
+Defined in: [src/receivers/ExpressReceiver.ts:120](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L120)
+
+***
+
 ### clientId?
 
 ```ts

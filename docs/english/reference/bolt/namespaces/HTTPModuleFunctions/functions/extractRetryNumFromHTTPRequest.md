@@ -4,7 +4,7 @@
 function extractRetryNumFromHTTPRequest(req): number | undefined;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L11)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L21)
 
 ## Parameters
 

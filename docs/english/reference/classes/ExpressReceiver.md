@@ -1,6 +1,6 @@
 # ExpressReceiver
 
-Defined in: [src/receivers/ExpressReceiver.ts:145](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L145)
+Defined in: [src/receivers/ExpressReceiver.ts:146](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L146)
 
 Receives HTTP requests with Events, Slash Commands, and Actions
 
@@ -16,7 +16,7 @@ Receives HTTP requests with Events, Slash Commands, and Actions
 new ExpressReceiver(__namedParameters): ExpressReceiver;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:175](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L175)
+Defined in: [src/receivers/ExpressReceiver.ts:176](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L176)
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:175](https://github.com/slackapi/b
 app: Application;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:147](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L147)
+Defined in: [src/receivers/ExpressReceiver.ts:148](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L148)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:147](https://github.com/slackapi/b
 installer: InstallProvider | undefined = undefined;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:161](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L161)
+Defined in: [src/receivers/ExpressReceiver.ts:162](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L162)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:161](https://github.com/slackapi/b
 optional installerOptions?: InstallerOptions;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:163](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L163)
+Defined in: [src/receivers/ExpressReceiver.ts:164](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L164)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:163](https://github.com/slackapi/b
 router: IRouter;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:159](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L159)
+Defined in: [src/receivers/ExpressReceiver.ts:160](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L160)
 
 ## Methods
 
@@ -76,7 +76,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:159](https://github.com/slackapi/b
 init(bolt): void;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:357](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L357)
+Defined in: [src/receivers/ExpressReceiver.ts:359](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L359)
 
 #### Parameters
 
@@ -100,7 +100,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:357](https://github.com/slackapi/b
 requestHandler(req, res): Promise<void>;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:317](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L317)
+Defined in: [src/receivers/ExpressReceiver.ts:319](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L319)
 
 #### Parameters
 
@@ -126,7 +126,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:317](https://github.com/slackapi/b
 start(port): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:362](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L362)
+Defined in: [src/receivers/ExpressReceiver.ts:364](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L364)
 
 ##### Parameters
 
@@ -148,7 +148,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:362](https://github.com/slackapi/b
 start(portOrListenOptions, serverOptions?): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:363](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L363)
+Defined in: [src/receivers/ExpressReceiver.ts:365](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L365)
 
 ##### Parameters
 
@@ -176,7 +176,7 @@ Receiver.start
 start(portOrListenOptions, httpsServerOptions?): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:364](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L364)
+Defined in: [src/receivers/ExpressReceiver.ts:366](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L366)
 
 ##### Parameters
 
@@ -206,7 +206,7 @@ Receiver.start
 stop(): Promise<void>;
 ```
 
-Defined in: [src/receivers/ExpressReceiver.ts:428](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L428)
+Defined in: [src/receivers/ExpressReceiver.ts:430](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L430)
 
 #### Returns
 

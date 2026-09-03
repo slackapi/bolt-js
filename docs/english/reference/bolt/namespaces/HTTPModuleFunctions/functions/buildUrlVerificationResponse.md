@@ -4,7 +4,7 @@
 function buildUrlVerificationResponse(res, body): void;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:136](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L136)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:150](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L150)
 
 ## Parameters
 

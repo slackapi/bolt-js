@@ -214,6 +214,18 @@ Renames and re-exports [App](classes/App.md)
 
 ***
 
+### defaultBodyLimit
+
+Re-exports [defaultBodyLimit](bolt/namespaces/HTTPModuleFunctions/variables/defaultBodyLimit.md)
+
+***
+
+### isRawBodyError
+
+Re-exports [isRawBodyError](bolt/namespaces/HTTPModuleFunctions/functions/isRawBodyError.md)
+
+***
+
 ### ReceiverDispatchErrorHandlerArgs
 
 Re-exports [ReceiverDispatchErrorHandlerArgs](bolt/namespaces/HTTPModuleFunctions/interfaces/ReceiverDispatchErrorHandlerArgs.md)

@@ -1,6 +1,6 @@
 # HTTPReceiver
 
-Defined in: [src/receivers/HTTPReceiver.ts:128](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L128)
+Defined in: [src/receivers/HTTPReceiver.ts:129](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L129)
 
 Receives HTTP requests with Events, Slash Commands, and Actions
 
@@ -16,7 +16,7 @@ Receives HTTP requests with Events, Slash Commands, and Actions
 new HTTPReceiver(__namedParameters): HTTPReceiver;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:173](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L173)
+Defined in: [src/receivers/HTTPReceiver.ts:176](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L176)
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:173](https://github.com/slackapi/bolt
 optional installer?: InstallProvider;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:147](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L147)
+Defined in: [src/receivers/HTTPReceiver.ts:148](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L148)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:147](https://github.com/slackapi/bolt
 requestListener: RequestListener;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:143](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L143)
+Defined in: [src/receivers/HTTPReceiver.ts:144](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L144)
 
 ## Methods
 
@@ -56,7 +56,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:143](https://github.com/slackapi/bolt
 init(app): void;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:264](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L264)
+Defined in: [src/receivers/HTTPReceiver.ts:269](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L269)
 
 #### Parameters
 
@@ -82,7 +82,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:264](https://github.com/slackapi/bolt
 start(port): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:268](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L268)
+Defined in: [src/receivers/HTTPReceiver.ts:273](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L273)
 
 ##### Parameters
 
@@ -104,7 +104,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:268](https://github.com/slackapi/bolt
 start(port): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:269](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L269)
+Defined in: [src/receivers/HTTPReceiver.ts:274](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L274)
 
 ##### Parameters
 
@@ -128,7 +128,7 @@ Receiver.start
 start(portOrListenOptions, serverOptions?): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:270](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L270)
+Defined in: [src/receivers/HTTPReceiver.ts:275](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L275)
 
 ##### Parameters
 
@@ -156,7 +156,7 @@ Receiver.start
 start(portOrListenOptions, httpsServerOptions?): Promise<Server<typeof IncomingMessage, typeof ServerResponse>>;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:271](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L271)
+Defined in: [src/receivers/HTTPReceiver.ts:276](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L276)
 
 ##### Parameters
 
@@ -186,7 +186,7 @@ Receiver.start
 stop(): Promise<void>;
 ```
 
-Defined in: [src/receivers/HTTPReceiver.ts:359](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L359)
+Defined in: [src/receivers/HTTPReceiver.ts:364](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L364)
 
 #### Returns
 

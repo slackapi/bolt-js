@@ -4,7 +4,7 @@
 function defaultDispatchErrorHandler(args): void;
 ```
 
-Defined in: [src/receivers/HTTPModuleFunctions.ts:167](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L167)
+Defined in: [src/receivers/HTTPModuleFunctions.ts:181](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L181)
 
 ## Parameters
 

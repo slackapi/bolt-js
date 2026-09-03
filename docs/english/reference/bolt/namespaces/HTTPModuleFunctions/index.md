@@ -11,6 +11,10 @@ sidebar_label: "HTTPModuleFunctions"
 - [ReceiverUnhandledRequestHandlerArgs](interfaces/ReceiverUnhandledRequestHandlerArgs.md)
 - [RequestVerificationOptions](interfaces/RequestVerificationOptions.md)
 
+## Variables
+
+- [defaultBodyLimit](variables/defaultBodyLimit.md)
+
 ## Functions
 
 - [bufferIncomingMessage](functions/bufferIncomingMessage.md)
@@ -26,5 +30,6 @@ sidebar_label: "HTTPModuleFunctions"
 - [extractRetryReasonFromHTTPRequest](functions/extractRetryReasonFromHTTPRequest.md)
 - [getHeader](functions/getHeader.md)
 - [isBufferedIncomingMessage](functions/isBufferedIncomingMessage.md)
+- [isRawBodyError](functions/isRawBodyError.md)
 - [parseAndVerifyHTTPRequest](functions/parseAndVerifyHTTPRequest.md)
 - [parseHTTPRequestBody](functions/parseHTTPRequestBody.md)
