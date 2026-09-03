@@ -9,6 +9,8 @@ export type StringIndexed = Record<string, any>;
 // TODO: unclear if this is helpful or just complicates further
 /**
  * Type function which allows either types `T` or `U`, but not both.
+ *
+ * @internal
  */
 export type XOR<T, U> = T | U extends Record<string, unknown> ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 

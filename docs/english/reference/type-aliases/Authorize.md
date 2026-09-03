@@ -1,3 +1,7 @@
+---
+sidebar_label: "Authorize"
+---
+
 # Authorize\<IsEnterpriseInstall\>
 
 ```ts

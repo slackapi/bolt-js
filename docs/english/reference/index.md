@@ -175,7 +175,6 @@ sidebar_position: 0
 - [SlackViewAction](type-aliases/SlackViewAction.md)
 - [StringIndexed](type-aliases/StringIndexed.md)
 - [ViewResponseAction](type-aliases/ViewResponseAction.md)
-- [XOR](type-aliases/XOR.md)
 
 ## Variables
 

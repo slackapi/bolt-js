@@ -1,3 +1,7 @@
+---
+sidebar_label: "MemoryStore"
+---
+
 # MemoryStore\<ConversationState\>
 
 Defined in: [src/conversation-store.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/conversation-store.ts#L21)

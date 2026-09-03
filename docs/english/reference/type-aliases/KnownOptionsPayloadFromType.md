@@ -1,3 +1,7 @@
+---
+sidebar_label: "KnownOptionsPayloadFromType"
+---
+
 # KnownOptionsPayloadFromType\<T\>
 
 ```ts

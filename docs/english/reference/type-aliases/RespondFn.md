@@ -4,7 +4,7 @@
 type RespondFn = (message) => Promise<Awaited<ReturnType<FetchFunction>>>;
 ```
 
-Defined in: [src/types/utilities.ts:43](https://github.com/slackapi/bolt-js/blob/main/src/types/utilities.ts#L43)
+Defined in: [src/types/utilities.ts:45](https://github.com/slackapi/bolt-js/blob/main/src/types/utilities.ts#L45)
 
 ## Parameters
 

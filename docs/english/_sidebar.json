@@ -112,7 +112,7 @@
     "type": "html",
     "value": "<hr>"
   },
-  "tools/bolt-js/interface-reference",
+  "tools/bolt-js/configurations",
   {
     "type": "category",
     "label": "Reference",

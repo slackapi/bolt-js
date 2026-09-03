@@ -1,3 +1,7 @@
+---
+sidebar_label: "OptionsPayloadFromType"
+---
+
 # OptionsPayloadFromType\<T\>
 
 ```ts

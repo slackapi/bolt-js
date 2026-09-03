@@ -1,3 +1,7 @@
+---
+sidebar_label: "Middleware"
+---
+
 # Middleware\<Args, CustomContext\>
 
 ```ts

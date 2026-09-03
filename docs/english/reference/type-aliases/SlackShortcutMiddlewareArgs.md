@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackShortcutMiddlewareArgs"
+---
+
 # SlackShortcutMiddlewareArgs\<Shortcut\>
 
 ```ts

@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackActionMiddlewareArgs"
+---
+
 # SlackActionMiddlewareArgs\<Action\>
 
 ```ts

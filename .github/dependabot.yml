@@ -12,6 +12,9 @@ updates:
       - dependency-name: "@types/node"
       # allow updates for slack official libraries
       - dependency-name: "@slack/*"
+      # allow updates for the reference-docs generator
+      - dependency-name: "typedoc"
+      - dependency-name: "typedoc-plugin-markdown"
     versioning-strategy: increase
     ignore:
       - dependency-name: "@types/node"

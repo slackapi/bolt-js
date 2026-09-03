@@ -1,3 +1,7 @@
+---
+sidebar_label: "SlackEventMiddlewareArgs"
+---
+
 # SlackEventMiddlewareArgs\<EventType\>
 
 ```ts
