@@ -1,5 +1,5 @@
 ---
-sidebar_label: Reference
+sidebar_label: Interface and configuration reference
 ---
 
 # Bolt for JavaScript interface and configuration reference
