@@ -5,11 +5,6 @@
     "label": "Bolt for JavaScript",
     "className": "sidebar-title"
   },
-  "tools/bolt-js/getting-started",
-  {
-    "type": "html",
-    "value": "<hr>"
-  },
   "tools/bolt-js/creating-an-app",
   {
     "type": "category",
@@ -108,10 +103,6 @@
       "tools/bolt-js/legacy/conversation-store"
     ]
   },
-  {
-    "type": "html",
-    "value": "<hr>"
-  },
   "tools/bolt-js/configurations",
   {
     "type": "category",
@@ -128,10 +119,6 @@
     ]
   },
   {
-    "type": "html",
-    "value": "<hr>"
-  },
-  {
     "type": "category",
     "label": "Tutorials",
     "items": [
@@ -143,7 +130,6 @@
       "tools/bolt-js/tutorials/random-fact-generator/random-fact-generator"
     ]
   },
-  { "type": "html", "value": "<hr>" },
   {
     "type": "category",
     "label": "日本語 (日本)",
