@@ -9,7 +9,7 @@ Since `v3.13.0`, the default built-in receivers (`HTTPReceiver` and `SocketModeR
 To determine what port the custom HTTP route will be available on locally, you can specify an `installerOptions.port` property in the `App` constructor. Otherwise, it will default to port `3000`.
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 // Initialize Bolt app, using the default HTTPReceiver
 const app = new App({
@@ -50,7 +50,7 @@ Adding custom HTTP routes is quite straightforward when using Bolt’s built-in 
 
 
 ```javascript
-const { App, ExpressReceiver } = require('@slack/bolt');
+import { App, ExpressReceiver } from '@slack/bolt';
 
 // Create a Bolt Receiver
 const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });
