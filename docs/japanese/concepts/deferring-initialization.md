@@ -5,7 +5,7 @@ Bolt は `deferInitialization` というオプションを使うことで、ア�
 _注意: `init()` メソッドを呼び出す前に `start()` メソッドを呼び出した場合、 Bolt は例外を発生させます。_
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 // deferInitialization はコンストラクターで指定できるオプション
 const app = new App({

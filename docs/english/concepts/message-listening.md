@@ -38,7 +38,7 @@ You can filter on subtypes of events by using the built-in `subtype()` middlewar
 
 ```javascript
 // Import subtype from the package
-const { App, subtype } = require('@slack/bolt');
+import { App, subtype } from '@slack/bolt';
 
 // Matches all message changes from users
 app.message(subtype('message_changed'), ({ event, logger }) => {
