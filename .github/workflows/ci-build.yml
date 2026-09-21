@@ -35,6 +35,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci --verbose
       - run: npm test
+      - name: Build docs
+        if: matrix.node-version == '24.x'
+        run: npm run docs
       - name: Upload coverage to Codecov
         if: matrix.node-version == '24.x'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0

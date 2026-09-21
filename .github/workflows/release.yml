@@ -13,7 +13,7 @@ jobs:
     name: Changelog
     runs-on: ubuntu-latest
     outputs:
-      hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
+      hasChangesets: ${{ steps.changesets.outputs.has-changesets }}
       releaseExists: ${{ steps.published.outputs.exists }}
     permissions:
       contents: write
@@ -34,18 +34,17 @@ jobs:
 
       - name: Create or update release PR
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
-          commit: "chore: release"
-          prDraft: create
-          title: "chore: release"
-          version: npm run version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: release"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-draft: create
+          pr-title: "chore: release"
+          version-script: npm run version
 
       - name: Check if publish is needed
         id: published
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.changesets.outputs.has-changesets == 'false'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if gh release view "v${VERSION}" &>/dev/null; then
@@ -93,12 +92,11 @@ jobs:
 
       - name: Publish to npm and create GitHub releases
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
-          createGithubReleases: true
-          publish: npm run changeset -- publish
-        env:
-          GITHUB_TOKEN: ${{ steps.credentials.outputs.token }}
+          create-github-releases: true
+          github-token: ${{ steps.credentials.outputs.token }}
+          publish-script: npm run changeset -- publish
 
       - name: Get publication details
         if: steps.changesets.outputs.published == 'true'
@@ -108,7 +106,7 @@ jobs:
           echo "message=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "\(.name)@\(.version)"' | paste -sd ', ' -)" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ steps.credentials.outputs.token }}
-          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
 
       - name: Notify Slack
         if: steps.changesets.outputs.published == 'true'

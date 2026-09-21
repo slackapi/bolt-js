@@ -1,6 +1,6 @@
 {
   "name": "@slack/bolt",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "A framework for building Slack apps, fast.",
   "author": "Slack Technologies, LLC",
   "license": "MIT",
@@ -28,6 +28,7 @@
     "build": "npm run build:clean && tsc",
     "build:clean": "shx rm -rf ./dist ./coverage",
     "changeset": "npx @changesets/cli",
+    "docs": "npx typedoc",
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "prepare": "npm run build",
@@ -35,7 +36,7 @@
     "test:coverage": "c8 npm run test:unit",
     "test:types": "tsd --files test/types",
     "test:unit": "TS_NODE_PROJECT=tsconfig.json mocha --config test/unit/.mocharc.json",
-    "version": "npm run changeset version && npm install",
+    "version": "npm run changeset version && npm install && npm run docs",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
   "repository": {
@@ -49,9 +50,9 @@
   "dependencies": {
     "@slack/logger": "^5.0.0",
     "@slack/oauth": "^4.0.0",
-    "@slack/socket-mode": "^3.0.0",
-    "@slack/types": "^3.0.0",
-    "@slack/web-api": "^8.0.0",
+    "@slack/socket-mode": "^3.0.1",
+    "@slack/types": "^3.1.0",
+    "@slack/web-api": "^8.1.1",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",
@@ -59,7 +60,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
-    "@changesets/cli": "^2.29.8",
+    "@changesets/cli": "^3.0.3",
     "@tsconfig/node20": "^20.1.5",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
@@ -76,6 +77,8 @@
     "source-map-support": "^0.5.12",
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.0",
     "typescript": "5.3.3"
   },
   "peerDependencies": {
