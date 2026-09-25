@@ -168,9 +168,9 @@ HUGGINGFACE_API_KEY=hf_exampletoken
 Delete the template contents in the `app.js` file and replace it with this:
 
 ````js title="app.js"
-const { App, LogLevel, Assistant } = require("@slack/bolt");
-const { config } = require("dotenv");
-const { InferenceClient } = require("@huggingface/inference");
+import { App, LogLevel, Assistant } from "@slack/bolt";
+import { config } from "dotenv";
+import { InferenceClient } from "@huggingface/inference";
 
 config();
 

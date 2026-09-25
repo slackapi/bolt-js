@@ -5,7 +5,7 @@
 `SocketModeReceiver` を使う方法は `App` インスタンスの初期化時にコンストラクターに `socketMode: true` と `appToken: YOUR_APP_TOKEN` を渡すだけです。App Level Token は、アプリ管理画面の **Basic Information** セクションから取得できます。
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.BOT_TOKEN,
@@ -24,7 +24,7 @@ const app = new App({
 以下のように `@slack/bolt` から `SocketModeReceiver` を import して、カスタムされたインスタンスとして定義することができます。
 
 ```javascript
-const { App, SocketModeReceiver } = require('@slack/bolt');
+import { App, SocketModeReceiver } from '@slack/bolt';
 
 const socketModeReceiver = new SocketModeReceiver({
   appToken: process.env.APP_TOKEN,
