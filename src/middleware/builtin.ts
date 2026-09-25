@@ -274,6 +274,11 @@ function matchesPattern(pattern: string | RegExp, candidate: string): boolean {
   if (typeof pattern === 'string') {
     return pattern === candidate;
   }
+  // RegExp#test() advances `lastIndex` on a pattern that carries the `g` or `y`
+  // flag, so reusing the same pattern (e.g. a command registered once but
+  // invoked repeatedly) alternates between matching and not matching the exact
+  // same candidate. Reset it first so every call is independent of prior ones.
+  pattern.lastIndex = 0;
   return pattern.test(candidate);
 }
 
