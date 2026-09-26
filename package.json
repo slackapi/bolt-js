@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
-    "@changesets/cli": "^3.0.1",
+    "@changesets/cli": "^3.0.3",
     "@tsconfig/node20": "^20.1.5",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^10.0.1",
@@ -78,7 +78,7 @@
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
     "typedoc": "^0.28.20",
-    "typedoc-plugin-markdown": "^4.13.0",
+    "typedoc-plugin-markdown": "^4.13.1",
     "typescript": "5.3.3"
   },
   "peerDependencies": {
