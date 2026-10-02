@@ -4,7 +4,7 @@ By default, Bolt for JavaScript will log information from your app to the consol
 
 ```javascript
 // Import LogLevel from the package
-const { App, LogLevel } = require('@slack/bolt');
+import { App, LogLevel } from '@slack/bolt';
 
 // Log level is one of the options you can set in the constructor
 const app = new App({
@@ -60,8 +60,8 @@ If you want to send logs to somewhere besides the console or want more control o
 A very simple custom logger might ignore the name and level, and write all messages to a file.
 
 ```javascript
-const { App } = require('@slack/bolt');
-const { createWriteStream } = require('fs');
+import { App } from '@slack/bolt';
+import { createWriteStream } from 'fs';
 const logWritable = createWriteStream('/var/my_log_file'); // Not shown: close this stream
 
 const app = new App({
