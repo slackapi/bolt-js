@@ -1,12 +1,22 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { parse as qsParse } from 'node:querystring';
 import type { Logger } from '@slack/logger';
-import rawBody from 'raw-body';
+import rawBody, { type RawBodyError } from 'raw-body';
 import { AuthorizationError, type CodedError, HTTPReceiverDeferredRequestError } from '../errors';
 import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
 import { verifySlackRequest } from './verify-request';
 
 const verifyErrorPrefix = 'Failed to verify authenticity';
+
+export const defaultBodyLimit = 4 * 1024 * 1024; // 4 MB
+
+export const isRawBodyError = (error: unknown): error is RawBodyError => {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  const e = error as RawBodyError;
+  return typeof e.type === 'string' && typeof e.statusCode === 'number';
+};
 
 export const extractRetryNumFromHTTPRequest = (req: IncomingMessage): number | undefined => {
   let retryNum: number | undefined;
@@ -60,7 +70,7 @@ export const parseAndVerifyHTTPRequest = async (
   const { signingSecret } = options;
 
   // Consume the readable stream (or use the previously consumed readable stream)
-  const bufferedReq = await bufferIncomingMessage(req);
+  const bufferedReq = await bufferIncomingMessage(req, options.bodyLimit);
 
   if (options.enabled !== undefined && !options.enabled) {
     // As the validation is disabled, immediately return the buffered request
@@ -114,12 +124,16 @@ export const getHeader = (req: IncomingMessage, header: string): string => {
   return value;
 };
 
-export const bufferIncomingMessage = async (req: IncomingMessage): Promise<BufferedIncomingMessage> => {
+export const bufferIncomingMessage = async (
+  req: IncomingMessage,
+  bodyLimit?: number | string,
+): Promise<BufferedIncomingMessage> => {
   if (isBufferedIncomingMessage(req)) {
     return req;
   }
   const bufferedRequest = req as BufferedIncomingMessage;
-  bufferedRequest.rawBody = await rawBody(req);
+  const rawBodyOptions = bodyLimit !== undefined ? { limit: bodyLimit } : undefined;
+  bufferedRequest.rawBody = await rawBody(req, rawBodyOptions);
   return bufferedRequest;
 };
 
@@ -230,6 +244,7 @@ export interface RequestVerificationOptions {
   signingSecret: string;
   nowMilliseconds?: () => number;
   logger?: Logger;
+  bodyLimit?: number | string;
 }
 
 // which handles errors occurred while dispatching a request

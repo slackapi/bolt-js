@@ -97,6 +97,7 @@ export interface HTTPReceiverOptions {
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
+  bodyLimit?: number | string;
 }
 
 // All the available argument for OAuth flow enabled apps
@@ -170,6 +171,8 @@ export default class HTTPReceiver implements Receiver {
 
   private unhandledRequestTimeoutMillis: number;
 
+  private bodyLimit: number | string;
+
   public constructor({
     signingSecret,
     endpoints = ['/slack/events'],
@@ -191,12 +194,14 @@ export default class HTTPReceiver implements Receiver {
     processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
+    bodyLimit = httpFunc.defaultBodyLimit,
   }: HTTPReceiverOptions) {
     verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
+    this.bodyLimit = bodyLimit;
     this.logger =
       logger ??
       (() => {
@@ -443,11 +448,19 @@ export default class HTTPReceiver implements Receiver {
             // If enabled: false, this method returns bufferedReq without verification
             enabled: this.signatureVerification,
             signingSecret: this.signingSecret,
+            bodyLimit: this.bodyLimit,
           },
           req,
         );
       } catch (err) {
         const e = err as Error;
+        if (httpFunc.isRawBodyError(err)) {
+          if (err.type === 'entity.too.large' || err.statusCode === 413) {
+            this.logger.warn(`Request body exceeded the maximum allowed size (limit: ${err.limit} bytes)`);
+            httpFunc.buildNoBodyResponse(res, 413);
+            return;
+          }
+        }
         if (this.signatureVerification) {
           this.logger.warn(`Failed to parse and verify the request data: ${e.message}`);
         } else {

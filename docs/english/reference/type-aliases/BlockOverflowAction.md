@@ -1,0 +1,7 @@
+# BlockOverflowAction
+
+```ts
+type BlockOverflowAction = BlockAction<OverflowAction>;
+```
+
+Defined in: [src/types/actions/block-action.ts:358](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L358)
