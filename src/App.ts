@@ -620,25 +620,27 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
   ): void;
   /**
    *
-   * @param pattern Used for filtering out messages that don't match.
+   * @param pattern Used for filtering out messages that don't match. Accepts a single string or RegExp, or an
+   * array of strings/RegExps in which case the message matches when it matches any one of the provided patterns.
    * Strings match via {@link String.prototype.includes}.
    * @param listeners Middlewares that process and react to the message events that matched the provided patterns.
    */
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    pattern: string | RegExp,
+    pattern: string | RegExp | (string | RegExp)[],
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
    *
    * @param filter Middleware that can filter out messages. Generally this is done by returning before
    * calling {@link AllMiddlewareArgs.next} if there is no match. See {@link directMention} for an example.
-   * @param pattern Used for filtering out messages that don't match the pattern. Strings match
-   * via {@link String.prototype.includes}.
+   * @param pattern Used for filtering out messages that don't match the pattern. Accepts a single string or
+   * RegExp, or an array of strings/RegExps in which case the message matches when it matches any one of them.
+   * Strings match via {@link String.prototype.includes}.
    * @param listeners Middlewares that process and react to the message events that matched the provided pattern.
    */
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
     filter: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>,
-    pattern: string | RegExp,
+    pattern: string | RegExp | (string | RegExp)[],
     ...listeners: MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>[]
   ): void;
   /**
@@ -658,14 +660,28 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
    * @param patternsOrMiddleware A mix of patterns and/or middlewares.
    */
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | (string | RegExp)[]
+      | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>
+    )[]
   ): void;
   // TODO: expose a type parameter for overriding the MessageEvent type (just like shortcut() and action() does) https://github.com/slackapi/bolt-js/issues/796
   public message<MiddlewareCustomContext extends StringIndexed = StringIndexed>(
-    ...patternsOrMiddleware: (string | RegExp | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>)[]
+    ...patternsOrMiddleware: (
+      | string
+      | RegExp
+      | (string | RegExp)[]
+      | MessageEventMiddleware<AppCustomContext & MiddlewareCustomContext>
+    )[]
   ): void {
     const messageMiddleware = patternsOrMiddleware.map((patternOrMiddleware) => {
-      if (typeof patternOrMiddleware === 'string' || util.types.isRegExp(patternOrMiddleware)) {
+      if (
+        typeof patternOrMiddleware === 'string' ||
+        util.types.isRegExp(patternOrMiddleware) ||
+        Array.isArray(patternOrMiddleware)
+      ) {
         return matchMessage(patternOrMiddleware);
       }
       return patternOrMiddleware;
