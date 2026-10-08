@@ -14,7 +14,7 @@ Using Heroku dynos to complete this tutorial counts towards your usage. [Delete 
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Quickstart guide](/tools/bolt-js/getting-started) or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Quickstart guide](/tools/bolt-js/creating-an-app) or clone the template app below:
 
 ```shell
 git clone https://github.com/slack-samples/bolt-js-getting-started-app.git
@@ -254,7 +254,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 Your app is now deployed and Slack is updated, so let's try it out!
 
-Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Quickstart guide](/tools/bolt-js/getting-started#running-the-app), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
+Open a Slack channel that your app has joined and say "hello" (lower-case). Just like in the [Quickstart guide](/tools/bolt-js/creating-an-app#running-the-app), your app should respond back. If you don't receive a response, check your **Request URL** and try again.
 
 ---
 
