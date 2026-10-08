@@ -46,14 +46,14 @@ Slack では、Hubot アプリはユーザーとの対話型のボットユー�
 
 :::warning 
 
-ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](/tools/bolt-js/getting-started) と [イベントの設定](/tools/bolt-js/getting-started#setting-up-events) を参考にしてください。
+ボットのイベントを設定する前に、パブリック URL が必要です。Bolt アプリを作成したことがない場合、または Events API を使用したことがない場合は、『Getting Started ガイド』の [ローカル Bolt プロジェクトの設定](/tools/bolt-js/ja-jp/creating-an-app#setting-up-your-project) と [イベントの設定](/tools/bolt-js/ja-jp/creating-an-app#setting-up-events) を参考にしてください。
 
 :::
 
 ### メッセージのリスニング
 すべての Hubot アプリは、デフォルトでメッセージをリッスンできるので、ボットユーザーがそうするように設定する必要があります。
 
-[イベントの設定](/tools/bolt-js/getting-started#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリッスン)、`message group` (プライベートチャンネルのメッセージをリッスン)、`message.im` (アプリのホーム/DM スペースのメッセージをリッスン)、`message.mpim` (マルチパーソン DM のメッセージをリッスン）。
+[イベントの設定](/tools/bolt-js/ja-jp/creating-an-app#setting-up-events) を行ってから、リクエスト URL を入力、そして検証されたことを確認したら、**Subscribe to Bot Events** にスクロールダウンします。メッセージに関連する次の 4 つのイベントがあります `message channel` (パブリックチャンネルのメッセージをリッスン)、`message group` (プライベートチャンネルのメッセージをリッスン)、`message.im` (アプリのホーム/DM スペースのメッセージをリッスン)、`message.mpim` (マルチパーソン DM のメッセージをリッスン）。
 
 ボットがチャンネルのメッセージをリッスンするだけでよい場合は、`message.channels` と`message.groups` をリッスンできます。または、ボットがすべての場所のメッセージをリッスンするようにするには、4 つのメッセージイベントすべてを選択します。
 
