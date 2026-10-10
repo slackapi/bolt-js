@@ -9,7 +9,7 @@
 カスタムの HTTP ルートがローカル環境でどのポートからアクセスできるかを指定するために `App` コンストラクターに `installerOptions.port` というプロパティを渡すことができます。指定しない場合は、デフォルトの `3000` ポートとなります。
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 // デフォルトの HTTPReceiver を使って Bolt アプリを初期化します
 const app = new App({
@@ -49,7 +49,7 @@ const app = new App({
 Bolt の組み込みの `ExpressReceiver` を使っているなら、カスタムの HTTP ルートを追加するのはとても簡単です。`v2.1.0` から `ExpressReceiver` には `router` というプロパティが追加されています。これは、さらにルートを追加できるように `App` 内部で保持している Express の [Router](http://expressjs.com/en/4x/api.html#router) を public にしたものです。
 
 ```javascript
-const { App, ExpressReceiver } = require('@slack/bolt');
+import { App, ExpressReceiver } from '@slack/bolt';
 
 // Bolt の Receiver を明に生成
 const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });

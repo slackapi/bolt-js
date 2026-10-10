@@ -67,7 +67,7 @@ Starting with version 3.8.0, when passing `extendedErrorHandler: true` to the co
 It is recommended to check whether a property exists on the `context` or `body` objects before accessing its value, as the data available in the `body` object differs from event to event, and because errors can happen at any point in a request's lifecycle (i.e. before a certain property of `context` has been set).
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,

@@ -38,7 +38,7 @@ app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
 
 ```javascript
 // パッケージから subtype をインポート
-const { App, subtype } = require('@slack/bolt');
+import { App, subtype } from '@slack/bolt';
 
 // user からのメッセージの編集と一致
 app.message(subtype('message_changed'), ({ event, logger }) => {
