@@ -615,4 +615,4 @@ Now that you have an app up and running, you can start exploring how to make you
 - Read through the various concepts pages to learn about the different methods and features accessible to your Bolt app.
 - Explore the different events your bot can listen to with the [`event`](/tools/bolt-js/concepts/event-listening) method. View the full events reference docs [here](/reference/events).
 - The Bolt framework allows you to [call Web API methods](/tools/bolt-js/concepts/web-api) with the client attached to your app. View the over 200 methods [here](/reference/methods).
-- Check out how to use AI in your app with the [Using AI in apps](/tools/bolt-js/concepts/ai-apps) guide.
+- Check out how to use AI in your app with the [Using AI in apps](/tools/bolt-js/concepts/adding-agent-features) guide.
