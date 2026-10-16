@@ -82,6 +82,7 @@
     "typescript": "5.3.3"
   },
   "peerDependencies": {
-    "@types/express": "^5.0.0"
+    "@types/express": "^5.0.0",
+    "undici": "^7.28.0"
   }
 }
