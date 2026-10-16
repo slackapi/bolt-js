@@ -154,11 +154,11 @@ const app = new App({
       // 実際のデータベースから削除するために、ここのコードを変更
       if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         // OrG 全体へのインストール情報の削除
-        return await myDB.delete(installQuery.enterpriseId);
+        return await database.delete(installQuery.enterpriseId);
       }
       if (installQuery.teamId !== undefined) {
         // 単独のワークスペースへのインストール情報の削除
-        return await myDB.delete(installQuery.teamId);
+        return await database.delete(installQuery.teamId);
       }
       throw new Error('Failed to delete installation');
     },
@@ -215,7 +215,7 @@ const app = new App({
           // URL の state パラメーターとして使用するランダムな文字列を生成
           const randomState = randomStringGenerator();
           // その値をキャッシュ、データベースに保存
-          await myDB.set(randomState, installUrlOptions);
+          await database.set(randomState, installUrlOptions);
           // データベースに保存されたものを利用可能な値として返却
           return randomState;
         },
@@ -224,7 +224,7 @@ const app = new App({
         // `installUrlOptions` オブジェクトを応答
         verifyStateParam: async (date, state) => {
           // state をキーに、データベースから保存された installOptions を取得
-          const installUrlOptions = await myDB.get(randomState);
+          const installUrlOptions = await database.get(state);
           return installUrlOptions;
         }
       },

@@ -85,7 +85,7 @@ import { SocketModeFunctions } from '@slack/bolt';
 SocketModeFunctions.defaultProcessEventErrorHandler
 
 // now:
-import { defaultProcessEventHandler } from '@slack/bolt';
+import { defaultProcessEventErrorHandler } from '@slack/bolt';
 ```
 
 ## 🏭 Built-in middleware changes {#built-in-middleware-changes}
