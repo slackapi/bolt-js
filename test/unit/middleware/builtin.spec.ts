@@ -317,6 +317,21 @@ describe('Built-in global middleware', () => {
         await builtins.matchCommandName('/will-not-match')(args);
         sinon.assert.notCalled(args.next);
       });
+
+      it('should match the same command every time when the pattern carries the g flag', async () => {
+        // Regression: RegExp#test() advances lastIndex on a /g-flagged pattern,
+        // so the same registered middleware alternated between matching and
+        // not matching identical repeated command invocations (#1058).
+        const middleware = builtins.matchCommandName(/hi/g);
+
+        const args1 = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), { ...dummyContext });
+        await middleware(args1);
+        sinon.assert.calledOnce(args1.next);
+
+        const args2 = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), { ...dummyContext });
+        await middleware(args2);
+        sinon.assert.calledOnce(args2.next);
+      });
     });
 
     describe('onlyEvents', () => {
