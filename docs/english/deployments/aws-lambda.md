@@ -82,7 +82,7 @@ You're now set up with the Serverless tools! Let's move on to preparing your Bol
 
 ## Get a Bolt Slack app {#get-a-bolt-slack-app}
 
-If you haven't already built your own Bolt app, you can use our [Quickstart guide](/tools/bolt-js/getting-started) or clone the template app below:
+If you haven't already built your own Bolt app, you can use our [Quickstart guide](/tools/bolt-js/creating-an-app) or clone the template app below:
 
 ```shell
 git clone https://github.com/slack-samples/bolt-js-getting-started-app.git
@@ -193,7 +193,7 @@ plugins:
 
 `SLACK_SIGNING_SECRET` and `SLACK_BOT_TOKEN` must be environment variables on your local machine.
 
-You can [learn how to export Slack environment variables](/tools/bolt-js/getting-started#creating-a-project) in our Quickstart guide.
+You can [learn how to export Slack environment variables](/tools/bolt-js/creating-an-app#creating-an-app) in our Quickstart guide.
 
 :::
 
@@ -255,7 +255,7 @@ Second, select **Event Subscriptions** from the side and update the **Request UR
 
 ### 3. Test your Slack app
 
-Now you can test your Slack app by inviting your app to a channel then saying “hello” (lower-case). Just like in the [Quickstart guide](/tools/bolt-js/getting-started#running-the-app), your app should respond back:
+Now you can test your Slack app by inviting your app to a channel then saying “hello” (lower-case). Just like in the [Quickstart guide](/tools/bolt-js/creating-an-app#running-the-app), your app should respond back:
 
 ```
 > 👩‍💻 hello
