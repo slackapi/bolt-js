@@ -79,10 +79,11 @@
     "tsd": "^0.31.2",
     "typedoc": "^0.28.20",
     "typedoc-plugin-markdown": "^4.13.1",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "undici": "^8.12.2"
   },
   "peerDependencies": {
     "@types/express": "^5.0.0",
-    "undici": "^7.28.0"
+    "undici": "^7.0.0 || ^8.0.0"
   }
 }
