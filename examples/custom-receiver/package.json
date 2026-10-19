@@ -15,7 +15,7 @@
     "@slack/bolt": "^5",
     "@slack/logger": "^5.0.0",
     "@slack/oauth": "^4",
-    "dotenv": "^17",
+    "dotenv": "^18",
     "fastify": "^5",
     "koa": "^3"
   },
