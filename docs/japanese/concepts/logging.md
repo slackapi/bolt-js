@@ -4,7 +4,7 @@ Bolt はデフォルトの設定では、標準出力のコンソールにログ
 
 ```javascript
 // パッケージから LogLevel をインポート
-const { App, LogLevel } = require('@slack/bolt');
+import { App, LogLevel } from '@slack/bolt';
 
 // オプションとして、コンストラクタで Log level を設定可能
 const app = new App({
@@ -31,8 +31,8 @@ const app = new App({
 非常に単純なカスタム logger では、名前やレベルが無視され、すべてのメッセージがファイルに書き込まれることがあります。
 
 ```javascript
-const { App } = require('@slack/bolt');
-const { createWriteStream } = require('fs');
+import { App } from '@slack/bolt';
+import { createWriteStream } from 'fs';
 const logWritable = createWriteStream('/var/my_log_file');
 
 const app = new App({
