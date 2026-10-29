@@ -1,4 +1,3 @@
-import type { FunctionsCompleteErrorResponse, FunctionsCompleteSuccessResponse } from '@slack/web-api';
 import { CustomFunctionInitializationError } from './errors';
 import { autoAcknowledge, matchEventType, onlyEvents } from './middleware/builtin';
 import type {
@@ -9,33 +8,8 @@ import type {
   SlackEventMiddlewareArgsOptions,
 } from './types';
 
-// TODO: move this type to src/context/create-function-complete.ts
-interface FunctionCompleteArguments {
-  // biome-ignore lint/suspicious/noExplicitAny: TODO: could probably improve custom function parameter shapes - deno-slack-sdk has a bunch of this stuff we should move to slack/types
-  outputs?: Record<string, any>;
-}
-// TODO: move this type to src/context/create-function-complete.ts
-export type FunctionCompleteFn = {
-  (params?: FunctionCompleteArguments): Promise<FunctionsCompleteSuccessResponse>;
-  /**
-   * @description Check if this complete function has been called.
-   */
-  hasBeenCalled(): boolean;
-};
-
-// TODO: move this type to src/context/create-function-fail.ts
-interface FunctionFailArguments {
-  error: string;
-}
-
-// TODO: move this type to src/context/create-function-fail.ts
-export type FunctionFailFn = {
-  (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
-  /**
-   * @description Check if this fail function has been called.
-   */
-  hasBeenCalled(): boolean;
-};
+export type { FunctionCompleteFn } from './context/create-function-complete';
+export type { FunctionFailFn } from './context/create-function-fail';
 
 export type SlackCustomFunctionMiddlewareArgs = SlackEventMiddlewareArgs<'function_executed'>;
 
