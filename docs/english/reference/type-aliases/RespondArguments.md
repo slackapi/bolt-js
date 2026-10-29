@@ -11,19 +11,19 @@ Defined in: [src/types/utilities.ts:36](https://github.com/slackapi/bolt-js/blob
 ### delete\_original?
 
 ```ts
-optional delete_original?: boolean;
+delete_original?: boolean;
 ```
 
 ### replace\_original?
 
 ```ts
-optional replace_original?: boolean;
+replace_original?: boolean;
 ```
 
 ### response\_type?
 
 ```ts
-optional response_type?: "in_channel" | "ephemeral";
+response_type?: "in_channel" | "ephemeral";
 ```
 
 Response URLs can be used to send ephemeral messages or in-channel messages using this argument
@@ -31,11 +31,11 @@ Response URLs can be used to send ephemeral messages or in-channel messages usin
 ### text?
 
 ```ts
-optional text?: string;
+text?: string;
 ```
 
 ### thread\_ts?
 
 ```ts
-optional thread_ts?: string;
+thread_ts?: string;
 ```

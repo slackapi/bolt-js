@@ -32,9 +32,7 @@ Defined in: [src/errors.ts:57](https://github.com/slackapi/bolt-js/blob/main/src
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 

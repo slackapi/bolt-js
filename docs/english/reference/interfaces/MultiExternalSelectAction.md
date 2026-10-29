@@ -55,7 +55,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 ### confirm?
 
 ```ts
-optional confirm?: Confirmation;
+confirm?: Confirmation;
 ```
 
 Defined in: [src/types/actions/block-action.ts:178](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L178)
@@ -65,7 +65,7 @@ Defined in: [src/types/actions/block-action.ts:178](https://github.com/slackapi/
 ### initial\_options?
 
 ```ts
-optional initial_options?: Option[];
+initial_options?: Option[];
 ```
 
 Defined in: [src/types/actions/block-action.ts:175](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L175)
@@ -75,7 +75,7 @@ Defined in: [src/types/actions/block-action.ts:175](https://github.com/slackapi/
 ### min\_query\_length?
 
 ```ts
-optional min_query_length?: number;
+min_query_length?: number;
 ```
 
 Defined in: [src/types/actions/block-action.ts:177](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L177)
@@ -85,7 +85,7 @@ Defined in: [src/types/actions/block-action.ts:177](https://github.com/slackapi/
 ### placeholder?
 
 ```ts
-optional placeholder?: PlainTextElement;
+placeholder?: PlainTextElement;
 ```
 
 Defined in: [src/types/actions/block-action.ts:176](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L176)
@@ -95,7 +95,7 @@ Defined in: [src/types/actions/block-action.ts:176](https://github.com/slackapi/
 ### selected\_options?
 
 ```ts
-optional selected_options?: Option[];
+selected_options?: Option[];
 ```
 
 Defined in: [src/types/actions/block-action.ts:174](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L174)

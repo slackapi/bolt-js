@@ -61,7 +61,7 @@ Defined in: [src/types/command/index.ts:22](https://github.com/slackapi/bolt-js/
 ### enterprise\_id?
 
 ```ts
-optional enterprise_id?: string;
+enterprise_id?: string;
 ```
 
 Defined in: [src/types/command/index.ts:33](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L33)
@@ -71,7 +71,7 @@ Defined in: [src/types/command/index.ts:33](https://github.com/slackapi/bolt-js/
 ### enterprise\_name?
 
 ```ts
-optional enterprise_name?: string;
+enterprise_name?: string;
 ```
 
 Defined in: [src/types/command/index.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L34)
@@ -81,7 +81,7 @@ Defined in: [src/types/command/index.ts:34](https://github.com/slackapi/bolt-js/
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: string;
+is_enterprise_install?: string;
 ```
 
 Defined in: [src/types/command/index.ts:36](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L36)

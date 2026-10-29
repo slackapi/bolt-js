@@ -53,7 +53,7 @@ name: string;
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/actions/dialog-action.ts:32](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L32)
@@ -75,7 +75,7 @@ name: string;
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/actions/dialog-action.ts:31](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L31)
@@ -178,5 +178,5 @@ name: string;
 #### team\_id?
 
 ```ts
-optional team_id?: string;
+team_id?: string;
 ```

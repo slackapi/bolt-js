@@ -41,7 +41,7 @@ Defined in: [src/types/events/index.ts:85](https://github.com/slackapi/bolt-js/b
 ### authorizations?
 
 ```ts
-optional authorizations?: Authorization[];
+authorizations?: Authorization[];
 ```
 
 Defined in: [src/types/events/index.ts:91](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L91)
@@ -51,7 +51,7 @@ Defined in: [src/types/events/index.ts:91](https://github.com/slackapi/bolt-js/b
 ### context\_enterprise\_id?
 
 ```ts
-optional context_enterprise_id?: string;
+context_enterprise_id?: string;
 ```
 
 Defined in: [src/types/events/index.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L84)
@@ -61,7 +61,7 @@ Defined in: [src/types/events/index.ts:84](https://github.com/slackapi/bolt-js/b
 ### context\_team\_id?
 
 ```ts
-optional context_team_id?: string;
+context_team_id?: string;
 ```
 
 Defined in: [src/types/events/index.ts:83](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L83)
@@ -71,7 +71,7 @@ Defined in: [src/types/events/index.ts:83](https://github.com/slackapi/bolt-js/b
 ### enterprise\_id?
 
 ```ts
-optional enterprise_id?: string;
+enterprise_id?: string;
 ```
 
 Defined in: [src/types/events/index.ts:82](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L82)
@@ -111,7 +111,7 @@ Defined in: [src/types/events/index.ts:89](https://github.com/slackapi/bolt-js/b
 ### is\_ext\_shared\_channel?
 
 ```ts
-optional is_ext_shared_channel?: boolean;
+is_ext_shared_channel?: boolean;
 ```
 
 Defined in: [src/types/events/index.ts:90](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L90)

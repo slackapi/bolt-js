@@ -17,7 +17,7 @@ Defined in: [src/types/options/index.ts:177](https://github.com/slackapi/bolt-js
 ### option\_groups
 
 ```ts
-option_groups: object & Options[];
+option_groups: (object & Options)[];
 ```
 
 Defined in: [src/types/options/index.ts:178](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L178)
