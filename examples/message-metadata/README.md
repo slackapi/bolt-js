@@ -1,6 +1,6 @@
 # Bolt for JavaScript Message Metadata
 
-This is a quick example app to test [Message Metadata](https://api.slack.com/metadata) with Bolt for JavaScript.
+This is a quick example app to test [Message Metadata](https://docs.slack.dev/messaging/message-metadata) with Bolt for JavaScript.
 
 Before we get started, make sure you have a development workspace where you have permissions to install apps. If you don’t have one setup, go ahead and [create one](https://slack.com/create). You also need to [create a new app](https://api.slack.com/apps?new_app=1) if you haven’t already. You will need to enable Socket Mode and generate an App Level Token.
 
