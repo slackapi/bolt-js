@@ -26,9 +26,7 @@ Defined in: [src/errors.ts:118](https://github.com/slackapi/bolt-js/blob/main/sr
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 

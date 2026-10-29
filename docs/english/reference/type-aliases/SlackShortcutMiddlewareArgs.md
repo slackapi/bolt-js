@@ -5,7 +5,7 @@ sidebar_label: "SlackShortcutMiddlewareArgs"
 # SlackShortcutMiddlewareArgs\<Shortcut\>
 
 ```ts
-type SlackShortcutMiddlewareArgs<Shortcut> = object & Shortcut extends MessageShortcut ? object : unknown;
+type SlackShortcutMiddlewareArgs<Shortcut> = object & (Shortcut extends MessageShortcut ? object : unknown);
 ```
 
 Defined in: [src/types/shortcuts/index.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/index.ts#L24)
@@ -13,6 +13,12 @@ Defined in: [src/types/shortcuts/index.ts:24](https://github.com/slackapi/bolt-j
 Arguments which listeners and middleware receive to process a shortcut from Slack.
 
 The type parameter `Shortcut` represents the entire JSON-encoded request body from Slack.
+
+## Type Parameters
+
+### Shortcut
+
+`Shortcut` *extends* [`SlackShortcut`](SlackShortcut.md) = [`SlackShortcut`](SlackShortcut.md)
 
 ## Type Declaration
 
@@ -45,9 +51,3 @@ respond: RespondFn;
 ```ts
 shortcut: Shortcut;
 ```
-
-## Type Parameters
-
-### Shortcut
-
-`Shortcut` *extends* [`SlackShortcut`](SlackShortcut.md) = [`SlackShortcut`](SlackShortcut.md)

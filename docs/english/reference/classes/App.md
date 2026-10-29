@@ -759,7 +759,8 @@ TODO: should replace HTTPReceiver in type definition with a generic that is cons
 
 ##### args
 
-\[`string` \| `number` \| `ListenOptions`, `ServerOptions`\] \| \[\]
+  \| \[`portOrListenOptions`: `string` \| `number` \| `ListenOptions`, `httpsServerOptions?`: `ServerOptions`\]
+  \| \[\]
 
 receiver-specific start arguments
 

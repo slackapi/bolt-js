@@ -53,7 +53,7 @@ name: string;
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:43](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L43)
@@ -75,7 +75,7 @@ name: string;
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:42](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L42)
@@ -99,7 +99,7 @@ Defined in: [src/types/shortcuts/message-shortcut.ts:14](https://github.com/slac
 #### text?
 
 ```ts
-optional text?: string;
+text?: string;
 ```
 
 #### ts
@@ -117,7 +117,7 @@ type: "message";
 #### user?
 
 ```ts
-optional user?: string;
+user?: string;
 ```
 
 ***
@@ -212,11 +212,11 @@ name: string;
 #### team\_id?
 
 ```ts
-optional team_id?: string;
+team_id?: string;
 ```
 
 #### username?
 
 ```ts
-optional username?: string;
+username?: string;
 ```

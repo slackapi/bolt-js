@@ -7,7 +7,7 @@ Defined in: [src/receivers/AwsLambdaReceiver.ts:84](https://github.com/slackapi/
 ### customPropertiesExtractor?
 
 ```ts
-optional customPropertiesExtractor?: (request) => StringIndexed;
+customPropertiesExtractor?: (request) => StringIndexed;
 ```
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:120](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L120)
@@ -39,7 +39,7 @@ noop
 ### invalidRequestSignatureHandler?
 
 ```ts
-optional invalidRequestSignatureHandler?: (args) => void;
+invalidRequestSignatureHandler?: (args) => void;
 ```
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:121](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L121)
@@ -59,7 +59,7 @@ Defined in: [src/receivers/AwsLambdaReceiver.ts:121](https://github.com/slackapi
 ### logger?
 
 ```ts
-optional logger?: Logger;
+logger?: Logger;
 ```
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:100](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L100)
@@ -77,7 +77,7 @@ ConsoleLogger
 ### logLevel?
 
 ```ts
-optional logLevel?: LogLevel;
+logLevel?: LogLevel;
 ```
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:106](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L106)
@@ -95,12 +95,12 @@ LogLevel.INFO
 ### signatureVerification?
 
 ```ts
-optional signatureVerification?: boolean;
+signatureVerification?: boolean;
 ```
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:112](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L112)
 
-Flag that determines whether Bolt should [Slack's signature on incoming requests](https://api.slack.com/authentication/verifying-requests-from-slack|verify).
+Flag that determines whether Bolt should [Slack's signature on incoming requests](https://docs.slack.dev/authentication/verifying-requests-from-slack|verify).
 
 #### Default
 
@@ -126,14 +126,14 @@ using this secret will not be performed.
 
 #### See
 
-[https://api.slack.com/authentication/verifying-requests-from-slack#about](https://api.slack.com/authentication/verifying-requests-from-slack#about) for details about signing secrets
+[https://docs.slack.dev/authentication/verifying-requests-from-slack#about](https://docs.slack.dev/authentication/verifying-requests-from-slack#about) for details about signing secrets
 
 ***
 
 ### unhandledRequestTimeoutMillis?
 
 ```ts
-optional unhandledRequestTimeoutMillis?: number;
+unhandledRequestTimeoutMillis?: number;
 ```
 
 Defined in: [src/receivers/AwsLambdaReceiver.ts:122](https://github.com/slackapi/bolt-js/blob/main/src/receivers/AwsLambdaReceiver.ts#L122)

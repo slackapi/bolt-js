@@ -9,7 +9,7 @@ Configuration object used to instantiate the Assistant
 ### threadContextChanged?
 
 ```ts
-optional threadContextChanged?: 
+threadContextChanged?: 
   | AssistantThreadContextChangedMiddleware
   | AssistantThreadContextChangedMiddleware[];
 ```
@@ -21,7 +21,7 @@ Defined in: [src/Assistant.ts:24](https://github.com/slackapi/bolt-js/blob/main/
 ### threadContextStore?
 
 ```ts
-optional threadContextStore?: AssistantThreadContextStore;
+threadContextStore?: AssistantThreadContextStore;
 ```
 
 Defined in: [src/Assistant.ts:22](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L22)

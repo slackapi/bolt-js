@@ -11,5 +11,5 @@ Defined in: [src/types/utilities.ts:30](https://github.com/slackapi/bolt-js/blob
 ### channel?
 
 ```ts
-optional channel?: string;
+channel?: string;
 ```

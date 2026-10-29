@@ -55,7 +55,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 ### confirm?
 
 ```ts
-optional confirm?: Confirmation;
+confirm?: Confirmation;
 ```
 
 Defined in: [src/types/actions/block-action.ts:218](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L218)
@@ -65,7 +65,7 @@ Defined in: [src/types/actions/block-action.ts:218](https://github.com/slackapi/
 ### initial\_option?
 
 ```ts
-optional initial_option?: Option;
+initial_option?: Option;
 ```
 
 Defined in: [src/types/actions/block-action.ts:217](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L217)
