@@ -90,9 +90,8 @@ export interface HTTPReceiverOptions {
   signatureVerification?: boolean;
   /**
    * Called when an incoming request fails signature verification. Override to
-   * emit custom telemetry, return a specific response body, or suppress the
-   * default warn log. The receiver still returns `401 Unauthorized` to the
-   * client regardless of what the handler does.
+   * emit custom telemetry or suppress the default warn log. The receiver still
+   * returns `401 Unauthorized` to the client regardless of what the handler does.
    *
    * Defaults to a handler that logs a warning with the received
    * `x-slack-signature` and `x-slack-request-timestamp` values.
