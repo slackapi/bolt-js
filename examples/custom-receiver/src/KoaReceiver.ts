@@ -1,10 +1,11 @@
-import { type Server, createServer } from 'node:http';
+import { createServer, type Server } from 'node:http';
 import Router from '@koa/router';
 import {
   type App,
   type BufferedIncomingMessage,
   type CodedError,
   HTTPResponseAck,
+  HTTPModuleFunctions as httpFunc,
   type InstallProviderOptions,
   type InstallURLOptions,
   type Receiver,
@@ -12,9 +13,8 @@ import {
   ReceiverInconsistentStateError,
   type ReceiverProcessEventErrorHandlerArgs,
   type ReceiverUnhandledRequestHandlerArgs,
-  HTTPModuleFunctions as httpFunc,
 } from '@slack/bolt';
-import { ConsoleLogger, type LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, type LogLevel } from '@slack/logger';
 import { type CallbackOptions, type InstallPathOptions, InstallProvider } from '@slack/oauth';
 import Koa from 'koa';
 
@@ -158,12 +158,7 @@ export default class KoaReceiver implements Receiver {
 
   public init(app: App): void {
     this.app = app;
-    if (
-      this.installer &&
-      this.installerOptions &&
-      this.installerOptions.installPath &&
-      this.installerOptions.redirectUriPath
-    ) {
+    if (this.installer && this.installerOptions?.installPath && this.installerOptions.redirectUriPath) {
       this.router.get(this.installerOptions.installPath, async (ctx) => {
         await this.installer?.handleInstallPath(ctx.req, ctx.res, this.installerOptions?.installPathOptions);
       });

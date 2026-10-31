@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import { ErrorCode, isCodedError } from '../../../../src/errors';
-import { FakeReceiver, createDummyReceiverEvent, importApp } from '../../helpers';
+import { createDummyReceiverEvent, FakeReceiver, importApp } from '../../helpers';
 
 describe('App listener middleware processing', () => {
   let fakeReceiver: FakeReceiver;

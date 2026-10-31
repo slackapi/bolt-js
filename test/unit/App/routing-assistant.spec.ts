@@ -2,15 +2,15 @@ import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import { Assistant } from '../../../src/Assistant';
 import {
-  FakeReceiver,
-  type Override,
   createDummyAssistantThreadContextChangedEventMiddlewareArgs,
   createDummyAssistantThreadStartedEventMiddlewareArgs,
   createDummyAssistantUserMessageEventMiddlewareArgs,
   createFakeLogger,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noopMiddleware,
+  type Override,
   withConversationContext,
   withMemoryStore,
   withNoopAppMetadata,

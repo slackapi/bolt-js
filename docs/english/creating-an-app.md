@@ -1,24 +1,16 @@
 ---
-sidebar_label: Building an App
+sidebar_label: Creating an App
 ---
 
 # Creating an app with Bolt for JavaScript
 
-This guide will walk you through creating and using a Slack app built with Bolt for JavaScript.
+:::tip[More doing, less reading]
+This guide is a more thorough explanation on creating a Slack app. If you want a running app as fast as possible, follow our [Quickstart](/quickstart) that harnesses the power of Bolt and the [Slack CLI](/tools/slack-cli). 
+:::
 
-On this journey, you'll:
-
-- set up your local environment,
-- create a new Slack app,
-- and enable it to listen for and respond to messages within a Slack workspace.
+Follow along to get up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 
 When you’re finished, you’ll have created the [Getting Started app](https://github.com/slack-samples/bolt-js-getting-started-app) to run, modify, and make your own. ⚡️
-
-:::tip[Less reading, more doing]
-
-Follow the [quickstart](/tools/bolt-js/getting-started) guide to run an app as soon as possible. This guide will more thoroughly explore building your first app using Bolt for JavaScript.
-
-:::
 
 ## Prerequisites
 
@@ -95,6 +87,7 @@ Create and move into a new directory before you initialize the project:
 $ mkdir first-bolt-app
 $ cd first-bolt-app
 $ npm init
+$ npm pkg set type=module
 ```
 
 You’ll be prompted with a series of questions to describe your new project (you can accept the defaults by hitting <kbd>Enter</kbd> on each prompt if you aren’t picky). After you’re done, you’ll have a new `package.json` file in your directory.
@@ -167,7 +160,7 @@ The above example works on Linux and macOS, but [similar commands are available 
 
 :::danger[Keep your tokens and signing secret secure]
 
-At a minimum, you should avoid checking tokens and signing secrets into public version control, and you should access them via environment variables as shown above. Check out the guide to [app security best practices](/security) for more insights.
+At a minimum, you should avoid checking tokens and signing secrets into public version control, and you should access them via environment variables as shown above. Check out the guide to [app security best practices](/concepts/security) for more insights.
 
 :::
 
@@ -211,7 +204,7 @@ $ export SLACK_APP_TOKEN=xapp-<your-app-token>
 Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -248,7 +241,7 @@ $ export SLACK_SIGNING_SECRET=<your-signing-secret>
 2. Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -346,7 +339,7 @@ The following example listens and responds to all messages in channels/DMs where
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -375,7 +368,7 @@ app.message("hello", async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -440,7 +433,7 @@ Below, the `app.js` file from the last section is modified to send a message con
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -488,7 +481,7 @@ app.message("hello", async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -559,7 +552,7 @@ https://github.com/slack-samples/bolt-js-getting-started-app/blob/main/app.js
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-const { App } = require("@slack/bolt");
+import { App } from "@slack/bolt";
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -622,4 +615,4 @@ Now that you have an app up and running, you can start exploring how to make you
 - Read through the various concepts pages to learn about the different methods and features accessible to your Bolt app.
 - Explore the different events your bot can listen to with the [`event`](/tools/bolt-js/concepts/event-listening) method. View the full events reference docs [here](/reference/events).
 - The Bolt framework allows you to [call Web API methods](/tools/bolt-js/concepts/web-api) with the client attached to your app. View the over 200 methods [here](/reference/methods).
-- Check out how to use AI in your app with the [Using AI in apps](/tools/bolt-js/concepts/ai-apps) guide.
+- Check out how to use AI in your app with the [Using AI in apps](/tools/bolt-js/concepts/adding-agent-features) guide.

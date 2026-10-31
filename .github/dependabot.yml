@@ -12,6 +12,11 @@ updates:
       - dependency-name: "@types/node"
       # allow updates for slack official libraries
       - dependency-name: "@slack/*"
+      # allow updates for the reference-docs generator
+      - dependency-name: "typedoc"
+      - dependency-name: "typedoc-plugin-markdown"
+      # allow updates for the changesets release toolchain
+      - dependency-name: "@changesets/*"
     versioning-strategy: increase
     ignore:
       - dependency-name: "@types/node"
@@ -23,6 +28,7 @@ updates:
           - "23.x"
           - "24.x"
           - "25.x"
+          - "26.x"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -50,3 +56,4 @@ updates:
       - dependency-name: "@types/node"
         versions:
           - "25.x"
+          - "26.x"

@@ -1,11 +1,12 @@
 import crypto from 'node:crypto';
 import querystring from 'node:querystring';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import tsscmp from 'tsscmp';
 import type App from '../App';
 import { ReceiverMultipleAckError } from '../errors';
 import type { Receiver, ReceiverEvent } from '../types/receiver';
 import type { StringIndexed } from '../types/utilities';
+import { verifySigningSecret } from './verify-signing-secret';
 
 export type AwsEvent = AwsEventV1 | AwsEventV2;
 type AwsEventStringParameters = Record<string, string | undefined>;
@@ -23,7 +24,7 @@ export interface AwsEventV1 {
   // v1-only properties:
   httpMethod: string;
   multiValueHeaders: AwsEventMultiValueStringParameters;
-  multiValueQueryStringParameters: AwsEventMultiValueStringParameters;
+  multiValueQueryStringParameters: AwsEventMultiValueStringParameters | null;
   path: string;
   resource: string;
 }
@@ -45,6 +46,15 @@ export interface AwsEventV2 {
   version: string;
 }
 
+/**
+ * Legacy callback signature retained for backwards compatibility with consumer
+ * code. `AwsHandler` is now a 2-arg promise-based signature; this callback is
+ * no longer invoked by `AwsLambdaReceiver`.
+ *
+ * @deprecated Lambda's Node.js 24+ runtimes reject callback-style handlers
+ * (`Runtime.CallbackHandlerDeprecated`). Return a `Promise<AwsResponse>`
+ * directly instead.
+ */
 // biome-ignore lint/suspicious/noExplicitAny: userland function results can be anything
 export type AwsCallback = (error?: Error | string | null, result?: any) => void;
 
@@ -69,7 +79,7 @@ export interface AwsResponse {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: request context can be anything
-export type AwsHandler = (event: AwsEvent, context: any, callback: AwsCallback) => Promise<AwsResponse>;
+export type AwsHandler = (event: AwsEvent, context: any) => Promise<AwsResponse>;
 
 export interface AwsLambdaReceiverOptions {
   /**
@@ -79,7 +89,7 @@ export interface AwsLambdaReceiverOptions {
    * If the {@link signatureVerification} flag is set to `false`, this can be set to any value as signature verification
    * using this secret will not be performed.
    *
-   * @see {@link https://api.slack.com/authentication/verifying-requests-from-slack#about} for details about signing secrets
+   * @see {@link https://docs.slack.dev/authentication/verifying-requests-from-slack#about} for details about signing secrets
    */
   signingSecret: string;
   /**
@@ -95,7 +105,7 @@ export interface AwsLambdaReceiverOptions {
    */
   logLevel?: LogLevel;
   /**
-   * Flag that determines whether Bolt should {@link https://api.slack.com/authentication/verifying-requests-from-slack|verify Slack's signature on incoming requests}.
+   * Flag that determines whether Bolt should {@link https://docs.slack.dev/authentication/verifying-requests-from-slack|verify Slack's signature on incoming requests}.
    *
    * @default true
    */
@@ -146,6 +156,7 @@ export default class AwsLambdaReceiver implements Receiver {
     invalidRequestSignatureHandler,
     unhandledRequestTimeoutMillis = 3001,
   }: AwsLambdaReceiverOptions) {
+    verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.signatureVerification = signatureVerification;
@@ -189,8 +200,12 @@ export default class AwsLambdaReceiver implements Receiver {
   }
 
   public toHandler(): AwsHandler {
+    // Returns a 2-arg promise-based handler so the resulting function has
+    // `length === 2`. Lambda's Node.js 24+ runtimes reject 3-arg handlers
+    // up front with `Runtime.CallbackHandlerDeprecated` before the handler
+    // is invoked.
     // biome-ignore lint/suspicious/noExplicitAny: request context can be anything
-    return async (awsEvent: AwsEvent, _awsContext: any, _awsCallback: AwsCallback): Promise<AwsResponse> => {
+    return async (awsEvent: AwsEvent, _awsContext: any): Promise<AwsResponse> => {
       this.logger.debug(`AWS event: ${JSON.stringify(awsEvent, null, 2)}`);
 
       const rawBody = this.getRawBody(awsEvent);

@@ -11,7 +11,6 @@ import type {
 } from '@slack/types';
 import { WebClient } from '@slack/web-api';
 import sinon, { type SinonSpy } from 'sinon';
-import { createFakeLogger } from '.';
 import type {
   AssistantThreadContextChangedMiddlewareArgs,
   AssistantThreadStartedMiddlewareArgs,
@@ -48,6 +47,7 @@ import type {
   ViewOutput,
   ViewSubmitAction,
 } from '../../../src/types';
+import { createFakeLogger } from '.';
 
 const ts = '1234.56';
 const user = 'U1234';
@@ -58,7 +58,7 @@ const app_id = 'A1234';
 const say: SayFn = (_msg) => Promise.resolve({ ok: true });
 const sayStream: SayStreamFn = (_args?) => ({}) as ReturnType<WebClient['chatStream']>;
 const setStatus: SetStatusFn = (_status) => Promise.resolve({ ok: true });
-const respond: RespondFn = (_msg) => Promise.resolve();
+const respond: RespondFn = (_msg) => Promise.resolve({} as Awaited<ReturnType<RespondFn>>);
 const ack: AckFn<void> = (_r?) => Promise.resolve();
 
 export function wrapMiddleware<Args extends AnyMiddlewareArgs>(

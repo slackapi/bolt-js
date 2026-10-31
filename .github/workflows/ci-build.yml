@@ -20,25 +20,36 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 18.x
           - 20.x
           - 22.x
+          - 22.23.4
           - 24.x
+        undici:
+          - "undici@^7"
+          - "undici@^8"
+        exclude:
+          - node-version: 20.x
+            undici: "undici@^8"
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install --verbose
+      - run: npm ci --verbose
+      - name: Install undici
+        run: npm install ${{ matrix.undici }} --no-save
       - run: npm test
+      - name: Build docs
+        if: matrix.node-version == '24.x' && matrix.undici == 'undici@^8'
+        run: npm run docs
       - name: Upload coverage to Codecov
-        if: matrix.node-version == '22.x'
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        if: matrix.node-version == '24.x' && matrix.undici == 'undici@^8'
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: coverage
@@ -51,7 +62,7 @@ jobs:
     if: ${{ !success() && github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Send notifications of failing tests
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
         with:
           errors: true
           webhook: ${{ secrets.SLACK_REGRESSION_FAILURES_WEBHOOK_URL }}

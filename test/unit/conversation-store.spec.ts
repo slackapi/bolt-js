@@ -1,10 +1,10 @@
 import path from 'node:path';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
-import { assert, AssertionError } from 'chai';
+import { AssertionError, assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
-import { type Override, createFakeLogger, delay, proxyquire } from './helpers';
+import { createFakeLogger, delay, type Override, proxyquire } from './helpers';
 
 /* Testing Harness */
 

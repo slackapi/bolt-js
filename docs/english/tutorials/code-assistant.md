@@ -1,6 +1,6 @@
 # AI Code Assistant with Hugging Face
 
-In this tutorial, we will create an [app that has platform AI features enabled](/ai/developing-ai-apps) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
+In this tutorial, we will create an [app that has platform AI features enabled](/ai/developing-agents) with the Bolt framework and integrate a [Hugging Face](https://huggingface.co) model to assist the user with coding questions. We'll also make this functionality available as a step in a workflow to use in Workflow Builder.
 
 Hugging Face is an open-source community best known for its transformers library and platform for machine learning models. Hugging Face's model hub is an online repository where you can find thousands of pre-trained models for natural language processing, computer vision, speech recognition, and more. The platform is open-source, so anyone can contribute to the models and browse the models others have started. Here, we will be using the [Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) model to create an app that can answer coding questions.
 
@@ -100,7 +100,7 @@ Before getting started, you will need the following:
 4. Review the configuration and click **Create**. Clicking around in these settings, you can see what the manifest has created for us. Some highlights:
 
 * Within **App Home**, we've enabled the **Chat Tab**. This will allow users to access your app both in the split-view container as well as within a chat tab of the app.
-* **Agents & AI Apps** is enabled. With this toggled on, the split-view container is available for your app.
+* **Agents** is enabled. With this toggled on, the split-view container is available for your app.
 * A custom step has been added to **Workflow Steps**. A workflow step is a custom step that can be used in Workflow Builder. Setting up information about that step here (its name, input parameters, and output parameters) lets Slack know what data to collect from the workflow to send to the function. We'll implement the logic step for this in code.
 * **Org Level Apps** has been enabled. This means that your app will be installed at the organization level. Upon installation, it is not added to any workspaces, but the workspace admin can choose which workspaces in the org to add the app to.
 * Within **OAuth & Permissions**, you will find several bot scopes have been added.

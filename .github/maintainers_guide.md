@@ -108,7 +108,6 @@ New official package versions are published when the release PR created from cha
 4. **Update Milestones**: Close the relevant [Milestones](https://github.com/slackapi/bolt-js/milestones) and rename these to match the released package version. Open a new Milestone for the next version, e.g. `@slack/bolt@next`.
 
 5. **Communicate the release**:
-   - **Internal**: Post a brief description and link to the GitHub release.
    - **External**: Post in relevant channels (e.g. #lang-javascript, #tools-bolt) on [Slack Community](https://community.slack.com/). Include a link to the package on `npmjs.com/package/@slack/bolt` as well as the release notes.
 
 #### Beta Release

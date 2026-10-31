@@ -1,6 +1,6 @@
 # Bolt for JavaScript
 
-Bolt for JavaScript is a JavaScript framework to build Slack apps with the latest Slack platform features. Read the [Quickstart Guide](/tools/bolt-js/getting-started) to set up and run your first Bolt app.
+Bolt for JavaScript is a JavaScript framework to build Slack apps with the latest Slack platform features. Read the [Quickstart Guide](/quickstart) to set up and run your first Bolt app.
 
 Then, explore the rest of the pages within the Guides section. The documentation there will help you build a Bolt app for whatever use case you may have.
 
@@ -12,6 +12,10 @@ If you otherwise get stuck, we're here to help. The following are the best ways 
 
 * [Issue Tracker](http://github.com/slackapi/bolt-js/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for JavaScript. Try searching for an existing issue before creating a new one.
 * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`.
+
+## Release notes
+
+Check out the [Bolt for JavaScript release notes](https://github.com/slackapi/bolt-js/releases) for all the latest happenings.
 
 ## Contributing
 

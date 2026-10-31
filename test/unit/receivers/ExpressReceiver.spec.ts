@@ -14,18 +14,19 @@ import {
   ReceiverInconsistentStateError,
 } from '../../../src/errors';
 import ExpressReceiver, {
+  buildBodyParserMiddleware,
   respondToSslCheck,
   respondToUrlVerification,
+  verifySignatureAndParseBody,
   verifySignatureAndParseRawBody,
-  buildBodyParserMiddleware,
 } from '../../../src/receivers/ExpressReceiver';
 import * as httpFunc from '../../../src/receivers/HTTPModuleFunctions';
 import type { ReceiverEvent } from '../../../src/types';
 import {
-  FakeServer,
-  type Override,
   createFakeLogger,
+  FakeServer,
   mergeOverrides,
+  type Override,
   proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
@@ -69,6 +70,20 @@ describe('ExpressReceiver', () => {
   });
 
   describe('constructor', () => {
+    it('should throw an error if signingSecret is empty string and signature verification enabled', async () => {
+      try {
+        new ExpressReceiver({ signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        assert.instanceOf(error, AppInitializationError);
+      }
+    });
+
+    it('should succeed with empty signingSecret when signatureVerification is false', async () => {
+      const receiver = new ExpressReceiver({ signingSecret: '', signatureVerification: false });
+      assert.isNotNull(receiver);
+    });
+
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
     it('should accept supported arguments', async () => {
       const receiver = new ExpressReceiver({
@@ -188,7 +203,7 @@ describe('ExpressReceiver', () => {
   describe('#start()', () => {
     it('should start listening for requests using the built-in HTTP server', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       const server = await receiver.start(port);
@@ -203,7 +218,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(fakeCreateServer),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
       const tlsOptions = { key: '', cert: '' };
 
@@ -220,7 +235,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       let caughtError: Error | undefined;
@@ -239,7 +254,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       let caughtError: Error | undefined;
@@ -254,7 +269,7 @@ describe('ExpressReceiver', () => {
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
 
       let caughtError: Error | undefined;
@@ -273,7 +288,7 @@ describe('ExpressReceiver', () => {
   describe('#stop()', () => {
     it('should stop listening for requests when a built-in HTTP server is already started', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
       await receiver.start(port);
 
@@ -281,7 +296,7 @@ describe('ExpressReceiver', () => {
     });
     it('should reject when a built-in HTTP server is not started', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
 
       let caughtError: Error | undefined;
       try {
@@ -304,7 +319,7 @@ describe('ExpressReceiver', () => {
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
       );
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       await receiver.start(12345);
 
       let caughtError: Error | undefined;
@@ -348,7 +363,7 @@ describe('ExpressReceiver', () => {
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -365,7 +380,7 @@ describe('ExpressReceiver', () => {
         return Promise.resolve({});
       });
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -377,7 +392,7 @@ describe('ExpressReceiver', () => {
     it('should throw and build an HTTP 500 response with no body if processEvent raises an uncoded Error or a coded, non-Authorization Error', async () => {
       processStub.callsFake(() => Promise.reject(new Error('uh oh')));
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -393,7 +408,7 @@ describe('ExpressReceiver', () => {
     it('should build an HTTP 401 response with no body and call ack() if processEvent raises a coded AuthorizationError', async () => {
       processStub.callsFake(() => Promise.reject(new AuthorizationError('uh oh', new Error())));
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
       receiver.init(app);
 
@@ -412,7 +427,7 @@ describe('ExpressReceiver', () => {
     describe('install path route', () => {
       it('should call into installer.handleInstallPath when HTTP GET request hits the install path', async () => {
         const ER = importExpressReceiver(overrides);
-        const receiver = new ER({ signingSecret: '', clientSecret: '', clientId: '', stateSecret: '' });
+        const receiver = new ER({ signingSecret: 'test-secret', clientSecret: '', clientId: '', stateSecret: '' });
         const handleStub = sinon.stub(receiver.installer as InstallProvider, 'handleInstallPath').resolves();
 
         const req = { body: {}, url: 'http://localhost/slack/install', method: 'GET' } as Request;
@@ -434,7 +449,7 @@ describe('ExpressReceiver', () => {
           callbackOptions,
         };
         const receiver = new ER({
-          signingSecret: '',
+          signingSecret: 'test-secret',
           clientSecret: '',
           clientId: '',
           stateSecret: '',
@@ -459,7 +474,7 @@ describe('ExpressReceiver', () => {
           callbackOptions,
         };
         const receiver = new ER({
-          signingSecret: '',
+          signingSecret: 'test-secret',
           clientSecret: '',
           clientId: '',
           stateSecret: '',
@@ -481,7 +496,7 @@ describe('ExpressReceiver', () => {
   describe('state management for built-in server', () => {
     it('should be able to start after it was stopped', async () => {
       const ER = importExpressReceiver(overrides);
-      const receiver = new ER({ signingSecret: '' });
+      const receiver = new ER({ signingSecret: 'test-secret' });
       const port = 12345;
       await receiver.start(port);
       await receiver.stop();
@@ -839,6 +854,84 @@ describe('ExpressReceiver', () => {
       const req = untypedReq as Request;
       await verifySignatureMismatch(req);
     });
+
+    it('should reject an empty signingSecret at request time', async () => {
+      try {
+        verifySignatureAndParseBody('', body, {
+          'x-slack-signature': signature,
+          'x-slack-request-timestamp': requestTimestamp,
+          'content-type': 'application/x-www-form-urlencoded',
+        });
+        assert.fail('Expected error to be thrown');
+      } catch (e) {
+        assert.instanceOf(e, Error);
+        assert.include((e as Error).message, 'signingSecret is empty or undefined');
+      }
+    });
+
+    // ----------------------------
+    // request body size limiting
+
+    function buildLargeExpressRequest(size: number): Request {
+      const reqAsStream = new Readable();
+      reqAsStream.push('x'.repeat(size));
+      reqAsStream.push(null); // indicate EOF
+      // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
+      (reqAsStream as any).headers = {
+        'content-type': 'application/x-www-form-urlencoded',
+      };
+      return reqAsStream as Request;
+    }
+
+    it('should respond 413 when the request body exceeds the configured bodyLimit', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, 128);
+      await verifier(buildLargeExpressRequest(1024), resp, next);
+      assert.equal(result.code, 413);
+      assert.equal(result.sent, true);
+      sinon.assert.notCalled(next);
+    });
+
+    it('should verify a request whose body is within the configured bodyLimit', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, 4096);
+      await verifier(buildExpressRequest(), resp, next);
+      // On success the middleware calls next() with no error and sends no response.
+      sinon.assert.calledOnce(next);
+      assert.isUndefined(next.firstCall.args[0]);
+      assert.isUndefined(result.code);
+    });
+
+    it('should parse a string bodyLimit and respond 413 when the body exceeds it', async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, '128b');
+      await verifier(buildLargeExpressRequest(1024), resp, next);
+      assert.equal(result.code, 413);
+      assert.equal(result.sent, true);
+      sinon.assert.notCalled(next);
+    });
+
+    it('should not enforce any limit when bodyLimit is Infinity', async () => {
+      // A validly-signed request within Infinity passes size and signature checks and calls next().
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const next = sinon.fake();
+      const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, Infinity);
+      await verifier(buildExpressRequest(), resp, next);
+      sinon.assert.calledOnce(next);
+      assert.isUndefined(next.firstCall.args[0]);
+      assert.isUndefined(result.code);
+    });
   });
 
   describe('buildBodyParserMiddleware', () => {
@@ -903,6 +996,44 @@ describe('ExpressReceiver', () => {
       await parser(req, res as unknown as Response, next);
       sinon.assert.called(next);
       assert.equal(req.body.awesome, true, 'request body form-urlencoded was not parsed');
+    });
+    it('should respond 413 when the request body exceeds bodyLimit', async () => {
+      req = new Readable();
+      req.push('x'.repeat(1024));
+      req.push(null); // indicate EOF
+      req.headers = { 'content-type': 'application/json' };
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const parser = buildBodyParserMiddleware(createFakeLogger(), 128);
+      await parser(req, resp, next);
+      assert.equal(result.code, 413);
+      assert.equal(result.sent, true);
+      sinon.assert.notCalled(next);
+    });
+    it('should parse a string bodyLimit and respond 413 when the body exceeds it', async () => {
+      req = new Readable();
+      req.push('x'.repeat(1024));
+      req.push(null); // indicate EOF
+      req.headers = { 'content-type': 'application/json' };
+      // biome-ignore lint/suspicious/noExplicitAny: mock response capture can be anything
+      const result: any = {};
+      const resp = buildResponseToVerify(result);
+      const parser = buildBodyParserMiddleware(createFakeLogger(), '128b');
+      await parser(req, resp, next);
+      assert.equal(result.code, 413);
+      assert.equal(result.sent, true);
+      sinon.assert.notCalled(next);
+    });
+    it('should not enforce any limit when bodyLimit is Infinity', async () => {
+      req = new Readable();
+      req.push(`a=${'x'.repeat(5000)}`); // large, but valid form body
+      req.push(null); // indicate EOF
+      req.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+      const parser = buildBodyParserMiddleware(createFakeLogger(), Infinity);
+      await parser(req, res as unknown as Response, next);
+      sinon.assert.called(next);
+      assert.equal(req.body.a, 'x'.repeat(5000), 'large body was parsed without hitting a limit');
     });
   });
 });

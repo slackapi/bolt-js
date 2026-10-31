@@ -14,12 +14,12 @@ import type { AssistantThreadContext, AssistantThreadContextStore } from '../../
 import { AssistantInitializationError, AssistantMissingPropertyError } from '../../src/errors';
 import type { Middleware } from '../../src/types';
 import {
-  type Override,
   createDummyAppMentionEventMiddlewareArgs,
   createDummyAssistantThreadContextChangedEventMiddlewareArgs,
   createDummyAssistantThreadStartedEventMiddlewareArgs,
   createDummyAssistantUserMessageEventMiddlewareArgs,
   createDummyMessageEventMiddlewareArgs,
+  type Override,
   proxyquire,
   wrapMiddleware,
 } from './helpers';

@@ -80,6 +80,8 @@ export interface EnvelopedEvent<Event = BaseSlackEvent> extends StringIndexed {
   token: string;
   team_id: string;
   enterprise_id?: string;
+  context_team_id?: string;
+  context_enterprise_id?: string;
   api_app_id: string;
   event: Event;
   type: 'event_callback';
@@ -103,7 +105,6 @@ interface Authorization {
  * When the string matches known event(s) from the `SlackEvent` union, only those types are returned (also as a union).
  * Otherwise, the `BasicSlackEvent<T>` type is returned.
  */
-export type EventFromType<T extends string> = KnownEventFromType<T> extends never
-  ? BaseSlackEvent<T>
-  : KnownEventFromType<T>;
+export type EventFromType<T extends string> =
+  KnownEventFromType<T> extends never ? BaseSlackEvent<T> : KnownEventFromType<T>;
 export type KnownEventFromType<T extends string> = Extract<SlackEvent, { type: T }>;

@@ -1,14 +1,13 @@
 import crypto from 'node:crypto';
-import { type Server, type ServerOptions, createServer } from 'node:http';
-import type { IncomingMessage, ServerResponse } from 'node:http';
+import { createServer, type IncomingMessage, type Server, type ServerOptions, type ServerResponse } from 'node:http';
 import {
+  createServer as createHttpsServer,
   type Server as HTTPSServer,
   type ServerOptions as HTTPSServerOptions,
-  createServer as createHttpsServer,
 } from 'node:https';
 import type { ListenOptions } from 'node:net';
 import querystring from 'node:querystring';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import {
   type CallbackOptions,
   type InstallPathOptions,
@@ -17,12 +16,12 @@ import {
   type InstallURLOptions,
 } from '@slack/oauth';
 import express, {
-  type Request,
-  type Response,
   type Application,
-  type RequestHandler,
-  Router,
   type IRouter,
+  type Request,
+  type RequestHandler,
+  type Response,
+  Router,
 } from 'express';
 import rawBody from 'raw-body';
 import tsscmp from 'tsscmp';
@@ -33,6 +32,7 @@ import type { StringIndexed } from '../types/utilities';
 import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import { verifySigningSecret } from './verify-signing-secret';
 
 // Option keys for tls.createServer() and tls.createSecureContext(), exclusive of those for http.createServer()
 const httpsOptionKeys = [
@@ -117,6 +117,7 @@ export interface ExpressReceiverOptions {
   // we can add a different name function for it.
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
+  bodyLimit?: number | string;
 }
 
 // Additional Installer Options
@@ -129,7 +130,7 @@ interface InstallerOptions {
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
-  directInstall?: InstallProviderOptions['directInstall']; // see https://api.slack.com/start/distributing/directory#direct_install
+  directInstall?: InstallProviderOptions['directInstall']; // see https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements#direct-install
   renderHtmlForInstallPath?: InstallProviderOptions['renderHtmlForInstallPath'];
   redirectUriPath?: string;
   installPathOptions?: InstallPathOptions;
@@ -173,7 +174,7 @@ export default class ExpressReceiver implements Receiver {
   private unhandledRequestTimeoutMillis: number;
 
   public constructor({
-    signingSecret = '',
+    signingSecret,
     logger = undefined,
     logLevel = LogLevel.INFO,
     endpoints = { events: '/slack/events' },
@@ -193,6 +194,7 @@ export default class ExpressReceiver implements Receiver {
     processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
+    bodyLimit = httpFunc.defaultBodyLimit,
   }: ExpressReceiverOptions) {
     this.app = app !== undefined ? app : express();
 
@@ -203,10 +205,13 @@ export default class ExpressReceiver implements Receiver {
       this.logger.setLevel(logLevel);
     }
 
+    if (typeof signingSecret !== 'function') {
+      verifySigningSecret(signingSecret, signatureVerification);
+    }
     this.signatureVerification = signatureVerification;
     const bodyParser = this.signatureVerification
-      ? buildVerificationBodyParserMiddleware(this.logger, signingSecret)
-      : buildBodyParserMiddleware(this.logger);
+      ? buildVerificationBodyParserMiddleware(this.logger, signingSecret, bodyLimit)
+      : buildBodyParserMiddleware(this.logger, bodyLimit);
     const expressMiddleware: RequestHandler[] = [
       bodyParser,
       respondToSslCheck,
@@ -444,8 +449,9 @@ export default class ExpressReceiver implements Receiver {
 export function verifySignatureAndParseRawBody(
   logger: Logger,
   signingSecret: string | (() => PromiseLike<string>),
+  bodyLimit?: number | string,
 ): RequestHandler {
-  return buildVerificationBodyParserMiddleware(logger, signingSecret);
+  return buildVerificationBodyParserMiddleware(logger, signingSecret, bodyLimit);
 }
 
 /**
@@ -456,11 +462,26 @@ export function verifySignatureAndParseRawBody(
 function buildVerificationBodyParserMiddleware(
   logger: Logger,
   signingSecret: string | (() => PromiseLike<string>),
+  bodyLimit?: number | string,
 ): RequestHandler {
   return async (req, res, next): Promise<void> => {
     // *** Parsing body ***
     // As the verification passed, parse the body as an object and assign it to req.body
-    const stringBody = await parseExpressRequestRawBody(req);
+    let stringBody: string;
+    try {
+      stringBody = await parseExpressRequestRawBody(req, bodyLimit);
+    } catch (error) {
+      if (httpFunc.isRawBodyError(error)) {
+        if (error.type === 'entity.too.large' || error.statusCode === 413) {
+          logError(logger, 'Request body exceeded the maximum allowed size', error);
+          res.status(413).send();
+          return;
+        }
+      }
+      logError(logger, 'Failed to read request body', error);
+      res.status(400).send();
+      return;
+    }
 
     // Following middlewares can expect `req.body` is already parsed.
     try {
@@ -502,6 +523,12 @@ function verifyRequestSignature(
   signature: string | undefined,
   requestTimestamp: string | undefined,
 ): void {
+  if (!signingSecret) {
+    throw new ReceiverAuthenticityError(
+      'Slack request signing verification failed. signingSecret is empty or undefined.',
+    );
+  }
+
   if (signature === undefined || requestTimestamp === undefined) {
     throw new ReceiverAuthenticityError('Slack request signing verification failed. Some headers are missing.');
   }
@@ -551,9 +578,23 @@ export function verifySignatureAndParseBody(
   return parseRequestBody(body, contentType);
 }
 
-export function buildBodyParserMiddleware(logger: Logger): RequestHandler {
+export function buildBodyParserMiddleware(logger: Logger, bodyLimit?: number | string): RequestHandler {
   return async (req, res, next) => {
-    const stringBody = await parseExpressRequestRawBody(req);
+    let stringBody: string;
+    try {
+      stringBody = await parseExpressRequestRawBody(req, bodyLimit);
+    } catch (error) {
+      if (httpFunc.isRawBodyError(error)) {
+        if (error.type === 'entity.too.large' || error.statusCode === 413) {
+          logError(logger, 'Request body exceeded the maximum allowed size', error);
+          res.status(413).send();
+          return;
+        }
+      }
+      logError(logger, 'Failed to read request body', error);
+      res.status(400).send();
+      return;
+    }
     try {
       const { 'content-type': contentType } = req.headers;
       req.body = parseRequestBody(stringBody, contentType);
@@ -585,9 +626,13 @@ function parseRequestBody(stringBody: string, contentType: string | undefined): 
 
 // On some environments like GCP (Google Cloud Platform),
 // req.body can be pre-parsed and be passed as req.rawBody
-async function parseExpressRequestRawBody(req: Parameters<RequestHandler>[0]): Promise<string> {
+async function parseExpressRequestRawBody(
+  req: Parameters<RequestHandler>[0],
+  bodyLimit?: number | string,
+): Promise<string> {
   if ('rawBody' in req && req.rawBody) {
     return Promise.resolve(req.rawBody.toString());
   }
-  return (await rawBody(req)).toString();
+  const rawBodyOptions = bodyLimit !== undefined ? { limit: bodyLimit } : undefined;
+  return (await rawBody(req, rawBodyOptions)).toString();
 }

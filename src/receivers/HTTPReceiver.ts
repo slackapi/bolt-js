@@ -1,19 +1,19 @@
 import {
+  createServer,
   type IncomingMessage,
   type RequestListener,
   type Server,
   type ServerOptions,
   type ServerResponse,
-  createServer,
 } from 'node:http';
 import {
+  createServer as createHttpsServer,
   type Server as HTTPSServer,
   type ServerOptions as HTTPSServerOptions,
-  createServer as createHttpsServer,
 } from 'node:https';
 import type { ListenOptions } from 'node:net';
 import { URL } from 'node:url';
-import { ConsoleLogger, LogLevel, type Logger } from '@slack/logger';
+import { ConsoleLogger, type Logger, LogLevel } from '@slack/logger';
 import {
   type CallbackOptions,
   type InstallPathOptions,
@@ -28,11 +28,12 @@ import { type CodedError, HTTPReceiverDeferredRequestError, ReceiverInconsistent
 import type { Receiver, ReceiverEvent } from '../types';
 import type { StringIndexed } from '../types/utilities';
 import type { BufferedIncomingMessage } from './BufferedIncomingMessage';
+import { buildReceiverRoutes, type CustomRoute, type ReceiverRoutes } from './custom-routes';
 import * as httpFunc from './HTTPModuleFunctions';
 import { HTTPResponseAck } from './HTTPResponseAck';
 import type { ParamsIncomingMessage } from './ParamsIncomingMessage';
-import { type CustomRoute, type ReceiverRoutes, buildReceiverRoutes } from './custom-routes';
 import { verifyRedirectOpts } from './verify-redirect-opts';
+import { verifySigningSecret } from './verify-signing-secret';
 
 export interface HTTPReceiverInvalidRequestSignatureHandlerArgs {
   rawBody: string;
@@ -112,6 +113,7 @@ export interface HTTPReceiverOptions {
   // NOTE: As we use setTimeout under the hood, this cannot be async
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
+  bodyLimit?: number | string;
 }
 
 // All the available argument for OAuth flow enabled apps
@@ -187,8 +189,10 @@ export default class HTTPReceiver implements Receiver {
 
   private unhandledRequestTimeoutMillis: number;
 
+  private bodyLimit: number | string;
+
   public constructor({
-    signingSecret = '',
+    signingSecret,
     endpoints = ['/slack/events'],
     port = 3000,
     customRoutes = [],
@@ -209,13 +213,16 @@ export default class HTTPReceiver implements Receiver {
     processEventErrorHandler = httpFunc.defaultProcessEventErrorHandler,
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
+    bodyLimit = httpFunc.defaultBodyLimit,
   }: HTTPReceiverOptions) {
+    verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
     this.signingSecret = signingSecret;
     this.processBeforeResponse = processBeforeResponse;
     this.signatureVerification = signatureVerification;
     this.invalidRequestSignatureHandler =
       invalidRequestSignatureHandler ?? this.defaultInvalidRequestSignatureHandler.bind(this);
+    this.bodyLimit = bodyLimit;
     this.logger =
       logger ??
       (() => {
@@ -462,11 +469,19 @@ export default class HTTPReceiver implements Receiver {
             // If enabled: false, this method returns bufferedReq without verification
             enabled: this.signatureVerification,
             signingSecret: this.signingSecret,
+            bodyLimit: this.bodyLimit,
           },
           req,
         );
       } catch (err) {
         const e = err as Error;
+        if (httpFunc.isRawBodyError(err)) {
+          if (err.type === 'entity.too.large' || err.statusCode === 413) {
+            this.logger.warn(`Request body exceeded the maximum allowed size (limit: ${err.limit} bytes)`);
+            httpFunc.buildNoBodyResponse(res, 413);
+            return;
+          }
+        }
         if (this.signatureVerification) {
           const requestWithRawBody = req as IncomingMessage & { rawBody?: string };
           const rawBody = typeof requestWithRawBody.rawBody === 'string' ? requestWithRawBody.rawBody : '';
@@ -495,9 +510,10 @@ export default class HTTPReceiver implements Receiver {
         return;
       }
 
-      // Handle SSL checks
-      if (body.ssl_check) {
-        httpFunc.buildNoBodyResponse(res, 200);
+      // Slack sends `ssl_check=1` to verify SSL connectivity
+      // https://docs.slack.dev/interactivity/implementing-slash-commands/#responding_basic_receipt
+      if (body.ssl_check === '1') {
+        httpFunc.buildSSLCheckResponse(res);
         return;
       }
 

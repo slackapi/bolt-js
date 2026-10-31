@@ -9,9 +9,7 @@ import {
   type AssistantThreadContextStore,
   DefaultThreadContextStore,
 } from './AssistantThreadContextStore';
-import { createSayStream, createSetStatus } from './context';
-import type { SayStreamFn } from './context';
-import type { SetStatusFn } from './context';
+import { createSayStream, createSetStatus, type SayStreamFn, type SetStatusFn } from './context';
 import { AssistantInitializationError, AssistantMissingPropertyError } from './errors';
 import { extractEventChannelId, extractEventThreadTs, isRecord } from './helpers';
 import processMiddleware from './middleware/process';
@@ -307,7 +305,7 @@ export async function processAssistantMiddleware(
 /**
  * Creates utility `say()` to easily respond to wherever the message
  * was received. Alias for `postMessage()`.
- * https://api.slack.com/methods/chat.postMessage
+ * https://docs.slack.dev/reference/methods/chat.postMessage
  */
 function createSay(args: AllAssistantMiddlewareArgs): SayFn {
   const { client, payload } = args;
@@ -344,7 +342,7 @@ function createAssistantSayStream(args: AllAssistantMiddlewareArgs): SayStreamFn
 
 /**
  * Creates utility `setStatus()` to set the status and indicate active processing.
- * https://api.slack.com/methods/assistant.threads.setStatus
+ * https://docs.slack.dev/reference/methods/assistant.threads.setStatus
  */
 function createAssistantSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn {
   const { client, payload } = args;
@@ -354,7 +352,7 @@ function createAssistantSetStatus(args: AllAssistantMiddlewareArgs): SetStatusFn
 
 /**
  * Creates utility `setSuggestedPrompts()` to provides prompts for the user to select from.
- * https://api.slack.com/methods/assistant.threads.setSuggestedPrompts
+ * https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts
  */
 function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggestedPromptsFn {
   const { client, payload } = args;
@@ -373,7 +371,7 @@ function createSetSuggestedPrompts(args: AllAssistantMiddlewareArgs): SetSuggest
 
 /**
  * Creates utility `setTitle()` to set the title of the Assistant thread
- * https://api.slack.com/methods/assistant.threads.setTitle
+ * https://docs.slack.dev/reference/methods/assistant.threads.setTitle
  */
 function createSetTitle(args: AllAssistantMiddlewareArgs): SetTitleFn {
   const { client, payload } = args;

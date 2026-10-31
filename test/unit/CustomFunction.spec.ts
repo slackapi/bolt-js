@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import {
   CustomFunction,
-  type SlackCustomFunctionMiddlewareArgs,
   matchCallbackId,
+  type SlackCustomFunctionMiddlewareArgs,
   validate,
 } from '../../src/CustomFunction';
 import { CustomFunctionInitializationError } from '../../src/errors';

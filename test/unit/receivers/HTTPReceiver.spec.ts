@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 import { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
@@ -12,11 +13,11 @@ import {
 } from '../../../src/errors';
 import type { CustomRoute } from '../../../src/receivers/custom-routes';
 import {
-  FakeServer,
-  type Override,
   createFakeLogger,
+  FakeServer,
   mergeOverrides,
   type noopVoid,
+  type Override,
   proxyquire,
   withHttpCreateServer,
   withHttpsCreateServer,
@@ -114,6 +115,22 @@ describe('HTTPReceiver', () => {
       });
       assert.isNotNull(customPort2);
       assert.propertyVal(customPort2, 'port', 9999);
+    });
+
+    it('should throw an error if signingSecret is empty string and signature verification enabled', async () => {
+      const HTTPReceiver = importHTTPReceiver(overrides);
+      try {
+        new HTTPReceiver({ signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        assert.instanceOf(error, AppInitializationError);
+      }
+    });
+
+    it('should succeed with empty signingSecret when signatureVerification is false', async () => {
+      const HTTPReceiver = importHTTPReceiver(overrides);
+      const receiver = new HTTPReceiver({ signingSecret: '', signatureVerification: false });
+      assert.isNotNull(receiver);
     });
 
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
@@ -581,6 +598,7 @@ describe('HTTPReceiver', () => {
           './HTTPModuleFunctions': {
             parseAndVerifyHTTPRequest: fakeParseAndVerify,
             parseHTTPRequestBody: sinon.fake(),
+            isRawBodyError: sinon.fake.returns(false),
             buildNoBodyResponse: fakeBuildNoBodyResponse,
             '@noCallThru': true,
           },
@@ -629,6 +647,7 @@ describe('HTTPReceiver', () => {
           './HTTPModuleFunctions': {
             parseAndVerifyHTTPRequest: fakeParseAndVerify,
             parseHTTPRequestBody: sinon.fake(),
+            isRawBodyError: sinon.fake.returns(false),
             buildNoBodyResponse: fakeBuildNoBodyResponse,
             '@noCallThru': true,
           },
@@ -664,6 +683,7 @@ describe('HTTPReceiver', () => {
           './HTTPModuleFunctions': {
             parseAndVerifyHTTPRequest: fakeParseAndVerify,
             parseHTTPRequestBody: sinon.fake(),
+            isRawBodyError: sinon.fake.returns(false),
             buildNoBodyResponse: fakeBuildNoBodyResponse,
             '@noCallThru': true,
           },
@@ -732,6 +752,130 @@ describe('HTTPReceiver', () => {
       const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
 
       assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
+    });
+
+    describe('ssl_check handling', () => {
+      let fakeHttpFunctions: Record<string, sinon.SinonSpy>;
+      let receiver: InstanceType<ReturnType<typeof importHTTPReceiver>>;
+      let fakeRes: ServerResponse;
+
+      beforeEach(() => {
+        fakeHttpFunctions = {
+          parseAndVerifyHTTPRequest: sinon.fake.resolves({
+            rawBody: Buffer.from(''),
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          }),
+          parseHTTPRequestBody: sinon.fake(),
+          buildSSLCheckResponse: sinon.fake(),
+          buildNoBodyResponse: sinon.fake(),
+          extractRetryNumFromHTTPRequest: sinon.fake.returns(undefined),
+          extractRetryReasonFromHTTPRequest: sinon.fake.returns(undefined),
+        };
+        const HTTPReceiver = importHTTPReceiver(
+          mergeOverrides(overrides, { './HTTPModuleFunctions': fakeHttpFunctions }),
+        );
+        receiver = new HTTPReceiver({
+          logger: noopLogger,
+          clientId: 'my-clientId',
+          clientSecret: 'my-client-secret',
+          signingSecret: 'secret',
+        });
+        fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+      });
+
+      it('should respond to ssl_check=1 with 200', async () => {
+        fakeHttpFunctions.parseHTTPRequestBody = sinon.fake.returns({ ssl_check: '1' });
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setImmediate(resolve));
+        sinon.assert.calledOnce(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+
+      it('should not treat ssl_check=0 as an ssl_check request', async () => {
+        fakeHttpFunctions.parseHTTPRequestBody = sinon.fake.returns({ ssl_check: '0' });
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setImmediate(resolve));
+        sinon.assert.notCalled(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+
+      it('should not treat an empty ssl_check value as an ssl_check request', async () => {
+        fakeHttpFunctions.parseHTTPRequestBody = sinon.fake.returns({ ssl_check: '' });
+        const fakeReq = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setImmediate(resolve));
+        sinon.assert.notCalled(fakeHttpFunctions.buildSSLCheckResponse);
+      });
+    });
+
+    describe('request body size limiting', () => {
+      // Drive a real POST through requestListener with a readable body and let the real raw-body
+      // enforce the limit. handleIncomingEvent is fire-and-forget, so we resolve when the response
+      // is ended rather than guessing how many ticks the stream read takes.
+      async function postBody(
+        receiver: InstanceType<ReturnType<typeof importHTTPReceiver>>,
+        bodyLength: number,
+      ): Promise<sinon.SinonSpy> {
+        const req = new Readable();
+        req.push('x'.repeat(bodyLength));
+        req.push(null); // indicate EOF
+        // biome-ignore lint/suspicious/noExplicitAny: mock requests can be anything
+        const untypedReq = req as Record<string, any>;
+        untypedReq.headers = { 'content-type': 'application/json' };
+        untypedReq.url = '/slack/events';
+        untypedReq.method = 'POST';
+
+        let resolveEnded: () => void = () => {};
+        const ended = new Promise<void>((resolve) => {
+          resolveEnded = resolve;
+        });
+        const writeHead = sinon.fake();
+        const res = { writeHead, end: sinon.fake(() => resolveEnded()) };
+
+        receiver.requestListener(req as unknown as IncomingMessage, res as unknown as ServerResponse);
+        await ended;
+        return writeHead;
+      }
+
+      it('should respond with 413 when the request body exceeds bodyLimit', async () => {
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({ logger: noopLogger, signingSecret: 'secret', bodyLimit: 128 });
+        const writeHead = await postBody(receiver, 1024);
+        sinon.assert.calledWith(writeHead, 413);
+      });
+
+      it('should respond with 413 for oversized bodies even when signatureVerification is false', async () => {
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({
+          logger: noopLogger,
+          signingSecret: 'secret',
+          signatureVerification: false,
+          bodyLimit: 128,
+        });
+        const writeHead = await postBody(receiver, 1024);
+        sinon.assert.calledWith(writeHead, 413);
+      });
+
+      it('should respond with 413 when a string bodyLimit is exceeded', async () => {
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({ logger: noopLogger, signingSecret: 'secret', bodyLimit: '128b' });
+        const writeHead = await postBody(receiver, 1024);
+        sinon.assert.calledWith(writeHead, 413);
+      });
+
+      it('should not respond with 413 for large bodies when bodyLimit is Infinity', async () => {
+        // Buffering passes (no limit); the request then fails signature verification with 401, never 413.
+        const HTTPReceiver = importHTTPReceiver(overrides);
+        const receiver = new HTTPReceiver({ logger: noopLogger, signingSecret: 'secret', bodyLimit: Infinity });
+        const writeHead = await postBody(receiver, 5000);
+        sinon.assert.neverCalledWith(writeHead, 413);
+      });
     });
   });
 });

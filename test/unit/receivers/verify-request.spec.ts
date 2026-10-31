@@ -6,6 +6,20 @@ describe('Request verification', async () => {
   const signingSecret = 'secret';
 
   describe('verifySlackRequest', async () => {
+    it('should throw when signingSecret is empty string', async () => {
+      try {
+        verifySlackRequest({
+          signingSecret: '',
+          headers: { 'x-slack-signature': 'v0=abc', 'x-slack-request-timestamp': Math.floor(Date.now() / 1000) },
+          body: '{}',
+        });
+        assert.fail('Expected error to be thrown');
+      } catch (e) {
+        assert.instanceOf(e, Error);
+        assert.include((e as Error).message, 'signingSecret is empty or undefined');
+      }
+    });
+
     it('should judge a valid request', async () => {
       const timestamp = Math.floor(Date.now() / 1000);
       const rawBody = '{"foo":"bar"}';

@@ -4,9 +4,9 @@ import sinon from 'sinon';
 import { ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
 import {
-  FakeReceiver,
   createFakeConversationStore,
   createFakeLogger,
+  FakeReceiver,
   importApp,
   mergeOverrides,
   noop,
@@ -32,13 +32,18 @@ describe('App basic features', () => {
     describe('with a custom port value in HTTP Mode', () => {
       it('should accept a port value at the top-level', async () => {
         const MockApp = importApp(overrides);
-        const app = new MockApp({ token: '', signingSecret: '', port: 9999 });
+        const app = new MockApp({ token: '', signingSecret: 'test-signing-secret', port: 9999 });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
         assert.propertyVal(app['receiver'], 'port', 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = importApp(overrides);
-        const app = new MockApp({ token: '', signingSecret: '', port: 7777, installerOptions: { port: 9999 } });
+        const app = new MockApp({
+          token: '',
+          signingSecret: 'test-signing-secret',
+          port: 7777,
+          installerOptions: { port: 9999 },
+        });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
         assert.propertyVal(app['receiver'], 'port', 9999);
       });
@@ -91,13 +96,13 @@ describe('App basic features', () => {
     describe('with successful single team authorization results', () => {
       it('should succeed with a token for single team authorization', async () => {
         const MockApp = importApp(overrides);
-        const app = new MockApp({ token: '', signingSecret: '' });
+        const app = new MockApp({ token: '', signingSecret: 'test-signing-secret' });
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
         assert.instanceOf(app, MockApp);
       });
       it('should pass the given token to app.client', async () => {
         const MockApp = importApp(overrides);
-        const app = new MockApp({ token: 'xoxb-foo-bar', signingSecret: '' });
+        const app = new MockApp({ token: 'xoxb-foo-bar', signingSecret: 'test-signing-secret' });
         assert.isDefined(app.client);
         assert.equal(app.client.token, 'xoxb-foo-bar');
       });
@@ -105,13 +110,13 @@ describe('App basic features', () => {
     it('should succeed with an authorize callback', async () => {
       const authorizeCallback = sinon.fake();
       const MockApp = importApp();
-      new MockApp({ authorize: authorizeCallback, signingSecret: '' });
+      new MockApp({ authorize: authorizeCallback, signingSecret: 'test-signing-secret' });
       assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
     });
     it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
       const MockApp = importApp();
       try {
-        new MockApp({ signingSecret: '' });
+        new MockApp({ signingSecret: 'test-signing-secret' });
         assert.fail();
       } catch (error) {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
@@ -121,7 +126,7 @@ describe('App basic features', () => {
       const authorizeCallback = sinon.fake();
       const MockApp = importApp();
       try {
-        new MockApp({ token: '', authorize: authorizeCallback, signingSecret: '' });
+        new MockApp({ token: '', authorize: authorizeCallback, signingSecret: 'test-signing-secret' });
         assert.fail();
       } catch (error) {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
@@ -132,7 +137,13 @@ describe('App basic features', () => {
       const authorizeCallback = sinon.fake();
       const MockApp = importApp();
       try {
-        new MockApp({ token: '', clientId: '', clientSecret: '', stateSecret: '', signingSecret: '' });
+        new MockApp({
+          token: '',
+          clientId: '',
+          clientSecret: '',
+          stateSecret: '',
+          signingSecret: 'test-signing-secret',
+        });
         assert.fail();
       } catch (error) {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
@@ -148,7 +159,7 @@ describe('App basic features', () => {
           clientId: '',
           clientSecret: '',
           stateSecret: '',
-          signingSecret: '',
+          signingSecret: 'test-signing-secret',
         });
         assert.fail();
       } catch (error) {
@@ -174,11 +185,29 @@ describe('App basic features', () => {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
       }
     });
+    it('should fail when signingSecret is empty string for the default receiver', async () => {
+      const MockApp = importApp();
+      try {
+        new MockApp({ authorize: noop, signingSecret: '' });
+        assert.fail();
+      } catch (error) {
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+      }
+    });
+    it('should fail when signingSecret is null for the default receiver', async () => {
+      const MockApp = importApp();
+      try {
+        new MockApp({ authorize: noop, signingSecret: null as unknown as string });
+        assert.fail();
+      } catch (error) {
+        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+      }
+    });
     it('should fail when both socketMode and a custom receiver are specified', async () => {
       const fakeReceiver = new FakeReceiver();
       const MockApp = importApp();
       try {
-        new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: fakeReceiver });
+        new MockApp({ token: '', signingSecret: 'test-signing-secret', socketMode: true, receiver: fakeReceiver });
         assert.fail();
       } catch (error) {
         assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
@@ -187,7 +216,7 @@ describe('App basic features', () => {
     it('should succeed when both socketMode and SocketModeReceiver are specified', async () => {
       const MockApp = importApp(overrides);
       const socketModeReceiver = new SocketModeReceiver({ appToken: fakeAppToken });
-      new MockApp({ token: '', signingSecret: '', socketMode: true, receiver: socketModeReceiver });
+      new MockApp({ token: '', signingSecret: 'test-signing-secret', socketMode: true, receiver: socketModeReceiver });
     });
     it('should initialize MemoryStore conversation store by default', async () => {
       const fakeMemoryStore = sinon.fake();
@@ -200,7 +229,7 @@ describe('App basic features', () => {
       );
       const MockApp = importApp(overrides);
 
-      new MockApp({ authorize: noop, signingSecret: '' });
+      new MockApp({ authorize: noop, signingSecret: 'test-signing-secret' });
       assert(fakeMemoryStore.calledWithNew);
       assert(fakeConversationContext.called);
     });
@@ -213,13 +242,13 @@ describe('App basic features', () => {
       );
       it('should initialize without a conversation store when option is false', async () => {
         const MockApp = importApp(overrides);
-        new MockApp({ convoStore: false, authorize: noop, signingSecret: '' });
+        new MockApp({ convoStore: false, authorize: noop, signingSecret: 'test-signing-secret' });
         assert(fakeConversationContext.notCalled);
       });
       it('should initialize the conversation store', async () => {
         const dummyConvoStore = createFakeConversationStore();
         const MockApp = importApp(overrides);
-        const app = new MockApp({ convoStore: dummyConvoStore, authorize: noop, signingSecret: '' });
+        const app = new MockApp({ convoStore: dummyConvoStore, authorize: noop, signingSecret: 'test-signing-secret' });
         assert.instanceOf(app, MockApp);
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
@@ -228,7 +257,7 @@ describe('App basic features', () => {
       it('should fail when missing installerOptions', async () => {
         const MockApp = importApp();
         try {
-          new MockApp({ token: '', signingSecret: '', redirectUri: 'http://example.com/redirect' }); // eslint-disable-line no-new
+          new MockApp({ token: '', signingSecret: 'test-signing-secret', redirectUri: 'http://example.com/redirect' }); // eslint-disable-line no-new
           assert.fail();
         } catch (error) {
           assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
@@ -239,7 +268,7 @@ describe('App basic features', () => {
         try {
           new MockApp({
             token: '',
-            signingSecret: '',
+            signingSecret: 'test-signing-secret',
             redirectUri: 'http://example.com/redirect',
             installerOptions: {},
           });
@@ -264,7 +293,7 @@ describe('App basic features', () => {
 
       const MockApp = importApp(overrides);
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
-      new MockApp({ clientOptions, authorize: noop, signingSecret: '', logLevel: LogLevel.ERROR });
+      new MockApp({ clientOptions, authorize: noop, signingSecret: 'test-signing-secret', logLevel: LogLevel.ERROR });
       assert.ok(fakeConstructor.called);
       const [token, options] = fakeConstructor.lastCall.args;
       assert.strictEqual(token, undefined, 'token should be undefined');
@@ -341,7 +370,51 @@ describe('App basic features', () => {
       });
     });
 
-    // TODO: tests for logger and logLevel option
+    describe('with logger option', () => {
+      // Regression for https://github.com/slackapi/bolt-js/issues/2521.
+      // When `logger` was omitted, the constructor still built a named
+      // `bolt-app` ConsoleLogger on `this.logger`, but threaded the
+      // *raw* (undefined) `logger` argument into `initReceiver`. The
+      // default HTTPReceiver / SocketModeReceiver then constructed their
+      // own anonymous ConsoleLogger, so receiver-side log lines (e.g.
+      // "An unhandled HTTP request (GET) made to /ohno was ignored")
+      // appeared without the `bolt-app` name prefix.
+      it("should share the app's named ConsoleLogger with the default receiver when no logger is provided", async () => {
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
+        );
+        const MockApp = importApp(overrides);
+        const app = new MockApp({ token: '', signingSecret: 'signing-secret' });
+
+        // The receiver should be holding the same Logger instance the
+        // app surfaces as `.logger`; without the fix the receiver had
+        // its own unnamed ConsoleLogger and receiver-side log lines
+        // dropped the `bolt-app` name prefix.
+        const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
+        const appLogger = (app as unknown as { logger: unknown }).logger;
+        assert.isDefined(receiverLogger, 'default receiver should expose a logger');
+        assert.strictEqual(receiverLogger, appLogger, 'receiver logger should be the same instance as app.logger');
+      });
+
+      it('should still honor an explicit logger option and pass it to the receiver', async () => {
+        const overrides = mergeOverrides(
+          withNoopAppMetadata(),
+          withSuccessfulBotUserFetchingWebClient('B_FAKE_BOT_ID', 'U_FAKE_BOT_USER_ID'),
+        );
+        const fakeLogger = createFakeLogger();
+        const MockApp = importApp(overrides);
+        const app = new MockApp({
+          token: '',
+          signingSecret: 'signing-secret',
+          logger: fakeLogger,
+        });
+
+        const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
+        assert.strictEqual(receiverLogger, fakeLogger, 'an explicit logger must reach the receiver unchanged');
+      });
+    });
+
     // TODO: tests for providing botId and botUserId options
     // TODO: tests for providing endpoints option
   });
