@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { describe, it } from 'node:test';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { AppInitializationError } from '../../../src/errors';

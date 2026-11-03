@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
+import { describe, it } from 'node:test';
 import { assert } from 'chai';
 import sinon from 'sinon';
 

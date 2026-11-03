@@ -1,3 +1,4 @@
+import { beforeEach, describe, it } from 'node:test';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';

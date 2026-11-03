@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
@@ -52,7 +53,7 @@ describe('HTTPResponseAck', async () => {
       'a 3 seconds timeout for the unhandledRequestHandler callback is expected',
     );
   });
-  it('should trigger unhandledRequestHandler if unacknowledged', (done) => {
+  it('should trigger unhandledRequestHandler if unacknowledged', (_t, done) => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const unhandledRequestTimeoutMillis = 1;
@@ -75,7 +76,7 @@ describe('HTTPResponseAck', async () => {
       done();
     }, 2);
   });
-  it('should not trigger unhandledRequestHandler if acknowledged', (done) => {
+  it('should not trigger unhandledRequestHandler if acknowledged', (_t, done) => {
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
     const spy = sinon.spy();

@@ -1,3 +1,4 @@
+import { describe, it } from 'node:test';
 import { assert } from 'chai';
 import { ErrorCode } from '../../../src/errors';
 import { verifySigningSecret } from '../../../src/receivers/verify-signing-secret';
