@@ -35,7 +35,7 @@
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
     "test:coverage": "c8 npm run test:unit",
     "test:types": "tsd --files test/types",
-    "test:unit": "TS_NODE_PROJECT=tsconfig.json bash -c 'node --require ts-node/register --require source-map-support/register --test-reporter=spec --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts'",
+    "test:unit": "TS_NODE_PROJECT=tsconfig.json node --require ts-node/register --require source-map-support/register --test-reporter=spec --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
     "version": "npm run changeset version && npm install && npm run docs",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
