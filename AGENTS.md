@@ -27,12 +27,12 @@ npm install
 Before considering any work complete, you MUST run `npm test` and confirm it passes.
 
 ```bash
-npm test              # Full pipeline: build -> lint -> type tests -> unit test coverage
+npm test              # Full pipeline: build -> lint -> type tests -> unit tests
 npm run build         # Clean build (rm dist/ + tsc compilation)
 npm run lint          # Biome check (formatting + linting)
 npm run lint:fix      # Biome auto-fix
 npm run test:unit     # Unit tests only (node:test)
-npm run test:coverage # Unit tests with coverage (c8)
+npm run test:coverage # Full pipeline with unit test coverage (latest Node only)
 npm run test:types    # Type definition tests (tsd)
 npm run watch         # Watch mode for development (rebuilds on src/ changes)
 ```
@@ -120,7 +120,7 @@ Listeners receive a single object with these properties (availability depends on
 ## Critical Rules
 
 1. **Use Biome exclusively** -- never ESLint or Prettier. Config is in `biome.json`.
-2. **Run `npm test` before submitting** -- this runs the full pipeline (build + lint + types + coverage).
+2. **Run `npm test` before submitting** -- this runs the full pipeline (build + lint + types + unit tests).
 3. **Follow existing patterns** -- when adding new listener types, middleware, or receivers, match the structure and style of existing implementations.
 4. **Don't duplicate `package.json` values** -- reference it for versions, engines, and dependency lists.
 5. **Don't add `WorkflowStep` code** -- it is deprecated. Use `CustomFunction` and `app.function()` instead.
