@@ -32,7 +32,7 @@ describe('SocketModeFunctions', async () => {
           logger,
           event,
         });
-        assert.strictEqual(shouldBeAcked, true);
+        assert.ok(shouldBeAcked);
       });
     });
   });

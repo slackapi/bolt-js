@@ -157,7 +157,7 @@ describe('App global middleware Processing', () => {
     });
 
     await fakeReceiver.sendEvent(dummyReceiverEvent);
-    assert.strictEqual(changed, true);
+    assert.ok(changed);
     assert(fakeErrorHandler.notCalled);
   });
 

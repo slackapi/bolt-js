@@ -237,12 +237,12 @@ describe('Helpers', () => {
   });
   describe(`${isRecord.name}()`, () => {
     it('should return true for plain objects', () => {
-      assert.strictEqual(isRecord({}), true);
-      assert.strictEqual(isRecord({ key: 'value' }), true);
+      assert.ok(isRecord({}));
+      assert.ok(isRecord({ key: 'value' }));
     });
 
     it('should return true for arrays', () => {
-      assert.strictEqual(isRecord([]), true);
+      assert.ok(isRecord([]));
     });
 
     it('should return false for null', () => {
@@ -262,7 +262,7 @@ describe('Helpers', () => {
 
   describe(`${hasStringProperty.name}()`, () => {
     it('should return true when key exists with a string value', () => {
-      assert.strictEqual(hasStringProperty({ name: 'test' }, 'name'), true);
+      assert.ok(hasStringProperty({ name: 'test' }, 'name'));
     });
 
     it('should return false when key exists with a non-string value', () => {

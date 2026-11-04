@@ -83,7 +83,7 @@ describe('Request verification', async () => {
       const hmac = createHmac('sha256', signingSecret);
       hmac.update(`v0:${timestamp}:${rawBody}`);
       const signature = hmac.digest('hex');
-      assert.strictEqual(
+      assert.ok(
         isValidSlackRequest({
           signingSecret,
           headers: {
@@ -92,7 +92,6 @@ describe('Request verification', async () => {
           },
           body: rawBody,
         }),
-        true,
       );
     });
     it('should detect an invalid timestamp', async () => {

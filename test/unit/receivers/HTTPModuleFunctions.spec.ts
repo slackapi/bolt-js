@@ -90,7 +90,7 @@ describe('HTTPModuleFunctions', async () => {
           func.getHeader(req, 'Cookie');
           assert.fail('Error should be thrown here');
         } catch (e) {
-          assert.strictEqual((e as Error).message.length > 0, true);
+          assert.ok((e as Error).message.length > 0);
         }
       });
       it('should parse a valid header', async () => {
@@ -288,7 +288,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret, enabled: false, bodyLimit: 128 }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.strictEqual(func.isRawBodyError(e), true);
+          assert.ok(func.isRawBodyError(e));
           assert.equal((e as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -306,7 +306,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.bufferIncomingMessage(req, 128);
           assert.fail('Expected an error to be thrown');
         } catch (error) {
-          assert.strictEqual(func.isRawBodyError(error), true);
+          assert.ok(func.isRawBodyError(error));
           assert.equal((error as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -321,7 +321,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.bufferIncomingMessage(req, '128b');
           assert.fail('Expected an error to be thrown');
         } catch (error) {
-          assert.strictEqual(func.isRawBodyError(error), true);
+          assert.ok(func.isRawBodyError(error));
           assert.equal((error as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -337,7 +337,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.bufferIncomingMessage(req, '1234');
           assert.fail('Expected an error to be thrown');
         } catch (error) {
-          assert.strictEqual(func.isRawBodyError(error), true);
+          assert.ok(func.isRawBodyError(error));
           assert.equal((error as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -358,8 +358,8 @@ describe('HTTPModuleFunctions', async () => {
       it('should detect http-errors instances by their numeric statusCode', async () => {
         const tooLarge = Object.assign(new Error('too large'), { type: 'entity.too.large', statusCode: 413 });
         const aborted = Object.assign(new Error('aborted'), { type: 'request.aborted', statusCode: 400 });
-        assert.strictEqual(func.isRawBodyError(tooLarge), true);
-        assert.strictEqual(func.isRawBodyError(aborted), true);
+        assert.ok(func.isRawBodyError(tooLarge));
+        assert.ok(func.isRawBodyError(aborted));
       });
       it('should not flag plain Errors or non-Error values', async () => {
         // A raw-body error always carries a numeric statusCode; a bare Error does not.
@@ -377,24 +377,24 @@ describe('HTTPModuleFunctions', async () => {
     it('should have buildContentResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildContentResponse(res as unknown as ServerResponse, 'OK');
-      assert.strictEqual(res.writeHead.calledWith(200), true);
+      assert.ok(res.writeHead.calledWith(200));
     });
     it('should have buildNoBodyResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildNoBodyResponse(res as unknown as ServerResponse, 500);
-      assert.strictEqual(res.writeHead.calledWith(500), true);
+      assert.ok(res.writeHead.calledWith(500));
     });
     it('should have buildSSLCheckResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildSSLCheckResponse(res as unknown as ServerResponse);
-      assert.strictEqual(res.writeHead.calledWith(200), true);
+      assert.ok(res.writeHead.calledWith(200));
     });
     it('should have buildUrlVerificationResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildUrlVerificationResponse(res as unknown as ServerResponse, {
         challenge: '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P',
       });
-      assert.strictEqual(res.writeHead.calledWith(200), true);
+      assert.ok(res.writeHead.calledWith(200));
     });
   });
 
@@ -411,7 +411,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.strictEqual(response.writeHead.calledWith(500), true);
+        assert.ok(response.writeHead.calledWith(500));
       });
       it('should properly handle HTTPReceiverDeferredRequestError', async () => {
         const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -422,7 +422,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.strictEqual(response.writeHead.calledWith(404), true);
+        assert.ok(response.writeHead.calledWith(404));
       });
     });
 
@@ -437,7 +437,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.strictEqual(response.writeHead.calledWith(500), true);
+        assert.ok(response.writeHead.calledWith(500));
       });
       it('should properly handle AuthorizationError', async () => {
         const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -449,7 +449,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.strictEqual(response.writeHead.calledWith(401), true);
+        assert.ok(response.writeHead.calledWith(401));
       });
     });
 
@@ -462,7 +462,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.strictEqual(response.writeHead.calledWith(404), true);
+        assert.ok(response.writeHead.calledWith(404));
       });
     });
   });

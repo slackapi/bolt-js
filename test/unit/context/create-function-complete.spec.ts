@@ -32,6 +32,6 @@ describe('createFunctionComplete', () => {
     assert.strictEqual(complete.hasBeenCalled(), false, 'hasBeenCalled should be false initially');
 
     await complete();
-    assert.strictEqual(complete.hasBeenCalled(), true, 'hasBeenCalled should be true after invoking complete');
+    assert.ok(complete.hasBeenCalled(), 'hasBeenCalled should be true after invoking complete');
   });
 });

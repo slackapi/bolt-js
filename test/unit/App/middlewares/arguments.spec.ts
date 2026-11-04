@@ -968,7 +968,7 @@ describe('App middleware and listener arguments', () => {
         ack: fakeAck,
       });
 
-      assert.strictEqual(called, true);
+      assert.ok(called);
       sinon.assert.calledOnce(fakeAck);
     });
 

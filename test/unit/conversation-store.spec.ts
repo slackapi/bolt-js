@@ -102,9 +102,7 @@ describe('conversationContext middleware', () => {
 
     assert(fakeNext.called);
     assert.ok(!('conversation' in dummyContext));
-    if (dummyContext.updateConversation === undefined) {
-      assert.fail();
-    }
+    assert.ok(dummyContext.updateConversation !== undefined);
     assert.equal(await dummyContext.updateConversation(dummyConversationState, dummyExpiresAt), dummyStoreSetResult);
     assert(fakeStore.set.calledOnce);
     assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState, dummyExpiresAt));

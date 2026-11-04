@@ -418,7 +418,7 @@ describe('Built-in global middleware', () => {
   describe(isSlackEventMiddlewareArgsOptions.name, () => {
     it('should return true if object is SlackEventMiddlewareArgsOptions', async () => {
       const actual = isSlackEventMiddlewareArgsOptions({ autoAcknowledge: true });
-      assert.strictEqual(actual, true);
+      assert.ok(actual);
     });
 
     it('should narrow proper type if object is SlackEventMiddlewareArgsOptions', async () => {

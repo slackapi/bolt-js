@@ -32,6 +32,6 @@ describe('createFunctionFail', () => {
     assert.strictEqual(fail.hasBeenCalled(), false, 'hasBeenCalled should be false initially');
 
     await fail({ error: 'boom' });
-    assert.strictEqual(fail.hasBeenCalled(), true, 'hasBeenCalled should be true after calling the function');
+    assert.ok(fail.hasBeenCalled(), 'hasBeenCalled should be true after calling the function');
   });
 });
