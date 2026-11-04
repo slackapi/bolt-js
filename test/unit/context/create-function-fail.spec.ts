@@ -1,6 +1,6 @@
+import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { createFunctionFail } from '../../../src/context';
 
@@ -29,9 +29,9 @@ describe('createFunctionFail', () => {
     sinon.stub(client.functions, 'completeError').resolves();
     const fail = createFunctionFail({ isEnterpriseInstall: false, functionExecutionId: 'Fx1234' }, client);
 
-    assert.isFalse(fail.hasBeenCalled(), 'hasBeenCalled should be false initially');
+    assert.strictEqual(fail.hasBeenCalled(), false, 'hasBeenCalled should be false initially');
 
     await fail({ error: 'boom' });
-    assert.isTrue(fail.hasBeenCalled(), 'hasBeenCalled should be true after calling the function');
+    assert.ok(fail.hasBeenCalled(), 'hasBeenCalled should be true after calling the function');
   });
 });

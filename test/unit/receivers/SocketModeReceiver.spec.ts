@@ -1,10 +1,10 @@
+import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import { beforeEach, describe, it } from 'node:test';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
-import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import sinon from 'sinon';
@@ -68,7 +68,7 @@ describe('SocketModeReceiver', () => {
           userScopes: ['chat:write'],
         },
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
     it('should allow for customizing port the socket listens on', async () => {
       const SocketModeReceiver = importSocketModeReceiver(overrides);
@@ -87,7 +87,7 @@ describe('SocketModeReceiver', () => {
           port: customPort,
         },
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
     it('should allow for extracting additional values from Socket Mode messages', async () => {
       const SocketModeReceiver = importSocketModeReceiver(overrides);
@@ -97,7 +97,7 @@ describe('SocketModeReceiver', () => {
         logger: noopLogger,
         customPropertiesExtractor: ({ type, body }) => ({ payload_type: type, body }),
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
     it('should pass clientPingTimeout to SocketModeClient', async () => {
       const constructorSpy = sinon.spy();
@@ -119,7 +119,7 @@ describe('SocketModeReceiver', () => {
         logger: noopLogger,
         clientPingTimeout: 15000,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(constructorSpy);
       const constructorArgs = constructorSpy.firstCall.args[0];
       assert.equal(constructorArgs.clientPingTimeout, 15000);
@@ -144,7 +144,7 @@ describe('SocketModeReceiver', () => {
         logger: noopLogger,
         serverPingTimeout: 60000,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(constructorSpy);
       const constructorArgs = constructorSpy.firstCall.args[0];
       assert.equal(constructorArgs.serverPingTimeout, 60000);
@@ -170,7 +170,7 @@ describe('SocketModeReceiver', () => {
         logger: noopLogger,
         dispatcher,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(constructorSpy);
       const constructorArgs = constructorSpy.firstCall.args[0];
       assert.strictEqual(constructorArgs.dispatcher, dispatcher);
@@ -182,7 +182,7 @@ describe('SocketModeReceiver', () => {
         logger: noopLogger,
         dispatcher: new Agent(),
       });
-      assert.instanceOf(receiver.client, SocketModeClient);
+      assert.ok(receiver.client instanceof SocketModeClient);
     });
     it('should pass all socket mode timeout options to SocketModeClient', async () => {
       const constructorSpy = sinon.spy();
@@ -207,7 +207,7 @@ describe('SocketModeReceiver', () => {
         pingPongLoggingEnabled: true,
         autoReconnectEnabled: false,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(constructorSpy);
       const constructorArgs = constructorSpy.firstCall.args[0];
       assert.equal(constructorArgs.clientPingTimeout, 15000);
@@ -234,14 +234,14 @@ describe('SocketModeReceiver', () => {
         appToken: 'my-secret',
         logger: noopLogger,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(constructorSpy);
       const constructorArgs = constructorSpy.firstCall.args[0];
       assert.equal(constructorArgs.appToken, 'my-secret');
-      assert.isUndefined(constructorArgs.clientPingTimeout);
-      assert.isUndefined(constructorArgs.serverPingTimeout);
-      assert.isUndefined(constructorArgs.pingPongLoggingEnabled);
-      assert.isUndefined(constructorArgs.autoReconnectEnabled);
+      assert.strictEqual(constructorArgs.clientPingTimeout, undefined);
+      assert.strictEqual(constructorArgs.serverPingTimeout, undefined);
+      assert.strictEqual(constructorArgs.pingPongLoggingEnabled, undefined);
+      assert.strictEqual(constructorArgs.autoReconnectEnabled, undefined);
     });
     it('should throw an error if redirect uri options supplied invalid or incomplete', async () => {
       const SocketModeReceiver = importSocketModeReceiver(overrides);
@@ -264,7 +264,7 @@ describe('SocketModeReceiver', () => {
         redirectUri,
         installerOptions,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       // redirectUri supplied, but no redirectUriPath
       assert.throws(
         () =>
@@ -336,7 +336,7 @@ describe('SocketModeReceiver', () => {
           userScopes,
         },
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       receiver.installer = installProviderStub as unknown as InstallProvider;
       const fakeReq = sinon.createStubInstance(IncomingMessage);
       fakeReq.url = '/nope';
@@ -368,7 +368,7 @@ describe('SocketModeReceiver', () => {
             userScopes,
           },
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq = {
           url: '/hiya',
@@ -403,7 +403,7 @@ describe('SocketModeReceiver', () => {
             userScopes,
           },
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq = {
           url: '/hiya',
@@ -438,7 +438,7 @@ describe('SocketModeReceiver', () => {
             userScopes,
           },
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq = {
           url: '/hiya',
@@ -477,7 +477,7 @@ describe('SocketModeReceiver', () => {
             callbackOptions,
           },
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq = {
           url: '/heyo',
@@ -527,7 +527,7 @@ describe('SocketModeReceiver', () => {
             metadata,
           },
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
         const fakeReq = sinon.createStubInstance(IncomingMessage);
         fakeReq.url = '/heyo';
@@ -555,7 +555,7 @@ describe('SocketModeReceiver', () => {
           appToken: 'my-secret',
           customRoutes,
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
         const fakeReq = sinon.createStubInstance(IncomingMessage);
@@ -593,7 +593,7 @@ describe('SocketModeReceiver', () => {
           appToken: 'my-secret',
           customRoutes,
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
         const fakeReq = sinon.createStubInstance(IncomingMessage);
@@ -631,7 +631,7 @@ describe('SocketModeReceiver', () => {
           appToken: 'my-secret',
           customRoutes,
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
         const fakeReq = sinon.createStubInstance(IncomingMessage);
@@ -672,7 +672,7 @@ describe('SocketModeReceiver', () => {
           appToken: 'my-secret',
           customRoutes,
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
         const fakeReq = sinon.createStubInstance(IncomingMessage);
@@ -715,7 +715,7 @@ describe('SocketModeReceiver', () => {
           appToken: 'my-secret',
           customRoutes,
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
         const fakeReq = sinon.createStubInstance(IncomingMessage);
@@ -774,7 +774,7 @@ describe('SocketModeReceiver', () => {
           userScopes: ['chat:write'],
         },
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       receiver.client = clientStub as unknown as SocketModeClient;
       await receiver.start();
       assert(clientStub.start.called);
@@ -798,7 +798,7 @@ describe('SocketModeReceiver', () => {
           userScopes: ['chat:write'],
         },
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       receiver.client = clientStub as unknown as SocketModeClient;
       await receiver.stop();
       assert(clientStub.disconnect.called);

@@ -1,8 +1,8 @@
+import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { describe, it } from 'node:test';
-import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../../../src/errors';
@@ -27,7 +27,7 @@ describe('HTTPModuleFunctions', async () => {
       it('should work when the header does not exist', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         const result = func.extractRetryNumFromHTTPRequest(req);
-        assert.isUndefined(result);
+        assert.strictEqual(result, undefined);
       });
       it('should parse a single value header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -46,7 +46,7 @@ describe('HTTPModuleFunctions', async () => {
       it('should work when the header does not exist', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
         const result = func.extractRetryReasonFromHTTPRequest(req);
-        assert.isUndefined(result);
+        assert.strictEqual(result, undefined);
       });
       it('should parse a valid header', async () => {
         const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -90,7 +90,7 @@ describe('HTTPModuleFunctions', async () => {
           func.getHeader(req, 'Cookie');
           assert.fail('Error should be thrown here');
         } catch (e) {
-          assert.isTrue((e as Error).message.length > 0);
+          assert.ok((e as Error).message.length > 0);
         }
       });
       it('should parse a valid header', async () => {
@@ -119,7 +119,7 @@ describe('HTTPModuleFunctions', async () => {
         } as unknown as BufferedIncomingMessage;
         const res = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
-        assert.isDefined(result.rawBody);
+        assert.ok(result.rawBody !== undefined);
       });
       it('should detect an invalid timestamp', async () => {
         const signingSecret = 'secret';
@@ -140,9 +140,8 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.propertyVal(
-            e,
-            'message',
+          assert.strictEqual(
+            (e as Error).message,
             'Failed to verify authenticity: x-slack-request-timestamp must differ from system time by no more than 5 minutes or request is stale',
           );
         }
@@ -163,7 +162,7 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
+          assert.strictEqual((e as Error).message, 'Failed to verify authenticity: signature mismatch');
         }
       });
       it('should parse a ssl_check request body without signature verification', async () => {
@@ -177,7 +176,7 @@ describe('HTTPModuleFunctions', async () => {
         } as unknown as BufferedIncomingMessage;
         const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
-        assert.isDefined(result.rawBody);
+        assert.ok(result.rawBody !== undefined);
         assert.equal(result.rawBody.toString(), 'ssl_check=1');
       });
       it('should strip smuggled event payloads from ssl_check requests', async () => {
@@ -207,7 +206,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.match((e as Error).message, /Failed to verify authenticity/);
         }
       });
       it('should not bypass signature verification when ssl_check=true', async () => {
@@ -224,7 +223,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.match((e as Error).message, /Failed to verify authenticity/);
         }
       });
       it('should not bypass signature verification for ssl_check=1 with JSON content-type', async () => {
@@ -241,7 +240,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.match((e as Error).message, /Failed to verify authenticity/);
         }
       });
       it('should not bypass signature verification when ssl_check is empty', async () => {
@@ -258,7 +257,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.include((e as Error).message, 'Failed to verify authenticity');
+          assert.match((e as Error).message, /Failed to verify authenticity/);
         }
       });
       it('should detect invalid signature for application/x-www-form-urlencoded body', async () => {
@@ -277,7 +276,7 @@ describe('HTTPModuleFunctions', async () => {
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
-          assert.propertyVal(e, 'message', 'Failed to verify authenticity: signature mismatch');
+          assert.strictEqual((e as Error).message, 'Failed to verify authenticity: signature mismatch');
         }
       });
       it('should reject an oversized request body with a 413 error before signature verification', async () => {
@@ -289,7 +288,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.parseAndVerifyHTTPRequest({ signingSecret, enabled: false, bodyLimit: 128 }, req, res);
           assert.fail('Expected an error to be thrown');
         } catch (e) {
-          assert.isTrue(func.isRawBodyError(e));
+          assert.ok(func.isRawBodyError(e));
           assert.equal((e as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -307,7 +306,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.bufferIncomingMessage(req, 128);
           assert.fail('Expected an error to be thrown');
         } catch (error) {
-          assert.isTrue(func.isRawBodyError(error));
+          assert.ok(func.isRawBodyError(error));
           assert.equal((error as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -322,7 +321,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.bufferIncomingMessage(req, '128b');
           assert.fail('Expected an error to be thrown');
         } catch (error) {
-          assert.isTrue(func.isRawBodyError(error));
+          assert.ok(func.isRawBodyError(error));
           assert.equal((error as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -338,7 +337,7 @@ describe('HTTPModuleFunctions', async () => {
           await func.bufferIncomingMessage(req, '1234');
           assert.fail('Expected an error to be thrown');
         } catch (error) {
-          assert.isTrue(func.isRawBodyError(error));
+          assert.ok(func.isRawBodyError(error));
           assert.equal((error as { statusCode?: number }).statusCode, 413);
         }
       });
@@ -359,17 +358,17 @@ describe('HTTPModuleFunctions', async () => {
       it('should detect http-errors instances by their numeric statusCode', async () => {
         const tooLarge = Object.assign(new Error('too large'), { type: 'entity.too.large', statusCode: 413 });
         const aborted = Object.assign(new Error('aborted'), { type: 'request.aborted', statusCode: 400 });
-        assert.isTrue(func.isRawBodyError(tooLarge));
-        assert.isTrue(func.isRawBodyError(aborted));
+        assert.ok(func.isRawBodyError(tooLarge));
+        assert.ok(func.isRawBodyError(aborted));
       });
       it('should not flag plain Errors or non-Error values', async () => {
         // A raw-body error always carries a numeric statusCode; a bare Error does not.
-        assert.isFalse(func.isRawBodyError(new Error('nope')));
+        assert.strictEqual(func.isRawBodyError(new Error('nope')), false);
         // A plain object is not an Error instance, so it is not a RawBodyError.
-        assert.isFalse(func.isRawBodyError({ statusCode: 413 }));
-        assert.isFalse(func.isRawBodyError(undefined));
-        assert.isFalse(func.isRawBodyError(null));
-        assert.isFalse(func.isRawBodyError('413'));
+        assert.strictEqual(func.isRawBodyError({ statusCode: 413 }), false);
+        assert.strictEqual(func.isRawBodyError(undefined), false);
+        assert.strictEqual(func.isRawBodyError(null), false);
+        assert.strictEqual(func.isRawBodyError('413'), false);
       });
     });
   });
@@ -378,24 +377,24 @@ describe('HTTPModuleFunctions', async () => {
     it('should have buildContentResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildContentResponse(res as unknown as ServerResponse, 'OK');
-      assert.isTrue(res.writeHead.calledWith(200));
+      assert.ok(res.writeHead.calledWith(200));
     });
     it('should have buildNoBodyResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildNoBodyResponse(res as unknown as ServerResponse, 500);
-      assert.isTrue(res.writeHead.calledWith(500));
+      assert.ok(res.writeHead.calledWith(500));
     });
     it('should have buildSSLCheckResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildSSLCheckResponse(res as unknown as ServerResponse);
-      assert.isTrue(res.writeHead.calledWith(200));
+      assert.ok(res.writeHead.calledWith(200));
     });
     it('should have buildUrlVerificationResponse', async () => {
       const res = sinon.createStubInstance(ServerResponse);
       func.buildUrlVerificationResponse(res as unknown as ServerResponse, {
         challenge: '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P',
       });
-      assert.isTrue(res.writeHead.calledWith(200));
+      assert.ok(res.writeHead.calledWith(200));
     });
   });
 
@@ -412,7 +411,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(500));
+        assert.ok(response.writeHead.calledWith(500));
       });
       it('should properly handle HTTPReceiverDeferredRequestError', async () => {
         const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -423,7 +422,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(404));
+        assert.ok(response.writeHead.calledWith(404));
       });
     });
 
@@ -438,7 +437,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(500));
+        assert.ok(response.writeHead.calledWith(500));
       });
       it('should properly handle AuthorizationError', async () => {
         const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
@@ -450,7 +449,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(401));
+        assert.ok(response.writeHead.calledWith(401));
       });
     });
 
@@ -463,7 +462,7 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.isTrue(response.writeHead.calledWith(404));
+        assert.ok(response.writeHead.calledWith(404));
       });
     });
   });

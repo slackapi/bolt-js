@@ -1,6 +1,6 @@
+import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { extractThreadInfo } from '../../src/Assistant';
 import { DefaultThreadContextStore } from '../../src/AssistantThreadContextStore';
@@ -43,7 +43,7 @@ describe('DefaultThreadContextStore class', () => {
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      assert.isEmpty(threadContext);
+      assert.strictEqual(Object.keys(threadContext).length, 0);
     });
 
     it('should return an empty object if no message metadata exists', async () => {
@@ -65,7 +65,7 @@ describe('DefaultThreadContextStore class', () => {
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      assert.isEmpty(threadContext);
+      assert.strictEqual(Object.keys(threadContext).length, 0);
     });
 
     it('should retrieve instance context if it has been saved previously', async () => {

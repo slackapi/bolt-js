@@ -1,5 +1,5 @@
+import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { SocketModeResponseAck } from '../../../src/receivers/SocketModeResponseAck';
@@ -19,8 +19,8 @@ describe('SocketModeResponseAck', async () => {
       logger: fakeLogger,
       socketModeClientAck: fakeSocketModeClientAck,
     });
-    assert.isDefined(responseAck);
-    assert.isDefined(responseAck.bind());
+    assert.ok(responseAck !== undefined);
+    assert.ok(responseAck.bind() !== undefined);
     expectType<ResponseAck>(responseAck);
   });
 

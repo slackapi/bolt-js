@@ -1,8 +1,8 @@
+import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { LogLevel } from '@slack/logger';
-import { assert } from 'chai';
 import sinon from 'sinon';
-import { ErrorCode } from '../../../src/errors';
+import { type CodedError, ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
 import {
   createFakeConversationStore,
@@ -35,7 +35,7 @@ describe('App basic features', () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: 'test-signing-secret', port: 9999 });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'port', 9999);
+        assert.strictEqual(Reflect.get(app['receiver'], 'port'), 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = importApp(overrides);
@@ -46,7 +46,7 @@ describe('App basic features', () => {
           installerOptions: { port: 9999 },
         });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'port', 9999);
+        assert.strictEqual(Reflect.get(app['receiver'], 'port'), 9999);
       });
     });
 
@@ -71,7 +71,7 @@ describe('App basic features', () => {
           installationStore,
         });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
+        assert.strictEqual(Reflect.get(app['receiver'], 'httpServerPort'), 9999);
       });
       it('should accept a port value under installerOptions', async () => {
         const MockApp = importApp(overrides);
@@ -88,7 +88,7 @@ describe('App basic features', () => {
           installationStore,
         });
         // biome-ignore lint/complexity/useLiteralKeys: reaching into private fields
-        assert.propertyVal(app['receiver'], 'httpServerPort', 9999);
+        assert.strictEqual(Reflect.get(app['receiver'], 'httpServerPort'), 9999);
       });
     });
 
@@ -99,12 +99,12 @@ describe('App basic features', () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: '', signingSecret: 'test-signing-secret' });
         // TODO: verify that the fake bot ID and fake bot user ID are retrieved
-        assert.instanceOf(app, MockApp);
+        assert.ok(app instanceof MockApp);
       });
       it('should pass the given token to app.client', async () => {
         const MockApp = importApp(overrides);
         const app = new MockApp({ token: 'xoxb-foo-bar', signingSecret: 'test-signing-secret' });
-        assert.isDefined(app.client);
+        assert.ok(app.client !== undefined);
         assert.equal(app.client.token, 'xoxb-foo-bar');
       });
     });
@@ -120,7 +120,7 @@ describe('App basic features', () => {
         new MockApp({ signingSecret: 'test-signing-secret' });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
       }
     });
     it('should fail when both a token and authorize callback are specified', async () => {
@@ -130,7 +130,7 @@ describe('App basic features', () => {
         new MockApp({ token: '', authorize: authorizeCallback, signingSecret: 'test-signing-secret' });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
       }
     });
@@ -147,7 +147,7 @@ describe('App basic features', () => {
         });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
       }
     });
@@ -164,7 +164,7 @@ describe('App basic features', () => {
         });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
         assert(authorizeCallback.notCalled);
       }
     });
@@ -183,7 +183,7 @@ describe('App basic features', () => {
         new MockApp({ authorize: noop });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
       }
     });
     it('should fail when signingSecret is empty string for the default receiver', async () => {
@@ -192,7 +192,7 @@ describe('App basic features', () => {
         new MockApp({ authorize: noop, signingSecret: '' });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
       }
     });
     it('should fail when signingSecret is null for the default receiver', async () => {
@@ -201,7 +201,7 @@ describe('App basic features', () => {
         new MockApp({ authorize: noop, signingSecret: null as unknown as string });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
       }
     });
     it('should fail when both socketMode and a custom receiver are specified', async () => {
@@ -211,7 +211,7 @@ describe('App basic features', () => {
         new MockApp({ token: '', signingSecret: 'test-signing-secret', socketMode: true, receiver: fakeReceiver });
         assert.fail();
       } catch (error) {
-        assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+        assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
       }
     });
     it('should succeed when both socketMode and SocketModeReceiver are specified', async () => {
@@ -250,7 +250,7 @@ describe('App basic features', () => {
         const dummyConvoStore = createFakeConversationStore();
         const MockApp = importApp(overrides);
         const app = new MockApp({ convoStore: dummyConvoStore, authorize: noop, signingSecret: 'test-signing-secret' });
-        assert.instanceOf(app, MockApp);
+        assert.ok(app instanceof MockApp);
         assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
       });
     });
@@ -261,7 +261,7 @@ describe('App basic features', () => {
           new MockApp({ token: '', signingSecret: 'test-signing-secret', redirectUri: 'http://example.com/redirect' }); // eslint-disable-line no-new
           assert.fail();
         } catch (error) {
-          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+          assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
         }
       });
       it('should fail when missing installerOptions.redirectUriPath', async () => {
@@ -275,7 +275,7 @@ describe('App basic features', () => {
           });
           assert.fail();
         } catch (error) {
-          assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+          assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
         }
       });
     });
@@ -336,14 +336,13 @@ describe('App basic features', () => {
           signingSecret: 'invalid-one',
           deferInitialization: true,
         });
-        assert.instanceOf(app, MockApp);
+        assert.ok(app instanceof MockApp);
         try {
           await app.start();
           assert.fail('The start() method should fail before init() call');
         } catch (err) {
-          assert.propertyVal(
-            err,
-            'message',
+          assert.strictEqual(
+            (err as Error).message,
             'This App instance is not yet initialized. Call `await App#init()` before starting the app.',
           );
         }
@@ -352,7 +351,7 @@ describe('App basic features', () => {
           assert.fail('The init() method should fail here');
         } catch (err) {
           console.log(err);
-          assert.propertyVal(err, 'message', exception);
+          assert.strictEqual((err as Error).message, exception);
         }
       });
     });
@@ -366,8 +365,8 @@ describe('App basic features', () => {
         const fakeLogger = createFakeLogger();
         const MockApp = importApp(overrides);
         const app = new MockApp({ logger: fakeLogger, token: '', appToken: fakeAppToken, developerMode: true });
-        assert.propertyVal(app, 'logLevel', LogLevel.DEBUG);
-        assert.propertyVal(app, 'socketMode', true);
+        assert.strictEqual(Reflect.get(app, 'logLevel'), LogLevel.DEBUG);
+        assert.strictEqual(Reflect.get(app, 'socketMode'), true);
       });
     });
 
@@ -394,7 +393,7 @@ describe('App basic features', () => {
         // dropped the `bolt-app` name prefix.
         const receiverLogger = ((app as unknown as { receiver: unknown }).receiver as { logger?: unknown }).logger;
         const appLogger = (app as unknown as { logger: unknown }).logger;
-        assert.isDefined(receiverLogger, 'default receiver should expose a logger');
+        assert.ok(receiverLogger !== undefined, 'default receiver should expose a logger');
         assert.strictEqual(receiverLogger, appLogger, 'receiver logger should be the same instance as app.logger');
       });
 
