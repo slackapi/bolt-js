@@ -1,5 +1,5 @@
+import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
-import { assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import { ErrorCode, isCodedError } from '../../../../src/errors';
@@ -57,8 +57,8 @@ describe('App listener middleware processing', () => {
     const error = fakeErrorHandler.firstCall.args[0];
     assert.ok(isCodedError(error));
     assert(error.code === ErrorCode.MultipleListenerError);
-    assert.isArray(error.originals);
-    if (error.originals) assert.sameMembers(error.originals, errorsToThrow);
+    assert.ok(Array.isArray(error.originals));
+    if (error.originals) assert.deepStrictEqual(error.originals, errorsToThrow);
   });
 
   // https://github.com/slackapi/bolt-js/issues/1457

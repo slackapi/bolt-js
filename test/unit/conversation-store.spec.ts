@@ -1,8 +1,8 @@
+import assert, { AssertionError } from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
-import { AssertionError, assert } from 'chai';
 import sinon, { type SinonSpy } from 'sinon';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 import { createFakeLogger, delay, type Override, proxyquire } from './helpers';
@@ -70,8 +70,8 @@ describe('conversationContext middleware', () => {
     // Assert
     assert(fakeLogger.debug.called);
     assert(fakeNext.called);
-    assert.notProperty(dummyContext, 'updateConversation');
-    assert.notProperty(dummyContext, 'conversation');
+    assert.ok(!('updateConversation' in dummyContext));
+    assert.ok(!('conversation' in dummyContext));
   });
 
   it('should add to the context for events within a conversation that was not previously stored and pass expiresAt', async () => {
@@ -101,7 +101,7 @@ describe('conversationContext middleware', () => {
     await middleware(fakeArgs);
 
     assert(fakeNext.called);
-    assert.notProperty(dummyContext, 'conversation');
+    assert.ok(!('conversation' in dummyContext));
     if (dummyContext.updateConversation === undefined) {
       assert.fail();
     }
@@ -137,11 +137,8 @@ describe('conversationContext middleware', () => {
 
     // Assert
     assert(fakeNext.called);
-    assert.notProperty(dummyContext, 'conversation');
-    // NOTE: chai types do not offer assertion signatures yet, and neither do node's assert module types.
-    if (dummyContext.updateConversation === undefined) {
-      assert.fail();
-    }
+    assert.ok(!('conversation' in dummyContext));
+    assert.ok(dummyContext.updateConversation !== undefined);
     assert.equal(await dummyContext.updateConversation(dummyConversationState), dummyStoreSetResult);
     assert(fakeStore.set.calledOnce);
     assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState));
@@ -174,10 +171,7 @@ describe('conversationContext middleware', () => {
 
     // Assert
     assert.equal(dummyContext.conversation, dummyConversationState);
-    // NOTE: chai types do not offer assertion signatures yet, and neither do node's assert module types.
-    if (dummyContext.updateConversation === undefined) {
-      assert.fail();
-    }
+    assert.ok(dummyContext.updateConversation !== undefined);
     const newDummyConversationState = Symbol();
     const result = await dummyContext.updateConversation(newDummyConversationState);
     assert.equal(result, dummyStoreSetResult);
@@ -196,7 +190,7 @@ describe('MemoryStore', () => {
       const store = new MemoryStore();
 
       // Assert
-      assert.isOk(store);
+      assert.ok(store);
     });
   });
 
@@ -230,8 +224,8 @@ describe('MemoryStore', () => {
         assert.fail();
       } catch (error) {
         // Assert
-        assert.instanceOf(error, Error);
-        assert.notInstanceOf(error, AssertionError);
+        assert.ok(error instanceof Error);
+        assert.ok(!(error instanceof AssertionError));
       }
     });
 
@@ -251,8 +245,8 @@ describe('MemoryStore', () => {
         assert.fail();
       } catch (error) {
         // Assert
-        assert.instanceOf(error, Error);
-        assert.notInstanceOf(error, AssertionError);
+        assert.ok(error instanceof Error);
+        assert.ok(!(error instanceof AssertionError));
       }
     });
   });

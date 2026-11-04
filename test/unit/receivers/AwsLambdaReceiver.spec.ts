@@ -1,6 +1,6 @@
+import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { describe, it } from 'node:test';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { AppInitializationError } from '../../../src/errors';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
@@ -32,13 +32,13 @@ describe('AwsLambdaReceiver', () => {
       new AwsLambdaReceiver({ signingSecret: '' });
       assert.fail();
     } catch (error) {
-      assert.instanceOf(error, AppInitializationError);
+      assert.ok(error instanceof AppInitializationError);
     }
   });
 
   it('should succeed with empty signingSecret when signatureVerification is false', async () => {
     const receiver = new AwsLambdaReceiver({ signingSecret: '', signatureVerification: false });
-    assert.isNotNull(receiver);
+    assert.notStrictEqual(receiver, null);
   });
 
   it('should instantiate with default logger', async () => {
@@ -46,7 +46,7 @@ describe('AwsLambdaReceiver', () => {
       signingSecret: 'my-secret',
       logger: noopLogger,
     });
-    assert.isNotNull(awsReceiver);
+    assert.notStrictEqual(awsReceiver, null);
   });
 
   it('should have start method', async () => {
@@ -55,7 +55,7 @@ describe('AwsLambdaReceiver', () => {
       logger: noopLogger,
     });
     const startedHandler = await awsReceiver.start();
-    assert.isNotNull(startedHandler);
+    assert.notStrictEqual(startedHandler, null);
   });
 
   it('should have stop method', async () => {
