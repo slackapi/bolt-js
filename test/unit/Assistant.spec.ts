@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { describe, it } from 'node:test';
 import type { AssistantThreadStartedEvent } from '@slack/types';
 import type { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
