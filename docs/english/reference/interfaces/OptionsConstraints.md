@@ -17,7 +17,7 @@ Defined in: [src/types/options/index.ts:18](https://github.com/slackapi/bolt-js/
 ### action\_id?
 
 ```ts
-optional action_id?: A extends SlackOptions ? string | RegExp : never;
+action_id?: A extends SlackOptions ? string | RegExp : never;
 ```
 
 Defined in: [src/types/options/index.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L21)
@@ -27,7 +27,7 @@ Defined in: [src/types/options/index.ts:21](https://github.com/slackapi/bolt-js/
 ### block\_id?
 
 ```ts
-optional block_id?: A extends SlackOptions ? string | RegExp : never;
+block_id?: A extends SlackOptions ? string | RegExp : never;
 ```
 
 Defined in: [src/types/options/index.ts:20](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L20)
@@ -37,7 +37,7 @@ Defined in: [src/types/options/index.ts:20](https://github.com/slackapi/bolt-js/
 ### callback\_id?
 
 ```ts
-optional callback_id?: Extract<A, {
+callback_id?: Extract<A, {
   callback_id?: string;
 }> extends any ? string | RegExp : never;
 ```
@@ -49,7 +49,7 @@ Defined in: [src/types/options/index.ts:23](https://github.com/slackapi/bolt-js/
 ### type?
 
 ```ts
-optional type?: A["type"];
+type?: A["type"];
 ```
 
 Defined in: [src/types/options/index.ts:19](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L19)

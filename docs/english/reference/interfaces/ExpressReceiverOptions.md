@@ -7,7 +7,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:92](https://github.com/slackapi/bo
 ### app?
 
 ```ts
-optional app?: Application;
+app?: Application;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:110](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L110)
@@ -17,7 +17,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:110](https://github.com/slackapi/b
 ### bodyLimit?
 
 ```ts
-optional bodyLimit?: string | number;
+bodyLimit?: string | number;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:120](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L120)
@@ -27,7 +27,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:120](https://github.com/slackapi/b
 ### clientId?
 
 ```ts
-optional clientId?: string;
+clientId?: string;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:103](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L103)
@@ -37,7 +37,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:103](https://github.com/slackapi/b
 ### clientSecret?
 
 ```ts
-optional clientSecret?: string;
+clientSecret?: string;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:104](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L104)
@@ -47,7 +47,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:104](https://github.com/slackapi/b
 ### customPropertiesExtractor?
 
 ```ts
-optional customPropertiesExtractor?: (request) => StringIndexed;
+customPropertiesExtractor?: (request) => StringIndexed;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:112](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L112)
@@ -67,7 +67,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:112](https://github.com/slackapi/b
 ### dispatchErrorHandler?
 
 ```ts
-optional dispatchErrorHandler?: (args) => Promise<void>;
+dispatchErrorHandler?: (args) => Promise<void>;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:113](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L113)
@@ -87,7 +87,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:113](https://github.com/slackapi/b
 ### endpoints?
 
 ```ts
-optional endpoints?: 
+endpoints?: 
   | string
   | {
 [endpointType: string]: string;
@@ -101,7 +101,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:96](https://github.com/slackapi/bo
 ### installationStore?
 
 ```ts
-optional installationStore?: InstallationStore;
+installationStore?: InstallationStore;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:107](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L107)
@@ -111,7 +111,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:107](https://github.com/slackapi/b
 ### installerOptions?
 
 ```ts
-optional installerOptions?: InstallerOptions;
+installerOptions?: InstallerOptions;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:109](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L109)
@@ -121,7 +121,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:109](https://github.com/slackapi/b
 ### logger?
 
 ```ts
-optional logger?: Logger;
+logger?: Logger;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:94](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L94)
@@ -131,7 +131,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:94](https://github.com/slackapi/bo
 ### logLevel?
 
 ```ts
-optional logLevel?: LogLevel;
+logLevel?: LogLevel;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:95](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L95)
@@ -141,7 +141,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:95](https://github.com/slackapi/bo
 ### processBeforeResponse?
 
 ```ts
-optional processBeforeResponse?: boolean;
+processBeforeResponse?: boolean;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:102](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L102)
@@ -151,7 +151,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:102](https://github.com/slackapi/b
 ### processEventErrorHandler?
 
 ```ts
-optional processEventErrorHandler?: (args) => Promise<boolean>;
+processEventErrorHandler?: (args) => Promise<boolean>;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:114](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L114)
@@ -171,7 +171,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:114](https://github.com/slackapi/b
 ### redirectUri?
 
 ```ts
-optional redirectUri?: string;
+redirectUri?: string;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:106](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L106)
@@ -181,7 +181,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:106](https://github.com/slackapi/b
 ### router?
 
 ```ts
-optional router?: IRouter;
+router?: IRouter;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:111](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L111)
@@ -191,7 +191,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:111](https://github.com/slackapi/b
 ### scopes?
 
 ```ts
-optional scopes?: string | string[];
+scopes?: string | string[];
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:108](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L108)
@@ -201,7 +201,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:108](https://github.com/slackapi/b
 ### signatureVerification?
 
 ```ts
-optional signatureVerification?: boolean;
+signatureVerification?: boolean;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:101](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L101)
@@ -221,7 +221,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:93](https://github.com/slackapi/bo
 ### stateSecret?
 
 ```ts
-optional stateSecret?: string;
+stateSecret?: string;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:105](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L105)
@@ -231,7 +231,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:105](https://github.com/slackapi/b
 ### unhandledRequestHandler?
 
 ```ts
-optional unhandledRequestHandler?: (args) => void;
+unhandledRequestHandler?: (args) => void;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:118](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L118)
@@ -251,7 +251,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:118](https://github.com/slackapi/b
 ### unhandledRequestTimeoutMillis?
 
 ```ts
-optional unhandledRequestTimeoutMillis?: number;
+unhandledRequestTimeoutMillis?: number;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:119](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L119)

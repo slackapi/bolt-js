@@ -21,7 +21,7 @@ Defined in: [src/errors.ts:5](https://github.com/slackapi/bolt-js/blob/main/src/
 ### missingProperty?
 
 ```ts
-optional missingProperty?: string;
+missingProperty?: string;
 ```
 
 Defined in: [src/errors.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L8)
@@ -31,7 +31,7 @@ Defined in: [src/errors.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/
 ### original?
 
 ```ts
-optional original?: Error;
+original?: Error;
 ```
 
 Defined in: [src/errors.ts:6](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L6)
@@ -41,7 +41,7 @@ Defined in: [src/errors.ts:6](https://github.com/slackapi/bolt-js/blob/main/src/
 ### originals?
 
 ```ts
-optional originals?: Error[];
+originals?: Error[];
 ```
 
 Defined in: [src/errors.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L7)
@@ -51,7 +51,7 @@ Defined in: [src/errors.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/
 ### req?
 
 ```ts
-optional req?: 
+req?: 
   | IncomingMessage
   | BufferedIncomingMessage;
 ```
@@ -63,7 +63,7 @@ Defined in: [src/errors.ts:9](https://github.com/slackapi/bolt-js/blob/main/src/
 ### res?
 
 ```ts
-optional res?: ServerResponse<IncomingMessage>;
+res?: ServerResponse<IncomingMessage>;
 ```
 
 Defined in: [src/errors.ts:10](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L10)
