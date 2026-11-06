@@ -17,7 +17,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:41](https://github.com/slackapi
 ### autoReconnectEnabled?
 
 ```ts
-optional autoReconnectEnabled?: boolean;
+autoReconnectEnabled?: boolean;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:47](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L47)
@@ -27,7 +27,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:47](https://github.com/slackapi
 ### clientId?
 
 ```ts
-optional clientId?: string;
+clientId?: string;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L34)
@@ -37,7 +37,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:34](https://github.com/slackapi
 ### clientPingTimeout?
 
 ```ts
-optional clientPingTimeout?: number;
+clientPingTimeout?: number;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:44](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L44)
@@ -47,7 +47,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:44](https://github.com/slackapi
 ### clientSecret?
 
 ```ts
-optional clientSecret?: string;
+clientSecret?: string;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:35](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L35)
@@ -57,7 +57,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:35](https://github.com/slackapi
 ### customPropertiesExtractor?
 
 ```ts
-optional customPropertiesExtractor?: (args) => StringIndexed;
+customPropertiesExtractor?: (args) => StringIndexed;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:49](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L49)
@@ -77,7 +77,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:49](https://github.com/slackapi
 ### customRoutes?
 
 ```ts
-optional customRoutes?: CustomRoute[];
+customRoutes?: CustomRoute[];
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:43](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L43)
@@ -87,7 +87,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:43](https://github.com/slackapi
 ### dispatcher?
 
 ```ts
-optional dispatcher?: SocketModeDispatcher;
+dispatcher?: SocketModeDispatcher;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:42](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L42)
@@ -97,7 +97,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:42](https://github.com/slackapi
 ### installationStore?
 
 ```ts
-optional installationStore?: InstallationStore;
+installationStore?: InstallationStore;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:38](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L38)
@@ -107,7 +107,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:38](https://github.com/slackapi
 ### installerOptions?
 
 ```ts
-optional installerOptions?: InstallerOptions;
+installerOptions?: InstallerOptions;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:40](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L40)
@@ -117,7 +117,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:40](https://github.com/slackapi
 ### logger?
 
 ```ts
-optional logger?: Logger;
+logger?: Logger;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:32](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L32)
@@ -127,7 +127,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:32](https://github.com/slackapi
 ### logLevel?
 
 ```ts
-optional logLevel?: LogLevel;
+logLevel?: LogLevel;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:33](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L33)
@@ -137,7 +137,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:33](https://github.com/slackapi
 ### pingPongLoggingEnabled?
 
 ```ts
-optional pingPongLoggingEnabled?: boolean;
+pingPongLoggingEnabled?: boolean;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:46](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L46)
@@ -147,7 +147,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:46](https://github.com/slackapi
 ### processEventErrorHandler?
 
 ```ts
-optional processEventErrorHandler?: (args) => Promise<boolean>;
+processEventErrorHandler?: (args) => Promise<boolean>;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:50](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L50)
@@ -167,7 +167,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:50](https://github.com/slackapi
 ### redirectUri?
 
 ```ts
-optional redirectUri?: string;
+redirectUri?: string;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:37](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L37)
@@ -177,7 +177,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:37](https://github.com/slackapi
 ### scopes?
 
 ```ts
-optional scopes?: string | string[];
+scopes?: string | string[];
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:39](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L39)
@@ -187,7 +187,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:39](https://github.com/slackapi
 ### serverPingTimeout?
 
 ```ts
-optional serverPingTimeout?: number;
+serverPingTimeout?: number;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:45](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L45)
@@ -197,7 +197,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:45](https://github.com/slackapi
 ### stateSecret?
 
 ```ts
-optional stateSecret?: string;
+stateSecret?: string;
 ```
 
 Defined in: [src/receivers/SocketModeReceiver.ts:36](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L36)

@@ -7,7 +7,7 @@ Defined in: [src/types/view/index.ts:236](https://github.com/slackapi/bolt-js/bl
 ### files?
 
 ```ts
-optional files?: UploadedFile[];
+files?: UploadedFile[];
 ```
 
 Defined in: [src/types/view/index.ts:251](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L251)
@@ -17,7 +17,7 @@ Defined in: [src/types/view/index.ts:251](https://github.com/slackapi/bolt-js/bl
 ### rich\_text\_value?
 
 ```ts
-optional rich_text_value?: RichTextBlock;
+rich_text_value?: RichTextBlock;
 ```
 
 Defined in: [src/types/view/index.ts:250](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L250)
@@ -27,7 +27,7 @@ Defined in: [src/types/view/index.ts:250](https://github.com/slackapi/bolt-js/bl
 ### selected\_channel?
 
 ```ts
-optional selected_channel?: string | null;
+selected_channel?: string | null;
 ```
 
 Defined in: [src/types/view/index.ts:243](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L243)
@@ -37,7 +37,7 @@ Defined in: [src/types/view/index.ts:243](https://github.com/slackapi/bolt-js/bl
 ### selected\_channels?
 
 ```ts
-optional selected_channels?: string[];
+selected_channels?: string[];
 ```
 
 Defined in: [src/types/view/index.ts:247](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L247)
@@ -47,7 +47,7 @@ Defined in: [src/types/view/index.ts:247](https://github.com/slackapi/bolt-js/bl
 ### selected\_conversation?
 
 ```ts
-optional selected_conversation?: string | null;
+selected_conversation?: string | null;
 ```
 
 Defined in: [src/types/view/index.ts:242](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L242)
@@ -57,7 +57,7 @@ Defined in: [src/types/view/index.ts:242](https://github.com/slackapi/bolt-js/bl
 ### selected\_conversations?
 
 ```ts
-optional selected_conversations?: string[];
+selected_conversations?: string[];
 ```
 
 Defined in: [src/types/view/index.ts:246](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L246)
@@ -67,7 +67,7 @@ Defined in: [src/types/view/index.ts:246](https://github.com/slackapi/bolt-js/bl
 ### selected\_date?
 
 ```ts
-optional selected_date?: string | null;
+selected_date?: string | null;
 ```
 
 Defined in: [src/types/view/index.ts:239](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L239)
@@ -77,7 +77,7 @@ Defined in: [src/types/view/index.ts:239](https://github.com/slackapi/bolt-js/bl
 ### selected\_date\_time?
 
 ```ts
-optional selected_date_time?: number | null;
+selected_date_time?: number | null;
 ```
 
 Defined in: [src/types/view/index.ts:241](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L241)
@@ -87,7 +87,7 @@ Defined in: [src/types/view/index.ts:241](https://github.com/slackapi/bolt-js/bl
 ### selected\_option?
 
 ```ts
-optional selected_option?: ViewStateSelectedOption | null;
+selected_option?: ViewStateSelectedOption | null;
 ```
 
 Defined in: [src/types/view/index.ts:245](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L245)
@@ -97,7 +97,7 @@ Defined in: [src/types/view/index.ts:245](https://github.com/slackapi/bolt-js/bl
 ### selected\_options?
 
 ```ts
-optional selected_options?: ViewStateSelectedOption[];
+selected_options?: ViewStateSelectedOption[];
 ```
 
 Defined in: [src/types/view/index.ts:249](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L249)
@@ -107,7 +107,7 @@ Defined in: [src/types/view/index.ts:249](https://github.com/slackapi/bolt-js/bl
 ### selected\_time?
 
 ```ts
-optional selected_time?: string | null;
+selected_time?: string | null;
 ```
 
 Defined in: [src/types/view/index.ts:240](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L240)
@@ -117,7 +117,7 @@ Defined in: [src/types/view/index.ts:240](https://github.com/slackapi/bolt-js/bl
 ### selected\_user?
 
 ```ts
-optional selected_user?: string | null;
+selected_user?: string | null;
 ```
 
 Defined in: [src/types/view/index.ts:244](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L244)
@@ -127,7 +127,7 @@ Defined in: [src/types/view/index.ts:244](https://github.com/slackapi/bolt-js/bl
 ### selected\_users?
 
 ```ts
-optional selected_users?: string[];
+selected_users?: string[];
 ```
 
 Defined in: [src/types/view/index.ts:248](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L248)
@@ -147,7 +147,7 @@ Defined in: [src/types/view/index.ts:237](https://github.com/slackapi/bolt-js/bl
 ### value?
 
 ```ts
-optional value?: string | null;
+value?: string | null;
 ```
 
 Defined in: [src/types/view/index.ts:238](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L238)

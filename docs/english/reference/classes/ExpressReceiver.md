@@ -53,7 +53,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:162](https://github.com/slackapi/b
 ### installerOptions?
 
 ```ts
-optional installerOptions?: InstallerOptions;
+installerOptions?: InstallerOptions;
 ```
 
 Defined in: [src/receivers/ExpressReceiver.ts:164](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L164)
@@ -166,9 +166,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:365](https://github.com/slackapi/b
 
 ##### Implementation of
 
-```ts
-Receiver.start
-```
+`Receiver.start`
 
 #### Call Signature
 
@@ -194,9 +192,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:366](https://github.com/slackapi/b
 
 ##### Implementation of
 
-```ts
-Receiver.start
-```
+`Receiver.start`
 
 ***
 

@@ -31,7 +31,7 @@ Defined in: [src/types/shortcuts/global-shortcut.ts:9](https://github.com/slacka
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:28](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L28)
@@ -53,7 +53,7 @@ name: string;
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:27](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L27)

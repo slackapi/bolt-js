@@ -15,7 +15,7 @@ Authorization function outputs - data that will be available as part of event pr
 ### botId?
 
 ```ts
-optional botId?: string;
+botId?: string;
 ```
 
 Defined in: [src/App.ts:182](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L182)
@@ -25,7 +25,7 @@ Defined in: [src/App.ts:182](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### botToken?
 
 ```ts
-optional botToken?: string;
+botToken?: string;
 ```
 
 Defined in: [src/App.ts:180](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L180)
@@ -35,7 +35,7 @@ Defined in: [src/App.ts:180](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### botUserId?
 
 ```ts
-optional botUserId?: string;
+botUserId?: string;
 ```
 
 Defined in: [src/App.ts:183](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L183)
@@ -45,7 +45,7 @@ Defined in: [src/App.ts:183](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### enterpriseId?
 
 ```ts
-optional enterpriseId?: string;
+enterpriseId?: string;
 ```
 
 Defined in: [src/App.ts:186](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L186)
@@ -55,7 +55,7 @@ Defined in: [src/App.ts:186](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### teamId?
 
 ```ts
-optional teamId?: string;
+teamId?: string;
 ```
 
 Defined in: [src/App.ts:185](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L185)
@@ -65,7 +65,7 @@ Defined in: [src/App.ts:185](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### userId?
 
 ```ts
-optional userId?: string;
+userId?: string;
 ```
 
 Defined in: [src/App.ts:184](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L184)
@@ -75,7 +75,7 @@ Defined in: [src/App.ts:184](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### userToken?
 
 ```ts
-optional userToken?: string;
+userToken?: string;
 ```
 
 Defined in: [src/App.ts:181](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L181)
