@@ -7,6 +7,7 @@ import { assert } from 'chai';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
 import sinon from 'sinon';
+import { Agent } from 'undici';
 import App from '../../../src/App';
 import { AppInitializationError, AuthorizationError, CustomRouteInitializationError } from '../../../src/errors';
 import { defaultProcessEventErrorHandler } from '../../../src/receivers/SocketModeFunctions';
@@ -146,6 +147,41 @@ describe('SocketModeReceiver', () => {
       sinon.assert.calledOnce(constructorSpy);
       const constructorArgs = constructorSpy.firstCall.args[0];
       assert.equal(constructorArgs.serverPingTimeout, 60000);
+    });
+    it('should pass dispatcher to SocketModeClient', async () => {
+      const constructorSpy = sinon.spy();
+      class FakeSocketModeClient extends EventEmitter {
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        constructor(opts: any) {
+          super();
+          constructorSpy(opts);
+        }
+      }
+      const smOverrides = mergeOverrides(overrides, {
+        '@slack/socket-mode': {
+          SocketModeClient: FakeSocketModeClient,
+        },
+      });
+      const SocketModeReceiver = importSocketModeReceiver(smOverrides);
+      const dispatcher = new Agent();
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        dispatcher,
+      });
+      assert.isNotNull(receiver);
+      sinon.assert.calledOnce(constructorSpy);
+      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.strictEqual(constructorArgs.dispatcher, dispatcher);
+    });
+    it('should construct a SocketModeClient with an undici dispatcher', async () => {
+      const SocketModeReceiver = importSocketModeReceiver(overrides);
+      const receiver = new SocketModeReceiver({
+        appToken: 'my-secret',
+        logger: noopLogger,
+        dispatcher: new Agent(),
+      });
+      assert.instanceOf(receiver.client, SocketModeClient);
     });
     it('should pass all socket mode timeout options to SocketModeClient', async () => {
       const constructorSpy = sinon.spy();

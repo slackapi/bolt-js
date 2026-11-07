@@ -50,9 +50,9 @@
   "dependencies": {
     "@slack/logger": "^5.0.0",
     "@slack/oauth": "^4.0.0",
-    "@slack/socket-mode": "^3.1.0",
-    "@slack/types": "^3.1.0",
-    "@slack/web-api": "^8.1.1",
+    "@slack/socket-mode": "^3.1.1",
+    "@slack/types": "^3.3.0",
+    "@slack/web-api": "^8.3.0",
     "express": "^5.0.0",
     "path-to-regexp": "^8.1.0",
     "raw-body": "^3",
@@ -78,10 +78,12 @@
     "ts-node": "^10.9.2",
     "tsd": "^0.31.2",
     "typedoc": "^0.28.20",
-    "typedoc-plugin-markdown": "^4.13.1",
-    "typescript": "5.3.3"
+    "typedoc-plugin-markdown": "^4.14.1",
+    "typescript": "5.3.3",
+    "undici": "^8.12.2"
   },
   "peerDependencies": {
-    "@types/express": "^5.0.0"
+    "@types/express": "^5.0.0",
+    "undici": "^7.28.0 || ^8.0.0"
   }
 }

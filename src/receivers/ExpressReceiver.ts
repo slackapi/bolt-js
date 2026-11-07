@@ -130,7 +130,7 @@ interface InstallerOptions {
   authVersion?: InstallProviderOptions['authVersion']; // default 'v2'
   metadata?: InstallURLOptions['metadata'];
   installPath?: string;
-  directInstall?: InstallProviderOptions['directInstall']; // see https://api.slack.com/start/distributing/directory#direct_install
+  directInstall?: InstallProviderOptions['directInstall']; // see https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements#direct-install
   renderHtmlForInstallPath?: InstallProviderOptions['renderHtmlForInstallPath'];
   redirectUriPath?: string;
   installPathOptions?: InstallPathOptions;

@@ -1,7 +1,18 @@
-import type { WebClient } from '@slack/web-api';
-import type { FunctionFailFn } from '../CustomFunction';
+import type { FunctionsCompleteErrorResponse, WebClient } from '@slack/web-api';
 import { CustomFunctionCompleteFailError } from '../errors';
 import type { Context } from '../types';
+
+interface FunctionFailArguments {
+  error: string;
+}
+
+export type FunctionFailFn = {
+  (params: FunctionFailArguments): Promise<FunctionsCompleteErrorResponse>;
+  /**
+   * @description Check if this fail function has been called.
+   */
+  hasBeenCalled(): boolean;
+};
 
 export function createFunctionFail(context: Context, client: WebClient): FunctionFailFn {
   const { functionExecutionId } = context;
