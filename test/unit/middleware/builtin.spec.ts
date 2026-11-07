@@ -38,7 +38,7 @@ describe('Built-in global middleware', () => {
   });
   describe('matchMessage()', () => {
     function matchesPatternTestCase(
-      pattern: string | RegExp,
+      pattern: string | RegExp | (string | RegExp)[],
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
     ): Mocha.AsyncFunc {
       return async () => {
@@ -50,7 +50,7 @@ describe('Built-in global middleware', () => {
 
         sinon.assert.calledOnce(args.next);
         // The following assertion(s) check behavior that is only targeted at RegExp patterns
-        if (typeof pattern !== 'string') {
+        if (typeof pattern !== 'string' && !Array.isArray(pattern)) {
           if (ctx.matches !== undefined) {
             assert.lengthOf(ctx.matches, 1);
           } else {
@@ -61,7 +61,7 @@ describe('Built-in global middleware', () => {
     }
 
     function notMatchesPatternTestCase(
-      pattern: string | RegExp,
+      pattern: string | RegExp | (string | RegExp)[],
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
     ): Mocha.AsyncFunc {
       return async () => {
@@ -135,6 +135,42 @@ describe('Built-in global middleware', () => {
       it(
         'should filter out message events which do not have text (block kit)',
 
+        notMatchesPatternTestCase(
+          pattern,
+          createDummyMessageEventMiddlewareArgs({
+            text: '',
+            blocks: [
+              {
+                type: 'divider',
+              },
+            ],
+          }),
+        ),
+      );
+    });
+
+    describe('using an array pattern', () => {
+      const pattern = ['foo', /bar/];
+      const matchingText = 'foobaz';
+      const nonMatchingText = 'apple';
+      it(
+        'should match message events with a pattern that matches',
+        matchesPatternTestCase(pattern, createDummyMessageEventMiddlewareArgs({ text: matchingText })),
+      );
+      it(
+        'should match app_mention events with a pattern that matches',
+        matchesPatternTestCase(pattern, createDummyAppMentionEventMiddlewareArgs({ text: matchingText })),
+      );
+      it(
+        'should filter out message events with a pattern that does not match',
+        notMatchesPatternTestCase(pattern, createDummyMessageEventMiddlewareArgs({ text: nonMatchingText })),
+      );
+      it(
+        'should filter out app_mention events with a pattern that does not match',
+        notMatchesPatternTestCase(pattern, createDummyAppMentionEventMiddlewareArgs({ text: nonMatchingText })),
+      );
+      it(
+        'should filter out message events which do not have text (block kit)',
         notMatchesPatternTestCase(
           pattern,
           createDummyMessageEventMiddlewareArgs({
