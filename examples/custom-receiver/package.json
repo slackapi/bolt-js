@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@koa/router": "^15.7.0",
+    "@koa/router": "^15.7.1",
     "@slack/bolt": "^5",
     "@slack/logger": "^5.0.0",
     "@slack/oauth": "^4",
