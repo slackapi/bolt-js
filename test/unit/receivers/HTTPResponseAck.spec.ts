@@ -1,13 +1,20 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
+import path from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ReceiverMultipleAckError } from '../../../src/errors';
-import * as HTTPModuleFunctions from '../../../src/receivers/HTTPModuleFunctions';
 import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
 import type { ResponseAck } from '../../../src/types';
-import { createFakeLogger } from '../helpers';
+import { createFakeLogger, type Override, proxyquire } from '../helpers';
+
+function importHTTPResponseAck(
+  overrides: Override = {},
+): typeof import('../../../src/receivers/HTTPResponseAck').HTTPResponseAck {
+  const absolutePath = path.resolve(__dirname, '../../../src/receivers/HTTPResponseAck');
+  return proxyquire(absolutePath, overrides).HTTPResponseAck;
+}
 
 describe('HTTPResponseAck', async () => {
   let setTimeoutSpy: sinon.SinonSpy;
@@ -145,10 +152,11 @@ describe('HTTPResponseAck', async () => {
     );
   });
   it('should call buildContentResponse with response body if processBeforeResponse=false', async () => {
-    const stub = sinon.stub(HTTPModuleFunctions, 'buildContentResponse');
+    const stub = sinon.stub();
+    const HTTPResponseAckWithStub = importHTTPResponseAck({ './HTTPModuleFunctions': { buildContentResponse: stub } });
     const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
     const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const responseAck = new HTTPResponseAck({
+    const responseAck = new HTTPResponseAckWithStub({
       logger: createFakeLogger(),
       processBeforeResponse: false,
       httpRequest,

@@ -2,7 +2,7 @@ import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
-import { after, afterEach, beforeEach, describe, it } from 'node:test';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import type { InstallProvider } from '@slack/oauth';
 import { assert } from 'chai';
 import type { Application, IRouter, Request, Response } from 'express';
@@ -21,7 +21,6 @@ import ExpressReceiver, {
   verifySignatureAndParseBody,
   verifySignatureAndParseRawBody,
 } from '../../../src/receivers/ExpressReceiver';
-import * as httpFunc from '../../../src/receivers/HTTPModuleFunctions';
 import type { ReceiverEvent } from '../../../src/types';
 import {
   createFakeLogger,
@@ -336,10 +335,10 @@ describe('ExpressReceiver', () => {
   });
 
   describe('#requestHandler()', () => {
-    const extractRetryNumStub = sinon.stub(httpFunc, 'extractRetryNumFromHTTPRequest');
-    const extractRetryReasonStub = sinon.stub(httpFunc, 'extractRetryReasonFromHTTPRequest');
-    const buildNoBodyResponseStub = sinon.stub(httpFunc, 'buildNoBodyResponse');
-    const buildContentResponseStub = sinon.stub(httpFunc, 'buildContentResponse');
+    const extractRetryNumStub = sinon.stub();
+    const extractRetryReasonStub = sinon.stub();
+    const buildNoBodyResponseStub = sinon.stub();
+    const buildContentResponseStub = sinon.stub();
     const processStub = sinon.stub<[ReceiverEvent]>().resolves({});
     const ackStub = function ackStub() {};
     ackStub.prototype.bind = function () {
@@ -351,16 +350,18 @@ describe('ExpressReceiver', () => {
         withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
         { './HTTPResponseAck': { HTTPResponseAck: ackStub } },
+        {
+          './HTTPModuleFunctions': {
+            extractRetryNumFromHTTPRequest: extractRetryNumStub,
+            extractRetryReasonFromHTTPRequest: extractRetryReasonStub,
+            buildNoBodyResponse: buildNoBodyResponseStub,
+            buildContentResponse: buildContentResponseStub,
+          },
+        },
       );
     });
     afterEach(() => {
       sinon.reset();
-    });
-    after(() => {
-      extractRetryNumStub.restore();
-      extractRetryReasonStub.restore();
-      buildNoBodyResponseStub.restore();
-      buildContentResponseStub.restore();
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);

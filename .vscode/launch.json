@@ -10,12 +10,11 @@
       "name": "Spec tests",
       "program": "${file}",
       "stopOnEntry": false,
-      "runtimeArgs": ["--require", "ts-node/register"],
+      "runtimeArgs": ["--enable-source-maps", "--import", "tsx"],
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": null,
       "env": {
-        "NODE_ENV": "testing",
-        "TS_NODE_PROJECT": "tsconfig.json"
+        "NODE_ENV": "testing"
       },
       "skipFiles": ["<node_internals>/**"]
     }
