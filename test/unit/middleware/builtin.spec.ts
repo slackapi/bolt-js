@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { beforeEach, describe, it } from 'node:test';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
@@ -40,7 +41,7 @@ describe('Built-in global middleware', () => {
     function matchesPatternTestCase(
       pattern: string | RegExp,
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
-    ): Mocha.AsyncFunc {
+    ): () => Promise<void> {
       return async () => {
         const { matchMessage } = builtins;
         const middleware = matchMessage(pattern);
@@ -63,7 +64,7 @@ describe('Built-in global middleware', () => {
     function notMatchesPatternTestCase(
       pattern: string | RegExp,
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
-    ): Mocha.AsyncFunc {
+    ): () => Promise<void> {
       return async () => {
         const { matchMessage } = builtins;
         const middleware = matchMessage(pattern);

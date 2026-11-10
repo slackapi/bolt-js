@@ -1,3 +1,4 @@
+import { describe, it } from 'node:test';
 import { WebClient } from '@slack/web-api';
 import { assert } from 'chai';
 import sinon from 'sinon';

@@ -31,7 +31,7 @@ npm test              # Full pipeline: build -> lint -> type tests -> unit test 
 npm run build         # Clean build (rm dist/ + tsc compilation)
 npm run lint          # Biome check (formatting + linting)
 npm run lint:fix      # Biome auto-fix
-npm run test:unit     # Unit tests only (mocha)
+npm run test:unit     # Unit tests only (node:test)
 npm run test:coverage # Unit tests with coverage (c8)
 npm run test:types    # Type definition tests (tsd)
 npm run watch         # Watch mode for development (rebuilds on src/ changes)
@@ -173,7 +173,8 @@ test/types/         # tsd type tests
 - **Test files** use `*.spec.ts` suffix
 - **Assertions** use chai (`expect`, `assert`)
 - **Mocking** uses sinon (`stub`, `spy`, `fake`) and proxyquire for module-level dependency replacement
-- **Test config** in `test/unit/.mocharc.json`
+- **Test runner** is `node:test`; import `describe`, `it`, and hooks from `node:test` in each spec
+- **Test config** is the `node --test` flags in the `test:unit` script of `package.json`
 - **Where to put new tests:** Mirror the source structure. For `src/Foo.ts`, add `test/unit/Foo.spec.ts`. For `src/receivers/Bar.ts`, add `test/unit/receivers/Bar.spec.ts`.
 
 ### CI
