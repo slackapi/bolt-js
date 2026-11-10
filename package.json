@@ -33,7 +33,7 @@
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "prepare": "npm run build",
     "test": "npm run build && npm run lint && npm run test:types && npm run test:unit",
-    "test:coverage": "npm run build && npm run lint && npm run test:types && node --enable-source-maps --import tsx --experimental-test-coverage --test-coverage-include='src/**/*.ts' --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
+    "test:coverage": "npm run build && npm run lint && npm run test:types && node --enable-source-maps --import tsx --experimental-test-coverage --test-coverage-include=\"src/**/*.ts\" --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
     "test:types": "tsd --files test/types",
     "test:unit": "node --enable-source-maps --import tsx --test-reporter=spec --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
     "version": "npm run changeset version && npm install && npm run docs",
