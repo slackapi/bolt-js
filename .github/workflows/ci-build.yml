@@ -30,6 +30,10 @@ jobs:
         exclude:
           - node-version: 20.x
             undici: "undici@^8"
+        include:
+          - node-version: 24.x
+            undici: "undici@^8"
+            coverage: true
     permissions:
       contents: read
     steps:
@@ -43,16 +47,21 @@ jobs:
       - run: npm ci --verbose
       - name: Install undici
         run: npm install ${{ matrix.undici }} --no-save
-      - run: npm test
+      - name: Run tests
+        if: ${{ !matrix.coverage }}
+        run: npm test
+      - name: Run tests with coverage
+        if: matrix.coverage
+        run: npm run test:coverage
       - name: Build docs
-        if: matrix.node-version == '24.x' && matrix.undici == 'undici@^8'
+        if: matrix.coverage
         run: npm run docs
       - name: Upload coverage to Codecov
-        if: matrix.node-version == '24.x' && matrix.undici == 'undici@^8'
+        if: matrix.coverage
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: coverage
+          files: lcov.info
           fail_ci_if_error: true
           verbose: true
   notifications:
