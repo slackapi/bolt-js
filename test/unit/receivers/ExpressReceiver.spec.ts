@@ -561,7 +561,6 @@ describe('ExpressReceiver', () => {
 
     beforeEach(() => {
       // requestTimestamp = 1531420618 means this timestamp
-      // Only fake Date since faking process.nextTick stalls the node:test reporter
       clock = sinon.useFakeTimers({
         now: new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime(),
         shouldAdvanceTime: true,
