@@ -9,7 +9,6 @@ import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
 import type { ResponseAck } from '../../../src/types';
 import { createFakeLogger, type Override, proxyquire } from '../helpers';
 
-// Loading the system under test using overrides
 function importHTTPResponseAck(
   overrides: Override = {},
 ): typeof import('../../../src/receivers/HTTPResponseAck').HTTPResponseAck {
