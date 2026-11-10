@@ -16,14 +16,6 @@ export function createFakeLogger() {
   return sinon.createStubInstance(ConsoleLogger);
 }
 
-/**
- * Fake only Date at the given time. Sinon fakes process.nextTick by default, which stalls the node:test reporter and
- * drops the remaining results of a file without failing it.
- */
-export function useFakeDate(now: number): sinon.SinonFakeTimers {
-  return sinon.useFakeTimers({ now, shouldAdvanceTime: true, toFake: ['Date'] });
-}
-
 export function delay(ms = 0): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);

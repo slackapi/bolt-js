@@ -29,7 +29,6 @@ import {
   mergeOverrides,
   type Override,
   proxyquire,
-  useFakeDate,
   withHttpCreateServer,
   withHttpsCreateServer,
 } from '../helpers';
@@ -561,7 +560,11 @@ describe('ExpressReceiver', () => {
 
     beforeEach(() => {
       // requestTimestamp = 1531420618 means this timestamp
-      clock = useFakeDate(new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime());
+      clock = sinon.useFakeTimers({
+        now: new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime(),
+        shouldAdvanceTime: true,
+        toFake: ['Date'],
+      });
     });
 
     afterEach(() => {
