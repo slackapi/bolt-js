@@ -32,9 +32,10 @@
     "lint": "npx @biomejs/biome check docs src test examples",
     "lint:fix": "npx @biomejs/biome check --write docs src test examples",
     "prepare": "npm run build",
-    "test": "npm run build && npm run lint && npm run test:types && npm run test:unit",
-    "test:coverage": "npm run build && npm run lint && npm run test:types && node --enable-source-maps --import tsx --test-timeout=10000 --experimental-test-coverage --test-coverage-include=\"src/**/*.ts\" --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
+    "test": "npm run build && npm run lint && npm run test:types && npm run test:typecheck && npm run test:unit",
+    "test:coverage": "npm run build && npm run lint && npm run test:types && npm run test:typecheck && node --enable-source-maps --import tsx --test-timeout=10000 --experimental-test-coverage --test-coverage-include=\"src/**/*.ts\" --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
     "test:types": "tsd --files test/types",
+    "test:typecheck": "tsc --project test/unit",
     "test:unit": "node --enable-source-maps --import tsx --test-reporter=spec --test-timeout=10000 --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
     "version": "npm run changeset version && npm install && npm run docs",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
