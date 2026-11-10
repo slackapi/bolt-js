@@ -39,7 +39,7 @@ describe('App ignore self middleware processing', () => {
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
     fakeAck = sinon.fake();

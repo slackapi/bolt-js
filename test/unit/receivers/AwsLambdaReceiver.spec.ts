@@ -330,6 +330,6 @@ describe('AwsLambdaReceiver', () => {
     await new Promise((res) => {
       setTimeout(res, delay + 2);
     });
-    sinon.assert.notCalled(awsReceiver.logger.error as sinon.SinonSpy);
+    assert.strictEqual(noopLogger.error.mock.callCount(), 0);
   });
 });

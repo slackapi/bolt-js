@@ -1,6 +1,6 @@
+import { type Mock, mock } from 'node:test';
 import { ConsoleLogger } from '@slack/logger';
 import proxyquire from 'proxyquire';
-import sinon from 'sinon';
 import type { ConversationStore } from '../../../src/conversation-store';
 import type { NextFn } from '../../../src/types';
 
@@ -12,8 +12,29 @@ export * from './events';
 export * from './receivers';
 export { proxyquire };
 
+// biome-ignore lint/suspicious/noExplicitAny: mocked methods accept any arguments
+type AnyFunction = (...args: any[]) => any;
+
+export type MockedInstance<T> = T & { [K in keyof T]: T[K] extends AnyFunction ? Mock<T[K]> : T[K] };
+
+/**
+ * Create an instance of a class with each prototype method replaced by a mock function.
+ */
+export function mockInstance<T extends object>(Class: abstract new (...args: never[]) => T): MockedInstance<T> {
+  const instance = Object.create(Class.prototype);
+  for (let proto = Class.prototype; proto && proto !== Object.prototype; proto = Object.getPrototypeOf(proto)) {
+    for (const key of Object.getOwnPropertyNames(proto)) {
+      const { value } = Object.getOwnPropertyDescriptor(proto, key) ?? {};
+      if (key !== 'constructor' && typeof value === 'function' && !Object.hasOwn(instance, key)) {
+        instance[key] = mock.fn();
+      }
+    }
+  }
+  return instance;
+}
+
 export function createFakeLogger() {
-  return sinon.createStubInstance(ConsoleLogger);
+  return mockInstance(ConsoleLogger);
 }
 
 export function delay(ms = 0): Promise<void> {

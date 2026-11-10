@@ -426,9 +426,9 @@ describe('App basic features', () => {
       const fakeReceiver = new FakeReceiver();
       const MockApp = importApp();
       const app = new MockApp({ receiver: fakeReceiver, authorize: noop });
-      fakeReceiver.start = sinon.fake.returns(sinon.promise().resolve(dummyReturn));
+      fakeReceiver.start.mock.mockImplementation(async () => dummyReturn);
       await app.start(1337);
-      assert.deepEqual(fakeReceiver.start.firstCall.args, [1337]);
+      assert.deepEqual(fakeReceiver.start.mock.calls[0].arguments, [1337]);
     });
   });
 
@@ -438,13 +438,13 @@ describe('App basic features', () => {
       const dummyParams = [Symbol(), Symbol()];
       const fakeReceiver = new FakeReceiver();
       const MockApp = importApp();
-      fakeReceiver.stop = sinon.fake.returns(sinon.promise().resolve(dummyReturn));
+      fakeReceiver.stop.mock.mockImplementation(async () => dummyReturn);
 
       const app = new MockApp({ receiver: fakeReceiver, authorize: noop });
       const actualReturn = await app.stop(...dummyParams);
 
       assert.deepEqual(actualReturn, dummyReturn);
-      assert.deepEqual(fakeReceiver.stop.firstCall.args, dummyParams as unknown);
+      assert.deepEqual(fakeReceiver.stop.mock.calls[0].arguments, dummyParams as unknown);
     });
   });
 });

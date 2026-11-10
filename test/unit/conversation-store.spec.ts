@@ -68,7 +68,7 @@ describe('conversationContext middleware', () => {
     await middleware(fakeArgs);
 
     // Assert
-    assert(fakeLogger.debug.called);
+    assert.ok(fakeLogger.debug.mock.callCount() > 0);
     assert(fakeNext.called);
     assert.ok(!('updateConversation' in dummyContext));
     assert.ok(!('conversation' in dummyContext));
