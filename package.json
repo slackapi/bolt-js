@@ -35,7 +35,7 @@
     "test": "npm run build && npm run lint && npm run test:types && npm run test:coverage",
     "test:coverage": "c8 npm run test:unit",
     "test:types": "tsd --files test/types",
-    "test:unit": "node --enable-source-maps --import tsx --test-reporter=spec --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
+    "test:unit": "node --enable-source-maps --import tsx --test-reporter=spec --test-timeout=10000 --test test/unit/*.spec.ts test/unit/*/*.spec.ts test/unit/*/*/*.spec.ts",
     "version": "npm run changeset version && npm install && npm run docs",
     "watch": "npx nodemon --watch 'src' --ext 'ts' --exec npm run build"
   },
