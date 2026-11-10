@@ -1,5 +1,5 @@
+import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { assert } from 'chai';
 import {
   CustomFunction,
   matchCallbackId,
@@ -20,12 +20,12 @@ describe('CustomFunction', () => {
   describe('constructor', () => {
     it('should accept single function as middleware', async () => {
       const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: true });
-      assert.isNotNull(fn);
+      assert.notStrictEqual(fn, null);
     });
 
     it('should accept multiple functions as middleware', async () => {
       const fn = new CustomFunction('test_callback_id', MOCK_MIDDLEWARE_MULTIPLE, { autoAcknowledge: true });
-      assert.isNotNull(fn);
+      assert.notStrictEqual(fn, null);
     });
   });
 
@@ -46,7 +46,7 @@ describe('CustomFunction', () => {
       const cbId = 'test_executed_callback_id';
       const fn = new CustomFunction(cbId, MOCK_MIDDLEWARE_SINGLE, { autoAcknowledge: false });
       const listeners = fn.getListeners();
-      assert.isFalse(listeners.includes(autoAcknowledge));
+      assert.strictEqual(listeners.includes(autoAcknowledge), false);
     });
   });
 
@@ -57,7 +57,10 @@ describe('CustomFunction', () => {
       const validationFn = () => validate(badId, MOCK_MIDDLEWARE_SINGLE);
 
       const expectedMsg = 'CustomFunction expects a callback_id as the first argument';
-      assert.throws(validationFn, CustomFunctionInitializationError, expectedMsg);
+      assert.throws(
+        validationFn,
+        (error) => error instanceof CustomFunctionInitializationError && error.message.includes(expectedMsg),
+      );
     });
 
     it('should throw an error if middleware is not a function or array', async () => {
@@ -66,7 +69,10 @@ describe('CustomFunction', () => {
 
       const validationFn = () => validate('callback_id', badConfig);
       const expectedMsg = 'CustomFunction expects a function or array of functions as the second argument';
-      assert.throws(validationFn, CustomFunctionInitializationError, expectedMsg);
+      assert.throws(
+        validationFn,
+        (error) => error instanceof CustomFunctionInitializationError && error.message.includes(expectedMsg),
+      );
     });
 
     it('should throw an error if middleware is not a single callback or an array of callbacks', async () => {
@@ -78,7 +84,10 @@ describe('CustomFunction', () => {
 
       const validationFn = () => validate('callback_id', badMiddleware);
       const expectedMsg = 'All CustomFunction middleware must be functions';
-      assert.throws(validationFn, CustomFunctionInitializationError, expectedMsg);
+      assert.throws(
+        validationFn,
+        (error) => error instanceof CustomFunctionInitializationError && error.message.includes(expectedMsg),
+      );
     });
   });
 });

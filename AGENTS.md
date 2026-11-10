@@ -171,7 +171,7 @@ test/types/         # tsd type tests
 ### Test Conventions
 
 - **Test files** use `*.spec.ts` suffix
-- **Assertions** use chai (`expect`, `assert`)
+- **Assertions** use `node:assert/strict` (`import assert from 'node:assert/strict'`)
 - **Mocking** uses sinon (`stub`, `spy`, `fake`) and proxyquire for module-level dependency replacement
 - **Test runner** is `node:test`; import `describe`, `it`, and hooks from `node:test` in each spec
 - **Test config** is the `node --test` flags in the `test:unit` script of `package.json`

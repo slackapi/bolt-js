@@ -1,7 +1,7 @@
+import assert from 'node:assert/strict';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
-import { assert } from 'chai';
 import sinon from 'sinon';
 import { expectType } from 'tsd';
 import { ReceiverMultipleAckError } from '../../../src/errors';
@@ -38,8 +38,8 @@ describe('HTTPResponseAck', async () => {
       httpRequest,
       httpResponse,
     });
-    assert.isDefined(responseAck);
-    assert.isDefined(responseAck.bind());
+    assert.ok(responseAck !== undefined);
+    assert.ok(responseAck.bind() !== undefined);
     expectType<ResponseAck>(responseAck);
     responseAck.ack(); // no exception
   });
@@ -116,7 +116,7 @@ describe('HTTPResponseAck', async () => {
       await bound();
       assert.fail('No exception raised');
     } catch (e) {
-      assert.instanceOf(e, ReceiverMultipleAckError);
+      assert.ok(e instanceof ReceiverMultipleAckError);
     }
   });
   it('should store response body if processBeforeResponse=true', async () => {

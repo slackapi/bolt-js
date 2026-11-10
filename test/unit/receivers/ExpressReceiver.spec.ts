@@ -1,10 +1,10 @@
+import assert from 'node:assert/strict';
 import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import type { InstallProvider } from '@slack/oauth';
-import { assert } from 'chai';
 import type { Application, IRouter, Request, Response } from 'express';
 import sinon, { type SinonFakeTimers } from 'sinon';
 import App from '../../../src/App';
@@ -75,13 +75,13 @@ describe('ExpressReceiver', () => {
         new ExpressReceiver({ signingSecret: '' });
         assert.fail();
       } catch (error) {
-        assert.instanceOf(error, AppInitializationError);
+        assert.ok(error instanceof AppInitializationError);
       }
     });
 
     it('should succeed with empty signingSecret when signatureVerification is false', async () => {
       const receiver = new ExpressReceiver({ signingSecret: '', signatureVerification: false });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
 
     // NOTE: it would be more informative to test known valid combinations of options, as well as invalid combinations
@@ -101,7 +101,7 @@ describe('ExpressReceiver', () => {
         },
         customPropertiesExtractor: (req) => ({ headers: req.headers }),
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
     });
     it('should accept custom Express app / router', async () => {
       const app = {
@@ -128,7 +128,7 @@ describe('ExpressReceiver', () => {
         app: app as unknown as Application,
         router: router as unknown as IRouter,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       sinon.assert.calledOnce(app.use);
       sinon.assert.calledOnce(router.get);
       sinon.assert.calledOnce(router.post);
@@ -153,7 +153,7 @@ describe('ExpressReceiver', () => {
         redirectUri,
         installerOptions,
       });
-      assert.isNotNull(receiver);
+      assert.notStrictEqual(receiver, null);
       // missing redirectUriPath
       assert.throws(
         () =>
@@ -245,7 +245,7 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, Error);
+      assert.ok(caughtError instanceof Error);
     });
     it('should reject with an error when the built-in HTTP server returns undefined', async () => {
       const fakeCreateUndefinedServer = sinon.fake.returns(undefined);
@@ -264,8 +264,8 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+      assert.strictEqual(caughtError.code, ErrorCode.ReceiverInconsistentStateError);
     });
     it('should reject with an error when starting and the server was already previously started', async () => {
       const ER = importExpressReceiver(overrides);
@@ -280,8 +280,8 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+      assert.strictEqual(caughtError.code, ErrorCode.ReceiverInconsistentStateError);
     });
   });
 
@@ -305,8 +305,8 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, ReceiverInconsistentStateError);
-      assert.propertyVal(caughtError, 'code', ErrorCode.ReceiverInconsistentStateError);
+      assert.ok(caughtError instanceof ReceiverInconsistentStateError);
+      assert.strictEqual(caughtError.code, ErrorCode.ReceiverInconsistentStateError);
     });
     it('should reject when a built-in HTTP server raises an error when closing', async () => {
       fakeServer = new FakeServer(
@@ -329,7 +329,7 @@ describe('ExpressReceiver', () => {
         caughtError = error as Error;
       }
 
-      assert.instanceOf(caughtError, Error);
+      assert.ok(caughtError instanceof Error);
       assert.equal(caughtError?.message, 'this error will be raised by the underlying HTTP server during close()');
     });
   });
@@ -630,21 +630,21 @@ describe('ExpressReceiver', () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildExpressRequest(), state);
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     it('should verify requests on GCP', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state);
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     it('should verify requests on GCP using async signingSecret', async () => {
       // biome-ignore lint/suspicious/noExplicitAny: errors can be anything
       const state: any = {};
       await runWithValidRequest(buildGCPRequest(), state, () => Promise.resolve(signingSecret));
-      assert.isUndefined(state.error);
+      assert.strictEqual(state.error, undefined);
     });
 
     // ----------------------------
@@ -867,8 +867,8 @@ describe('ExpressReceiver', () => {
         });
         assert.fail('Expected error to be thrown');
       } catch (e) {
-        assert.instanceOf(e, Error);
-        assert.include((e as Error).message, 'signingSecret is empty or undefined');
+        assert.ok(e instanceof Error);
+        assert.match((e as Error).message, /signingSecret is empty or undefined/);
       }
     });
 
@@ -907,8 +907,8 @@ describe('ExpressReceiver', () => {
       await verifier(buildExpressRequest(), resp, next);
       // On success the middleware calls next() with no error and sends no response.
       sinon.assert.calledOnce(next);
-      assert.isUndefined(next.firstCall.args[0]);
-      assert.isUndefined(result.code);
+      assert.strictEqual(next.firstCall.args[0], undefined);
+      assert.strictEqual(result.code, undefined);
     });
 
     it('should parse a string bodyLimit and respond 413 when the body exceeds it', async () => {
@@ -932,8 +932,8 @@ describe('ExpressReceiver', () => {
       const verifier = verifySignatureAndParseRawBody(noopLogger, signingSecret, Infinity);
       await verifier(buildExpressRequest(), resp, next);
       sinon.assert.calledOnce(next);
-      assert.isUndefined(next.firstCall.args[0]);
-      assert.isUndefined(result.code);
+      assert.strictEqual(next.firstCall.args[0], undefined);
+      assert.strictEqual(result.code, undefined);
     });
   });
 
