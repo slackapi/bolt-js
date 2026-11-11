@@ -11,7 +11,7 @@ If you call `start()` before `init()`, Bolt will raise an exception.
 ## Example
 
 ```javascript
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 // deferInitialization is one of the options you can set in the constructor
 const app = new App({
