@@ -386,17 +386,18 @@ describe('ExpressReceiver', () => {
       );
     });
     afterEach(() => {
-      for (const fake of [
-        extractRetryNumStub,
-        extractRetryReasonStub,
-        buildNoBodyResponseStub,
-        buildContentResponseStub,
-        processStub,
-        ackStub.prototype.ack,
-      ]) {
-        fake.mock.resetCalls();
-        fake.mock.restore();
-      }
+      extractRetryNumStub.mock.resetCalls();
+      extractRetryNumStub.mock.restore();
+      extractRetryReasonStub.mock.resetCalls();
+      extractRetryReasonStub.mock.restore();
+      buildNoBodyResponseStub.mock.resetCalls();
+      buildNoBodyResponseStub.mock.restore();
+      buildContentResponseStub.mock.resetCalls();
+      buildContentResponseStub.mock.restore();
+      processStub.mock.resetCalls();
+      processStub.mock.restore();
+      ackStub.prototype.ack.mock.resetCalls();
+      ackStub.prototype.ack.mock.restore();
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);
