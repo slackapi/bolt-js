@@ -36,7 +36,7 @@ describe('App function() routing', () => {
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
     fakeHandler.resetHistory();
     fakeAck.resetHistory();

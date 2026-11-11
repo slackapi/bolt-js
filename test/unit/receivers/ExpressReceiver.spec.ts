@@ -210,7 +210,7 @@ describe('ExpressReceiver', () => {
 
       sinon.assert.calledOnce(fakeCreateServer);
       assert.strictEqual(server, fakeServer as unknown as Server);
-      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(port));
+      assert.strictEqual(fakeServer.listen.mock.calls[0].arguments[0], port);
     });
     it('should start listening for requests using the built-in HTTPS (TLS) server when given TLS server options', async () => {
       overrides = mergeOverrides(
@@ -226,7 +226,7 @@ describe('ExpressReceiver', () => {
 
       sinon.assert.calledWith(fakeCreateServer, tlsOptions);
       assert.strictEqual(server, fakeServer as unknown as HTTPSServer);
-      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(port));
+      assert.strictEqual(fakeServer.listen.mock.calls[0].arguments[0], port);
     });
     it('should reject with an error when the built-in HTTP server fails to listen (such as EADDRINUSE)', async () => {
       const fakeCreateFailingServer = sinon.fake.returns(new FakeServer(new Error('fake listening error')));

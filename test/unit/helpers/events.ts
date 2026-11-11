@@ -1,3 +1,4 @@
+import { type Mock, mock } from 'node:test';
 import type {
   AppHomeOpenedEvent,
   AppMentionEvent,
@@ -10,7 +11,6 @@ import type {
   ReactionAddedEvent,
 } from '@slack/types';
 import { WebClient } from '@slack/web-api';
-import sinon, { type SinonSpy } from 'sinon';
 import type {
   AssistantThreadContextChangedMiddlewareArgs,
   AssistantThreadStartedMiddlewareArgs,
@@ -32,6 +32,7 @@ import type {
   FunctionInputs,
   GlobalShortcut,
   MessageShortcut,
+  NextFn,
   ReceiverEvent,
   RespondFn,
   SayFn,
@@ -64,13 +65,13 @@ const ack: AckFn<void> = (_r?) => Promise.resolve();
 export function wrapMiddleware<Args extends AnyMiddlewareArgs>(
   args: Args,
   ctx?: Context,
-): Args & AllMiddlewareArgs & { next: SinonSpy } {
+): Args & AllMiddlewareArgs & { next: Mock<NextFn> } {
   const wrapped = {
     ...args,
     context: ctx || { isEnterpriseInstall: false },
     logger: createFakeLogger(),
     client: new WebClient(),
-    next: sinon.fake(),
+    next: mock.fn<NextFn>(),
   };
   return wrapped;
 }
@@ -221,11 +222,11 @@ export function createDummyAppMentionEventMiddlewareArgs(
 }
 function enrichDummyAssistantMiddlewareArgs() {
   return {
-    getThreadContext: sinon.spy(),
-    saveThreadContext: sinon.spy(),
-    setStatus: sinon.spy(),
-    setSuggestedPrompts: sinon.spy(),
-    setTitle: sinon.spy(),
+    getThreadContext: mock.fn<AssistantThreadStartedMiddlewareArgs['getThreadContext']>(),
+    saveThreadContext: mock.fn<AssistantThreadStartedMiddlewareArgs['saveThreadContext']>(),
+    setStatus: mock.fn<AssistantThreadStartedMiddlewareArgs['setStatus']>(),
+    setSuggestedPrompts: mock.fn<AssistantThreadStartedMiddlewareArgs['setSuggestedPrompts']>(),
+    setTitle: mock.fn<AssistantThreadStartedMiddlewareArgs['setTitle']>(),
   };
 }
 export function createDummyAssistantThreadContextChangedEventMiddlewareArgs(

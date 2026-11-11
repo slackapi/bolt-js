@@ -114,7 +114,7 @@ describe('Assistant class', () => {
       const middleware = assistant.getMiddleware();
       const fakeMessageArgs = wrapMiddleware(createDummyMessageEventMiddlewareArgs());
       await middleware(fakeMessageArgs);
-      sinon.assert.called(fakeMessageArgs.next);
+      assert.ok(fakeMessageArgs.next.mock.callCount() > 0);
     });
 
     it('should not call next if a assistant event', async () => {
@@ -122,7 +122,7 @@ describe('Assistant class', () => {
       const middleware = assistant.getMiddleware();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       await middleware(mockThreadStartedArgs);
-      sinon.assert.notCalled(mockThreadStartedArgs.next);
+      assert.strictEqual(mockThreadStartedArgs.next.mock.callCount(), 0);
     });
 
     describe('isAssistantEvent', () => {
