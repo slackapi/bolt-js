@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it, mock } from 'node:test';
-import type { AssistantThreadStartedEvent } from '@slack/types';
 import type { WebClient } from '@slack/web-api';
 import {
   type AllAssistantMiddlewareArgs,
@@ -9,10 +8,10 @@ import {
   type AssistantConfig,
   type AssistantMiddleware,
   type AssistantMiddlewareArgs,
+  type AssistantThreadContextChangedMiddleware,
 } from '../../src/Assistant';
 import type { AssistantThreadContext, AssistantThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from '../../src/errors';
-import type { Middleware } from '../../src/types';
 import {
   createDummyAppMentionEventMiddlewareArgs,
   createDummyAssistantThreadContextChangedEventMiddlewareArgs,
@@ -510,11 +509,11 @@ describe('Assistant class', () => {
         );
         const { processAssistantMiddleware } = importAssistant();
 
-        const fn1 = mock.fn((async ({ next: continuation }) => {
+        const fn1 = mock.fn<AssistantThreadContextChangedMiddleware>(async ({ next: continuation }) => {
           await continuation();
-        }) as Middleware<AssistantThreadStartedEvent>);
-        const fn2 = mock.fn(async () => {});
-        const fakeMiddleware = [fn1, fn2] as unknown as AssistantMiddleware;
+        });
+        const fn2 = mock.fn<AssistantThreadContextChangedMiddleware>(async () => {});
+        const fakeMiddleware: AssistantMiddleware = [fn1, fn2];
 
         await processAssistantMiddleware(mockThreadContextChangedArgs, fakeMiddleware);
 
