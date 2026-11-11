@@ -3,7 +3,7 @@ import type { Server } from 'node:http';
 import type { Server as HTTPSServer } from 'node:https';
 import path from 'node:path';
 import { Readable } from 'node:stream';
-import { afterEach, beforeEach, describe, it, mock } from 'node:test';
+import { afterEach, beforeEach, describe, it, type Mock, mock } from 'node:test';
 import type { InstallProvider } from '@slack/oauth';
 import type { Application, IRouter, Request, Response } from 'express';
 import App from '../../../src/App';
@@ -356,17 +356,22 @@ describe('ExpressReceiver', () => {
   });
 
   describe('#requestHandler()', () => {
-    const extractRetryNumStub = mock.fn();
-    const extractRetryReasonStub = mock.fn();
-    const buildNoBodyResponseStub = mock.fn();
-    const buildContentResponseStub = mock.fn();
-    const processStub = mock.fn<(event: ReceiverEvent) => Promise<unknown>>(() => Promise.resolve({}));
+    let extractRetryNumStub: MockFn;
+    let extractRetryReasonStub: MockFn;
+    let buildNoBodyResponseStub: MockFn;
+    let buildContentResponseStub: MockFn;
+    let processStub: Mock<(event: ReceiverEvent) => Promise<unknown>>;
     const ackStub = function ackStub() {};
     ackStub.prototype.bind = function () {
       return this;
     };
-    ackStub.prototype.ack = mock.fn();
     beforeEach(() => {
+      extractRetryNumStub = mock.fn();
+      extractRetryReasonStub = mock.fn();
+      buildNoBodyResponseStub = mock.fn();
+      buildContentResponseStub = mock.fn();
+      processStub = mock.fn(() => Promise.resolve({}));
+      ackStub.prototype.ack = mock.fn();
       overrides = mergeOverrides(
         withHttpCreateServer(fakeCreateServer),
         withHttpsCreateServer(
@@ -384,20 +389,6 @@ describe('ExpressReceiver', () => {
           },
         },
       );
-    });
-    afterEach(() => {
-      extractRetryNumStub.mock.resetCalls();
-      extractRetryNumStub.mock.restore();
-      extractRetryReasonStub.mock.resetCalls();
-      extractRetryReasonStub.mock.restore();
-      buildNoBodyResponseStub.mock.resetCalls();
-      buildNoBodyResponseStub.mock.restore();
-      buildContentResponseStub.mock.resetCalls();
-      buildContentResponseStub.mock.restore();
-      processStub.mock.resetCalls();
-      processStub.mock.restore();
-      ackStub.prototype.ack.mock.resetCalls();
-      ackStub.prototype.ack.mock.restore();
     });
     it('should not build an HTTP response if processBeforeResponse=false', async () => {
       const ER = importExpressReceiver(overrides);
