@@ -53,8 +53,9 @@ describe('App view() routing', () => {
   it('should throw if provided a constraint with unknown view constraint keys', async () => {
     // @ts-expect-error providing known invalid view constraint parameter
     app.view({ id: 'boom' }, fakeHandler);
-    assert.ok(
-      fakeLogger.error.mock.calls.some((call) => String(call.arguments[0]).includes('unknown constraint keys')),
+    assert.deepStrictEqual(
+      fakeLogger.error.mock.calls.map((call) => call.arguments),
+      [['View listener cannot be attached using unknown constraint keys: id']],
     );
   });
 
