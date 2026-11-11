@@ -2,7 +2,6 @@
 
 Your app can use the `function()` method to listen to incoming [custom step requests](/workflows/workflow-steps). Custom steps are used in Workflow Builder to build workflows. The method requires a step `callback_id` of type string. This `callback_id` must also be defined in your [Function](/reference/app-manifest#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
 
-
 * `complete()` requires one argument: an `outputs` object. It ends your custom step **successfully** and provides an object containing the outputs of your custom step as per its definition.
 * `fail()` requires **one** argument: `error` of type string. It ends your custom step **unsuccessfully** and provides a message containing information regarding why your custom step failed.
 
@@ -153,11 +152,11 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
 
 Learn more about responding to interactivity, see the [Slack API documentation](/tools/bolt-js/concepts/custom-steps#listening-to-custom-step-interactivity-events).
 
-## Workflow-scoped tokens
+## Function-scoped bot access tokens
 
 When a custom function execution includes a function-scoped bot access token, Bolt uses that token by default for the `client` injected into the listener. This also applies to function-scoped interactivity when the corresponding token is available.
 
-To disable automatic workflow-token selection, set `attachFunctionToken: false` when initializing your app:
+To disable automatic function-token selection, set `attachFunctionToken: false` when initializing your app:
 
 ```javascript
 import { App } from '@slack/bolt';
