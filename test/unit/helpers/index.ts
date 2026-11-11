@@ -15,14 +15,10 @@ export { proxyquire };
 // biome-ignore lint/suspicious/noExplicitAny: mocked methods accept any arguments
 type AnyFunction = (...args: any[]) => any;
 
-/** A mock that accepts any arguments, for fakes passed where many function types are expected. */
 export type MockFn = Mock<AnyFunction>;
 
 export type MockedInstance<T> = T & { [K in keyof T]: T[K] extends AnyFunction ? Mock<T[K]> : T[K] };
 
-/**
- * Create an instance of a class with each prototype method replaced by a mock function.
- */
 export function mockInstance<T extends object>(Class: abstract new (...args: never[]) => T): MockedInstance<T> {
   const instance = Object.create(Class.prototype);
   for (let proto = Class.prototype; proto && proto !== Object.prototype; proto = Object.getPrototypeOf(proto)) {

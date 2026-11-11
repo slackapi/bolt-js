@@ -131,7 +131,7 @@ describe('App middleware and listener arguments', () => {
       });
 
       assert.strictEqual(fakeAck.mock.callCount(), 2);
-      assert.strictEqual(fakeAuthorize.mock.callCount(), 1); // still 1
+      assert.strictEqual(fakeAuthorize.mock.callCount(), 1);
       assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
     it('should be skipped for app_uninstalled events #674', async () => {
@@ -167,7 +167,7 @@ describe('App middleware and listener arguments', () => {
       });
 
       assert.strictEqual(fakeAck.mock.callCount(), 2);
-      assert.strictEqual(fakeAuthorize.mock.callCount(), 1); // still 1
+      assert.strictEqual(fakeAuthorize.mock.callCount(), 1);
       assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
   });
