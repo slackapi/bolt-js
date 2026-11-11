@@ -211,11 +211,11 @@ describe('HTTPReceiver', () => {
       assert.notStrictEqual(defaultPort, null);
       assert.strictEqual(Reflect.get(defaultPort, 'port'), 3000);
       await defaultPort.start(9001);
-      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(9001));
+      assert.strictEqual(fakeServer.listen.mock.calls[0].arguments[0], 9001);
       await defaultPort.stop();
-      fakeServer.listen.resetHistory();
+      fakeServer.listen.mock.resetCalls();
       await defaultPort.start('1337');
-      sinon.assert.calledWithMatch(fakeServer.listen, sinon.match(1337));
+      assert.strictEqual(fakeServer.listen.mock.calls[0].arguments[0], 1337);
       await defaultPort.stop();
     });
   });

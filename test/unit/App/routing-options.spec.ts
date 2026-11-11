@@ -35,7 +35,7 @@ describe('App options() routing', () => {
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
     fakeAck = sinon.fake();

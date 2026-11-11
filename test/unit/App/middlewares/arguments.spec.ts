@@ -335,8 +335,8 @@ describe('App middleware and listener arguments', () => {
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
       sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeLogger.info);
-      sinon.assert.calledOnce(fakeLogger.debug);
+      assert.strictEqual(fakeLogger.info.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.debug.mock.callCount(), 1);
     });
 
     it('should work in the case both logger and logLevel are given', async () => {
@@ -381,9 +381,9 @@ describe('App middleware and listener arguments', () => {
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
       sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeLogger.info);
-      sinon.assert.calledOnce(fakeLogger.debug);
-      sinon.assert.calledOnce(fakeLogger.setLevel);
+      assert.strictEqual(fakeLogger.info.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.debug.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.setLevel.mock.callCount(), 1);
     });
   });
 
@@ -896,7 +896,8 @@ describe('App middleware and listener arguments', () => {
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      sinon.assert.calledOnceWithExactly(fakeLogger.info, 'Events API');
+      assert.strictEqual(fakeLogger.info.mock.callCount(), 1);
+      assert.deepStrictEqual(fakeLogger.info.mock.calls[0].arguments, ['Events API']);
       sinon.assert.calledTwice(fakeAck);
     });
   });

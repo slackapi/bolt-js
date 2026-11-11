@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
@@ -35,7 +36,7 @@ describe('App shortcut() routing', () => {
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
     fakeAck = sinon.fake();
@@ -97,7 +98,10 @@ describe('App shortcut() routing', () => {
   it('should throw if provided a constraint with unknown shortcut constraint keys', async () => {
     // @ts-expect-error providing known invalid shortcut constraint parameter
     app.shortcut({ id: 'boom' }, fakeHandler);
-    sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
+    assert.deepStrictEqual(
+      fakeLogger.error.mock.calls.map((call) => call.arguments),
+      [['Slack listener cannot be attached using unknown constraint keys: id']],
+    );
   });
 
   it('should route a Slack shortcut event to the corresponding handler and only acknowledge in the handler', async () => {

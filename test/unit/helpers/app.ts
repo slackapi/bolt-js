@@ -1,6 +1,7 @@
 import path from 'node:path';
+import { mock } from 'node:test';
 import type { AuthTestResponse, WebClientOptions } from '@slack/web-api';
-import sinon, { type SinonSpy } from 'sinon';
+import type { SinonSpy } from 'sinon';
 import { proxyquire } from './index';
 
 /*
@@ -57,7 +58,7 @@ export function withNoopWebClient(authTestResponse?: AuthTestResponse): Override
             }
 
             public auth = {
-              test: sinon.fake.resolves(authTestResponse),
+              test: mock.fn(async () => authTestResponse),
             };
           }
         : class {
@@ -74,7 +75,7 @@ export function withNoopWebClient(authTestResponse?: AuthTestResponse): Override
 export function withNoopAppMetadata(): Override {
   return {
     '@slack/web-api': {
-      addAppMetadata: sinon.fake(),
+      addAppMetadata: mock.fn(),
     },
   };
 }
@@ -142,17 +143,17 @@ export function withSuccessfulBotUserFetchingWebClient(botId: string, botUserId:
         }
 
         public auth = {
-          test: sinon.fake.resolves({ user_id: botUserId }),
+          test: mock.fn(async () => ({ user_id: botUserId })),
         };
 
         public users = {
-          info: sinon.fake.resolves({
+          info: mock.fn(async () => ({
             user: {
               profile: {
                 bot_id: botId,
               },
             },
-          }),
+          })),
         };
       },
     },

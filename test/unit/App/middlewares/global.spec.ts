@@ -82,7 +82,7 @@ describe('App global middleware Processing', () => {
 
     assert(fakeErrorHandler.notCalled);
     assert(fakeMiddleware.notCalled);
-    assert.ok(fakeLogger.warn.callCount >= invalidReceiverEvents.length);
+    assert.ok(fakeLogger.warn.mock.callCount() >= invalidReceiverEvents.length);
   });
 
   it('should warn, send to global error handler, acknowledge, and skip when a receiver event fails authorization', async () => {
@@ -103,7 +103,7 @@ describe('App global middleware Processing', () => {
     await fakeReceiver.sendEvent({ ...dummyReceiverEvent, ack: fakeAck });
 
     assert(fakeMiddleware.notCalled);
-    assert(fakeLogger.warn.called);
+    assert.ok(fakeLogger.warn.mock.callCount() > 0);
     assert.ok(fakeErrorHandler.firstCall.args[0] instanceof AuthorizationError);
     assert.strictEqual(fakeErrorHandler.firstCall.args[0].code, ErrorCode.AuthorizationError);
     assert.strictEqual(fakeErrorHandler.firstCall.args[0].original, dummyAuthorizationError);

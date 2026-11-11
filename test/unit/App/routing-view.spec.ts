@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
 import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../src/App';
@@ -36,7 +37,7 @@ describe('App view() routing', () => {
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
     fakeAck = sinon.fake();
@@ -52,7 +53,10 @@ describe('App view() routing', () => {
   it('should throw if provided a constraint with unknown view constraint keys', async () => {
     // @ts-expect-error providing known invalid view constraint parameter
     app.view({ id: 'boom' }, fakeHandler);
-    sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
+    assert.deepStrictEqual(
+      fakeLogger.error.mock.calls.map((call) => call.arguments),
+      [['View listener cannot be attached using unknown constraint keys: id']],
+    );
   });
 
   describe('for view submission events', () => {

@@ -37,7 +37,7 @@ describe('App action() routing', () => {
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
     fakeHandler = sinon.fake();
     fakeAck = sinon.fake();
@@ -90,7 +90,10 @@ describe('App action() routing', () => {
   it('should throw if provided a constraint with unknown action constraint keys', async () => {
     // @ts-expect-error providing known invalid action constraint parameter
     app.action({ id: 'boom' }, fakeHandler);
-    sinon.assert.calledWithMatch(fakeLogger.error, 'unknown constraint keys');
+    assert.deepStrictEqual(
+      fakeLogger.error.mock.calls.map((call) => call.arguments),
+      [['Action listener cannot be attached using unknown constraint keys: id']],
+    );
   });
 
   it('should route an action event to the corresponding handler and only acknowledge in the handler', async () => {
