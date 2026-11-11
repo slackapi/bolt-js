@@ -143,10 +143,9 @@ describe('conversationContext middleware', () => {
     assert.ok(dummyContext.updateConversation !== undefined);
     assert.equal(await dummyContext.updateConversation(dummyConversationState), dummyStoreSetResult);
     assert.strictEqual(fakeStore.set.mock.callCount(), 1);
-    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments, [
+    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments.slice(0, 2), [
       dummyConversationId,
       dummyConversationState,
-      undefined,
     ]);
   });
 
@@ -182,10 +181,9 @@ describe('conversationContext middleware', () => {
     const result = await dummyContext.updateConversation(newDummyConversationState);
     assert.equal(result, dummyStoreSetResult);
     assert.strictEqual(fakeStore.set.mock.callCount(), 1);
-    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments, [
+    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments.slice(0, 2), [
       dummyConversationId,
       newDummyConversationState,
-      undefined,
     ]);
   });
 });

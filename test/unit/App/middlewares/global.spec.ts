@@ -329,11 +329,9 @@ describe('App global middleware Processing', () => {
 
   it('should use the xwfp token if the request contains one and not reuse it in following requests', async () => {
     const MockApp = importApp();
-    // App adds the first event's teamId to this shared result, which the second event's client lookup uses
-    const authorizeResult = { botToken: 'xoxb-valid' };
     const app = new MockApp({
       receiver: fakeReceiver,
-      authorize: mock.fn(() => Promise.resolve(authorizeResult)),
+      authorize: mock.fn(() => Promise.resolve({ botToken: 'xoxb-valid', teamId: 'T123' })),
     });
 
     let clientArg: WebClient | undefined;

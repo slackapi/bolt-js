@@ -54,18 +54,18 @@ export class FakeServer extends EventEmitter {
     super();
   }
 }
-export function withHttpCreateServer(spy: MockFn): Override {
+export function withHttpCreateServer(fake: MockFn): Override {
   return {
     'node:http': {
-      createServer: spy,
+      createServer: fake,
     },
   };
 }
 
-export function withHttpsCreateServer(spy: MockFn): Override {
+export function withHttpsCreateServer(fake: MockFn): Override {
   return {
     'node:https': {
-      createServer: spy,
+      createServer: fake,
     },
   };
 }
