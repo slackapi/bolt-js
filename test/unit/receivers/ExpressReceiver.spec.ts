@@ -602,7 +602,10 @@ describe('ExpressReceiver', () => {
   describe('verifySignatureAndParseRawBody', () => {
     beforeEach(() => {
       // requestTimestamp = 1531420618 means this timestamp
-      mock.timers.enable({ apis: ['Date'], now: new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime() });
+      mock.timers.enable({
+        apis: ['Date'],
+        now: new Date('Thu Jul 12 2018 11:36:58 GMT-0700').getTime(),
+      });
     });
 
     afterEach(() => {
