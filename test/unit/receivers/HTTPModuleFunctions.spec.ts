@@ -3,12 +3,11 @@ import { createHmac } from 'node:crypto';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { describe, it } from 'node:test';
-import sinon from 'sinon';
 
 import { AuthorizationError, HTTPReceiverDeferredRequestError, ReceiverMultipleAckError } from '../../../src/errors';
 import type { BufferedIncomingMessage } from '../../../src/receivers/BufferedIncomingMessage';
 import * as func from '../../../src/receivers/HTTPModuleFunctions';
-import { createFakeLogger } from '../helpers';
+import { createFakeLogger, mockInstance } from '../helpers';
 
 // Build a real readable request stream so raw-body actually consumes bytes. The other tests in this
 // file pre-set `rawBody` and bypass the stream read, so they can't exercise the size-limit behavior.
@@ -25,18 +24,18 @@ describe('HTTPModuleFunctions', async () => {
   describe('Request header extraction', async () => {
     describe('extractRetryNumFromHTTPRequest', async () => {
       it('should work when the header does not exist', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         const result = func.extractRetryNumFromHTTPRequest(req);
         assert.strictEqual(result, undefined);
       });
       it('should parse a single value header', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         req.headers['x-slack-retry-num'] = '2';
         const result = func.extractRetryNumFromHTTPRequest(req);
         assert.equal(result, 2);
       });
       it('should parse an array of value headers', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         req.headers['x-slack-retry-num'] = ['2'];
         const result = func.extractRetryNumFromHTTPRequest(req);
         assert.equal(result, 2);
@@ -44,18 +43,18 @@ describe('HTTPModuleFunctions', async () => {
     });
     describe('extractRetryReasonFromHTTPRequest', async () => {
       it('should work when the header does not exist', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         const result = func.extractRetryReasonFromHTTPRequest(req);
         assert.strictEqual(result, undefined);
       });
       it('should parse a valid header', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         req.headers['x-slack-retry-reason'] = 'timeout';
         const result = func.extractRetryReasonFromHTTPRequest(req);
         assert.equal(result, 'timeout');
       });
       it('should parse an array of value headers', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         req.headers['x-slack-retry-reason'] = ['timeout'];
         const result = func.extractRetryReasonFromHTTPRequest(req);
         assert.equal(result, 'timeout');
@@ -85,7 +84,7 @@ describe('HTTPModuleFunctions', async () => {
 
     describe('getHeader', async () => {
       it('should throw an exception when parsing a missing header', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         try {
           func.getHeader(req, 'Cookie');
           assert.fail('Error should be thrown here');
@@ -94,7 +93,7 @@ describe('HTTPModuleFunctions', async () => {
         }
       });
       it('should parse a valid header', async () => {
-        const req = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
+        const req = mockInstance(IncomingMessage) as IncomingMessage;
         req.headers.Cookie = 'foo=bar';
         const result = func.getHeader(req, 'Cookie');
         assert.equal(result, 'foo=bar');
@@ -117,7 +116,7 @@ describe('HTTPModuleFunctions', async () => {
             'x-slack-request-timestamp': timestamp,
           },
         } as unknown as BufferedIncomingMessage;
-        const res = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res = mockInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         assert.ok(result.rawBody !== undefined);
       });
@@ -136,7 +135,7 @@ describe('HTTPModuleFunctions', async () => {
             'x-slack-request-timestamp': timestamp,
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
@@ -158,7 +157,7 @@ describe('HTTPModuleFunctions', async () => {
             'x-slack-request-timestamp': timestamp,
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
@@ -174,7 +173,7 @@ describe('HTTPModuleFunctions', async () => {
             'content-type': 'application/x-www-form-urlencoded',
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         assert.ok(result.rawBody !== undefined);
         assert.equal(result.rawBody.toString(), 'ssl_check=1');
@@ -188,7 +187,7 @@ describe('HTTPModuleFunctions', async () => {
             'content-type': 'application/x-www-form-urlencoded',
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         const result = await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         assert.equal(result.rawBody.toString(), 'ssl_check=1');
       });
@@ -201,7 +200,7 @@ describe('HTTPModuleFunctions', async () => {
             'content-type': 'application/x-www-form-urlencoded',
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
@@ -218,7 +217,7 @@ describe('HTTPModuleFunctions', async () => {
             'content-type': 'application/x-www-form-urlencoded',
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
@@ -235,7 +234,7 @@ describe('HTTPModuleFunctions', async () => {
             'content-type': 'application/json',
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
@@ -252,7 +251,7 @@ describe('HTTPModuleFunctions', async () => {
             'content-type': 'application/x-www-form-urlencoded',
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
           assert.fail('Expected an error to be thrown');
@@ -272,7 +271,7 @@ describe('HTTPModuleFunctions', async () => {
             'x-slack-request-timestamp': timestamp,
           },
         } as unknown as BufferedIncomingMessage;
-        const res: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret }, req, res);
         } catch (e) {
@@ -283,7 +282,7 @@ describe('HTTPModuleFunctions', async () => {
         const signingSecret = 'secret';
         // enabled: false skips verification but still buffers first, so the limit must apply here too
         const req = streamOf('x'.repeat(1024), { 'content-type': 'application/json' });
-        const res = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const res = mockInstance(ServerResponse) as unknown as ServerResponse;
         try {
           await func.parseAndVerifyHTTPRequest({ signingSecret, enabled: false, bodyLimit: 128 }, req, res);
           assert.fail('Expected an error to be thrown');
@@ -375,26 +374,26 @@ describe('HTTPModuleFunctions', async () => {
 
   describe('HTTP response builder methods', async () => {
     it('should have buildContentResponse', async () => {
-      const res = sinon.createStubInstance(ServerResponse);
+      const res = mockInstance(ServerResponse);
       func.buildContentResponse(res as unknown as ServerResponse, 'OK');
-      assert.ok(res.writeHead.calledWith(200));
+      assert.strictEqual(res.writeHead.mock.calls[0].arguments[0], 200);
     });
     it('should have buildNoBodyResponse', async () => {
-      const res = sinon.createStubInstance(ServerResponse);
+      const res = mockInstance(ServerResponse);
       func.buildNoBodyResponse(res as unknown as ServerResponse, 500);
-      assert.ok(res.writeHead.calledWith(500));
+      assert.strictEqual(res.writeHead.mock.calls[0].arguments[0], 500);
     });
     it('should have buildSSLCheckResponse', async () => {
-      const res = sinon.createStubInstance(ServerResponse);
+      const res = mockInstance(ServerResponse);
       func.buildSSLCheckResponse(res as unknown as ServerResponse);
-      assert.ok(res.writeHead.calledWith(200));
+      assert.strictEqual(res.writeHead.mock.calls[0].arguments[0], 200);
     });
     it('should have buildUrlVerificationResponse', async () => {
-      const res = sinon.createStubInstance(ServerResponse);
+      const res = mockInstance(ServerResponse);
       func.buildUrlVerificationResponse(res as unknown as ServerResponse, {
         challenge: '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P',
       });
-      assert.ok(res.writeHead.calledWith(200));
+      assert.strictEqual(res.writeHead.mock.calls[0].arguments[0], 200);
     });
   });
 
@@ -403,33 +402,33 @@ describe('HTTPModuleFunctions', async () => {
 
     describe('defaultDispatchErrorHandler', async () => {
       it('should properly handle ReceiverMultipleAckError', async () => {
-        const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const response = sinon.createStubInstance(ServerResponse);
+        const request = mockInstance(IncomingMessage) as IncomingMessage;
+        const response = mockInstance(ServerResponse);
         func.defaultDispatchErrorHandler({
           error: new ReceiverMultipleAckError(),
           logger,
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.ok(response.writeHead.calledWith(500));
+        assert.strictEqual(response.writeHead.mock.calls[0].arguments[0], 500);
       });
       it('should properly handle HTTPReceiverDeferredRequestError', async () => {
-        const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const response = sinon.createStubInstance(ServerResponse);
+        const request = mockInstance(IncomingMessage) as IncomingMessage;
+        const response = mockInstance(ServerResponse);
         func.defaultDispatchErrorHandler({
           error: new HTTPReceiverDeferredRequestError('msg', request, response as unknown as ServerResponse),
           logger,
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.ok(response.writeHead.calledWith(404));
+        assert.strictEqual(response.writeHead.mock.calls[0].arguments[0], 404);
       });
     });
 
     describe('defaultProcessEventErrorHandler', async () => {
       it('should properly handle ReceiverMultipleAckError', async () => {
-        const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const response = sinon.createStubInstance(ServerResponse);
+        const request = mockInstance(IncomingMessage) as IncomingMessage;
+        const response = mockInstance(ServerResponse);
         func.defaultProcessEventErrorHandler({
           error: new ReceiverMultipleAckError(),
           storedResponse: undefined,
@@ -437,11 +436,11 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.ok(response.writeHead.calledWith(500));
+        assert.strictEqual(response.writeHead.mock.calls[0].arguments[0], 500);
       });
       it('should properly handle AuthorizationError', async () => {
-        const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const response = sinon.createStubInstance(ServerResponse);
+        const request = mockInstance(IncomingMessage) as IncomingMessage;
+        const response = mockInstance(ServerResponse);
         func.defaultProcessEventErrorHandler({
           error: new AuthorizationError('msg', new Error()),
           storedResponse: undefined,
@@ -449,20 +448,20 @@ describe('HTTPModuleFunctions', async () => {
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.ok(response.writeHead.calledWith(401));
+        assert.strictEqual(response.writeHead.mock.calls[0].arguments[0], 401);
       });
     });
 
     describe('defaultUnhandledRequestHandler', async () => {
       it('should properly execute', async () => {
-        const request = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-        const response = sinon.createStubInstance(ServerResponse);
+        const request = mockInstance(IncomingMessage) as IncomingMessage;
+        const response = mockInstance(ServerResponse);
         func.defaultUnhandledRequestHandler({
           logger,
           request,
           response: response as unknown as ServerResponse,
         });
-        assert.ok(response.writeHead.calledWith(404));
+        assert.strictEqual(response.writeHead.mock.calls[0].arguments[0], 404);
       });
     });
   });

@@ -172,7 +172,7 @@ test/types/         # tsd type tests
 
 - **Test files** use `*.spec.ts` suffix
 - **Assertions** use `node:assert/strict` (`import assert from 'node:assert/strict'`)
-- **Mocking** uses sinon (`stub`, `spy`, `fake`) and proxyquire for module-level dependency replacement
+- **Mocking** uses `node:test` mocks (`mock.fn()`, `mock.method()`, and `mockInstance()` from `test/unit/helpers`) and proxyquire for module-level dependency replacement
 - **Test runner** is `node:test`; import `describe`, `it`, and hooks from `node:test` in each spec
 - **Test config** is the `node --test` flags in the `test:unit` script of `package.json`
 - **Where to put new tests:** Mirror the source structure. For `src/Foo.ts`, add `test/unit/Foo.spec.ts`. For `src/receivers/Bar.ts`, add `test/unit/receivers/Bar.spec.ts`.
