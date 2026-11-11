@@ -348,8 +348,7 @@ describe('SocketModeReceiver', () => {
       fakeReq.method = 'GET';
       const fakeRes = mockInstance(ServerResponse);
       await socketModeHttpServerHandler(fakeReq, fakeRes);
-      assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
-      assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+      assert.deepStrictEqual(fakeRes.writeHead.mock.calls[0].arguments, [404, {}]);
       assert.strictEqual(fakeRes.end.mock.callCount(), 1);
     });
     describe('handleInstallPathRequest()', () => {
@@ -582,17 +581,16 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
-        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.deepStrictEqual(fakeRes.writeHead.mock.calls[0].arguments, [404, {}]);
         assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
@@ -621,17 +619,16 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
-        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.deepStrictEqual(fakeRes.writeHead.mock.calls[0].arguments, [404, {}]);
         assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
@@ -660,17 +657,16 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
-        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.deepStrictEqual(fakeRes.writeHead.mock.calls[0].arguments, [404, {}]);
         assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
@@ -702,19 +698,18 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
         assert.strictEqual(customRoutes[1].handler.mock.callCount(), 0);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
         assert.strictEqual(customRoutes[1].handler.mock.callCount(), 0);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
-        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.deepStrictEqual(fakeRes.writeHead.mock.calls[0].arguments, [404, {}]);
         assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
@@ -746,18 +741,17 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
         assert.strictEqual(customRoutes[1].handler.mock.callCount(), 0);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
-        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.deepStrictEqual(fakeRes.writeHead.mock.calls[0].arguments, [404, {}]);
         assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 

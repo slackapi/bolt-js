@@ -448,7 +448,7 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -480,7 +480,7 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -512,7 +512,7 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -548,7 +548,7 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
@@ -584,7 +584,7 @@ describe('HTTPReceiver', () => {
         fakeReq.method = 'POST';
         receiver.requestListener(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments, [expectedMessage, fakeRes]);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[1].arguments, [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         assert.throws(() => receiver.requestListener(fakeReq, fakeRes), HTTPReceiverDeferredRequestError);
