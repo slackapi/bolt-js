@@ -1,0 +1,24 @@
+{
+  "name": "bolt-oauth-custom-data-example",
+  "version": "1.0.0",
+  "description": "Example app that passes custom data through the OAuth flow with ExpressReceiver",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node --test app.spec.js"
+  },
+  "author": "Slack Technologies, LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.0",
+    "express": "^5.0.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  },
+  "overrides": {
+    "undici": "^7.28.0"
+  }
+}
