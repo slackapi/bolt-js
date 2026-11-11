@@ -835,7 +835,6 @@ describe('ExpressReceiver', () => {
     // verifyTooOldTimestampError
 
     async function verifyTooOldTimestampError(req: Request): Promise<void> {
-      // restore the valid clock
       mock.timers.reset();
       // biome-ignore lint/suspicious/noExplicitAny: requests can be anything
       const result: any = {};
