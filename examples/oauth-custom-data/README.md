@@ -21,6 +21,8 @@ The cookie is registered on an Express router that is passed to
 
 ## Setup
 
+This example requires Node.js 20.18.1 or newer.
+
 Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps), then add
 your public redirect URL under **OAuth & Permissions**. For local development,
 use a tunnel such as [`ngrok`](https://ngrok.com/download):
