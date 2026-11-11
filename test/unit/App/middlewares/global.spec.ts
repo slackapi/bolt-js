@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import { beforeEach, describe, it } from 'node:test';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import sinon, { type SinonSpy } from 'sinon';
 import type App from '../../../../src/App';
 import type { ExtendedErrorHandlerArgs } from '../../../../src/App';
 import { AuthorizationError, type CodedError, ErrorCode, UnknownError } from '../../../../src/errors';
@@ -13,7 +12,9 @@ import {
   delay,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
+  noop,
   noopMiddleware,
   withConversationContext,
   withMemoryStore,
@@ -23,37 +24,37 @@ import {
 
 describe('App global middleware Processing', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeErrorHandler: SinonSpy;
+  let fakeErrorHandler: MockFn;
   let dummyAuthorizationResult: { botToken: string; botId: string };
-  let fakeFirstMiddleware: SinonSpy;
-  let fakeSecondMiddleware: SinonSpy;
-  const fakeAck = sinon.fake.resolves({});
+  let fakeFirstMiddleware: MockFn;
+  let fakeSecondMiddleware: MockFn;
+  const fakeAck: MockFn = mock.fn(() => Promise.resolve({}));
   let app: App;
   let dummyReceiverEvent: ReceiverEvent;
 
   beforeEach(async () => {
     fakeReceiver = new FakeReceiver();
-    fakeErrorHandler = sinon.fake();
+    fakeErrorHandler = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
-    fakeAck.resetHistory();
+    fakeAck.mock.resetCalls();
 
-    const fakeConversationContext = sinon.fake.returns(noopMiddleware);
+    const fakeConversationContext = mock.fn(() => noopMiddleware);
     const overrides = mergeOverrides(
       withNoopAppMetadata(),
       withNoopWebClient(),
-      withMemoryStore(sinon.fake()),
+      withMemoryStore(mock.fn()),
       withConversationContext(fakeConversationContext),
     );
     const MockApp = importApp(overrides);
 
     dummyReceiverEvent = createDummyReceiverEvent();
-    fakeFirstMiddleware = sinon.fake(noopMiddleware);
-    fakeSecondMiddleware = sinon.fake(noopMiddleware);
+    fakeFirstMiddleware = mock.fn(noopMiddleware);
+    fakeSecondMiddleware = mock.fn(noopMiddleware);
 
     app = new MockApp({
       logger: createFakeLogger(),
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
   });
 
@@ -72,22 +73,22 @@ describe('App global middleware Processing', () => {
 
   it('should warn and skip when processing a receiver event with unknown type (never crash)', async () => {
     const fakeLogger = createFakeLogger();
-    const fakeMiddleware = sinon.fake(noopMiddleware);
+    const fakeMiddleware = mock.fn(noopMiddleware);
     const invalidReceiverEvents = createInvalidReceiverEvents();
     const MockApp = importApp();
 
-    const app = new MockApp({ receiver: fakeReceiver, logger: fakeLogger, authorize: sinon.fake() });
+    const app = new MockApp({ receiver: fakeReceiver, logger: fakeLogger, authorize: noop });
     app.use(fakeMiddleware);
     await Promise.all(invalidReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-    assert(fakeErrorHandler.notCalled);
-    assert(fakeMiddleware.notCalled);
+    assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
+    assert.strictEqual(fakeMiddleware.mock.callCount(), 0);
     assert.ok(fakeLogger.warn.mock.callCount() >= invalidReceiverEvents.length);
   });
 
   it('should warn, send to global error handler, acknowledge, and skip when a receiver event fails authorization', async () => {
     const fakeLogger = createFakeLogger();
-    const fakeMiddleware = sinon.fake(noopMiddleware);
+    const fakeMiddleware = mock.fn(noopMiddleware);
     const dummyOrigError = new Error('auth failed');
     const dummyAuthorizationError = new AuthorizationError('auth failed', dummyOrigError);
     const dummyReceiverEvent = createDummyReceiverEvent();
@@ -96,18 +97,18 @@ describe('App global middleware Processing', () => {
     const app = new MockApp({
       receiver: fakeReceiver,
       logger: fakeLogger,
-      authorize: sinon.fake.rejects(dummyAuthorizationError),
+      authorize: mock.fn(() => Promise.reject(dummyAuthorizationError)),
     });
     app.use(fakeMiddleware);
     app.error(fakeErrorHandler);
     await fakeReceiver.sendEvent({ ...dummyReceiverEvent, ack: fakeAck });
 
-    assert(fakeMiddleware.notCalled);
+    assert.strictEqual(fakeMiddleware.mock.callCount(), 0);
     assert.ok(fakeLogger.warn.mock.callCount() > 0);
-    assert.ok(fakeErrorHandler.firstCall.args[0] instanceof AuthorizationError);
-    assert.strictEqual(fakeErrorHandler.firstCall.args[0].code, ErrorCode.AuthorizationError);
-    assert.strictEqual(fakeErrorHandler.firstCall.args[0].original, dummyAuthorizationError);
-    assert(fakeAck.called);
+    assert.ok(fakeErrorHandler.mock.calls[0].arguments[0] instanceof AuthorizationError);
+    assert.strictEqual(fakeErrorHandler.mock.calls[0].arguments[0].code, ErrorCode.AuthorizationError);
+    assert.strictEqual(fakeErrorHandler.mock.calls[0].arguments[0].original, dummyAuthorizationError);
+    assert.ok(fakeAck.mock.callCount() > 0);
   });
 
   it('should preserve a non-Error authorization rejection via the original error cause', async () => {
@@ -124,9 +125,9 @@ describe('App global middleware Processing', () => {
     app.error(fakeErrorHandler);
     await fakeReceiver.sendEvent({ ...dummyReceiverEvent, ack: fakeAck });
 
-    assert.ok(fakeErrorHandler.firstCall.args[0] instanceof AuthorizationError);
-    assert.strictEqual(fakeErrorHandler.firstCall.args[0].original.cause, dummyRejection);
-    assert(fakeAck.called);
+    assert.ok(fakeErrorHandler.mock.calls[0].arguments[0] instanceof AuthorizationError);
+    assert.strictEqual(fakeErrorHandler.mock.calls[0].arguments[0].original.cause, dummyRejection);
+    assert.ok(fakeAck.mock.callCount() > 0);
   });
 
   it('should error if next called multiple times', async () => {
@@ -143,7 +144,7 @@ describe('App global middleware Processing', () => {
     await fakeReceiver.sendEvent(dummyReceiverEvent);
 
     // Assert
-    assert.ok(fakeErrorHandler.firstCall.args[0] instanceof Error);
+    assert.ok(fakeErrorHandler.mock.calls[0].arguments[0] instanceof Error);
   });
 
   it('correctly waits for async listeners', async () => {
@@ -158,7 +159,7 @@ describe('App global middleware Processing', () => {
 
     await fakeReceiver.sendEvent(dummyReceiverEvent);
     assert.ok(changed);
-    assert(fakeErrorHandler.notCalled);
+    assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
   });
 
   it('throws errors which can be caught by upstream async listeners', async () => {
@@ -183,7 +184,7 @@ describe('App global middleware Processing', () => {
     await fakeReceiver.sendEvent(dummyReceiverEvent);
 
     assert.equal(caughtError, thrownError);
-    assert(fakeErrorHandler.notCalled);
+    assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
   });
 
   it('calls async middleware in declared order', async () => {
@@ -225,7 +226,7 @@ describe('App global middleware Processing', () => {
     });
 
     assert.equal(middlewareCount, 8);
-    assert(fakeErrorHandler.notCalled);
+    assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
   });
 
   it('should, on error, call the global error handler, not extended', async () => {
@@ -293,7 +294,7 @@ describe('App global middleware Processing', () => {
     const MockApp = importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves({}),
+      authorize: mock.fn(() => Promise.resolve({})),
     });
 
     let clientArg: WebClient | undefined;
@@ -311,7 +312,7 @@ describe('App global middleware Processing', () => {
     const MockApp = importApp();
     const app = new MockApp({
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves({}),
+      authorize: mock.fn(() => Promise.resolve({})),
       attachFunctionToken: false,
     });
 
@@ -328,9 +329,11 @@ describe('App global middleware Processing', () => {
 
   it('should use the xwfp token if the request contains one and not reuse it in following requests', async () => {
     const MockApp = importApp();
+    // App adds the first event's teamId to this shared result, which the second event's client lookup uses
+    const authorizeResult = { botToken: 'xoxb-valid' };
     const app = new MockApp({
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves({ botToken: 'xoxb-valid' }),
+      authorize: mock.fn(() => Promise.resolve(authorizeResult)),
     });
 
     let clientArg: WebClient | undefined;

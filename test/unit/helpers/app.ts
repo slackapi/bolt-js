@@ -1,8 +1,7 @@
 import path from 'node:path';
 import { mock } from 'node:test';
 import type { AuthTestResponse, WebClientOptions } from '@slack/web-api';
-import type { SinonSpy } from 'sinon';
-import { proxyquire } from './index';
+import { type MockFn, proxyquire } from './index';
 
 /*
  * Contains test helpers related to importing, mocking and overriding parts of the App class
@@ -80,7 +79,7 @@ export function withNoopAppMetadata(): Override {
   };
 }
 
-export function withMemoryStore(spy: SinonSpy): Override {
+export function withMemoryStore(spy: MockFn): Override {
   return {
     './conversation-store': {
       MemoryStore: spy,
@@ -88,7 +87,7 @@ export function withMemoryStore(spy: SinonSpy): Override {
   };
 }
 
-export function withConversationContext(spy: SinonSpy): Override {
+export function withConversationContext(spy: MockFn): Override {
   return {
     './conversation-store': {
       conversationContext: spy,
@@ -96,7 +95,7 @@ export function withConversationContext(spy: SinonSpy): Override {
   };
 }
 
-export function withPostMessage(spy: SinonSpy): Override {
+export function withPostMessage(spy: MockFn): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
@@ -108,7 +107,7 @@ export function withPostMessage(spy: SinonSpy): Override {
   };
 }
 
-export function withChatStream(spy: SinonSpy): Override {
+export function withChatStream(spy: MockFn): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
@@ -118,7 +117,7 @@ export function withChatStream(spy: SinonSpy): Override {
   };
 }
 
-export function withSetStatus(spy: SinonSpy): Override {
+export function withSetStatus(spy: MockFn): Override {
   return {
     '@slack/web-api': {
       WebClient: class {

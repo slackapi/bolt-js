@@ -1,12 +1,12 @@
 import assert from 'node:assert';
-import { beforeEach, describe, it } from 'node:test';
-import sinon, { type SinonSpy } from 'sinon';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../src/App';
 import {
   createDummyAppMentionEventMiddlewareArgs,
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noopMiddleware,
   type Override,
@@ -21,29 +21,29 @@ function buildOverrides(secondOverrides: Override[]): Override {
     withNoopAppMetadata(),
     withNoopWebClient(),
     ...secondOverrides,
-    withMemoryStore(sinon.fake()),
-    withConversationContext(sinon.fake.returns(noopMiddleware)),
+    withMemoryStore(mock.fn()),
+    withConversationContext(mock.fn(() => noopMiddleware)),
   );
 }
 
 describe('App event() routing', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeHandler: SinonSpy;
-  let fakeAck: SinonSpy;
+  let fakeHandler: MockFn;
+  let fakeAck: MockFn;
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
   let app: App;
 
   beforeEach(async () => {
     fakeReceiver = new FakeReceiver();
-    fakeHandler = sinon.fake();
-    fakeAck = sinon.fake();
+    fakeHandler = mock.fn();
+    fakeAck = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: createFakeLogger(),
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
   });
 
@@ -53,8 +53,8 @@ describe('App event() routing', () => {
       ...createDummyAppMentionEventMiddlewareArgs(),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.calledOnce(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 1);
   });
 
   it('should route a Slack event to a handler registered with `event(RegExp)`', async () => {
@@ -63,8 +63,8 @@ describe('App event() routing', () => {
       ...createDummyAppMentionEventMiddlewareArgs(),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.calledOnce(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 1);
   });
 
   it('should throw if provided invalid message subtype event names', async () => {
@@ -79,7 +79,7 @@ describe('App event() routing', () => {
       ...createDummyAppMentionEventMiddlewareArgs(),
       ack: fakeAck,
     });
-    sinon.assert.notCalled(fakeHandler);
-    sinon.assert.calledOnce(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 0);
+    assert.strictEqual(fakeAck.mock.callCount(), 1);
   });
 });

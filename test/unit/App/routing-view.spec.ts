@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
-import { beforeEach, describe, it } from 'node:test';
-import sinon, { type SinonSpy } from 'sinon';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../src/App';
 import {
   createDummyViewClosedMiddlewareArgs,
@@ -8,6 +7,7 @@ import {
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noopMiddleware,
   type Override,
@@ -22,15 +22,15 @@ function buildOverrides(secondOverrides: Override[]): Override {
     withNoopAppMetadata(),
     withNoopWebClient(),
     ...secondOverrides,
-    withMemoryStore(sinon.fake()),
-    withConversationContext(sinon.fake.returns(noopMiddleware)),
+    withMemoryStore(mock.fn()),
+    withConversationContext(mock.fn(() => noopMiddleware)),
   );
 }
 
 describe('App view() routing', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeHandler: SinonSpy;
-  let fakeAck: SinonSpy;
+  let fakeHandler: MockFn;
+  let fakeAck: MockFn;
   const fakeLogger = createFakeLogger();
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
@@ -39,14 +39,14 @@ describe('App view() routing', () => {
   beforeEach(async () => {
     fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
-    fakeHandler = sinon.fake();
-    fakeAck = sinon.fake();
+    fakeHandler = mock.fn();
+    fakeAck = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
   });
 
@@ -65,8 +65,8 @@ describe('App view() routing', () => {
         ...createDummyViewSubmissionMiddlewareArgs({ callback_id: 'my_id' }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
 
     it('should route a view submission event to a handler registered with `view(RegExp)` that matches the callback ID', async () => {
@@ -75,8 +75,8 @@ describe('App view() routing', () => {
         ...createDummyViewSubmissionMiddlewareArgs({ callback_id: 'my_action' }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
 
     it('should route a view submission event to a handler registered with `view({callback_id})` that matches callback ID', async () => {
@@ -84,8 +84,8 @@ describe('App view() routing', () => {
       await fakeReceiver.sendEvent({
         ...createDummyViewSubmissionMiddlewareArgs({ callback_id: 'my_id' }),
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
 
     it('should route a view submission event to a handler registered with `view({type:view_submission})`', async () => {
@@ -94,12 +94,12 @@ describe('App view() routing', () => {
         ...createDummyViewSubmissionMiddlewareArgs(),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
 
     it('should route a view submission event to the corresponding handler and only acknowledge in the handler', async () => {
-      fakeHandler = sinon.spy(async ({ ack }) => {
+      fakeHandler = mock.fn(async ({ ack }) => {
         await ack();
       });
       app.view('my_id', fakeHandler);
@@ -107,8 +107,8 @@ describe('App view() routing', () => {
         ...createDummyViewSubmissionMiddlewareArgs({ callback_id: 'my_id' }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.calledOnce(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
     });
 
     it('should not execute handler if no routing found', async () => {
@@ -116,8 +116,8 @@ describe('App view() routing', () => {
         ...createDummyViewSubmissionMiddlewareArgs({ callback_id: 'my_id' }),
         ack: fakeAck,
       });
-      sinon.assert.notCalled(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 0);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
   });
 
@@ -128,8 +128,8 @@ describe('App view() routing', () => {
         ...createDummyViewClosedMiddlewareArgs({ callback_id: 'my_id', type: 'view_closed' }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
 
     it('should route a view closed event to a handler registered with `view({type:view_closed})`', async () => {
@@ -138,12 +138,12 @@ describe('App view() routing', () => {
         ...createDummyViewClosedMiddlewareArgs(),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
 
     it('should route a view closed event to the corresponding handler and only acknowledge in the handler', async () => {
-      fakeHandler = sinon.spy(async ({ ack }) => {
+      fakeHandler = mock.fn(async ({ ack }) => {
         await ack();
       });
       app.view({ callback_id: 'my_id', type: 'view_closed' }, fakeHandler);
@@ -151,8 +151,8 @@ describe('App view() routing', () => {
         ...createDummyViewClosedMiddlewareArgs({ callback_id: 'my_id', type: 'view_closed' }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.calledOnce(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
     });
 
     it('should not execute handler if no routing found', async () => {
@@ -160,8 +160,8 @@ describe('App view() routing', () => {
         ...createDummyViewClosedMiddlewareArgs({ callback_id: 'my_id', type: 'view_closed' }),
         ack: fakeAck,
       });
-      sinon.assert.notCalled(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 0);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
   });
 });
