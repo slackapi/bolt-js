@@ -90,8 +90,9 @@ describe('App action() routing', () => {
   it('should throw if provided a constraint with unknown action constraint keys', async () => {
     // @ts-expect-error providing known invalid action constraint parameter
     app.action({ id: 'boom' }, fakeHandler);
-    assert.ok(
-      fakeLogger.error.mock.calls.some((call) => String(call.arguments[0]).includes('unknown constraint keys')),
+    assert.deepStrictEqual(
+      fakeLogger.error.mock.calls.map((call) => call.arguments),
+      [['Action listener cannot be attached using unknown constraint keys: id']],
     );
   });
 
