@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-import { beforeEach, describe, it } from 'node:test';
+import { beforeEach, describe, it, mock } from 'node:test';
 import { WebAPIHTTPError, WebAPIPlatformError, WebAPIRateLimitedError } from '@slack/web-api';
-import sinon from 'sinon';
 import type App from '../../../src/App';
 import type { ReceiverEvent } from '../../../src/types';
 import {
@@ -20,8 +19,8 @@ import {
 const overrides = mergeOverrides(
   withNoopAppMetadata(),
   withNoopWebClient(),
-  withMemoryStore(sinon.fake()),
-  withConversationContext(sinon.fake.returns(noopMiddleware)),
+  withMemoryStore(mock.fn()),
+  withConversationContext(mock.fn(() => noopMiddleware)),
 );
 
 describe('App default error handler', () => {
@@ -39,7 +38,7 @@ describe('App default error handler', () => {
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves({ botToken: '', botId: '' }),
+      authorize: mock.fn(() => Promise.resolve({ botToken: '', botId: '' })),
     });
   });
 

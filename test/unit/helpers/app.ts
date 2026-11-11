@@ -1,8 +1,7 @@
 import path from 'node:path';
 import { mock } from 'node:test';
 import type { AuthTestResponse, WebClientOptions } from '@slack/web-api';
-import type { SinonSpy } from 'sinon';
-import { proxyquire } from './index';
+import { type MockFn, proxyquire } from './index';
 
 /*
  * Contains test helpers related to importing, mocking and overriding parts of the App class
@@ -80,51 +79,51 @@ export function withNoopAppMetadata(): Override {
   };
 }
 
-export function withMemoryStore(spy: SinonSpy): Override {
+export function withMemoryStore(fake: MockFn): Override {
   return {
     './conversation-store': {
-      MemoryStore: spy,
+      MemoryStore: fake,
     },
   };
 }
 
-export function withConversationContext(spy: SinonSpy): Override {
+export function withConversationContext(fake: MockFn): Override {
   return {
     './conversation-store': {
-      conversationContext: spy,
+      conversationContext: fake,
     },
   };
 }
 
-export function withPostMessage(spy: SinonSpy): Override {
+export function withPostMessage(fake: MockFn): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
         public chat = {
-          postMessage: spy,
+          postMessage: fake,
         };
       },
     },
   };
 }
 
-export function withChatStream(spy: SinonSpy): Override {
+export function withChatStream(fake: MockFn): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
-        public chatStream = spy;
+        public chatStream = fake;
       },
     },
   };
 }
 
-export function withSetStatus(spy: SinonSpy): Override {
+export function withSetStatus(fake: MockFn): Override {
   return {
     '@slack/web-api': {
       WebClient: class {
         public assistant = {
           threads: {
-            setStatus: spy,
+            setStatus: fake,
           },
         };
       },

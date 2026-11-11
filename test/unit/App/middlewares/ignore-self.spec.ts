@@ -1,5 +1,5 @@
-import { beforeEach, describe, it } from 'node:test';
-import sinon, { type SinonSpy } from 'sinon';
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../../src/App';
 import {
   createDummyMemberChannelEventMiddlewareArgs,
@@ -8,6 +8,7 @@ import {
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noopMiddleware,
   type Override,
@@ -22,8 +23,8 @@ function buildOverrides(secondOverrides: Override[]): Override {
     withNoopAppMetadata(),
     withNoopWebClient(),
     ...secondOverrides,
-    withMemoryStore(sinon.fake()),
-    withConversationContext(sinon.fake.returns(noopMiddleware)),
+    withMemoryStore(mock.fn()),
+    withConversationContext(mock.fn(() => noopMiddleware)),
   );
 }
 
@@ -32,8 +33,8 @@ describe('App ignore self middleware processing', () => {
   const fakeBotUserId = 'BUSER1';
 
   let fakeReceiver: FakeReceiver;
-  let fakeHandler: SinonSpy;
-  let fakeAck: SinonSpy;
+  let fakeHandler: MockFn;
+  let fakeAck: MockFn;
   let dummyAuthorizationResult: { botToken: string; botId: string; botUserId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
   let app: App;
@@ -41,8 +42,8 @@ describe('App ignore self middleware processing', () => {
   beforeEach(async () => {
     fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
-    fakeHandler = sinon.fake();
-    fakeAck = sinon.fake();
+    fakeHandler = mock.fn();
+    fakeAck = mock.fn();
     dummyAuthorizationResult = { botToken: '', botUserId: fakeBotUserId, botId: fakeBotUserId };
   });
 
@@ -52,7 +53,7 @@ describe('App ignore self middleware processing', () => {
       app = new MockApp({
         logger: fakeLogger,
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
     });
 
@@ -73,8 +74,8 @@ describe('App ignore self middleware processing', () => {
         }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.notCalled(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 0);
     });
 
     it('should ack & ignore events that match own app', async () => {
@@ -83,8 +84,8 @@ describe('App ignore self middleware processing', () => {
         ...createDummyReactionAddedEventMiddlewareArgs({ user: fakeBotUserId }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.notCalled(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 0);
     });
 
     it('should not filter `member_joined_channel` and `member_left_channel` events originating from own app', async () => {
@@ -98,8 +99,8 @@ describe('App ignore self middleware processing', () => {
         });
       }
 
-      sinon.assert.callCount(fakeAck, 2);
-      sinon.assert.callCount(fakeHandler, 2);
+      assert.strictEqual(fakeAck.mock.callCount(), 2);
+      assert.strictEqual(fakeHandler.mock.callCount(), 2);
     });
   });
 
@@ -109,7 +110,7 @@ describe('App ignore self middleware processing', () => {
       app = new MockApp({
         logger: fakeLogger,
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
         ignoreSelf: false,
       });
     });
@@ -131,8 +132,8 @@ describe('App ignore self middleware processing', () => {
         }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
 
     it('should ack & route events that match own app', async () => {
@@ -141,8 +142,8 @@ describe('App ignore self middleware processing', () => {
         ...createDummyReactionAddedEventMiddlewareArgs({ user: fakeBotUserId }),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
   });
 });
