@@ -4,16 +4,6 @@ All listeners have access to a `context` object, which can be used to enrich req
 
 `context` is just an object, so you can add to it by setting it to a modified version of itself.
 
-## Workflow-scoped context
-
-When Slack provides a function-scoped bot access token for a custom function execution, Bolt makes it available through `context.functionBotAccessToken`.
-
-By default, Bolt uses this token for the Web API `client` passed to the listener. Setting `attachFunctionToken: false` when initializing your app disables automatic workflow-token selection. In that case, the injected client uses the authorized bot token, or a user token if no bot token is available.
-
-The function-scoped token remains accessible in `context` when the corresponding function execution information and token are present. Treat this value as a sensitive credential and avoid logging or exposing it.
-
-For configuration examples, see [Custom Steps](/tools/bolt-js/concepts/custom-steps).
-
 ## Example
 
 ```javascript
@@ -70,3 +60,5 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
   }
 });
 ```
+
+> **Note:** For custom function executions, Bolt makes an available function-scoped bot access token accessible through `context.functionBotAccessToken`. See [Custom Steps](/tools/bolt-js/concepts/custom-steps) for token selection behavior and the `attachFunctionToken` setting.
