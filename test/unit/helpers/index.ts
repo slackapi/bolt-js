@@ -15,7 +15,6 @@ export { proxyquire };
 // biome-ignore lint/suspicious/noExplicitAny: mocked methods accept any arguments
 type AnyFunction = (...args: any[]) => any;
 
-/** A mock that accepts any arguments, for fakes passed where many function types are expected. */
 export type MockFn = Mock<AnyFunction>;
 
 export type MockedInstance<T> = T & { [K in keyof T]: T[K] extends AnyFunction ? Mock<T[K]> : T[K] };
