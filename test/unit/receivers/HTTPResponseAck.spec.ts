@@ -1,13 +1,12 @@
 import assert from 'node:assert/strict';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
-import { afterEach, beforeEach, describe, it } from 'node:test';
-import sinon from 'sinon';
+import { afterEach, beforeEach, describe, it, mock } from 'node:test';
 import { expectType } from 'tsd';
 import { ReceiverMultipleAckError } from '../../../src/errors';
 import { HTTPResponseAck } from '../../../src/receivers/HTTPResponseAck';
 import type { ResponseAck } from '../../../src/types';
-import { createFakeLogger, type Override, proxyquire } from '../helpers';
+import { createFakeLogger, type MockFn, mockInstance, type Override, proxyquire } from '../helpers';
 
 function importHTTPResponseAck(
   overrides: Override = {},
@@ -17,21 +16,21 @@ function importHTTPResponseAck(
 }
 
 describe('HTTPResponseAck', async () => {
-  let setTimeoutSpy: sinon.SinonSpy;
+  let setTimeoutSpy: MockFn;
 
   beforeEach(() => {
-    setTimeoutSpy = sinon.spy(global, 'setTimeout');
+    setTimeoutSpy = mock.method(global, 'setTimeout');
   });
 
   afterEach(() => {
     if (setTimeoutSpy) {
-      setTimeoutSpy.restore();
+      setTimeoutSpy.mock.restore();
     }
   });
 
   it('should implement ResponseAck and work', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -44,8 +43,8 @@ describe('HTTPResponseAck', async () => {
     responseAck.ack(); // no exception
   });
   it('should set the unhandled request handler to execute after 3 seconds', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -53,18 +52,18 @@ describe('HTTPResponseAck', async () => {
       httpResponse,
     });
     responseAck.ack(); // no exception
-    assert(setTimeoutSpy.calledOnce, 'unhandledRequestHandler is set as a timeout callback exactly once');
+    assert(setTimeoutSpy.mock.callCount() === 1, 'unhandledRequestHandler is set as a timeout callback exactly once');
     assert.equal(
-      setTimeoutSpy.firstCall.args[1],
+      setTimeoutSpy.mock.calls[0].arguments[1],
       3001,
       'a 3 seconds timeout for the unhandledRequestHandler callback is expected',
     );
   });
   it('should trigger unhandledRequestHandler if unacknowledged', (_t, done) => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const unhandledRequestTimeoutMillis = 1;
-    const spy = sinon.spy();
+    const spy = mock.fn();
     new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -74,19 +73,19 @@ describe('HTTPResponseAck', async () => {
       httpResponse,
     });
     assert.equal(
-      setTimeoutSpy.firstCall.args[1],
+      setTimeoutSpy.mock.calls[0].arguments[1],
       unhandledRequestTimeoutMillis,
       `a ${unhandledRequestTimeoutMillis} timeout for the unhandledRequestHandler callback is expected`,
     );
     setTimeout(() => {
-      assert(spy.calledOnce);
+      assert.strictEqual(spy.mock.callCount(), 1);
       done();
     }, 2);
   });
   it('should not trigger unhandledRequestHandler if acknowledged', (_t, done) => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
-    const spy = sinon.spy();
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
+    const spy = mock.fn();
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -97,13 +96,13 @@ describe('HTTPResponseAck', async () => {
     });
     responseAck.ack();
     setTimeout(() => {
-      assert(spy.notCalled);
+      assert.strictEqual(spy.mock.callCount(), 0);
       done();
     }, 2);
   });
   it('should throw an error if a bound Ack invocation was already acknowledged', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -120,8 +119,8 @@ describe('HTTPResponseAck', async () => {
     }
   });
   it('should store response body if processBeforeResponse=true', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: true,
@@ -134,8 +133,8 @@ describe('HTTPResponseAck', async () => {
     assert.equal(responseAck.storedResponse, body, 'Body passed to bound handler not stored in Ack instance.');
   });
   it('should store an empty string if response body is falsy and processBeforeResponse=true', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: true,
@@ -152,10 +151,10 @@ describe('HTTPResponseAck', async () => {
     );
   });
   it('should call buildContentResponse with response body if processBeforeResponse=false', async () => {
-    const stub = sinon.stub();
+    const stub = mock.fn();
     const HTTPResponseAckWithStub = importHTTPResponseAck({ './HTTPModuleFunctions': { buildContentResponse: stub } });
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAckWithStub({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -165,14 +164,15 @@ describe('HTTPResponseAck', async () => {
     const bound = responseAck.bind();
     const body = { some: 'thing' };
     await bound(body);
-    assert(
-      stub.calledWith(httpResponse, body),
+    assert.deepStrictEqual(
+      stub.mock.calls[0].arguments.slice(0, 2),
+      [httpResponse, body],
       'buildContentResponse called with HTTP Response object and response body.',
     );
   });
   it('should use extended timeout when handling function_executed events', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -182,14 +182,14 @@ describe('HTTPResponseAck', async () => {
     });
     responseAck.ack(); // no exception
     assert.equal(
-      setTimeoutSpy.firstCall.args[1],
+      setTimeoutSpy.mock.calls[0].arguments[1],
       5001,
       'a 5 second timeout for the unhandledRequestHandler callback is expected',
     );
   });
   it('should not use extended timeout, when the httpRequestBody is malformed', async () => {
-    const httpRequest = sinon.createStubInstance(IncomingMessage) as IncomingMessage;
-    const httpResponse: ServerResponse = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+    const httpRequest = mockInstance(IncomingMessage) as IncomingMessage;
+    const httpResponse: ServerResponse = mockInstance(ServerResponse) as unknown as ServerResponse;
     const responseAck = new HTTPResponseAck({
       logger: createFakeLogger(),
       processBeforeResponse: false,
@@ -199,7 +199,7 @@ describe('HTTPResponseAck', async () => {
     });
     responseAck.ack(); // no exception
     assert.equal(
-      setTimeoutSpy.firstCall.args[1],
+      setTimeoutSpy.mock.calls[0].arguments[1],
       3001,
       'a 3 second timeout for the unhandledRequestHandler callback is expected',
     );

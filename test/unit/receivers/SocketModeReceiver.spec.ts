@@ -2,12 +2,11 @@ import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
-import { beforeEach, describe, it } from 'node:test';
+import { beforeEach, describe, it, mock } from 'node:test';
 import { InstallProvider } from '@slack/oauth';
 import { SocketModeClient } from '@slack/socket-mode';
 import type { ParamsDictionary } from 'express-serve-static-core';
 import { match } from 'path-to-regexp';
-import sinon from 'sinon';
 import { Agent } from 'undici';
 import App from '../../../src/App';
 import { AppInitializationError, AuthorizationError, CustomRouteInitializationError } from '../../../src/errors';
@@ -17,7 +16,9 @@ import {
   createFakeLogger,
   delay,
   FakeServer,
+  type MockFn,
   mergeOverrides,
+  mockInstance,
   type noopVoid,
   type Override,
   proxyquire,
@@ -36,18 +37,22 @@ function importSocketModeReceiver(
 describe('SocketModeReceiver', () => {
   let socketModeHttpServerHandler: typeof noopVoid;
   let fakeServer: FakeServer;
-  let fakeCreateServer: sinon.SinonSpy;
+  let fakeCreateServer: MockFn;
   const noopLogger = createFakeLogger();
   let overrides: Override;
   beforeEach(() => {
     fakeServer = new FakeServer();
-    fakeCreateServer = sinon.fake((handler: typeof noopVoid) => {
+    fakeCreateServer = mock.fn((handler: typeof noopVoid) => {
       socketModeHttpServerHandler = handler; // pick up the socket-mode receiver's HTTP request handler so we can assert on its behaviour
       return fakeServer;
     });
     overrides = mergeOverrides(
       withHttpCreateServer(fakeCreateServer),
-      withHttpsCreateServer(sinon.fake.throws('Should not be used.')),
+      withHttpsCreateServer(
+        mock.fn(() => {
+          throw new Error('Should not be used.');
+        }),
+      ),
     );
   });
 
@@ -100,7 +105,7 @@ describe('SocketModeReceiver', () => {
       assert.notStrictEqual(receiver, null);
     });
     it('should pass clientPingTimeout to SocketModeClient', async () => {
-      const constructorSpy = sinon.spy();
+      const constructorSpy = mock.fn();
       class FakeSocketModeClient extends EventEmitter {
         // biome-ignore lint/suspicious/noExplicitAny: test mock
         constructor(opts: any) {
@@ -120,12 +125,12 @@ describe('SocketModeReceiver', () => {
         clientPingTimeout: 15000,
       });
       assert.notStrictEqual(receiver, null);
-      sinon.assert.calledOnce(constructorSpy);
-      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.strictEqual(constructorSpy.mock.callCount(), 1);
+      const constructorArgs = constructorSpy.mock.calls[0].arguments[0];
       assert.equal(constructorArgs.clientPingTimeout, 15000);
     });
     it('should pass serverPingTimeout to SocketModeClient', async () => {
-      const constructorSpy = sinon.spy();
+      const constructorSpy = mock.fn();
       class FakeSocketModeClient extends EventEmitter {
         // biome-ignore lint/suspicious/noExplicitAny: test mock
         constructor(opts: any) {
@@ -145,12 +150,12 @@ describe('SocketModeReceiver', () => {
         serverPingTimeout: 60000,
       });
       assert.notStrictEqual(receiver, null);
-      sinon.assert.calledOnce(constructorSpy);
-      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.strictEqual(constructorSpy.mock.callCount(), 1);
+      const constructorArgs = constructorSpy.mock.calls[0].arguments[0];
       assert.equal(constructorArgs.serverPingTimeout, 60000);
     });
     it('should pass dispatcher to SocketModeClient', async () => {
-      const constructorSpy = sinon.spy();
+      const constructorSpy = mock.fn();
       class FakeSocketModeClient extends EventEmitter {
         // biome-ignore lint/suspicious/noExplicitAny: test mock
         constructor(opts: any) {
@@ -171,8 +176,8 @@ describe('SocketModeReceiver', () => {
         dispatcher,
       });
       assert.notStrictEqual(receiver, null);
-      sinon.assert.calledOnce(constructorSpy);
-      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.strictEqual(constructorSpy.mock.callCount(), 1);
+      const constructorArgs = constructorSpy.mock.calls[0].arguments[0];
       assert.strictEqual(constructorArgs.dispatcher, dispatcher);
     });
     it('should construct a SocketModeClient with an undici dispatcher', async () => {
@@ -185,7 +190,7 @@ describe('SocketModeReceiver', () => {
       assert.ok(receiver.client instanceof SocketModeClient);
     });
     it('should pass all socket mode timeout options to SocketModeClient', async () => {
-      const constructorSpy = sinon.spy();
+      const constructorSpy = mock.fn();
       class FakeSocketModeClient extends EventEmitter {
         // biome-ignore lint/suspicious/noExplicitAny: test mock
         constructor(opts: any) {
@@ -208,15 +213,15 @@ describe('SocketModeReceiver', () => {
         autoReconnectEnabled: false,
       });
       assert.notStrictEqual(receiver, null);
-      sinon.assert.calledOnce(constructorSpy);
-      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.strictEqual(constructorSpy.mock.callCount(), 1);
+      const constructorArgs = constructorSpy.mock.calls[0].arguments[0];
       assert.equal(constructorArgs.clientPingTimeout, 15000);
       assert.equal(constructorArgs.serverPingTimeout, 60000);
       assert.equal(constructorArgs.pingPongLoggingEnabled, true);
       assert.equal(constructorArgs.autoReconnectEnabled, false);
     });
     it('should use defaults when socket mode timeout options are not provided', async () => {
-      const constructorSpy = sinon.spy();
+      const constructorSpy = mock.fn();
       class FakeSocketModeClient extends EventEmitter {
         // biome-ignore lint/suspicious/noExplicitAny: test mock
         constructor(opts: any) {
@@ -235,8 +240,8 @@ describe('SocketModeReceiver', () => {
         logger: noopLogger,
       });
       assert.notStrictEqual(receiver, null);
-      sinon.assert.calledOnce(constructorSpy);
-      const constructorArgs = constructorSpy.firstCall.args[0];
+      assert.strictEqual(constructorSpy.mock.callCount(), 1);
+      const constructorArgs = constructorSpy.mock.calls[0].arguments[0];
       assert.equal(constructorArgs.appToken, 'my-secret');
       assert.strictEqual(constructorArgs.clientPingTimeout, undefined);
       assert.strictEqual(constructorArgs.serverPingTimeout, undefined);
@@ -312,13 +317,13 @@ describe('SocketModeReceiver', () => {
   });
   describe('request handling', () => {
     it('should return a 404 if a request flows through the install path, redirect URI path and custom routes without being handled', async () => {
-      const installProviderStub = sinon.createStubInstance(InstallProvider);
+      const installProviderStub = mockInstance(InstallProvider);
       const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const metadata = 'this is bat country';
       const scopes = ['channels:read'];
       const userScopes = ['chat:write'];
-      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+      const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: mock.fn() }];
       const receiver = new SocketModeReceiver({
         appToken: 'my-secret',
         logger: noopLogger,
@@ -338,17 +343,18 @@ describe('SocketModeReceiver', () => {
       });
       assert.notStrictEqual(receiver, null);
       receiver.installer = installProviderStub as unknown as InstallProvider;
-      const fakeReq = sinon.createStubInstance(IncomingMessage);
+      const fakeReq = mockInstance(IncomingMessage);
       fakeReq.url = '/nope';
       fakeReq.method = 'GET';
-      const fakeRes = sinon.createStubInstance(ServerResponse);
+      const fakeRes = mockInstance(ServerResponse);
       await socketModeHttpServerHandler(fakeReq, fakeRes);
-      sinon.assert.calledWith(fakeRes.writeHead, 404, sinon.match.object);
-      assert(fakeRes.end.calledOnce);
+      assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
+      assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+      assert.strictEqual(fakeRes.end.mock.callCount(), 1);
     });
     describe('handleInstallPathRequest()', () => {
       it('should invoke installer handleInstallPath if a request comes into the install path', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -375,14 +381,17 @@ describe('SocketModeReceiver', () => {
           method: 'GET',
         } as IncomingMessage;
         const fakeRes = {
-          writeHead: sinon.fake(),
-          end: sinon.fake(),
+          writeHead: mock.fn(),
+          end: mock.fn(),
         } as unknown as ServerResponse;
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
+        assert.deepStrictEqual(installProviderStub.handleInstallPath.mock.calls[0].arguments.slice(0, 2), [
+          fakeReq,
+          fakeRes,
+        ]);
       });
       it('should use a custom HTML renderer for the install path webpage', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -410,14 +419,17 @@ describe('SocketModeReceiver', () => {
           method: 'GET',
         } as IncomingMessage;
         const fakeRes = {
-          writeHead: sinon.fake(),
-          end: sinon.fake(),
+          writeHead: mock.fn(),
+          end: mock.fn(),
         } as unknown as ServerResponse;
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
+        assert.deepStrictEqual(installProviderStub.handleInstallPath.mock.calls[0].arguments.slice(0, 2), [
+          fakeReq,
+          fakeRes,
+        ]);
       });
       it('should redirect installers if directInstall is true', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const metadata = 'this is bat country';
@@ -445,16 +457,19 @@ describe('SocketModeReceiver', () => {
           method: 'GET',
         } as IncomingMessage;
         const fakeRes = {
-          writeHead: sinon.fake(),
-          end: sinon.fake(),
+          writeHead: mock.fn(),
+          end: mock.fn(),
         } as unknown as ServerResponse;
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(installProviderStub.handleInstallPath.calledWith(fakeReq, fakeRes));
+        assert.deepStrictEqual(installProviderStub.handleInstallPath.mock.calls[0].arguments.slice(0, 2), [
+          fakeReq,
+          fakeRes,
+        ]);
       });
     });
     describe('handleInstallRedirectRequest()', () => {
       it('should invoke installer handleCallback if a request comes into the redirect URI path', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
 
         const callbackOptions = {
@@ -485,16 +500,14 @@ describe('SocketModeReceiver', () => {
         };
         const fakeRes = null;
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(
-          installProviderStub.handleCallback.calledWith(
-            fakeReq as IncomingMessage,
-            fakeRes as unknown as ServerResponse,
-            callbackOptions,
-          ),
-        );
+        assert.deepStrictEqual(installProviderStub.handleCallback.mock.calls[0].arguments.slice(0, 3), [
+          fakeReq as IncomingMessage,
+          fakeRes as unknown as ServerResponse,
+          callbackOptions,
+        ]);
       });
       it('should invoke handleCallback with installURLoptions as params if state verification is off', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
         const metadata = 'this is bat country';
         const scopes = ['channels:read'];
@@ -529,26 +542,25 @@ describe('SocketModeReceiver', () => {
         });
         assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
-        const fakeReq = sinon.createStubInstance(IncomingMessage);
+        const fakeReq = mockInstance(IncomingMessage);
         fakeReq.url = '/heyo';
         fakeReq.headers = { host: 'localhost' };
         fakeReq.method = 'GET';
-        const fakeRes = sinon.createStubInstance(ServerResponse);
+        const fakeRes = mockInstance(ServerResponse);
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        sinon.assert.calledWith(
-          installProviderStub.handleCallback,
+        assert.deepStrictEqual(installProviderStub.handleCallback.mock.calls[0].arguments, [
           fakeReq as IncomingMessage,
           fakeRes as unknown as ServerResponse,
           callbackOptions,
           installUrlOptions,
-        );
+        ]);
       });
     });
     describe('custom route handling', () => {
       it('should call custom route handler only if request matches route path and method', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
-        const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+        const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: mock.fn() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
         const receiver = new SocketModeReceiver({
@@ -558,8 +570,8 @@ describe('SocketModeReceiver', () => {
         assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage);
-        const fakeRes = sinon.createStubInstance(ServerResponse);
+        const fakeReq = mockInstance(IncomingMessage);
+        const fakeRes = mockInstance(ServerResponse);
 
         fakeReq.url = '/test';
         const tempMatch = matchRegex(fakeReq.url);
@@ -570,23 +582,24 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
+        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
       it('should call custom route handler when request matches path, ignoring query params', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
-        const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: sinon.fake() }];
+        const customRoutes = [{ path: '/test', method: ['get', 'POST'], handler: mock.fn() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
         const receiver = new SocketModeReceiver({
@@ -596,8 +609,8 @@ describe('SocketModeReceiver', () => {
         assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage);
-        const fakeRes = sinon.createStubInstance(ServerResponse);
+        const fakeReq = mockInstance(IncomingMessage);
+        const fakeRes = mockInstance(ServerResponse);
 
         fakeReq.url = '/test?hello=world';
         const tempMatch = matchRegex('/test');
@@ -608,23 +621,24 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
+        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
       it('should call custom route handler only if request matches route path and method including params', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
-        const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() }];
+        const customRoutes = [{ path: '/test/:id', method: ['get', 'POST'], handler: mock.fn() }];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
         const receiver = new SocketModeReceiver({
@@ -634,8 +648,8 @@ describe('SocketModeReceiver', () => {
         assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage);
-        const fakeRes = sinon.createStubInstance(ServerResponse);
+        const fakeReq = mockInstance(IncomingMessage);
+        const fakeRes = mockInstance(ServerResponse);
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -646,25 +660,26 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, { params });
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
+        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
       it('should call custom route handler only if request matches multiple route paths and method including params', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [
-          { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
-          { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
+          { path: '/test/123', method: ['get', 'POST'], handler: mock.fn() },
+          { path: '/test/:id', method: ['get', 'POST'], handler: mock.fn() },
         ];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
@@ -675,8 +690,8 @@ describe('SocketModeReceiver', () => {
         assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage);
-        const fakeRes = sinon.createStubInstance(ServerResponse);
+        const fakeReq = mockInstance(IncomingMessage);
+        const fakeRes = mockInstance(ServerResponse);
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -687,27 +702,28 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
-        assert(customRoutes[1].handler.notCalled);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.strictEqual(customRoutes[1].handler.mock.callCount(), 0);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
-        assert(customRoutes[1].handler.notCalled);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.strictEqual(customRoutes[1].handler.mock.callCount(), 0);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
+        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
       it('should call custom route handler only if request matches multiple route paths and method including params reverse order', async () => {
-        const installProviderStub = sinon.createStubInstance(InstallProvider);
+        const installProviderStub = mockInstance(InstallProvider);
         const SocketModeReceiver = importSocketModeReceiver(overrides);
         const customRoutes = [
-          { path: '/test/:id', method: ['get', 'POST'], handler: sinon.fake() },
-          { path: '/test/123', method: ['get', 'POST'], handler: sinon.fake() },
+          { path: '/test/:id', method: ['get', 'POST'], handler: mock.fn() },
+          { path: '/test/123', method: ['get', 'POST'], handler: mock.fn() },
         ];
         const matchRegex = match(customRoutes[0].path, { decode: decodeURIComponent });
 
@@ -718,8 +734,8 @@ describe('SocketModeReceiver', () => {
         assert.notStrictEqual(receiver, null);
         receiver.installer = installProviderStub as unknown as InstallProvider;
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage);
-        const fakeRes = sinon.createStubInstance(ServerResponse);
+        const fakeReq = mockInstance(IncomingMessage);
+        const fakeRes = mockInstance(ServerResponse);
 
         fakeReq.url = '/test/123';
         const tempMatch = matchRegex(fakeReq.url);
@@ -730,24 +746,25 @@ describe('SocketModeReceiver', () => {
         fakeReq.method = 'GET';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         let expectedMessage = Object.assign(fakeReq, params);
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
-        assert(customRoutes[1].handler.notCalled);
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
+        assert.strictEqual(customRoutes[1].handler.mock.callCount(), 0);
 
         fakeReq.method = 'POST';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
         expectedMessage = Object.assign(fakeReq, params);
-        assert(customRoutes[0].handler.calledWith(expectedMessage, fakeRes));
+        assert.deepStrictEqual(customRoutes[0].handler.mock.calls[0].arguments.slice(0, 2), [expectedMessage, fakeRes]);
 
         fakeReq.method = 'UNHANDLED_METHOD';
         await socketModeHttpServerHandler(fakeReq, fakeRes);
-        assert(fakeRes.writeHead.calledWith(404, sinon.match.object));
-        assert(fakeRes.end.called);
+        assert.strictEqual(fakeRes.writeHead.mock.calls[0].arguments[0], 404);
+        assert.strictEqual(typeof fakeRes.writeHead.mock.calls[0].arguments[1], 'object');
+        assert.ok(fakeRes.end.mock.callCount() > 0);
       });
 
       it("should throw an error if customRoutes don't have the required keys", async () => {
         const SocketModeReceiver = importSocketModeReceiver(overrides);
         // biome-ignore lint/suspicious/noExplicitAny: typing as any to intentionally have missing required keys
-        const customRoutes = [{ handler: sinon.fake() }] as any;
+        const customRoutes = [{ handler: mock.fn() }] as any;
 
         assert.throws(
           () => new SocketModeReceiver({ appToken: 'my-secret', customRoutes }),
@@ -759,7 +776,7 @@ describe('SocketModeReceiver', () => {
 
   describe('#start()', () => {
     it('should invoke the SocketModeClient start method', async () => {
-      const clientStub = sinon.createStubInstance(SocketModeClient);
+      const clientStub = mockInstance(SocketModeClient);
       const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
@@ -777,13 +794,13 @@ describe('SocketModeReceiver', () => {
       assert.notStrictEqual(receiver, null);
       receiver.client = clientStub as unknown as SocketModeClient;
       await receiver.start();
-      assert(clientStub.start.called);
+      assert.ok(clientStub.start.mock.callCount() > 0);
     });
   });
 
   describe('#stop()', () => {
     it('should invoke the SocketModeClient disconnect method', async () => {
-      const clientStub = sinon.createStubInstance(SocketModeClient);
+      const clientStub = mockInstance(SocketModeClient);
       const SocketModeReceiver = importSocketModeReceiver(overrides);
 
       const receiver = new SocketModeReceiver({
@@ -801,16 +818,16 @@ describe('SocketModeReceiver', () => {
       assert.notStrictEqual(receiver, null);
       receiver.client = clientStub as unknown as SocketModeClient;
       await receiver.stop();
-      assert(clientStub.disconnect.called);
+      assert.ok(clientStub.disconnect.mock.callCount() > 0);
     });
   });
 
   describe('event', () => {
     it('should allow events processed to be acknowledged', async () => {
-      const processStub = sinon.stub<[ReceiverEvent]>().callsFake(async (event: ReceiverEvent) => {
+      const processStub = mock.fn(async (event: ReceiverEvent) => {
         await event.ack();
       });
-      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const app = Object.assign(mockInstance(App), { processEvent: processStub }) as unknown as App;
       const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
       receiver.init(app);
@@ -820,18 +837,20 @@ describe('SocketModeReceiver', () => {
       const ackCalled = new Promise<void>((resolve) => {
         notifyAckCalled = resolve;
       });
-      const ack = sinon.stub().callsFake(async () => {
+      const ack = mock.fn(async () => {
         notifyAckCalled();
       });
 
       receiver.client.emit('slack_event', { ack });
       await ackCalled;
-      sinon.assert.calledOnce(ack);
+      assert.strictEqual(ack.mock.callCount(), 1);
     });
 
     it('acknowledges events that throw AuthorizationError', async () => {
-      const processStub = sinon.stub<[ReceiverEvent]>().throws(new AuthorizationError('brokentoken', new Error()));
-      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const processStub = mock.fn(() => {
+        throw new AuthorizationError('brokentoken', new Error());
+      });
+      const app = Object.assign(mockInstance(App), { processEvent: processStub }) as unknown as App;
       const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({ appToken: 'xapp-example' });
       receiver.init(app);
@@ -841,19 +860,21 @@ describe('SocketModeReceiver', () => {
       const ackCalled = new Promise<void>((resolve) => {
         notifyAckCalled = resolve;
       });
-      const ack = sinon.stub().callsFake(async () => {
+      const ack = mock.fn(async () => {
         notifyAckCalled();
       });
 
       receiver.client.emit('slack_event', { ack });
       await ackCalled;
-      sinon.assert.calledOnce(ack);
+      assert.strictEqual(ack.mock.callCount(), 1);
     });
 
     it('does not acknowledge events that throw unknown errors', async () => {
-      const processStub = sinon.stub<[ReceiverEvent]>().throws(new Error('internal error'));
-      const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
-      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const processStub = mock.fn(() => {
+        throw new Error('internal error');
+      });
+      const defaultProcessEventErrorHandlerSpy = mock.fn(defaultProcessEventErrorHandler);
+      const app = Object.assign(mockInstance(App), { processEvent: processStub }) as unknown as App;
       const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({
         appToken: 'xapp-example',
@@ -861,23 +882,23 @@ describe('SocketModeReceiver', () => {
       });
       receiver.init(app);
 
-      const slackRequestArgs = { body: {}, ack: sinon.fake() };
+      const slackRequestArgs = { body: {}, ack: mock.fn() };
       receiver.client.emit('slack_event', slackRequestArgs);
 
-      while (!defaultProcessEventErrorHandlerSpy.called) {
+      while (defaultProcessEventErrorHandlerSpy.mock.callCount() === 0) {
         await delay(50);
       }
-      sinon.assert.calledOnce(defaultProcessEventErrorHandlerSpy);
-      sinon.assert.notCalled(slackRequestArgs.ack);
+      assert.strictEqual(defaultProcessEventErrorHandlerSpy.mock.callCount(), 1);
+      assert.strictEqual(slackRequestArgs.ack.mock.callCount(), 0);
     });
 
     it('does not re-acknowledge events that handle acknowledge and then throw unknown errors', async () => {
-      const processStub = sinon.stub<[ReceiverEvent]>().callsFake(async (event: ReceiverEvent) => {
+      const processStub = mock.fn(async (event: ReceiverEvent) => {
         await event.ack();
         throw new Error('internal error');
       });
-      const defaultProcessEventErrorHandlerSpy = sinon.spy(defaultProcessEventErrorHandler);
-      const app = sinon.createStubInstance(App, { processEvent: processStub }) as unknown as App;
+      const defaultProcessEventErrorHandlerSpy = mock.fn(defaultProcessEventErrorHandler);
+      const app = Object.assign(mockInstance(App), { processEvent: processStub }) as unknown as App;
       const SocketModeReceiver = importSocketModeReceiver(overrides);
       const receiver = new SocketModeReceiver({
         appToken: 'xapp-example',
@@ -885,14 +906,14 @@ describe('SocketModeReceiver', () => {
       });
       receiver.init(app);
 
-      const slackRequestArgs = { body: {}, ack: sinon.fake() };
+      const slackRequestArgs = { body: {}, ack: mock.fn() };
       receiver.client.emit('slack_event', slackRequestArgs);
 
-      while (!defaultProcessEventErrorHandlerSpy.called) {
+      while (defaultProcessEventErrorHandlerSpy.mock.callCount() === 0) {
         await delay(50);
       }
-      sinon.assert.calledOnce(defaultProcessEventErrorHandlerSpy);
-      sinon.assert.calledOnce(slackRequestArgs.ack);
+      assert.strictEqual(defaultProcessEventErrorHandlerSpy.mock.callCount(), 1);
+      assert.strictEqual(slackRequestArgs.ack.mock.callCount(), 1);
     });
   });
 });
