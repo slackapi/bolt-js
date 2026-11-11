@@ -329,8 +329,9 @@ The cookie flow has three steps:
    after the `state` parameter is verified. Reject the installation if the
    cookie is missing, invalid, or expired.
 3. `callbackOptions.afterInstallation` runs after the token exchange and before
-   the installation is stored. Attach the value to `installation.metadata` and
-   return `true`.
+   the installation is stored. Attach the value validated in step 2 to
+   `installation.metadata` and return `true`. Reuse that value instead of
+   re-reading the cookie, which may have expired during the exchange.
 
 `ExpressReceiver` accepts a router, so you can register `cookie-parser` before
 the receiver adds its OAuth routes:
@@ -382,12 +383,13 @@ const receiver = new ExpressReceiver({
           res.status(400).send("Missing or invalid tenant");
           return false;
         }
+        res.locals.tenant = payload.tenant;
         return true;
       },
       afterInstallation: async (installation, options, req, res) => {
         installation.metadata = {
           ...installation.metadata,
-          tenant: req.signedCookies.tenant.tenant,
+          tenant: res.locals.tenant,
         };
         return true;
       },
