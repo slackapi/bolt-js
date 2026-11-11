@@ -13,6 +13,7 @@ By default, Bolt uses this token for the Web API `client` passed to the listener
 The function-scoped token remains accessible in `context` when the corresponding function execution information and token are present. Treat this value as a sensitive credential and avoid logging or exposing it.
 
 For configuration examples, see [Custom Steps](/tools/bolt-js/concepts/custom-steps).
+
 ## Example
 
 ```javascript
