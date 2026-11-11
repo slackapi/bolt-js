@@ -1,9 +1,9 @@
 import assert, { AssertionError } from 'node:assert/strict';
 import path from 'node:path';
-import { describe, it } from 'node:test';
+import { describe, it, type Mock, mock } from 'node:test';
 import type { Logger } from '@slack/logger';
 import type { WebClient } from '@slack/web-api';
-import sinon, { type SinonSpy } from 'sinon';
+import type { ConversationStore } from '../../src/conversation-store';
 import type { AnyMiddlewareArgs, Context, NextFn } from '../../src/types';
 import { createFakeLogger, delay, type Override, proxyquire } from './helpers';
 
@@ -28,7 +28,7 @@ function importConversationStore(overrides: Override = {}): typeof import('../..
 }
 
 // Composable overrides
-function withGetTypeAndConversation(spy: SinonSpy): Override {
+function withGetTypeAndConversation(spy: Mock<() => unknown>): Override {
   return {
     './helpers': {
       getTypeAndConversation: spy,
@@ -38,8 +38,8 @@ function withGetTypeAndConversation(spy: SinonSpy): Override {
 
 // Fakes
 function createFakeStore(
-  getSpy: SinonSpy = sinon.fake.resolves(undefined),
-  setSpy: SinonSpy = sinon.fake.resolves({}),
+  getSpy: Mock<ConversationStore['get']> = mock.fn(() => Promise.resolve(undefined)),
+  setSpy: Mock<ConversationStore['set']> = mock.fn(() => Promise.resolve({})),
 ) {
   return {
     set: setSpy,
@@ -50,10 +50,10 @@ describe('conversationContext middleware', () => {
   it('should forward events that have no conversation ID', async () => {
     // Arrange
     // conversationId property is omitted from return value
-    const fakeGetTypeAndConversation = sinon.fake.returns({});
+    const fakeGetTypeAndConversation = mock.fn(() => ({}));
     const fakeStore = createFakeStore();
     const fakeLogger = createFakeLogger();
-    const fakeNext = sinon.fake();
+    const fakeNext = mock.fn();
     const dummyContext: DummyContext<void> = {};
     const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
@@ -69,7 +69,7 @@ describe('conversationContext middleware', () => {
 
     // Assert
     assert.ok(fakeLogger.debug.mock.callCount() > 0);
-    assert(fakeNext.called);
+    assert.ok(fakeNext.mock.callCount() > 0);
     assert.ok(!('updateConversation' in dummyContext));
     assert.ok(!('conversation' in dummyContext));
   });
@@ -80,13 +80,13 @@ describe('conversationContext middleware', () => {
     const dummyConversationId = 'CONVERSATION_ID';
     const dummyStoreSetResult = Symbol();
     const dummyExpiresAt = 1234;
-    const fakeGetTypeAndConversation = sinon.fake.returns({ conversationId: dummyConversationId });
+    const fakeGetTypeAndConversation = mock.fn(() => ({ conversationId: dummyConversationId }));
     const fakeStore = createFakeStore(
-      sinon.fake.rejects(new Error('Test conversation missing')),
-      sinon.fake.resolves(dummyStoreSetResult),
+      mock.fn(() => Promise.reject(new Error('Test conversation missing'))),
+      mock.fn(() => Promise.resolve(dummyStoreSetResult)),
     );
     const fakeLogger = createFakeLogger();
-    const fakeNext = sinon.fake();
+    const fakeNext = mock.fn();
     const dummyContext: DummyContext<symbol> = {};
     const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
@@ -100,12 +100,16 @@ describe('conversationContext middleware', () => {
     const middleware = conversationContext(fakeStore);
     await middleware(fakeArgs);
 
-    assert(fakeNext.called);
+    assert.ok(fakeNext.mock.callCount() > 0);
     assert.ok(!('conversation' in dummyContext));
     assert.ok(dummyContext.updateConversation !== undefined);
     assert.equal(await dummyContext.updateConversation(dummyConversationState, dummyExpiresAt), dummyStoreSetResult);
-    assert(fakeStore.set.calledOnce);
-    assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState, dummyExpiresAt));
+    assert.strictEqual(fakeStore.set.mock.callCount(), 1);
+    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments, [
+      dummyConversationId,
+      dummyConversationState,
+      dummyExpiresAt,
+    ]);
   });
 
   it('should add to the context for events within a conversation that was not previously stored', async () => {
@@ -113,13 +117,13 @@ describe('conversationContext middleware', () => {
     const dummyConversationState = Symbol();
     const dummyConversationId = 'CONVERSATION_ID';
     const dummyStoreSetResult = Symbol();
-    const fakeGetTypeAndConversation = sinon.fake.returns({ conversationId: dummyConversationId });
+    const fakeGetTypeAndConversation = mock.fn(() => ({ conversationId: dummyConversationId }));
     const fakeStore = createFakeStore(
-      sinon.fake.rejects(new Error('Test conversation missing')),
-      sinon.fake.resolves(dummyStoreSetResult),
+      mock.fn(() => Promise.reject(new Error('Test conversation missing'))),
+      mock.fn(() => Promise.resolve(dummyStoreSetResult)),
     );
     const fakeLogger = createFakeLogger();
-    const fakeNext = sinon.fake();
+    const fakeNext = mock.fn();
     const dummyContext: DummyContext<symbol> = {};
     const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
@@ -134,12 +138,16 @@ describe('conversationContext middleware', () => {
     await middleware(fakeArgs);
 
     // Assert
-    assert(fakeNext.called);
+    assert.ok(fakeNext.mock.callCount() > 0);
     assert.ok(!('conversation' in dummyContext));
     assert.ok(dummyContext.updateConversation !== undefined);
     assert.equal(await dummyContext.updateConversation(dummyConversationState), dummyStoreSetResult);
-    assert(fakeStore.set.calledOnce);
-    assert(fakeStore.set.calledWith(dummyConversationId, dummyConversationState));
+    assert.strictEqual(fakeStore.set.mock.callCount(), 1);
+    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments, [
+      dummyConversationId,
+      dummyConversationState,
+      undefined,
+    ]);
   });
 
   it('should add to the context for events within a conversation that was previously stored', async () => {
@@ -147,13 +155,13 @@ describe('conversationContext middleware', () => {
     const dummyConversationState = Symbol();
     const dummyConversationId = 'CONVERSATION_ID';
     const dummyStoreSetResult = Symbol();
-    const fakeGetTypeAndConversation = sinon.fake.returns({ conversationId: dummyConversationId });
+    const fakeGetTypeAndConversation = mock.fn(() => ({ conversationId: dummyConversationId }));
     const fakeStore = createFakeStore(
-      sinon.fake.resolves(dummyConversationState),
-      sinon.fake.resolves(dummyStoreSetResult),
+      mock.fn(() => Promise.resolve(dummyConversationState)),
+      mock.fn(() => Promise.resolve(dummyStoreSetResult)),
     );
     const fakeLogger = createFakeLogger();
-    const fakeNext = sinon.fake();
+    const fakeNext = mock.fn();
     const dummyContext: DummyContext<symbol> = {};
     const { conversationContext } = importConversationStore(withGetTypeAndConversation(fakeGetTypeAndConversation));
     const fakeArgs = {
@@ -173,8 +181,12 @@ describe('conversationContext middleware', () => {
     const newDummyConversationState = Symbol();
     const result = await dummyContext.updateConversation(newDummyConversationState);
     assert.equal(result, dummyStoreSetResult);
-    assert(fakeStore.set.calledOnce);
-    assert(fakeStore.set.calledWith(dummyConversationId, newDummyConversationState));
+    assert.strictEqual(fakeStore.set.mock.callCount(), 1);
+    assert.deepStrictEqual(fakeStore.set.mock.calls[0].arguments, [
+      dummyConversationId,
+      newDummyConversationState,
+      undefined,
+    ]);
   });
 });
 
