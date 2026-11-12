@@ -1,19 +1,17 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { describe, it } from 'node:test';
-import type { AssistantThreadStartedEvent } from '@slack/types';
+import { describe, it, mock } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import sinon from 'sinon';
 import {
   type AllAssistantMiddlewareArgs,
   Assistant,
   type AssistantConfig,
   type AssistantMiddleware,
   type AssistantMiddlewareArgs,
+  type AssistantThreadContextChangedMiddleware,
 } from '../../src/Assistant';
 import type { AssistantThreadContext, AssistantThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { AssistantInitializationError, AssistantMissingPropertyError } from '../../src/errors';
-import type { Middleware } from '../../src/types';
 import {
   createDummyAppMentionEventMiddlewareArgs,
   createDummyAssistantThreadContextChangedEventMiddlewareArgs,
@@ -319,7 +317,7 @@ describe('Assistant class', () => {
         it('say should call chat.postMessage', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          const fakeClient = { chat: { postMessage: mock.fn() } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -328,13 +326,13 @@ describe('Assistant class', () => {
 
           await threadStartedArgs.say('Say called!');
 
-          sinon.assert.called(fakeClient.chat.postMessage);
+          assert.ok(fakeClient.chat.postMessage.mock.callCount() > 0);
         });
 
         it('say should be called with message_metadata that includes thread context', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          const fakeClient = { chat: { postMessage: mock.fn() } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -359,13 +357,13 @@ describe('Assistant class', () => {
             },
           };
 
-          sinon.assert.calledWith(fakeClient.chat.postMessage, expectedParams);
+          assert.deepStrictEqual(fakeClient.chat.postMessage.mock.calls[0].arguments, [expectedParams]);
         });
 
         it('say should be called with message_metadata that supplements thread context', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          const fakeClient = { chat: { postMessage: mock.fn() } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -393,32 +391,35 @@ describe('Assistant class', () => {
             },
           };
 
-          sinon.assert.calledWith(fakeClient.chat.postMessage, expectedParams);
+          assert.deepStrictEqual(fakeClient.chat.postMessage.mock.calls[0].arguments, [expectedParams]);
         });
 
         it('say should get context from store if no thread context is included in event', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
           mockThreadStartedArgs.payload.assistant_thread.context = {};
 
-          const fakeClient = { chat: { postMessage: sinon.spy() } };
+          const fakeClient = { chat: { postMessage: mock.fn() } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
-          const mockThreadContextStore = { save: sinon.spy(), get: sinon.spy() };
+          const mockThreadContextStore = {
+            save: mock.fn<AssistantThreadContextStore['save']>(),
+            get: mock.fn<AssistantThreadContextStore['get']>(),
+          };
 
           const { enrichAssistantArgs } = importAssistant();
           const threadStartedArgs = enrichAssistantArgs(mockThreadContextStore, mockThreadStartedArgs);
 
           // Verify that get is not called prior to say being used
-          sinon.assert.notCalled(mockThreadContextStore.get);
+          assert.strictEqual(mockThreadContextStore.get.mock.callCount(), 0);
 
           await threadStartedArgs.say('Say called!');
 
-          sinon.assert.calledOnce(mockThreadContextStore.get);
+          assert.strictEqual(mockThreadContextStore.get.mock.callCount(), 1);
         });
 
         it('setStatus should call assistant.threads.setStatus with a string', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { assistant: { threads: { setStatus: sinon.spy() } } };
+          const fakeClient = { assistant: { threads: { setStatus: mock.fn() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -427,17 +428,19 @@ describe('Assistant class', () => {
 
           await threadStartedArgs.setStatus('Status set!');
 
-          sinon.assert.calledWith(fakeClient.assistant.threads.setStatus, {
-            channel_id: 'C1234',
-            thread_ts: '1234.56',
-            status: 'Status set!',
-          });
+          assert.deepStrictEqual(fakeClient.assistant.threads.setStatus.mock.calls[0].arguments, [
+            {
+              channel_id: 'C1234',
+              thread_ts: '1234.56',
+              status: 'Status set!',
+            },
+          ]);
         });
 
         it('setStatus should call assistant.threads.setStatus with method arguments', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { assistant: { threads: { setStatus: sinon.spy() } } };
+          const fakeClient = { assistant: { threads: { setStatus: mock.fn() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -453,22 +456,24 @@ describe('Assistant class', () => {
             ],
           });
 
-          sinon.assert.calledWith(fakeClient.assistant.threads.setStatus, {
-            channel_id: 'C1234',
-            thread_ts: '1234.56',
-            status: 'Loading...',
-            loading_messages: [
-              'Thinking about a response...',
-              'Wondering what to say next...',
-              'Writing a first draft...',
-            ],
-          });
+          assert.deepStrictEqual(fakeClient.assistant.threads.setStatus.mock.calls[0].arguments, [
+            {
+              channel_id: 'C1234',
+              thread_ts: '1234.56',
+              status: 'Loading...',
+              loading_messages: [
+                'Thinking about a response...',
+                'Wondering what to say next...',
+                'Writing a first draft...',
+              ],
+            },
+          ]);
         });
 
         it('setSuggestedPrompts should call assistant.threads.setSuggestedPrompts', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { assistant: { threads: { setSuggestedPrompts: sinon.spy() } } };
+          const fakeClient = { assistant: { threads: { setSuggestedPrompts: mock.fn() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -477,13 +482,13 @@ describe('Assistant class', () => {
 
           await threadStartedArgs.setSuggestedPrompts({ prompts: [{ title: '', message: '' }], title: '' });
 
-          sinon.assert.called(fakeClient.assistant.threads.setSuggestedPrompts);
+          assert.ok(fakeClient.assistant.threads.setSuggestedPrompts.mock.callCount() > 0);
         });
 
         it('setTitle should call assistant.threads.setTitle', async () => {
           const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
 
-          const fakeClient = { assistant: { threads: { setTitle: sinon.spy() } } };
+          const fakeClient = { assistant: { threads: { setTitle: mock.fn() } } };
           mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
           const mockThreadContextStore = createMockThreadContextStore();
 
@@ -492,7 +497,7 @@ describe('Assistant class', () => {
 
           await threadStartedArgs.setTitle('Title set!');
 
-          sinon.assert.called(fakeClient.assistant.threads.setTitle);
+          assert.ok(fakeClient.assistant.threads.setTitle.mock.callCount() > 0);
         });
       });
     });
@@ -504,16 +509,16 @@ describe('Assistant class', () => {
         );
         const { processAssistantMiddleware } = importAssistant();
 
-        const fn1 = sinon.spy((async ({ next: continuation }) => {
+        const fn1 = mock.fn<AssistantThreadContextChangedMiddleware>(async ({ next: continuation }) => {
           await continuation();
-        }) as Middleware<AssistantThreadStartedEvent>);
-        const fn2 = sinon.spy(async () => {});
-        const fakeMiddleware = [fn1, fn2] as AssistantMiddleware;
+        });
+        const fn2 = mock.fn<AssistantThreadContextChangedMiddleware>(async () => {});
+        const fakeMiddleware: AssistantMiddleware = [fn1, fn2];
 
         await processAssistantMiddleware(mockThreadContextChangedArgs, fakeMiddleware);
 
-        assert(fn1.called);
-        assert(fn2.called);
+        assert.ok(fn1.mock.callCount() > 0);
+        assert.ok(fn2.mock.callCount() > 0);
       });
     });
   });

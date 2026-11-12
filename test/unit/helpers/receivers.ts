@@ -1,11 +1,11 @@
 import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { type Mock, mock } from 'node:test';
-import type { SinonSpy } from 'sinon';
 import type App from '../../../src/App';
 import type { AwsEvent } from '../../../src/receivers/AwsLambdaReceiver';
 import type { Receiver, ReceiverEvent } from '../../../src/types';
 import type { Override } from './app';
+import type { MockFn } from './index';
 
 export class FakeReceiver implements Receiver {
   private bolt: App | undefined;
@@ -54,18 +54,18 @@ export class FakeServer extends EventEmitter {
     super();
   }
 }
-export function withHttpCreateServer(spy: SinonSpy): Override {
+export function withHttpCreateServer(fake: MockFn): Override {
   return {
     'node:http': {
-      createServer: spy,
+      createServer: fake,
     },
   };
 }
 
-export function withHttpsCreateServer(spy: SinonSpy): Override {
+export function withHttpsCreateServer(fake: MockFn): Override {
   return {
     'node:https': {
-      createServer: spy,
+      createServer: fake,
     },
   };
 }

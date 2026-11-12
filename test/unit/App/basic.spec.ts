@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, it, mock } from 'node:test';
 import { LogLevel } from '@slack/logger';
-import sinon from 'sinon';
 import { type CodedError, ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
 import {
@@ -9,6 +8,7 @@ import {
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noop,
   noopMiddleware,
@@ -109,10 +109,10 @@ describe('App basic features', () => {
       });
     });
     it('should succeed with an authorize callback', async () => {
-      const authorizeCallback = sinon.fake();
+      const authorizeCallback: MockFn = mock.fn();
       const MockApp = importApp();
       new MockApp({ authorize: authorizeCallback, signingSecret: 'test-signing-secret' });
-      assert(authorizeCallback.notCalled, 'Should not call the authorize callback on instantiation');
+      assert(authorizeCallback.mock.callCount() === 0, 'Should not call the authorize callback on instantiation');
     });
     it('should fail without a token for single team authorization, authorize callback, nor oauth installer', async () => {
       const MockApp = importApp();
@@ -124,18 +124,18 @@ describe('App basic features', () => {
       }
     });
     it('should fail when both a token and authorize callback are specified', async () => {
-      const authorizeCallback = sinon.fake();
+      const authorizeCallback: MockFn = mock.fn();
       const MockApp = importApp();
       try {
         new MockApp({ token: '', authorize: authorizeCallback, signingSecret: 'test-signing-secret' });
         assert.fail();
       } catch (error) {
         assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
-        assert(authorizeCallback.notCalled);
+        assert.strictEqual(authorizeCallback.mock.callCount(), 0);
       }
     });
     it('should fail when both a token is specified and OAuthInstaller is initialized', async () => {
-      const authorizeCallback = sinon.fake();
+      const authorizeCallback: MockFn = mock.fn();
       const MockApp = importApp();
       try {
         new MockApp({
@@ -148,11 +148,11 @@ describe('App basic features', () => {
         assert.fail();
       } catch (error) {
         assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
-        assert(authorizeCallback.notCalled);
+        assert.strictEqual(authorizeCallback.mock.callCount(), 0);
       }
     });
     it('should fail when both a authorize callback is specified and OAuthInstaller is initialized', async () => {
-      const authorizeCallback = sinon.fake();
+      const authorizeCallback: MockFn = mock.fn();
       const MockApp = importApp();
       try {
         new MockApp({
@@ -165,7 +165,7 @@ describe('App basic features', () => {
         assert.fail();
       } catch (error) {
         assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
-        assert(authorizeCallback.notCalled);
+        assert.strictEqual(authorizeCallback.mock.callCount(), 0);
       }
     });
     describe('with a custom receiver', () => {
@@ -220,8 +220,8 @@ describe('App basic features', () => {
       new MockApp({ token: '', signingSecret: 'test-signing-secret', socketMode: true, receiver: socketModeReceiver });
     });
     it('should initialize MemoryStore conversation store by default', async () => {
-      const fakeMemoryStore = sinon.fake();
-      const fakeConversationContext = sinon.fake.returns(noopMiddleware);
+      const fakeMemoryStore = mock.fn();
+      const fakeConversationContext = mock.fn(() => noopMiddleware);
       const overrides = mergeOverrides(
         withNoopAppMetadata(),
         withNoopWebClient(),
@@ -231,11 +231,11 @@ describe('App basic features', () => {
       const MockApp = importApp(overrides);
 
       new MockApp({ authorize: noop, signingSecret: 'test-signing-secret' });
-      assert(fakeMemoryStore.calledWithNew);
-      assert(fakeConversationContext.called);
+      assert.ok(fakeMemoryStore.mock.calls[0].target !== undefined);
+      assert.ok(fakeConversationContext.mock.callCount() > 0);
     });
     describe('conversation store', () => {
-      const fakeConversationContext = sinon.fake.returns(noopMiddleware);
+      const fakeConversationContext = mock.fn(() => noopMiddleware);
       const overrides = mergeOverrides(
         withNoopAppMetadata(),
         withNoopWebClient(),
@@ -244,14 +244,14 @@ describe('App basic features', () => {
       it('should initialize without a conversation store when option is false', async () => {
         const MockApp = importApp(overrides);
         new MockApp({ convoStore: false, authorize: noop, signingSecret: 'test-signing-secret' });
-        assert(fakeConversationContext.notCalled);
+        assert.strictEqual(fakeConversationContext.mock.callCount(), 0);
       });
       it('should initialize the conversation store', async () => {
         const dummyConvoStore = createFakeConversationStore();
         const MockApp = importApp(overrides);
         const app = new MockApp({ convoStore: dummyConvoStore, authorize: noop, signingSecret: 'test-signing-secret' });
         assert.ok(app instanceof MockApp);
-        assert(fakeConversationContext.firstCall.calledWith(dummyConvoStore));
+        assert.deepStrictEqual(fakeConversationContext.mock.calls[0].arguments, [dummyConvoStore]);
       });
     });
     describe('with custom redirectUri supplied', () => {
@@ -280,7 +280,7 @@ describe('App basic features', () => {
       });
     });
     it('with WebClientOptions', async () => {
-      const fakeConstructor = sinon.fake();
+      const fakeConstructor: MockFn = mock.fn();
       const overrides = mergeOverrides(withNoopAppMetadata(), {
         '@slack/web-api': {
           WebClient: class {
@@ -295,14 +295,16 @@ describe('App basic features', () => {
       const MockApp = importApp(overrides);
       const clientOptions = { slackApiUrl: 'proxy.slack.com' };
       new MockApp({ clientOptions, authorize: noop, signingSecret: 'test-signing-secret', logLevel: LogLevel.ERROR });
-      assert.ok(fakeConstructor.called);
-      const [token, options] = fakeConstructor.lastCall.args;
+      assert.ok(fakeConstructor.mock.callCount() > 0);
+      const lastCall = fakeConstructor.mock.calls.at(-1);
+      assert.ok(lastCall);
+      const [token, options] = lastCall.arguments;
       assert.strictEqual(token, undefined, 'token should be undefined');
       assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
       assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
     });
     describe('with auth.test failure', () => {
-      const fakeConstructor = sinon.fake();
+      const fakeConstructor: MockFn = mock.fn();
       const exception = 'This API method call should not be performed';
       const overrides = mergeOverrides(withNoopAppMetadata(), {
         '@slack/web-api': {

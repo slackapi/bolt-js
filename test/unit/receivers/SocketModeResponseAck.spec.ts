@@ -1,17 +1,17 @@
 import assert from 'node:assert/strict';
-import { beforeEach, describe, it } from 'node:test';
-import sinon from 'sinon';
+import { beforeEach, describe, it, mock } from 'node:test';
 import { expectType } from 'tsd';
 import { SocketModeResponseAck } from '../../../src/receivers/SocketModeResponseAck';
 import type { ResponseAck } from '../../../src/types';
-import { createFakeLogger } from '../helpers';
+import { createFakeLogger, type MockFn } from '../helpers';
 
 describe('SocketModeResponseAck', async () => {
-  const fakeSocketModeClientAck = sinon.fake();
+  const fakeSocketModeClientAck: MockFn = mock.fn();
   const fakeLogger = createFakeLogger();
 
   beforeEach(() => {
-    sinon.reset();
+    fakeSocketModeClientAck.mock.resetCalls();
+    fakeLogger.warn.mock.resetCalls();
   });
 
   it('should implement ResponseAck', async () => {
@@ -32,7 +32,7 @@ describe('SocketModeResponseAck', async () => {
       });
       const ack = responseAck.bind();
       await ack(); // no exception
-      sinon.assert.calledOnce(fakeSocketModeClientAck);
+      assert.strictEqual(fakeSocketModeClientAck.mock.callCount(), 1);
     });
 
     it('should log an error message when there are more then 1 bound Ack invocation', async () => {

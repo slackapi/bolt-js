@@ -1,11 +1,12 @@
-import { beforeEach, describe, it } from 'node:test';
-import sinon, { type SinonSpy } from 'sinon';
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../src/App';
 import {
   createDummyBlockSuggestionsMiddlewareArgs,
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noopMiddleware,
   type Override,
@@ -20,15 +21,15 @@ function buildOverrides(secondOverrides: Override[]): Override {
     withNoopAppMetadata(),
     withNoopWebClient(),
     ...secondOverrides,
-    withMemoryStore(sinon.fake()),
-    withConversationContext(sinon.fake.returns(noopMiddleware)),
+    withMemoryStore(mock.fn()),
+    withConversationContext(mock.fn(() => noopMiddleware)),
   );
 }
 
 describe('App options() routing', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeHandler: SinonSpy;
-  let fakeAck: SinonSpy;
+  let fakeHandler: MockFn;
+  let fakeAck: MockFn;
   const fakeLogger = createFakeLogger();
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
@@ -37,14 +38,14 @@ describe('App options() routing', () => {
   beforeEach(async () => {
     fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
-    fakeHandler = sinon.fake();
-    fakeAck = sinon.fake();
+    fakeHandler = mock.fn();
+    fakeAck = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
   });
 
@@ -54,8 +55,8 @@ describe('App options() routing', () => {
       ...createDummyBlockSuggestionsMiddlewareArgs({ action_id: 'my_id' }),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a block suggestion event to a handler registered with `options(RegExp)` that matches the action ID', async () => {
     app.options(/my_action/, fakeHandler);
@@ -63,8 +64,8 @@ describe('App options() routing', () => {
       ...createDummyBlockSuggestionsMiddlewareArgs({ action_id: 'my_action' }),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a block suggestion event to a handler registered with `options({block_id})` that matches the block ID', async () => {
     app.options({ block_id: 'my_id' }, fakeHandler);
@@ -72,8 +73,8 @@ describe('App options() routing', () => {
       ...createDummyBlockSuggestionsMiddlewareArgs({ block_id: 'my_id' }),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a block suggestion event to a handler registered with `options({type:block_suggestion})`', async () => {
     app.options({ type: 'block_suggestion' }, fakeHandler);
@@ -81,12 +82,12 @@ describe('App options() routing', () => {
       ...createDummyBlockSuggestionsMiddlewareArgs(),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
 
   it('should route block suggestion event to the corresponding handler and only acknowledge in the handler', async () => {
-    fakeHandler = sinon.spy(async ({ ack }) => {
+    fakeHandler = mock.fn(async ({ ack }) => {
       await ack();
     });
     app.options('my_id', fakeHandler);
@@ -94,8 +95,8 @@ describe('App options() routing', () => {
       ...createDummyBlockSuggestionsMiddlewareArgs({ action_id: 'my_id' }),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.calledOnce(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 1);
   });
 
   it('should not execute handler if no routing found', async () => {
@@ -103,7 +104,7 @@ describe('App options() routing', () => {
       ...createDummyBlockSuggestionsMiddlewareArgs({ action_id: 'my_id' }),
       ack: fakeAck,
     });
-    sinon.assert.notCalled(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 0);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
 });

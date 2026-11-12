@@ -1,13 +1,12 @@
 import assert from 'node:assert/strict';
-import { beforeEach, describe, it } from 'node:test';
-import sinon, { type SinonSpy } from 'sinon';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../../src/App';
 import { ErrorCode, isCodedError } from '../../../../src/errors';
-import { createDummyReceiverEvent, FakeReceiver, importApp } from '../../helpers';
+import { createDummyReceiverEvent, FakeReceiver, importApp, type MockFn } from '../../helpers';
 
 describe('App listener middleware processing', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeErrorHandler: SinonSpy;
+  let fakeErrorHandler: MockFn;
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let app: App;
 
@@ -16,13 +15,13 @@ describe('App listener middleware processing', () => {
 
   beforeEach(async () => {
     fakeReceiver = new FakeReceiver();
-    fakeErrorHandler = sinon.fake();
+    fakeErrorHandler = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
 
     const MockAppNoOverrides = importApp();
     app = new MockAppNoOverrides({
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
     app.error(fakeErrorHandler);
   });
@@ -35,8 +34,8 @@ describe('App listener middleware processing', () => {
     });
     await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-    assert(fakeErrorHandler.calledOnce);
-    const error = fakeErrorHandler.firstCall.args[0];
+    assert.strictEqual(fakeErrorHandler.mock.callCount(), 1);
+    const error = fakeErrorHandler.mock.calls[0].arguments[0];
     assert.equal(error.code, ErrorCode.UnknownError);
     assert.equal(error.original, errorToThrow);
   });
@@ -53,8 +52,8 @@ describe('App listener middleware processing', () => {
     app.event(eventType, createThrowingListener(errorsToThrow[1]));
     await fakeReceiver.sendEvent(dummyReceiverEvent);
 
-    assert(fakeErrorHandler.calledOnce);
-    const error = fakeErrorHandler.firstCall.args[0];
+    assert.strictEqual(fakeErrorHandler.mock.callCount(), 1);
+    const error = fakeErrorHandler.mock.calls[0].arguments[0];
     assert.ok(isCodedError(error));
     assert(error.code === ErrorCode.MultipleListenerError);
     assert.ok(Array.isArray(error.originals));

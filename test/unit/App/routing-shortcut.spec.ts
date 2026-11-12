@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { beforeEach, describe, it } from 'node:test';
-import sinon, { type SinonSpy } from 'sinon';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../src/App';
 import {
   createDummyMessageShortcutMiddlewareArgs,
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noopMiddleware,
   type Override,
@@ -21,15 +21,15 @@ function buildOverrides(secondOverrides: Override[]): Override {
     withNoopAppMetadata(),
     withNoopWebClient(),
     ...secondOverrides,
-    withMemoryStore(sinon.fake()),
-    withConversationContext(sinon.fake.returns(noopMiddleware)),
+    withMemoryStore(mock.fn()),
+    withConversationContext(mock.fn(() => noopMiddleware)),
   );
 }
 
 describe('App shortcut() routing', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeHandler: SinonSpy;
-  let fakeAck: SinonSpy;
+  let fakeHandler: MockFn;
+  let fakeAck: MockFn;
   const fakeLogger = createFakeLogger();
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
@@ -38,14 +38,14 @@ describe('App shortcut() routing', () => {
   beforeEach(async () => {
     fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
-    fakeHandler = sinon.fake();
-    fakeAck = sinon.fake();
+    fakeHandler = mock.fn();
+    fakeAck = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
   });
 
@@ -55,8 +55,8 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a Slack shortcut event to a handler registered with `shortcut(RegExp)` that matches the callback ID', async () => {
     app.shortcut(/my_call/, fakeHandler);
@@ -64,8 +64,8 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a Slack shortcut event to a handler registered with `shortcut({callback_id})` that matches the callback ID', async () => {
     app.shortcut({ callback_id: 'my_callback_id' }, fakeHandler);
@@ -73,8 +73,8 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a Slack shortcut event to a handler registered with `shortcut({type})` that matches the type', async () => {
     app.shortcut({ type: 'message_action' }, fakeHandler);
@@ -82,8 +82,8 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs(),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
   it('should route a Slack shortcut event to a handler registered with `shortcut({type, callback_id})` that matches both the type and the callback_id', async () => {
     app.shortcut({ type: 'message_action', callback_id: 'my_id' }, fakeHandler);
@@ -91,8 +91,8 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs('my_id'),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
 
   it('should throw if provided a constraint with unknown shortcut constraint keys', async () => {
@@ -105,7 +105,7 @@ describe('App shortcut() routing', () => {
   });
 
   it('should route a Slack shortcut event to the corresponding handler and only acknowledge in the handler', async () => {
-    fakeHandler = sinon.spy(async ({ ack }) => {
+    fakeHandler = mock.fn(async ({ ack }) => {
       await ack();
     });
     app.shortcut('my_callback_id', fakeHandler);
@@ -113,8 +113,8 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
       ack: fakeAck,
     });
-    sinon.assert.calledOnce(fakeHandler);
-    sinon.assert.calledOnce(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 1);
+    assert.strictEqual(fakeAck.mock.callCount(), 1);
   });
 
   it('should not execute handler if no routing found', async () => {
@@ -122,7 +122,7 @@ describe('App shortcut() routing', () => {
       ...createDummyMessageShortcutMiddlewareArgs('my_callback_id'),
       ack: fakeAck,
     });
-    sinon.assert.notCalled(fakeHandler);
-    sinon.assert.notCalled(fakeAck);
+    assert.strictEqual(fakeHandler.mock.callCount(), 0);
+    assert.strictEqual(fakeAck.mock.callCount(), 0);
   });
 });

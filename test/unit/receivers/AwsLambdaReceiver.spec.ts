@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import { describe, it } from 'node:test';
-import sinon from 'sinon';
+import { describe, it, mock } from 'node:test';
 import { AppInitializationError } from '../../../src/errors';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
@@ -250,7 +249,7 @@ describe('AwsLambdaReceiver', () => {
   });
 
   it('should detect invalid signature', async () => {
-    const spy = sinon.spy();
+    const spy = mock.fn();
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -285,7 +284,7 @@ describe('AwsLambdaReceiver', () => {
     };
     const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 401);
-    assert(spy.calledOnce);
+    assert.strictEqual(spy.mock.callCount(), 1);
   });
 
   it('should detect too old request timestamp', async () => {
