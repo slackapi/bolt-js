@@ -41,7 +41,7 @@ Defined in: [src/types/actions/block-action.ts:291](https://github.com/slackapi/
 ### app\_unfurl?
 
 ```ts
-optional app_unfurl?: any;
+app_unfurl?: any;
 ```
 
 Defined in: [src/types/actions/block-action.ts:297](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L297)
@@ -51,7 +51,7 @@ Defined in: [src/types/actions/block-action.ts:297](https://github.com/slackapi/
 ### bot\_access\_token?
 
 ```ts
-optional bot_access_token?: string;
+bot_access_token?: string;
 ```
 
 Defined in: [src/types/actions/block-action.ts:311](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L311)
@@ -67,7 +67,7 @@ An expiring token generated for the context of a workflow step.
 ### channel?
 
 ```ts
-optional channel?: object;
+channel?: object;
 ```
 
 Defined in: [src/types/actions/block-action.ts:267](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L267)
@@ -99,7 +99,7 @@ Defined in: [src/types/actions/block-action.ts:294](https://github.com/slackapi/
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/actions/block-action.ts:301](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L301)
@@ -121,7 +121,7 @@ name: string;
 ### function\_data?
 
 ```ts
-optional function_data?: object;
+function_data?: object;
 ```
 
 Defined in: [src/types/actions/block-action.ts:317](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L317)
@@ -191,7 +191,7 @@ Values of input parameters for the executed step.
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/actions/block-action.ts:300](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L300)
@@ -201,7 +201,7 @@ Defined in: [src/types/actions/block-action.ts:300](https://github.com/slackapi/
 ### message?
 
 ```ts
-optional message?: object;
+message?: object;
 ```
 
 Defined in: [src/types/actions/block-action.ts:272](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L272)
@@ -215,7 +215,7 @@ Defined in: [src/types/actions/block-action.ts:272](https://github.com/slackapi/
 #### text?
 
 ```ts
-optional text?: string;
+text?: string;
 ```
 
 #### ts
@@ -233,7 +233,7 @@ type: "message";
 #### user?
 
 ```ts
-optional user?: string;
+user?: string;
 ```
 
 ***
@@ -251,7 +251,7 @@ Defined in: [src/types/actions/block-action.ts:289](https://github.com/slackapi/
 ### state?
 
 ```ts
-optional state?: object;
+state?: object;
 ```
 
 Defined in: [src/types/actions/block-action.ts:281](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L281)
@@ -334,7 +334,7 @@ id: string;
 #### name?
 
 ```ts
-optional name?: string;
+name?: string;
 ```
 
 name will be present if the block_action originates from the Home tab
@@ -342,7 +342,7 @@ name will be present if the block_action originates from the Home tab
 #### team\_id?
 
 ```ts
-optional team_id?: string;
+team_id?: string;
 ```
 
 #### username
@@ -356,7 +356,7 @@ username: string;
 ### view?
 
 ```ts
-optional view?: ViewOutput;
+view?: ViewOutput;
 ```
 
 Defined in: [src/types/actions/block-action.ts:280](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L280)

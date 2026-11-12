@@ -33,7 +33,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:176](https://github.com/slackapi/bolt
 ### installer?
 
 ```ts
-optional installer?: InstallProvider;
+installer?: InstallProvider;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:148](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L148)
@@ -118,9 +118,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:274](https://github.com/slackapi/bolt
 
 ##### Implementation of
 
-```ts
-Receiver.start
-```
+`Receiver.start`
 
 #### Call Signature
 
@@ -146,9 +144,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:275](https://github.com/slackapi/bolt
 
 ##### Implementation of
 
-```ts
-Receiver.start
-```
+`Receiver.start`
 
 #### Call Signature
 
@@ -174,9 +170,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:276](https://github.com/slackapi/bolt
 
 ##### Implementation of
 
-```ts
-Receiver.start
-```
+`Receiver.start`
 
 ***
 

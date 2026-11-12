@@ -20,7 +20,7 @@ You can set any other custom attributes in global middleware as long as the key 
 ### botId?
 
 ```ts
-optional botId?: string;
+botId?: string;
 ```
 
 Defined in: [src/types/middleware.ts:53](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L53)
@@ -34,7 +34,7 @@ see also: https://github.com/slackapi/bolt-js/issues/874
 ### botToken?
 
 ```ts
-optional botToken?: string;
+botToken?: string;
 ```
 
 Defined in: [src/types/middleware.ts:42](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L42)
@@ -47,7 +47,7 @@ This value can be used by `say` (preferred over userToken),
 ### botUserId?
 
 ```ts
-optional botUserId?: string;
+botUserId?: string;
 ```
 
 Defined in: [src/types/middleware.ts:58](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L58)
@@ -60,7 +60,7 @@ This value is optional but allows `ignoreSelf` global middleware be more filter 
 ### enterpriseId?
 
 ```ts
-optional enterpriseId?: string;
+enterpriseId?: string;
 ```
 
 Defined in: [src/types/middleware.ts:70](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L70)
@@ -72,7 +72,7 @@ Enterprise Grid Organization ID.
 ### functionBotAccessToken?
 
 ```ts
-optional functionBotAccessToken?: string;
+functionBotAccessToken?: string;
 ```
 
 Defined in: [src/types/middleware.ts:81](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L81)
@@ -86,7 +86,7 @@ creates an association between a function's execution and subsequent actions
 ### functionExecutionId?
 
 ```ts
-optional functionExecutionId?: string;
+functionExecutionId?: string;
 ```
 
 Defined in: [src/types/middleware.ts:86](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L86)
@@ -98,7 +98,7 @@ Function execution ID associated with the event
 ### functionInputs?
 
 ```ts
-optional functionInputs?: FunctionInputs;
+functionInputs?: FunctionInputs;
 ```
 
 Defined in: [src/types/middleware.ts:91](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L91)
@@ -122,7 +122,7 @@ Is the app installed at an Enterprise level?
 ### retryNum?
 
 ```ts
-optional retryNum?: number;
+retryNum?: number;
 ```
 
 Defined in: [src/types/middleware.ts:96](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L96)
@@ -134,7 +134,7 @@ Retry count of an Events API request (this property does not exist for other req
 ### retryReason?
 
 ```ts
-optional retryReason?: string;
+retryReason?: string;
 ```
 
 Defined in: [src/types/middleware.ts:100](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L100)
@@ -146,7 +146,7 @@ Retry reason of an Events API request (this property does not exist for other re
 ### teamId?
 
 ```ts
-optional teamId?: string;
+teamId?: string;
 ```
 
 Defined in: [src/types/middleware.ts:66](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L66)
@@ -158,7 +158,7 @@ Workspace ID.
 ### userId?
 
 ```ts
-optional userId?: string;
+userId?: string;
 ```
 
 Defined in: [src/types/middleware.ts:62](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L62)
@@ -170,7 +170,7 @@ User ID.
 ### userToken?
 
 ```ts
-optional userToken?: string;
+userToken?: string;
 ```
 
 Defined in: [src/types/middleware.ts:47](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L47)
