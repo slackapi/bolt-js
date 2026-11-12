@@ -7,7 +7,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:76](https://github.com/slackapi/bolt-
 ### bodyLimit?
 
 ```ts
-optional bodyLimit?: string | number;
+bodyLimit?: string | number;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:100](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L100)
@@ -17,7 +17,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:100](https://github.com/slackapi/bolt
 ### clientId?
 
 ```ts
-optional clientId?: string;
+clientId?: string;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:85](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L85)
@@ -27,7 +27,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:85](https://github.com/slackapi/bolt-
 ### clientSecret?
 
 ```ts
-optional clientSecret?: string;
+clientSecret?: string;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:86](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L86)
@@ -37,7 +37,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:86](https://github.com/slackapi/bolt-
 ### customPropertiesExtractor?
 
 ```ts
-optional customPropertiesExtractor?: (request) => StringIndexed;
+customPropertiesExtractor?: (request) => StringIndexed;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:92](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L92)
@@ -57,7 +57,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:92](https://github.com/slackapi/bolt-
 ### customRoutes?
 
 ```ts
-optional customRoutes?: CustomRoute[];
+customRoutes?: CustomRoute[];
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:80](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L80)
@@ -67,7 +67,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:80](https://github.com/slackapi/bolt-
 ### dispatchErrorHandler?
 
 ```ts
-optional dispatchErrorHandler?: (args) => void;
+dispatchErrorHandler?: (args) => void;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:94](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L94)
@@ -87,7 +87,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:94](https://github.com/slackapi/bolt-
 ### endpoints?
 
 ```ts
-optional endpoints?: string | string[];
+endpoints?: string | string[];
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:78](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L78)
@@ -97,7 +97,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:78](https://github.com/slackapi/bolt-
 ### installationStore?
 
 ```ts
-optional installationStore?: InstallationStore;
+installationStore?: InstallationStore;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:89](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L89)
@@ -107,7 +107,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:89](https://github.com/slackapi/bolt-
 ### installerOptions?
 
 ```ts
-optional installerOptions?: HTTPReceiverInstallerOptions;
+installerOptions?: HTTPReceiverInstallerOptions;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:91](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L91)
@@ -117,7 +117,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:91](https://github.com/slackapi/bolt-
 ### logger?
 
 ```ts
-optional logger?: Logger;
+logger?: Logger;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:81](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L81)
@@ -127,7 +127,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:81](https://github.com/slackapi/bolt-
 ### logLevel?
 
 ```ts
-optional logLevel?: LogLevel;
+logLevel?: LogLevel;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:82](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L82)
@@ -137,7 +137,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:82](https://github.com/slackapi/bolt-
 ### port?
 
 ```ts
-optional port?: number;
+port?: number;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:79](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L79)
@@ -147,7 +147,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:79](https://github.com/slackapi/bolt-
 ### processBeforeResponse?
 
 ```ts
-optional processBeforeResponse?: boolean;
+processBeforeResponse?: boolean;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:83](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L83)
@@ -157,7 +157,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:83](https://github.com/slackapi/bolt-
 ### processEventErrorHandler?
 
 ```ts
-optional processEventErrorHandler?: (args) => Promise<boolean>;
+processEventErrorHandler?: (args) => Promise<boolean>;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:95](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L95)
@@ -177,7 +177,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:95](https://github.com/slackapi/bolt-
 ### redirectUri?
 
 ```ts
-optional redirectUri?: string;
+redirectUri?: string;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:88](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L88)
@@ -187,7 +187,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:88](https://github.com/slackapi/bolt-
 ### scopes?
 
 ```ts
-optional scopes?: string | string[];
+scopes?: string | string[];
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:90](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L90)
@@ -197,7 +197,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:90](https://github.com/slackapi/bolt-
 ### signatureVerification?
 
 ```ts
-optional signatureVerification?: boolean;
+signatureVerification?: boolean;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L84)
@@ -217,7 +217,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:77](https://github.com/slackapi/bolt-
 ### stateSecret?
 
 ```ts
-optional stateSecret?: string;
+stateSecret?: string;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:87](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L87)
@@ -227,7 +227,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:87](https://github.com/slackapi/bolt-
 ### unhandledRequestHandler?
 
 ```ts
-optional unhandledRequestHandler?: (args) => void;
+unhandledRequestHandler?: (args) => void;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:98](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L98)
@@ -247,7 +247,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:98](https://github.com/slackapi/bolt-
 ### unhandledRequestTimeoutMillis?
 
 ```ts
-optional unhandledRequestTimeoutMillis?: number;
+unhandledRequestTimeoutMillis?: number;
 ```
 
 Defined in: [src/receivers/HTTPReceiver.ts:99](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L99)
