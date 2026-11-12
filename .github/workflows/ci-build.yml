@@ -24,6 +24,7 @@ jobs:
           - 22.x
           - 22.23.4
           - 24.x
+          - 26.x
         undici:
           - "undici@^7"
           - "undici@^8"
