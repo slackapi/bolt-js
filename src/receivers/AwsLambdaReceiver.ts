@@ -89,7 +89,7 @@ export interface AwsLambdaReceiverOptions {
    * If the {@link signatureVerification} flag is set to `false`, this can be set to any value as signature verification
    * using this secret will not be performed.
    *
-   * @see {@link https://api.slack.com/authentication/verifying-requests-from-slack#about} for details about signing secrets
+   * @see {@link https://docs.slack.dev/authentication/verifying-requests-from-slack#about} for details about signing secrets
    */
   signingSecret: string;
   /**
@@ -105,7 +105,7 @@ export interface AwsLambdaReceiverOptions {
    */
   logLevel?: LogLevel;
   /**
-   * Flag that determines whether Bolt should {@link https://api.slack.com/authentication/verifying-requests-from-slack|verify Slack's signature on incoming requests}.
+   * Flag that determines whether Bolt should {@link https://docs.slack.dev/authentication/verifying-requests-from-slack|verify Slack's signature on incoming requests}.
    *
    * @default true
    */

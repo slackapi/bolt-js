@@ -86,7 +86,7 @@ Serverless のツールのセットアップが完了しました。次に、AWS
 
 ## Bolt Slack アプリを入手する {#get-a-bolt-slack-app}
 
-まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド](/tools/bolt-js/getting-started)を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
+まだ Bolt アプリを自分で作成したことがない場合は、[入門ガイド](/tools/bolt-js/ja-jp/creating-an-app)を参照してください。テンプレートのアプリをクローンするには、以下のコマンドを実行します。
 
 ```shell
 git clone https://github.com/slackapi/bolt-js-getting-started-app.git
@@ -194,7 +194,7 @@ plugins:
 
 :::tip 
 
-`SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/tools/bolt-js/getting-started#setting-up-your-project)を入門ガイドで参照してください。
+`SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/tools/bolt-js/ja-jp/creating-an-app#setting-up-your-project)を入門ガイドで参照してください。
 
 :::
 
@@ -238,7 +238,7 @@ ngrok http 3000
 
 :::tip 
 
-パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](/tools/bolt-js/getting-started#setting-up-events)を参照してください。
+パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](/tools/bolt-js/ja-jp/creating-an-app#setting-up-events)を参照してください。
 
 :::
 
@@ -262,7 +262,7 @@ ngrok http 3000
 
 ### 3. Slack アプリをテストする
 
-Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド](/tools/bolt-js/getting-started)のとおり、アプリから応答があるはずです。
+Slack アプリをテストします。今作った Bolt アプリを Slack のチャンネルに招待し、半角の小文字で「hello」と入力してみましょう。[入門ガイド](/tools/bolt-js/ja-jp/creating-an-app)のとおり、アプリから応答があるはずです。
 
 > 👩‍💻 hello<br/>
 > 🤖 Hey there @Jane!

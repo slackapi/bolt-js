@@ -1,0 +1,7 @@
+# BlockDatepickerAction
+
+```ts
+type BlockDatepickerAction = BlockAction<DatepickerAction>;
+```
+
+Defined in: [src/types/actions/block-action.ts:359](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L359)

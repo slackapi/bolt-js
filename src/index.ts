@@ -62,6 +62,8 @@ export {
 export type { ExpressReceiverOptions } from './receivers/ExpressReceiver';
 export * as HTTPModuleFunctions from './receivers/HTTPModuleFunctions';
 export {
+  defaultBodyLimit,
+  isRawBodyError,
   ReceiverDispatchErrorHandlerArgs,
   ReceiverProcessEventErrorHandlerArgs,
   ReceiverUnhandledRequestHandlerArgs,

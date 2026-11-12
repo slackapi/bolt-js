@@ -6,8 +6,7 @@
 *.tgz
 
 # coverage
-/.nyc_output
-/coverage
+/lcov.info
 
 # macOS
 .DS_Store

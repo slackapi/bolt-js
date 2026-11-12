@@ -1,6 +1,6 @@
 # Bolt for JavaScript Socket Mode Test App
 
-This is a quick example app to test [Socket Mode](https://api.slack.com/socket-mode) with Bolt for JavaScript.
+This is a quick example app to test [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode) with Bolt for JavaScript.
 
 If using OAuth, Slack requires a public URL where it can send requests. In this guide, we'll be using [`ngrok`](https://ngrok.com/download). Checkout [this guide](https://api.slack.com/tutorials/tunneling-with-ngrok) for setting it up. OAuth installation is only needed for public distribution. For internal apps, we recommend installing via your app configuration. 
 

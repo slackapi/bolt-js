@@ -1,29 +1,26 @@
+import assert from 'node:assert/strict';
+import { afterEach, beforeEach, describe, it, type Mock, mock } from 'node:test';
 import { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
-import sinon from 'sinon';
 import { createSetStatus } from '../../../src/context';
 
 describe('createSetStatus', () => {
-  const sandbox = sinon.createSandbox();
   const client = new WebClient('token');
-  let setStatusStub: sinon.SinonStub;
+  let setStatusStub: Mock<WebClient['assistant']['threads']['setStatus']>;
 
   beforeEach(() => {
-    setStatusStub = sandbox.stub(client.assistant.threads, 'setStatus').resolves({
-      ok: true,
-    });
+    setStatusStub = mock.method(client.assistant.threads, 'setStatus', () => Promise.resolve({ ok: true }));
   });
 
   afterEach(() => {
-    sandbox.restore();
+    mock.restoreAll();
   });
 
   it('should call client.assistant.threads.setStatus with string status', () => {
     const setStatus = createSetStatus(client, 'C1234', '1234.5678');
     setStatus('is thinking...');
 
-    assert(setStatusStub.calledOnce);
-    const args = setStatusStub.firstCall.args[0];
+    assert.strictEqual(setStatusStub.mock.callCount(), 1);
+    const args = setStatusStub.mock.calls[0].arguments[0];
 
     assert.equal(args.channel_id, 'C1234');
     assert.equal(args.thread_ts, '1234.5678');
@@ -34,8 +31,8 @@ describe('createSetStatus', () => {
     const setStatus = createSetStatus(client, 'C1234', '1234.5678');
     setStatus({ status: 'is thinking...', loading_messages: ['Loading...', 'Still working...'] });
 
-    assert(setStatusStub.calledOnce);
-    const args = setStatusStub.firstCall.args[0];
+    assert.strictEqual(setStatusStub.mock.callCount(), 1);
+    const args = setStatusStub.mock.calls[0].arguments[0];
 
     assert.equal(args.channel_id, 'C1234');
     assert.equal(args.thread_ts, '1234.5678');
@@ -47,8 +44,8 @@ describe('createSetStatus', () => {
     const setStatus = createSetStatus(client, 'C9999', '9999.0000');
     setStatus('processing');
 
-    assert(setStatusStub.calledOnce);
-    const args = setStatusStub.firstCall.args[0];
+    assert.strictEqual(setStatusStub.mock.callCount(), 1);
+    const args = setStatusStub.mock.calls[0].arguments[0];
 
     assert.equal(args.channel_id, 'C9999');
     assert.equal(args.thread_ts, '9999.0000');
