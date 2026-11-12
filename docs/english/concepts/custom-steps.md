@@ -151,3 +151,23 @@ app.action('sample_button', async ({ ack, body, client, complete, fail, logger }
 ```
 
 Learn more about responding to interactivity, see the [Slack API documentation](/tools/bolt-js/concepts/custom-steps#listening-to-custom-step-interactivity-events).
+
+## Function-scoped bot access tokens
+
+When a custom function execution includes a function-scoped bot access token, Bolt uses that token by default for the `client` injected into the listener. This also applies to function-scoped interactivity when the corresponding token is available.
+
+To disable automatic function-token selection, set `attachFunctionToken: false` when initializing your app:
+
+```javascript
+import { App } from '@slack/bolt';
+
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN,
+  attachFunctionToken: false,
+});
+```
+
+With this setting disabled, Bolt uses an authorized bot token, or a user token when a bot token is unavailable, for the injected client.
+
+When the function execution information and token are present, the function-scoped token is also available as `context.functionBotAccessToken`. Do not log or expose authentication tokens.

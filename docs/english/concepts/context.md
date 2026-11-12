@@ -60,3 +60,5 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
   }
 });
 ```
+
+> **Note:** For custom function executions, Bolt makes an available function-scoped bot access token accessible through `context.functionBotAccessToken`. See [Custom Steps](/tools/bolt-js/concepts/custom-steps) for token selection behavior and the `attachFunctionToken` setting.
