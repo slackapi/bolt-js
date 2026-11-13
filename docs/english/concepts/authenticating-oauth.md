@@ -313,6 +313,104 @@ Full reference reveals [these additional options][callback-options] but if no
 options are provided, the [`defaultCallbackSuccess`][callback-default-success]
 and [`defaultCallbackFailure`][callback-default-failure] callbacks are used.
 
+### Passing custom data through OAuth
+
+The `metadata` option in `installerOptions` is static: it is set once when the
+app starts and is shared by every installation. When the data belongs to a
+single installation, such as the tenant that started the flow, pass it through
+the OAuth redirect with a cookie instead.
+
+The cookie flow has three steps:
+
+1. `installPathOptions.beforeRedirection` runs before the installer is sent to
+   Slack. Read the value from the install URL, store it in a signed cookie, and
+   return `true`.
+2. `callbackOptions.beforeInstallation` runs after Slack redirects back and
+   after the `state` parameter is verified. Reject the installation if the
+   cookie is missing, invalid, or expired.
+3. `callbackOptions.afterInstallation` runs after the token exchange and before
+   the installation is stored. Attach the value validated in step 2 to
+   `installation.metadata` and return `true`. Reuse that value instead of
+   re-reading the cookie, which may have expired during the exchange.
+
+`ExpressReceiver` accepts a router, so you can register `cookie-parser` before
+the receiver adds its OAuth routes:
+
+```javascript
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const { App, ExpressReceiver } = require("@slack/bolt");
+
+const router = express.Router();
+router.use(cookieParser(process.env.COOKIE_SECRET));
+
+const receiver = new ExpressReceiver({
+  router,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: process.env.SLACK_STATE_SECRET,
+  scopes: ["chat:write"],
+  installerOptions: {
+    directInstall: true,
+    installPath: "/slack/install",
+    installPathOptions: {
+      beforeRedirection: async (req, res) => {
+        // Validate the tenant against your own records before trusting it.
+        res.cookie(
+          "tenant",
+          { tenant: req.query.tenant, issuedAt: Date.now() },
+          {
+            signed: true,
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            maxAge: 10 * 60 * 1000,
+          },
+        );
+        return true;
+      },
+    },
+    callbackOptions: {
+      beforeInstallation: async (options, req, res) => {
+        const payload = req.signedCookies.tenant;
+        if (
+          !payload ||
+          typeof payload.tenant !== "string" ||
+          typeof payload.issuedAt !== "number" ||
+          Date.now() - payload.issuedAt > 10 * 60 * 1000
+        ) {
+          res.status(400).send("Missing or invalid tenant");
+          return false;
+        }
+        res.locals.tenant = payload.tenant;
+        return true;
+      },
+      afterInstallation: async (installation, options, req, res) => {
+        installation.metadata = {
+          ...installation.metadata,
+          tenant: res.locals.tenant,
+        };
+        return true;
+      },
+    },
+  },
+});
+```
+
+:::warning
+
+A signed cookie is not encrypted. Its contents are readable by anyone who can
+see the cookie, so never store secrets or tokens in it. Serve the app over
+HTTPS, keep `HttpOnly`, `Secure`, and `SameSite=Lax` on the cookie, and
+validate and authorize the tenant on the server. Values from the query string
+and the cookie both come from the client and must not be trusted on their own.
+
+:::
+
+The [OAuth custom data example][oauth-custom-data] is a complete app with the
+router setup, cookie validation, and offline tests.
+
 ### Workspace installations
 
 Incoming installations are received after a successful OAuth process and must be
@@ -710,6 +808,7 @@ for additional details for common error codes.
 [installation-page]: /tools/node-slack-sdk/oauth/#showing-an-installation-page
 [installation-store]: /tools/node-slack-sdk/reference/oauth/interfaces/InstallationStore
 [installation-store-file]: https://github.com/slackapi/node-slack-sdk/blob/main/packages/oauth/src/installation-stores/file-store.ts
+[oauth-custom-data]: https://github.com/slackapi/bolt-js/tree/main/examples/oauth-custom-data
 [oauth-node]: /tools/node-slack-sdk/oauth
 [oauth-v2]: /authentication/installing-with-oauth
 [oidc]: /tools/node-slack-sdk/web-api#sign-in-with-slack-via-openid-connect
