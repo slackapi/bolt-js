@@ -27,12 +27,13 @@ npm install
 Before considering any work complete, you MUST run `npm test` and confirm it passes.
 
 ```bash
-npm test              # Full pipeline: build -> lint -> type tests -> unit tests
+npm test              # Full pipeline: build -> lint -> type tests -> spec type checks -> unit tests
 npm run build         # Clean build (rm dist/ + tsc compilation)
 npm run lint          # Biome check (formatting + linting)
 npm run lint:fix      # Biome auto-fix
 npm run test:unit     # Unit tests only (node:test)
 npm run test:coverage # Full pipeline with unit test coverage (latest Node only)
+npm run test:check    # Type-check unit test specs (tsc)
 npm run test:types    # Type definition tests (tsd)
 npm run watch         # Watch mode for development (rebuilds on src/ changes)
 ```
