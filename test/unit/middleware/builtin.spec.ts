@@ -1,8 +1,8 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
-import { assert } from 'chai';
-import sinon from 'sinon';
+import { beforeEach, describe, it } from 'node:test';
 import { expectType } from 'tsd';
-import { ErrorCode } from '../../../src/errors';
+import { type CodedError, ErrorCode } from '../../../src/errors';
 import { isSlackEventMiddlewareArgsOptions } from '../../../src/middleware/builtin';
 import type { Context, SlackEventMiddlewareArgs, SlackEventMiddlewareArgsOptions } from '../../../src/types';
 import {
@@ -40,7 +40,7 @@ describe('Built-in global middleware', () => {
     function matchesPatternTestCase(
       pattern: string | RegExp | (string | RegExp)[],
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
-    ): Mocha.AsyncFunc {
+    ): () => Promise<void> {
       return async () => {
         const { matchMessage } = builtins;
         const middleware = matchMessage(pattern);
@@ -48,11 +48,11 @@ describe('Built-in global middleware', () => {
         const args = wrapMiddleware(event, ctx);
         await middleware(args);
 
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
         // The following assertion(s) check behavior that is only targeted at RegExp patterns
         if (typeof pattern !== 'string' && !Array.isArray(pattern)) {
           if (ctx.matches !== undefined) {
-            assert.lengthOf(ctx.matches, 1);
+            assert.strictEqual(ctx.matches.length, 1);
           } else {
             assert.fail();
           }
@@ -63,7 +63,7 @@ describe('Built-in global middleware', () => {
     function notMatchesPatternTestCase(
       pattern: string | RegExp | (string | RegExp)[],
       event: SlackEventMiddlewareArgs<'message' | 'app_mention'>,
-    ): Mocha.AsyncFunc {
+    ): () => Promise<void> {
       return async () => {
         const { matchMessage } = builtins;
         const middleware = matchMessage(pattern);
@@ -71,8 +71,8 @@ describe('Built-in global middleware', () => {
         const args = wrapMiddleware(event, ctx);
         await middleware(args);
 
-        sinon.assert.notCalled(args.next);
-        assert.notProperty(ctx, 'matches');
+        assert.strictEqual(args.next.mock.callCount(), 0);
+        assert.ok(!('matches' in ctx));
       };
     }
 
@@ -197,9 +197,9 @@ describe('Built-in global middleware', () => {
           error = err as Error;
         }
 
-        assert.instanceOf(error, Error);
-        assert.propertyVal(error, 'code', ErrorCode.ContextMissingPropertyError);
-        assert.propertyVal(error, 'missingProperty', 'botUserId');
+        assert.ok(error instanceof Error);
+        assert.strictEqual((error as CodedError).code, ErrorCode.ContextMissingPropertyError);
+        assert.strictEqual((error as CodedError).missingProperty, 'botUserId');
       });
 
       it('should match message events that mention the bot user ID at the beginning of message text', async () => {
@@ -210,7 +210,7 @@ describe('Built-in global middleware', () => {
 
         await builtins.directMention(args);
 
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should not match message events that do not mention the bot user ID', async () => {
@@ -221,7 +221,7 @@ describe('Built-in global middleware', () => {
 
         await builtins.directMention(args);
 
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should not match message events that mention the bot user ID NOT at the beginning of message text', async () => {
@@ -232,7 +232,7 @@ describe('Built-in global middleware', () => {
 
         await builtins.directMention(args);
 
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should not match message events which do not have text (block kit)', async () => {
@@ -242,7 +242,7 @@ describe('Built-in global middleware', () => {
 
         await builtins.directMention(args);
 
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should not match message events that contain a link to a conversation at the beginning', async () => {
@@ -253,7 +253,7 @@ describe('Built-in global middleware', () => {
 
         await builtins.directMention(args);
 
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
     });
 
@@ -263,7 +263,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext, botUserId: fakeBotUserId, botId: fakeBotUserId };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs(), ctx);
         await builtins.ignoreSelf(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should ignore message events identified as a bot message from the same bot ID as this app', async () => {
@@ -284,21 +284,21 @@ describe('Built-in global middleware', () => {
           ctx,
         );
         await builtins.ignoreSelf(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should ignore events with only a botUserId', async () => {
         const ctx = { ...dummyContext, botUserId: fakeBotUserId };
         const args = wrapMiddleware(createDummyReactionAddedEventMiddlewareArgs({ user: fakeBotUserId }), ctx);
         await builtins.ignoreSelf(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should ignore events that match own app', async () => {
         const ctx = { ...dummyContext, botUserId: fakeBotUserId, botId: fakeBotUserId };
         const args = wrapMiddleware(createDummyReactionAddedEventMiddlewareArgs({ user: fakeBotUserId }), ctx);
         await builtins.ignoreSelf(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should not filter `member_joined_channel` and `member_left_channel` events originating from own app', async () => {
@@ -311,7 +311,7 @@ describe('Built-in global middleware', () => {
 
         await Promise.all(listOfFakeArgs.map(builtins.ignoreSelf));
         for (const args of listOfFakeArgs) {
-          sinon.assert.calledOnce(args.next);
+          assert.strictEqual(args.next.mock.callCount(), 1);
         }
       });
     });
@@ -321,14 +321,14 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs(), ctx);
         await builtins.onlyCommands(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should ignore non-command payloads', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyReactionAddedEventMiddlewareArgs(), ctx);
         await builtins.onlyCommands(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
     });
 
@@ -337,21 +337,21 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), ctx);
         await builtins.matchCommandName('/hi')(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should continue middleware processing for requests that match a pattern', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), ctx);
         await builtins.matchCommandName(/h/)(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should skip other requests', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), ctx);
         await builtins.matchCommandName('/will-not-match')(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
     });
 
@@ -360,14 +360,14 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
         await builtins.onlyEvents(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should skip other requests', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyCommandMiddlewareArgs({ command: '/hi' }), ctx);
         await builtins.onlyEvents(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
     });
 
@@ -376,7 +376,7 @@ describe('Built-in global middleware', () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
         await builtins.matchEventType('app_mention')(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should continue middleware processing for if RegExp match occurs on event type', async () => {
@@ -385,23 +385,23 @@ describe('Built-in global middleware', () => {
         const appHomeArgs = wrapMiddleware(createDummyAppHomeOpenedEventMiddlewareArgs(), ctx);
         const middleware = builtins.matchEventType(/app_mention|app_home_opened/);
         await middleware(appMentionArgs);
-        sinon.assert.calledOnce(appMentionArgs.next);
+        assert.strictEqual(appMentionArgs.next.mock.callCount(), 1);
         await middleware(appHomeArgs);
-        sinon.assert.calledOnce(appHomeArgs.next);
+        assert.strictEqual(appHomeArgs.next.mock.callCount(), 1);
       });
 
       it('should skip non-matching event types', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
         await builtins.matchEventType('app_home_opened')(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
 
       it('should skip non-matching event types via RegExp', async () => {
         const ctx = { ...dummyContext };
         const args = wrapMiddleware(createDummyAppMentionEventMiddlewareArgs(), ctx);
         await builtins.matchEventType(/foo/)(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
     });
 
@@ -424,7 +424,7 @@ describe('Built-in global middleware', () => {
           ctx,
         );
         await builtins.subtype('bot_message')(args);
-        sinon.assert.calledOnce(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 1);
       });
 
       it('should skip non-matching message subtypes', async () => {
@@ -445,7 +445,7 @@ describe('Built-in global middleware', () => {
           ctx,
         );
         await builtins.subtype('me_message')(args);
-        sinon.assert.notCalled(args.next);
+        assert.strictEqual(args.next.mock.callCount(), 0);
       });
     });
   });
@@ -453,7 +453,7 @@ describe('Built-in global middleware', () => {
   describe(isSlackEventMiddlewareArgsOptions.name, () => {
     it('should return true if object is SlackEventMiddlewareArgsOptions', async () => {
       const actual = isSlackEventMiddlewareArgsOptions({ autoAcknowledge: true });
-      assert.isTrue(actual);
+      assert.ok(actual);
     });
 
     it('should narrow proper type if object is SlackEventMiddlewareArgsOptions', async () => {
@@ -467,7 +467,7 @@ describe('Built-in global middleware', () => {
 
     it('should return false if object is Middleware', async () => {
       const actual = isSlackEventMiddlewareArgsOptions(async () => {});
-      assert.isFalse(actual);
+      assert.strictEqual(actual, false);
     });
   });
 });

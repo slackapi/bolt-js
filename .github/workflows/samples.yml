@@ -21,6 +21,7 @@ jobs:
           - 22.x
           - 22.23.4
           - 24.x
+          - 26.x
         example:
           - examples/getting-started-typescript
           - examples/custom-receiver
@@ -52,6 +53,7 @@ jobs:
           - 22.x
           - 22.23.4
           - 24.x
+          - 26.x
         sample:
           - slack-samples/bolt-ts-starter-template
           - slack-samples/bolt-ts-custom-function-template
