@@ -72,12 +72,10 @@ app.view('view_b', async ({ ack, body, view, client, logger }) => {
   try {
     await client.chat.postMessage({
       channel: user,
-      text: msg
+      text: msg,
     });
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
-
 });
 ```

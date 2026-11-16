@@ -206,9 +206,9 @@ app.command('/ticket', async ({ command, ack, respond }) => {
   await ack();
   const result = await respond(`Ticket created: ${command.text}`);
   // result was an AxiosResponse
-  console.log(result.status);   // 200
-  console.log(result.data);     // response body (pre-parsed)
-  console.log(result.headers);  // AxiosHeaders object
+  console.log(result.status); // 200
+  console.log(result.data); // response body (pre-parsed)
+  console.log(result.headers); // AxiosHeaders object
 });
 ```
 
@@ -219,9 +219,9 @@ app.command('/ticket', async ({ command, ack, respond }) => {
   await ack();
   const result = await respond(`Ticket created: ${command.text}`);
   // result is a native Fetch Response
-  console.log(result.status);        // 200
-  console.log(await result.text());  // response body (call .text() or .json())
-  console.log(result.headers);       // Headers object
+  console.log(result.status); // 200
+  console.log(await result.text()); // response body (call .text() or .json())
+  console.log(result.headers); // Headers object
 });
 ```
 
@@ -235,14 +235,14 @@ If you're only calling `await respond(...)` without using the return value (the 
 
 All Node Slack SDK packages have been bumped to their next major versions.
 
-* The `logger` package has been updated to v5.
-* The `oauth` package has been updated to v4.
-* The `types` package has been updated to v3.
+- The `logger` package has been updated to v5.
+- The `oauth` package has been updated to v4.
+- The `types` package has been updated to v3.
 
 Three packages have more substantial breaking changes:
 
-* The `socket-mode` package has been updated to v3. See the guide on [migrating @slack/socket-mode from v2 to v3](/tools/node-slack-sdk/migration/socket-mode/migrating-socket-mode-package-to-v3) for handling breaking changes. 
-* The `web-api` package has been updated to v8. See the guide on [migrating @slack/web-api from v7 to v8](/tools/node-slack-sdk/migration/web-api/migrating-web-api-package-to-v8) for handling breaking changes.
+- The `socket-mode` package has been updated to v3. See the guide on [migrating @slack/socket-mode from v2 to v3](/tools/node-slack-sdk/migration/socket-mode/migrating-socket-mode-package-to-v3) for handling breaking changes.
+- The `web-api` package has been updated to v8. See the guide on [migrating @slack/web-api from v7 to v8](/tools/node-slack-sdk/migration/web-api/migrating-web-api-package-to-v8) for handling breaking changes.
 
 ---
 
@@ -255,7 +255,9 @@ This version of Bolt leverages the new error classes from v8 of the `@slack/web-
 ```typescript
 import { App } from '@slack/bolt';
 
-const app = new App({ /* ... */ });
+const app = new App({
+  /* ... */
+});
 
 app.error(async ({ error }) => {
   if ('code' in error && error.code === 'slack_webapi_platform_error') {
@@ -270,7 +272,9 @@ app.error(async ({ error }) => {
 import { App } from '@slack/bolt';
 import { WebAPIPlatformError, WebAPIRequestError } from '@slack/web-api';
 
-const app = new App({ /* ... */ });
+const app = new App({
+  /* ... */
+});
 
 app.error(async ({ error }) => {
   if (error instanceof WebAPIPlatformError) {

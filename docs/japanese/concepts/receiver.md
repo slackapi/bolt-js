@@ -2,15 +2,15 @@
 
 レシーバーは、Slack からのイベントを受け付けてパースした後、それを Bolt アプリに伝える責務を担っています。Bolt アプリは、`context` 情報やリスナーへのイベントの引き渡しを行います。レシーバーの実装は `Receiver` インターフェイスに準拠している必要があります。
 
-| メソッド      | パラメーター                     | 戻り値の型   |
-|--------------|----------------------------------|-------------|
-| `init()`     | `app: App`                       | `unknown`   |
-| `start()`    | None                             | `Promise`   |
-| `stop()`     | None                             | `Promise`   |
+| メソッド  | パラメーター | 戻り値の型 |
+| --------- | ------------ | ---------- |
+| `init()`  | `app: App`   | `unknown`  |
+| `start()` | None         | `Promise`  |
+| `stop()`  | None         | `Promise`  |
 
 `init()` メソッドは Bolt for JavaScript アプリが生成されたときに呼び出されます。このメソッドはレシーバーに `App` インスタンスへの参照を与えます。レシーバーはこれを保持して、イベント受信時に呼び出します。
 
-* `await app.processEvent(event)` は Slack から送信されてくるイベントを受け取るたびに呼び出されます。ハンドリングされなかったエラーが発生した場合はそれを throw します。
+- `await app.processEvent(event)` は Slack から送信されてくるイベントを受け取るたびに呼び出されます。ハンドリングされなかったエラーが発生した場合はそれを throw します。
 
 カスタムのレシーバーを使用する場合は、それを `App` のコンストラクターに渡します。ここで紹介しているコード例は、基本的なカスタムレシーバーの実装例です。
 
@@ -33,7 +33,7 @@ class simpleReceiver extends EventEmitter {
       this.app.post(endpoint, this.requestHandler.bind(this));
     }
   }
-  
+
   init(app) {
     this.bolt = app;
   }
@@ -58,8 +58,8 @@ class simpleReceiver extends EventEmitter {
           return;
         }
         resolve();
-      })
-    })
+      });
+    });
   }
 
   async requestHandler(req, res) {
@@ -73,17 +73,17 @@ class simpleReceiver extends EventEmitter {
         if (ackCalled) {
           return;
         }
-        
+
         if (response instanceof Error) {
           res.status(500).send();
         } else if (!response) {
-          res.send('')
+          res.send('');
         } else {
           res.send(response);
         }
-        
+
         ackCalled = true;
-      }
+      },
     };
     await this.bolt.processEvent(event);
   }

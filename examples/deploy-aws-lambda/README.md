@@ -49,17 +49,17 @@ Ensure you can correctly run the `serverless` command from your terminal. You ma
 
 1. Go to https://api.slack.com/apps
 1. Select **Create New App**
-    * Name your app, _don't worry you can change it later!_
+   - Name your app, _don't worry you can change it later!_
 1. Select **OAuth & Permissions**
-    1. Scroll down to **Bot Token Scopes**
-    1. Add the following bot scopes:
-        1. Add the scope `app_mentions:read`
-        1. Add the scope `channels:history`
-        1. Add the scope `chat:write`
-        1. Add the scope `groups:history`
-        1. Add the scope `im:history`
-        1. Add the scope `mpim:history`
-    1. Select **Install App to Workspace** at the top of the page
+   1. Scroll down to **Bot Token Scopes**
+   1. Add the following bot scopes:
+      1. Add the scope `app_mentions:read`
+      1. Add the scope `channels:history`
+      1. Add the scope `chat:write`
+      1. Add the scope `groups:history`
+      1. Add the scope `im:history`
+      1. Add the scope `mpim:history`
+   1. Select **Install App to Workspace** at the top of the page
 
 ### Export environment variables
 
@@ -88,20 +88,20 @@ Now that your Slack app is deployed, you can register your AWS Lambda endpoint w
 1. Go to https://api.slack.com/apps
 1. Select your app
 1. Select **Event Subscriptions**
-    1. Enable **Events**
-    1. Set the **Request URL** to `https://{your-domain}.amazonaws.com/dev/slack/events`
-    1. Scroll down to **Subscribe to Bot Events**
-    1. Add the following bot events:
-        - `app_mention`
-        - `message.channels`
-        - `message.groups`
-        - `message.im`
-        - `message.mpim`
-    1. Select **Save Changes**
+   1. Enable **Events**
+   1. Set the **Request URL** to `https://{your-domain}.amazonaws.com/dev/slack/events`
+   1. Scroll down to **Subscribe to Bot Events**
+   1. Add the following bot events:
+      - `app_mention`
+      - `message.channels`
+      - `message.groups`
+      - `message.im`
+      - `message.mpim`
+   1. Select **Save Changes**
 1. Select **Interactivity & Shortcuts**
-    1. Enable **Interactivity**
-    1. Set the **Request URL** to `https://{your-domain}.amazonaws.com/dev/slack/events`
-    1. Select **Save Changes**
+   1. Enable **Interactivity**
+   1. Set the **Request URL** to `https://{your-domain}.amazonaws.com/dev/slack/events`
+   1. Select **Save Changes**
 
 ## 6. Test your Slack app
 
@@ -129,10 +129,11 @@ ngrok http 3000 -subdomain=my-unique-name
 ```
 
 Update your [Slack app settings][slack-app-settings] to use your ngrok address:
+
 1. **Interactivity & Shortcuts**
-    1. Set the **Request URL** to `https://my-unique-name.ngrok.io/slack/events`
+   1. Set the **Request URL** to `https://my-unique-name.ngrok.io/slack/events`
 1. **Event Subscriptions**
-    1. Set the **Request URL** to `https://my-unique-name.ngrok.io/slack/events`
+   1. Set the **Request URL** to `https://my-unique-name.ngrok.io/slack/events`
 
 Follow the steps to [test your app](#6-test-your-slack-app).
 

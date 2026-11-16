@@ -8,7 +8,7 @@
 async function addTimezoneContext({ payload, client, context, next }) {
   const user = await client.users.info({
     user: payload.user_id,
-    include_locale: true
+    include_locale: true,
   });
 
   // ユーザのタイムゾーン情報を追加
@@ -39,10 +39,9 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
       const result = await client.chat.scheduleMessage({
         channel: requestChannel,
         text: requestText,
-        post_at: localTomorrow
+        post_at: localTomorrow,
       });
-    }
-    catch (error) {
+    } catch (error) {
       logger.error(error);
     }
   } else {
@@ -50,7 +49,7 @@ app.command('/request', addTimezoneContext, async ({ command, ack, client, conte
       // 送信
       const result = await client.chat.postMessage({
         channel: requestChannel,
-        text: requestText
+        text: requestText,
       });
     } catch (error) {
       logger.error(error);

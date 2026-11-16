@@ -2,7 +2,7 @@
 
 Your app can use the `command()` method to listen to incoming slash command requests. The method requires a `commandName` of type string or RegExp.
 
-:::warning 
+:::warning
 
 If you use `command()` multiple times with overlapping RegExp matches, _all_ matching listeners will run. Design your regular expressions to avoid this possibility.
 

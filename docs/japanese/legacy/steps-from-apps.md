@@ -43,7 +43,7 @@ app.step(ws);
 
 ---
 
-##  ステップの追加・編集
+## ステップの追加・編集
 
 ワークフローの作成者が、アプリが提供するステップをワークフローに追加（またはその設定を変更）するタイミングで、アプリは `workflow_step_edit` というイベントを受信します。このイベントの受信時に `WorkflowStep` 設定オブジェクト内の `edit` コールバック関数が実行されます。
 
@@ -100,7 +100,7 @@ const ws = new WorkflowStep('add_task', {
 
 ---
 
-##  ステップの設定の保存
+## ステップの設定の保存
 
 ワークフローステップの設定モーダルが開いたら、アプリはワークフロー作成者がモーダルを送信するイベントである `view_submission` イベントを待ち受けます。このイベントを受信すると `WorkflowStep` 設定オブジェクト内の `save` コールバック関数が実行されます。
 
@@ -120,10 +120,10 @@ const ws = new WorkflowStep('add_task', {
     const { values } = view.state;
     const taskName = values.task_name_input.name;
     const taskDescription = values.task_description_input.description;
-                
+
     const inputs = {
       taskName: { value: taskName.value },
-      taskDescription: { value: taskDescription.value }
+      taskDescription: { value: taskDescription.value },
     };
 
     const outputs = [
@@ -136,7 +136,7 @@ const ws = new WorkflowStep('add_task', {
         type: 'text',
         name: 'taskDescription',
         label: 'Task description',
-      }
+      },
     ];
 
     await update({ inputs, outputs });
@@ -144,7 +144,6 @@ const ws = new WorkflowStep('add_task', {
   execute: async ({ step, complete, fail }) => {},
 });
 ```
-
 
 ---
 

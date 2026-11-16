@@ -18,10 +18,10 @@ app.view('ticket_submit', async ({ ack, view }) => {
   } else {
     // メールアドレスが無効。エラーを確認
     await ack({
-      "response_action": "errors",
+      response_action: 'errors',
       errors: {
-        "email_address": "Sorry, this isn’t a valid email"
-      }
+        email_address: 'Sorry, this isn’t a valid email',
+      },
     });
   }
 });

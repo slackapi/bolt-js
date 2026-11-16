@@ -126,10 +126,10 @@ const ws = new WorkflowStep('add_task', {
     const { values } = view.state;
     const taskName = values.task_name_input.name;
     const taskDescription = values.task_description_input.description;
-                
+
     const inputs = {
       taskName: { value: taskName.value },
-      taskDescription: { value: taskDescription.value }
+      taskDescription: { value: taskDescription.value },
     };
 
     const outputs = [
@@ -142,7 +142,7 @@ const ws = new WorkflowStep('add_task', {
         type: 'text',
         name: 'taskDescription',
         label: 'Task description',
-      }
+      },
     ];
 
     await update({ inputs, outputs });

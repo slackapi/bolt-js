@@ -13,19 +13,19 @@ Bolt アプリ内のリスナー関数は、全て `async` 関数に変更する
 これまで:
 
 ```javascript
-app.action('some-action-id', ({action, ack, say}) => {
+app.action('some-action-id', ({ action, ack, say }) => {
   ack();
   say('hello world');
-})
+});
 ```
 
 これから:
 
 ```javascript
-app.action('some-action-id', async ({action, ack, say}) => {
+app.action('some-action-id', async ({ action, ack, say }) => {
   await ack();
   await say('hello world');
-})
+});
 ```
 
 ## エラーハンドリング {#error-handling}
@@ -35,7 +35,7 @@ Bolt for JavaScript 2.x では、より多くのユースケースで、必要�
 ### リスナー関数内で `try`/`catch` 節を用いたエラーハンドリング
 
 ```javascript
-app.action('some-action-id', async ({action, ack, say, logger}) => {
+app.action('some-action-id', async ({ action, ack, say, logger }) => {
   try {
     await ack();
     await say('hello world');
@@ -43,7 +43,7 @@ app.action('some-action-id', async ({action, ack, say, logger}) => {
     // ここでエラーに対処
     logger.error(error);
   }
-})
+});
 ```
 
 ### グローバルエラーハンドラーによるエラーハンドリング
@@ -67,19 +67,19 @@ app.error(async (error) => {
 これまで:
 
 ```javascript
-app.action({ callback_id: 'message-action-callback' }, ({action, ack, context}) => {
+app.action({ callback_id: 'message-action-callback' }, ({ action, ack, context }) => {
   ack();
   // ここで処理を行う
-})
+});
 ```
 
 これから:
 
 ```javascript
-app.shortcut('message-action-callback', async ({shortcut, ack, context}) => {
+app.shortcut('message-action-callback', async ({ shortcut, ack, context }) => {
   await ack();
   // ここで処理を行う
-})
+});
 ```
 
 ## ミドルウェアに関する変更 {#upgrading-middleware}
@@ -89,11 +89,11 @@ app.shortcut('message-action-callback', async ({shortcut, ack, context}) => {
 これまで:
 
 ```javascript
-function noBotMessages({message, next }) {
+function noBotMessages({ message, next }) {
   function doAfter() {
     // 後続の処理をここでやる
   }
-if (!message.subtype || message.subtype !== 'bot_message') {
+  if (!message.subtype || message.subtype !== 'bot_message') {
     next(doAfter);
   }
 }
@@ -102,7 +102,7 @@ if (!message.subtype || message.subtype !== 'bot_message') {
 これから:
 
 ```javascript
-async function noBotMessages({message, next }) {
+async function noBotMessages({ message, next }) {
   if (!message.subtype || message.subtype !== 'bot_message') {
     await next();
     // 後続の処理をここでやる

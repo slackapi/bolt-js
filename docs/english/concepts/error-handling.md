@@ -31,7 +31,7 @@ const app = new App({
     dispatchErrorHandler: async ({ error, logger, response }) => {
       logger.error(`dispatch error: ${error}`);
       response.writeHead(404);
-      response.write("Something is wrong!");
+      response.write('Something is wrong!');
       response.end();
     },
     processEventErrorHandler: async ({ error, logger, response }) => {
