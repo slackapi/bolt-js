@@ -6,7 +6,7 @@ This guide will walk you through the process of updating your app from using `@s
 
 ## 🚨 Breaking Changes
 
-- ⬆️  [Support for node v14 and v16 have been officially dropped, as these node versions have been EOL'ed](#minimum-node-version).
+- ⬆️ [Support for node v14 and v16 have been officially dropped, as these node versions have been EOL'ed](#minimum-node-version).
 - 🚥 [`*MiddlewareArgs` interfaces, modeling middleware arguments for different _kinds_ of Slack event payloads processed by bolt apps, have been improved](#middleware-arg-types).
 - 🌐 [The Web API client, `@slack/web-api`, has been upgraded from v6 to v7](#web-api-v7).
 - 🔌 [The Socket Mode handler package, `@slack/socket-mode`, has been upgraded from v1 to v2](#socket-mode-v2).
@@ -40,10 +40,9 @@ Instead, these `MiddlewareArgs` types now conditionally create a type intersecti
 type SomeMiddlewareArgs<EventType extends string = string> = {
   // some type in here
 } & (EventType extends 'message'
-  // If this is a message event, add a `message` property
-  ? { message: EventFromType<EventType> }
-  : unknown
-)
+  ? // If this is a message event, add a `message` property
+    { message: EventFromType<EventType> }
+  : unknown);
 ```
 
 With the above, now when a message payload is wrapped in middleware arguments, it will contain an appropriate `message` property, whereas a non-message payload will be intersected with `unknown` - effectively a type "noop." No more e.g. `say: undefined` or `message: undefined` to deal with!
@@ -82,7 +81,7 @@ If you previously imported the `SocketModeFunctions` class, you likely only did 
 // before:
 import { SocketModeFunctions } from '@slack/bolt';
 // you probably did something with:
-SocketModeFunctions.defaultProcessEventErrorHandler
+SocketModeFunctions.defaultProcessEventErrorHandler;
 
 // now:
 import { defaultProcessEventHandler } from '@slack/bolt';

@@ -1,12 +1,12 @@
 # Listening to views
 
-You may listen for user interactions with views using the `view` method. 
+You may listen for user interactions with views using the `view` method.
 
 Slack will send a `view_submission` request when a user submits a view. To receive the values submitted in view input blocks, you can access the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 If the `notify_on_close` field of a view has been set to `true`, Slack will also send a `view_closed` request if a user clicks the close button. See the section on **Handling views on close** for more detail.
 To listen to either a `view_submission` request or `view_closed` request, you can use the built-in `view()` method.
 
-The `view()` method requires a `callback_id` of type `string` or `RegExp` or a constraint object with properties `type` and `callback_id`. 
+The `view()` method requires a `callback_id` of type `string` or `RegExp` or a constraint object with properties `type` and `callback_id`.
 
 ---
 
@@ -15,7 +15,7 @@ The `view()` method requires a `callback_id` of type `string` or `RegExp` or a c
 To update a view in response to a `view_submission` request, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
 
 ```javascript
-// Update the view on submission 
+// Update the view on submission
 app.view('modal-callback-id', async ({ ack, body }) => {
   await ack({
     response_action: 'update',
@@ -77,12 +77,10 @@ app.view('view_b', async ({ ack, body, view, client, logger }) => {
   try {
     await client.chat.postMessage({
       channel: user,
-      text: msg
+      text: msg,
     });
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
-
 });
 ```

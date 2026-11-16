@@ -9,7 +9,7 @@ We recommend calling `ack()` right away before sending a new message or fetching
 ```javascript
 // Regex to determine if this is a valid email
 let isEmail = /^[\w\-\.]+@([\w\-]+\.)+[\w\-]+$/;
-// This uses a constraint object to listen for modal submissions with a callback_id of ticket_submit 
+// This uses a constraint object to listen for modal submissions with a callback_id of ticket_submit
 app.view('ticket_submit', async ({ ack, view }) => {
   // get the email value from the input block with `email_address` as the block_id
   const email = view.state.values['email_address']['input_a'].value;
@@ -20,10 +20,10 @@ app.view('ticket_submit', async ({ ack, view }) => {
   } else {
     // if it isn’t a valid email, acknowledge with an error
     await ack({
-      "response_action": "errors",
+      response_action: 'errors',
       errors: {
-        "email_address": "Sorry, this isn’t a valid email"
-      }
+        email_address: 'Sorry, this isn’t a valid email',
+      },
     });
   }
 });

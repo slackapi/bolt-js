@@ -39,7 +39,7 @@ const socketModeReceiver = new SocketModeReceiver({
 const app = new App({
   receiver: socketModeReceiver,
   // OAuth を使うなら以下の token 指定は不要です
-  token: process.env.BOT_TOKEN
+  token: process.env.BOT_TOKEN,
 });
 
 (async () => {

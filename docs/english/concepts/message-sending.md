@@ -47,30 +47,28 @@ app.event('reaction_added', async ({ event, say }) => {
 
 ## Streaming messages {#streaming-messages}
 
-You can have your app's messages stream in to replicate conventional agent behavior. Bolt for JavaScript provides a `sayStream` utility as a listener argument available for `app.event` and `app.message` listeners. 
+You can have your app's messages stream in to replicate conventional agent behavior. Bolt for JavaScript provides a `sayStream` utility as a listener argument available for `app.event` and `app.message` listeners.
 
 The `sayStream` utility streamlines calling the Node Slack SDK's [`WebClient.chatStream()`](/tools/node-slack-sdk/reference/web-api/classes/WebClient#chatstream) helper utility by sourcing parameter values from the relevant event payload.
 
-| Parameter | Value |
-|---|---| 
-| `channel_id` | Sourced from the event payload.
-| `thread_ts` | Sourced from the event payload. Falls back to the `ts` value if available.
-| `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org).
-| `recipient_user_id` | Sourced from the `user_id` of the event.
+| Parameter           | Value                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| `channel_id`        | Sourced from the event payload.                                                       |
+| `thread_ts`         | Sourced from the event payload. Falls back to the `ts` value if available.            |
+| `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org). |
+| `recipient_user_id` | Sourced from the `user_id` of the event.                                              |
 
-If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
----
+## If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
 
 ```js
 import { App, LogLevel } from '@slack/bolt';
 import 'dotenv/config';
 
-
 const app = new App({
-token: process.env.SLACK_BOT_TOKEN,
-socketMode: true,
-appToken: process.env.SLACK_APP_TOKEN,
-logLevel: LogLevel.DEBUG,
+  token: process.env.SLACK_BOT_TOKEN,
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN,
+  logLevel: LogLevel.DEBUG,
 });
 
 app.event('app_mention', async ({ sayStream, setStatus }) => {
@@ -85,12 +83,12 @@ app.event('app_mention', async ({ sayStream, setStatus }) => {
 });
 
 (async () => {
-try {
-  await app.start(process.env.PORT || 3000);
-  app.logger.info('Bolt app is running!');
-} catch (error) {
-  app.logger.error('Unable to start App', error);
-}
+  try {
+    await app.start(process.env.PORT || 3000);
+    app.logger.info('Bolt app is running!');
+  } catch (error) {
+    app.logger.error('Unable to start App', error);
+  }
 })();
 ```
 

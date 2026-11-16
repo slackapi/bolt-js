@@ -8,10 +8,10 @@ When you’re finished, you’ll have this ⚡️[Slack agent template](https://
 
 ## Prerequisites
 
-First things first, take a few moments to set up the following: 
+First things first, take a few moments to set up the following:
 
-* Make sure you have a development environment where you have permission to install apps. You can get a free sandbox with the [Slack Developer Program](https://api.slack.com/developer-program). 
-* Ensure you have an account with a Git provider (GitHub, GitLab, or Bitbucket).
+- Make sure you have a development environment where you have permission to install apps. You can get a free sandbox with the [Slack Developer Program](https://api.slack.com/developer-program).
+- Ensure you have an account with a Git provider (GitHub, GitLab, or Bitbucket).
 
 ## Create a new Vercel project
 
@@ -19,13 +19,13 @@ Create a new Vercel project based on a Bolt for JavaScript template by clicking 
 
 <Button label="Deploy with Vercel" link="https://vercel.com/new/clone?demo-description=This+is+a+generic+Bolt+for+JavaScript+%28TypeScript%29+template+app+used+to+build+out+Slack+apps+with+Next.js&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F1BL852bc5uyQQuswDrLggh%2F7f91aaaebace15775b982649b153354a%2FFrame.png&demo-title=Slack+Bolt+with+Next.js&demo-url=https%3A%2F%2Fgithub.com%2Fvercel-partner-solutions%2Fslack-bolt-with-nextjs&env=SLACK_SIGNING_SECRET%2CSLACK_BOT_TOKEN&envDescription=These+environment+variables+are+required+to+deploy+your+Slack+app+to+Vercel&envLink=https%3A%2F%2Fapi.slack.com%2Fapps&from=templates&project-name=Slack+Bolt+with+Next.js&project-names=Comma+separated+list+of+project+names%2Cto+match+the+root-directories&repository-name=slack-bolt-with-next-js&repository-url=https%3A%2F%2Fgithub.com%2Fvercel-partner-solutions%2Fslack-bolt-with-nextjs&root-directories=List+of+directory+paths+for+the+directories+to+clone+into+projects&skippable-integrations=1&teamSlug=haleychaas-projects" />
 
-You will then be prompted to select a Git provider. Select your preferred provider and log in. 
+You will then be prompted to select a Git provider. Select your preferred provider and log in.
 
 ![New project](new_project.png)
 
 Select your provider as the Git Scope and rename the repo if you'd like. Click **Create**.
 
-Keep this browser tab open; we'll be back to it soon. Next, we'll need to add a couple of variables for our app. To obtain these, direct your attention to the Slack app settings page. 
+Keep this browser tab open; we'll be back to it soon. Next, we'll need to add a couple of variables for our app. To obtain these, direct your attention to the Slack app settings page.
 
 ## Create a Slack app
 
@@ -56,12 +56,13 @@ You will only need the AI Gateway token if you are running the app locally. All 
 :::
 
 1. From the Vercel dashboard, click on the **AI Gateway** tab in the top nav bar.
-2. On the left sidebar, select **API Keys**. 
+2. On the left sidebar, select **API Keys**.
 3. Click **Create Key**, give it a name, and copy the value (it won't be shown again).
 
 Once you have the key, you need to add it to your project so your code can use it. There are two primary ways to do this: through the dashboard and for local development.
 
 Through the dashboard:
+
 1. Go to your project in Vercel.
 2. Click the **Settings** tab in the top nav bar.
 3. Select **Environment Variables** from the left-hand menu.
@@ -76,12 +77,13 @@ export AI_GATEWAY_API_KEY=<your-key-here>
 
 ## Update URLs
 
-Once the deployment has completed, navigate back to the Slack [app settings](https://api.slack.com/apps) and open the **App Manifest** from the sidebar. 
+Once the deployment has completed, navigate back to the Slack [app settings](https://api.slack.com/apps) and open the **App Manifest** from the sidebar.
 
 Update the manifest so that all of the `reference_url` and `url` fields use your domain. Here are some examples:
-* **Slash commands URL**: `https://slack-agent-template-example.vercel.app/api/slack/events`
-* **Event subscriptions**: `https://slack-agent-template-example.vercel.app/api/slack/events`
-* **Interactivity request URL**: `https://slack-agent-template-example.vercel.app/api/slack/events`
+
+- **Slash commands URL**: `https://slack-agent-template-example.vercel.app/api/slack/events`
+- **Event subscriptions**: `https://slack-agent-template-example.vercel.app/api/slack/events`
+- **Interactivity request URL**: `https://slack-agent-template-example.vercel.app/api/slack/events`
 
 Click **Save** and verify the URL.
 

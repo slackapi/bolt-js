@@ -39,7 +39,7 @@ const socketModeReceiver = new SocketModeReceiver({
 const app = new App({
   receiver: socketModeReceiver,
   // disable token line below if using OAuth
-  token: process.env.BOT_TOKEN
+  token: process.env.BOT_TOKEN,
 });
 
 (async () => {

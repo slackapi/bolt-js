@@ -24,5 +24,5 @@ const app = new App({
     app.logger.error(e);
     process.exit(1);
   }
-})()
+})();
 ```

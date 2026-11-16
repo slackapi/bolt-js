@@ -1,6 +1,6 @@
 # Adding custom HTTP routes 
 
-As of `v3.7.0`, custom HTTP routes can be easily added by passing in an array of routes as `customRoutes` when initializing `App`. 
+As of `v3.7.0`, custom HTTP routes can be easily added by passing in an array of routes as `customRoutes` when initializing `App`.
 
 Each `CustomRoute` object must contain three properties: `path`, `method`, and `handler`. `method`, which corresponds to the HTTP verb, can be either a string or an array of strings.
 
@@ -47,7 +47,6 @@ const app = new App({
 ## Custom ExpressReceiver routes
 
 Adding custom HTTP routes is quite straightforward when using Bolt’s built-in ExpressReceiver. Since `v2.1.0`, `ExpressReceiver` added a `router` property, which exposes the Express [Router](http://expressjs.com/en/4x/api.html#router) on which additional routes and middleware can be added.
-
 
 ```javascript
 const { App, ExpressReceiver } = require('@slack/bolt');

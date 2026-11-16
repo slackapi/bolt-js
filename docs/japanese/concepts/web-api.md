@@ -20,10 +20,9 @@ app.message('wake me up', async ({ message, context, logger }) => {
       token: context.botToken,
       channel: message.channel,
       post_at: whenSeptemberEnds,
-      text: 'Summer has come and passed'
+      text: 'Summer has come and passed',
     });
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

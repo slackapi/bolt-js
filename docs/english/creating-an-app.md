@@ -5,7 +5,7 @@ sidebar_label: Creating an App
 # Creating an app with Bolt for JavaScript
 
 :::tip[More doing, less reading]
-This guide is a more thorough explanation on creating a Slack app. If you want a running app as fast as possible, follow our [Quickstart](/quickstart) that harnesses the power of Bolt and the [Slack CLI](/tools/slack-cli). 
+This guide is a more thorough explanation on creating a Slack app. If you want a running app as fast as possible, follow our [Quickstart](/quickstart) that harnesses the power of Bolt and the [Slack CLI](/tools/slack-cli).
 :::
 
 Follow along to get up and running with a Slack app using Bolt for JavaScript. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
@@ -204,7 +204,7 @@ $ export SLACK_APP_TOKEN=xapp-<your-app-token>
 Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -217,7 +217,7 @@ const app = new App({
   // Start your app
   await app.start();
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -241,7 +241,7 @@ $ export SLACK_SIGNING_SECRET=<your-signing-secret>
 2. Create a new entrypoint file called `app.js` in your project directory and add the following code:
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -253,7 +253,7 @@ const app = new App({
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -339,7 +339,7 @@ The following example listens and responds to all messages in channels/DMs where
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -350,7 +350,7 @@ const app = new App({
 
 // highlight-start
 // Listens to incoming messages that contain "hello"
-app.message("hello", async ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say(`Hey there <@${message.user}>!`);
 });
@@ -360,7 +360,7 @@ app.message("hello", async ({ message, say }) => {
   // Start your app
   await app.start();
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -368,7 +368,7 @@ app.message("hello", async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -378,7 +378,7 @@ const app = new App({
 
 // highlight-start
 // Listens to incoming messages that contain "hello"
-app.message("hello", async ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say(`Hey there <@${message.user}>!`);
 });
@@ -388,7 +388,7 @@ app.message("hello", async ({ message, say }) => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -433,7 +433,7 @@ Below, the `app.js` file from the last section is modified to send a message con
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your Slack app and bot token
 const app = new App({
@@ -444,23 +444,23 @@ const app = new App({
 
 // highlight-start
 // Listens to incoming messages that contain "hello"
-app.message("hello", async ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        type: "section",
+        type: 'section',
         text: {
-          type: "mrkdwn",
+          type: 'mrkdwn',
           text: `Hey there <@${message.user}>!`,
         },
         accessory: {
-          type: "button",
+          type: 'button',
           text: {
-            type: "plain_text",
-            text: "Click Me",
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          action_id: "button_click",
+          action_id: 'button_click',
         },
       },
     ],
@@ -473,7 +473,7 @@ app.message("hello", async ({ message, say }) => {
   // Start your app
   await app.start();
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -481,7 +481,7 @@ app.message("hello", async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -491,23 +491,23 @@ const app = new App({
 
 // highlight-start
 // Listens to incoming messages that contain "hello"
-app.message("hello", async ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        type: "section",
+        type: 'section',
         text: {
-          type: "mrkdwn",
+          type: 'mrkdwn',
           text: `Hey there <@${message.user}>!`,
         },
         accessory: {
-          type: "button",
+          type: 'button',
           text: {
-            type: "plain_text",
-            text: "Click Me",
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          action_id: "button_click",
+          action_id: 'button_click',
         },
       },
     ],
@@ -520,7 +520,7 @@ app.message("hello", async ({ message, say }) => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 
@@ -552,7 +552,7 @@ https://github.com/slack-samples/bolt-js-getting-started-app/blob/main/app.js
 <TabItem value="http" label="HTTP">
 
 ```javascript title="app.js"
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -561,23 +561,23 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message("hello", async ({ message, say }) => {
+app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
       {
-        type: "section",
+        type: 'section',
         text: {
-          type: "mrkdwn",
+          type: 'mrkdwn',
           text: `Hey there <@${message.user}>!`,
         },
         accessory: {
-          type: "button",
+          type: 'button',
           text: {
-            type: "plain_text",
-            text: "Click Me",
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          action_id: "button_click",
+          action_id: 'button_click',
         },
       },
     ],
@@ -586,7 +586,7 @@ app.message("hello", async ({ message, say }) => {
 });
 
 // highlight-start
-app.action("button_click", async ({ body, ack, say }) => {
+app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
   await say(`<@${body.user.id}> clicked the button`);
@@ -597,7 +597,7 @@ app.action("button_click", async ({ body, ack, say }) => {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 })();
 ```
 

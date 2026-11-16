@@ -70,22 +70,27 @@ installationStore: {
 これまで:
 
 ```javascript
-const app = new App({ authorize: authorizeFn, orgAuthorize: orgAuthorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
-const authorizeFn = async ({ teamId, enterpriseId}) => { 
+const app = new App({
+  authorize: authorizeFn,
+  orgAuthorize: orgAuthorizeFn,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+});
+const authorizeFn = async ({ teamId, enterpriseId }) => {
   // Use teamId to fetch installation details from database
-}
-const orgAuthorizeFn = async ({ teamId, enterpriseId }) => { 
+};
+const orgAuthorizeFn = async ({ teamId, enterpriseId }) => {
   // Use enterpriseId to fetch installation details from database
-}
+};
 ```
 
 これから:
+
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
-const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => { 
+const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall }) => {
   // if isEnterpriseInstall is true, use enterpriseId to fetch installation details from database
   // else, use teamId to fetch installation details from database
-}
+};
 ```
 
 ## デフォルトのレシーバーを HTTPReceiver に変更 {#http-receiver-as-default}

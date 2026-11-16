@@ -8,10 +8,12 @@
 // 特定の文字列、この場合 👋絵文字を含むメッセージと一致
 app.message(':wave:', async ({ message, say }) => {
   // 新しく投稿されたメッセージだけを処理
-  if (message.subtype === undefined
-    || message.subtype === 'bot_message'
-    || message.subtype === 'file_share'
-    || message.subtype === 'thread_broadcast') {
+  if (
+    message.subtype === undefined ||
+    message.subtype === 'bot_message' ||
+    message.subtype === 'file_share' ||
+    message.subtype === 'thread_broadcast'
+  ) {
     await say(`Hello, <@${message.user}>`);
   }
 });
@@ -43,9 +45,10 @@ const { App, subtype } = require('@slack/bolt');
 // user からのメッセージの編集と一致
 app.message(subtype('message_changed'), ({ event, logger }) => {
   // この if 文は TypeScript でコードを書く際に必要
-  if (event.subtype === 'message_changed'
-    && !event.message.subtype
-    && !event.previous_message.subtype) {
-    logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+  if (event.subtype === 'message_changed' && !event.message.subtype && !event.previous_message.subtype) {
+    logger.info(
+      `The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`,
+    );
   }
 });
+```

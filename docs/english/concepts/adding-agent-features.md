@@ -5,7 +5,7 @@ sidebar_label: Adding agent features
 # Adding agent features with Bolt for JavaScript
 
 :::tip[Check out the Support Agent sample app]
-The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-js-support-agent), Casey, which supports integration with the Claude Agent SDK and OpenAI Agents SDK. 
+The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-js-support-agent), Casey, which supports integration with the Claude Agent SDK and OpenAI Agents SDK.
 
 View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey. Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
 :::
@@ -18,7 +18,7 @@ If you're unfamiliar with using these feature within Slack, you may want to read
 
 ## Slack MCP Server {#slack-mcp-server}
 
-Casey can harness the [Slack MCP Server](https://docs.slack.dev/ai/slack-mcp-server/developing) when deployed via an HTTP Server with OAuth. 
+Casey can harness the [Slack MCP Server](https://docs.slack.dev/ai/slack-mcp-server/developing) when deployed via an HTTP Server with OAuth.
 
 To enable the Slack MCP Server:
 
@@ -71,7 +71,7 @@ Your agent can now access the Slack MCP server!
 
 ## Listening for user invocation 
 
-Agents can be invoked throughout Slack, such as via @mentions in channels, messaging the agent, and using the assistant side panel. 
+Agents can be invoked throughout Slack, such as via @mentions in channels, messaging the agent, and using the assistant side panel.
 
 <Tabs>
 <TabItem value="appmention" label = "App mention">
@@ -183,8 +183,8 @@ export async function handleMessage({ client, context, event, logger, say, saySt
 
 How you greet a user and set suggested prompts when they open the agent's DM depends on which [messaging experience](/ai/developing-agents) your app uses:
 
-* The **agent messaging experience** (`agent_view`) is the default and the only experience available to apps going forward. Conversations happen in the app's **Messages** tab, so you listen for the [`app_home_opened`](/reference/events/app_home_opened) event and check for the `messages` tab to detect when a user opens the DM, then set suggested prompts at the top of the tab (no `thread_ts` required). Casey uses this approach.
-* The **assistant messaging experience** (`assistant_view`) is the legacy experience, with separate **Chat** and **History** tabs. You listen for the [`assistant_thread_started`](/reference/events/assistant_thread_started) event to detect a thread, then set suggested prompts on it via `thread_ts`. Existing apps can continue to use this but should migrate to the agent messaging experience.
+- The **agent messaging experience** (`agent_view`) is the default and the only experience available to apps going forward. Conversations happen in the app's **Messages** tab, so you listen for the [`app_home_opened`](/reference/events/app_home_opened) event and check for the `messages` tab to detect when a user opens the DM, then set suggested prompts at the top of the tab (no `thread_ts` required). Casey uses this approach.
+- The **assistant messaging experience** (`assistant_view`) is the legacy experience, with separate **Chat** and **History** tabs. You listen for the [`assistant_thread_started`](/reference/events/assistant_thread_started) event to detect a thread, then set suggested prompts on it via `thread_ts`. Existing apps can continue to use this but should migrate to the agent messaging experience.
 
 Refer to the [agent messaging experience changelog entry](/changelog/2026/06/30/agent-messages-tab) for the full list of changes and a migration checklist.
 
@@ -255,7 +255,7 @@ export async function handleAssistantThreadStarted({ client, event, logger }) {
 
 ## Setting status {#setting-assistant-status}
 
-Your app can show its users action is happening behind the scenes by setting its thread status. 
+Your app can show its users action is happening behind the scenes by setting its thread status.
 
 ```javascript
 export async function handleAppMentioned({ setStatus, ...args }) {
@@ -276,16 +276,16 @@ export async function handleAppMentioned({ setStatus, ...args }) {
 
 ## Streaming messages {#text-streaming}
 
-You can have your app's messages stream in to replicate conventional agent behavior. Bolt for JavaScript provides a `sayStream` utility as a listener argument available for `app.event` and `app.message` listeners. 
+You can have your app's messages stream in to replicate conventional agent behavior. Bolt for JavaScript provides a `sayStream` utility as a listener argument available for `app.event` and `app.message` listeners.
 
 The `sayStream` utility streamlines calling the JavaScript Slack SDK's [`WebClient.chat.stream`](https://slack.dev/node-slack-sdk/web-api#streaming-messages) helper utility by sourcing parameter values from the relevant event payload.
 
-| Parameter | Value |
-|---|---| 
-| `channel_id` | Sourced from the event payload.
-| `thread_ts` | Sourced from the event payload. Falls back to the `ts` value if available.
-| `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org).
-| `recipient_user_id` | Sourced from the `user_id` of the event.
+| Parameter           | Value                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| `channel_id`        | Sourced from the event payload.                                                       |
+| `thread_ts`         | Sourced from the event payload. Falls back to the `ts` value if available.            |
+| `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org). |
+| `recipient_user_id` | Sourced from the `user_id` of the event.                                              |
 
 If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `null`.
 
@@ -340,7 +340,7 @@ const feedbackBlocks = buildFeedbackBlocks();
 await streamer.stop({ blocks: feedbackBlocks });
 ```
 
-You can also add a response for when the user provides feedback. 
+You can also add a response for when the user provides feedback.
 
 ```javascript title="...listeners/actions/feedback-buttons.js"
 export async function handleFeedbackButton({ ack, body, client, context, logger }) {
@@ -380,7 +380,6 @@ export async function handleFeedbackButton({ ack, body, client, context, logger 
 ## Full example
 
 Putting all those concepts together results in a dynamic agent ready to helpfully respond.
-
 
 <details>
 <summary>Full example</summary>
@@ -554,23 +553,23 @@ import { tool } from '@anthropic-ai/claude-agent-sdk';
 
 export const checkGitHubStatusTool = tool(
   'check_github_status',
-  'Check GitHub\'s current operational status',
+  "Check GitHub's current operational status",
   {},
   async () => {
     const response = await fetch('https://www.githubstatus.com/api/v2/status.json');
     const data = await response.json();
     const status = data.status.indicator;
     const description = data.status.description;
-    
+
     return {
       content: [
         {
           type: 'text',
           text: `**GitHub Status** — ${status}\n${description}`,
-        }
-      ]
+        },
+      ],
     };
-  }
+  },
 );
 ```
 
@@ -587,7 +586,7 @@ const caseyToolsServer = createSdkMcpServer({
   name: 'casey-tools',
   version: '1.0.0',
   tools: [
-    checkGitHubStatusTool,  // Add here
+    checkGitHubStatusTool, // Add here
     // ... other tools
   ],
 });
@@ -597,7 +596,7 @@ const caseyToolsServer = createSdkMcpServer({
 
 ```javascript title="agent/casey.js"
 const ALLOWED_TOOLS = [
-  'check_github_status',  // Add here
+  'check_github_status', // Add here
   // ... other tools
 ];
 ```

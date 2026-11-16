@@ -12,9 +12,9 @@ When finished, you'll be ready to build scalable and innovative workflow steps f
 
 In this tutorial, you'll be wiring up a sample app with a sample step and corresponding function listener to be used as a workflow step in Workflow Builder. Here's how it works:
 
-* When someone starts the workflow, Slack will notify your app that your custom step was invoked as part of a workflow.
-* Your app will send a message to the requestor, along with a button to complete the step.
-* When the user clicks or taps the button, Slack will let your app know, and your app will respond by changing the message.
+- When someone starts the workflow, Slack will notify your app that your custom step was invoked as part of a workflow.
+- Your app will send a message to the requestor, along with a button to complete the step.
+- When the user clicks or taps the button, Slack will let your app know, and your app will respond by changing the message.
 
 :::info[Skip to the code]
 If you'd rather skip the tutorial and just head straight to the code, create a new app and use our [Bolt JS custom step sample](https://github.com/slack-samples/bolt-js-custom-step-template) as a template. The sample custom step provided in the template will be a good place to start exploring!
@@ -60,13 +60,13 @@ Open a browser and navigate to [your apps page](https://api.slack.com/apps). Thi
 
 Next, select a workspace where you have permissions to install apps, and click **Next**. Select the **JSON** tab and clear the existing contents. Paste the contents of the `manifest.json` file you previously copied.
 
-Click **Next** again. You will be shown a brief overview of the features your app includes. You'll see we are creating an app with a `chat:write` bot scope, an App Home and Bot User, as well as Socket Mode, Interactivity, an Event Subscription, and Org Deploy. We'll get into these details later. Click **Create**. 
+Click **Next** again. You will be shown a brief overview of the features your app includes. You'll see we are creating an app with a `chat:write` bot scope, an App Home and Bot User, as well as Socket Mode, Interactivity, an Event Subscription, and Org Deploy. We'll get into these details later. Click **Create**.
 
 ### App settings {#app-settings}
 
-All of your app's settings can be configured within these screens. By creating an app from an existing manifest, you will notice many settings have already been configured. Navigate to **Org Level Apps** and notice that we've already opted in. This is a requirement for adding workflow steps to an app. 
+All of your app's settings can be configured within these screens. By creating an app from an existing manifest, you will notice many settings have already been configured. Navigate to **Org Level Apps** and notice that we've already opted in. This is a requirement for adding workflow steps to an app.
 
-Navigate to **Event Subscriptions** and expand **Subscribe to bot events** to see that we have subscribed to the `function_executed` event. This is also a requirement for adding workflow steps to our app, as it lets our app know when a step has been triggered, allowing our app to respond to it. 
+Navigate to **Event Subscriptions** and expand **Subscribe to bot events** to see that we have subscribed to the `function_executed` event. This is also a requirement for adding workflow steps to our app, as it lets our app know when a step has been triggered, allowing our app to respond to it.
 
 Another configuration setting to note is **Socket Mode**. We have turned this on for our local development, but socket mode is not intended for use in a production environment. When you are satisfied with your app and ready to deploy it to a production environment, you should switch to using public HTTP request URLs. Read more about getting started with HTTP in [Bolt for JavaScript here](/tools/bolt-js/creating-an-app).
 
@@ -76,18 +76,18 @@ Clicking on **Workflow Steps** in the left nav will show you that one workflow s
 
 ### Tokens {#tokens}
 
-In order to connect our app here with the logic of our sample code set up locally, we need to obtain two tokens, a bot token and an app token. 
+In order to connect our app here with the logic of our sample code set up locally, we need to obtain two tokens, a bot token and an app token.
 
-* **Bot tokens** are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that most apps use.
-* **App-level** tokens represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.
+- **Bot tokens** are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that most apps use.
+- **App-level** tokens represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.
 
-To generate an app token, navigate to **Basic Information** and scroll down to **App-Level Token**. 
+To generate an app token, navigate to **Basic Information** and scroll down to **App-Level Token**.
 
 ![App token](app-token.png)
 
 Click **Generate Token and Scopes**, then **Add Scope** and choose `connections:write`. Choose a name for your token and click **Generate**. Copy that value, save it somewhere accessible, and click **Done** to close out of the modal.
 
-Next up is the bot token. We can only get this token by installing the app into the workspace. Navigate to **Install App** and click the button to install, choosing **Allow** at the next screen. 
+Next up is the bot token. We can only get this token by installing the app into the workspace. Navigate to **Install App** and click the button to install, choosing **Allow** at the next screen.
 
 ![Install app](install.png)
 
@@ -99,7 +99,7 @@ You will then have a bot token. Again, copy that value and save it somewhere acc
 
 ## Starting your local development server {#local}
 
-While building your app, you can see your changes appear in your workspace in real-time with `npm start`. Soon we'll start our local development server and see what our sample code is all about! But first, we need to store those tokens we gathered as environment variables. 
+While building your app, you can see your changes appear in your workspace in real-time with `npm start`. Soon we'll start our local development server and see what our sample code is all about! But first, we need to store those tokens we gathered as environment variables.
 
 Navigate back to VSCode. Rename the `.env.sample` file to `.env`. Open this file and update `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` with the values you previously saved. It will look like this, with your actual token values where you see `<your_app_token>` and `<your_bot_token>`:
 
@@ -232,8 +232,8 @@ The custom step will take the following input: Message recipient (as a Slack Use
 
 The custom step will produce the following output: The user that completed the step.
 
-* When the step is invoked, a message will be sent to the user who invoked the workflow with a button to complete the step.
-* When the button is clicked, a message is posted indicating the step's completion.
+- When the step is invoked, a message will be sent to the user who invoked the workflow with a button to complete the step.
+- When the button is clicked, a message is posted indicating the step's completion.
 
 ### Implementing the function listener {#function-listener}
 
@@ -281,18 +281,18 @@ app.function('sample_step', async ({ client, inputs, fail }) => {
 
 The function listener registration method (`.function()`) takes two arguments:
 
-* The first argument is the unique callback ID of the step. For our custom step, we’re using `sample_step`. Every custom step you implement in an app needs to have a unique callback ID.
-* The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells the app that a user in the Slack client started a workflow that contains the `sample_step` custom step.
+- The first argument is the unique callback ID of the step. For our custom step, we’re using `sample_step`. Every custom step you implement in an app needs to have a unique callback ID.
+- The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells the app that a user in the Slack client started a workflow that contains the `sample_step` custom step.
 
 The callback function offers various utilities that can be used to take action when a function execution event is received. The ones we’ll be using here are:
 
-* `client` provides access to Slack API methods — like the `chat.postMessage` method, which we’ll use later to send a message to a channel
-* `inputs` provides access to the workflow variables passed into the step when the workflow was started
-* `fail` is a utility method for indicating that the step invoked for the current workflow step had an error
+- `client` provides access to Slack API methods — like the `chat.postMessage` method, which we’ll use later to send a message to a channel
+- `inputs` provides access to the workflow variables passed into the step when the workflow was started
+- `fail` is a utility method for indicating that the step invoked for the current workflow step had an error
 
 #### Understanding the function listener's callback logic {#function-listener-callback-logic}
 
-When our step is executed, we want a message to be sent to the invoking user. That message should include a button that prompts the user to complete the step. 
+When our step is executed, we want a message to be sent to the invoking user. That message should include a button that prompts the user to complete the step.
 
 When Slack tells your Bolt app that the `sample_step` step was invoked, this step uses `chat.postMessage` to send a message to the `user_id` channel (which means this will be sent as a DM to the Slack user whose ID == `user_id`) with some text and blocks. The Block Kit element being sent as part of the message is a button, labeled 'Complete step' (which sends the `sample_click` action ID).
 
@@ -302,7 +302,7 @@ In order for your Bolt app to listen for these actions, we’ll now define an ac
 
 ### Implementing the action listener {#action-listener}
 
-The message we send to the user will include the button prompting them to complete the step. 
+The message we send to the user will include the button prompting them to complete the step.
 
 To listen for and respond to this button click, you'll see an `.action()` listener to `app.js`, right after the function listener definition:
 
@@ -333,15 +333,15 @@ app.action('sample_button', async ({ body, client, complete, fail }) => {
 
 Similar to a function listener, the action listener registration method (`.action()`) takes two arguments:
 
-* The first argument is the unique callback ID of the action that your app will respond to. 
-* The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells our app that the user has clicked or tapped the button.
+- The first argument is the unique callback ID of the action that your app will respond to.
+- The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells our app that the user has clicked or tapped the button.
 
 Just like the function listener’s callback function, the action listener’s callback function offers various utilities that can be used to take action when an action event is received. The ones we’ll be using here are:
 
-* `client`, which provides access to Slack API methods
-* `action`, which provides the action’s event payload
-* `complete`, which is a utility method indicating to Slack that the step behind the workflow step that was just invoked has completed successfully
-* `fail`, which is a utility method for indicating that the step invoked for the current workflow step had an error
+- `client`, which provides access to Slack API methods
+- `action`, which provides the action’s event payload
+- `complete`, which is a utility method indicating to Slack that the step behind the workflow step that was just invoked has completed successfully
+- `fail`, which is a utility method for indicating that the step invoked for the current workflow step had an error
 
 #### Understanding the action listener's callback logic {#action-listener-callback-logic}
 
