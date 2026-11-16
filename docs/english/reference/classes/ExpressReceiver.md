@@ -38,7 +38,7 @@ app: Application;
 
 Defined in: [src/receivers/ExpressReceiver.ts:148](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L148)
 
----
+***
 
 ### installer
 
@@ -48,7 +48,7 @@ installer: InstallProvider | undefined = undefined;
 
 Defined in: [src/receivers/ExpressReceiver.ts:162](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L162)
 
----
+***
 
 ### installerOptions?
 
@@ -58,7 +58,7 @@ optional installerOptions?: InstallerOptions;
 
 Defined in: [src/receivers/ExpressReceiver.ts:164](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts#L164)
 
----
+***
 
 ### router
 
@@ -92,7 +92,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:359](https://github.com/slackapi/b
 
 [`Receiver`](../interfaces/Receiver.md).[`init`](../interfaces/Receiver.md#init)
 
----
+***
 
 ### requestHandler()
 
@@ -116,7 +116,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:319](https://github.com/slackapi/b
 
 `Promise`\<`void`\>
 
----
+***
 
 ### start()
 
@@ -136,7 +136,7 @@ Defined in: [src/receivers/ExpressReceiver.ts:364](https://github.com/slackapi/b
 
 ##### Returns
 
-`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
+`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
 
 ##### Implementation of
 
@@ -158,16 +158,16 @@ Defined in: [src/receivers/ExpressReceiver.ts:365](https://github.com/slackapi/b
 
 ###### serverOptions?
 
-`ServerOptions`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>
+`ServerOptions`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>
 
 ##### Returns
 
-`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
+`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
 
 ##### Implementation of
 
 ```ts
-Receiver.start;
+Receiver.start
 ```
 
 #### Call Signature
@@ -190,15 +190,15 @@ Defined in: [src/receivers/ExpressReceiver.ts:366](https://github.com/slackapi/b
 
 ##### Returns
 
-`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
+`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
 
 ##### Implementation of
 
 ```ts
-Receiver.start;
+Receiver.start
 ```
 
----
+***
 
 ### stop()
 

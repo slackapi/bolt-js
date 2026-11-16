@@ -19,4 +19,4 @@ Otherwise, the `BasicSlackEvent<T>` type is returned.
 
 ### T
 
-`T` _extends_ `string`
+`T` *extends* `string`

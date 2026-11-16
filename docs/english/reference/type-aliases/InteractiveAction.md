@@ -1,7 +1,9 @@
 # InteractiveAction
 
 ```ts
-type InteractiveAction = ButtonClick | MenuSelect;
+type InteractiveAction = 
+  | ButtonClick
+  | MenuSelect;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:5](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L5)

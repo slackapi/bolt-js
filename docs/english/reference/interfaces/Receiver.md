@@ -22,7 +22,7 @@ Defined in: [src/types/receiver.ts:27](https://github.com/slackapi/bolt-js/blob/
 
 `void`
 
----
+***
 
 ### start()
 
@@ -42,7 +42,7 @@ Defined in: [src/types/receiver.ts:29](https://github.com/slackapi/bolt-js/blob/
 
 `Promise`\<`unknown`\>
 
----
+***
 
 ### stop()
 

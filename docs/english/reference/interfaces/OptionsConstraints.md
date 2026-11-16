@@ -10,7 +10,7 @@ Defined in: [src/types/options/index.ts:18](https://github.com/slackapi/bolt-js/
 
 ### A
 
-`A` _extends_ [`SlackOptions`](../type-aliases/SlackOptions.md) = [`SlackOptions`](../type-aliases/SlackOptions.md)
+`A` *extends* [`SlackOptions`](../type-aliases/SlackOptions.md) = [`SlackOptions`](../type-aliases/SlackOptions.md)
 
 ## Properties
 
@@ -22,7 +22,7 @@ optional action_id?: A extends SlackOptions ? string | RegExp : never;
 
 Defined in: [src/types/options/index.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L21)
 
----
+***
 
 ### block\_id?
 
@@ -32,7 +32,7 @@ optional block_id?: A extends SlackOptions ? string | RegExp : never;
 
 Defined in: [src/types/options/index.ts:20](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L20)
 
----
+***
 
 ### callback\_id?
 
@@ -44,7 +44,7 @@ optional callback_id?: Extract<A, {
 
 Defined in: [src/types/options/index.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L23)
 
----
+***
 
 ### type?
 

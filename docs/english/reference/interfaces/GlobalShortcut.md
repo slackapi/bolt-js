@@ -16,7 +16,7 @@ action_ts: string;
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L24)
 
----
+***
 
 ### callback\_id
 
@@ -26,7 +26,7 @@ callback_id: string;
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:9](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L9)
 
----
+***
 
 ### enterprise?
 
@@ -48,7 +48,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### is\_enterprise\_install?
 
@@ -58,7 +58,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:27](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L27)
 
----
+***
 
 ### team
 
@@ -75,7 +75,7 @@ team:
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:17](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L17)
 
----
+***
 
 ### token
 
@@ -85,7 +85,7 @@ token: string;
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L23)
 
----
+***
 
 ### trigger\_id
 
@@ -95,17 +95,17 @@ trigger_id: string;
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:10](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L10)
 
----
+***
 
 ### type
 
 ```ts
-type: 'shortcut';
+type: "shortcut";
 ```
 
 Defined in: [src/types/shortcuts/global-shortcut.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/global-shortcut.ts#L8)
 
----
+***
 
 ### user
 

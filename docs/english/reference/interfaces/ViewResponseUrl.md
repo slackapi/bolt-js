@@ -12,7 +12,7 @@ action_id: string;
 
 Defined in: [src/types/view/index.ts:36](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L36)
 
----
+***
 
 ### block\_id
 
@@ -22,7 +22,7 @@ block_id: string;
 
 Defined in: [src/types/view/index.ts:35](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L35)
 
----
+***
 
 ### channel\_id
 
@@ -32,7 +32,7 @@ channel_id: string;
 
 Defined in: [src/types/view/index.ts:37](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L37)
 
----
+***
 
 ### response\_url
 

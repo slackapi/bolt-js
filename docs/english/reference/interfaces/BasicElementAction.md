@@ -38,7 +38,7 @@ implement this interface.
 
 ### T
 
-`T` _extends_ `string` = `string`
+`T` *extends* `string` = `string`
 
 ## Properties
 
@@ -50,7 +50,7 @@ action_id: string;
 
 Defined in: [src/types/actions/block-action.ts:42](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L42)
 
----
+***
 
 ### action\_ts
 
@@ -60,7 +60,7 @@ action_ts: string;
 
 Defined in: [src/types/actions/block-action.ts:43](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L43)
 
----
+***
 
 ### block\_id
 
@@ -70,7 +70,7 @@ block_id: string;
 
 Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L41)
 
----
+***
 
 ### type
 

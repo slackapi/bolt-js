@@ -22,7 +22,7 @@ Defined in: [src/types/actions/block-action.ts:42](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_id`](BasicElementAction.md#action_id)
 
----
+***
 
 ### action\_ts
 
@@ -36,7 +36,7 @@ Defined in: [src/types/actions/block-action.ts:43](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_ts`](BasicElementAction.md#action_ts)
 
----
+***
 
 ### block\_id
 
@@ -50,7 +50,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`block_id`](BasicElementAction.md#block_id)
 
----
+***
 
 ### confirm?
 
@@ -60,7 +60,7 @@ optional confirm?: Confirmation;
 
 Defined in: [src/types/actions/block-action.ts:178](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L178)
 
----
+***
 
 ### initial\_options?
 
@@ -70,7 +70,7 @@ optional initial_options?: Option[];
 
 Defined in: [src/types/actions/block-action.ts:175](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L175)
 
----
+***
 
 ### min\_query\_length?
 
@@ -80,7 +80,7 @@ optional min_query_length?: number;
 
 Defined in: [src/types/actions/block-action.ts:177](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L177)
 
----
+***
 
 ### placeholder?
 
@@ -90,7 +90,7 @@ optional placeholder?: PlainTextElement;
 
 Defined in: [src/types/actions/block-action.ts:176](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L176)
 
----
+***
 
 ### selected\_options?
 
@@ -100,12 +100,12 @@ optional selected_options?: Option[];
 
 Defined in: [src/types/actions/block-action.ts:174](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L174)
 
----
+***
 
 ### type
 
 ```ts
-type: 'multi_external_select';
+type: "multi_external_select";
 ```
 
 Defined in: [src/types/actions/block-action.ts:40](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L40)

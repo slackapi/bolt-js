@@ -37,7 +37,7 @@ Defined in: [src/errors.ts:89](https://github.com/slackapi/bolt-js/blob/main/src
 #### Overrides
 
 ```ts
-Error.constructor;
+Error.constructor
 ```
 
 ## Properties
@@ -54,7 +54,7 @@ Defined in: [src/errors.ts:85](https://github.com/slackapi/bolt-js/blob/main/src
 
 [`CodedError`](../interfaces/CodedError.md).[`code`](../interfaces/CodedError.md#code)
 
----
+***
 
 ### original
 

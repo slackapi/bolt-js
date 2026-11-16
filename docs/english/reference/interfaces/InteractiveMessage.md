@@ -14,7 +14,7 @@ This describes the entire JSON-encoded body of a request from Slack's legacy int
 
 ### Action
 
-`Action` _extends_ [`InteractiveAction`](../type-aliases/InteractiveAction.md) = [`InteractiveAction`](../type-aliases/InteractiveAction.md)
+`Action` *extends* [`InteractiveAction`](../type-aliases/InteractiveAction.md) = [`InteractiveAction`](../type-aliases/InteractiveAction.md)
 
 ## Properties
 
@@ -26,7 +26,7 @@ action_ts: string;
 
 Defined in: [src/types/actions/interactive-message.ts:51](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L51)
 
----
+***
 
 ### actions
 
@@ -36,7 +36,7 @@ actions: Action[];
 
 Defined in: [src/types/actions/interactive-message.ts:35](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L35)
 
----
+***
 
 ### attachment\_id?
 
@@ -46,7 +46,7 @@ optional attachment_id?: string;
 
 Defined in: [src/types/actions/interactive-message.ts:52](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L52)
 
----
+***
 
 ### callback\_id
 
@@ -56,7 +56,7 @@ callback_id: string;
 
 Defined in: [src/types/actions/interactive-message.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L34)
 
----
+***
 
 ### channel
 
@@ -78,7 +78,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### enterprise?
 
@@ -100,7 +100,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### is\_app\_unfurl?
 
@@ -110,7 +110,7 @@ optional is_app_unfurl?: boolean;
 
 Defined in: [src/types/actions/interactive-message.ts:56](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L56)
 
----
+***
 
 ### is\_enterprise\_install?
 
@@ -120,7 +120,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/actions/interactive-message.ts:64](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L64)
 
----
+***
 
 ### message\_ts?
 
@@ -130,7 +130,7 @@ optional message_ts?: string;
 
 Defined in: [src/types/actions/interactive-message.ts:59](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L59)
 
----
+***
 
 ### original\_message?
 
@@ -146,7 +146,7 @@ Defined in: [src/types/actions/interactive-message.ts:61](https://github.com/sla
 [key: string]: string
 ```
 
----
+***
 
 ### response\_url
 
@@ -156,7 +156,7 @@ response_url: string;
 
 Defined in: [src/types/actions/interactive-message.ts:54](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L54)
 
----
+***
 
 ### team
 
@@ -173,7 +173,7 @@ team:
 
 Defined in: [src/types/actions/interactive-message.ts:36](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L36)
 
----
+***
 
 ### token
 
@@ -183,7 +183,7 @@ token: string;
 
 Defined in: [src/types/actions/interactive-message.ts:53](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L53)
 
----
+***
 
 ### trigger\_id
 
@@ -193,17 +193,17 @@ trigger_id: string;
 
 Defined in: [src/types/actions/interactive-message.ts:55](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L55)
 
----
+***
 
 ### type
 
 ```ts
-type: 'interactive_message';
+type: "interactive_message";
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:33](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L33)
 
----
+***
 
 ### user
 

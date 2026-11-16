@@ -24,7 +24,7 @@ action_ts: string;
 
 Defined in: [src/types/options/index.ts:87](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L87)
 
----
+***
 
 ### attachment\_id
 
@@ -34,7 +34,7 @@ attachment_id: string;
 
 Defined in: [src/types/options/index.ts:89](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L89)
 
----
+***
 
 ### callback\_id
 
@@ -44,7 +44,7 @@ callback_id: string;
 
 Defined in: [src/types/options/index.ts:86](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L86)
 
----
+***
 
 ### channel?
 
@@ -66,7 +66,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### enterprise?
 
@@ -88,7 +88,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### is\_enterprise\_install?
 
@@ -98,7 +98,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/options/index.ts:108](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L108)
 
----
+***
 
 ### message\_ts
 
@@ -108,7 +108,7 @@ message_ts: string;
 
 Defined in: [src/types/options/index.ts:88](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L88)
 
----
+***
 
 ### name
 
@@ -118,7 +118,7 @@ name: string;
 
 Defined in: [src/types/options/index.ts:84](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L84)
 
----
+***
 
 ### team
 
@@ -135,7 +135,7 @@ team:
 
 Defined in: [src/types/options/index.ts:91](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L91)
 
----
+***
 
 ### token
 
@@ -145,17 +145,17 @@ token: string;
 
 Defined in: [src/types/options/index.ts:106](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L106)
 
----
+***
 
 ### type
 
 ```ts
-type: 'interactive_message';
+type: "interactive_message";
 ```
 
 Defined in: [src/types/options/index.ts:83](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L83)
 
----
+***
 
 ### user
 
@@ -183,7 +183,7 @@ name: string;
 optional team_id?: string;
 ```
 
----
+***
 
 ### value
 

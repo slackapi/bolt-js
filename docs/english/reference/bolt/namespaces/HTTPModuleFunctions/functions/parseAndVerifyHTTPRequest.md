@@ -1,7 +1,11 @@
 # parseAndVerifyHTTPRequest()
 
 ```ts
-function parseAndVerifyHTTPRequest(options, req, _res?): Promise<BufferedIncomingMessage>;
+function parseAndVerifyHTTPRequest(
+   options, 
+   req, 
+   _res?
+): Promise<BufferedIncomingMessage>;
 ```
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:65](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L65)

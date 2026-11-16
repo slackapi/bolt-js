@@ -31,10 +31,10 @@ An object containing custom properties
 #### Default
 
 ```ts
-noop;
+noop
 ```
 
----
+***
 
 ### invalidRequestSignatureHandler?
 
@@ -54,7 +54,7 @@ Defined in: [src/receivers/AwsLambdaReceiver.ts:121](https://github.com/slackapi
 
 `void`
 
----
+***
 
 ### logger?
 
@@ -69,10 +69,10 @@ The Logger for the receiver
 #### Default
 
 ```ts
-ConsoleLogger;
+ConsoleLogger
 ```
 
----
+***
 
 ### logLevel?
 
@@ -87,10 +87,10 @@ The LogLevel to be used for the logger.
 #### Default
 
 ```ts
-LogLevel.INFO;
+LogLevel.INFO
 ```
 
----
+***
 
 ### signatureVerification?
 
@@ -105,10 +105,10 @@ Flag that determines whether Bolt should [Slack's signature on incoming requests
 #### Default
 
 ```ts
-true;
+true
 ```
 
----
+***
 
 ### signingSecret
 
@@ -128,7 +128,7 @@ using this secret will not be performed.
 
 [https://api.slack.com/authentication/verifying-requests-from-slack#about](https://api.slack.com/authentication/verifying-requests-from-slack#about) for details about signing secrets
 
----
+***
 
 ### unhandledRequestTimeoutMillis?
 

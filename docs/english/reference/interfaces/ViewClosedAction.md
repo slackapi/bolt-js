@@ -16,7 +16,7 @@ api_app_id: string;
 
 Defined in: [src/types/view/index.ts:92](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L92)
 
----
+***
 
 ### enterprise?
 
@@ -38,7 +38,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### is\_cleared
 
@@ -48,7 +48,7 @@ is_cleared: boolean;
 
 Defined in: [src/types/view/index.ts:94](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L94)
 
----
+***
 
 ### is\_enterprise\_install?
 
@@ -58,7 +58,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/view/index.ts:96](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L96)
 
----
+***
 
 ### team
 
@@ -75,7 +75,7 @@ team:
 
 Defined in: [src/types/view/index.ts:80](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L80)
 
----
+***
 
 ### token
 
@@ -85,17 +85,17 @@ token: string;
 
 Defined in: [src/types/view/index.ts:93](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L93)
 
----
+***
 
 ### type
 
 ```ts
-type: 'view_closed';
+type: "view_closed";
 ```
 
 Defined in: [src/types/view/index.ts:79](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L79)
 
----
+***
 
 ### user
 
@@ -123,7 +123,7 @@ name: string;
 optional team_id?: string;
 ```
 
----
+***
 
 ### view
 

@@ -50,7 +50,7 @@ Defined in: [src/receivers/HTTPResponseAck.ts:119](https://github.com/slackapi/b
 
 `void`
 
----
+***
 
 ### bind()
 

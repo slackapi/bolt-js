@@ -5,12 +5,9 @@ sidebar_label: "KnownEventFromType"
 # KnownEventFromType\<T\>
 
 ```ts
-type KnownEventFromType<T> = Extract<
-  SlackEvent,
-  {
-    type: T;
-  }
->;
+type KnownEventFromType<T> = Extract<SlackEvent, {
+  type: T;
+}>;
 ```
 
 Defined in: [src/types/events/index.ts:110](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L110)
@@ -19,4 +16,4 @@ Defined in: [src/types/events/index.ts:110](https://github.com/slackapi/bolt-js/
 
 ### T
 
-`T` _extends_ `string`
+`T` *extends* `string`

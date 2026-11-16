@@ -38,7 +38,7 @@ client: SocketModeClient;
 
 Defined in: [src/receivers/SocketModeReceiver.ts:85](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeReceiver.ts#L85)
 
----
+***
 
 ### installer
 
@@ -72,7 +72,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:268](https://github.com/slackap
 
 [`Receiver`](../interfaces/Receiver.md).[`init`](../interfaces/Receiver.md#init)
 
----
+***
 
 ### start()
 
@@ -90,7 +90,7 @@ Defined in: [src/receivers/SocketModeReceiver.ts:272](https://github.com/slackap
 
 [`Receiver`](../interfaces/Receiver.md).[`start`](../interfaces/Receiver.md#start)
 
----
+***
 
 ### stop()
 

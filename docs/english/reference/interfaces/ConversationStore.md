@@ -34,7 +34,7 @@ Defined in: [src/conversation-store.ts:11](https://github.com/slackapi/bolt-js/b
 
 `Promise`\<`ConversationState`\>
 
----
+***
 
 ### set()
 

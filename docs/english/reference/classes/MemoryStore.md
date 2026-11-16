@@ -57,7 +57,7 @@ Defined in: [src/conversation-store.ts:31](https://github.com/slackapi/bolt-js/b
 
 [`ConversationStore`](../interfaces/ConversationStore.md).[`get`](../interfaces/ConversationStore.md#get)
 
----
+***
 
 ### set()
 

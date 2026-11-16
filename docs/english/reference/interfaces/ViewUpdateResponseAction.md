@@ -7,12 +7,12 @@ Defined in: [src/types/view/index.ts:288](https://github.com/slackapi/bolt-js/bl
 ### response\_action
 
 ```ts
-response_action: 'update';
+response_action: "update";
 ```
 
 Defined in: [src/types/view/index.ts:289](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L289)
 
----
+***
 
 ### view
 

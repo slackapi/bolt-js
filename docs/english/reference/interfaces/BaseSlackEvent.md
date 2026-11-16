@@ -10,7 +10,7 @@ Defined in: [src/types/events/index.ts:68](https://github.com/slackapi/bolt-js/b
 
 ### T
 
-`T` _extends_ `string` = `string`
+`T` *extends* `string` = `string`
 
 ## Properties
 

@@ -14,7 +14,7 @@ This describes the entire JSON-encoded body of a request from Slack's Block Kit 
 
 ### ElementAction
 
-`ElementAction` _extends_ [`BasicElementAction`](BasicElementAction.md) = [`BlockElementAction`](../type-aliases/BlockElementAction.md)
+`ElementAction` *extends* [`BasicElementAction`](BasicElementAction.md) = [`BlockElementAction`](../type-aliases/BlockElementAction.md)
 
 ## Properties
 
@@ -26,7 +26,7 @@ actions: ElementAction[];
 
 Defined in: [src/types/actions/block-action.ts:251](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L251)
 
----
+***
 
 ### api\_app\_id
 
@@ -36,7 +36,7 @@ api_app_id: string;
 
 Defined in: [src/types/actions/block-action.ts:291](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L291)
 
----
+***
 
 ### app\_unfurl?
 
@@ -46,7 +46,7 @@ optional app_unfurl?: any;
 
 Defined in: [src/types/actions/block-action.ts:297](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L297)
 
----
+***
 
 ### bot\_access\_token?
 
@@ -62,7 +62,7 @@ An expiring token generated for the context of a workflow step.
 
 [https://docs.slack.dev/authentication/tokens/#wfb](https://docs.slack.dev/authentication/tokens/#wfb)
 
----
+***
 
 ### channel?
 
@@ -84,7 +84,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### container
 
@@ -94,7 +94,7 @@ container: StringIndexed;
 
 Defined in: [src/types/actions/block-action.ts:294](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L294)
 
----
+***
 
 ### enterprise?
 
@@ -116,7 +116,7 @@ id: string;
 name: string;
 ```
 
----
+***
 
 ### function\_data?
 
@@ -138,8 +138,8 @@ A unique ID for the step being executed.
 
 ##### See
 
-- [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
-- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+ - [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
+ - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
 
 #### function
 
@@ -151,8 +151,8 @@ Details about the step.
 
 ##### See
 
-- [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
-- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+ - [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
+ - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
 
 ##### function.callback\_id
 
@@ -164,8 +164,8 @@ The unique callback ID of the step.
 
 ###### See
 
-- [https://docs.slack.dev/workflows/workflow-steps/#create](https://docs.slack.dev/workflows/workflow-steps/#create)
-- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+ - [https://docs.slack.dev/workflows/workflow-steps/#create](https://docs.slack.dev/workflows/workflow-steps/#create)
+ - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
 
 #### inputs
 
@@ -177,16 +177,16 @@ Values of input parameters for the executed step.
 
 ##### See
 
-- [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
-- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
-- [https://docs.slack.dev/tools/bolt-js/tutorials/custom-steps/#inputs-outputs](https://docs.slack.dev/tools/bolt-js/tutorials/custom-steps/#inputs-outputs)
+ - [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
+ - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+ - [https://docs.slack.dev/tools/bolt-js/tutorials/custom-steps/#inputs-outputs](https://docs.slack.dev/tools/bolt-js/tutorials/custom-steps/#inputs-outputs)
 
 #### See
 
-- [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
-- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+ - [https://docs.slack.dev/workflows/workflow-steps/](https://docs.slack.dev/workflows/workflow-steps/)
+ - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
 
----
+***
 
 ### is\_enterprise\_install?
 
@@ -196,7 +196,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/actions/block-action.ts:300](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L300)
 
----
+***
 
 ### message?
 
@@ -227,7 +227,7 @@ ts: string;
 #### type
 
 ```ts
-type: 'message';
+type: "message";
 ```
 
 #### user?
@@ -236,7 +236,7 @@ type: 'message';
 optional user?: string;
 ```
 
----
+***
 
 ### response\_url
 
@@ -246,7 +246,7 @@ response_url: string;
 
 Defined in: [src/types/actions/block-action.ts:289](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L289)
 
----
+***
 
 ### state?
 
@@ -268,7 +268,7 @@ values: object;
 [blockId: string]: object
 ```
 
----
+***
 
 ### team
 
@@ -285,7 +285,7 @@ team:
 
 Defined in: [src/types/actions/block-action.ts:252](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L252)
 
----
+***
 
 ### token
 
@@ -295,7 +295,7 @@ token: string;
 
 Defined in: [src/types/actions/block-action.ts:288](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L288)
 
----
+***
 
 ### trigger\_id
 
@@ -305,17 +305,17 @@ trigger_id: string;
 
 Defined in: [src/types/actions/block-action.ts:290](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L290)
 
----
+***
 
 ### type
 
 ```ts
-type: 'block_actions';
+type: "block_actions";
 ```
 
 Defined in: [src/types/actions/block-action.ts:250](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L250)
 
----
+***
 
 ### user
 
@@ -351,7 +351,7 @@ optional team_id?: string;
 username: string;
 ```
 
----
+***
 
 ### view?
 

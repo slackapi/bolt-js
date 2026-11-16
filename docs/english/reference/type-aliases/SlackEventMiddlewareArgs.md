@@ -5,25 +5,15 @@ sidebar_label: "SlackEventMiddlewareArgs"
 # SlackEventMiddlewareArgs\<EventType\>
 
 ```ts
-type SlackEventMiddlewareArgs<EventType> = object & EventType extends 'message'
-  ? object
-  : unknown & EventFromType<EventType> extends
-        | {
-            channel: string;
-          }
-        | {
-            item: {
-              channel: string;
-            };
-          }
-    ? object
-    : unknown & EventFromType<EventType> extends EventWithChannelContext
-      ? EventFromType<EventType> extends EventWithThreadTsContext | EventWithTsContext
-        ? object
-        : unknown
-      : unknown & EventType extends 'function_executed'
-        ? object
-        : object;
+type SlackEventMiddlewareArgs<EventType> = object & EventType extends "message" ? object : unknown & EventFromType<EventType> extends 
+  | {
+  channel: string;
+}
+  | {
+  item: {
+     channel: string;
+  };
+} ? object : unknown & EventFromType<EventType> extends EventWithChannelContext ? EventFromType<EventType> extends EventWithThreadTsContext | EventWithTsContext ? object : unknown : unknown & EventType extends "function_executed" ? object : object;
 ```
 
 Defined in: [src/types/events/index.ts:39](https://github.com/slackapi/bolt-js/blob/main/src/types/events/index.ts#L39)
@@ -54,4 +44,4 @@ payload: EventFromType<EventType>;
 
 ### EventType
 
-`EventType` _extends_ `string` = `string`
+`EventType` *extends* `string` = `string`

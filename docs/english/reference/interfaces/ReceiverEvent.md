@@ -12,7 +12,7 @@ ack: AckFn<any>;
 
 Defined in: [src/types/receiver.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L23)
 
----
+***
 
 ### body
 
@@ -22,7 +22,7 @@ body: StringIndexed;
 
 Defined in: [src/types/receiver.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L7)
 
----
+***
 
 ### customProperties?
 
@@ -32,7 +32,7 @@ optional customProperties?: StringIndexed;
 
 Defined in: [src/types/receiver.ts:18](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L18)
 
----
+***
 
 ### retryNum?
 
@@ -42,7 +42,7 @@ optional retryNum?: number;
 
 Defined in: [src/types/receiver.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L11)
 
----
+***
 
 ### retryReason?
 

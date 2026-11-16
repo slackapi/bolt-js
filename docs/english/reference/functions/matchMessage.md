@@ -1,7 +1,7 @@
 # matchMessage()
 
 ```ts
-function matchMessage(pattern): Middleware<SlackEventMiddlewareArgs<'message' | 'app_mention'>>;
+function matchMessage(pattern): Middleware<SlackEventMiddlewareArgs<"message" | "app_mention">>;
 ```
 
 Defined in: [src/middleware/builtin.ts:230](https://github.com/slackapi/bolt-js/blob/main/src/middleware/builtin.ts#L230)

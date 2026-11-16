@@ -20,7 +20,7 @@ optional botId?: string;
 
 Defined in: [src/App.ts:182](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L182)
 
----
+***
 
 ### botToken?
 
@@ -30,7 +30,7 @@ optional botToken?: string;
 
 Defined in: [src/App.ts:180](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L180)
 
----
+***
 
 ### botUserId?
 
@@ -40,7 +40,7 @@ optional botUserId?: string;
 
 Defined in: [src/App.ts:183](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L183)
 
----
+***
 
 ### enterpriseId?
 
@@ -50,7 +50,7 @@ optional enterpriseId?: string;
 
 Defined in: [src/App.ts:186](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L186)
 
----
+***
 
 ### teamId?
 
@@ -60,7 +60,7 @@ optional teamId?: string;
 
 Defined in: [src/App.ts:185](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L185)
 
----
+***
 
 ### userId?
 
@@ -70,7 +70,7 @@ optional userId?: string;
 
 Defined in: [src/App.ts:184](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L184)
 
----
+***
 
 ### userToken?
 

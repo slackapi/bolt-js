@@ -12,7 +12,7 @@ text: PlainTextElement;
 
 Defined in: [src/types/view/index.ts:104](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L104)
 
----
+***
 
 ### value
 

@@ -29,7 +29,7 @@ This app's bot ID in the installed workspace.
 This is required for `ignoreSelf` global middleware.
 see also: https://github.com/slackapi/bolt-js/issues/874
 
----
+***
 
 ### botToken?
 
@@ -42,7 +42,7 @@ Defined in: [src/types/middleware.ts:42](https://github.com/slackapi/bolt-js/blo
 A bot token, which starts with `xoxb-`.
 This value can be used by `say` (preferred over userToken),
 
----
+***
 
 ### botUserId?
 
@@ -55,7 +55,7 @@ Defined in: [src/types/middleware.ts:58](https://github.com/slackapi/bolt-js/blo
 This app's bot user ID in the installed workspace.
 This value is optional but allows `ignoreSelf` global middleware be more filter more than just message events.
 
----
+***
 
 ### enterpriseId?
 
@@ -67,7 +67,7 @@ Defined in: [src/types/middleware.ts:70](https://github.com/slackapi/bolt-js/blo
 
 Enterprise Grid Organization ID.
 
----
+***
 
 ### functionBotAccessToken?
 
@@ -81,7 +81,7 @@ A JIT and function-specific token that, when used to make API calls,
 creates an association between a function's execution and subsequent actions
 (e.g., buttons and other interactivity)
 
----
+***
 
 ### functionExecutionId?
 
@@ -93,7 +93,7 @@ Defined in: [src/types/middleware.ts:86](https://github.com/slackapi/bolt-js/blo
 
 Function execution ID associated with the event
 
----
+***
 
 ### functionInputs?
 
@@ -105,7 +105,7 @@ Defined in: [src/types/middleware.ts:91](https://github.com/slackapi/bolt-js/blo
 
 Inputs that were provided to a function when it was executed
 
----
+***
 
 ### isEnterpriseInstall
 
@@ -117,7 +117,7 @@ Defined in: [src/types/middleware.ts:74](https://github.com/slackapi/bolt-js/blo
 
 Is the app installed at an Enterprise level?
 
----
+***
 
 ### retryNum?
 
@@ -129,7 +129,7 @@ Defined in: [src/types/middleware.ts:96](https://github.com/slackapi/bolt-js/blo
 
 Retry count of an Events API request (this property does not exist for other requests)
 
----
+***
 
 ### retryReason?
 
@@ -141,7 +141,7 @@ Defined in: [src/types/middleware.ts:100](https://github.com/slackapi/bolt-js/bl
 
 Retry reason of an Events API request (this property does not exist for other requests)
 
----
+***
 
 ### teamId?
 
@@ -153,7 +153,7 @@ Defined in: [src/types/middleware.ts:66](https://github.com/slackapi/bolt-js/blo
 
 Workspace ID.
 
----
+***
 
 ### userId?
 
@@ -165,7 +165,7 @@ Defined in: [src/types/middleware.ts:62](https://github.com/slackapi/bolt-js/blo
 
 User ID.
 
----
+***
 
 ### userToken?
 

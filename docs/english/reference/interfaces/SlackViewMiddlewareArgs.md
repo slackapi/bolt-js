@@ -12,7 +12,7 @@ Arguments which listeners and middleware receive to process a view submission ev
 
 ### ViewActionType
 
-`ViewActionType` _extends_ [`SlackViewAction`](../type-aliases/SlackViewAction.md) = [`SlackViewAction`](../type-aliases/SlackViewAction.md)
+`ViewActionType` *extends* [`SlackViewAction`](../type-aliases/SlackViewAction.md) = [`SlackViewAction`](../type-aliases/SlackViewAction.md)
 
 ## Properties
 
@@ -24,7 +24,7 @@ ack: ViewAckFn<ViewActionType>;
 
 Defined in: [src/types/view/index.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L23)
 
----
+***
 
 ### body
 
@@ -34,7 +34,7 @@ body: ViewActionType;
 
 Defined in: [src/types/view/index.ts:22](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L22)
 
----
+***
 
 ### payload
 
@@ -44,7 +44,7 @@ payload: ViewOutput;
 
 Defined in: [src/types/view/index.ts:20](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L20)
 
----
+***
 
 ### respond
 
@@ -54,7 +54,7 @@ respond: RespondFn;
 
 Defined in: [src/types/view/index.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L24)
 
----
+***
 
 ### view
 
