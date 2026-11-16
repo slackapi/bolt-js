@@ -12,7 +12,7 @@ error: CodedError | Error;
 
 Defined in: [src/receivers/SocketModeFunctions.ts:25](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeFunctions.ts#L25)
 
-***
+---
 
 ### event
 
@@ -22,7 +22,7 @@ event: ReceiverEvent;
 
 Defined in: [src/receivers/SocketModeFunctions.ts:27](https://github.com/slackapi/bolt-js/blob/main/src/receivers/SocketModeFunctions.ts#L27)
 
-***
+---
 
 ### logger
 

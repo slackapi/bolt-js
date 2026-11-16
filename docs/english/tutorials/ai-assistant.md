@@ -6,8 +6,8 @@ In this tutorial, you will create an app, enable the features to take advantage 
 
 Before getting started, you will need the following:
 
-* a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* an [OpenAI](https://auth.openai.com/log-in) account with sufficient credits, and in which you can generate an API key.
+- a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
+- an [OpenAI](https://auth.openai.com/log-in) account with sufficient credits, and in which you can generate an API key.
 
 **Skip to the code**
 
@@ -90,9 +90,9 @@ Creating this app from the manifest of a sample app added several features you c
 
 ### Import relevant modules {#import-modules}
 
-This app's code is split into a few different files. The main ones we'll look at here are the `app.js` file, the `ai/index.js` file, and the `listeners/assistant/index.js` file. 
+This app's code is split into a few different files. The main ones we'll look at here are the `app.js` file, the `ai/index.js` file, and the `listeners/assistant/index.js` file.
 
-The app is initialized in the `app.js` file, and we import a few relevant modules to be able to use the Bolt classes. 
+The app is initialized in the `app.js` file, and we import a few relevant modules to be able to use the Bolt classes.
 
 ```js
 import 'dotenv/config';
@@ -148,7 +148,6 @@ When a prompt has Slack's special syntax like <@USER_ID> or <#CHANNEL_ID>, you m
 Next, we initialize the `openai` client with the `OPENAI_API_KEY` token we previously saved as an environment variable in the `.env` file.
 
 ```js
-
 // OpenAI LLM client
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -357,9 +356,9 @@ After getting the channel history, it's time to construct the prompt to send to 
 
 The `role` represents the perspective from which you'd like model to respond to the provided input and influences how the model might interpret the input. The three possible role values are `system`, `assistant`, and `user`.
 
-* The `system` role provides high-level instructions; it sets the scene.
-* The `assistant` role denotes the model's response. We'll see this further down in the code when we provided a thread history to the model for context.
-* The `user` role is the user talking to the assistant or other users.
+- The `system` role provides high-level instructions; it sets the scene.
+- The `assistant` role denotes the model's response. We'll see this further down in the code when we provided a thread history to the model for context.
+- The `user` role is the user talking to the assistant or other users.
 
 Refer back to the top of the `ai/index.js` file to where we defined the `DEFAULT_SYSTEM_CONTENT` variable, and notice how that message now makes sense to provide the model alongside the `system` role for setting the scene of the model's response.
 
@@ -405,24 +404,24 @@ In this scenario, we've provided the channel history within the user message. Le
 In the code that follows, we provide the thread history to the LLM for interpreting, rather than the channel history. This is for simplification in the sample, but you could combine the two concepts in your own app.
 
 ```js
-      /**
-       * Scenario 2: Format and pass user messages directly to the LLM
-      */
+/**
+ * Scenario 2: Format and pass user messages directly to the LLM
+ */
 
-      // Retrieve the Assistant thread history for context of question being asked
-      const thread = await client.conversations.replies({
-        channel,
-        ts: thread_ts,
-        oldest: thread_ts,
-      });
+// Retrieve the Assistant thread history for context of question being asked
+const thread = await client.conversations.replies({
+  channel,
+  ts: thread_ts,
+  oldest: thread_ts,
+});
 
-      // Prepare and tag each message for LLM processing
-      const threadHistory = thread.messages.map((m) => {
-        const role = m.bot_id ? 'Assistant' : 'User';
-        return `${role}: ${m.text || ''}`;
-      });
-      // parsed threadHistory to align with openai.responses api input format
-      const parsedThreadHistory = threadHistory.join('\n');
+// Prepare and tag each message for LLM processing
+const threadHistory = thread.messages.map((m) => {
+  const role = m.bot_id ? 'Assistant' : 'User';
+  return `${role}: ${m.text || ''}`;
+});
+// parsed threadHistory to align with openai.responses api input format
+const parsedThreadHistory = threadHistory.join('\n');
 ```
 
 After getting the thread replies, we map them to the appropriate object structure to send to OpenAI, providing the `role` and `content` from each conversation reply. Notice how we check for the presence of a `bot_id` to determine which `role` to set. This constructs the message history for the LLM to interpret and use as context when providing a response.

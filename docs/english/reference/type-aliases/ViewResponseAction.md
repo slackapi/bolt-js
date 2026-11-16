@@ -1,7 +1,7 @@
 # ViewResponseAction
 
 ```ts
-type ViewResponseAction = 
+type ViewResponseAction =
   | ViewUpdateResponseAction
   | ViewPushResponseAction
   | ViewClearResponseAction

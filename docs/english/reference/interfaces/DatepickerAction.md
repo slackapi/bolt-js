@@ -22,7 +22,7 @@ Defined in: [src/types/actions/block-action.ts:42](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_id`](BasicElementAction.md#action_id)
 
-***
+---
 
 ### action\_ts
 
@@ -36,7 +36,7 @@ Defined in: [src/types/actions/block-action.ts:43](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_ts`](BasicElementAction.md#action_ts)
 
-***
+---
 
 ### block\_id
 
@@ -50,7 +50,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`block_id`](BasicElementAction.md#block_id)
 
-***
+---
 
 ### confirm?
 
@@ -60,7 +60,7 @@ optional confirm?: Confirmation;
 
 Defined in: [src/types/actions/block-action.ts:199](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L199)
 
-***
+---
 
 ### initial\_date?
 
@@ -70,7 +70,7 @@ optional initial_date?: string;
 
 Defined in: [src/types/actions/block-action.ts:197](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L197)
 
-***
+---
 
 ### placeholder?
 
@@ -80,7 +80,7 @@ optional placeholder?: PlainTextElement;
 
 Defined in: [src/types/actions/block-action.ts:198](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L198)
 
-***
+---
 
 ### selected\_date
 
@@ -90,12 +90,12 @@ selected_date: string | null;
 
 Defined in: [src/types/actions/block-action.ts:196](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L196)
 
-***
+---
 
 ### type
 
 ```ts
-type: "datepicker";
+type: 'datepicker';
 ```
 
 Defined in: [src/types/actions/block-action.ts:40](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L40)

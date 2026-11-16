@@ -10,7 +10,7 @@ In this tutorial, we’ll create a workflow that fetches data from a third-party
 
 All apps built for Slack have an [app manifest](/app-manifests). This is the configuration for the app, such as the name, settings, and required permissions. The app manifest also describes any functions (custom steps) your app will make available to your Slack workspace. We'll create an app from the manifest shown below.
 
-First, log in to your Slack workspace or [join the Developer Program](https://api.slack.com/developer-program/join) to get a free enterprise sandbox. [Create a new app](https://api.slack.com/apps/new), then, choose **From a manifest**. Follow the prompts, copying and pasting the manifest contents below in the JSON tab, replacing the placeholder text that is there. 
+First, log in to your Slack workspace or [join the Developer Program](https://api.slack.com/developer-program/join) to get a free enterprise sandbox. [Create a new app](https://api.slack.com/apps/new), then, choose **From a manifest**. Follow the prompts, copying and pasting the manifest contents below in the JSON tab, replacing the placeholder text that is there.
 
 ```json
 {
@@ -30,23 +30,13 @@ First, log in to your Slack workspace or [join the Developer Program](https://ap
   },
   "oauth_config": {
     "scopes": {
-      "bot": [
-        "chat:write",
-        "app_mentions:read",
-        "workflow.steps:execute"
-      ]
+      "bot": ["chat:write", "app_mentions:read", "workflow.steps:execute"]
     }
   },
   "settings": {
     "event_subscriptions": {
-      "user_events": [
-        "message.app_home"
-      ],
-      "bot_events": [
-        "app_mention",
-        "workflow_step_execute",
-        "function_executed"
-      ]
+      "user_events": ["message.app_home"],
+      "bot_events": ["app_mention", "workflow_step_execute", "function_executed"]
     },
     "interactivity": {
       "is_enabled": true
@@ -117,7 +107,7 @@ In your terminal window, run the following command to clone the starter template
 git clone https://github.com/slack-samples/bolt-js-starter-template.git .
 ```
 
-Open the project in VS Code or your favorite code editor. Rename the `.env.sample` file to `.env`. Open the file and paste the following, replacing the placeholders with the values you saved earlier. 
+Open the project in VS Code or your favorite code editor. Rename the `.env.sample` file to `.env`. Open the file and paste the following, replacing the placeholders with the values you saved earlier.
 
 ```txt
 SLACK_BOT_TOKEN={your-bot-token-xoxb-1234}
@@ -129,8 +119,8 @@ SLACK_APP_TOKEN={your-app-token-xapp-1234}
 Replace the contents of the `app.js` with the code shown here.
 
 ```js
-import bolt from "@slack/bolt";
-import "dotenv/config";
+import bolt from '@slack/bolt';
+import 'dotenv/config';
 
 const { App } = bolt;
 
@@ -143,18 +133,18 @@ const app = new App({
 
 // Make an API call to retrieve a random fact
 async function getUselessFact() {
-  const res = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random");
-	  if (!res.ok) {
-	    return null;
-	  }
-	  const data = await res.json();
-	  return data;
+  const res = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random');
+  if (!res.ok) {
+    return null;
+  }
+  const data = await res.json();
+  return data;
 }
 
 // Define the function for Workflow Builder
-app.function("useless_fact_step", async ({ complete, fail, logger }) => {
+app.function('useless_fact_step', async ({ complete, fail, logger }) => {
   try {
-    app.logger.info("Running useless fact step...");
+    app.logger.info('Running useless fact step...');
 
     // Get the fact using the API
     const fact = await getUselessFact();
@@ -168,19 +158,19 @@ app.function("useless_fact_step", async ({ complete, fail, logger }) => {
       });
     } else {
       // Use fail() to send an error to Slack
-      await fail({ error: "There was an error retrieving a random useless fact :cry:" });
+      await fail({ error: 'There was an error retrieving a random useless fact :cry:' });
     }
   } catch (error) {
     // Log the error and send an error message back to Slack
     logger.error(error);
-    await fail({ error: `There was an error 😥 : ${error}` })
-    }
+    await fail({ error: `There was an error 😥 : ${error}` });
+  }
 });
 
 // Start the Bolt App!
 async function main() {
   await app.start();
-  app.logger.info("⚡️ Bolt app is running!");
+  app.logger.info('⚡️ Bolt app is running!');
 }
 
 main();
@@ -212,12 +202,13 @@ Your Bolt app is running, and you can now use it in your Slack workspace!
 
 To create a new workflow, open Workflow Builder in Slack using one of the following methods.
 
-* **Use the message box:** In any channel, type `/workflow` and select **Create a workflow**.
-* **Use the sidebar:** Navigate to the left sidebar in Slack and click **More**, then **Tools**, then **Workflows**. Click **+New** then **Build Workflow** to create a new workflow.
+- **Use the message box:** In any channel, type `/workflow` and select **Create a workflow**.
+- **Use the sidebar:** Navigate to the left sidebar in Slack and click **More**, then **Tools**, then **Workflows**. Click **+New** then **Build Workflow** to create a new workflow.
 
 ### Schedule the workflow
 
-Every workflow starts with a trigger. For this workflow, it may make sense to have it scheduled for each work day at a specific time. 
+Every workflow starts with a trigger. For this workflow, it may make sense to have it scheduled for each work day at a specific time.
+
 1. Under **Start the workflow...**, click **Choose an event**.
 2. From the list of events, click **On a schedule**.
 3. Configure the schedule for your app to run. Under **Starts on**, choose today’s date. Change the time to 15 or 30 minutes from now (you can update the scheduled time and frequency after you verify it is working). Under **Frequency**, choose **Every weekday (Monday to Friday)**. Click **Continue**.
@@ -258,14 +249,14 @@ Wait for the scheduled time and see your new custom Bolt app in action!
 
 ### Make changes to the workflow
 
-If needed, you can always make changes to elements of your workflow, such as the schedule, channel, or message. 
+If needed, you can always make changes to elements of your workflow, such as the schedule, channel, or message.
 
-1. From the left sidebar in Slack, click **More**, then **Tools**, then **Workflows**. 
+1. From the left sidebar in Slack, click **More**, then **Tools**, then **Workflows**.
 2. Find your workflow and click the three vertical dots on the right side.
 3. Click **Edit workflow** and make changes. Don't forget to publish!
 
 ## Deploy your Bolt app
 
-Congratulations! You’ve learned how to create a Bolt app using the [Bolt for JavaScript](/tools/bolt-js) framework and a daily scheduled workflow using [Workflow Builder](/workflows/workflow-builder)! 
+Congratulations! You’ve learned how to create a Bolt app using the [Bolt for JavaScript](/tools/bolt-js) framework and a daily scheduled workflow using [Workflow Builder](/workflows/workflow-builder)!
 
 The Bolt app will continue to work as long as you have it running on your computer. This is acceptable for development and testing purposes, but a better long-term solution is to deploy the application to a production environment. You can follow the guides available for [Deploying to AWS Lambda](/tools/bolt-js/deployments/aws-lambda/) or [Deploying to Heroku](/tools/bolt-js/deployments/heroku) for steps on deploying to those environments. Alternatively, you can deploy to any platform that supports JavaScript serverless functions or Node.js applications.

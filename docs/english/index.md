@@ -10,8 +10,8 @@ These docs have lots of information on Bolt for JavaScript. There's also an in-d
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 
-* [Issue Tracker](http://github.com/slackapi/bolt-js/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for JavaScript. Try searching for an existing issue before creating a new one.
-* [Email](mailto:support@slack.com) our developer support team: `support@slack.com`.
+- [Issue Tracker](http://github.com/slackapi/bolt-js/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for JavaScript. Try searching for an existing issue before creating a new one.
+- [Email](mailto:support@slack.com) our developer support team: `support@slack.com`.
 
 ## Release notes
 

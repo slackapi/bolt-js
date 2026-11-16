@@ -26,7 +26,7 @@ api_app_id: string;
 
 Defined in: [src/types/command/index.ts:32](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L32)
 
-***
+---
 
 ### channel\_id
 
@@ -36,7 +36,7 @@ channel_id: string;
 
 Defined in: [src/types/command/index.ts:30](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L30)
 
-***
+---
 
 ### channel\_name
 
@@ -46,7 +46,7 @@ channel_name: string;
 
 Defined in: [src/types/command/index.ts:31](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L31)
 
-***
+---
 
 ### command
 
@@ -56,7 +56,7 @@ command: string;
 
 Defined in: [src/types/command/index.ts:22](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L22)
 
-***
+---
 
 ### enterprise\_id?
 
@@ -66,7 +66,7 @@ optional enterprise_id?: string;
 
 Defined in: [src/types/command/index.ts:33](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L33)
 
-***
+---
 
 ### enterprise\_name?
 
@@ -76,7 +76,7 @@ optional enterprise_name?: string;
 
 Defined in: [src/types/command/index.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L34)
 
-***
+---
 
 ### is\_enterprise\_install?
 
@@ -86,7 +86,7 @@ optional is_enterprise_install?: string;
 
 Defined in: [src/types/command/index.ts:36](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L36)
 
-***
+---
 
 ### response\_url
 
@@ -96,7 +96,7 @@ response_url: string;
 
 Defined in: [src/types/command/index.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L24)
 
-***
+---
 
 ### team\_domain
 
@@ -106,7 +106,7 @@ team_domain: string;
 
 Defined in: [src/types/command/index.ts:29](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L29)
 
-***
+---
 
 ### team\_id
 
@@ -116,7 +116,7 @@ team_id: string;
 
 Defined in: [src/types/command/index.ts:28](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L28)
 
-***
+---
 
 ### text
 
@@ -126,7 +126,7 @@ text: string;
 
 Defined in: [src/types/command/index.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L23)
 
-***
+---
 
 ### token
 
@@ -136,7 +136,7 @@ token: string;
 
 Defined in: [src/types/command/index.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L21)
 
-***
+---
 
 ### trigger\_id
 
@@ -146,7 +146,7 @@ trigger_id: string;
 
 Defined in: [src/types/command/index.ts:25](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L25)
 
-***
+---
 
 ### user\_id
 
@@ -156,7 +156,7 @@ user_id: string;
 
 Defined in: [src/types/command/index.ts:26](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L26)
 
-***
+---
 
 ### user\_name
 

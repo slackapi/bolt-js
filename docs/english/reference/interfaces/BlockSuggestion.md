@@ -24,7 +24,7 @@ action_id: string;
 
 Defined in: [src/types/options/index.ts:48](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L48)
 
-***
+---
 
 ### api\_app\_id
 
@@ -34,7 +34,7 @@ api_app_id: string;
 
 Defined in: [src/types/options/index.ts:51](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L51)
 
-***
+---
 
 ### block\_id
 
@@ -44,7 +44,7 @@ block_id: string;
 
 Defined in: [src/types/options/index.ts:47](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L47)
 
-***
+---
 
 ### channel?
 
@@ -66,7 +66,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### container
 
@@ -76,7 +76,7 @@ container: StringIndexed;
 
 Defined in: [src/types/options/index.ts:68](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L68)
 
-***
+---
 
 ### enterprise?
 
@@ -98,7 +98,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### is\_enterprise\_install?
 
@@ -108,7 +108,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/options/index.ts:72](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L72)
 
-***
+---
 
 ### team
 
@@ -125,7 +125,7 @@ team:
 
 Defined in: [src/types/options/index.ts:52](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L52)
 
-***
+---
 
 ### token
 
@@ -135,17 +135,17 @@ token: string;
 
 Defined in: [src/types/options/index.ts:67](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L67)
 
-***
+---
 
 ### type
 
 ```ts
-type: "block_suggestion";
+type: 'block_suggestion';
 ```
 
 Defined in: [src/types/options/index.ts:46](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L46)
 
-***
+---
 
 ### user
 
@@ -173,7 +173,7 @@ name: string;
 optional team_id?: string;
 ```
 
-***
+---
 
 ### value
 
@@ -183,7 +183,7 @@ value: string;
 
 Defined in: [src/types/options/index.ts:49](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L49)
 
-***
+---
 
 ### view?
 

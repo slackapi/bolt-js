@@ -1,6 +1,6 @@
 # Migrating to V3
 
-End of life for `@slack/bolt@2.x` was **May 31st, 2021**. Development has been fully stopped for `@slack/bolt@2.x` and all remaining open issues and pull requests have been closed. 
+End of life for `@slack/bolt@2.x` was **May 31st, 2021**. Development has been fully stopped for `@slack/bolt@2.x` and all remaining open issues and pull requests have been closed.
 
 This guide will walk you through the process of updating your app from using `@slack/bolt@2.x` to `@slack/bolt@3.x`. There are a few changes you'll need to make but for most apps, these changes can be applied in 5 - 15 minutes.
 
@@ -70,25 +70,30 @@ Along with this change, we have also dropped support for `orgAuthorize`, and ins
 Before:
 
 ```javascript
-const app = new App({ authorize: authorizeFn, orgAuthorize: orgAuthorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
+const app = new App({
+  authorize: authorizeFn,
+  orgAuthorize: orgAuthorizeFn,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+});
 
-const authorizeFn = async ({ teamId, enterpriseId}) => { 
+const authorizeFn = async ({ teamId, enterpriseId }) => {
   // Use teamId to fetch installation details from database
-}
+};
 
-const orgAuthorizeFn = async ({ teamId, enterpriseId }) => { 
+const orgAuthorizeFn = async ({ teamId, enterpriseId }) => {
   // Use enterpriseId to fetch installation details from database
-}
+};
 ```
 
 After:
+
 ```javascript
 const app = new App({ authorize: authorizeFn, signingSecret: process.env.SLACK_SIGNING_SECRET });
 
-const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall}) => { 
+const authorizeFn = async ({ teamId, enterpriseId, isEnterpriseInstall }) => {
   // if isEnterpriseInstall is true, use enterpriseId to fetch installation details from database
   // else, use teamId to fetch installation details from database
-}
+};
 ```
 
 ## HTTP Receiver as default {#http-receiver-as-default}

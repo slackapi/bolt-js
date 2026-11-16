@@ -16,7 +16,7 @@ Authorization function - seeds the middleware processing and listeners with an a
 
 ### IsEnterpriseInstall
 
-`IsEnterpriseInstall` *extends* `boolean` = `false`
+`IsEnterpriseInstall` _extends_ `boolean` = `false`
 
 ## Parameters
 

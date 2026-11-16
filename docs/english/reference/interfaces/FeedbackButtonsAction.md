@@ -22,7 +22,7 @@ Defined in: [src/types/actions/block-action.ts:42](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_id`](BasicElementAction.md#action_id)
 
-***
+---
 
 ### action\_ts
 
@@ -36,7 +36,7 @@ Defined in: [src/types/actions/block-action.ts:43](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_ts`](BasicElementAction.md#action_ts)
 
-***
+---
 
 ### block\_id
 
@@ -50,7 +50,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`block_id`](BasicElementAction.md#block_id)
 
-***
+---
 
 ### text
 
@@ -60,12 +60,12 @@ text: PlainTextElement;
 
 Defined in: [src/types/actions/block-action.ts:61](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L61)
 
-***
+---
 
 ### type
 
 ```ts
-type: "feedback_buttons";
+type: 'feedback_buttons';
 ```
 
 Defined in: [src/types/actions/block-action.ts:40](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L40)
@@ -74,7 +74,7 @@ Defined in: [src/types/actions/block-action.ts:40](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`type`](BasicElementAction.md#type)
 
-***
+---
 
 ### value
 

@@ -1,7 +1,7 @@
 # RespondArguments
 
 ```ts
-type RespondArguments = DistributiveOmit<ChatPostMessageArguments, "channel" | "text"> & object;
+type RespondArguments = DistributiveOmit<ChatPostMessageArguments, 'channel' | 'text'> & object;
 ```
 
 Defined in: [src/types/utilities.ts:36](https://github.com/slackapi/bolt-js/blob/main/src/types/utilities.ts#L36)

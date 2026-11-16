@@ -16,7 +16,7 @@ api_app_id: string;
 
 Defined in: [src/types/view/index.ts:61](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L61)
 
-***
+---
 
 ### enterprise?
 
@@ -38,7 +38,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### is\_enterprise\_install?
 
@@ -48,7 +48,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/view/index.ts:65](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L65)
 
-***
+---
 
 ### response\_urls?
 
@@ -58,7 +58,7 @@ optional response_urls?: ViewResponseUrl[];
 
 Defined in: [src/types/view/index.ts:70](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L70)
 
-***
+---
 
 ### team
 
@@ -75,7 +75,7 @@ team:
 
 Defined in: [src/types/view/index.ts:49](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L49)
 
-***
+---
 
 ### token
 
@@ -85,7 +85,7 @@ token: string;
 
 Defined in: [src/types/view/index.ts:62](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L62)
 
-***
+---
 
 ### trigger\_id
 
@@ -95,17 +95,17 @@ trigger_id: string;
 
 Defined in: [src/types/view/index.ts:63](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L63)
 
-***
+---
 
 ### type
 
 ```ts
-type: "view_submission";
+type: 'view_submission';
 ```
 
 Defined in: [src/types/view/index.ts:48](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L48)
 
-***
+---
 
 ### user
 
@@ -133,7 +133,7 @@ name: string;
 optional team_id?: string;
 ```
 
-***
+---
 
 ### view
 

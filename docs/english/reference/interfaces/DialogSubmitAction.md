@@ -16,7 +16,7 @@ action_ts: string;
 
 Defined in: [src/types/actions/dialog-action.ts:26](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L26)
 
-***
+---
 
 ### callback\_id
 
@@ -26,7 +26,7 @@ callback_id: string;
 
 Defined in: [src/types/actions/dialog-action.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L8)
 
-***
+---
 
 ### channel
 
@@ -48,7 +48,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### enterprise?
 
@@ -70,7 +70,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### is\_enterprise\_install?
 
@@ -80,7 +80,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/actions/dialog-action.ts:31](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L31)
 
-***
+---
 
 ### response\_url
 
@@ -90,7 +90,7 @@ response_url: string;
 
 Defined in: [src/types/actions/dialog-action.ts:28](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L28)
 
-***
+---
 
 ### state
 
@@ -100,7 +100,7 @@ state: string;
 
 Defined in: [src/types/actions/dialog-action.ts:10](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L10)
 
-***
+---
 
 ### submission
 
@@ -116,7 +116,7 @@ Defined in: [src/types/actions/dialog-action.ts:9](https://github.com/slackapi/b
 [name: string]: string
 ```
 
-***
+---
 
 ### team
 
@@ -133,7 +133,7 @@ team:
 
 Defined in: [src/types/actions/dialog-action.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L11)
 
-***
+---
 
 ### token
 
@@ -143,17 +143,17 @@ token: string;
 
 Defined in: [src/types/actions/dialog-action.ts:27](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L27)
 
-***
+---
 
 ### type
 
 ```ts
-type: "dialog_submission";
+type: 'dialog_submission';
 ```
 
 Defined in: [src/types/actions/dialog-action.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/dialog-action.ts#L7)
 
-***
+---
 
 ### user
 

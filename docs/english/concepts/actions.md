@@ -4,7 +4,7 @@ Your app can listen and respond to user actions like button clicks, and menu sel
 
 ## Listening to actions
 
-Actions can be filtered on an `action_id` of type string or RegExp object. `action_id`s act as unique identifiers for interactive components on the Slack platform. 
+Actions can be filtered on an `action_id` of type string or RegExp object. `action_id`s act as unique identifiers for interactive components on the Slack platform.
 
 You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/tools/bolt-js/concepts/acknowledge).
 
@@ -24,25 +24,23 @@ You can use a constraints object to listen to `callback_id`s, `block_id`s, and `
 
 ```javascript
 // Your listener function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
-app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, client, ack, logger }) => {
-    await ack();
-    try {
-      // Make sure the action isn't from a view (modal or app home)
-      if (body.message) {
-        const result = await client.reactions.add({
-          name: 'white_check_mark',
-          timestamp: body.message.ts,
-          channel: body.channel.id
-        });
+app.action({ action_id: 'select_user', block_id: 'assign_ticket' }, async ({ body, client, ack, logger }) => {
+  await ack();
+  try {
+    // Make sure the action isn't from a view (modal or app home)
+    if (body.message) {
+      const result = await client.reactions.add({
+        name: 'white_check_mark',
+        timestamp: body.message.ts,
+        channel: body.channel.id,
+      });
 
-        logger.info(result);
-      }
+      logger.info(result);
     }
-    catch (error) {
-      logger.error(error);
-    }
-  });
+  } catch (error) {
+    logger.error(error);
+  }
+});
 ```
 
 ## Responding to actions

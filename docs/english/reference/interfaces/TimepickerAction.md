@@ -22,7 +22,7 @@ Defined in: [src/types/actions/block-action.ts:42](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_id`](BasicElementAction.md#action_id)
 
-***
+---
 
 ### action\_ts
 
@@ -36,7 +36,7 @@ Defined in: [src/types/actions/block-action.ts:43](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_ts`](BasicElementAction.md#action_ts)
 
-***
+---
 
 ### block\_id
 
@@ -50,7 +50,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`block_id`](BasicElementAction.md#block_id)
 
-***
+---
 
 ### confirm?
 
@@ -60,7 +60,7 @@ optional confirm?: Confirmation;
 
 Defined in: [src/types/actions/block-action.ts:209](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L209)
 
-***
+---
 
 ### initial\_time?
 
@@ -70,7 +70,7 @@ optional initial_time?: string;
 
 Defined in: [src/types/actions/block-action.ts:207](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L207)
 
-***
+---
 
 ### placeholder?
 
@@ -80,7 +80,7 @@ optional placeholder?: PlainTextElement;
 
 Defined in: [src/types/actions/block-action.ts:208](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L208)
 
-***
+---
 
 ### selected\_time
 
@@ -90,12 +90,12 @@ selected_time: string | null;
 
 Defined in: [src/types/actions/block-action.ts:206](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L206)
 
-***
+---
 
 ### type
 
 ```ts
-type: "timepicker";
+type: 'timepicker';
 ```
 
 Defined in: [src/types/actions/block-action.ts:40](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L40)

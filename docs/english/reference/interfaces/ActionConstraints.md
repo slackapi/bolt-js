@@ -10,7 +10,7 @@ Defined in: [src/types/actions/index.ts:28](https://github.com/slackapi/bolt-js/
 
 ### A
 
-`A` *extends* [`SlackAction`](../type-aliases/SlackAction.md) = [`SlackAction`](../type-aliases/SlackAction.md)
+`A` _extends_ [`SlackAction`](../type-aliases/SlackAction.md) = [`SlackAction`](../type-aliases/SlackAction.md)
 
 ## Properties
 
@@ -22,7 +22,7 @@ optional action_id?: A extends BlockAction<BlockElementAction> ? string | RegExp
 
 Defined in: [src/types/actions/index.ts:31](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L31)
 
-***
+---
 
 ### block\_id?
 
@@ -32,7 +32,7 @@ optional block_id?: A extends BlockAction<BlockElementAction> ? string | RegExp 
 
 Defined in: [src/types/actions/index.ts:30](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L30)
 
-***
+---
 
 ### callback\_id?
 
@@ -44,7 +44,7 @@ optional callback_id?: Extract<A, {
 
 Defined in: [src/types/actions/index.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L34)
 
-***
+---
 
 ### type?
 

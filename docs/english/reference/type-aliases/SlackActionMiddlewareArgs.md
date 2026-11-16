@@ -5,7 +5,8 @@ sidebar_label: "SlackActionMiddlewareArgs"
 # SlackActionMiddlewareArgs\<Action\>
 
 ```ts
-type SlackActionMiddlewareArgs<Action> = object & Action extends Exclude<SlackAction, DialogSubmitAction> ? object : unknown;
+type SlackActionMiddlewareArgs<Action> =
+  object & Action extends Exclude<SlackAction, DialogSubmitAction> ? object : unknown;
 ```
 
 Defined in: [src/types/actions/index.ts:46](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L46)
@@ -71,4 +72,4 @@ respond: RespondFn;
 
 ### Action
 
-`Action` *extends* [`SlackAction`](SlackAction.md) = [`SlackAction`](SlackAction.md)
+`Action` _extends_ [`SlackAction`](SlackAction.md) = [`SlackAction`](SlackAction.md)

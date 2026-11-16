@@ -12,7 +12,7 @@ A Slack App
 
 ### AppCustomContext
 
-`AppCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`AppCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ## Constructors
 
@@ -46,7 +46,7 @@ Defined in: [src/App.ts:235](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 Slack Web API client
 
-***
+---
 
 ### logger
 
@@ -90,11 +90,11 @@ Defined in: [src/App.ts:735](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### Action
 
-`Action` *extends* [`SlackAction`](../type-aliases/SlackAction.md) = [`SlackAction`](../type-aliases/SlackAction.md)
+`Action` _extends_ [`SlackAction`](../type-aliases/SlackAction.md) = [`SlackAction`](../type-aliases/SlackAction.md)
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -122,15 +122,15 @@ Defined in: [src/App.ts:742](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### Action
 
-`Action` *extends* [`SlackAction`](../type-aliases/SlackAction.md) = [`SlackAction`](../type-aliases/SlackAction.md)
+`Action` _extends_ [`SlackAction`](../type-aliases/SlackAction.md) = [`SlackAction`](../type-aliases/SlackAction.md)
 
 ###### Constraints
 
-`Constraints` *extends* [`ActionConstraints`](../interfaces/ActionConstraints.md)\<`Action`\> = [`ActionConstraints`](../interfaces/ActionConstraints.md)\<`Action`\>
+`Constraints` _extends_ [`ActionConstraints`](../interfaces/ActionConstraints.md)\<`Action`\> = [`ActionConstraints`](../interfaces/ActionConstraints.md)\<`Action`\>
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -141,14 +141,14 @@ Defined in: [src/App.ts:742](https://github.com/slackapi/bolt-js/blob/main/src/A
 ###### listeners
 
 ...[`Middleware`](../type-aliases/Middleware.md)\<[`SlackActionMiddlewareArgs`](../type-aliases/SlackActionMiddlewareArgs.md)\<`Extract`\<`Action`, \{
-  `type`: `Constraints`\[`"type"`\];
+`type`: `Constraints`\[`"type"`\];
 \}\>\>, `AppCustomContext` & `MiddlewareCustomContext`\>[]
 
 ##### Returns
 
 `void`
 
-***
+---
 
 ### assistant()
 
@@ -172,7 +172,7 @@ global assistant middleware function
 
 `this`
 
-***
+---
 
 ### command()
 
@@ -186,7 +186,7 @@ Defined in: [src/App.ts:788](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ##### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 #### Parameters
 
@@ -202,7 +202,7 @@ Defined in: [src/App.ts:788](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 `void`
 
-***
+---
 
 ### error()
 
@@ -242,7 +242,7 @@ Defined in: [src/App.ts:885](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 `void`
 
-***
+---
 
 ### event()
 
@@ -258,11 +258,11 @@ Defined in: [src/App.ts:577](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### EventType
 
-`EventType` *extends* `string` = `string`
+`EventType` _extends_ `string` = `string`
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -290,11 +290,11 @@ Defined in: [src/App.ts:581](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### EventType
 
-`EventType` *extends* `RegExp` = `RegExp`
+`EventType` _extends_ `RegExp` = `RegExp`
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -310,7 +310,7 @@ Defined in: [src/App.ts:581](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 `void`
 
-***
+---
 
 ### function()
 
@@ -354,8 +354,8 @@ Middleware handlers to call.
 
 ##### See
 
- - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
- - [https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options](https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options)
+- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+- [https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options](https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options)
 
 #### Call Signature
 
@@ -387,10 +387,10 @@ Middleware handlers to call.
 
 ##### See
 
- - [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
- - [https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options](https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options)
+- [https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/)
+- [https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options](https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options)
 
-***
+---
 
 ### init()
 
@@ -404,7 +404,7 @@ Defined in: [src/App.ts:458](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 `Promise`\<`void`\>
 
-***
+---
 
 ### message()
 
@@ -420,7 +420,7 @@ Defined in: [src/App.ts:618](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -446,7 +446,7 @@ Defined in: [src/App.ts:627](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -483,7 +483,7 @@ Defined in: [src/App.ts:639](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -523,7 +523,7 @@ Defined in: [src/App.ts:650](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -560,16 +560,16 @@ all remaining patterns and middlewares will be skipped.
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
 ###### patternsOrMiddleware
 
 ...(
-  \| `string`
-  \| `RegExp`
-  \| `MessageEventMiddleware`\<`AppCustomContext` & `MiddlewareCustomContext`\>)[]
+\| `string`
+\| `RegExp`
+\| `MessageEventMiddleware`\<`AppCustomContext` & `MiddlewareCustomContext`\>)[]
 
 A mix of patterns and/or middlewares.
 
@@ -577,7 +577,7 @@ A mix of patterns and/or middlewares.
 
 `void`
 
-***
+---
 
 ### options()
 
@@ -593,11 +593,11 @@ Defined in: [src/App.ts:801](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### Source
 
-`Source` *extends* `"interactive_message"` \| `"block_suggestion"` \| `"dialog_suggestion"` = `"block_suggestion"`
+`Source` _extends_ `"interactive_message"` \| `"block_suggestion"` \| `"dialog_suggestion"` = `"block_suggestion"`
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -625,11 +625,11 @@ Defined in: [src/App.ts:809](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### Source
 
-`Source` *extends* `"interactive_message"` \| `"block_suggestion"` \| `"dialog_suggestion"` = `"interactive_message"` \| `"block_suggestion"` \| `"dialog_suggestion"`
+`Source` _extends_ `"interactive_message"` \| `"block_suggestion"` \| `"dialog_suggestion"` = `"interactive_message"` \| `"block_suggestion"` \| `"dialog_suggestion"`
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -645,7 +645,7 @@ Defined in: [src/App.ts:809](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 `void`
 
-***
+---
 
 ### processEvent()
 
@@ -667,7 +667,7 @@ Handles events from the receiver
 
 `Promise`\<`void`\>
 
-***
+---
 
 ### shortcut()
 
@@ -683,11 +683,11 @@ Defined in: [src/App.ts:682](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### Shortcut
 
-`Shortcut` *extends* [`SlackShortcut`](../type-aliases/SlackShortcut.md) = [`SlackShortcut`](../type-aliases/SlackShortcut.md)
+`Shortcut` _extends_ [`SlackShortcut`](../type-aliases/SlackShortcut.md) = [`SlackShortcut`](../type-aliases/SlackShortcut.md)
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -715,15 +715,15 @@ Defined in: [src/App.ts:689](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### Shortcut
 
-`Shortcut` *extends* [`SlackShortcut`](../type-aliases/SlackShortcut.md) = [`SlackShortcut`](../type-aliases/SlackShortcut.md)
+`Shortcut` _extends_ [`SlackShortcut`](../type-aliases/SlackShortcut.md) = [`SlackShortcut`](../type-aliases/SlackShortcut.md)
 
 ###### Constraints
 
-`Constraints` *extends* [`ShortcutConstraints`](../interfaces/ShortcutConstraints.md)\<`Shortcut`\> = [`ShortcutConstraints`](../interfaces/ShortcutConstraints.md)\<`Shortcut`\>
+`Constraints` _extends_ [`ShortcutConstraints`](../interfaces/ShortcutConstraints.md)\<`Shortcut`\> = [`ShortcutConstraints`](../interfaces/ShortcutConstraints.md)\<`Shortcut`\>
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -734,14 +734,14 @@ Defined in: [src/App.ts:689](https://github.com/slackapi/bolt-js/blob/main/src/A
 ###### listeners
 
 ...[`Middleware`](../type-aliases/Middleware.md)\<[`SlackShortcutMiddlewareArgs`](../type-aliases/SlackShortcutMiddlewareArgs.md)\<`Extract`\<`Shortcut`, \{
-  `type`: `Constraints`\[`"type"`\];
+`type`: `Constraints`\[`"type"`\];
 \}\>\>, `AppCustomContext` & `MiddlewareCustomContext`\>[]
 
 ##### Returns
 
 `void`
 
-***
+---
 
 ### start()
 
@@ -765,9 +765,9 @@ receiver-specific start arguments
 
 #### Returns
 
-`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
+`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
 
-***
+---
 
 ### stop()
 
@@ -787,7 +787,7 @@ Defined in: [src/App.ts:572](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 `Promise`\<`unknown`\>
 
-***
+---
 
 ### use()
 
@@ -803,7 +803,7 @@ Register a new middleware, processed in the order registered.
 
 ##### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 #### Parameters
 
@@ -817,7 +817,7 @@ global middleware function
 
 `this`
 
-***
+---
 
 ### view()
 
@@ -833,11 +833,11 @@ Defined in: [src/App.ts:834](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### ViewActionType
 
-`ViewActionType` *extends* [`SlackViewAction`](../type-aliases/SlackViewAction.md) = [`SlackViewAction`](../type-aliases/SlackViewAction.md)
+`ViewActionType` _extends_ [`SlackViewAction`](../type-aliases/SlackViewAction.md) = [`SlackViewAction`](../type-aliases/SlackViewAction.md)
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 
@@ -865,11 +865,11 @@ Defined in: [src/App.ts:841](https://github.com/slackapi/bolt-js/blob/main/src/A
 
 ###### ViewActionType
 
-`ViewActionType` *extends* [`SlackViewAction`](../type-aliases/SlackViewAction.md) = [`SlackViewAction`](../type-aliases/SlackViewAction.md)
+`ViewActionType` _extends_ [`SlackViewAction`](../type-aliases/SlackViewAction.md) = [`SlackViewAction`](../type-aliases/SlackViewAction.md)
 
 ###### MiddlewareCustomContext
 
-`MiddlewareCustomContext` *extends* [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
+`MiddlewareCustomContext` _extends_ [`StringIndexed`](../type-aliases/StringIndexed.md) = [`StringIndexed`](../type-aliases/StringIndexed.md)
 
 ##### Parameters
 

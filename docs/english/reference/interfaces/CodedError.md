@@ -16,7 +16,7 @@ code: string;
 
 Defined in: [src/errors.ts:5](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L5)
 
-***
+---
 
 ### missingProperty?
 
@@ -26,7 +26,7 @@ optional missingProperty?: string;
 
 Defined in: [src/errors.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L8)
 
-***
+---
 
 ### original?
 
@@ -36,7 +36,7 @@ optional original?: Error;
 
 Defined in: [src/errors.ts:6](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L6)
 
-***
+---
 
 ### originals?
 
@@ -46,7 +46,7 @@ optional originals?: Error[];
 
 Defined in: [src/errors.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L7)
 
-***
+---
 
 ### req?
 
@@ -58,7 +58,7 @@ optional req?:
 
 Defined in: [src/errors.ts:9](https://github.com/slackapi/bolt-js/blob/main/src/errors.ts#L9)
 
-***
+---
 
 ### res?
 

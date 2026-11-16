@@ -1,7 +1,7 @@
 # AnyMiddlewareArgs
 
 ```ts
-type AnyMiddlewareArgs = 
+type AnyMiddlewareArgs =
   | SlackEventMiddlewareArgs
   | SlackActionMiddlewareArgs
   | SlackCommandMiddlewareArgs

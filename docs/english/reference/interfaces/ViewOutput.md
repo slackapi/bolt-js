@@ -12,7 +12,7 @@ app_id: string | null;
 
 Defined in: [src/types/view/index.ts:259](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L259)
 
-***
+---
 
 ### app\_installed\_team\_id?
 
@@ -22,7 +22,7 @@ optional app_installed_team_id?: string;
 
 Defined in: [src/types/view/index.ts:258](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L258)
 
-***
+---
 
 ### app\_unfurl\_url?
 
@@ -32,7 +32,7 @@ optional app_unfurl_url?: string;
 
 Defined in: [src/types/view/index.ts:282](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L282)
 
-***
+---
 
 ### blocks
 
@@ -42,7 +42,7 @@ blocks: (Block | KnownBlock)[];
 
 Defined in: [src/types/view/index.ts:263](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L263)
 
-***
+---
 
 ### bot\_id
 
@@ -52,7 +52,7 @@ bot_id: string;
 
 Defined in: [src/types/view/index.ts:260](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L260)
 
-***
+---
 
 ### callback\_id
 
@@ -62,7 +62,7 @@ callback_id: string;
 
 Defined in: [src/types/view/index.ts:256](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L256)
 
-***
+---
 
 ### channel?
 
@@ -72,7 +72,7 @@ optional channel?: string;
 
 Defined in: [src/types/view/index.ts:285](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L285)
 
-***
+---
 
 ### clear\_on\_close
 
@@ -82,7 +82,7 @@ clear_on_close: boolean;
 
 Defined in: [src/types/view/index.ts:277](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L277)
 
-***
+---
 
 ### close
 
@@ -92,7 +92,7 @@ close: PlainTextElementOutput | null;
 
 Defined in: [src/types/view/index.ts:264](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L264)
 
-***
+---
 
 ### entity\_url?
 
@@ -102,7 +102,7 @@ optional entity_url?: string;
 
 Defined in: [src/types/view/index.ts:280](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L280)
 
-***
+---
 
 ### external\_id?
 
@@ -112,7 +112,7 @@ optional external_id?: string;
 
 Defined in: [src/types/view/index.ts:279](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L279)
 
-***
+---
 
 ### external\_ref?
 
@@ -134,7 +134,7 @@ id: string;
 optional type?: string;
 ```
 
-***
+---
 
 ### hash
 
@@ -144,7 +144,7 @@ hash: string;
 
 Defined in: [src/types/view/index.ts:273](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L273)
 
-***
+---
 
 ### id
 
@@ -154,7 +154,7 @@ id: string;
 
 Defined in: [src/types/view/index.ts:255](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L255)
 
-***
+---
 
 ### message\_ts?
 
@@ -164,7 +164,7 @@ optional message_ts?: string;
 
 Defined in: [src/types/view/index.ts:283](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L283)
 
-***
+---
 
 ### notify\_on\_close
 
@@ -174,7 +174,7 @@ notify_on_close: boolean;
 
 Defined in: [src/types/view/index.ts:278](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L278)
 
-***
+---
 
 ### previous\_view\_id
 
@@ -184,7 +184,7 @@ previous_view_id: string | null;
 
 Defined in: [src/types/view/index.ts:276](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L276)
 
-***
+---
 
 ### private\_metadata
 
@@ -194,7 +194,7 @@ private_metadata: string;
 
 Defined in: [src/types/view/index.ts:274](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L274)
 
-***
+---
 
 ### root\_view\_id
 
@@ -204,7 +204,7 @@ root_view_id: string | null;
 
 Defined in: [src/types/view/index.ts:275](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L275)
 
-***
+---
 
 ### state
 
@@ -226,7 +226,7 @@ values: object;
 [blockId: string]: object
 ```
 
-***
+---
 
 ### submit
 
@@ -236,7 +236,7 @@ submit: PlainTextElementOutput | null;
 
 Defined in: [src/types/view/index.ts:265](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L265)
 
-***
+---
 
 ### team\_id
 
@@ -246,7 +246,7 @@ team_id: string;
 
 Defined in: [src/types/view/index.ts:257](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L257)
 
-***
+---
 
 ### thread\_ts?
 
@@ -256,7 +256,7 @@ optional thread_ts?: string;
 
 Defined in: [src/types/view/index.ts:284](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L284)
 
-***
+---
 
 ### title
 
@@ -266,7 +266,7 @@ title: PlainTextElementOutput;
 
 Defined in: [src/types/view/index.ts:261](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L261)
 
-***
+---
 
 ### type
 

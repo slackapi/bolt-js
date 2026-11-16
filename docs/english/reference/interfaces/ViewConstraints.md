@@ -12,7 +12,7 @@ optional callback_id?: string | RegExp;
 
 Defined in: [src/types/view/index.ts:12](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L12)
 
-***
+---
 
 ### type?
 

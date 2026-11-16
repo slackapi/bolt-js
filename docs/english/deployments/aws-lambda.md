@@ -132,22 +132,21 @@ Then update the [source code that initializes your Bolt app](https://github.com/
 ```javascript
 // Initialize your custom receiver
 const awsLambdaReceiver = new AwsLambdaReceiver({
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // Initializes your app with your bot token and the AWS Lambda ready receiver
 const app = new App({
-    token: process.env.SLACK_BOT_TOKEN,
-    receiver: awsLambdaReceiver,
+  token: process.env.SLACK_BOT_TOKEN,
+  receiver: awsLambdaReceiver,
 
-    // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
-    // If you use other Receivers, such as ExpressReceiver for OAuth flow support
-    // then processBeforeResponse: true is required. This option will defer sending back
-    // the acknowledgement until after your handler has run to ensure your handler
-    // isn't terminated early by responding to the HTTP request that triggered it.
+  // When using the AwsLambdaReceiver, processBeforeResponse can be omitted.
+  // If you use other Receivers, such as ExpressReceiver for OAuth flow support
+  // then processBeforeResponse: true is required. This option will defer sending back
+  // the acknowledgement until after your handler has run to ensure your handler
+  // isn't terminated early by responding to the HTTP request that triggered it.
 
-    // receiver.processBeforeResponse: true
-
+  // receiver.processBeforeResponse: true
 });
 ```
 
@@ -156,9 +155,9 @@ Finally, at the bottom of your app, update the [source code that starts the HTTP
 ```javascript
 // Handle the Lambda function event
 module.exports.handler = async (event, context, callback) => {
-    const handler = await awsLambdaReceiver.start();
-    return handler(event, context, callback);
-}
+  const handler = await awsLambdaReceiver.start();
+  return handler(event, context, callback);
+};
 ```
 
 When you're done, your app should look similar to the ⚡️[Deploying to AWS Lambda app](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js).

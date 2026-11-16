@@ -35,27 +35,26 @@ app.action('button_abc', async ({ ack, body, client, logger }) => {
         callback_id: 'view_1',
         title: {
           type: 'plain_text',
-          text: 'Updated modal'
+          text: 'Updated modal',
         },
         blocks: [
           {
             type: 'section',
             text: {
               type: 'plain_text',
-              text: 'You updated the modal!'
-            }
+              text: 'You updated the modal!',
+            },
           },
           {
             type: 'image',
             image_url: 'https://media.giphy.com/media/SVZGEcYt7brkFUyU90/giphy.gif',
-            alt_text: 'Yay! The modal was updated'
-          }
-        ]
-      }
+            alt_text: 'Yay! The modal was updated',
+          },
+        ],
+      },
     });
     logger.info(result);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

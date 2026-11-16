@@ -4,11 +4,11 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 ## アクションのリスニング
 
-アクションは文字列型の `action_id` または RegExp オブジェクトでフィルタリングできます。 `action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントの一意の識別子として機能します。 
+アクションは文字列型の `action_id` または RegExp オブジェクトでフィルタリングできます。 `action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントの一意の識別子として機能します。
 
 すべての `action()` の例で `ack()` が使用されていることに注目してください。Slack からリクエストを受信したことを確認するために、アクションリスナー内で `ack()` 関数を呼び出す必要があります。これについては、「[リクエストの確認](/tools/bolt-js/concepts/acknowledge)」 セクションで説明しています。
 
-:::info 
+:::info
 
 Bolt 2.x からメッセージショートカット（以前はメッセージアクションと呼ばれていました）は `action()` ではなく `shortcut()` メソッドを使用するようになりました。この変更については [2.x マイグレーションガイド](/tools/bolt-js/migration/migration-v2)を参照してください。
 
@@ -28,27 +28,24 @@ app.action('approve_button', async ({ ack }) => {
 
 制約付きのオブジェクトを使って、 `callback_id` 、 `block_id` 、および `action_id` (またはそれらの組み合わせ) をリッスンすることができます。オブジェクト内の制約には、文字列型または RegExp オブジェクトを使用できます。
 
-
 ```javascript
 // action_id が 'select_user' と一致し、block_id が 'assign_ticket' と一致する場合のみミドルウェアが呼び出される
-app.action({ action_id: 'select_user', block_id: 'assign_ticket' },
-  async ({ body, client, ack, logger }) => {
-    await ack();
-    try {
-      if (body.message) {
-        const result = await client.reactions.add({
-          name: 'white_check_mark',
-          timestamp: body.message.ts,
-          channel: body.channel.id
-        });
+app.action({ action_id: 'select_user', block_id: 'assign_ticket' }, async ({ body, client, ack, logger }) => {
+  await ack();
+  try {
+    if (body.message) {
+      const result = await client.reactions.add({
+        name: 'white_check_mark',
+        timestamp: body.message.ts,
+        channel: body.channel.id,
+      });
 
-        logger.info(result);
-      }
+      logger.info(result);
     }
-    catch (error) {
-      logger.error(error);
-    }
-  });
+  } catch (error) {
+    logger.error(error);
+  }
+});
 ```
 
 ## アクションへの応答

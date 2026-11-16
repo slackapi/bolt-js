@@ -14,7 +14,7 @@ ack: AckFn<string | RespondArguments>;
 
 Defined in: [src/types/command/index.ts:12](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L12)
 
-***
+---
 
 ### body
 
@@ -24,7 +24,7 @@ body: SlashCommand;
 
 Defined in: [src/types/command/index.ts:9](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L9)
 
-***
+---
 
 ### command
 
@@ -34,7 +34,7 @@ command: SlashCommand;
 
 Defined in: [src/types/command/index.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L8)
 
-***
+---
 
 ### payload
 
@@ -44,7 +44,7 @@ payload: SlashCommand;
 
 Defined in: [src/types/command/index.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L7)
 
-***
+---
 
 ### respond
 
@@ -54,7 +54,7 @@ respond: RespondFn;
 
 Defined in: [src/types/command/index.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/command/index.ts#L11)
 
-***
+---
 
 ### say
 

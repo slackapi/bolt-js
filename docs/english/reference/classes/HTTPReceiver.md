@@ -38,7 +38,7 @@ optional installer?: InstallProvider;
 
 Defined in: [src/receivers/HTTPReceiver.ts:148](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPReceiver.ts#L148)
 
-***
+---
 
 ### requestListener
 
@@ -72,7 +72,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:269](https://github.com/slackapi/bolt
 
 [`Receiver`](../interfaces/Receiver.md).[`init`](../interfaces/Receiver.md#init)
 
-***
+---
 
 ### start()
 
@@ -92,7 +92,7 @@ Defined in: [src/receivers/HTTPReceiver.ts:273](https://github.com/slackapi/bolt
 
 ##### Returns
 
-`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
+`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
 
 ##### Implementation of
 
@@ -114,12 +114,12 @@ Defined in: [src/receivers/HTTPReceiver.ts:274](https://github.com/slackapi/bolt
 
 ##### Returns
 
-`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
+`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
 
 ##### Implementation of
 
 ```ts
-Receiver.start
+Receiver.start;
 ```
 
 #### Call Signature
@@ -138,16 +138,16 @@ Defined in: [src/receivers/HTTPReceiver.ts:275](https://github.com/slackapi/bolt
 
 ###### serverOptions?
 
-`ServerOptions`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>
+`ServerOptions`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>
 
 ##### Returns
 
-`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
+`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
 
 ##### Implementation of
 
 ```ts
-Receiver.start
+Receiver.start;
 ```
 
 #### Call Signature
@@ -170,15 +170,15 @@ Defined in: [src/receivers/HTTPReceiver.ts:276](https://github.com/slackapi/bolt
 
 ##### Returns
 
-`Promise`\<`Server`\<*typeof* `IncomingMessage`, *typeof* `ServerResponse`\>\>
+`Promise`\<`Server`\<_typeof_ `IncomingMessage`, _typeof_ `ServerResponse`\>\>
 
 ##### Implementation of
 
 ```ts
-Receiver.start
+Receiver.start;
 ```
 
-***
+---
 
 ### stop()
 

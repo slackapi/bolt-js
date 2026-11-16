@@ -10,7 +10,7 @@ Defined in: [src/types/shortcuts/index.ts:14](https://github.com/slackapi/bolt-j
 
 ### S
 
-`S` *extends* [`SlackShortcut`](../type-aliases/SlackShortcut.md) = [`SlackShortcut`](../type-aliases/SlackShortcut.md)
+`S` _extends_ [`SlackShortcut`](../type-aliases/SlackShortcut.md) = [`SlackShortcut`](../type-aliases/SlackShortcut.md)
 
 ## Properties
 
@@ -22,7 +22,7 @@ optional callback_id?: string | RegExp;
 
 Defined in: [src/types/shortcuts/index.ts:16](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/index.ts#L16)
 
-***
+---
 
 ### type?
 

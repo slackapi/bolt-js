@@ -26,7 +26,7 @@ Defined in: [src/receivers/custom-routes.ts:8](https://github.com/slackapi/bolt-
 
 `void`
 
-***
+---
 
 ### method
 
@@ -36,7 +36,7 @@ method: string | string[];
 
 Defined in: [src/receivers/custom-routes.ts:7](https://github.com/slackapi/bolt-js/blob/main/src/receivers/custom-routes.ts#L7)
 
-***
+---
 
 ### path
 

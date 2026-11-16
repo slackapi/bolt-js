@@ -22,7 +22,7 @@ client: WebClient;
 
 Defined in: [src/types/middleware.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L23)
 
-***
+---
 
 ### context
 
@@ -32,7 +32,7 @@ context: Context & CustomContext;
 
 Defined in: [src/types/middleware.ts:21](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L21)
 
-***
+---
 
 ### logger
 
@@ -42,7 +42,7 @@ logger: Logger;
 
 Defined in: [src/types/middleware.ts:22](https://github.com/slackapi/bolt-js/blob/main/src/types/middleware.ts#L22)
 
-***
+---
 
 ### next
 

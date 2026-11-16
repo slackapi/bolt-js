@@ -11,17 +11,18 @@ sidebar_label: 入門ガイド
 ---
 
 ## アプリを作成する {#create-an-app}
+
 最初にやるべきこと: Bolt で開発を始める前に、 [Slack アプリを作成](https://api.slack.com/apps/new)します。
 
-:::tip 
+:::tip
 
 いつもの仕事のさまたげにならないように、別に開発用のワークスペースを使用することをおすすめします — [新しいワークスペースを無料で作成](https://slack.com/get-started#create)できます。
 
 :::
 
-アプリ名を入力し (後で変更可能)、インストール先のワークスペースを選択したら、`Create App`  ボタンをクリックすると、アプリの  **Basic Information**  ページが表示されます。
+アプリ名を入力し (後で変更可能)、インストール先のワークスペースを選択したら、`Create App` ボタンをクリックすると、アプリの **Basic Information** ページが表示されます。
 
-このページには、後で必要になる重要な認証情報 (**App Credentials**  ヘッダーの下の  `Signing Secret`  など) に加えて、アプリケーションの概要が表示されます。
+このページには、後で必要になる重要な認証情報 (**App Credentials** ヘッダーの下の `Signing Secret` など) に加えて、アプリケーションの概要が表示されます。
 
 ![Basic Information page](/img/bolt-js/basic-information-page.png "Basic Information page")
 
@@ -30,9 +31,11 @@ sidebar_label: 入門ガイド
 ---
 
 ## トークンとアプリのインストール {#tokens-and-installing-apps}
+
 Slack アプリは、[OAuth を使用して、Slack の API へのアクセスを管理](/authentication/installing-with-oauth)します。アプリがインストールされるとトークンが発行されます。そのトークンを使って、アプリは API メソッドを呼び出すことができます。
 
 Slack アプリで使用できるトークンには、ユーザートークン（`xoxp`）とボットトークン（`xoxb`）、アプリレベルトークン（`xapp`）の 3 種類があります。
+
 - [ユーザートークン](/authentication/tokens#user) を使用すると、アプリをインストールまたは認証したユーザーに成り代わって API メソッドを呼び出すことができます。1 つのワークスペースに複数のユーザートークンが存在する可能性があります。
 - [ボットトークン](/authentication/tokens#bot) はボットユーザーに関連づけられ、1 つのワークスペースでは最初に誰かがそのアプリをインストールした際に一度だけ発行されます。どのユーザーがインストールを実行しても、アプリが使用するボットトークンは同じになります。 _ほとんど_ のアプリで使用されるのは、ボットトークンです。
 - [アプリレベルトークン](/authentication/tokens#app-level) は、全ての組織（とその配下のワークスペースでの個々のユーザーによるインストール）を横断して、あなたのアプリを代理するものです。アプリレベルトークンは、アプリの WebSocket コネクションを確立するためによく使われます。
@@ -49,7 +52,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 ![OAuth Tokens](/img/bolt-js/bot-token.png "OAuth Tokens")
 
-:::tip 
+:::tip
 
 トークンは、パスワードのように大切に扱い、[安全に保管](/concepts/security)してください。アプリではそのトークンを使用して、Slack ワークスペースからの情報を投稿および取得します。
 
@@ -58,6 +61,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 ---
 
 ## ローカルプロジェクトの設定 {#setting-up-your-project}
+
 初期設定が完了したので、次は新しい Bolt プロジェクトを設定します。ここで、アプリのロジックを処理するコードを記述します。
 
 プロジェクトをまだ作成していない場合は、新しいプロジェクトを作成しましょう。次のように、空のディレクトリを作成して、新しいプロジェクトを初期化します。
@@ -100,12 +104,12 @@ npm install @slack/bolt
 このディレクトリ内に `app.js` という名前の新しいファイルを作成し、以下のコードを追加します。
 
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 // ボットトークンと Signing Secret を使ってアプリを初期化します
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 (async () => {
@@ -137,7 +141,7 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 
 このチュートリアルでは、[ソケットモード](/apis/events-api/using-socket-mode)を使用します。 Socket モードは、チームのために何かを作り始めたばかりの人にお勧めのオプションです。
 
-:::tip 
+:::tip
 
 ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境（[AWS](/tools/bolt-js/deployments/aws-lambda) or [Heroku](/tools/bolt-js/deployments/heroku)など）にデプロイするアプリや Slack App Directory で配布されるアプリに適しています。 HTTP での情報については[こちらのドキュメント](#setting-up-events)を参照してください。
 
@@ -154,11 +158,11 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 
 アプリのイベントを有効にしましょう。
 
-1. アプリのイベントを有効にするには、まずアプリ設定ページに戻ります ([アプリ管理ページ](https://api.slack.com/apps)でアプリをクリックします)。左側のサイドバーにある  **Event Subscription**  をクリックします。**Enable Events**  のスイッチをオンにします。
+1. アプリのイベントを有効にするには、まずアプリ設定ページに戻ります ([アプリ管理ページ](https://api.slack.com/apps)でアプリをクリックします)。左側のサイドバーにある **Event Subscription** をクリックします。**Enable Events** のスイッチをオンにします。
 
 2. Request URLを追加します。Slackはイベントに対応するHTTP POSTリクエストをこの[Request URL](/apis/events-api/#subscribing)エンドポイントに送信します。Boltは`/slack/events`のパスを使用して、すべての受信リクエスト（ショートカット、イベント、インタラクティビティのペイロードなど）をリッスンします。アプリの設定でRequest URLを設定する際には、`https://<your-domain>/slack/events`のように`/slack/events`を追加します。💡
 
-:::tip 
+:::tip
 
 ローカル開発では、[ngrok](https://ngrok.com/)のようなプロキシサービスを使って公開 URL を作成し、リクエストを開発環境にトンネリングすることができます。このトンネリングの方法については、[ngrok のガイド](https://ngrok.com/docs#getting-started-expose)を参照してください。
 
@@ -168,7 +172,7 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 
 イベントが発生すると、Slack は、そのイベントをトリガーしたユーザーやイベントが発生したチャンネルなど、イベントに関する情報をアプリに送信します。アプリが詳細を処理し、それに応じて応答することができます。
 
-**Request URL**  ボックスの  **Enable Events**  スイッチの下のフィールドにこの URL を貼り付けます。Bolt アプリが引き続き実行されている場合は、URL が検証されチェックマークが表示されます。
+**Request URL** ボックスの **Enable Events** スイッチの下のフィールドにこの URL を貼り付けます。Bolt アプリが引き続き実行されている場合は、URL が検証されチェックマークが表示されます。
 
 </TabItem>
 </Tabs>
@@ -178,6 +182,7 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 イベントが発生すると、そのイベントをトリガーしたユーザーやイベントが発生したチャンネルなど、イベントに関する情報が Slack からアプリに送信されます。アプリではこれらの情報を処理して、適切な応答を返します。
 
 **Subscribe to Bot Events** まで下にスクロールします。4つのメッセージに関するイベントがあります。
+
 - [`message.channels`](/reference/events/message.channels) アプリが参加しているパブリックチャンネルのメッセージをリッスン
 - [`message.groups`](/reference/events/message.groups) アプリが参加しているプライベートチャンネルのメッセージをリッスン
 - [`message.im`](/reference/events/message.im) あなたのアプリとユーザーのダイレクトメッセージをリッスン
@@ -202,7 +207,7 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true, // 追加
-  appToken: process.env.SLACK_APP_TOKEN // 追加
+  appToken: process.env.SLACK_APP_TOKEN, // 追加
 });
 ```
 
@@ -217,6 +222,7 @@ const app = new App({
 ---
 
 ## メッセージのリスニングと応答 {#listening-and-responding-to-a-message}
+
 これで、アプリでいくつかのロジックを設定する準備が整いました。まずは `message()` メソッドを使用して、メッセージのリスナーをアタッチしましょう。
 
 次の例では、あなたのアプリが追加されているチャンネルや DM で `hello` という単語を含むすべてのメッセージをリッスンし、 `Hey there @user!` と応答します。
@@ -225,7 +231,7 @@ const app = new App({
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -234,7 +240,7 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   // ソケットモードではポートをリッスンしませんが、アプリを OAuth フローに対応させる場合、
   // 何らかのポートをリッスンする必要があります
-  port: process.env.PORT || 3000
+  port: process.env.PORT || 3000,
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -255,11 +261,11 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -297,11 +303,11 @@ app.message('hello', async ({ message, say }) => {
 </TabItem>
 <TabItem value="http" label="HTTP">
 
-アプリ設定ページに戻り、左側の  **Interactivity & Shortcuts**  をクリックします。**Request URL**  ボックスがもう 1 つあることがわかります。
+アプリ設定ページに戻り、左側の **Interactivity & Shortcuts** をクリックします。**Request URL** ボックスがもう 1 つあることがわかります。
 
-:::tip 
+:::tip
 
-デフォルトでは、Bolt はイベントに使用しているのと同じエンドポイントをインタラクティブコンポーネントに使用するように設定されているため、上記と同じリクエスト URL (この例では `https://8e8ec2d7.ngrok.io/slack/events`) を使用します。右下隅にある  **Save Changes**  ボタンを押してください。これでアプリのインタラクティブなコンポーネントを利用する設定が有効になりました!
+デフォルトでは、Bolt はイベントに使用しているのと同じエンドポイントをインタラクティブコンポーネントに使用するように設定されているため、上記と同じリクエスト URL (この例では `https://8e8ec2d7.ngrok.io/slack/events`) を使用します。右下隅にある **Save Changes** ボタンを押してください。これでアプリのインタラクティブなコンポーネントを利用する設定が有効になりました!
 
 :::
 
@@ -313,6 +319,7 @@ app.message('hello', async ({ message, say }) => {
 インタラクティブ機能が有効化されていると、ショートカット、モーダル、インタラクティブコンポーネント (例：ボタン、選択メニュー、日付ピッカーなど) とのインタラクションがイベントとしてあなたのアプリに送信されます。
 
 それでは、アプリのコードに戻り、インタラクティブな処理を追加しましょう。この実装は以下の二つのステップで構成されます。
+
 - 最初に、アプリからボタンを含むメッセージを送信します。
 - 次に、ユーザーがボタンをクリックしたときの動作をアプリでリッスンし、応答します。
 
@@ -322,7 +329,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -331,7 +338,7 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   // ソケットモードではポートをリッスンしませんが、アプリを OAuth フローに対応させる場合、
   // 何らかのポートをリッスンする必要があります
-  port: process.env.PORT || 3000
+  port: process.env.PORT || 3000,
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -340,22 +347,22 @@ app.message('hello', async ({ message, say }) => {
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: 'button_click',
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
@@ -371,11 +378,11 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="http" label="HTTP">
 
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -384,22 +391,22 @@ app.message('hello', async ({ message, say }) => {
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: 'button_click',
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
@@ -418,7 +425,7 @@ app.message('hello', async ({ message, say }) => {
 
 このボタン `accessory` オブジェクトには、`action_id` が割り当てられています。これはボタンの一意の識別子として機能するため、アプリはどのアクションに応答するかを指定できます。
 
-:::tip 
+:::tip
 
 [Block Kit ビルダー](https://app.slack.com/block-kit-builder)を使うとインタラクティブメッセージを簡単にプロトタイプすることができます。ビルダーを使用すると、ユーザー (またはそのチームメンバー) はメッセージをモックアップして、対応する JSON を生成し、それをアプリに直接貼り付けることができます。
 
@@ -432,7 +439,7 @@ app.message('hello', async ({ message, say }) => {
 <TabItem value="socket-mode" label="Socket Mode">
 
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -441,7 +448,7 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   // ソケットモードではポートをリッスンしませんが、アプリを OAuth フローに対応させる場合、
   // 何らかのポートをリッスンする必要があります
-  port: process.env.PORT || 3000
+  port: process.env.PORT || 3000,
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -450,22 +457,22 @@ app.message('hello', async ({ message, say }) => {
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: 'button_click',
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
@@ -486,13 +493,12 @@ app.action('button_click', async ({ body, ack, say }) => {
 </TabItem>
 <TabItem value="http" label="HTTP">
 
-
 ```javascript
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // "hello" を含むメッセージをリッスンします
@@ -501,22 +507,22 @@ app.message('hello', async ({ message, say }) => {
   await say({
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Hey there <@${message.user}>!`,
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Click Me',
           },
-          "action_id": "button_click"
-        }
-      }
+          action_id: 'button_click',
+        },
+      },
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
   });
 });
 
@@ -537,17 +543,18 @@ app.action('button_click', async ({ body, ack, say }) => {
 </TabItem>
 </Tabs>
 
-このように、`app.action()` を使うことで `button_click` という `action_id` のボタンアクションのリスナーを追加できるのです。アプリを再起動してボタンをクリックしてみましょう。すると、you clicked the button  という新しいメッセージがアプリに表示されるはずです。
+このように、`app.action()` を使うことで `button_click` という `action_id` のボタンアクションのリスナーを追加できるのです。アプリを再起動してボタンをクリックしてみましょう。すると、you clicked the button という新しいメッセージがアプリに表示されるはずです。
 
 ---
 
 ## 次のステップ {#next-steps}
+
 これで最初の Bolt アプリが構築できました! 🎉
 
 基本的なアプリの作成ができましたので、次回は是非もっといろいろな、 Bolt の機能を使ってアプリを作ってみましょう。下記のリンクを辿っていろいろアイデアを模索してみてください！
 
-* 基本的な概念 をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
+- 基本的な概念 をお読みください。Bolt アプリからアクセスできるさまざまなメソッドと機能について学ぶことができます。
 
-* ボットが[`events()` メソッド](/tools/bolt-js/concepts/event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](/reference/events)にリストされています。
+- ボットが[`events()` メソッド](/tools/bolt-js/concepts/event-listening)でリッスンできるさまざまなイベントを確認しましょう。イベントはすべて[API サイト](/reference/events)にリストされています。
 
-* Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/tools/bolt-js/concepts/web-api)ことができます。API サイトに [200 を超えるメソッド](/reference/methods)を用意してあります。
+- Bolt を使用すると、アプリにアタッチされているクライアントで [Web API メソッドを呼び出す](/tools/bolt-js/concepts/web-api)ことができます。API サイトに [200 を超えるメソッド](/reference/methods)を用意してあります。

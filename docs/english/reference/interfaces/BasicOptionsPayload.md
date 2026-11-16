@@ -10,7 +10,7 @@ Defined in: [src/types/options/index.ts:33](https://github.com/slackapi/bolt-js/
 
 ### Type
 
-`Type` *extends* `string` = `string`
+`Type` _extends_ `string` = `string`
 
 ## Properties
 
@@ -22,7 +22,7 @@ type: Type;
 
 Defined in: [src/types/options/index.ts:34](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L34)
 
-***
+---
 
 ### value
 

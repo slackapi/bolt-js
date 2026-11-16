@@ -5,7 +5,8 @@ sidebar_label: "OptionsPayloadFromType"
 # OptionsPayloadFromType\<T\>
 
 ```ts
-type OptionsPayloadFromType<T> = KnownOptionsPayloadFromType<T> extends never ? BasicOptionsPayload<T> : KnownOptionsPayloadFromType<T>;
+type OptionsPayloadFromType<T> =
+  KnownOptionsPayloadFromType<T> extends never ? BasicOptionsPayload<T> : KnownOptionsPayloadFromType<T>;
 ```
 
 Defined in: [src/types/options/index.ts:38](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L38)
@@ -14,4 +15,4 @@ Defined in: [src/types/options/index.ts:38](https://github.com/slackapi/bolt-js/
 
 ### T
 
-`T` *extends* `string`
+`T` _extends_ `string`

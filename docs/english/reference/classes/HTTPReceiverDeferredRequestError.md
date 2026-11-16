@@ -32,8 +32,8 @@ Defined in: [src/errors.ts:138](https://github.com/slackapi/bolt-js/blob/main/sr
 
 ##### req
 
-  \| `IncomingMessage`
-  \| [`BufferedIncomingMessage`](../interfaces/BufferedIncomingMessage.md)
+\| `IncomingMessage`
+\| [`BufferedIncomingMessage`](../interfaces/BufferedIncomingMessage.md)
 
 ##### res
 
@@ -46,7 +46,7 @@ Defined in: [src/errors.ts:138](https://github.com/slackapi/bolt-js/blob/main/sr
 #### Overrides
 
 ```ts
-Error.constructor
+Error.constructor;
 ```
 
 ## Properties
@@ -63,7 +63,7 @@ Defined in: [src/errors.ts:132](https://github.com/slackapi/bolt-js/blob/main/sr
 
 [`CodedError`](../interfaces/CodedError.md).[`code`](../interfaces/CodedError.md#code)
 
-***
+---
 
 ### req
 
@@ -79,7 +79,7 @@ Defined in: [src/errors.ts:134](https://github.com/slackapi/bolt-js/blob/main/sr
 
 [`CodedError`](../interfaces/CodedError.md).[`req`](../interfaces/CodedError.md#req)
 
-***
+---
 
 ### res
 

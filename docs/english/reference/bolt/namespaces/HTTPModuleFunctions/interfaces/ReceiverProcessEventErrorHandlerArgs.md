@@ -12,7 +12,7 @@ error: CodedError | Error;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:261](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L261)
 
-***
+---
 
 ### logger
 
@@ -22,7 +22,7 @@ logger: Logger;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:262](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L262)
 
-***
+---
 
 ### request
 
@@ -32,7 +32,7 @@ request: IncomingMessage;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:263](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L263)
 
-***
+---
 
 ### response
 
@@ -42,7 +42,7 @@ response: ServerResponse;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:264](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L264)
 
-***
+---
 
 ### storedResponse
 

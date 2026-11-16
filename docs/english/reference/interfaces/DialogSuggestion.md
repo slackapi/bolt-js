@@ -24,7 +24,7 @@ action_ts: string;
 
 Defined in: [src/types/options/index.ts:123](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L123)
 
-***
+---
 
 ### callback\_id
 
@@ -34,7 +34,7 @@ callback_id: string;
 
 Defined in: [src/types/options/index.ts:122](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L122)
 
-***
+---
 
 ### channel?
 
@@ -56,7 +56,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### enterprise?
 
@@ -78,7 +78,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### is\_enterprise\_install?
 
@@ -88,7 +88,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/options/index.ts:142](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L142)
 
-***
+---
 
 ### name
 
@@ -98,7 +98,7 @@ name: string;
 
 Defined in: [src/types/options/index.ts:120](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L120)
 
-***
+---
 
 ### team
 
@@ -115,7 +115,7 @@ team:
 
 Defined in: [src/types/options/index.ts:125](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L125)
 
-***
+---
 
 ### token
 
@@ -125,17 +125,17 @@ token: string;
 
 Defined in: [src/types/options/index.ts:140](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L140)
 
-***
+---
 
 ### type
 
 ```ts
-type: "dialog_suggestion";
+type: 'dialog_suggestion';
 ```
 
 Defined in: [src/types/options/index.ts:119](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L119)
 
-***
+---
 
 ### user
 
@@ -163,7 +163,7 @@ name: string;
 optional team_id?: string;
 ```
 
-***
+---
 
 ### value
 

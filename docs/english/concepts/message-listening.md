@@ -8,10 +8,12 @@ The `message()` listener accepts an optional `pattern` parameter of type `string
 // This will match any message that contains 👋
 app.message(':wave:', async ({ message, say }) => {
   // Handle only newly posted messages here
-  if (message.subtype === undefined
-    || message.subtype === 'bot_message'
-    || message.subtype === 'file_share'
-    || message.subtype === 'thread_broadcast') {
+  if (
+    message.subtype === undefined ||
+    message.subtype === 'bot_message' ||
+    message.subtype === 'file_share' ||
+    message.subtype === 'thread_broadcast'
+  ) {
     await say(`Hello, <@${message.user}>`);
   }
 });
@@ -43,10 +45,10 @@ const { App, subtype } = require('@slack/bolt');
 // Matches all message changes from users
 app.message(subtype('message_changed'), ({ event, logger }) => {
   // This if statement is required in TypeScript code
-  if (event.subtype === 'message_changed'
-    && !event.message.subtype
-    && !event.previous_message.subtype) {
-    logger.info(`The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`);
+  if (event.subtype === 'message_changed' && !event.message.subtype && !event.previous_message.subtype) {
+    logger.info(
+      `The user ${event.message.user} changed their message from ${event.previous_message.text} to ${event.message.text}`,
+    );
   }
 });
 ```

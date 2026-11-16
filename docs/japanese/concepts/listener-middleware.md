@@ -25,11 +25,7 @@ async function noBotMessages({ message, next }) {
 // ボットではなく人間からのメッセージのみを受信するリスナー
 app.message(noBotMessages, async ({ message, logger }) => {
   // 新規で投稿されたメッセージのみを処理
-  if (
-    message.subtype === undefined ||
-    message.subtype === 'file_share' ||
-    message.subtype === 'thread_broadcast'
-  ) {
+  if (message.subtype === undefined || message.subtype === 'file_share' || message.subtype === 'thread_broadcast') {
     logger.info(`(MSG) User: ${message.user} Message: ${message.text}`);
   }
 });

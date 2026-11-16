@@ -12,7 +12,7 @@ optional bodyLimit?: string | number;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:247](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L247)
 
-***
+---
 
 ### enabled?
 
@@ -22,7 +22,7 @@ optional enabled?: boolean;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:243](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L243)
 
-***
+---
 
 ### logger?
 
@@ -32,7 +32,7 @@ optional logger?: Logger;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:246](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L246)
 
-***
+---
 
 ### nowMilliseconds?
 
@@ -46,7 +46,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:245](https://github.com/slacka
 
 `number`
 
-***
+---
 
 ### signingSecret
 

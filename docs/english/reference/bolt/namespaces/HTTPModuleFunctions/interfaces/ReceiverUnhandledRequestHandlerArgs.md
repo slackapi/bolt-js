@@ -12,7 +12,7 @@ logger: Logger;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:273](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L273)
 
-***
+---
 
 ### request
 
@@ -22,7 +22,7 @@ request: IncomingMessage;
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:274](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L274)
 
-***
+---
 
 ### response
 

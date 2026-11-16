@@ -14,17 +14,17 @@ name: string;
 
 Defined in: [src/types/actions/interactive-message.ts:12](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L12)
 
-***
+---
 
 ### type
 
 ```ts
-type: "button";
+type: 'button';
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L11)
 
-***
+---
 
 ### value
 

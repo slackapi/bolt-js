@@ -22,22 +22,24 @@ app.message('knock knock', async ({ message, say }) => {
 app.event('reaction_added', async ({ event, say }) => {
   if (event.reaction === 'calendar') {
     await say({
-      blocks: [{
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "Pick a date for me to remind you"
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'Pick a date for me to remind you',
+          },
+          accessory: {
+            type: 'datepicker',
+            action_id: 'datepicker_remind',
+            initial_date: '2019-04-28',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+            },
+          },
         },
-        "accessory": {
-          "type": "datepicker",
-          "action_id": "datepicker_remind",
-          "initial_date": "2019-04-28",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Select a date"
-          }
-        }
-      }]
+      ],
     });
   }
 });

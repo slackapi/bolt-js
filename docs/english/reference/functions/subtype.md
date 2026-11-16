@@ -1,7 +1,7 @@
 # subtype()
 
 ```ts
-function subtype(subtype1): Middleware<SlackEventMiddlewareArgs<"message">>;
+function subtype(subtype1): Middleware<SlackEventMiddlewareArgs<'message'>>;
 ```
 
 Defined in: [src/middleware/builtin.ts:346](https://github.com/slackapi/bolt-js/blob/main/src/middleware/builtin.ts#L346)

@@ -1,10 +1,7 @@
 # SlackAction
 
 ```ts
-type SlackAction = 
-  | BlockAction
-  | InteractiveMessage
-  | DialogSubmitAction;
+type SlackAction = BlockAction | InteractiveMessage | DialogSubmitAction;
 ```
 
 Defined in: [src/types/actions/index.ts:26](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L26)

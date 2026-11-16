@@ -33,7 +33,7 @@ Defined in: node\_modules/typescript/lib/lib.es5.d.ts:1081
 #### Inherited from
 
 ```ts
-Error.constructor
+Error.constructor;
 ```
 
 ### Constructor
@@ -61,7 +61,7 @@ Defined in: node\_modules/typescript/lib/lib.es5.d.ts:1081
 #### Inherited from
 
 ```ts
-Error.constructor
+Error.constructor;
 ```
 
 ## Properties

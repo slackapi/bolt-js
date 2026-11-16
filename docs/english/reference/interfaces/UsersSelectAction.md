@@ -22,7 +22,7 @@ Defined in: [src/types/actions/block-action.ts:42](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_id`](BasicElementAction.md#action_id)
 
-***
+---
 
 ### action\_ts
 
@@ -36,7 +36,7 @@ Defined in: [src/types/actions/block-action.ts:43](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`action_ts`](BasicElementAction.md#action_ts)
 
-***
+---
 
 ### block\_id
 
@@ -50,7 +50,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 
 [`BasicElementAction`](BasicElementAction.md).[`block_id`](BasicElementAction.md#block_id)
 
-***
+---
 
 ### confirm?
 
@@ -60,7 +60,7 @@ optional confirm?: Confirmation;
 
 Defined in: [src/types/actions/block-action.ts:106](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L106)
 
-***
+---
 
 ### initial\_user?
 
@@ -70,7 +70,7 @@ optional initial_user?: string;
 
 Defined in: [src/types/actions/block-action.ts:104](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L104)
 
-***
+---
 
 ### placeholder?
 
@@ -80,7 +80,7 @@ optional placeholder?: PlainTextElement;
 
 Defined in: [src/types/actions/block-action.ts:105](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L105)
 
-***
+---
 
 ### selected\_user
 
@@ -90,12 +90,12 @@ selected_user: string;
 
 Defined in: [src/types/actions/block-action.ts:103](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L103)
 
-***
+---
 
 ### type
 
 ```ts
-type: "users_select";
+type: 'users_select';
 ```
 
 Defined in: [src/types/actions/block-action.ts:40](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L40)

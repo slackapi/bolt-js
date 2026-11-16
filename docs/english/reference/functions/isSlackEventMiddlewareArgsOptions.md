@@ -1,7 +1,9 @@
 # isSlackEventMiddlewareArgsOptions()
 
 ```ts
-function isSlackEventMiddlewareArgsOptions<EventType>(optionOrListener): optionOrListener is SlackEventMiddlewareArgsOptions;
+function isSlackEventMiddlewareArgsOptions<EventType>(
+  optionOrListener,
+): optionOrListener is SlackEventMiddlewareArgsOptions;
 ```
 
 Defined in: [src/middleware/builtin.ts:67](https://github.com/slackapi/bolt-js/blob/main/src/middleware/builtin.ts#L67)
@@ -10,14 +12,14 @@ Defined in: [src/middleware/builtin.ts:67](https://github.com/slackapi/bolt-js/b
 
 ### EventType
 
-`EventType` *extends* `string` = `string`
+`EventType` _extends_ `string` = `string`
 
 ## Parameters
 
 ### optionOrListener
 
-  \| [`SlackEventMiddlewareArgsOptions`](../type-aliases/SlackEventMiddlewareArgsOptions.md)
-  \| [`Middleware`](../type-aliases/Middleware.md)\<[`SlackEventMiddlewareArgs`](../type-aliases/SlackEventMiddlewareArgs.md)\<`EventType`\>\>
+\| [`SlackEventMiddlewareArgsOptions`](../type-aliases/SlackEventMiddlewareArgsOptions.md)
+\| [`Middleware`](../type-aliases/Middleware.md)\<[`SlackEventMiddlewareArgs`](../type-aliases/SlackEventMiddlewareArgs.md)\<`EventType`\>\>
 
 ## Returns
 

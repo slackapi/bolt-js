@@ -50,4 +50,4 @@ shortcut: Shortcut;
 
 ### Shortcut
 
-`Shortcut` *extends* [`SlackShortcut`](SlackShortcut.md) = [`SlackShortcut`](SlackShortcut.md)
+`Shortcut` _extends_ [`SlackShortcut`](SlackShortcut.md) = [`SlackShortcut`](SlackShortcut.md)

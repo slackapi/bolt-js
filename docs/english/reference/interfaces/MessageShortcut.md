@@ -16,7 +16,7 @@ action_ts: string;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:39](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L39)
 
-***
+---
 
 ### callback\_id
 
@@ -26,7 +26,7 @@ callback_id: string;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:9](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L9)
 
-***
+---
 
 ### channel
 
@@ -48,7 +48,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### enterprise?
 
@@ -70,7 +70,7 @@ id: string;
 name: string;
 ```
 
-***
+---
 
 ### is\_enterprise\_install?
 
@@ -80,7 +80,7 @@ optional is_enterprise_install?: boolean;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:42](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L42)
 
-***
+---
 
 ### message
 
@@ -111,7 +111,7 @@ ts: string;
 #### type
 
 ```ts
-type: "message";
+type: 'message';
 ```
 
 #### user?
@@ -120,7 +120,7 @@ type: "message";
 optional user?: string;
 ```
 
-***
+---
 
 ### message\_ts
 
@@ -130,7 +130,7 @@ message_ts: string;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L11)
 
-***
+---
 
 ### response\_url
 
@@ -140,7 +140,7 @@ response_url: string;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:12](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L12)
 
-***
+---
 
 ### team
 
@@ -157,7 +157,7 @@ team:
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:32](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L32)
 
-***
+---
 
 ### token
 
@@ -167,7 +167,7 @@ token: string;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:38](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L38)
 
-***
+---
 
 ### trigger\_id
 
@@ -177,17 +177,17 @@ trigger_id: string;
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:10](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L10)
 
-***
+---
 
 ### type
 
 ```ts
-type: "message_action";
+type: 'message_action';
 ```
 
 Defined in: [src/types/shortcuts/message-shortcut.ts:8](https://github.com/slackapi/bolt-js/blob/main/src/types/shortcuts/message-shortcut.ts#L8)
 
-***
+---
 
 ### user
 

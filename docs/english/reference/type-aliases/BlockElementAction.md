@@ -1,7 +1,7 @@
 # BlockElementAction
 
 ```ts
-type BlockElementAction = 
+type BlockElementAction =
   | ButtonAction
   | FeedbackButtonsAction
   | IconButtonAction

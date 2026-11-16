@@ -1,6 +1,6 @@
 # Opening modals
 
-[Modals](/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](/reference/views/modal-views) to the built-in client's [`views.open`](/reference/methods/views.open/) method. 
+[Modals](/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](/reference/views/modal-views) to the built-in client's [`views.open`](/reference/methods/views.open/) method.
 
 Your app receives `trigger_id` parameters in payloads sent to your Request URL triggered user invocation like a slash command, button press, or interaction with a select menu.
 
@@ -26,47 +26,46 @@ app.command('/ticket', async ({ ack, body, client, logger }) => {
         callback_id: 'view_1',
         title: {
           type: 'plain_text',
-          text: 'Modal title'
+          text: 'Modal title',
         },
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: 'Welcome to a modal with _blocks_'
+              text: 'Welcome to a modal with _blocks_',
             },
             accessory: {
               type: 'button',
               text: {
                 type: 'plain_text',
-                text: 'Click me!'
+                text: 'Click me!',
               },
-              action_id: 'button_abc'
-            }
+              action_id: 'button_abc',
+            },
           },
           {
             type: 'input',
             block_id: 'input_c',
             label: {
               type: 'plain_text',
-              text: 'What are your hopes and dreams?'
+              text: 'What are your hopes and dreams?',
             },
             element: {
               type: 'plain_text_input',
               action_id: 'dreamy_input',
-              multiline: true
-            }
-          }
+              multiline: true,
+            },
+          },
         ],
         submit: {
           type: 'plain_text',
-          text: 'Submit'
-        }
-      }
+          text: 'Submit',
+        },
+      },
     });
     logger.info(result);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

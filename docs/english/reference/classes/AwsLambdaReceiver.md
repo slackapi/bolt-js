@@ -66,7 +66,7 @@ Defined in: [src/receivers/AwsLambdaReceiver.ts:179](https://github.com/slackapi
 
 [`Receiver`](../interfaces/Receiver.md).[`init`](../interfaces/Receiver.md#init)
 
-***
+---
 
 ### start()
 
@@ -90,7 +90,7 @@ Defined in: [src/receivers/AwsLambdaReceiver.ts:184](https://github.com/slackapi
 
 [`Receiver`](../interfaces/Receiver.md).[`start`](../interfaces/Receiver.md#start)
 
-***
+---
 
 ### stop()
 
@@ -114,7 +114,7 @@ Defined in: [src/receivers/AwsLambdaReceiver.ts:196](https://github.com/slackapi
 
 [`Receiver`](../interfaces/Receiver.md).[`stop`](../interfaces/Receiver.md#stop)
 
-***
+---
 
 ### toHandler()
 

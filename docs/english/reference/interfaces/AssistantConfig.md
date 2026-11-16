@@ -16,7 +16,7 @@ optional threadContextChanged?:
 
 Defined in: [src/Assistant.ts:24](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L24)
 
-***
+---
 
 ### threadContextStore?
 
@@ -26,7 +26,7 @@ optional threadContextStore?: AssistantThreadContextStore;
 
 Defined in: [src/Assistant.ts:22](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L22)
 
-***
+---
 
 ### threadStarted
 
@@ -38,7 +38,7 @@ threadStarted:
 
 Defined in: [src/Assistant.ts:23](https://github.com/slackapi/bolt-js/blob/main/src/Assistant.ts#L23)
 
-***
+---
 
 ### userMessage
 
