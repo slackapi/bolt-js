@@ -63,7 +63,7 @@ git add Procfile
 git commit -m "Add Procfile"
 ```
 
-:::tip 
+:::tip
 
 既存のBolt アプリを使ってこのガイドに沿って進めている場合は、[Preparing a Codebase for Heroku Deployment](https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port)のガイドを参考に、適切なポートをリッスンするようにしてください。
 
@@ -89,7 +89,7 @@ brew install heroku/brew/heroku
 heroku help
 ```
 
-:::tip 
+:::tip
 
 `heroku`コマンドが見つからない場合は、パスを更新するため新しいターミナルセッションまたはターミナルタブを開いてください。
 
@@ -102,7 +102,7 @@ Heroku CLI では、ローカルマシンからHeroku アカウントに接続�
 ```shell
 heroku login
 ```
-:::tip 
+:::tip
 
 ファイアウォールを使っている場合、Heroku CLI で使用される[プロキシ環境変数](https://devcenter.heroku.com/articles/using-the-cli#using-an-http-proxy)の設定が必要なことがあります。
 
@@ -124,7 +124,7 @@ heroku auth:whoami
 
 先ほどインストールしたツールを使って、[Heroku アプリを作成](https://devcenter.heroku.com/articles/creating-apps)します。アプリを作成するときは、ユニークな名前を自分で指定するか、ランダムな名前を生成することができます。
 
-:::tip 
+:::tip
 
 [Heroku アプリはあとから名前を変更することもできます](https://devcenter.heroku.com/articles/renaming-apps)が、リモートのGit アドレスとパブリックのWeb アドレスも変更になります。
 
@@ -171,7 +171,7 @@ heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
 heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-:::tip 
+:::tip
 
 認証情報の入手場所がわからない場合、Bolt 入門ガイドで[署名シークレットとトークンのエクスポート](/tools/bolt-js/ja-jp/creating-an-app#tokens-and-installing-apps)について参照してください。
 
@@ -196,7 +196,7 @@ git push heroku main
 ```
 Heroku でデプロイされるのは、[master またはmain ブランチ](https://devcenter.heroku.com/articles/git-branches)のコードです。それ以外のブランチにプッシュした場合、デプロイ処理はトリガーされません
 
-:::tip 
+:::tip
 
 Heroku deploys code that's pushed to the [master or main branches](https://devcenter.heroku.com/articles/git-branches). Pushing to other branches will not trigger a deployment.
 
@@ -224,7 +224,7 @@ heroku info
 
 [Slack アプリのページ](https://api.slack.com/apps)を開き、アプリ名を選択します。次に、リクエストURLを自分で確認したWeb アドレスに変更します。設定する場所は2 か所あります。
 
-:::tip 
+:::tip
 
 リクエストURL の末尾は`/slack/events`です。例えば`https://sharp-rain-871.herokuapp.com/slack/events`のようになります。
 
@@ -238,7 +238,7 @@ heroku info
 
 ![Event Subscriptions page](/img/bolt-js/event-subscriptions-page.png "Event Subscriptions")
 
-:::tip 
+:::tip
 
 無料プランで使用するHeroku アプリは、非アクティブな状態が続くとスリープします。💤 認証が失敗した場合、すぐに再試行してみてください。
 

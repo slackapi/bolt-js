@@ -4,18 +4,17 @@
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-
-With custom steps for Bolt apps, your app can create and process workflow steps that users later add in Workflow Builder. This guide goes through how to build a custom step for your app using the [app settings](https://api.slack.com/apps). 
+With custom steps for Bolt apps, your app can create and process workflow steps that users later add in Workflow Builder. This guide goes through how to build a custom step for your app using the [app settings](https://api.slack.com/apps).
 
 If you're looking to build a custom step using the Deno Slack SDK, check out our guide on [creating a custom step for Workflow Builder with the Deno Slack SDK](/tools/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
 
 You can also take a look at the template for the [Bolt for JavaScript custom workflow step](https://github.com/slack-samples/bolt-js-custom-step-template) on GitHub.
 
-There are two components of a custom step: the step definition in the app manifest, and a listener to handle the `function_executed` event in your project code. 
+There are two components of a custom step: the step definition in the app manifest, and a listener to handle the `function_executed` event in your project code.
 
 ## Opt in to org-ready apps {#org-ready-apps}
 
-Before we create the step definition, we first need to opt in to organization-ready apps. The app must opt-in to org-ready apps to be able to add the custom step to its manifest. This can be done in one of two ways: 
+Before we create the step definition, we first need to opt in to organization-ready apps. The app must opt-in to org-ready apps to be able to add the custom step to its manifest. This can be done in one of two ways:
 
 - Set the manifest `settings.org_deploy_enabled` property to `true`.
 - Alternatively, navigate to your [apps](https://api.slack.com/apps), select your app, then under the **Features** section in the navigation, select **Org Level Apps** and then **Opt-In**.
@@ -41,18 +40,18 @@ The Org Admin can then install your app directly at the org level from the [app 
 
 ## Defining the custom step {#define-step}
 
-A workflow step's definition contains information about the step, including its `input_parameters`, `output_parameters`, as well as display information. 
+A workflow step's definition contains information about the step, including its `input_parameters`, `output_parameters`, as well as display information.
 
 Each step is defined in the `functions` object of the manifest. Each entry in the `functions` object is a key-value pair representing each step. The key is the step's `callback_id`, which is any string you wish to use to identify the step (max 100 characters), and the value contains the details listed in the table below for each separate custom step. We recommend using the step's name, like `sample_step` in the code example below for the step's `callback_id`.
 
-Field | Type | Description | Required? 
----- | ----- | ------------|----------
-`title` | String | A string to identify the step. Max 255 characters. | Yes 
-`description` | String | A succinct summary of what your step does. | No 
-`input_parameters` | Object | An object which describes one or more [input parameters](#inputs-outputs) that will be available to your step. Each top-level property of this object defines the name of one input parameter available to your step.| No 
-`output_parameters` | Object | An object which describes one or more [output parameters](#inputs-outputs) that will be returned by your step. Each top-level property of this object defines the name of one output parameter your step makes available. | No 
+| Field               | Type   | Description                                                                                                                                                                                                               | Required? |
+| ------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `title`             | String | A string to identify the step. Max 255 characters.                                                                                                                                                                        | Yes       |
+| `description`       | String | A succinct summary of what your step does.                                                                                                                                                                                | No        |
+| `input_parameters`  | Object | An object which describes one or more [input parameters](#inputs-outputs) that will be available to your step. Each top-level property of this object defines the name of one input parameter available to your step.     | No        |
+| `output_parameters` | Object | An object which describes one or more [output parameters](#inputs-outputs) that will be returned by your step. Each top-level property of this object defines the name of one output parameter your step makes available. | No        |
 
-Once you are in your [app settings](https://api.slack.com/apps), navigate to **Workflow Steps** in the left nav. Click **Add Step** and fill out your step details, including callback ID, name, description, input parameters, and output parameters. 
+Once you are in your [app settings](https://api.slack.com/apps), navigate to **Workflow Steps** in the left nav. Click **Add Step** and fill out your step details, including callback ID, name, description, input parameters, and output parameters.
 
 ### Defining input and output parameters {#inputs-outputs}
 
@@ -62,21 +61,21 @@ Both inputs and outputs adhere to the same schema and consist of a unique identi
 
 Each input or output that belongs to `input_parameters` or `output_parameters` must have a unique key.
 
-Field | Type | Description 
-------|------|-------------
-`type` | String | Defines the data type and can fall into one of two categories: primitives or Slack-specific. 
-`title` | String | The label that appears in Workflow Builder when a user sets up this step in their workflow.
-`description` | String | The description that accompanies the input when a user sets up this step in their workflow.
-`dynamic_options` | Object | For custom steps dynamic options in Workflow Builder, define this property and point to a custom step designed to return the set of dynamic elements once the step is added to a workflow within Workflow Builder. Dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields. Refer to custom steps dynamic options for Workflow Builder using [Bolt for JavaScript](/tools/bolt-js/concepts/custom-steps-dynamic-options) or [Bolt for Python](/tools/bolt-python/concepts/custom-steps-dynamic-options) for more details.
-`is_required` | Boolean | Indicates whether or not the input is required by the step in order to run. If it’s required and not provided, the user will not be able to save the configuration nor use the step in their workflow. This property is available only in v1 of the manifest. We recommend v2, using the `required` array as noted in the example above.
-`hint` | String | Helper text that appears below the input when a user sets up this step in their workflow.
+| Field             | Type    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`            | String  | Defines the data type and can fall into one of two categories: primitives or Slack-specific.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `title`           | String  | The label that appears in Workflow Builder when a user sets up this step in their workflow.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `description`     | String  | The description that accompanies the input when a user sets up this step in their workflow.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `dynamic_options` | Object  | For custom steps dynamic options in Workflow Builder, define this property and point to a custom step designed to return the set of dynamic elements once the step is added to a workflow within Workflow Builder. Dynamic options in Workflow Builder can be rendered in one of two ways: as a drop-down menu (single-select or multi-select), or as a set of fields. Refer to custom steps dynamic options for Workflow Builder using [Bolt for JavaScript](/tools/bolt-js/concepts/custom-steps-dynamic-options) or [Bolt for Python](/tools/bolt-python/concepts/custom-steps-dynamic-options) for more details. |
+| `is_required`     | Boolean | Indicates whether or not the input is required by the step in order to run. If it’s required and not provided, the user will not be able to save the configuration nor use the step in their workflow. This property is available only in v1 of the manifest. We recommend v2, using the `required` array as noted in the example above.                                                                                                                                                                                                                                                                             |
+| `hint`            | String  | Helper text that appears below the input when a user sets up this step in their workflow.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 In addition, the `dynamic_options` field has two required properties:
 
-Property | Type | Description 
-------|------|-------------
-`function` | String | A reference to the custom step that should be used as a dynamic option.
-`inputs` | Object | Maps the inputs from the custom step consuming the dynamic option to the inputs required by the step used as a dynamic option.
+| Property   | Type   | Description                                                                                                                    |
+| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `function` | String | A reference to the custom step that should be used as a dynamic option.                                                        |
+| `inputs`   | Object | Maps the inputs from the custom step consuming the dynamic option to the inputs required by the step used as a dynamic option. |
 
 For example:
 
@@ -158,14 +157,13 @@ app.function('sample_step', async ({ client, inputs, complete, fail }) => {
   try {
     const { user_id } = inputs;
 
-    await client.chat.postMessage({ 
-      channel: user_id, 
-      text: `Greetings <@${user_id}>!` 
+    await client.chat.postMessage({
+      channel: user_id,
+      text: `Greetings <@${user_id}>!`,
     });
 
     await complete({ outputs: { user_id } });
-  } 
-  catch (error) {
+  } catch (error) {
     console.error(error);
     fail({ error: `Failed to complete the step: ${error}` });
   }
@@ -226,16 +224,16 @@ app.function('create_issue', async ({ inputs, complete, fail }) => {
 
 ### Anatomy of a function listener {#anatomy}
 
-The first argument (in our case above, `sample_step`) is the unique callback ID of the step. After receiving an event from Slack, this identifier is how your app knows which custom step handler to invoke. This `callback_id` also corresponds to the step definition provided in your manifest file. 
+The first argument (in our case above, `sample_step`) is the unique callback ID of the step. After receiving an event from Slack, this identifier is how your app knows which custom step handler to invoke. This `callback_id` also corresponds to the step definition provided in your manifest file.
 
 The second argument is the callback function, or the logic that will run when your app receives notice from Slack that `sample_step` was run by a user&mdash;in the Slack client&mdash;as part of a workflow.
 
-Field | Description
-------|------------
-`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](/reference/methods). Read more about the `WebClient` for Bolt JS [here](/tools/bolt-js/concepts/web-api).
-`complete` | A utility method that invokes `functions.completeSuccess`. This method indicates to Slack that a step has completed successfully without issue. When called, `complete` requires you include an `outputs` object that matches your step definition in [`output_parameters`](#inputs-outputs).
-`fail` | A utility method that invokes `functions.completeError`. True to its name, this method signals to Slack that a step has failed to complete. The `fail` method requires an argument of `error` to be sent along with it, which is used to help users understand what went wrong.
-`inputs` | An alias for the `input_parameters` that were provided to the step upon execution.
+| Field      | Description                                                                                                                                                                                                                                                                                                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `client`   | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](/reference/methods). Read more about the `WebClient` for Bolt JS [here](/tools/bolt-js/concepts/web-api). |
+| `complete` | A utility method that invokes `functions.completeSuccess`. This method indicates to Slack that a step has completed successfully without issue. When called, `complete` requires you include an `outputs` object that matches your step definition in [`output_parameters`](#inputs-outputs).                     |
+| `fail`     | A utility method that invokes `functions.completeError`. True to its name, this method signals to Slack that a step has failed to complete. The `fail` method requires an argument of `error` to be sent along with it, which is used to help users understand what went wrong.                                   |
+| `inputs`   | An alias for the `input_parameters` that were provided to the step upon execution.                                                                                                                                                                                                                                |
 
 ## Responding to interactivity {#interactivity}
 
@@ -244,16 +242,16 @@ Interactive elements provided to the user from within the `function()` method’
 Incoming actions that are associated with a step have the same `inputs`, `complete`, and `fail` utilities as offered by the `function()` method.
 
 ```js
-// If associated with a step, step-specific utilities are made available 
+// If associated with a step, step-specific utilities are made available
 app.action('approve_button', async ({ complete, fail }) => {
-  // Signal the step has completed once the button is clicked  
+  // Signal the step has completed once the button is clicked
   await complete({ outputs: { message: 'Request approved 👍' } });
 });
 ```
 
 ## Deploying a custom step {#deploy}
 
-When you're ready to deploy your steps for wider use, you'll need to decide *where* to deploy, since Bolt apps are not hosted on the Slack infrastructure.
+When you're ready to deploy your steps for wider use, you'll need to decide _where_ to deploy, since Bolt apps are not hosted on the Slack infrastructure.
 
 Not sure where to host your app? We recommend following the [Heroku Deployment Guide](/tools/bolt-js/deployments/heroku).
 
@@ -265,12 +263,12 @@ You can choose who has access to your custom steps. To define this, refer to the
 
 Distribution works differently for Slack apps that contain custom steps when the app is within a standalone (non-Enterprise Grid) workspace versus within an Enterprise Grid organization.
 
-* **Within a standalone workspace**: Slack apps that contain custom steps can be installed on the same workspace and used within that workspace. We do not support distribution to other standalone workspaces (also known as public distribution). 
-* **Within an organization**: Slack apps that contain custom steps should be org-ready (enabled for private distribution) and installed on the organization level. They must also be granted access to at least one workspace in the organization for the steps to appear in Workflow Builder.
+- **Within a standalone workspace**: Slack apps that contain custom steps can be installed on the same workspace and used within that workspace. We do not support distribution to other standalone workspaces (also known as public distribution).
+- **Within an organization**: Slack apps that contain custom steps should be org-ready (enabled for private distribution) and installed on the organization level. They must also be granted access to at least one workspace in the organization for the steps to appear in Workflow Builder.
 
 Apps containing custom steps cannot be distributed publicly or submitted to the Slack Marketplace. We recommend sharing your code as a public repository in order to share custom steps in Bolt apps.
 
 ## Related tutorials {#tutorials}
 
-* [Custom steps for Workflow Builder (new app)](/tools/bolt-js/tutorials/custom-steps-workflow-builder-new)
-* [Custom steps for Workflow Builder (existing app)](/tools/bolt-js/tutorials/custom-steps-workflow-builder-existing)
+- [Custom steps for Workflow Builder (new app)](/tools/bolt-js/tutorials/custom-steps-workflow-builder-new)
+- [Custom steps for Workflow Builder (existing app)](/tools/bolt-js/tutorials/custom-steps-workflow-builder-existing)

@@ -1,6 +1,6 @@
+import assert from 'node:assert/strict';
+import { describe, it, mock } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
-import sinon from 'sinon';
 import { extractThreadInfo } from '../../src/Assistant';
 import { DefaultThreadContextStore } from '../../src/AssistantThreadContextStore';
 import { createDummyAssistantThreadStartedEventMiddlewareArgs, wrapMiddleware } from './helpers';
@@ -17,7 +17,7 @@ describe('DefaultThreadContextStore class', () => {
       const mockThreadContext = { channel_id: '123', thread_ts: '123', enterprise_id: null };
       const fakeClient = {
         conversations: {
-          replies: sinon.fake.returns({
+          replies: mock.fn(() => ({
             messages: [
               {
                 user: botUserId,
@@ -25,24 +25,24 @@ describe('DefaultThreadContextStore class', () => {
                 metadata: { event_payload: mockThreadContext },
               },
             ],
-          }),
+          })),
         },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      sinon.assert.called(fakeClient.conversations.replies);
+      assert.ok(fakeClient.conversations.replies.mock.callCount() > 0);
       assert.equal(threadContext, mockThreadContext);
     });
 
     it('should return an empty object if no message history exists', async () => {
       const mockContextStore = new DefaultThreadContextStore();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
-      const fakeClient = { conversations: { replies: sinon.fake.returns([]) } };
+      const fakeClient = { conversations: { replies: mock.fn(() => []) } };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      assert.isEmpty(threadContext);
+      assert.strictEqual(Object.keys(threadContext).length, 0);
     });
 
     it('should return an empty object if no message metadata exists', async () => {
@@ -50,7 +50,7 @@ describe('DefaultThreadContextStore class', () => {
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       const fakeClient = {
         conversations: {
-          replies: sinon.fake.returns({
+          replies: mock.fn(() => ({
             messages: [
               {
                 user: 'U12345',
@@ -58,28 +58,28 @@ describe('DefaultThreadContextStore class', () => {
                 metadata: {},
               },
             ],
-          }),
+          })),
         },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      assert.isEmpty(threadContext);
+      assert.strictEqual(Object.keys(threadContext).length, 0);
     });
 
     it('should retrieve instance context if it has been saved previously', async () => {
       const mockContextStore = new DefaultThreadContextStore();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       const fakeClient = {
-        conversations: { replies: sinon.fake.returns({ messages: [{ user: 'U12345', ts: '12345' }] }) },
-        chat: { update: sinon.fake() },
+        conversations: { replies: mock.fn(() => ({ messages: [{ user: 'U12345', ts: '12345' }] })) },
+        chat: { update: mock.fn() },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
 
       await mockContextStore.save(mockThreadStartedArgs);
       const threadContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      sinon.assert.calledOnce(fakeClient.conversations.replies);
+      assert.strictEqual(fakeClient.conversations.replies.mock.callCount(), 1);
       assert.equal(threadContext, mockThreadStartedArgs.payload.assistant_thread.context);
     });
   });
@@ -89,15 +89,15 @@ describe('DefaultThreadContextStore class', () => {
       const mockContextStore = new DefaultThreadContextStore();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       const fakeClient = {
-        conversations: { replies: sinon.fake.returns({ messages: [] }) },
-        chat: { update: sinon.fake() },
+        conversations: { replies: mock.fn(() => ({ messages: [] })) },
+        chat: { update: mock.fn() },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
 
       await mockContextStore.save(mockThreadStartedArgs);
       const instanceContext = await mockContextStore.get(mockThreadStartedArgs);
 
-      sinon.assert.called(fakeClient.conversations.replies);
+      assert.ok(fakeClient.conversations.replies.mock.callCount() > 0);
       assert.deepEqual(instanceContext, mockThreadStartedArgs.payload.assistant_thread.context);
     });
 
@@ -105,26 +105,26 @@ describe('DefaultThreadContextStore class', () => {
       const mockContextStore = new DefaultThreadContextStore();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       const fakeClient = {
-        conversations: { replies: sinon.fake.returns({}) },
-        chat: { update: sinon.fake() },
+        conversations: { replies: mock.fn(() => ({})) },
+        chat: { update: mock.fn() },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
 
       await mockContextStore.save(mockThreadStartedArgs);
-      sinon.assert.calledOnce(fakeClient.conversations.replies);
+      assert.strictEqual(fakeClient.conversations.replies.mock.callCount(), 1);
     });
 
     it('should return early if no message history exists', async () => {
       const mockContextStore = new DefaultThreadContextStore();
       const mockThreadStartedArgs = wrapMiddleware(createDummyAssistantThreadStartedEventMiddlewareArgs());
       const fakeClient = {
-        conversations: { replies: sinon.fake.returns({}) },
-        chat: { update: sinon.fake() },
+        conversations: { replies: mock.fn(() => ({})) },
+        chat: { update: mock.fn() },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
 
       await mockContextStore.save(mockThreadStartedArgs);
-      sinon.assert.notCalled(fakeClient.chat.update);
+      assert.strictEqual(fakeClient.chat.update.mock.callCount(), 0);
     });
 
     it('should update first bot message metadata with threadContext', async () => {
@@ -135,8 +135,8 @@ describe('DefaultThreadContextStore class', () => {
         isEnterpriseInstall: false,
       });
       const fakeClient = {
-        conversations: { replies: sinon.fake.returns({ messages: [{ user: botUserId, ts: '12345', text: 'foo' }] }) },
-        chat: { update: sinon.fake() },
+        conversations: { replies: mock.fn(() => ({ messages: [{ user: botUserId, ts: '12345', text: 'foo' }] })) },
+        chat: { update: mock.fn() },
       };
       mockThreadStartedArgs.client = fakeClient as unknown as WebClient;
       const { channelId, context } = extractThreadInfo(mockThreadStartedArgs.payload);
@@ -152,7 +152,7 @@ describe('DefaultThreadContextStore class', () => {
       };
 
       await mockContextStore.save(mockThreadStartedArgs);
-      sinon.assert.calledWith(fakeClient.chat.update, mockParams);
+      assert.deepStrictEqual(fakeClient.chat.update.mock.calls[0].arguments, [mockParams]);
     });
   });
 });

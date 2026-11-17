@@ -16,29 +16,28 @@ app.event('app_home_opened', async ({ event, client, logger }) => {
       user_id: event.user,
       view: {
         // Home tabs must be enabled in your app configuration page under "App Home"
-        type: "home",
+        type: 'home',
         blocks: [
           {
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
-              text: "*Welcome home, <@" + event.user + "> :house:*"
-            }
+              type: 'mrkdwn',
+              text: '*Welcome home, <@' + event.user + '> :house:*',
+            },
           },
           {
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
-              text: "Learn how home tabs can be more useful and interactive <https://docs.slack.dev/surfaces/app-home|*in the documentation*>."
-            }
-          }
-        ]
-      }
+              type: 'mrkdwn',
+              text: 'Learn how home tabs can be more useful and interactive <https://docs.slack.dev/surfaces/app-home|*in the documentation*>.',
+            },
+          },
+        ],
+      },
     });
 
     logger.info(result);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

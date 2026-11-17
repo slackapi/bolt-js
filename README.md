@@ -1,7 +1,7 @@
 # Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-js/main/docs/img/bolt.svg" alt="Bolt logo" width="32"/> for JavaScript
 
 [![codecov](https://codecov.io/gh/slackapi/bolt-js/branch/main/graph/badge.svg?token=x4oCgiexvp)](https://codecov.io/gh/slackapi/bolt-js)
-[![Node.js CI](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml/badge.svg)](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml)
+[![Node.js CI](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml/badge.svg)](https://github.com/slackapi/bolt-js/actions/workflows/ci-build.yml?query=branch%3Amain)
 
 A JavaScript framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://docs.slack.dev/tools/bolt-js/getting-started) to set-up and run your first Bolt app.
 

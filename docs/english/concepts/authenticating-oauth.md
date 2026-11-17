@@ -44,14 +44,14 @@ Here we've provided a default implementation of the `installationStore` with
 developing and testing your app:
 
 ```javascript
-const { App } = require("@slack/bolt");
-const { FileInstallationStore } = require("@slack/oauth");
+const { App } = require('@slack/bolt');
+const { FileInstallationStore } = require('@slack/oauth');
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: process.env.SLACK_STATE_SECRET,
-  scopes: ["channels:history", "chat:write", "commands"],
+  scopes: ['channels:history', 'chat:write', 'commands'],
   installationStore: new FileInstallationStore(),
 });
 ```
@@ -103,33 +103,27 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  scopes: [
-    "channels:manage",
-    "channels:read",
-    "chat:write",
-    "groups:read",
-    "incoming-webhook",
-  ],
+  scopes: ['channels:manage', 'channels:read', 'chat:write', 'groups:read', 'incoming-webhook'],
   installerOptions: {
-    authVersion: "v2",
+    authVersion: 'v2',
     directInstall: false,
-    installPath: "/slack/install",
-    metadata: "",
-    redirectUriPath: "/slack/oauth_redirect",
-    stateVerification: "true",
+    installPath: '/slack/install',
+    metadata: '',
+    redirectUriPath: '/slack/oauth_redirect',
+    stateVerification: 'true',
     /**
      * Example user scopes to request during installation.
      */
-    userScopes: ["chat:write"],
+    userScopes: ['chat:write'],
     /**
      * Example pages to navigate to on certain callbacks.
      */
     callbackOptions: {
       success: (installation, installUrlOptions, req, res) => {
-        res.send("The installation succeeded!");
+        res.send('The installation succeeded!');
       },
       failure: (error, installUrlOptions, req, res) => {
-        res.send("Something strange happened...");
+        res.send('Something strange happened...');
       },
     },
     /**
@@ -146,11 +140,9 @@ const app = new App({
       verifyStateParam: async (now, state) => {
         const value = await database.get(state);
         const generated = new Date(value.now);
-        const seconds = Math.floor(
-          (now.getTime() - generated.getTime()) / 1000,
-        );
+        const seconds = Math.floor((now.getTime() - generated.getTime()) / 1000);
         if (seconds > 600) {
-          throw new Error("The state expired after 10 minutes!");
+          throw new Error('The state expired after 10 minutes!');
         }
         return value.options;
       },
@@ -217,7 +209,7 @@ const app = new App({
   installerOptions: {
     // highlight-start
     directInstall: true,
-    installPath: "/slack/installations", // www.example.com/slack/installations
+    installPath: '/slack/installations', // www.example.com/slack/installations
     // highlight-end
   },
 });
@@ -275,12 +267,12 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: process.env.SLACK_STATE_SECRET,
-  scopes: ["chat:write"],
+  scopes: ['chat:write'],
   // highlight-next-line
-  redirectUri: "https://example.com/slack/redirect",
+  redirectUri: 'https://example.com/slack/redirect',
   installerOptions: {
     // highlight-next-line
-    redirectUriPath: "/slack/redirect",
+    redirectUriPath: '/slack/redirect',
   },
 });
 ```
@@ -298,10 +290,10 @@ const app = new App({
     // highlight-start
     callbackOptions: {
       success: (installation, installOptions, req, res) => {
-        res.send("The installation succeeded!");
+        res.send('The installation succeeded!');
       },
       failure: (error, installOptions, req, res) => {
-        res.send("Something strange happened...");
+        res.send('Something strange happened...');
       },
     },
     // highlight-end
@@ -382,25 +374,25 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: process.env.SLACK_STATE_SECRET,
-  scopes: ["chat:write", "commands"],
+  scopes: ['chat:write', 'commands'],
   installationStore: {
     storeInstallation: async (installation) => {
       if (installation.team !== undefined) {
         return await database.set(installation.team.id, installation);
       }
-      throw new Error("Failed to save installation data to installationStore");
+      throw new Error('Failed to save installation data to installationStore');
     },
     fetchInstallation: async (installQuery) => {
       if (installQuery.teamId !== undefined) {
         return await database.get(installQuery.teamId);
       }
-      throw new Error("Failed to fetch installation");
+      throw new Error('Failed to fetch installation');
     },
     deleteInstallation: async (installQuery) => {
       if (installQuery.teamId !== undefined) {
         return await database.delete(installQuery.teamId);
       }
-      throw new Error("Failed to delete installation");
+      throw new Error('Failed to delete installation');
     },
   },
 });
@@ -451,9 +443,9 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  scopes: ["chat:write", "channels:history"],
+  scopes: ['chat:write', 'channels:history'],
   installerOptions: {
-    userScopes: ["chat:write"],
+    userScopes: ['chat:write'],
   },
 });
 ```
@@ -508,7 +500,7 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
-  scopes: ["chat:write"],
+  scopes: ['chat:write'],
   installerOptions: {
     // highlight-next-line
     stateVerification: false,
@@ -594,44 +586,35 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: process.env.SLACK_STATE_SECRET,
-  scopes: ["chat:write", "commands"],
+  scopes: ['chat:write', 'commands'],
   // highlight-start
   installationStore: {
     storeInstallation: async (installation) => {
-      if (
-        installation.isEnterpriseInstall &&
-        installation.enterprise !== undefined
-      ) {
+      if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
         return await database.set(installation.enterprise.id, installation);
       }
       if (installation.team !== undefined) {
         return await database.set(installation.team.id, installation);
       }
-      throw new Error("Failed to save installation data to installationStore");
+      throw new Error('Failed to save installation data to installationStore');
     },
     fetchInstallation: async (installQuery) => {
-      if (
-        installQuery.isEnterpriseInstall &&
-        installQuery.enterpriseId !== undefined
-      ) {
+      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         return await database.get(installQuery.enterpriseId);
       }
       if (installQuery.teamId !== undefined) {
         return await database.get(installQuery.teamId);
       }
-      throw new Error("Failed to fetch installation");
+      throw new Error('Failed to fetch installation');
     },
     deleteInstallation: async (installQuery) => {
-      if (
-        installQuery.isEnterpriseInstall &&
-        installQuery.enterpriseId !== undefined
-      ) {
+      if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
         return await database.delete(installQuery.enterpriseId);
       }
       if (installQuery.teamId !== undefined) {
         return await database.delete(installQuery.teamId);
       }
-      throw new Error("Failed to delete installation");
+      throw new Error('Failed to delete installation');
     },
   },
   // highlight-end

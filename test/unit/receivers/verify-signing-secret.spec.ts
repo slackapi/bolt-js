@@ -1,5 +1,6 @@
-import { assert } from 'chai';
-import { ErrorCode } from '../../../src/errors';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { type CodedError, ErrorCode } from '../../../src/errors';
 import { verifySigningSecret } from '../../../src/receivers/verify-signing-secret';
 
 describe('verifySigningSecret', () => {
@@ -8,7 +9,7 @@ describe('verifySigningSecret', () => {
       verifySigningSecret('', true);
       assert.fail();
     } catch (error) {
-      assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+      assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
     }
   });
 
@@ -17,7 +18,7 @@ describe('verifySigningSecret', () => {
       verifySigningSecret(null, true);
       assert.fail();
     } catch (error) {
-      assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+      assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
     }
   });
 
@@ -26,7 +27,7 @@ describe('verifySigningSecret', () => {
       verifySigningSecret(undefined, true);
       assert.fail();
     } catch (error) {
-      assert.propertyVal(error, 'code', ErrorCode.AppInitializationError);
+      assert.strictEqual((error as CodedError).code, ErrorCode.AppInitializationError);
     }
   });
 

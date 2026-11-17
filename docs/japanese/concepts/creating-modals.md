@@ -23,47 +23,46 @@ app.command('/ticket', async ({ ack, body, client, logger }) => {
         callback_id: 'view_1',
         title: {
           type: 'plain_text',
-          text: 'Modal title'
+          text: 'Modal title',
         },
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: 'Welcome to a modal with _blocks_'
+              text: 'Welcome to a modal with _blocks_',
             },
             accessory: {
               type: 'button',
               text: {
                 type: 'plain_text',
-                text: 'Click me!'
+                text: 'Click me!',
               },
-              action_id: 'button_abc'
-            }
+              action_id: 'button_abc',
+            },
           },
           {
             type: 'input',
             block_id: 'input_c',
             label: {
               type: 'plain_text',
-              text: 'What are your hopes and dreams?'
+              text: 'What are your hopes and dreams?',
             },
             element: {
               type: 'plain_text_input',
               action_id: 'dreamy_input',
-              multiline: true
-            }
-          }
+              multiline: true,
+            },
+          },
         ],
         submit: {
           type: 'plain_text',
-          text: 'Submit'
-        }
-      }
+          text: 'Submit',
+        },
+      },
     });
     logger.info(result);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

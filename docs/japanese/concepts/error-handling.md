@@ -1,6 +1,6 @@
 # エラーの処理
 
-*注: Bolt 2.x からエラーハンドリングが改善されました！この変更については [2.x マイグレーションガイド](/tools/bolt-js/migration/migration-v2)を参照してください。*
+_注: Bolt 2.x からエラーハンドリングが改善されました！この変更については [2.x マイグレーションガイド](/tools/bolt-js/migration/migration-v2)を参照してください。_
 
 リスナーでエラーが発生した場合は `try`/`catch` を使って直接ハンドリングすることをおすすめします。しかし、それでもなおすり抜けてしまうエラーのパターンもあるでしょう。デフォルトでは、このようなエラーはコンソールにログ出力されます。ご自身でこれらをハンドリングするには、`app.error(fn)` メソッドによって、グローバルエラーハンドラーを定義してください。
 
@@ -9,9 +9,9 @@
 - `dispatchErrorHandler`: 想定しないパスにリクエストが来たときに実行されます
 - `processEventErrorHandler`: リクエストを処理するとき（例：ミドルウェアや認可プロセス）に発生した例外に対して実行されます
 - `unhandledRequestHandler`: Slack からのリクエストが確認（`ack()`）されなかったときに実行されます
-- `unhandledRequestTimeoutMillis`: リクエストが受信されてから `unhandledRequestHandler` が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは `3001` です。 
+- `unhandledRequestTimeoutMillis`: リクエストが受信されてから `unhandledRequestHandler` が実行されるまでの待機時間（ミリ秒単位）。 デフォルトは `3001` です。
 
-*注*: あなたのアプリ内に定義されたカスタムのエラーハンドラーは、エラーとなった Slack からのリクストに応答するために `response.writeHead()` を呼び出して応答の HTTP ステータスコードを設定し、かつ `response.end()` を呼び出して Slack へのレスポンスを送信する必要があります。詳細は以下の例を参考にしてください。
+_注_: あなたのアプリ内に定義されたカスタムのエラーハンドラーは、エラーとなった Slack からのリクストに応答するために `response.writeHead()` を呼び出して応答の HTTP ステータスコードを設定し、かつ `response.end()` を呼び出して Slack へのレスポンスを送信する必要があります。詳細は以下の例を参考にしてください。
 
 ```javascript
 import { App, HTTPReceiver } from '@slack/bolt';
@@ -23,7 +23,7 @@ const app = new App({
     dispatchErrorHandler: async ({ error, logger, response }) => {
       logger.error(`dispatch error: ${error}`);
       response.writeHead(404);
-      response.write("Something is wrong!");
+      response.write('Something is wrong!');
       response.end();
     },
     processEventErrorHandler: async ({ error, logger, response }) => {
@@ -54,10 +54,9 @@ app.error(async (error) => {
 
 グローバルエラーハンドラーの中で、リクエストからのデータをログ出力したい場合もあるでしょう。あるいは単に Bolt に設定した `logger` を利用したい場合もあるでしょう。
 
-バージョン 3.8.0 からは、コンストラクターに  `extendedErrorHandler: true` を渡すと、エラーハンドラーはリクエストの `error` 、 `logger` 、 `context` 、 `body` を含むオブジェクトを受け取ります。
+バージョン 3.8.0 からは、コンストラクターに `extendedErrorHandler: true` を渡すと、エラーハンドラーはリクエストの `error` 、 `logger` 、 `context` 、 `body` を含むオブジェクトを受け取ります。
 
 `context` や `body` オブジェクト内にアクセスしたいプロパティが存在するかどうかをチェックすることをおすすめします。なぜなら `body` オブジェクト内に存在するデータはイベント毎に異なりますし、エラーはリクエストのライフサイクルの中のどんなタイミング（例えば `context` のプロパティが設定される前）でも発生しうるからです。
-
 
 ```javascript
 const { App } = require('@slack/bolt');

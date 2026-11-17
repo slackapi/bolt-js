@@ -4,14 +4,15 @@
 
 A receiver is responsible for handling and parsing any incoming requests from Slack then sending it to the app, so that the app can add context and pass the request to your listeners. Receivers must conform to the [Receiver interface](https://github.com/slackapi/bolt-js/blob/%40slack/bolt%403.13.1/src/types/receiver.ts#L27-L31):
 
-| Method       | Parameters                       | Return type |
-|--------------|----------------------------------|-------------|
-| `init()`     | `app: App`                       | `unknown`   |
-| `start()`    | None                             | `Promise`   |
-| `stop()`     | None                             | `Promise`   |
+| Method    | Parameters | Return type |
+| --------- | ---------- | ----------- |
+| `init()`  | `app: App` | `unknown`   |
+| `start()` | None       | `Promise`   |
+| `stop()`  | None       | `Promise`   |
 
 `init()` is called after Bolt for JavaScript app is created. This method gives the receiver a reference to an `App` to store so that it can call:
-* `await app.processEvent(event)` whenever your app receives a request from Slack. It will throw if there is an unhandled error.
+
+- `await app.processEvent(event)` whenever your app receives a request from Slack. It will throw if there is an unhandled error.
 
 To use a custom receiver, you can pass it into the constructor when initializing your Bolt for JavaScript app. Here is what a basic custom receiver might look like.
 
@@ -38,10 +39,10 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     customPropertiesExtractor: (req) => {
       return {
-        "headers": req.headers,
-        "foo": "bar",
+        headers: req.headers,
+        foo: 'bar',
       };
-    }
+    },
   }),
 });
 
@@ -60,12 +61,11 @@ app.use(async ({ logger, context, next }) => {
 
 You can find [more examples of extracting custom properties](https://github.com/slackapi/bolt-js/tree/%40slack/bolt%403.13.1/examples/custom-properties) from different types of receivers here.
 
-
 ```javascript
 import { createServer } from 'http';
 import express from 'express';
 
-class SimpleReceiver  {
+class SimpleReceiver {
   constructor(signingSecret, endpoints) {
     this.app = express();
     this.server = createServer(this.app);
@@ -99,8 +99,8 @@ class SimpleReceiver  {
           return;
         }
         resolve();
-      })
-    })
+      });
+    });
   }
 
   // This is a simple implementation. Look at the ExpressReceiver source for more detail
@@ -121,13 +121,13 @@ class SimpleReceiver  {
         if (response instanceof Error) {
           res.status(500).send();
         } else if (!response) {
-          res.send('')
+          res.send('');
         } else {
           res.send(response);
         }
 
         ackCalled = true;
-      }
+      },
     };
     await this.bolt.processEvent(event);
   }

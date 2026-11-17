@@ -13,11 +13,10 @@ app.event('team_join', async ({ event, client, logger }) => {
     // 組み込みの client で chat.postMessage を呼び出す
     const result = await client.chat.postMessage({
       channel: welcomeChannelId,
-      text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
+      text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`,
     });
     logger.info(result);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

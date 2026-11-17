@@ -3,7 +3,7 @@
 The `options()` method listens for incoming option request payloads from Slack. Similar to the [`action()`](/tools/bolt-js/concepts/actions) method,
 an `action_id` or constraints object is required.
 
-While it's recommended to use `action_id` for `external_select` menus, dialogs do not yet support Block Kit so you'll have to 
+While it's recommended to use `action_id` for `external_select` menus, dialogs do not yet support Block Kit so you'll have to
 use the constraints object to filter on a `callback_id`.
 
 To respond to options requests, you'll need to `ack()` with valid options. Find [external select response examples](/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select) on our API site.
@@ -22,15 +22,15 @@ app.options('external_action', async ({ options, ack }) => {
     for (const result of results) {
       options.push({
         text: {
-          type: "plain_text",
-          text: result.label
+          type: 'plain_text',
+          text: result.label,
         },
-        value: result.value
+        value: result.value,
       });
     }
 
     await ack({
-      options: options
+      options: options,
     });
   } else {
     await ack();

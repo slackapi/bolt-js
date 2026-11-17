@@ -15,29 +15,31 @@ app.message('knock knock', async ({ message, say }) => {
 
 `say()` は、より複雑なメッセージペイロードを受け付けるので、メッセージに機能やリッチな構造を与えることが容易です。
 
-リッチなメッセージレイアウトをアプリに追加する方法については、[API サイトのガイド](/messaging/#structure)を参照し、[Block Kit ビルダー](https://api.slack.com/tools/block-kit-builder?template=1)の一般的なアプリフローのテンプレートを確認してください。
+リッチなメッセージレイアウトをアプリに追加する方法については、[API サイトのガイド](/messaging/#structure)を参照し、[Block Kit ビルダー](https://app.slack.com/block-kit-builder)の一般的なアプリフローのテンプレートを確認してください。
 
 ```javascript
 // 誰かが 📅 絵文字でリアクションした時に、日付ピッカー block を送信
 app.event('reaction_added', async ({ event, say }) => {
   if (event.reaction === 'calendar') {
     await say({
-      blocks: [{
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "Pick a date for me to remind you"
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'Pick a date for me to remind you',
+          },
+          accessory: {
+            type: 'datepicker',
+            action_id: 'datepicker_remind',
+            initial_date: '2019-04-28',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+            },
+          },
         },
-        "accessory": {
-          "type": "datepicker",
-          "action_id": "datepicker_remind",
-          "initial_date": "2019-04-28",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Select a date"
-          }
-        }
-      }]
+      ],
     });
   }
 });

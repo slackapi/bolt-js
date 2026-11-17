@@ -36,17 +36,17 @@ const authorizeFn = async ({ teamId, enterpriseId }) => {
   // データベースから team（ワークスペース）を取得
   for (const team of installations) {
     // installations 配列から teamId と enterpriseId（Enterprise Grid の OrG の ID）が一致するかチェック
-    if ((team.teamId === teamId) && (team.enterpriseId === enterpriseId)) {
+    if (team.teamId === teamId && team.enterpriseId === enterpriseId) {
       // 一致したワークスペースのクレデンシャルを使用
       return {
         // 代わりに userToken をセットしても OK
         botToken: team.botToken,
         botId: team.botId,
-        botUserId: team.botUserId
+        botUserId: team.botUserId,
       };
     }
   }
 
   throw new Error('No matching authorizations');
-}
+};
 ```

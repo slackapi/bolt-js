@@ -1,29 +1,28 @@
+import assert from 'node:assert/strict';
+import { afterEach, beforeEach, describe, it, type Mock, mock } from 'node:test';
 import { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
-import sinon from 'sinon';
 import { createSayStream } from '../../../src/context';
 import type { Context } from '../../../src/types';
 
 describe('createSayStream', () => {
-  const sandbox = sinon.createSandbox();
   const client = new WebClient('token');
-  let chatStreamStub: sinon.SinonStub;
+  let chatStreamStub: Mock<WebClient['chatStream']>;
   const ctx: Context = { teamId: 'T1234', userId: 'U1234', isEnterpriseInstall: false };
 
   beforeEach(() => {
-    chatStreamStub = sandbox.stub(client, 'chatStream').returns({} as ReturnType<WebClient['chatStream']>);
+    chatStreamStub = mock.method(client, 'chatStream', () => ({}) as ReturnType<WebClient['chatStream']>);
   });
 
   afterEach(() => {
-    sandbox.restore();
+    mock.restoreAll();
   });
 
   it('should call client.chatStream with defaults when called with no args', () => {
     const sayStream = createSayStream(client, ctx, 'C1234', '1234.5678');
     sayStream();
 
-    assert(chatStreamStub.calledOnce);
-    const args = chatStreamStub.firstCall.args[0];
+    assert.strictEqual(chatStreamStub.mock.callCount(), 1);
+    const args = chatStreamStub.mock.calls[0].arguments[0];
 
     assert.equal(args.channel, 'C1234');
     assert.equal(args.thread_ts, '1234.5678');
@@ -40,8 +39,8 @@ describe('createSayStream', () => {
       recipient_user_id: 'U9999',
     });
 
-    assert(chatStreamStub.calledOnce);
-    const args = chatStreamStub.firstCall.args[0];
+    assert.strictEqual(chatStreamStub.mock.callCount(), 1);
+    const args = chatStreamStub.mock.calls[0].arguments[0];
 
     assert.equal(args.channel, 'C9999');
     assert.equal(args.thread_ts, '9999.0000');
@@ -53,8 +52,8 @@ describe('createSayStream', () => {
     const sayStream = createSayStream(client, ctx, 'C1234', '1234.5678');
     sayStream({ buffer_size: 512 });
 
-    assert(chatStreamStub.calledOnce);
-    const args = chatStreamStub.firstCall.args[0];
+    assert.strictEqual(chatStreamStub.mock.callCount(), 1);
+    const args = chatStreamStub.mock.calls[0].arguments[0];
 
     assert.equal(args.buffer_size, 512);
   });
@@ -68,8 +67,8 @@ describe('createSayStream', () => {
     );
     sayStream();
 
-    assert(chatStreamStub.calledOnce);
-    const args = chatStreamStub.firstCall.args[0];
+    assert.strictEqual(chatStreamStub.mock.callCount(), 1);
+    const args = chatStreamStub.mock.calls[0].arguments[0];
 
     assert.equal(args.recipient_team_id, 'E1234');
   });

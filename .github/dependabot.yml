@@ -3,7 +3,11 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    cooldown:
+      default-days: 7
+      exclude:
+        - "@slack/*"
     open-pull-requests-limit: 5
     allow:
       # allow updates for typescript
@@ -17,6 +21,8 @@ updates:
       - dependency-name: "typedoc-plugin-markdown"
       # allow updates for the changesets release toolchain
       - dependency-name: "@changesets/*"
+      # allow updates for the biome linter and formatter
+      - dependency-name: "@biomejs/biome"
     versioning-strategy: increase
     ignore:
       - dependency-name: "@types/node"
@@ -32,7 +38,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "daily"
+    cooldown:
+      default-days: 7
   - package-ecosystem: "npm"
     directories:
       - "/examples/custom-properties"
@@ -50,7 +58,11 @@ updates:
       - "dependencies"
       - "javascript"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    cooldown:
+      default-days: 7
+      exclude:
+        - "@slack/*"
     versioning-strategy: increase
     ignore:
       - dependency-name: "@types/node"

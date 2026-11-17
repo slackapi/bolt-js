@@ -21,11 +21,7 @@ async function noBotMessages({ message, next }) {
 // The listener only receives messages from humans
 app.message(noBotMessages, async ({ message, logger }) => {
   // Handle only newly posted messages
-  if (
-    message.subtype === undefined ||
-    message.subtype === 'file_share' ||
-    message.subtype === 'thread_broadcast'
-  ) {
+  if (message.subtype === undefined || message.subtype === 'file_share' || message.subtype === 'thread_broadcast') {
     logger.info(`(MSG) User: ${message.user} Message: ${message.text}`);
   }
 });

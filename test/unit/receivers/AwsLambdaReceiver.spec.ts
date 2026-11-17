@@ -1,6 +1,6 @@
+import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import { assert } from 'chai';
-import sinon from 'sinon';
+import { describe, it, mock } from 'node:test';
 import { AppInitializationError } from '../../../src/errors';
 import AwsLambdaReceiver from '../../../src/receivers/AwsLambdaReceiver';
 import {
@@ -31,13 +31,13 @@ describe('AwsLambdaReceiver', () => {
       new AwsLambdaReceiver({ signingSecret: '' });
       assert.fail();
     } catch (error) {
-      assert.instanceOf(error, AppInitializationError);
+      assert.ok(error instanceof AppInitializationError);
     }
   });
 
   it('should succeed with empty signingSecret when signatureVerification is false', async () => {
     const receiver = new AwsLambdaReceiver({ signingSecret: '', signatureVerification: false });
-    assert.isNotNull(receiver);
+    assert.notStrictEqual(receiver, null);
   });
 
   it('should instantiate with default logger', async () => {
@@ -45,7 +45,7 @@ describe('AwsLambdaReceiver', () => {
       signingSecret: 'my-secret',
       logger: noopLogger,
     });
-    assert.isNotNull(awsReceiver);
+    assert.notStrictEqual(awsReceiver, null);
   });
 
   it('should have start method', async () => {
@@ -54,7 +54,7 @@ describe('AwsLambdaReceiver', () => {
       logger: noopLogger,
     });
     const startedHandler = await awsReceiver.start();
-    assert.isNotNull(startedHandler);
+    assert.notStrictEqual(startedHandler, null);
   });
 
   it('should have stop method', async () => {
@@ -249,7 +249,7 @@ describe('AwsLambdaReceiver', () => {
   });
 
   it('should detect invalid signature', async () => {
-    const spy = sinon.spy();
+    const spy = mock.fn();
     const awsReceiver = new AwsLambdaReceiver({
       signingSecret: 'my-secret',
       logger: noopLogger,
@@ -284,7 +284,7 @@ describe('AwsLambdaReceiver', () => {
     };
     const response = await handler(awsEvent, {});
     assert.equal(response.statusCode, 401);
-    assert(spy.calledOnce);
+    assert.strictEqual(spy.mock.callCount(), 1);
   });
 
   it('should detect too old request timestamp', async () => {
@@ -329,6 +329,6 @@ describe('AwsLambdaReceiver', () => {
     await new Promise((res) => {
       setTimeout(res, delay + 2);
     });
-    sinon.assert.notCalled(awsReceiver.logger.error as sinon.SinonSpy);
+    assert.strictEqual(noopLogger.error.mock.callCount(), 0);
   });
 });

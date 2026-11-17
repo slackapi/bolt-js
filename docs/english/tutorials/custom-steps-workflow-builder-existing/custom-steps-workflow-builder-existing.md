@@ -7,6 +7,7 @@ If you don't have a paid workspace for development, you can join the [Developer 
 If you followed along with our [create a custom step for Workflow Builder: new app](/tools/bolt-js/tutorials/custom-steps-workflow-builder-new) tutorial, you have seen how to add custom steps to a brand new app. But what if you have an app up and running currently to which you'd like to add custom steps? You've come to the right place!
 
 In this tutorial we will:
+
 - Start with an existing Bolt app
 - Add a custom **workflow step** in the [app settings](https://api.slack.com/apps)
 - Wire up the new step to a **function listener** in our project, using the [Bolt for JavaScript](https://slack.dev/bolt-js/) framework
@@ -20,7 +21,7 @@ The custom steps feature is compatible with Bolt version 1.20.0 and above. First
 npm install
 ```
 
-In order to add custom workflow steps to an app, the app also needs to be org-ready. To do this, navigate to your [app settings page](https://api.slack.com/apps) and select your Bolt app. 
+In order to add custom workflow steps to an app, the app also needs to be org-ready. To do this, navigate to your [app settings page](https://api.slack.com/apps) and select your Bolt app.
 
 Navigate to **Org Level Apps** in the left nav and click **Opt-In**, then confirm **Yes, Opt-In**.
 
@@ -125,9 +126,9 @@ Next, we'll define a function listener to handle what happens when the workflow 
 
 ### Implementing the function listener {#function-listener}
 
-Direct your attention back to your app project in VSCode or your preferred code editor. Here we'll add logic that your app will execute when the custom step is executed. 
+Direct your attention back to your app project in VSCode or your preferred code editor. Here we'll add logic that your app will execute when the custom step is executed.
 
-Open your `app.js` file and add the following function listener code for the `request_time_off` step. 
+Open your `app.js` file and add the following function listener code for the `request_time_off` step.
 
 ```js
 app.function('request_time_off', async ({ client, inputs, fail }) => {
@@ -187,19 +188,24 @@ The function listener registration method (`.function()`) takes two arguments:
 - The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells the app that a user in the Slack client started a workflow that contains the `request_time_off` custom step.
 
 The callback function offers various utilities that can be used to take action when a function execution event is received. The ones we’ll be using here are:
+
 - `client` provides access to Slack API methods — like the `chat.postMessage` method, which we’ll use later to send a message to a channel
 - `inputs` provides access to the workflow variables passed into the step when the workflow was started
 - `fail` is a utility method for indicating that the step invoked for the current workflow step had an error
 
 ### Implementing the action listener {#action-listener}
 
-This custom step also requires an action listener to respond to the action of a user clicking a button. 
+This custom step also requires an action listener to respond to the action of a user clicking a button.
 
 In that same `app.js` file, add the following action listener:
 
 ```js
 app.action(/^(approve_button|deny_button).*/, async ({ action, body, client, complete, fail }) => {
-  const { channel, message, function_data: { inputs } } = body;
+  const {
+    channel,
+    message,
+    function_data: { inputs },
+  } = body;
   const { manager_id, submitter_id } = inputs;
   const request_decision = action.value === 'approve';
 
@@ -225,6 +231,7 @@ Similar to a function listener, the action listener registration method (`.actio
 - The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells our app that the manager has clicked or tapped the Approve button or the Deny button.
 
 Just like the function listener’s callback function, the action listener’s callback function offers various utilities that can be used to take action when an action event is received. The ones we’ll be using here are:
+
 - `client`, which provides access to Slack API methods
 - `action`, which provides the action’s event payload
 - `complete`, which is a utility method indicating to Slack that the step behind the workflow step that was just invoked has completed successfully
@@ -236,7 +243,7 @@ Now that the custom step has been added to the app and we've defined step and ac
 
 ### Creating a workflow with the new step {#add-new-step}
 
-Turn your attention to the Slack client where your app is installed. 
+Turn your attention to the Slack client where your app is installed.
 
 Open Workflow Builder by clicking on the workspace name, then **Tools**, then **Workflow Builder**.
 

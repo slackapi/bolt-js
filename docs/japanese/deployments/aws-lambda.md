@@ -20,7 +20,7 @@
 
 AWS アカウントをまだ持っていない場合は、[アカウントを作成](https://aws.amazon.com/)する必要があります。画面に表示される案内に沿って作成しましょう。
 
-:::tip 
+:::tip
 
 作成手順の中で請求情報の入力を求められる場合がありますが、ご心配なく。このガイドでは[無料利用枠](https://aws.amazon.com/lambda/pricing/)のみを使用します。
 
@@ -32,7 +32,7 @@ Lambda へのデプロイでは、プログラムから AWS アカウントに�
 
 🍿 [IAM ユーザーを作成してアクセスキーをダウンロードする手順](https://www.youtube.com/watch?v=KngM5bfpttA)を紹介する短い動画を参考にしてみてください。
 
-:::tip 
+:::tip
 
 **すでに IAM ユーザーの作成が完了している場合は、** AWS の公式ガイドに従って [IAM ユーザーのアクセスキーを作成](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds)してください。
 
@@ -58,7 +58,7 @@ aws configure
 # Default output format [None]: json
 ```
 
-:::tip 
+:::tip
 
 [Default region name](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-region) と [Default output format](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-format) は最も望ましい設定でカスタマイズしてください。
 
@@ -125,7 +125,7 @@ const app = new App({
 const { App, AwsLambdaReceiver } = require('@slack/bolt');
 ```
 
-:::tip 
+:::tip
 
 OAuth フローを実装するなら、現時点では [`ExpressReceiver`](https://github.com/slackapi/bolt-js/blob/main/src/receivers/ExpressReceiver.ts) を使用する必要があります。
 
@@ -141,16 +141,16 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 
 // ボットトークンと、AWS Lambda に対応させたレシーバーを使ってアプリを初期化します。
 const app = new App({
-    token: process.env.SLACK_BOT_TOKEN,
-    receiver: awsLambdaReceiver,
-    
-    // AwsLambdaReceiver を利用する場合は  `processBeforeResponse` は省略可能です。
-    // OAuth フローに対応した ExpressReceiver など、他のレシーバーを使用する場合、
-    // `processBeforeResponse: true` が必要になります。
-    // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
-    // これによってハンドラーがトリガーとなった HTTP リクエストに応答を返すことでただちに終了されることを防ぐことができます。
-    
-    // receiver.processBeforeResponse: true
+  token: process.env.SLACK_BOT_TOKEN,
+  receiver: awsLambdaReceiver,
+
+  // AwsLambdaReceiver を利用する場合は  `processBeforeResponse` は省略可能です。
+  // OAuth フローに対応した ExpressReceiver など、他のレシーバーを使用する場合、
+  // `processBeforeResponse: true` が必要になります。
+  // このオプションは、ハンドラーの実行が完了するまで応答を返すのを遅延させます。
+  // これによってハンドラーがトリガーとなった HTTP リクエストに応答を返すことでただちに終了されることを防ぐことができます。
+
+  // receiver.processBeforeResponse: true
 });
 ```
 
@@ -161,7 +161,7 @@ const app = new App({
 module.exports.handler = async (event, context, callback) => {
   const handler = await awsLambdaReceiver.start();
   return handler(event, context, callback);
-}
+};
 ```
 
 完成したアプリのソースコードは、⚡️[deploy-aws-lambda](https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda/app.js) のサンプルのようになります。
@@ -192,7 +192,7 @@ plugins:
   - serverless-offline
 ```
 
-:::tip 
+:::tip
 
 `SLACK_SIGNING_SECRET` と `SLACK_BOT_TOKEN` の環境変数は、ローカルマシンで設定しておく必要があります。[Slack の環境変数をエクスポートする方法](/tools/bolt-js/ja-jp/creating-an-app#setting-up-your-project)を入門ガイドで参照してください。
 
@@ -225,8 +225,8 @@ serverless offline --noPrependStageInUrl
 ```
 
 :::tip
- 
- 別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
+
+別のターミナルで上記のコマンドを実行しておくことで、ターミナル上でアプリのコードを変更することができます。コードの変更を保存する度、アプリは自動的にリロードされます。
 
 :::
 
@@ -236,7 +236,7 @@ serverless offline --noPrependStageInUrl
 ngrok http 3000
 ```
 
-:::tip 
+:::tip
 
 パブリック URL の作成方法と、ローカルマシンへのリクエストの転送方法については、[ngrok の使い方](/tools/bolt-js/ja-jp/creating-an-app#setting-up-events)を参照してください。
 
@@ -269,7 +269,7 @@ Slack アプリをテストします。今作った Bolt アプリを Slack の�
 
 応答がない場合、**リクエスト URL** を確認してからもう一度試してみてください。
 
-:::tip 
+:::tip
 
 **動作の仕組み** : ngrok と Serverless のコマンドは同じポートを使用するように設定されています（デフォルトでは「3000」）。**リクエスト URL** に向けて送信された Slack イベントは、ローカルマシンの ngrok で受信されます。このリクエストはさらに Serverless Offline に転送されます。Serverless Offline は AWS Lambda 関数のイベントをエミュレートしていて、Bolt アプリのレシーバーをトリガーさせます。 🛫🛬 長旅ですね。
 
@@ -298,7 +298,7 @@ serverless deploy
 
 アプリのデプロイが成功すると、**エンドポイント**が発行されます。これをアプリの**リクエスト URL** に指定します。発行された**エンドポイント**をコピーして、次のセクションで使います。
 
-:::tip 
+:::tip
 
 **エンドポイント**は、`/slack/events` で終わる文字列です。
 

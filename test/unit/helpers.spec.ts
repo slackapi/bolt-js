@@ -1,4 +1,5 @@
-import { assert } from 'chai';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import {
   extractEventChannelId,
   extractEventThreadTs,
@@ -116,7 +117,7 @@ describe('Helpers', () => {
         const typeAndConversation = getTypeAndConversation(fakeEventBody);
 
         // Assert
-        assert.isEmpty(typeAndConversation);
+        assert.strictEqual(Object.keys(typeAndConversation).length, 0);
       });
     });
   });
@@ -236,47 +237,47 @@ describe('Helpers', () => {
   });
   describe(`${isRecord.name}()`, () => {
     it('should return true for plain objects', () => {
-      assert.isTrue(isRecord({}));
-      assert.isTrue(isRecord({ key: 'value' }));
+      assert.ok(isRecord({}));
+      assert.ok(isRecord({ key: 'value' }));
     });
 
     it('should return true for arrays', () => {
-      assert.isTrue(isRecord([]));
+      assert.ok(isRecord([]));
     });
 
     it('should return false for null', () => {
-      assert.isFalse(isRecord(null));
+      assert.strictEqual(isRecord(null), false);
     });
 
     it('should return false for undefined', () => {
-      assert.isFalse(isRecord(undefined));
+      assert.strictEqual(isRecord(undefined), false);
     });
 
     it('should return false for primitives', () => {
-      assert.isFalse(isRecord('string'));
-      assert.isFalse(isRecord(42));
-      assert.isFalse(isRecord(true));
+      assert.strictEqual(isRecord('string'), false);
+      assert.strictEqual(isRecord(42), false);
+      assert.strictEqual(isRecord(true), false);
     });
   });
 
   describe(`${hasStringProperty.name}()`, () => {
     it('should return true when key exists with a string value', () => {
-      assert.isTrue(hasStringProperty({ name: 'test' }, 'name'));
+      assert.ok(hasStringProperty({ name: 'test' }, 'name'));
     });
 
     it('should return false when key exists with a non-string value', () => {
-      assert.isFalse(hasStringProperty({ count: 42 }, 'count'));
-      assert.isFalse(hasStringProperty({ flag: true }, 'flag'));
-      assert.isFalse(hasStringProperty({ nested: {} }, 'nested'));
+      assert.strictEqual(hasStringProperty({ count: 42 }, 'count'), false);
+      assert.strictEqual(hasStringProperty({ flag: true }, 'flag'), false);
+      assert.strictEqual(hasStringProperty({ nested: {} }, 'nested'), false);
     });
 
     it('should return false when key does not exist', () => {
-      assert.isFalse(hasStringProperty({ other: 'value' }, 'missing'));
+      assert.strictEqual(hasStringProperty({ other: 'value' }, 'missing'), false);
     });
 
     it('should return false for null or undefined input', () => {
-      assert.isFalse(hasStringProperty(null, 'key'));
-      assert.isFalse(hasStringProperty(undefined, 'key'));
+      assert.strictEqual(hasStringProperty(null, 'key'), false);
+      assert.strictEqual(hasStringProperty(undefined, 'key'), false);
     });
   });
 
@@ -329,7 +330,7 @@ describe('Helpers', () => {
 
     for (const { name, event } of noThreadTsEvents) {
       it(`should return undefined for ${name}`, () => {
-        assert.isUndefined(extractEventThreadTs(event as KnownEventFromType<string>));
+        assert.strictEqual(extractEventThreadTs(event as KnownEventFromType<string>), undefined);
       });
     }
   });
@@ -357,7 +358,7 @@ describe('Helpers', () => {
 
     for (const { name, event } of noTsEvents) {
       it(`should return undefined for ${name}`, () => {
-        assert.isUndefined(extractEventTs(event as KnownEventFromType<string>));
+        assert.strictEqual(extractEventTs(event as KnownEventFromType<string>), undefined);
       });
     }
   });
@@ -408,7 +409,7 @@ describe('Helpers', () => {
 
     for (const { name, event } of noChannelEvents) {
       it(`should return undefined for ${name}`, () => {
-        assert.isUndefined(extractEventChannelId(event as KnownEventFromType<string>));
+        assert.strictEqual(extractEventChannelId(event as KnownEventFromType<string>), undefined);
       });
     }
 

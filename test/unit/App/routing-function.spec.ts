@@ -1,11 +1,12 @@
-import { assert } from 'chai';
-import sinon from 'sinon';
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type App from '../../../src/App';
 import {
   createDummyCustomFunctionMiddlewareArgs,
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noopMiddleware,
   type Override,
@@ -20,31 +21,31 @@ function buildOverrides(secondOverrides: Override[]): Override {
     withNoopAppMetadata(),
     withNoopWebClient(),
     ...secondOverrides,
-    withMemoryStore(sinon.fake()),
-    withConversationContext(sinon.fake.returns(noopMiddleware)),
+    withMemoryStore(mock.fn()),
+    withConversationContext(mock.fn(() => noopMiddleware)),
   );
 }
 
 describe('App function() routing', () => {
   let fakeReceiver: FakeReceiver;
-  const fakeHandler = sinon.fake();
-  const fakeAck = sinon.fake.resolves({});
+  const fakeHandler: MockFn = mock.fn();
+  const fakeAck: MockFn = mock.fn(() => Promise.resolve({}));
   const fakeLogger = createFakeLogger();
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let MockApp: Awaited<ReturnType<typeof importApp>>;
   let app: App;
 
   beforeEach(async () => {
-    fakeLogger.error.reset();
+    fakeLogger.error.mock.resetCalls();
     fakeReceiver = new FakeReceiver();
-    fakeHandler.resetHistory();
-    fakeAck.resetHistory();
+    fakeHandler.mock.resetCalls();
+    fakeAck.mock.resetCalls();
     dummyAuthorizationResult = { botToken: '', botId: '' };
     MockApp = importApp(buildOverrides([]));
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves(dummyAuthorizationResult),
+      authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
     });
   });
   describe('for function executed events', () => {
@@ -58,15 +59,15 @@ describe('App function() routing', () => {
         ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.calledOnce(fakeHandler);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
 
     it('should route a function executed event to a handler with the proper arguments', async () => {
       const testInputs = { test: true };
-      const testHandler = sinon.spy(async ({ inputs, complete, fail, client }) => {
+      const testHandler = mock.fn(async ({ inputs, complete, fail, client }) => {
         assert.equal(inputs, testInputs);
-        assert.typeOf(complete, 'function');
-        assert.typeOf(fail, 'function');
+        assert.strictEqual(typeof complete, 'function');
+        assert.strictEqual(typeof fail, 'function');
         assert.equal(client.token, 'xwfp-valid');
       });
       app.function('my_id', testHandler);
@@ -79,7 +80,7 @@ describe('App function() routing', () => {
         ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.calledOnce(testHandler);
+      assert.strictEqual(testHandler.mock.callCount(), 1);
     });
 
     it('should route a function executed event to a handler and auto ack by default', async () => {
@@ -89,20 +90,20 @@ describe('App function() routing', () => {
         ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.calledOnce(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
     });
 
     it('should route a function executed event to a handler and NOT auto ack if autoAcknowledge is false', async () => {
       app.function('my_id', { autoAcknowledge: false }, fakeHandler);
       const args = createDummyCustomFunctionMiddlewareArgs({ callbackId: 'my_id' });
-      const fakeAck = sinon.fake.resolves({});
+      const fakeAck: MockFn = mock.fn(() => Promise.resolve({}));
       await fakeReceiver.sendEvent({
         ack: fakeAck,
         body: args.body,
       });
-      sinon.assert.calledOnce(fakeHandler);
-      sinon.assert.notCalled(fakeAck);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
+      assert.strictEqual(fakeAck.mock.callCount(), 0);
     });
   });
 });

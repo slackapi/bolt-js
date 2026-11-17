@@ -8,8 +8,8 @@ Hugging Face is an open-source community best known for its transformers library
 
 Before getting started, you will need the following:
 
-* a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* a Hugging Face account in which you can generate an access token.
+- a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
+- a Hugging Face account in which you can generate an access token.
 
 ## Creating your app {#create-app}
 
@@ -39,24 +39,12 @@ Before getting started, you will need the following:
   },
   "oauth_config": {
     "scopes": {
-      "bot": [
-        "assistant:write",
-        "channels:join",
-        "im:history",
-        "channels:history",
-        "groups:history",
-        "chat:write"
-      ]
+      "bot": ["assistant:write", "channels:join", "im:history", "channels:history", "groups:history", "chat:write"]
     }
   },
   "settings": {
     "event_subscriptions": {
-      "bot_events": [
-        "assistant_thread_context_changed",
-        "assistant_thread_started",
-        "message.im",
-        "function_executed"
-      ]
+      "bot_events": ["assistant_thread_context_changed", "assistant_thread_started", "message.im", "function_executed"]
     },
     "interactivity": {
       "is_enabled": true
@@ -99,12 +87,12 @@ Before getting started, you will need the following:
 
 4. Review the configuration and click **Create**. Clicking around in these settings, you can see what the manifest has created for us. Some highlights:
 
-* Within **App Home**, we've enabled the **Chat Tab**. This will allow users to access your app both in the split-view container as well as within a chat tab of the app.
-* **Agents** is enabled. With this toggled on, the split-view container is available for your app.
-* A custom step has been added to **Workflow Steps**. A workflow step is a custom step that can be used in Workflow Builder. Setting up information about that step here (its name, input parameters, and output parameters) lets Slack know what data to collect from the workflow to send to the function. We'll implement the logic step for this in code.
-* **Org Level Apps** has been enabled. This means that your app will be installed at the organization level. Upon installation, it is not added to any workspaces, but the workspace admin can choose which workspaces in the org to add the app to.
-* Within **OAuth & Permissions**, you will find several bot scopes have been added.
-* Within **Event Subscriptions**, you will find several events this app subscribes to, which allow it to respond to user requests appropriately.
+- Within **App Home**, we've enabled the **Chat Tab**. This will allow users to access your app both in the split-view container as well as within a chat tab of the app.
+- **Agents** is enabled. With this toggled on, the split-view container is available for your app.
+- A custom step has been added to **Workflow Steps**. A workflow step is a custom step that can be used in Workflow Builder. Setting up information about that step here (its name, input parameters, and output parameters) lets Slack know what data to collect from the workflow to send to the function. We'll implement the logic step for this in code.
+- **Org Level Apps** has been enabled. This means that your app will be installed at the organization level. Upon installation, it is not added to any workspaces, but the workspace admin can choose which workspaces in the org to add the app to.
+- Within **OAuth & Permissions**, you will find several bot scopes have been added.
+- Within **Event Subscriptions**, you will find several events this app subscribes to, which allow it to respond to user requests appropriately.
 
 5. Navigate to the **Install App** page in the left nav and click **Install to Workspace**, then **Allow** on the screen that follows.
 
@@ -168,9 +156,9 @@ HUGGINGFACE_API_KEY=hf_exampletoken
 Delete the template contents in the `app.js` file and replace it with this:
 
 ````js title="app.js"
-const { App, LogLevel, Assistant } = require("@slack/bolt");
-const { config } = require("dotenv");
-const { InferenceClient } = require("@huggingface/inference");
+const { App, LogLevel, Assistant } = require('@slack/bolt');
+const { config } = require('dotenv');
+const { InferenceClient } = require('@huggingface/inference');
 
 config();
 
@@ -198,24 +186,24 @@ function convertMarkdownToSlack(markdown) {
   // Add newlines around code blocks first
   text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
     code = code.trim();
-    return "\n\n```\n" + code + "\n```\n\n";
+    return '\n\n```\n' + code + '\n```\n\n';
   });
 
   // Fix up any triple+ newlines to be double newlines
-  text = text.replace(/\n{3,}/g, "\n\n");
+  text = text.replace(/\n{3,}/g, '\n\n');
 
   // Remaining markdown conversions
-  text = text.replace(/`([^`]+)`/g, "`$1`");
-  text = text.replace(/\*\*([^*]+)\*\*/g, "*$1*");
-  text = text.replace(/__([^_]+)__/g, "*$1*");
-  text = text.replace(/\*([^*]+)\*/g, "_$1_");
-  text = text.replace(/_([^_]+)_/g, "_$1_");
-  text = text.replace(/~~([^~]+)~~/g, "~$1~");
-  text = text.replace(/^>\s(.+)/gm, ">>>\n$1");
-  text = text.replace(/^#{1,6}\s(.+)$/gm, "*$1*");
-  text = text.replace(/^[\*\-\+]\s(.+)/gm, "• $1");
-  text = text.replace(/^\d+\.\s(.+)/gm, "$1");
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<$2|$1>");
+  text = text.replace(/`([^`]+)`/g, '`$1`');
+  text = text.replace(/\*\*([^*]+)\*\*/g, '*$1*');
+  text = text.replace(/__([^_]+)__/g, '*$1*');
+  text = text.replace(/\*([^*]+)\*/g, '_$1_');
+  text = text.replace(/_([^_]+)_/g, '_$1_');
+  text = text.replace(/~~([^~]+)~~/g, '~$1~');
+  text = text.replace(/^>\s(.+)/gm, '>>>\n$1');
+  text = text.replace(/^#{1,6}\s(.+)$/gm, '*$1*');
+  text = text.replace(/^[\*\-\+]\s(.+)/gm, '• $1');
+  text = text.replace(/^\d+\.\s(.+)/gm, '$1');
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<$2|$1>');
 
   return text;
 }
@@ -224,33 +212,29 @@ function convertMarkdownToSlack(markdown) {
 const assistant = new Assistant({
   threadStarted: async ({ logger, say, setSuggestedPrompts }) => {
     try {
-      await say(
-        "Hi! I'm your coding assistant. Ask me any questions about code!",
-      );
+      await say("Hi! I'm your coding assistant. Ask me any questions about code!");
 
       const prompts = [
         {
-          title: "Code Example",
-          message:
-            "Show me an example of implementing a binary search tree in JavaScript.",
+          title: 'Code Example',
+          message: 'Show me an example of implementing a binary search tree in JavaScript.',
         },
         {
-          title: "Code Review",
-          message:
-            "What are best practices for writing clean, maintainable code?",
+          title: 'Code Review',
+          message: 'What are best practices for writing clean, maintainable code?',
         },
         {
-          title: "Debug Help",
-          message: "How do I debug memory leaks in Node.js applications?",
+          title: 'Debug Help',
+          message: 'How do I debug memory leaks in Node.js applications?',
         },
       ];
 
       await setSuggestedPrompts({
         prompts,
-        title: "Here are some questions you can ask:",
+        title: 'Here are some questions you can ask:',
       });
     } catch (error) {
-      logger.error("Error in threadStarted:", error);
+      logger.error('Error in threadStarted:', error);
     }
   },
 
@@ -259,7 +243,7 @@ const assistant = new Assistant({
 
     try {
       await setTitle(message.text);
-      await setStatus("is thinking...");
+      await setStatus('is thinking...');
 
       // Retrieve the Assistant thread history for context of question being asked
       const thread = await client.conversations.replies({
@@ -269,33 +253,25 @@ const assistant = new Assistant({
       });
 
       // Prepare and tag each message for LLM processing
-      const userMessage = { role: "user", content: message.text };
+      const userMessage = { role: 'user', content: message.text };
       const threadHistory = thread.messages.map((m) => {
-        const role = m.bot_id ? "assistant" : "user";
+        const role = m.bot_id ? 'assistant' : 'user';
         return { role, content: m.text };
       });
 
-      const messages = [
-        { role: "system", content: DEFAULT_SYSTEM_CONTENT },
-        ...threadHistory,
-        userMessage,
-      ];
+      const messages = [{ role: 'system', content: DEFAULT_SYSTEM_CONTENT }, ...threadHistory, userMessage];
 
       const modelResponse = await hfClient.chatCompletion({
-        model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+        model: 'Qwen/Qwen2.5-Coder-32B-Instruct',
         messages,
         max_tokens: 2000,
       });
 
-      await setStatus("is typing...");
-      await say(
-        convertMarkdownToSlack(modelResponse.choices[0].message.content),
-      );
+      await setStatus('is typing...');
+      await say(convertMarkdownToSlack(modelResponse.choices[0].message.content));
     } catch (error) {
-      logger.error("Error in userMessage:", error);
-      await say(
-        "I'm sorry, I ran into an error processing your request. Please try again.",
-      );
+      logger.error('Error in userMessage:', error);
+      await say("I'm sorry, I ran into an error processing your request. Please try again.");
     }
   },
 });
@@ -304,7 +280,7 @@ const assistant = new Assistant({
 app.assistant(assistant);
 
 // Set up custom function for assistant
-app.function("code_assist", async ({ client, inputs, logger, complete, fail }) => {
+app.function('code_assist', async ({ client, inputs, logger, complete, fail }) => {
   try {
     const { channel_id, message_id } = inputs;
     let messages;
@@ -318,13 +294,13 @@ app.function("code_assist", async ({ client, inputs, logger, complete, fail }) =
       });
 
       messages = [
-        { role: "system", content: DEFAULT_SYSTEM_CONTENT },
-        { role: "user", content: result.messages[0].text },
+        { role: 'system', content: DEFAULT_SYSTEM_CONTENT },
+        { role: 'user', content: result.messages[0].text },
       ];
     } catch (e) {
       // If the Assistant is not in the channel it's being asked about,
       // have it join the channel and then retry the API call
-      if (e.data.error === "not_in_channel") {
+      if (e.data.error === 'not_in_channel') {
         await client.conversations.join({ channel: channel_id });
         const result = await client.conversations.history({
           channel: channel_id,
@@ -334,8 +310,8 @@ app.function("code_assist", async ({ client, inputs, logger, complete, fail }) =
         });
 
         messages = [
-          { role: "system", content: DEFAULT_SYSTEM_CONTENT },
-          { role: "user", content: result.messages[0].text },
+          { role: 'system', content: DEFAULT_SYSTEM_CONTENT },
+          { role: 'user', content: result.messages[0].text },
         ];
       } else {
         logger.error(e);
@@ -343,16 +319,14 @@ app.function("code_assist", async ({ client, inputs, logger, complete, fail }) =
     }
 
     const modelResponse = await hfClient.chatCompletion({
-      model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+      model: 'Qwen/Qwen2.5-Coder-32B-Instruct',
       messages,
       max_tokens: 2000,
     });
 
     await complete({
       outputs: {
-        message: convertMarkdownToSlack(
-          modelResponse.choices[0].message.content,
-        ),
+        message: convertMarkdownToSlack(modelResponse.choices[0].message.content),
       },
     });
   } catch (error) {
@@ -365,20 +339,20 @@ app.function("code_assist", async ({ client, inputs, logger, complete, fail }) =
 (async () => {
   try {
     await app.start();
-    app.logger.info("⚡️ Code Assistant app is running!");
+    app.logger.info('⚡️ Code Assistant app is running!');
   } catch (error) {
-    app.logger.error("Failed to start app:", error);
+    app.logger.error('Failed to start app:', error);
   }
 })();
 ````
 
 This is the meat of our app! Here's a breakdown of what we've added:
 
-* `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model. Think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
-* `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](/reference/block-kit/blocks/markdown-block) to achieve the same result.
-* `assistant` is an instance of the [`Assistant` class](/tools/bolt-js/concepts/using-the-assistant-class); this sets up the suggested prompts that the user sees in the split-view container upon opening your app.
-* `userMessage` is the handler that takes care of the fiddly bits around getting the thread history, preparing the structure of the messages for processing in a way that the model is expecting, interacting with the model, and responding to the user.
-* `app.function` sets up the custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 This is the implementation logic of the custom workflow step we saw created by the manifest in the app settings. We use the [`conversations.history`](/reference/methods/conversations.history) method to find the message where the emoji reaction was placed, then send that to the model as the question.
+- `DEFAULT_SYSTEM_CONTENT` is a set of instructions for the model. Think of it as setting the scene in the play that is the interaction between your users and the AI model; it is the context for the role that the model will be playing.
+- `convertMarkdownToSlack` is a function that converts traditional markdown to the markdown that Slack uses (which is different). Alternatively, you could send the model's response through the [markdown block](/reference/block-kit/blocks/markdown-block) to achieve the same result.
+- `assistant` is an instance of the [`Assistant` class](/tools/bolt-js/concepts/using-the-assistant-class); this sets up the suggested prompts that the user sees in the split-view container upon opening your app.
+- `userMessage` is the handler that takes care of the fiddly bits around getting the thread history, preparing the structure of the messages for processing in a way that the model is expecting, interacting with the model, and responding to the user.
+- `app.function` sets up the custom function that can be used to achieve the same result of `userMessage` but as a custom step in a workflow built in Workflow Builder 🎉 This is the implementation logic of the custom workflow step we saw created by the manifest in the app settings. We use the [`conversations.history`](/reference/methods/conversations.history) method to find the message where the emoji reaction was placed, then send that to the model as the question.
 
 ### Run the app {#run}
 

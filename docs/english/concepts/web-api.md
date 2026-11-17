@@ -22,10 +22,9 @@ app.message('wake me up', async ({ message, client, logger }) => {
     const result = await client.chat.scheduleMessage({
       channel: message.channel,
       post_at: whenSeptemberEnds,
-      text: 'Summer has come and passed'
+      text: 'Summer has come and passed',
     });
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
   }
 });

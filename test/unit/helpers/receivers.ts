@@ -1,10 +1,11 @@
 import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
-import sinon, { type SinonSpy } from 'sinon';
+import { type Mock, mock } from 'node:test';
 import type App from '../../../src/App';
 import type { AwsEvent } from '../../../src/receivers/AwsLambdaReceiver';
 import type { Receiver, ReceiverEvent } from '../../../src/types';
 import type { Override } from './app';
+import type { MockFn } from './index';
 
 export class FakeReceiver implements Receiver {
   private bolt: App | undefined;
@@ -13,11 +14,11 @@ export class FakeReceiver implements Receiver {
     this.bolt = bolt;
   };
 
-  public start = sinon.fake(
+  public start = mock.fn(
     (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
   );
 
-  public stop = sinon.fake(
+  public stop = mock.fn(
     (...params: Parameters<typeof App.prototype.start>): Promise<unknown> => Promise.resolve([...params]),
   );
 
@@ -27,9 +28,9 @@ export class FakeReceiver implements Receiver {
 }
 
 export class FakeServer extends EventEmitter {
-  public on = sinon.fake();
+  public override on: Mock<(...args: unknown[]) => this> = mock.fn(() => this);
 
-  public listen = sinon.fake((_opts: Record<string, unknown>, cb: () => void) => {
+  public listen = mock.fn((_opts: Record<string, unknown>, cb: () => void) => {
     if (this.listeningFailure !== undefined) {
       this.emit('error', this.listeningFailure);
     }
@@ -37,7 +38,7 @@ export class FakeServer extends EventEmitter {
   });
 
   // biome-ignore lint/suspicious/noExplicitAny: event handlers could accept anything as parameters
-  public close = sinon.fake((...args: any[]) => {
+  public close = mock.fn((...args: any[]) => {
     setImmediate(() => {
       this.emit('close');
       setImmediate(() => {
@@ -53,18 +54,18 @@ export class FakeServer extends EventEmitter {
     super();
   }
 }
-export function withHttpCreateServer(spy: SinonSpy): Override {
+export function withHttpCreateServer(fake: MockFn): Override {
   return {
     'node:http': {
-      createServer: spy,
+      createServer: fake,
     },
   };
 }
 
-export function withHttpsCreateServer(spy: SinonSpy): Override {
+export function withHttpsCreateServer(fake: MockFn): Override {
   return {
     'node:https': {
-      createServer: spy,
+      createServer: fake,
     },
   };
 }

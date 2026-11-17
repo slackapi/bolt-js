@@ -1,6 +1,6 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it, mock } from 'node:test';
 import type { WebClient } from '@slack/web-api';
-import { assert } from 'chai';
-import sinon, { type SinonSpy } from 'sinon';
 import { LogLevel } from '../../../../src/App';
 import type { SayStreamFn } from '../../../../src/context/create-say-stream';
 import type { SetStatusFn } from '../../../../src/context/create-set-status';
@@ -15,6 +15,7 @@ import {
   createFakeLogger,
   FakeReceiver,
   importApp,
+  type MockFn,
   mergeOverrides,
   noop,
   noopMiddleware,
@@ -31,8 +32,8 @@ import {
 
 describe('App middleware and listener arguments', () => {
   let fakeReceiver: FakeReceiver;
-  let fakeErrorHandler: SinonSpy;
-  let fakeAck: SinonSpy;
+  let fakeErrorHandler: MockFn;
+  let fakeAck: MockFn;
   let dummyAuthorizationResult: { botToken: string; botId: string };
   let overrides: Override;
 
@@ -43,16 +44,16 @@ describe('App middleware and listener arguments', () => {
     overrides = mergeOverrides(
       withNoopAppMetadata(),
       ...secondOverrides,
-      withMemoryStore(sinon.fake()),
-      withConversationContext(sinon.fake.returns(noopMiddleware)),
+      withMemoryStore(mock.fn()),
+      withConversationContext(mock.fn(() => noopMiddleware)),
     );
     return overrides;
   }
 
   beforeEach(() => {
     fakeReceiver = new FakeReceiver();
-    fakeErrorHandler = sinon.fake();
-    fakeAck = sinon.fake();
+    fakeErrorHandler = mock.fn();
+    fakeAck = mock.fn();
     dummyAuthorizationResult = { botToken: '', botId: '' };
   });
 
@@ -60,7 +61,7 @@ describe('App middleware and listener arguments', () => {
     it('should extract valid enterprise_id in a shared channel #935', async () => {
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
-      const fakeHandler = sinon.fake();
+      const fakeHandler: MockFn = mock.fn();
 
       const app = new MockApp({
         receiver: fakeReceiver,
@@ -90,14 +91,14 @@ describe('App middleware and listener arguments', () => {
         ack: fakeAck,
       });
 
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
     it('should be skipped for tokens_revoked events #674', async () => {
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
-      const fakeAuthorize = sinon.fake.resolves({});
-      const fakeHandler = sinon.fake();
+      const fakeAuthorize = mock.fn(() => Promise.resolve({}));
+      const fakeHandler: MockFn = mock.fn();
 
       const app = new MockApp({
         receiver: fakeReceiver,
@@ -110,8 +111,8 @@ describe('App middleware and listener arguments', () => {
         ...createDummyAppMentionEventMiddlewareArgs(),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeAuthorize);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeAuthorize.mock.callCount(), 1);
 
       await fakeReceiver.sendEvent({
         ack: fakeAck,
@@ -129,15 +130,15 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledTwice(fakeAck);
-      sinon.assert.calledOnce(fakeAuthorize); // still 1
-      sinon.assert.calledOnce(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 2);
+      assert.strictEqual(fakeAuthorize.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
     it('should be skipped for app_uninstalled events #674', async () => {
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
-      const fakeAuthorize = sinon.fake.resolves({});
-      const fakeHandler = sinon.fake();
+      const fakeAuthorize = mock.fn(() => Promise.resolve({}));
+      const fakeHandler: MockFn = mock.fn();
 
       const app = new MockApp({
         receiver: fakeReceiver,
@@ -150,8 +151,8 @@ describe('App middleware and listener arguments', () => {
         ...createDummyAppMentionEventMiddlewareArgs(),
         ack: fakeAck,
       });
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeAuthorize);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeAuthorize.mock.callCount(), 1);
 
       await fakeReceiver.sendEvent({
         ack: fakeAck,
@@ -165,9 +166,9 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledTwice(fakeAck);
-      sinon.assert.calledOnce(fakeAuthorize); // still 1
-      sinon.assert.calledOnce(fakeHandler);
+      assert.strictEqual(fakeAck.mock.callCount(), 2);
+      assert.strictEqual(fakeAuthorize.mock.callCount(), 1);
+      assert.strictEqual(fakeHandler.mock.callCount(), 1);
     });
   });
 
@@ -176,13 +177,13 @@ describe('App middleware and listener arguments', () => {
       const responseText = 'response';
       const response_url = 'https://fake.slack/response_url';
       const action_id = 'block_action_id';
-      const fakeFetch = sinon.fake.resolves(new Response(null, { status: 200 }));
+      const fakeFetch: MockFn = mock.fn(() => Promise.resolve(new Response(null, { status: 200 })));
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
       const app = new MockApp({
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
         clientOptions: { fetch: fakeFetch },
       });
       app.action(action_id, async ({ respond }) => {
@@ -206,23 +207,23 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      sinon.assert.notCalled(fakeErrorHandler);
-      sinon.assert.calledOnce(fakeFetch);
-      assert.equal(fakeFetch.firstCall.args[0], response_url);
-      assert.deepEqual(JSON.parse(fakeFetch.firstCall.args[1].body), { text: responseText });
+      assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
+      assert.strictEqual(fakeFetch.mock.callCount(), 1);
+      assert.equal(fakeFetch.mock.calls[0].arguments[0], response_url);
+      assert.deepEqual(JSON.parse(fakeFetch.mock.calls[0].arguments[1].body), { text: responseText });
     });
 
     it('should respond with a response object', async () => {
       const responseObject = { text: 'response' };
       const response_url = 'https://fake.slack/response_url';
       const action_id = 'block_action_id';
-      const fakeFetch = sinon.fake.resolves(new Response(null, { status: 200 }));
+      const fakeFetch: MockFn = mock.fn(() => Promise.resolve(new Response(null, { status: 200 })));
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
       const app = new MockApp({
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
         clientOptions: { fetch: fakeFetch },
       });
       app.action(action_id, async ({ respond }) => {
@@ -246,20 +247,20 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      sinon.assert.calledOnce(fakeFetch);
-      assert.equal(fakeFetch.firstCall.args[0], response_url);
-      assert.deepEqual(JSON.parse(fakeFetch.firstCall.args[1].body), responseObject);
+      assert.strictEqual(fakeFetch.mock.callCount(), 1);
+      assert.equal(fakeFetch.mock.calls[0].arguments[0], response_url);
+      assert.deepEqual(JSON.parse(fakeFetch.mock.calls[0].arguments[1].body), responseObject);
     });
     it('should be able to use respond for view_submission payloads', async () => {
       const responseObject = { text: 'response' };
       const responseUrl = 'https://fake.slack/response_url';
-      const fakeFetch = sinon.fake.resolves(new Response(null, { status: 200 }));
+      const fakeFetch: MockFn = mock.fn(() => Promise.resolve(new Response(null, { status: 200 })));
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
       const app = new MockApp({
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
         clientOptions: { fetch: fakeFetch },
       });
       app.view('view-id', async ({ respond }) => {
@@ -286,9 +287,9 @@ describe('App middleware and listener arguments', () => {
         ),
       );
 
-      sinon.assert.calledOnce(fakeFetch);
-      assert.equal(fakeFetch.firstCall.args[0], responseUrl);
-      assert.deepEqual(JSON.parse(fakeFetch.firstCall.args[1].body), responseObject);
+      assert.strictEqual(fakeFetch.mock.callCount(), 1);
+      assert.equal(fakeFetch.mock.calls[0].arguments[0], responseUrl);
+      assert.deepEqual(JSON.parse(fakeFetch.mock.calls[0].arguments[1].body), responseObject);
     });
   });
 
@@ -299,7 +300,7 @@ describe('App middleware and listener arguments', () => {
       const app = new MockApp({
         logger: fakeLogger,
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
       app.use(async ({ logger, body, next }) => {
         logger.info(body);
@@ -333,9 +334,9 @@ describe('App middleware and listener arguments', () => {
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeLogger.info);
-      sinon.assert.calledOnce(fakeLogger.debug);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.info.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.debug.mock.callCount(), 1);
     });
 
     it('should work in the case both logger and logLevel are given', async () => {
@@ -345,7 +346,7 @@ describe('App middleware and listener arguments', () => {
         logger: fakeLogger,
         logLevel: LogLevel.DEBUG,
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
       app.use(async ({ logger, body, next }) => {
         logger.info(body);
@@ -379,10 +380,10 @@ describe('App middleware and listener arguments', () => {
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      sinon.assert.calledOnce(fakeAck);
-      sinon.assert.calledOnce(fakeLogger.info);
-      sinon.assert.calledOnce(fakeLogger.debug);
-      sinon.assert.calledOnce(fakeLogger.setLevel);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.info.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.debug.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.setLevel.mock.callCount(), 1);
     });
   });
 
@@ -437,9 +438,9 @@ describe('App middleware and listener arguments', () => {
 
       await Promise.all(receiverEvents.map((evt) => fakeReceiver.sendEvent(evt)));
 
-      sinon.assert.calledThrice(fakeAck);
+      assert.strictEqual(fakeAck.mock.callCount(), 3);
 
-      assert.isUndefined(app.client.token);
+      assert.strictEqual(app.client.token, undefined);
       assert.equal(clients[0].token, 'xoxb-123');
       assert.equal(clients[1].token, 'xoxp-456');
       assert.equal(clients[2].token, 'xoxb-123');
@@ -536,14 +537,17 @@ describe('App middleware and listener arguments', () => {
     }
     describe('for events that should include say() utility', () => {
       it('should send a simple message to a channel where the incoming event originates', async () => {
-        const fakePostMessage = sinon.fake.resolves({});
+        const fakePostMessage: MockFn = mock.fn(() => Promise.resolve({}));
         overrides = buildOverrides([withPostMessage(fakePostMessage)]);
         const MockApp = importApp(overrides);
 
         const dummyMessage = 'test';
         const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
-        const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+        const app = new MockApp({
+          receiver: fakeReceiver,
+          authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+        });
         app.use(async (args) => {
           // biome-ignore lint/suspicious/noExplicitAny: By definition, these events should all produce a say function, so we cast args.say into a SayFn
           const say = (args as any).say as SayFn;
@@ -552,25 +556,28 @@ describe('App middleware and listener arguments', () => {
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        sinon.assert.callCount(fakePostMessage, dummyReceiverEvents.length);
+        assert.strictEqual(fakePostMessage.mock.callCount(), dummyReceiverEvents.length);
         // Assert that each call to fakePostMessage had the right arguments
-        for (const call of fakePostMessage.getCalls()) {
-          const firstArg = call.args[0];
-          assert.propertyVal(firstArg, 'text', dummyMessage);
-          assert.propertyVal(firstArg, 'channel', dummyChannelId);
+        for (const call of fakePostMessage.mock.calls) {
+          const firstArg = call.arguments[0];
+          assert.strictEqual(firstArg.text, dummyMessage);
+          assert.strictEqual(firstArg.channel, dummyChannelId);
         }
-        sinon.assert.notCalled(fakeErrorHandler);
+        assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
       });
 
       it('should send a complex message to a channel where the incoming event originates', async () => {
-        const fakePostMessage = sinon.fake.resolves({});
+        const fakePostMessage: MockFn = mock.fn(() => Promise.resolve({}));
         overrides = buildOverrides([withPostMessage(fakePostMessage)]);
         const MockApp = importApp(overrides);
 
         const dummyMessage = { text: 'test' };
         const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
-        const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+        const app = new MockApp({
+          receiver: fakeReceiver,
+          authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+        });
         app.use(async (args) => {
           // biome-ignore lint/suspicious/noExplicitAny: By definition, these events should all produce a say function, so we cast args.say into a SayFn
           const say = (args as any).say as SayFn;
@@ -579,14 +586,14 @@ describe('App middleware and listener arguments', () => {
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        sinon.assert.callCount(fakePostMessage, dummyReceiverEvents.length);
+        assert.strictEqual(fakePostMessage.mock.callCount(), dummyReceiverEvents.length);
         // Assert that each call to fakePostMessage had the right arguments
-        for (const call of fakePostMessage.getCalls()) {
-          const firstArg = call.args[0];
-          assert.propertyVal(firstArg, 'channel', dummyChannelId);
-          assert.propertyVal(firstArg, 'text', dummyMessage.text);
+        for (const call of fakePostMessage.mock.calls) {
+          const firstArg = call.arguments[0];
+          assert.strictEqual(firstArg.channel, dummyChannelId);
+          assert.strictEqual(firstArg.text, dummyMessage.text);
         }
-        sinon.assert.notCalled(fakeErrorHandler);
+        assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
       });
     });
 
@@ -640,12 +647,15 @@ describe('App middleware and listener arguments', () => {
         overrides = buildOverrides([withNoopWebClient()]);
         const MockApp = importApp(overrides);
 
-        const assertionAggregator = sinon.fake();
+        const assertionAggregator = mock.fn();
         const dummyReceiverEvents = createReceiverEventsWithoutSay(dummyChannelId);
 
-        const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+        const app = new MockApp({
+          receiver: fakeReceiver,
+          authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+        });
         app.use(async (args) => {
-          assert.notProperty(args, 'say');
+          assert.ok(!('say' in args));
           // If the above assertion fails, then it would throw an AssertionError and the following line will not be
           // called
           assertionAggregator();
@@ -653,18 +663,21 @@ describe('App middleware and listener arguments', () => {
 
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        sinon.assert.callCount(assertionAggregator, dummyReceiverEvents.length);
+        assert.strictEqual(assertionAggregator.mock.callCount(), dummyReceiverEvents.length);
       });
 
       it("should handle failures through the App's global error handler", async () => {
-        const fakePostMessage = sinon.fake.rejects(new Error('fake error'));
+        const fakePostMessage = mock.fn(() => Promise.reject(new Error('fake error')));
         overrides = buildOverrides([withPostMessage(fakePostMessage)]);
         const MockApp = importApp(overrides);
 
         const dummyMessage = { text: 'test' };
         const dummyReceiverEvents = createChannelContextualReceiverEvents(dummyChannelId);
 
-        const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+        const app = new MockApp({
+          receiver: fakeReceiver,
+          authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+        });
         app.use(async (args) => {
           // biome-ignore lint/suspicious/noExplicitAny: By definition, these events should all produce a say function, so we cast args.say into a SayFn
           const say = (args as any).say as SayFn;
@@ -673,23 +686,26 @@ describe('App middleware and listener arguments', () => {
         app.error(fakeErrorHandler);
         await Promise.all(dummyReceiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-        sinon.assert.callCount(fakeErrorHandler, dummyReceiverEvents.length);
+        assert.strictEqual(fakeErrorHandler.mock.callCount(), dummyReceiverEvents.length);
       });
     });
   });
 
   describe('sayStream()', () => {
     it('should be available for events with channel and ts context', async () => {
-      const fakeChatStream = sinon.fake.returns({});
+      const fakeChatStream: MockFn = mock.fn(() => ({}));
       overrides = buildOverrides([withChatStream(fakeChatStream)]);
       const MockApp = importApp(overrides);
 
-      const assertionAggregator = sinon.fake();
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const assertionAggregator = mock.fn();
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+      });
       app.use(async (args) => {
         // biome-ignore lint/suspicious/noExplicitAny: test utility
         const sayStream = (args as any).sayStream as SayStreamFn;
-        assert.isFunction(sayStream);
+        assert.strictEqual(typeof sayStream, 'function');
         assertionAggregator();
       });
       app.error(fakeErrorHandler);
@@ -707,16 +723,19 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledOnce(assertionAggregator);
-      sinon.assert.notCalled(fakeErrorHandler);
+      assert.strictEqual(assertionAggregator.mock.callCount(), 1);
+      assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
     });
 
     it('should call client.chatStream when invoked', async () => {
-      const fakeChatStream = sinon.fake.returns({});
+      const fakeChatStream: MockFn = mock.fn(() => ({}));
       overrides = buildOverrides([withChatStream(fakeChatStream)]);
       const MockApp = importApp(overrides);
 
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+      });
       app.use(async (args) => {
         // biome-ignore lint/suspicious/noExplicitAny: test utility
         const sayStream = (args as any).sayStream as SayStreamFn;
@@ -739,21 +758,24 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledOnce(fakeChatStream);
-      const chatStreamArgs = fakeChatStream.firstCall.args[0] as Record<string, unknown>;
+      assert.strictEqual(fakeChatStream.mock.callCount(), 1);
+      const chatStreamArgs = fakeChatStream.mock.calls[0].arguments[0] as Record<string, unknown>;
       assert.equal(chatStreamArgs.channel, dummyChannelId);
       assert.equal(chatStreamArgs.thread_ts, '1111.2222');
-      sinon.assert.notCalled(fakeErrorHandler);
+      assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
     });
 
     it('should not be available for events without channel context', async () => {
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
-      const assertionAggregator = sinon.fake();
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const assertionAggregator = mock.fn();
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+      });
       app.use(async (args) => {
-        assert.notProperty(args, 'sayStream');
+        assert.ok(!('sayStream' in args));
         assertionAggregator();
       });
 
@@ -768,22 +790,25 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledOnce(assertionAggregator);
+      assert.strictEqual(assertionAggregator.mock.callCount(), 1);
     });
   });
 
   describe('setStatus()', () => {
     it('should be available for events with channel and ts context', async () => {
-      const fakeSetStatus = sinon.fake.resolves({ ok: true });
+      const fakeSetStatus = mock.fn(() => Promise.resolve({ ok: true }));
       overrides = buildOverrides([withSetStatus(fakeSetStatus)]);
       const MockApp = importApp(overrides);
 
-      const assertionAggregator = sinon.fake();
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const assertionAggregator = mock.fn();
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+      });
       app.use(async (args) => {
         // biome-ignore lint/suspicious/noExplicitAny: test utility
         const setStatus = (args as any).setStatus as SetStatusFn;
-        assert.isFunction(setStatus);
+        assert.strictEqual(typeof setStatus, 'function');
         assertionAggregator();
       });
       app.error(fakeErrorHandler);
@@ -801,18 +826,21 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledOnce(assertionAggregator);
-      sinon.assert.notCalled(fakeErrorHandler);
+      assert.strictEqual(assertionAggregator.mock.callCount(), 1);
+      assert.strictEqual(fakeErrorHandler.mock.callCount(), 0);
     });
 
     it('should not be available for events without channel context', async () => {
       overrides = buildOverrides([withNoopWebClient()]);
       const MockApp = importApp(overrides);
 
-      const assertionAggregator = sinon.fake();
-      const app = new MockApp({ receiver: fakeReceiver, authorize: sinon.fake.resolves(dummyAuthorizationResult) });
+      const assertionAggregator = mock.fn();
+      const app = new MockApp({
+        receiver: fakeReceiver,
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
+      });
       app.use(async (args) => {
-        assert.notProperty(args, 'setStatus');
+        assert.ok(!('setStatus' in args));
         assertionAggregator();
       });
 
@@ -827,7 +855,7 @@ describe('App middleware and listener arguments', () => {
         },
       });
 
-      sinon.assert.calledOnce(assertionAggregator);
+      assert.strictEqual(assertionAggregator.mock.callCount(), 1);
     });
   });
 
@@ -838,7 +866,7 @@ describe('App middleware and listener arguments', () => {
       const app = new MockApp({
         logger: fakeLogger,
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
       app.use(async ({ ack, next }) => {
         if (ack) {
@@ -895,8 +923,9 @@ describe('App middleware and listener arguments', () => {
 
       await Promise.all(receiverEvents.map((event) => fakeReceiver.sendEvent(event)));
 
-      sinon.assert.calledOnceWithExactly(fakeLogger.info, 'Events API');
-      sinon.assert.calledTwice(fakeAck);
+      assert.strictEqual(fakeLogger.info.mock.callCount(), 1);
+      assert.deepStrictEqual(fakeLogger.info.mock.calls[0].arguments, ['Events API']);
+      assert.strictEqual(fakeAck.mock.callCount(), 2);
     });
   });
 
@@ -909,7 +938,7 @@ describe('App middleware and listener arguments', () => {
 
       const app = new MockApp({
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
 
       app.view(callback_id, async ({ ack, context, view }) => {
@@ -927,7 +956,7 @@ describe('App middleware and listener arguments', () => {
         ack: fakeAck,
       });
 
-      sinon.assert.calledOnce(fakeAck);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
     });
 
     it('should have function executed event details from a custom step payload', async () => {
@@ -945,7 +974,7 @@ describe('App middleware and listener arguments', () => {
       const app = new MockApp({
         attachFunctionToken: false, // https://github.com/slackapi/bolt-js/pull/2513
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
 
       let called = false;
@@ -967,8 +996,8 @@ describe('App middleware and listener arguments', () => {
         ack: fakeAck,
       });
 
-      assert.isTrue(called);
-      sinon.assert.calledOnce(fakeAck);
+      assert.ok(called);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
     });
 
     it('should have function executed event details from a block actions payload', async () => {
@@ -986,7 +1015,7 @@ describe('App middleware and listener arguments', () => {
       const app = new MockApp({
         attachFunctionToken: false, // https://github.com/slackapi/bolt-js/pull/2513
         receiver: fakeReceiver,
-        authorize: sinon.fake.resolves(dummyAuthorizationResult),
+        authorize: mock.fn(() => Promise.resolve(dummyAuthorizationResult)),
       });
 
       app.action(callbackId, async ({ ack, context }) => {
@@ -1013,7 +1042,7 @@ describe('App middleware and listener arguments', () => {
         ack: fakeAck,
       });
 
-      sinon.assert.calledOnce(fakeAck);
+      assert.strictEqual(fakeAck.mock.callCount(), 1);
     });
   });
 });

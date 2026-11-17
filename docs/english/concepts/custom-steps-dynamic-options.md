@@ -10,7 +10,7 @@ Let's say a builder wants to add a custom step in Workflow Builder that creates 
 
 As a developer, dynamic options allow you to supply data to input parameters of custom steps so that you can provide builders with varying sets of fields based on the builders' selections.
 
-In this example, the primary step would invoke a separate project selection step that retrieves the list of available projects. The builder-selected item from the  retrieved list would then be used as the input to the secondary issue creation step.
+In this example, the primary step would invoke a separate project selection step that retrieves the list of available projects. The builder-selected item from the retrieved list would then be used as the input to the secondary issue creation step.
 
 There are two parts necessary for Slack apps to support dynamic options: custom step definitions, and handling custom step dynamic options. We'll take a look at both in the following sections.
 
@@ -62,7 +62,7 @@ The following code snippet from our issue creation example discussed above shows
 ```
 ### Defining the `function` and `inputs` attributes {#define-attributes}
 
-Defining the `function` and `inputs` attributes of the `dynamic_options` property would look as follows: 
+Defining the `function` and `inputs` attributes of the `dynamic_options` property would look as follows:
 
 ```
 "dynamic_options": {
@@ -185,7 +185,7 @@ The input parameter that defines the dynamic option must be of type [`object`](/
 
 ### Dynamic option types {#dynamic-option-types}
 
-As mentioned earlier, in order to use a custom step as a dynamic option, its output must adhere to a defined interface: it must have an `options` output parameter of the type either [`options_select`](/reference/types/options_select-type) or [`options_field`](/reference/types/options_field-type). 
+As mentioned earlier, in order to use a custom step as a dynamic option, its output must adhere to a defined interface: it must have an `options` output parameter of the type either [`options_select`](/reference/types/options_select-type) or [`options_field`](/reference/types/options_field-type).
 
 To take a look at these in more detail, refer to our [Options Slack type](/reference/types) documentation.
 
@@ -193,12 +193,12 @@ To take a look at these in more detail, refer to our [Options Slack type](/refer
 
 Each custom step defined in the manifest needs a corresponding handler in your Slack app. Although implemented similarly to existing function execution event handlers, there are two key differences between regular custom step invocations and those used for dynamic options:
 
-* The custom step must have an `options` output parameter that is of type [`options_select`](/reference/types/options_select-type) or [`options_field`](/reference/types/options_field-type).
-* The [`function_executed`](/reference/events/function_executed) event must be handled synchronously. This optimizes the response time of returned dynamic options and provides a crisp builder experience.
+- The custom step must have an `options` output parameter that is of type [`options_select`](/reference/types/options_select-type) or [`options_field`](/reference/types/options_field-type).
+- The [`function_executed`](/reference/events/function_executed) event must be handled synchronously. This optimizes the response time of returned dynamic options and provides a crisp builder experience.
 
 ### Asynchronous event handling {#async}
 
-By default, the [Bolt family of frameworks](/tools) handles `function_executed` events asynchronously. 
+By default, the [Bolt family of frameworks](/tools) handles `function_executed` events asynchronously.
 
 For example, the various modal-related API methods provide two ways to update a view: synchronously using a `response_action` HTTP response, or asynchronously using a separate HTTP API call. Using the asynchronous approach allows developers to handle events free of timeouts, but this isn't desired for dynamic options as it introduces delays and violates our stated goal of providing a crisp builder experience.
 
@@ -220,29 +220,29 @@ In [Bolt for JavaScript](/tools/bolt-js/), you can pass an `{ autoAcknowledge: f
 app.function('get-projects', { autoAcknowledge: false }, async ({ ack, complete }) => {
   try {
     complete({
-        outputs: {
-            options: [
-            {
-                text: {
-                    type: 'plain_text',
-                    text: 'Secret Squirrel Project',
-                },
-                value: 'p1',
+      outputs: {
+        options: [
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Secret Squirrel Project',
             },
-            {
-                text: {
-                    type: 'plain_text',
-                    text: 'Public Kangaroo Project',
-                },
-                value: 'p2',
+            value: 'p1',
+          },
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Public Kangaroo Project',
             },
-          ],
-        },
-      });
+            value: 'p2',
+          },
+        ],
+      },
+    });
   } finally {
     await ack();
   }
 });
 ```
 
-✨  **To learn more about the Bolt family of frameworks and tools**, check out our [Slack Developer Tools](/tools).
+✨ **To learn more about the Bolt family of frameworks and tools**, check out our [Slack Developer Tools](/tools).

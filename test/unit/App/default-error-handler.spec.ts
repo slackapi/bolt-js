@@ -1,6 +1,6 @@
 import assert from 'node:assert';
+import { beforeEach, describe, it, mock } from 'node:test';
 import { WebAPIHTTPError, WebAPIPlatformError, WebAPIRateLimitedError } from '@slack/web-api';
-import sinon from 'sinon';
 import type App from '../../../src/App';
 import type { ReceiverEvent } from '../../../src/types';
 import {
@@ -19,8 +19,8 @@ import {
 const overrides = mergeOverrides(
   withNoopAppMetadata(),
   withNoopWebClient(),
-  withMemoryStore(sinon.fake()),
-  withConversationContext(sinon.fake.returns(noopMiddleware)),
+  withMemoryStore(mock.fn()),
+  withConversationContext(mock.fn(() => noopMiddleware)),
 );
 
 describe('App default error handler', () => {
@@ -38,7 +38,7 @@ describe('App default error handler', () => {
     app = new MockApp({
       logger: fakeLogger,
       receiver: fakeReceiver,
-      authorize: sinon.fake.resolves({ botToken: '', botId: '' }),
+      authorize: mock.fn(() => Promise.resolve({ botToken: '', botId: '' })),
     });
   });
 
@@ -51,9 +51,9 @@ describe('App default error handler', () => {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
     } catch (thrown) {
-      assert.ok(fakeLogger.error.calledOnce);
-      assert.strictEqual(fakeLogger.error.firstCall.args[0], 'Slack API error: channel_not_found');
-      assert.strictEqual(fakeLogger.error.firstCall.args[1], thrown);
+      assert.strictEqual(fakeLogger.error.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.error.mock.calls[0].arguments[0], 'Slack API error: channel_not_found');
+      assert.strictEqual(fakeLogger.error.mock.calls[0].arguments[1], thrown);
     }
   });
 
@@ -66,9 +66,9 @@ describe('App default error handler', () => {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
     } catch (thrown) {
-      assert.ok(fakeLogger.error.calledOnce);
-      assert.strictEqual(fakeLogger.error.firstCall.args[0], 'Rate limited, retry after 30s');
-      assert.strictEqual(fakeLogger.error.firstCall.args[1], thrown);
+      assert.strictEqual(fakeLogger.error.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.error.mock.calls[0].arguments[0], 'Rate limited, retry after 30s');
+      assert.strictEqual(fakeLogger.error.mock.calls[0].arguments[1], thrown);
     }
   });
 
@@ -81,9 +81,9 @@ describe('App default error handler', () => {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
     } catch (thrown) {
-      assert.ok(fakeLogger.error.calledOnce);
-      assert.strictEqual(fakeLogger.error.firstCall.args[0], 'HTTP error 500: Internal Server Error');
-      assert.strictEqual(fakeLogger.error.firstCall.args[1], thrown);
+      assert.strictEqual(fakeLogger.error.mock.callCount(), 1);
+      assert.strictEqual(fakeLogger.error.mock.calls[0].arguments[0], 'HTTP error 500: Internal Server Error');
+      assert.strictEqual(fakeLogger.error.mock.calls[0].arguments[1], thrown);
     }
   });
 
@@ -96,8 +96,8 @@ describe('App default error handler', () => {
       await fakeReceiver.sendEvent(dummyReceiverEvent);
       assert.fail('should have thrown');
     } catch (_) {
-      assert.ok(fakeLogger.error.calledOnce);
-      const loggedArg = fakeLogger.error.firstCall.args[0];
+      assert.strictEqual(fakeLogger.error.mock.callCount(), 1);
+      const loggedArg = fakeLogger.error.mock.calls[0].arguments[0];
       assert.ok('code' in loggedArg);
       assert.strictEqual(loggedArg.message, 'something unexpected');
     }
