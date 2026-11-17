@@ -608,15 +608,15 @@ describe('HTTPReceiver', () => {
 
     describe('invalidRequestSignatureHandler', () => {
       it('should call the custom handler when signature verification fails', async () => {
-        const spy = sinon.spy();
-        const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
-        const fakeBuildNoBodyResponse = sinon.fake();
+        const spy = mock.fn();
+        const fakeParseAndVerify = mock.fn(() => Promise.reject(new Error('Signature mismatch')));
+        const fakeBuildNoBodyResponse = mock.fn();
 
         const overridesWithFakeVerify = mergeOverrides(overrides, {
           './HTTPModuleFunctions': {
             parseAndVerifyHTTPRequest: fakeParseAndVerify,
-            parseHTTPRequestBody: sinon.fake(),
-            isRawBodyError: sinon.fake.returns(false),
+            parseHTTPRequestBody: mock.fn(),
+            isRawBodyError: mock.fn(() => false),
             buildNoBodyResponse: fakeBuildNoBodyResponse,
             '@noCallThru': true,
           },
@@ -628,9 +628,9 @@ describe('HTTPReceiver', () => {
           logger: noopLogger,
           invalidRequestSignatureHandler: spy,
         });
-        assert.isNotNull(receiver);
+        assert.notStrictEqual(receiver, null);
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage) as unknown as IncomingMessage;
+        const fakeReq = mockInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/slack/events';
         fakeReq.method = 'POST';
         fakeReq.headers = {
@@ -639,33 +639,34 @@ describe('HTTPReceiver', () => {
         };
         (fakeReq as IncomingMessage & { rawBody?: string }).rawBody = '{"token":"test"}';
 
-        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeRes = mockInstance(ServerResponse) as unknown as ServerResponse;
 
         receiver.requestListener(fakeReq, fakeRes);
 
         // Wait for the async closure inside handleIncomingEvent to settle
         await new Promise((resolve) => setTimeout(resolve, 50));
 
-        assert(spy.calledOnce, 'invalidRequestSignatureHandler should be called once');
-        const args = spy.firstCall.args[0];
+        assert.strictEqual(spy.mock.callCount(), 1, 'invalidRequestSignatureHandler should be called once');
+        const args = spy.mock.calls[0].arguments[0];
         assert.equal(args.rawBody, '{"token":"test"}');
         assert.equal(args.signature, 'v0=bad');
         assert.equal(args.ts, 1234567890);
-        assert.isUndefined(
+        assert.strictEqual(
           (args as { logger?: unknown }).logger,
+          undefined,
           'logger should not be passed to the handler (parity with AwsLambdaReceiver)',
         );
       });
 
       it('should use the default noop handler when no custom handler is provided', async () => {
-        const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
-        const fakeBuildNoBodyResponse = sinon.fake();
+        const fakeParseAndVerify = mock.fn(() => Promise.reject(new Error('Signature mismatch')));
+        const fakeBuildNoBodyResponse = mock.fn();
 
         const overridesWithFakeVerify = mergeOverrides(overrides, {
           './HTTPModuleFunctions': {
             parseAndVerifyHTTPRequest: fakeParseAndVerify,
-            parseHTTPRequestBody: sinon.fake(),
-            isRawBodyError: sinon.fake.returns(false),
+            parseHTTPRequestBody: mock.fn(),
+            isRawBodyError: mock.fn(() => false),
             buildNoBodyResponse: fakeBuildNoBodyResponse,
             '@noCallThru': true,
           },
@@ -677,31 +678,31 @@ describe('HTTPReceiver', () => {
           logger: noopLogger,
         });
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage) as unknown as IncomingMessage;
+        const fakeReq = mockInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/slack/events';
         fakeReq.method = 'POST';
         fakeReq.headers = {};
 
-        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeRes = mockInstance(ServerResponse) as unknown as ServerResponse;
 
         // Should not throw even without a custom handler
         receiver.requestListener(fakeReq, fakeRes);
         await new Promise((resolve) => setTimeout(resolve, 50));
 
-        sinon.assert.calledOnce(fakeBuildNoBodyResponse);
-        sinon.assert.calledWith(fakeBuildNoBodyResponse, fakeRes, 401);
+        assert.strictEqual(fakeBuildNoBodyResponse.mock.callCount(), 1);
+        assert.deepStrictEqual(fakeBuildNoBodyResponse.mock.calls[0].arguments, [fakeRes, 401]);
       });
 
       it('should pass empty signature and zero ts when headers are missing', async () => {
-        const spy = sinon.spy();
-        const fakeParseAndVerify = sinon.fake.rejects(new Error('Signature mismatch'));
-        const fakeBuildNoBodyResponse = sinon.fake();
+        const spy = mock.fn();
+        const fakeParseAndVerify = mock.fn(() => Promise.reject(new Error('Signature mismatch')));
+        const fakeBuildNoBodyResponse = mock.fn();
 
         const overridesWithFakeVerify = mergeOverrides(overrides, {
           './HTTPModuleFunctions': {
             parseAndVerifyHTTPRequest: fakeParseAndVerify,
-            parseHTTPRequestBody: sinon.fake(),
-            isRawBodyError: sinon.fake.returns(false),
+            parseHTTPRequestBody: mock.fn(),
+            isRawBodyError: mock.fn(() => false),
             buildNoBodyResponse: fakeBuildNoBodyResponse,
             '@noCallThru': true,
           },
@@ -714,22 +715,22 @@ describe('HTTPReceiver', () => {
           invalidRequestSignatureHandler: spy,
         });
 
-        const fakeReq = sinon.createStubInstance(IncomingMessage) as unknown as IncomingMessage;
+        const fakeReq = mockInstance(IncomingMessage) as IncomingMessage;
         fakeReq.url = '/slack/events';
         fakeReq.method = 'POST';
         fakeReq.headers = {};
 
-        const fakeRes = sinon.createStubInstance(ServerResponse) as unknown as ServerResponse;
+        const fakeRes = mockInstance(ServerResponse) as unknown as ServerResponse;
 
         receiver.requestListener(fakeReq, fakeRes);
         await new Promise((resolve) => setTimeout(resolve, 50));
 
-        assert(spy.calledOnce);
-        const args = spy.firstCall.args[0];
+        assert.strictEqual(spy.mock.callCount(), 1);
+        const args = spy.mock.calls[0].arguments[0];
         assert.equal(args.rawBody, '');
         assert.equal(args.signature, '');
         assert.equal(args.ts, 0);
-        assert.isUndefined((args as { logger?: unknown }).logger);
+        assert.strictEqual((args as { logger?: unknown }).logger, undefined);
       });
     });
 
