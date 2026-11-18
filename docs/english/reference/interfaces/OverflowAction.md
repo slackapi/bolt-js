@@ -55,7 +55,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 ### confirm?
 
 ```ts
-optional confirm?: Confirmation;
+confirm?: Confirmation;
 ```
 
 Defined in: [src/types/actions/block-action.ts:189](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L189)
