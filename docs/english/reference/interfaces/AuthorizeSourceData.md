@@ -19,7 +19,7 @@ Authorization function inputs - authenticated data about an event for the author
 ### conversationId?
 
 ```ts
-optional conversationId?: string;
+conversationId?: string;
 ```
 
 Defined in: [src/App.ts:173](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L173)
@@ -59,7 +59,7 @@ Defined in: [src/App.ts:170](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### userId?
 
 ```ts
-optional userId?: string;
+userId?: string;
 ```
 
 Defined in: [src/App.ts:172](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L172)

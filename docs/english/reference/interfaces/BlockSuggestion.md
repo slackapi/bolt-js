@@ -49,7 +49,7 @@ Defined in: [src/types/options/index.ts:47](https://github.com/slackapi/bolt-js/
 ### channel?
 
 ```ts
-optional channel?: object;
+channel?: object;
 ```
 
 Defined in: [src/types/options/index.ts:58](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L58)
@@ -81,7 +81,7 @@ Defined in: [src/types/options/index.ts:68](https://github.com/slackapi/bolt-js/
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/options/index.ts:73](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L73)
@@ -103,7 +103,7 @@ name: string;
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/options/index.ts:72](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L72)
@@ -170,7 +170,7 @@ name: string;
 #### team\_id?
 
 ```ts
-optional team_id?: string;
+team_id?: string;
 ```
 
 ***
@@ -188,7 +188,7 @@ Defined in: [src/types/options/index.ts:49](https://github.com/slackapi/bolt-js/
 ### view?
 
 ```ts
-optional view?: ViewOutput;
+view?: ViewOutput;
 ```
 
 Defined in: [src/types/options/index.ts:70](https://github.com/slackapi/bolt-js/blob/main/src/types/options/index.ts#L70)

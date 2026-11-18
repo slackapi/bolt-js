@@ -41,7 +41,7 @@ Defined in: [src/types/actions/interactive-message.ts:35](https://github.com/sla
 ### attachment\_id?
 
 ```ts
-optional attachment_id?: string;
+attachment_id?: string;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:52](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L52)
@@ -83,7 +83,7 @@ name: string;
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:65](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L65)
@@ -105,7 +105,7 @@ name: string;
 ### is\_app\_unfurl?
 
 ```ts
-optional is_app_unfurl?: boolean;
+is_app_unfurl?: boolean;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:56](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L56)
@@ -115,7 +115,7 @@ Defined in: [src/types/actions/interactive-message.ts:56](https://github.com/sla
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:64](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L64)
@@ -125,7 +125,7 @@ Defined in: [src/types/actions/interactive-message.ts:64](https://github.com/sla
 ### message\_ts?
 
 ```ts
-optional message_ts?: string;
+message_ts?: string;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:59](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L59)
@@ -135,7 +135,7 @@ Defined in: [src/types/actions/interactive-message.ts:59](https://github.com/sla
 ### original\_message?
 
 ```ts
-optional original_message?: object;
+original_message?: object;
 ```
 
 Defined in: [src/types/actions/interactive-message.ts:61](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/interactive-message.ts#L61)
@@ -228,5 +228,5 @@ name: string;
 #### team\_id?
 
 ```ts
-optional team_id?: string;
+team_id?: string;
 ```

@@ -27,7 +27,7 @@ Defined in: [src/types/receiver.ts:7](https://github.com/slackapi/bolt-js/blob/m
 ### customProperties?
 
 ```ts
-optional customProperties?: StringIndexed;
+customProperties?: StringIndexed;
 ```
 
 Defined in: [src/types/receiver.ts:18](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L18)
@@ -37,7 +37,7 @@ Defined in: [src/types/receiver.ts:18](https://github.com/slackapi/bolt-js/blob/
 ### retryNum?
 
 ```ts
-optional retryNum?: number;
+retryNum?: number;
 ```
 
 Defined in: [src/types/receiver.ts:11](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L11)
@@ -47,7 +47,7 @@ Defined in: [src/types/receiver.ts:11](https://github.com/slackapi/bolt-js/blob/
 ### retryReason?
 
 ```ts
-optional retryReason?: string;
+retryReason?: string;
 ```
 
 Defined in: [src/types/receiver.ts:15](https://github.com/slackapi/bolt-js/blob/main/src/types/receiver.ts#L15)

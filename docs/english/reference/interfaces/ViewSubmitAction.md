@@ -21,7 +21,7 @@ Defined in: [src/types/view/index.ts:61](https://github.com/slackapi/bolt-js/blo
 ### enterprise?
 
 ```ts
-optional enterprise?: object;
+enterprise?: object;
 ```
 
 Defined in: [src/types/view/index.ts:66](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L66)
@@ -43,7 +43,7 @@ name: string;
 ### is\_enterprise\_install?
 
 ```ts
-optional is_enterprise_install?: boolean;
+is_enterprise_install?: boolean;
 ```
 
 Defined in: [src/types/view/index.ts:65](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L65)
@@ -53,7 +53,7 @@ Defined in: [src/types/view/index.ts:65](https://github.com/slackapi/bolt-js/blo
 ### response\_urls?
 
 ```ts
-optional response_urls?: ViewResponseUrl[];
+response_urls?: ViewResponseUrl[];
 ```
 
 Defined in: [src/types/view/index.ts:70](https://github.com/slackapi/bolt-js/blob/main/src/types/view/index.ts#L70)
@@ -130,7 +130,7 @@ name: string;
 #### team\_id?
 
 ```ts
-optional team_id?: string;
+team_id?: string;
 ```
 
 ***

@@ -9,7 +9,7 @@ App initialization options
 ### appToken?
 
 ```ts
-optional appToken?: string;
+appToken?: string;
 ```
 
 Defined in: [src/App.ts:138](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L138)
@@ -19,7 +19,7 @@ Defined in: [src/App.ts:138](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### attachFunctionToken?
 
 ```ts
-optional attachFunctionToken?: boolean;
+attachFunctionToken?: boolean;
 ```
 
 Defined in: [src/App.ts:157](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L157)
@@ -29,7 +29,7 @@ Defined in: [src/App.ts:157](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### authorize?
 
 ```ts
-optional authorize?: Authorize<boolean>;
+authorize?: Authorize<boolean>;
 ```
 
 Defined in: [src/App.ts:141](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L141)
@@ -39,7 +39,7 @@ Defined in: [src/App.ts:141](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### botId?
 
 ```ts
-optional botId?: string;
+botId?: string;
 ```
 
 Defined in: [src/App.ts:139](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L139)
@@ -49,7 +49,7 @@ Defined in: [src/App.ts:139](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### botUserId?
 
 ```ts
-optional botUserId?: string;
+botUserId?: string;
 ```
 
 Defined in: [src/App.ts:140](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L140)
@@ -59,7 +59,7 @@ Defined in: [src/App.ts:140](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### clientId?
 
 ```ts
-optional clientId?: string;
+clientId?: string;
 ```
 
 Defined in: [src/App.ts:129](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L129)
@@ -69,7 +69,7 @@ Defined in: [src/App.ts:129](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### clientOptions?
 
 ```ts
-optional clientOptions?: WebClientOptions;
+clientOptions?: WebClientOptions;
 ```
 
 Defined in: [src/App.ts:151](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L151)
@@ -83,7 +83,7 @@ See [https://docs.slack.dev/tools/node-slack-sdk/reference/web-api/interfaces/We
 ### clientSecret?
 
 ```ts
-optional clientSecret?: string;
+clientSecret?: string;
 ```
 
 Defined in: [src/App.ts:130](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L130)
@@ -93,7 +93,7 @@ Defined in: [src/App.ts:130](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### convoStore?
 
 ```ts
-optional convoStore?: false | ConversationStore<any>;
+convoStore?: false | ConversationStore<any>;
 ```
 
 Defined in: [src/App.ts:136](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L136)
@@ -103,7 +103,7 @@ Defined in: [src/App.ts:136](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### customRoutes?
 
 ```ts
-optional customRoutes?: CustomRoute[];
+customRoutes?: CustomRoute[];
 ```
 
 Defined in: [src/App.ts:126](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L126)
@@ -113,7 +113,7 @@ Defined in: [src/App.ts:126](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### deferInitialization?
 
 ```ts
-optional deferInitialization?: boolean;
+deferInitialization?: boolean;
 ```
 
 Defined in: [src/App.ts:155](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L155)
@@ -123,7 +123,7 @@ Defined in: [src/App.ts:155](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### developerMode?
 
 ```ts
-optional developerMode?: boolean;
+developerMode?: boolean;
 ```
 
 Defined in: [src/App.ts:153](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L153)
@@ -133,7 +133,7 @@ Defined in: [src/App.ts:153](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### endpoints?
 
 ```ts
-optional endpoints?: string | string[];
+endpoints?: string | string[];
 ```
 
 Defined in: [src/App.ts:124](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L124)
@@ -143,7 +143,7 @@ Defined in: [src/App.ts:124](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### extendedErrorHandler?
 
 ```ts
-optional extendedErrorHandler?: boolean;
+extendedErrorHandler?: boolean;
 ```
 
 Defined in: [src/App.ts:156](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L156)
@@ -153,7 +153,7 @@ Defined in: [src/App.ts:156](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### ignoreSelf?
 
 ```ts
-optional ignoreSelf?: boolean;
+ignoreSelf?: boolean;
 ```
 
 Defined in: [src/App.ts:145](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L145)
@@ -163,7 +163,7 @@ Defined in: [src/App.ts:145](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### installationStore?
 
 ```ts
-optional installationStore?: InstallationStore;
+installationStore?: InstallationStore;
 ```
 
 Defined in: [src/App.ts:133](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L133)
@@ -173,7 +173,7 @@ Defined in: [src/App.ts:133](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### installerOptions?
 
 ```ts
-optional installerOptions?: HTTPReceiverInstallerOptions;
+installerOptions?: HTTPReceiverInstallerOptions;
 ```
 
 Defined in: [src/App.ts:135](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L135)
@@ -183,7 +183,7 @@ Defined in: [src/App.ts:135](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### logger?
 
 ```ts
-optional logger?: Logger;
+logger?: Logger;
 ```
 
 Defined in: [src/App.ts:143](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L143)
@@ -193,7 +193,7 @@ Defined in: [src/App.ts:143](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### logLevel?
 
 ```ts
-optional logLevel?: LogLevel;
+logLevel?: LogLevel;
 ```
 
 Defined in: [src/App.ts:144](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L144)
@@ -203,7 +203,7 @@ Defined in: [src/App.ts:144](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### port?
 
 ```ts
-optional port?: number;
+port?: number;
 ```
 
 Defined in: [src/App.ts:125](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L125)
@@ -213,7 +213,7 @@ Defined in: [src/App.ts:125](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### processBeforeResponse?
 
 ```ts
-optional processBeforeResponse?: boolean;
+processBeforeResponse?: boolean;
 ```
 
 Defined in: [src/App.ts:127](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L127)
@@ -223,7 +223,7 @@ Defined in: [src/App.ts:127](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### receiver?
 
 ```ts
-optional receiver?: Receiver;
+receiver?: Receiver;
 ```
 
 Defined in: [src/App.ts:142](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L142)
@@ -233,7 +233,7 @@ Defined in: [src/App.ts:142](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### redirectUri?
 
 ```ts
-optional redirectUri?: string;
+redirectUri?: string;
 ```
 
 Defined in: [src/App.ts:132](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L132)
@@ -243,7 +243,7 @@ Defined in: [src/App.ts:132](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### scopes?
 
 ```ts
-optional scopes?: string | string[];
+scopes?: string | string[];
 ```
 
 Defined in: [src/App.ts:134](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L134)
@@ -253,7 +253,7 @@ Defined in: [src/App.ts:134](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### signatureVerification?
 
 ```ts
-optional signatureVerification?: boolean;
+signatureVerification?: boolean;
 ```
 
 Defined in: [src/App.ts:128](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L128)
@@ -263,7 +263,7 @@ Defined in: [src/App.ts:128](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### signingSecret?
 
 ```ts
-optional signingSecret?: string;
+signingSecret?: string;
 ```
 
 Defined in: [src/App.ts:123](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L123)
@@ -273,7 +273,7 @@ Defined in: [src/App.ts:123](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### socketMode?
 
 ```ts
-optional socketMode?: boolean;
+socketMode?: boolean;
 ```
 
 Defined in: [src/App.ts:152](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L152)
@@ -283,7 +283,7 @@ Defined in: [src/App.ts:152](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### stateSecret?
 
 ```ts
-optional stateSecret?: string;
+stateSecret?: string;
 ```
 
 Defined in: [src/App.ts:131](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L131)
@@ -293,7 +293,7 @@ Defined in: [src/App.ts:131](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### token?
 
 ```ts
-optional token?: string;
+token?: string;
 ```
 
 Defined in: [src/App.ts:137](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L137)
@@ -303,7 +303,7 @@ Defined in: [src/App.ts:137](https://github.com/slackapi/bolt-js/blob/main/src/A
 ### tokenVerificationEnabled?
 
 ```ts
-optional tokenVerificationEnabled?: boolean;
+tokenVerificationEnabled?: boolean;
 ```
 
 Defined in: [src/App.ts:154](https://github.com/slackapi/bolt-js/blob/main/src/App.ts#L154)
