@@ -98,6 +98,7 @@ export interface HTTPReceiverOptions {
   unhandledRequestHandler?: (args: httpFunc.ReceiverUnhandledRequestHandlerArgs) => void;
   unhandledRequestTimeoutMillis?: number;
   bodyLimit?: number | string;
+  invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
 }
 
 // All the available argument for OAuth flow enabled apps
@@ -138,6 +139,8 @@ export default class HTTPReceiver implements Receiver {
   private processBeforeResponse: boolean;
 
   private signatureVerification: boolean;
+
+  private invalidRequestSignatureHandler?: (args: httpFunc.ReceiverInvalidRequestSignatureHandlerArgs) => void;
 
   private app?: App;
 
@@ -195,6 +198,7 @@ export default class HTTPReceiver implements Receiver {
     unhandledRequestHandler = httpFunc.defaultUnhandledRequestHandler,
     unhandledRequestTimeoutMillis = 3001,
     bodyLimit = httpFunc.defaultBodyLimit,
+    invalidRequestSignatureHandler = undefined,
   }: HTTPReceiverOptions) {
     verifySigningSecret(signingSecret, signatureVerification);
     // Initialize instance variables, substituting defaults for each value
@@ -261,6 +265,7 @@ export default class HTTPReceiver implements Receiver {
     this.processEventErrorHandler = processEventErrorHandler;
     this.unhandledRequestHandler = unhandledRequestHandler;
     this.unhandledRequestTimeoutMillis = unhandledRequestTimeoutMillis;
+    this.invalidRequestSignatureHandler = invalidRequestSignatureHandler;
 
     // Assign the requestListener property by binding the unboundRequestListener to this instance
     this.requestListener = this.unboundRequestListener.bind(this);
@@ -449,6 +454,7 @@ export default class HTTPReceiver implements Receiver {
             enabled: this.signatureVerification,
             signingSecret: this.signingSecret,
             bodyLimit: this.bodyLimit,
+            invalidRequestSignatureHandler: this.invalidRequestSignatureHandler,
           },
           req,
         );
