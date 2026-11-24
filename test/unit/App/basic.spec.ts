@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { describe, it, mock } from 'node:test';
+import { afterEach, beforeEach, describe, it, mock } from 'node:test';
 import { LogLevel } from '@slack/logger';
 import { type CodedError, ErrorCode } from '../../../src/errors';
 import SocketModeReceiver from '../../../src/receivers/SocketModeReceiver';
@@ -302,6 +302,84 @@ describe('App basic features', () => {
       assert.strictEqual(token, undefined, 'token should be undefined');
       assert.strictEqual(clientOptions.slackApiUrl, options.slackApiUrl);
       assert.strictEqual(LogLevel.ERROR, options.logLevel, 'override logLevel');
+    });
+    describe('with SLACK_API_URL environment variable', () => {
+      let originalSlackApiUrl: string | undefined;
+      beforeEach(() => {
+        originalSlackApiUrl = process.env.SLACK_API_URL;
+      });
+      afterEach(() => {
+        if (originalSlackApiUrl === undefined) {
+          delete process.env.SLACK_API_URL;
+        } else {
+          process.env.SLACK_API_URL = originalSlackApiUrl;
+        }
+      });
+
+      function createWebClientCapture() {
+        const fakeConstructor: MockFn = mock.fn();
+        const overrides = mergeOverrides(withNoopAppMetadata(), {
+          '@slack/web-api': {
+            WebClient: class {
+              // biome-ignore lint/suspicious/noExplicitAny: test overrides can be anything
+              public constructor(...args: any[]) {
+                fakeConstructor(...args);
+              }
+            },
+          },
+        });
+        return { fakeConstructor, MockApp: importApp(overrides) };
+      }
+
+      it('should use SLACK_API_URL when clientOptions is omitted', async () => {
+        process.env.SLACK_API_URL = 'https://qa.slack.com/api/';
+        const { fakeConstructor, MockApp } = createWebClientCapture();
+        new MockApp({ authorize: noop, signingSecret: 'test-signing-secret', logLevel: LogLevel.ERROR });
+        const lastCall = fakeConstructor.mock.calls.at(-1);
+        assert.ok(lastCall);
+        const [, options] = lastCall.arguments;
+        assert.strictEqual(options.slackApiUrl, 'https://qa.slack.com/api/');
+      });
+
+      it('should use SLACK_API_URL when clientOptions has no slackApiUrl', async () => {
+        process.env.SLACK_API_URL = 'https://qa.slack.com/api/';
+        const { fakeConstructor, MockApp } = createWebClientCapture();
+        new MockApp({
+          clientOptions: {},
+          authorize: noop,
+          signingSecret: 'test-signing-secret',
+          logLevel: LogLevel.ERROR,
+        });
+        const lastCall = fakeConstructor.mock.calls.at(-1);
+        assert.ok(lastCall);
+        const [, options] = lastCall.arguments;
+        assert.strictEqual(options.slackApiUrl, 'https://qa.slack.com/api/');
+      });
+
+      it('should prefer explicit clientOptions.slackApiUrl over SLACK_API_URL', async () => {
+        process.env.SLACK_API_URL = 'https://qa.slack.com/api/';
+        const { fakeConstructor, MockApp } = createWebClientCapture();
+        new MockApp({
+          clientOptions: { slackApiUrl: 'https://custom.slack.com/api/' },
+          authorize: noop,
+          signingSecret: 'test-signing-secret',
+          logLevel: LogLevel.ERROR,
+        });
+        const lastCall = fakeConstructor.mock.calls.at(-1);
+        assert.ok(lastCall);
+        const [, options] = lastCall.arguments;
+        assert.strictEqual(options.slackApiUrl, 'https://custom.slack.com/api/');
+      });
+
+      it('should not set slackApiUrl when SLACK_API_URL is empty', async () => {
+        process.env.SLACK_API_URL = '';
+        const { fakeConstructor, MockApp } = createWebClientCapture();
+        new MockApp({ authorize: noop, signingSecret: 'test-signing-secret', logLevel: LogLevel.ERROR });
+        const lastCall = fakeConstructor.mock.calls.at(-1);
+        assert.ok(lastCall);
+        const [, options] = lastCall.arguments;
+        assert.strictEqual(options.slackApiUrl, undefined);
+      });
     });
     describe('with auth.test failure', () => {
       const fakeConstructor: MockFn = mock.fn();

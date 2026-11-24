@@ -354,6 +354,9 @@ export default class App<AppCustomContext extends StringIndexed = StringIndexed>
 
     /* ------------------------ Set client options ------------------------*/
     this.clientOptions = clientOptions !== undefined ? clientOptions : {};
+    if (this.clientOptions.slackApiUrl === undefined && process.env.SLACK_API_URL) {
+      this.clientOptions.slackApiUrl = process.env.SLACK_API_URL;
+    }
     if (logLevel !== undefined && logger === undefined) {
       // only logLevel is passed
       this.clientOptions.logLevel = logLevel;
