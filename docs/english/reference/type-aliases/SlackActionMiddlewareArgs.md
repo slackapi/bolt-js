@@ -5,7 +5,7 @@ sidebar_label: "SlackActionMiddlewareArgs"
 # SlackActionMiddlewareArgs\<Action\>
 
 ```ts
-type SlackActionMiddlewareArgs<Action> = object & Action extends Exclude<SlackAction, DialogSubmitAction> ? object : unknown;
+type SlackActionMiddlewareArgs<Action> = object & (Action extends Exclude<SlackAction, DialogSubmitAction> ? object : unknown);
 ```
 
 Defined in: [src/types/actions/index.ts:46](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/index.ts#L46)
@@ -16,6 +16,12 @@ message actions, dialogs, or legacy interactive messages.
 The type parameter `Action` represents the entire JSON-encoded request body from Slack. The generic type
 `BlockAction<ElementAction>` can be used to create a type for this parameter based on an element's action type. In
 this case `ElementAction` must extend `BasicElementAction`.
+
+## Type Parameters
+
+### Action
+
+`Action` *extends* [`SlackAction`](SlackAction.md) = [`SlackAction`](SlackAction.md)
 
 ## Type Declaration
 
@@ -40,19 +46,19 @@ body: Action;
 ### complete?
 
 ```ts
-optional complete?: FunctionCompleteFn;
+complete?: FunctionCompleteFn;
 ```
 
 ### fail?
 
 ```ts
-optional fail?: FunctionFailFn;
+fail?: FunctionFailFn;
 ```
 
 ### inputs?
 
 ```ts
-optional inputs?: FunctionInputs;
+inputs?: FunctionInputs;
 ```
 
 ### payload
@@ -66,9 +72,3 @@ payload: Action extends BlockAction<infer ElementAction> ? ElementAction : Actio
 ```ts
 respond: RespondFn;
 ```
-
-## Type Parameters
-
-### Action
-
-`Action` *extends* [`SlackAction`](SlackAction.md) = [`SlackAction`](SlackAction.md)

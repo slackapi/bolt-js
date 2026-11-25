@@ -7,7 +7,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:242](https://github.com/slacka
 ### bodyLimit?
 
 ```ts
-optional bodyLimit?: string | number;
+bodyLimit?: string | number;
 ```
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:247](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L247)
@@ -17,7 +17,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:247](https://github.com/slacka
 ### enabled?
 
 ```ts
-optional enabled?: boolean;
+enabled?: boolean;
 ```
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:243](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L243)
@@ -27,7 +27,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:243](https://github.com/slacka
 ### logger?
 
 ```ts
-optional logger?: Logger;
+logger?: Logger;
 ```
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:246](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L246)
@@ -37,7 +37,7 @@ Defined in: [src/receivers/HTTPModuleFunctions.ts:246](https://github.com/slacka
 ### nowMilliseconds?
 
 ```ts
-optional nowMilliseconds?: () => number;
+nowMilliseconds?: () => number;
 ```
 
 Defined in: [src/receivers/HTTPModuleFunctions.ts:245](https://github.com/slackapi/bolt-js/blob/main/src/receivers/HTTPModuleFunctions.ts#L245)

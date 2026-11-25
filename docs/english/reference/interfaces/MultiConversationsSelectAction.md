@@ -55,7 +55,7 @@ Defined in: [src/types/actions/block-action.ts:41](https://github.com/slackapi/b
 ### confirm?
 
 ```ts
-optional confirm?: Confirmation;
+confirm?: Confirmation;
 ```
 
 Defined in: [src/types/actions/block-action.ts:136](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L136)
@@ -65,7 +65,7 @@ Defined in: [src/types/actions/block-action.ts:136](https://github.com/slackapi/
 ### initial\_conversations?
 
 ```ts
-optional initial_conversations?: string[];
+initial_conversations?: string[];
 ```
 
 Defined in: [src/types/actions/block-action.ts:134](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L134)
@@ -75,7 +75,7 @@ Defined in: [src/types/actions/block-action.ts:134](https://github.com/slackapi/
 ### placeholder?
 
 ```ts
-optional placeholder?: PlainTextElement;
+placeholder?: PlainTextElement;
 ```
 
 Defined in: [src/types/actions/block-action.ts:135](https://github.com/slackapi/bolt-js/blob/main/src/types/actions/block-action.ts#L135)
