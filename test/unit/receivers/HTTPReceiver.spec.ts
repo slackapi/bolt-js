@@ -606,6 +606,134 @@ describe('HTTPReceiver', () => {
       });
     });
 
+    describe('invalidRequestSignatureHandler', () => {
+      it('should call the custom handler when signature verification fails', async () => {
+        const spy = mock.fn();
+        const fakeParseAndVerify = mock.fn(() => Promise.reject(new Error('Signature mismatch')));
+        const fakeBuildNoBodyResponse = mock.fn();
+
+        const overridesWithFakeVerify = mergeOverrides(overrides, {
+          './HTTPModuleFunctions': {
+            parseAndVerifyHTTPRequest: fakeParseAndVerify,
+            parseHTTPRequestBody: mock.fn(),
+            isRawBodyError: mock.fn(() => false),
+            buildNoBodyResponse: fakeBuildNoBodyResponse,
+            '@noCallThru': true,
+          },
+        });
+
+        const HTTPReceiver = importHTTPReceiver(overridesWithFakeVerify);
+        const receiver = new HTTPReceiver({
+          signingSecret: 'secret',
+          logger: noopLogger,
+          invalidRequestSignatureHandler: spy,
+        });
+        assert.notStrictEqual(receiver, null);
+
+        const fakeReq = mockInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        fakeReq.headers = {
+          'x-slack-signature': 'v0=bad',
+          'x-slack-request-timestamp': '1234567890',
+        };
+        (fakeReq as IncomingMessage & { rawBody?: string }).rawBody = '{"token":"test"}';
+
+        const fakeRes = mockInstance(ServerResponse) as unknown as ServerResponse;
+
+        receiver.requestListener(fakeReq, fakeRes);
+
+        // Wait for the async closure inside handleIncomingEvent to settle
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        assert.strictEqual(spy.mock.callCount(), 1, 'invalidRequestSignatureHandler should be called once');
+        const args = spy.mock.calls[0].arguments[0];
+        assert.equal(args.rawBody, '{"token":"test"}');
+        assert.equal(args.signature, 'v0=bad');
+        assert.equal(args.ts, 1234567890);
+        assert.strictEqual(
+          (args as { logger?: unknown }).logger,
+          undefined,
+          'logger should not be passed to the handler (parity with AwsLambdaReceiver)',
+        );
+      });
+
+      it('should use the default noop handler when no custom handler is provided', async () => {
+        const fakeParseAndVerify = mock.fn(() => Promise.reject(new Error('Signature mismatch')));
+        const fakeBuildNoBodyResponse = mock.fn();
+
+        const overridesWithFakeVerify = mergeOverrides(overrides, {
+          './HTTPModuleFunctions': {
+            parseAndVerifyHTTPRequest: fakeParseAndVerify,
+            parseHTTPRequestBody: mock.fn(),
+            isRawBodyError: mock.fn(() => false),
+            buildNoBodyResponse: fakeBuildNoBodyResponse,
+            '@noCallThru': true,
+          },
+        });
+
+        const HTTPReceiver = importHTTPReceiver(overridesWithFakeVerify);
+        const receiver = new HTTPReceiver({
+          signingSecret: 'secret',
+          logger: noopLogger,
+        });
+
+        const fakeReq = mockInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        fakeReq.headers = {};
+
+        const fakeRes = mockInstance(ServerResponse) as unknown as ServerResponse;
+
+        // Should not throw even without a custom handler
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        assert.strictEqual(fakeBuildNoBodyResponse.mock.callCount(), 1);
+        assert.deepStrictEqual(fakeBuildNoBodyResponse.mock.calls[0].arguments, [fakeRes, 401]);
+      });
+
+      it('should pass empty signature and zero ts when headers are missing', async () => {
+        const spy = mock.fn();
+        const fakeParseAndVerify = mock.fn(() => Promise.reject(new Error('Signature mismatch')));
+        const fakeBuildNoBodyResponse = mock.fn();
+
+        const overridesWithFakeVerify = mergeOverrides(overrides, {
+          './HTTPModuleFunctions': {
+            parseAndVerifyHTTPRequest: fakeParseAndVerify,
+            parseHTTPRequestBody: mock.fn(),
+            isRawBodyError: mock.fn(() => false),
+            buildNoBodyResponse: fakeBuildNoBodyResponse,
+            '@noCallThru': true,
+          },
+        });
+
+        const HTTPReceiver = importHTTPReceiver(overridesWithFakeVerify);
+        const receiver = new HTTPReceiver({
+          signingSecret: 'secret',
+          logger: noopLogger,
+          invalidRequestSignatureHandler: spy,
+        });
+
+        const fakeReq = mockInstance(IncomingMessage) as IncomingMessage;
+        fakeReq.url = '/slack/events';
+        fakeReq.method = 'POST';
+        fakeReq.headers = {};
+
+        const fakeRes = mockInstance(ServerResponse) as unknown as ServerResponse;
+
+        receiver.requestListener(fakeReq, fakeRes);
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        assert.strictEqual(spy.mock.callCount(), 1);
+        const args = spy.mock.calls[0].arguments[0];
+        assert.equal(args.rawBody, '');
+        assert.equal(args.signature, '');
+        assert.equal(args.ts, 0);
+        assert.strictEqual((args as { logger?: unknown }).logger, undefined);
+      });
+    });
+
     it("should throw if request doesn't match install path, redirect URI path, or custom routes", async () => {
       const installProviderStub = mockInstance(InstallProvider);
       const HTTPReceiver = importHTTPReceiver(overrides);
